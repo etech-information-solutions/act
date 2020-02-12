@@ -1,0 +1,145 @@
+﻿@model PagingExtension
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Core.Services;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ViewName = "_Roles";
+
+    UserModel user = User.Get();
+}
+
+
+@Html.Partial( "_Notification" )
+
+@{
+    Int32 count = Model.Start;
+    List<Role> items = ( List<Role> ) Model.Items;
+
+    UserRoleService urservice = new UserRoleService();
+}
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Roles available matching your search criteria.
+    </div>
+}
+
+<p>
+    @Html.ActionLink( "Add Role", "AddRole", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Role?", @data_edit = "1", @data_id = 0, @data_target = "#roles" } )
+    <span class="loader"></span>
+</p>
+
+<table id="roles-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#roles-table_wrapper" data-starting-point=".ap-tabs ul">
+
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="Name" data-column="Name">
+                Name
+            </th>
+            <th data-name="Type" data-column="Type">
+                Type
+            </th>
+            <th data-name="DashBoard">
+                DashBoard
+            </th>
+            <th data-name="Administration">
+                Administration
+            </th>
+            <th data-name="Finance">
+                Finance
+            </th>
+            <th data-name="Client">
+                Clients
+            </th>
+            <th data-name="Customer">
+                Customers
+            </th>
+            <th data-name="Product">
+                Products
+            </th>
+            <th data-name="Pallet">
+                Pallets
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( Role item in items )
+            {
+                RoleType type = ( RoleType ) item.Type;
+
+                int users = urservice.Count( item.Id );
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.Name
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Role">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+
+                        <a rel="tipsyW" title="There are @users @item.Name (s) in the system" class="right counter-tip">
+                            @users
+                        </a>
+                    </td>
+                    <td style="width: 10%;">
+                        @type.GetDisplayText()
+                    </td>
+                    <td class="@( ( item.DashBoard ? "light-green-bg" : "") )">
+                        @item.DashBoard
+                    </td>
+                    <td class="@( ( item.Administration ? "light-green-bg" : "") )">
+                        @item.Administration
+                    </td>
+                    <td class="@( ( item.Finance ? "light-green-bg" : "") )">
+                        @item.Finance
+                    </td>
+                    <td class="@( ( item.Client ? "light-green-bg" : "") )">
+                        @item.Client
+                    </td>
+                    <td class="@( ( item.Customer ? "light-green-bg" : "") )">
+                        @item.Customer
+                    </td>
+                    <td class="@( ( item.Product ? "light-green-bg" : "") )">
+                        @item.Product
+                    </td>
+                    <td class="@( ( item.Pallet ? "light-green-bg" : "") )">
+                        @item.Pallet
+                    </td>
+                    <td width="15%">
+                        @Html.ActionLink( "Details", "RoleDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( "Edit", "EditRole", new { id = item.Id, returnView = "Roles" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink( "Delete", "DeleteRole", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#roles", @rel = "tipsyE", @title = "Delete this item?" } )
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_RoleCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
+
+@Html.Partial( "_Paging" )

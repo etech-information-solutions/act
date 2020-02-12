@@ -1,0 +1,76 @@
+﻿@model ACT.UI.Models.BankViewModel
+
+@using ACT.Data.Models
+@using ACT.Core.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Add Bank";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "AddBank", "Administration", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#banks", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content( "~/images/add.png" )" />
+            <span>Add Bank</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="edit-label">
+                @Html.LabelFor( model => model.Name )
+            </div>
+            <div class="edit-field">
+                @Html.TextBoxFor( model => model.Name, new { @placeholder = "Enter Bank Name" } )
+                @Html.ValidationMessageFor( model => model.Name )
+            </div>
+
+            <div class="edit-label">
+                @Html.LabelFor( model => model.Description )
+            </div>
+            <div class="edit-field">
+                @Html.TextBoxFor( model => model.Description, new { @placeholder = "Enter Bank Description" } )
+                @Html.ValidationMessageFor( model => model.Description )
+            </div>
+
+            <div class="edit-label">
+                @Html.LabelFor( model => model.Code )
+            </div>
+            <div class="edit-field">
+                @Html.TextBoxFor( model => model.Code, new { @placeholder = "Enter Default Branch Code" } )
+                @Html.ValidationMessageFor( model => model.Code )
+            </div>
+
+            <div class="edit-label">
+                @Html.LabelFor( model => model.Status )
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.Status )
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-refresh="1" data-target="#banks">Cancel</a>
+            </p>
+
+        </div>
+
+    </div>
+}

@@ -1,0 +1,227 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_PSPs";
+}
+
+
+@Html.Partial( "_Notification" )
+
+
+@{
+    UserModel user = User.Get();
+
+    Int32 count = Model.Start;
+    List<PSPCustomModel> items = ( List<PSPCustomModel> ) Model.Items;
+}
+
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no PSPs  available matching your search criteria.
+    </div>
+}
+
+@if ( user.IsAdmin )
+{
+    <p>
+        @Html.ActionLink( "Add PSP", "AddPSP", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new PSP?", @data_edit = "1", @data_id = 0, @data_target = "#psps" } )
+        <span class="loader"></span>
+    </p>
+}
+
+
+<table id="psps-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#psps-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="CompanyName" data-column="CompanyName">
+                Company Name
+            </th>
+            <th data-name="CompanyRegistrationNumber" data-column="CompanyRegistrationNumber">
+                Reg #
+            </th>
+            <th data-name="VATNumber" data-column="VATNumber">
+                VAT #
+            </th>
+            <th data-name="ContactPerson" data-column="ContactPerson">
+                Contact Person
+            </th>
+            <th data-name="ServiceRequired" data-column="ServiceRequired">
+                Service Required
+            </th>
+            <th data-name="Status" data-column="Status">
+                Status
+            </th>
+            <th data-name="UserCount">
+                Users
+            </th>
+            <th data-name="ClientCount">
+                Clients
+            </th>
+            <th data-name="ProductCount">
+                Products
+            </th>
+            <th data-name="InvoiceCount">
+                Invoices
+            </th>
+            <th data-name="BudgetCount">
+                Budget
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                PSPClientStatus status = ( PSPClientStatus ) item.Status;
+                ServiceType serviceType = ( ServiceType ) item.ServiceRequired;
+
+                String enable = status == PSPClientStatus.Verified ? "Disable" : "Enable";
+                String active = status == PSPClientStatus.Verified ? "active" : status == PSPClientStatus.Unverified ? "pending" : "inactive";
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td style="width: 15%;">
+                        @item.CompanyName
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="PSP">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.CompanyRegistrationNumber
+                    </td>
+                    <td>
+                        @item.VATNumber
+                    </td>
+                    <td>
+                        @item.ContactPerson <br />
+                        <i>
+                            <a href="mailto:@item.Email">@item.Email</a>/
+                            <a href="mailto:@item.AdminEmail">@item.AdminEmail</a>
+                        </i>
+                        <br />
+                        <i>@item.ContactNumber</i>
+                    </td>
+                    <td style="width: 15%;">
+                        @serviceType.GetDisplayText()
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+                    </td>
+                    <td>
+                        @if ( item.UserCount > 0 )
+                        {
+                            @Html.ActionLink( item.UserCount.ToString(), "PSPUsers", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        }
+                    </td>
+                    <td>
+                        @if ( item.ClientCount > 0 )
+                        {
+                            @Html.ActionLink( item.ClientCount.ToString(), "PSPClients", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        }
+                    </td>
+                    <td>
+                        @if ( item.ProductCount > 0 )
+                        {
+                            @Html.ActionLink( item.ProductCount.ToString(), "PSPProducts", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        }
+                    </td>
+                    <td>
+                        @if ( item.InvoiceCount > 0 )
+                        {
+                            @Html.ActionLink( item.InvoiceCount.ToString(), "PSPInvoices", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        }
+                    </td>
+                    <td>
+                        @if ( item.BudgetCount > 0 )
+                        {
+                            @Html.ActionLink( item.BudgetCount.ToString(), "PSPBudgets", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        }
+                    </td>
+                    <td width="13%" style="text-align: center;">
+
+                        @if ( status == PSPClientStatus.Unverified && user.IsAdmin )
+                        {
+                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                                @Html.ActionLink( "Approve", "ApprovePSP", new { id = item.Id, returnView = "PSPs" }, new { @class = "approve", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                                @Html.ActionLink( "Decline", "DeclinePSP", new { id = item.Id, returnView = "PSPs" }, new { @class = "decline", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            </div>
+                        }
+
+                        @if ( status != PSPClientStatus.Unverified )
+                        {
+                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                                @Html.ActionLink( "Details", "PSPDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                                @Html.ActionLink( "Edit", "EditPSP", new { id = item.Id, returnView = "PSPs" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            </div>
+                        }
+
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                            @if ( item.Documents != null && item.Documents.Any( s => s.Status == ( Int32 ) Status.Active ) )
+                            {
+                                <a class="docs" data-sticky-one="1" data-target="#supporting-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Supporting Documents">
+                                    Docs
+                                </a>
+                                <div id="supporting-@item.Id-docs" class="none">
+                                    <ul class="list">
+                                        @foreach ( var d in item.Documents.Where( s => s.Status == ( Int32 ) Status.Active ) )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )" target="_blank">
+                                                    @d.Name (@d.Type)
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+
+                            @if ( status != PSPClientStatus.Unverified && user.IsAdmin )
+                            {
+                                @Html.ActionLink( "Config", "PSPConfig", new { id = item.Id, returnView = "PSPs" }, new { @class = "setting", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            }
+
+                        </div>
+
+                        @if ( status == PSPClientStatus.Verified || status == PSPClientStatus.Inactive )
+                        {
+                            @Html.ActionLink( enable, "DeletePSP", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#psps", @rel = "tipsyE", @title = enable + " this item?" } )
+                        }
+
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_PSPCustomSearch", new ACT.Core.Models.CustomSearchModel( "PSP" ) )*@
+
+@Html.Partial( "_Paging" )

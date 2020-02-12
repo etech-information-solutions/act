@@ -1,0 +1,17 @@
+﻿@model System.String
+
+@using Newtonsoft.Json.Linq;
+
+@{
+    String j = Model.Replace( "{\"Key\":", "" )
+                    .Replace( ",\"Value\"", "" )
+                    .Replace( "}", "" )
+                    .Replace( "[", "{" )
+                    .Replace( "]", "}" );
+
+    JObject json = !String.IsNullOrEmpty( j ) ? JObject.Parse( Model ) : null;
+}
+
+<pre style="overflow: hidden;">
+    @json
+</pre>

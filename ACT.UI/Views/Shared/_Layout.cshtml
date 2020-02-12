@@ -1,0 +1,181 @@
+﻿
+
+@{
+    VariableExtension.SetRules();
+
+    String controller = ViewContext.RouteData.Values[ "controller" ].ToString();
+    var user = ( Request.IsAuthenticated && ViewBag.CurrentUser != null ) ? ( ACT.Core.Models.UserModel ) ViewBag.CurrentUser : User.Get();
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>@ViewBag.Title - ACT Pallet Solutions</title>
+
+    <link href="~/Images/favicon.png" rel="shortcut icon" type="image/x-icon" />
+
+    @Styles.Render( "~/Content/css" )
+    @Styles.Render( "~/Content/jqueryui" )
+    @Scripts.Render( "~/bundles/modernizr" )
+    @Scripts.Render( "~/bundles/jquery" )
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="@(Request.IsAuthenticated ? "logged-in" : "")">
+
+            @if ( Request.IsAuthenticated )
+            {
+                @*<div id="my-account" class="header my-account" style="border-bottom: 1px solid #eee1e0;">
+
+                    <div class="left" style="width: 22%;">
+
+                        <a href="@Url.Action( "Index", "DashBoard" )">
+                            <img alt="ACT - Pallets" src="@Url.Content( "~/images/act-logo.png" )" style="width: 40%; border-right: 1px solid #848484; padding-right: 73px;" />
+                        </a>
+
+                        <strong style="font-size: 13px; padding-left: 20px;">
+                            @DateTime.Now.ToString( "dd / MM / yyyy" )
+                        </strong>
+
+                    </div>
+
+                    <div class="right" style="font-size: 13px;">
+
+                        <span class="left" style="text-align: right;">
+                            Welcome:
+
+                            <strong class="block">@user.Name @user.Surname</strong>
+                        </span>
+
+                        <div class="clear"></div>
+
+                    </div>
+
+                    <div class="clear"></div>
+
+                </div>*@
+            }
+            else
+            {
+                @*<div class="logo @(Request.IsAuthenticated ? "logged-in" : "")">
+                        <a href="@Url.Action( "Login", "Account" )">
+                            <img alt="ACT - Pallets" src="@Url.Content( "~/images/act-logo.png" )" />
+                        </a>
+                    </div>*@
+            }
+
+            <div class="sep @(Request.IsAuthenticated ? "logged-in" : "")"></div>
+
+        </div>
+
+        @if ( Request.IsAuthenticated )
+        {
+            <div id="side-bar" class="side-bar @(Request.IsAuthenticated ? "logged-in" : "")">
+
+                @Html.Partial( "_Menu" )
+
+                <div class="clear"></div>
+
+            </div>
+        }
+
+        <div id="main-content" class="content @(Request.IsAuthenticated ? "logged-in" : "")" style="margin-bottom: 0;">
+
+            @Html.Partial( "_Notification" )
+
+            @if ( Request.IsAuthenticated )
+            {
+                @*<strong class="main-title">@ViewBag.Title</strong>*@
+            }
+
+            <div id="item-list" class="body">
+
+                @RenderBody()
+            </div>
+
+        </div>
+
+        <footer class="@(Request.IsAuthenticated ? "logged-in" : "")">
+
+            <div id="footernote" class="content">
+
+                Copyright &copy; @DateTime.Now.Year ACT Pallet Solutions. All rights reserved.
+
+            </div>
+
+        </footer>
+
+    </div>
+
+
+    @Html.Partial( "_Modal" )
+    @Html.Partial( "_StickyOne" )
+    @Html.Partial( "_AutoLogout" )
+    @Html.Partial( "_Announcement" )
+
+    @{
+        String h = "",
+               m = "",
+               s = "",
+               alo = "-1",
+               atr = "-1";
+
+        String[] ms = new String[] { "-1" };
+
+        String absoluteUrlBase = Request.Url.Scheme + "://" + Request.Url.Host + ( Request.Url.IsDefaultPort ? "" : ":" + Request.Url.Port );
+
+        if ( VariableExtension.SystemRules.AutoLogoff && Request.IsAuthenticated )
+        {
+            Decimal asec = ( VariableExtension.SystemRules.LogoffSeconds - 180 );
+
+            // Lets find hours
+            Decimal t = ( asec / 60 / 60 );
+
+            h = String.Format( "{0}h", ( Int32 ) t );
+
+            // Lets find minutes
+            t = ( asec / 60 ) - ( ( Int32 ) t * 60 );
+
+            m = String.Format( "{0}m", ( Int32 ) t );
+
+            // Lets find seconds
+            t = ( Int32 ) ( t / 60 );
+
+            s = String.Format( "{0}s", Math.Round( t, 0 ) );
+
+            alo = String.Format( "{0}{1}{2}", h, m, s );
+        }
+
+        Int32 ate = 0;
+
+        String a = ( ViewBag.AccessTokenExpiry != null ) ? ( ( Int32 ) ViewBag.AccessTokenExpiry ).ToString() : "abcd";
+
+        if ( ViewBag.AccessTokenExpiry != null && Int32.TryParse( a, out ate ) )
+        {
+            atr = ( TimeSpan.FromSeconds( ( ate - 60 ) ).TotalMilliseconds ).ToString();
+        }
+    }
+
+    <script>
+        var imgurl = "@absoluteUrlBase/";
+        var siteurl = "@Url.Content( String.Format( "~/{0}/", controller ) )";
+
+            var lgt = "@( ( Request.IsAuthenticated ) ? alo : "-1")";
+            var atr = "@( ( Request.IsAuthenticated ) ? atr : "-1")";
+            var cas = "@( ( Request.IsAuthenticated ) ? VariableExtension.SystemRules.LogoffSeconds : 0)";
+    </script>
+
+    @Scripts.Render( "~/bundles/jqueryval" )
+    @Scripts.Render( "~/bundles/jqueryui" )
+    @Scripts.Render( "~/bundles/plugins" )
+    @Scripts.Render( "~/bundles/act" )
+
+    <div id="empty-div" style="display: none;"></div>
+
+</body>
+</html>

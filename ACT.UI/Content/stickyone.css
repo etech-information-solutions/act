@@ -1,0 +1,228 @@
+﻿
+
+
+.sticky-one
+{
+    z-index: 200;
+    display: none;
+    padding: 6px 0;
+    color: #555555;
+    text-align: left;
+    position: absolute;
+    background: url("../images/arrow-top.png") no-repeat top center;
+}
+
+    .sticky-one.t-position
+    {
+        background: url("../images/arrow-bottom.png") no-repeat bottom center;
+    }
+
+    .sticky-one.error.t-position
+    {
+        background: url("../images/arrow-bottom-error.png") no-repeat bottom center;
+    }
+
+
+    .sticky-one.top-right
+    {
+        min-width: 200px;
+        background: url("../images/arrow-top.png") no-repeat top right;
+    }
+
+    .sticky-one.bottom-right
+    {
+        min-width: 200px;
+        background: url("../images/arrow-bottom.png") no-repeat bottom right;
+    }
+
+    .sticky-one.top-left
+    {
+        min-width: 200px;
+        background: url("../images/arrow-top.png") no-repeat 5px top;
+    }
+
+    .sticky-one.bottom-left
+    {
+        min-width: 200px;
+        background: url("../images/arrow-bottom.png") no-repeat 5px bottom;
+    }
+
+    .sticky-one.error.top-right
+    {
+        background: url("../images/arrow-top-error.png") no-repeat top right;
+    }
+
+    .sticky-one.error.bottom-right
+    {
+        background: url("../images/arrow-bottom-error.png") no-repeat bottom right;
+    }
+
+    .sticky-one.error.top-left
+    {
+        background: url("../images/arrow-top-error.png") no-repeat 5px top;
+    }
+
+    .sticky-one.error.bottom-left
+    {
+        background: url("../images/arrow-bottom-error.png") no-repeat 5px bottom;
+    }
+
+
+    .sticky-one.center-left
+    {
+        padding: 6px;
+        min-width: 200px;
+        background: url("../images/arrow-left.png") no-repeat center left;
+    }
+
+    .sticky-one.error.center-left
+    {
+        background: url("../images/arrow-left-error.png") no-repeat center left;
+    }
+
+
+    .sticky-one.center-right
+    {
+        padding: 6px;
+        min-width: 200px;
+        background: url("../images/arrow-right.png") no-repeat center right;
+    }
+
+    .sticky-one.error.center-right
+    {
+        background: url("../images/arrow-right-error.png") no-repeat center right;
+    }
+
+
+    .sticky-one .sticky-frame
+    {
+        padding: 10px;
+        max-width: 425px;
+        border-radius: 4px;
+        background: #eeeeee;
+        border-top: 1px solid #000000;
+        border-bottom: 1px solid #000000;
+    }
+
+        .sticky-one .sticky-frame .sticky-data
+        {
+            padding-top: 5px;
+            border-top: 1px solid #fff;
+        }
+
+            .sticky-one .sticky-frame .sticky-data .editor-field
+            {
+                margin-bottom: 10px;
+            }
+
+            .sticky-one .sticky-frame .sticky-data form label
+            {
+                color: #555555;
+                margin: 0 0 0 5px;
+            }
+
+    .sticky-one.top-right .sticky-frame
+    {
+        border-top-right-radius: 0;
+    }
+
+    .sticky-one.center-left .sticky-frame, .sticky-one.center-right .sticky-frame
+    {
+        border: 1px solid #000000;
+    }
+
+    .sticky-one.error.top-right .sticky-frame, .sticky-one.error.top-left .sticky-frame
+    {
+        border-top: 1px solid #e80c4d;
+        border-bottom: 1px solid #e80c4d;
+    }
+
+    .sticky-one.error.center-right .sticky-frame, .sticky-one.error.center-left .sticky-frame
+    {
+        border-left: 1px solid #e80c4d;
+        border-right: 1px solid #e80c4d;
+    }
+
+    .sticky-one .sticky-frame .sticky-title
+    {
+        display: block;
+        text-align: center;
+        text-transform: uppercase;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .sticky-one .sticky-frame table
+    {
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+    }
+
+    .sticky-one .sticky-frame tr th
+    {
+        padding: 10px 0 10px 8px;
+        background: linear-gradient(to bottom, #FFFFFF 0%, #F7F7F7 3%, #EEEEEE 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);
+    }
+
+    .sticky-one .sticky-frame tr td
+    {
+        padding: 5px;
+        border-bottom: 1px solid #dddddd;
+    }
+
+    .sticky-one .sticky-frame tr.last, .sticky-one .sticky-frame tr.last td
+    {
+        border-bottom: 0 none;
+    }
+
+    .sticky-one .sticky-frame tr.even
+    {
+        background-color: #F4F4F4;
+    }
+
+    .sticky-one .sticky-frame tr.old
+    {
+        background-color: #FCFCFC;
+    }
+
+    .sticky-one .sticky-frame tbody tr:hover, .sticky-one .sticky-frame tbody tr:hover td
+    {
+        cursor: pointer;
+        background: #fff;
+    }
+
+.paging
+{
+    padding: 10px 0;
+    border-top: 1px solid #CCCCCC;
+}
+
+    .paging .nav
+    {
+        float: right;
+    }
+
+        .paging .nav a
+        {
+            color: #ffffff;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: #000000;
+        }
+
+            .paging .nav a:hover
+            {
+                color: #000000;
+                background: #ffffff;
+            }
+
+            .paging .nav a.inactive
+            {
+                cursor: not-allowed;
+                background: #cccccc;
+            }
+
+                .paging .nav a.inactive:hover
+                {
+                    color: #ffffff;
+                }

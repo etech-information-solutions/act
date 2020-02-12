@@ -1,0 +1,107 @@
+﻿@using ACT.Core.Enums
+
+@{
+    string controller = ViewContext.RouteData.Values[ "controller" ].ToString();
+
+    var user = ( Request.IsAuthenticated && ViewBag.CurrentUser != null ) ? ( ACT.Core.Models.UserModel ) ViewBag.CurrentUser : User.Get();
+}
+
+<div class="menu">
+
+    <ul>
+
+        <li class="logz">
+            <a href="@Url.Action( "Index", "DashBoard" )">
+                <img alt="ACT Pallet Solutions" src="@Url.Content( "~/images/act-logo.png" )" style="width: 100%;" />
+            </a>
+        </li>
+
+        <li class="welcome">
+            Welcome <strong>@user.Name</strong>
+        </li>
+
+        @if ( User.Has( PermissionTo.View, PermissionContext.DashBoard ) )
+        {
+            <li class="@(controller.ToLower().Equals( "dashboard" ) ? "current" : "")" data-hot-spot="1" data-c="Dashboard" data-t="">
+                <a rel="tipsyW" title="Dashboard" href="@Url.Action( "Index", "Dashboard" )">
+                    <span>Dashboard</span>
+                </a>
+            </li>
+        }
+
+        @if ( User.Has( PermissionTo.View, PermissionContext.Client ) )
+        {
+            <li data-hot-spot="1" data-c="Client" data-t="" class="@(controller.ToLower().Equals( "client" ) ? "current" : "")">
+                <a rel="tipsyW" title="Clients" href="@Url.Action( "Index", "Client" )">
+                    <span>Clients</span>
+                </a>
+            </li>
+        }
+
+        @if ( User.Has( PermissionTo.View, PermissionContext.Customer ) )
+        {
+            <li data-hot-spot="1" data-c="Customer" data-t="" class="@(controller.ToLower().Equals( "customer" ) ? "current" : "")">
+                <a rel="tipsyW" title="Customers" href="@Url.Action( "Index", "Customer" )">
+                    <span>Customers</span>
+                </a>
+            </li>
+        }
+
+        @if ( User.Has( PermissionTo.View, PermissionContext.Product ) )
+        {
+            <li data-hot-spot="1" data-c="Product" data-t="" class="@(controller.ToLower().Equals( "product" ) ? "current" : "")">
+                <a rel="tipsyW" title="Products" href="@Url.Action( "Index", "Product" )">
+                    <span>Products</span>
+                </a>
+            </li>
+        }
+
+        @if ( User.Has( PermissionTo.View, PermissionContext.Pallet ) )
+        {
+            <li data-hot-spot="1" data-c="Pallet" data-t="" class="@(controller.ToLower().Equals( "pallet" ) ? "current" : "")">
+                <a rel="tipsyW" title="Pallets" href="@Url.Action( "Index", "Pallet" )">
+                    <span>Pallets</span>
+                </a>
+            </li>
+        }
+
+        @if ( User.Has( PermissionTo.View, PermissionContext.Finance ) )
+        {
+            <li class="first @(controller.ToLower().Equals( "finance" ) ? "current" : "")" data-hot-spot="1" data-c="Finance" data-t="">
+                <a rel="tipsyW" title="Finance" href="@Url.Action( "Index", "Finance" )">
+                    <span>Finance</span>
+                </a>
+            </li>
+        }
+
+        @if ( User.Has( PermissionTo.View, PermissionContext.Administration ) )
+        {
+            <li data-hot-spot="1" data-c="SystemAdministration" data-t="" class="@(controller.ToLower().Equals( "administration" ) ? "current" : "")">
+                <a rel="tipsyW" title="Administration" href="@Url.Action( "Index", "Administration" )">
+                    <span>Administration</span>
+                </a>
+            </li>
+        }
+
+        @if ( User.Has( PermissionTo.View, PermissionContext.Reports ) )
+        {
+            <li data-hot-spot="1" data-c="Report" data-t="" class="@(controller.ToLower().Equals( "report" ) ? "current" : "")">
+                <a rel="tipsyW" title="Reports" href="@Url.Action( "Index", "Report" )">
+                    <span>Reports</span>
+                </a>
+            </li>
+        }
+
+        <li style="border-top: 5px solid #f5f5f5; border-bottom: 5px solid #f5f5f5;">
+            <a class="red-bg" href="@Url.Action( "LogOff", "Account" )" style="padding: 10px 20px;">
+                LOGOUT
+            </a>
+        </li>
+
+    </ul>
+
+    <div class="clear"></div>
+
+
+
+</div>

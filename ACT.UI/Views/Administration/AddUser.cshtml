@@ -1,0 +1,121 @@
+﻿@model UserViewModel
+
+@using ACT.UI.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Add User";
+
+}
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "AddUser", "Administration", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#users", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content( "~/images/add.png" )" />
+            <span>Add User</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="left" style="width: 46%; margin-right: 2%;">
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Name )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Name, new { @placeholder = "Enter First Name" } )
+                    @Html.ValidationMessageFor( model => model.Name )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Surname )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Surname, new { @placeholder = "Enter Surname" } )
+                    @Html.ValidationMessageFor( model => model.Surname )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Status )
+                </div>
+                <div class="edit-field">
+                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.Status )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.RoleId )
+                </div>
+                <div class="edit-field">
+                    @Html.DropDownListFor( model => model.RoleId, model => Model.RoleOptions, role => role.Id, role => role.Name, false, new { @class = "chzn", data_role = "1", data_target = "#qa-clients", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.RoleId )
+                </div>
+
+                <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Password )
+                </div>
+                <div class="edit-field">
+                    @Html.PasswordFor( model => model.Password, new { @placeholder = "Enter Password" } )
+                    @Html.ValidationMessageFor( model => model.Password )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.ConfirmPassword )
+                </div>
+                <div class="edit-field">
+                    @Html.PasswordFor( model => model.ConfirmPassword, new { @placeholder = "Confirm Password" } )
+                    @Html.ValidationMessageFor( model => model.ConfirmPassword )
+                </div>
+
+            </div>
+
+            <div class="grouped-area left" style="width: 46%;">
+
+                <p>
+                    <strong class="uppercase" style="color: #002e70 !important;">CONTACT DETAILS</strong>
+                </p>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Email )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Email, new { @placeholder = "Enter Email Address" } )
+                    @Html.ValidationMessageFor( model => model.Email )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Cell )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Cell, new { @placeholder = "Enter Cell Number" } )
+                    @Html.ValidationMessageFor( model => model.Cell )
+                </div>
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-refresh="1" data-target="#users">Cancel</a>
+            </p>
+
+        </div>
+
+    </div>
+}

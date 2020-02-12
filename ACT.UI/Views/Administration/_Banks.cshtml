@@ -1,0 +1,104 @@
+﻿@model PagingExtension
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ViewName = "_Banks";
+    
+    UserModel user = User.Get();
+}
+
+
+@Html.Partial( "_Notification" )
+
+@{
+    Int32 count = Model.Start;
+    List<Bank> items = ( List<Bank> ) Model.Items;
+}
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Banks available matching your search criteria.
+    </div>
+}
+
+<p>
+    @Html.ActionLink( "Add Bank", "AddBank", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Bank?", @data_edit = "1", @data_id = 0, @data_target = "#banks" } )
+    <span class="loader"></span>
+</p>
+
+<table id="banks-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#banks-table_wrapper" data-starting-point=".ap-tabs ul">
+
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="Name" data-column="Name">
+                Name
+            </th>
+            <th data-name="Description" data-column="Description">
+                Description
+            </th>
+            <th data-name="Code" data-column="Code">
+                Default Branch Code
+            </th>
+            <th data-name="Status" data-column="Status">
+                Status
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                Status status = ( Status ) item.Status;
+
+                String active = status.Equals( Status.Active ) ? "active" : "inactive";
+                String enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td width="17%">
+                        @item.Name
+                    </td>
+                    <td>
+                        @item.Description
+                    </td>
+                    <td>
+                        @item.Code
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+                    </td>
+                    <td width="17%">
+                        @Html.ActionLink( "Details", "BankDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( "Edit", "EditBank", new { id = item.Id, returnView = "Banks" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink( enable, "DeleteBank", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#banks", @rel = "tipsyE", @title = enable + " this item?" } )
+                    </td>
+
+                </tr>
+                
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_BankCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
+
+@Html.Partial( "_Paging" )

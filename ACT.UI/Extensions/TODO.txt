@@ -1,0 +1,3 @@
+﻿TODO: We probably need to move items in this folder out to a separate library
+
+-Herman Raath
