@@ -253,6 +253,7 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>ACT.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <None Include="Backup\ACT-2020-02-12.bak" />
     <None Include="Models\ACT.edmx.diagram">
       <DependentUpon>ACT.edmx</DependentUpon>
     </None>
