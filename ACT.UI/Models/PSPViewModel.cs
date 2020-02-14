@@ -61,7 +61,7 @@ namespace ACT.UI.Models
         [Display( Name = "Status" )]
         public PSPClientStatus Status { get; set; }
 
-        [Display( Name = "Estimated Loads Per Month" )] 
+        [Display( Name = "Estimated Loads Per Month" )]
         public EstimatedLoadViewModel PSPBudget { get; set; }
 
         public AddressViewModel Address { get; set; }
@@ -69,13 +69,30 @@ namespace ACT.UI.Models
         [Display( Name = "Company Registration File" )]
         public FileViewModel RegistrationFile { get; set; }
 
-
+        [Display( Name = "Select a reason why you're declining this PSP" )]
+        public string DeclineReason { get; set; }
 
         public UserViewModel User { get; set; }
 
         #endregion
 
         #region Model Options
+
+        public List<string> DeclineReasonOptions
+        {
+            get
+            {
+                if ( Status == PSPClientStatus.Unverified )
+                {
+                    using ( DeclineReasonService dservice = new DeclineReasonService() )
+                    {
+                        return dservice.ListByColumn( "Description", "Status", ( int ) Core.Enums.Status.Active );
+                    }
+                }
+
+                return new List<string>();
+            }
+        }
 
         #endregion
     }

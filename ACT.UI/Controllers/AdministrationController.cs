@@ -725,6 +725,36 @@ namespace ACT.UI.Controllers
                     Password = uservice.GetSha1Md5String( model.Password )
                 };
 
+                #region Link PSP / Client
+
+                if ( role.Type == ( int ) RoleType.PSP && model.PSPId > 0 )
+                {
+                    user.PSPUsers.Add( new PSPUser()
+                    {
+                        UserId = user.Id,
+                        PSPId = model.PSPId,
+                        Status = user.Status,
+                        CreatedOn = DateTime.Now,
+                        ModifiedOn = DateTime.Now,
+                        ModifiedBy = CurrentUser.Email,
+                    } );
+                }
+                else if ( role.Type == ( int ) RoleType.Client && model.ClientId > 0 )
+                {
+                    user.ClientUsers.Add( new ClientUser()
+                    {
+                        UserId = user.Id,
+                        Status = user.Status,
+                        CreatedOn = DateTime.Now,
+                        ClientId = model.ClientId,
+                        ModifiedOn = DateTime.Now,
+                        ModifiedBy = CurrentUser.Email,
+
+                    } );
+                }
+
+                #endregion
+
                 user = uservice.Create( user, model.RoleId );
 
                 #endregion
@@ -774,6 +804,9 @@ namespace ACT.UI.Controllers
                 Email = user.Email?.Trim(),
                 Surname = user.Surname?.Trim(),
                 Status = ( Status ) user.Status,
+                RoleType = ( RoleType ) user.Type,
+                PSPId = user.PSPUsers.FirstOrDefault( p => p.Status == ( int ) Status.Active )?.PSPId ?? 0,
+                ClientId = user.ClientUsers.FirstOrDefault( p => p.Status == ( int ) Status.Active )?.ClientId ?? 0
             };
 
             return View( model );
@@ -844,6 +877,32 @@ namespace ACT.UI.Controllers
                 {
                     user.PasswordDate = DateTime.Now;
                     user.Password = uservice.GetSha1Md5String( model.Password );
+                }
+
+                if ( role.Type == ( int ) RoleType.PSP && model.PSPId > 0 && !user.PSPUsers.Any( p => p.PSPId == model.PSPId ) )
+                {
+                    user.PSPUsers.Add( new PSPUser()
+                    {
+                        UserId = user.Id,
+                        PSPId = model.PSPId,
+                        Status = user.Status,
+                        CreatedOn = DateTime.Now,
+                        ModifiedOn = DateTime.Now,
+                        ModifiedBy = CurrentUser.Email,
+                    } );
+                }
+                else if ( role.Type == ( int ) RoleType.Client && model.ClientId > 0 && !user.ClientUsers.Any( p => p.ClientId == model.ClientId ) )
+                {
+                    user.ClientUsers.Add( new ClientUser()
+                    {
+                        UserId = user.Id,
+                        Status = user.Status,
+                        CreatedOn = DateTime.Now,
+                        ClientId = model.ClientId,
+                        ModifiedOn = DateTime.Now,
+                        ModifiedBy = CurrentUser.Email,
+
+                    } );
                 }
 
                 user = uservice.Update( user, model.RoleId );
@@ -1360,10 +1419,20 @@ namespace ACT.UI.Controllers
         {
             using ( AddressService aservice = new AddressService() )
             using ( DocumentService dservice = new DocumentService() )
+            using ( EstimatedLoadService eservice = new EstimatedLoadService() )
             {
                 Address address = aservice.Get( psp.Id, "PSP" );
 
                 List<Document> documents = dservice.List( psp.Id, "PSP" );
+
+                EstimatedLoad load = new EstimatedLoad();
+
+                bool unverified = ( psp.Status == ( int ) PSPClientStatus.Unverified );
+
+                if ( unverified )
+                {
+                    load = eservice.Get( psp.Id, "PSP" );
+                }
 
                 PSPViewModel model = new PSPViewModel()
                 {
@@ -1389,19 +1458,19 @@ namespace ACT.UI.Controllers
                     },
                     PSPBudget = new EstimatedLoadViewModel()
                     {
-                        Id = psp.PSPBudgets?.FirstOrDefault()?.Id ?? 0,
-                        January = psp.PSPBudgets?.FirstOrDefault()?.January,
-                        February = psp.PSPBudgets?.FirstOrDefault()?.February,
-                        March = psp.PSPBudgets?.FirstOrDefault()?.March,
-                        April = psp.PSPBudgets?.FirstOrDefault()?.April,
-                        May = psp.PSPBudgets?.FirstOrDefault()?.May,
-                        June = psp.PSPBudgets?.FirstOrDefault()?.June,
-                        July = psp.PSPBudgets?.FirstOrDefault()?.July,
-                        August = psp.PSPBudgets?.FirstOrDefault()?.August,
-                        September = psp.PSPBudgets?.FirstOrDefault()?.September,
-                        October = psp.PSPBudgets?.FirstOrDefault()?.October,
-                        November = psp.PSPBudgets?.FirstOrDefault()?.November,
-                        December = psp.PSPBudgets?.FirstOrDefault()?.December,
+                        Id = ( unverified ) ? 0 : psp.PSPBudgets?.FirstOrDefault()?.Id ?? 0,
+                        January = ( unverified ) ? load.January : psp.PSPBudgets?.FirstOrDefault()?.January,
+                        February = ( unverified ) ? load.February : psp.PSPBudgets?.FirstOrDefault()?.February,
+                        March = ( unverified ) ? load.March : psp.PSPBudgets?.FirstOrDefault()?.March,
+                        April = ( unverified ) ? load.April : psp.PSPBudgets?.FirstOrDefault()?.April,
+                        May = ( unverified ) ? load.May : psp.PSPBudgets?.FirstOrDefault()?.May,
+                        June = ( unverified ) ? load.June : psp.PSPBudgets?.FirstOrDefault()?.June,
+                        July = ( unverified ) ? load.July : psp.PSPBudgets?.FirstOrDefault()?.July,
+                        August = ( unverified ) ? load.August : psp.PSPBudgets?.FirstOrDefault()?.August,
+                        September = ( unverified ) ? load.September : psp.PSPBudgets?.FirstOrDefault()?.September,
+                        October = ( unverified ) ? load.October : psp.PSPBudgets?.FirstOrDefault()?.October,
+                        November = ( unverified ) ? load.November : psp.PSPBudgets?.FirstOrDefault()?.November,
+                        December = ( unverified ) ? load.December : psp.PSPBudgets?.FirstOrDefault()?.December,
                     },
                     Address = new AddressViewModel()
                     {
@@ -1417,6 +1486,8 @@ namespace ACT.UI.Controllers
                     User = new UserViewModel()
                     {
                         EditMode = true,
+                        Password = " ",
+                        ConfirmPassword = " ",
                         Status = Status.Inactive,
                         Cell = psp.PSPUsers?.FirstOrDefault()?.User?.Cell,
                         Name = psp.PSPUsers?.FirstOrDefault()?.User?.Name,
@@ -1433,7 +1504,7 @@ namespace ACT.UI.Controllers
 
         //
         // GET: /Administration/ApprovePSP/5
-        public ActionResult ApprovePSP( int id )
+        public ActionResult ApproveDeclinePSP( int id )
         {
             using ( PSPService pservice = new PSPService() )
             using ( AddressService aservice = new AddressService() )
@@ -1450,7 +1521,7 @@ namespace ACT.UI.Controllers
 
                 PSPViewModel model = ConstructPSPViewModel( psp );
 
-                return PartialView( "_ApprovePSP", model );
+                return PartialView( "_ApproveDeclinePSP", model );
             }
         }
 
@@ -1458,7 +1529,7 @@ namespace ACT.UI.Controllers
         // POST: /Administration/ApprovePSP/5
         [HttpPost]
         [Requires( PermissionTo.Edit )]
-        public ActionResult ApprovePSP( PSPViewModel model )
+        public ActionResult ApproveDeclinePSP( PSPViewModel model )
         {
             using ( PSPService pservice = new PSPService() )
             using ( RoleService rservice = new RoleService() )
@@ -1483,12 +1554,12 @@ namespace ACT.UI.Controllers
 
                     model = ConstructPSPViewModel( psp );
 
-                    return PartialView( "_ApprovePSP", model );
+                    return PartialView( "_ApproveDeclinePSP", model );
                 }
 
                 #region Update PSP
 
-                psp.Status = ( int ) PSPClientStatus.Verified;
+                psp.Status = ( int ) model.Status;
 
                 psp = pservice.Update( psp );
 
@@ -1496,10 +1567,10 @@ namespace ACT.UI.Controllers
 
                 #region Create/Update User
 
-                if ( model.User != null )
-                {
-                    User user = uservice.GetById( model.User.Id );
+                User user = uservice.GetById( model.User.Id );
 
+                if ( model.User != null && model.Status == PSPClientStatus.Verified )
+                {
                     if ( user == null )
                     {
                         Role role = rservice.GetByName( RoleType.PSP.GetStringValue() );
@@ -1512,7 +1583,7 @@ namespace ACT.UI.Controllers
                             Type = ( int ) RoleType.PSP,
                             PasswordDate = DateTime.Now,
                             Surname = model.User.Surname,
-                            Status = ( int ) model.Status,
+                            Status = ( int ) Status.Active,
                             Password = uservice.GetSha1Md5String( model.User.Password )
                         };
 
@@ -1530,6 +1601,12 @@ namespace ACT.UI.Controllers
 
                         uservice.Update( user );
                     }
+                }
+                else if ( user != null )
+                {
+                    user.Status = ( int ) Status.Rejected;
+
+                    uservice.Update( user );
                 }
 
                 #endregion
@@ -1566,122 +1643,39 @@ namespace ACT.UI.Controllers
 
                 #region Emails
 
-                bool emailed = SendUserApproved( model.User );
+                bool emailed;
 
-                if ( emailed )
+                if ( model.Status == PSPClientStatus.Verified )
                 {
-                    Notify( $"The selected PSP ({model.CompanyName}) was successfully approved and an email has been sent to {model.User.Email}.", NotificationType.Success );
-                }
-                else
-                {
-                    Notify( $"The selected PSP ({model.CompanyName}) was successfully approved and an email could not be sent to {model.User.Email}. NOTE: Send login details manually.", NotificationType.Warn );
-                }
+                    emailed = SendUserApproved( model.User );
 
-                #endregion
-
-                return PSPs( new PagingModel(), new CustomSearchModel() );
-            }
-        }
-
-        //
-        // GET: /Administration/DeclinePSP/5
-        public ActionResult DeclinePSP( int id )
-        {
-            using ( PSPService pservice = new PSPService() )
-            using ( AddressService aservice = new AddressService() )
-            using ( DocumentService dservice = new DocumentService() )
-            using ( EstimatedLoadService eservice = new EstimatedLoadService() )
-            {
-                PSP psp = pservice.GetById( id );
-
-                if ( psp == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return PartialView( "_Notification" );
-                }
-
-                PSPViewModel model = ConstructPSPViewModel( psp );
-
-                return PartialView( "_DeclinePSP", model );
-            }
-        }
-
-        //
-        // POST: /Administration/ApprovePSP/5
-        [HttpPost]
-        [Requires( PermissionTo.Edit )]
-        public ActionResult DeclinePSP( PSPViewModel model )
-        {
-            using ( PSPService pservice = new PSPService() )
-            using ( RoleService rservice = new RoleService() )
-            using ( UserService uservice = new UserService() )
-            using ( AddressService aservice = new AddressService() )
-            using ( TransactionScope scope = new TransactionScope() )
-            using ( DocumentService dservice = new DocumentService() )
-            using ( PSPBudgetService bservice = new PSPBudgetService() )
-            {
-                PSP psp = pservice.GetById( model.Id );
-
-                if ( psp == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return PartialView( "_Notification" );
-                }
-
-                if ( !ModelState.IsValid )
-                {
-                    Notify( "Sorry, the selected PSP was not updated. Please correct all errors and try again.", NotificationType.Error );
-
-                    model = ConstructPSPViewModel( psp );
-
-                    return PartialView( "_DeclinePSP", model );
-                }
-
-                #region Update PSP
-
-                psp.Status = ( int ) PSPClientStatus.Rejected;
-
-                psp = pservice.Update( psp );
-
-                #endregion
-
-                #region Update User
-
-                if ( model.User != null )
-                {
-                    User user = uservice.GetById( model.User.Id );
-
-                    if ( user != null )
+                    if ( emailed )
                     {
-                        user.Status = ( int ) Status.Rejected;
+                        Notify( $"The selected PSP ({model.CompanyName}) was successfully approved and an email has been sent to {model.User.Email}.", NotificationType.Success );
+                    }
+                    else
+                    {
+                        Notify( $"The selected PSP ({model.CompanyName}) was successfully approved and an email could not be sent to {model.User.Email}. NOTE: Send login details manually.", NotificationType.Warn );
+                    }
+                }
+                else if ( model.Status == PSPClientStatus.Rejected )
+                {
+                    emailed = SendUserDecline( model.User );
 
-                        uservice.Update( user );
+                    if ( emailed )
+                    {
+                        Notify( $"The selected PSP ({model.CompanyName}) was successfully declined and an email has been sent to {model.User.Email}.", NotificationType.Success );
+                    }
+                    else
+                    {
+                        Notify( $"The selected PSP ({model.CompanyName}) was successfully declined BUT an email could not be sent to {model.User.Email}. NOTE: Notify manually.", NotificationType.Warn );
                     }
                 }
 
                 #endregion
-
-                scope.Complete();
-
-                #region Emails
-
-                bool emailed = SendUserDecline( model.User );
-
-                if ( emailed )
-                {
-                    Notify( $"The selected PSP ({model.CompanyName}) was successfully declined and an email has been sent to {model.User.Email}.", NotificationType.Success );
-                }
-                else
-                {
-                    Notify( $"The selected PSP ({model.CompanyName}) was successfully declined BUT an email could not be sent to {model.User.Email}. NOTE: Notify manually.", NotificationType.Warn );
-                }
-
-                #endregion
-
-                return PSPs( new PagingModel(), new CustomSearchModel() );
             }
+
+            return PSPs( new PagingModel(), new CustomSearchModel() );
         }
 
         //
@@ -1804,7 +1798,7 @@ namespace ACT.UI.Controllers
                     return PartialView( "_Notification" );
                 }
 
-                return PartialView( "_PSPUsers", model.PSPUsers.ToList() );
+                return PartialView( "_PSPUsers", model );
             }
         }
 
@@ -1823,7 +1817,7 @@ namespace ACT.UI.Controllers
                     return PartialView( "_Notification" );
                 }
 
-                return PartialView( "_PSPClients", model.PSPClients.ToList() );
+                return PartialView( "_PSPClients", model );
             }
         }
 
@@ -1842,7 +1836,7 @@ namespace ACT.UI.Controllers
                     return PartialView( "_Notification" );
                 }
 
-                return PartialView( "_PSPProducts", model.PSPProducts.ToList() );
+                return PartialView( "_PSPProducts", model );
             }
         }
 
@@ -1861,7 +1855,7 @@ namespace ACT.UI.Controllers
                     return PartialView( "_Notification" );
                 }
 
-                return PartialView( "_PSPInvoices", model.PSPBillings.ToList() );
+                return PartialView( "_PSPInvoices", model );
             }
         }
 
@@ -1880,7 +1874,7 @@ namespace ACT.UI.Controllers
                     return PartialView( "_Notification" );
                 }
 
-                return PartialView( "_PSPBudgets", model.PSPBudgets.FirstOrDefault() );
+                return PartialView( "_PSPBudgets", model );
             }
         }
 

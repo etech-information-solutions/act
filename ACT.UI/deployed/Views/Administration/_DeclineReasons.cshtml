@@ -1,0 +1,98 @@
+﻿@model PagingExtension
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = false;
+    ViewBag.ViewName = "_DeclineReasons";
+
+    UserModel user = User.Get();
+}
+
+
+@Html.Partial( "_Notification" )
+
+@{
+    Int32 count = Model.Start;
+    List<DeclineReason> items = ( List<DeclineReason> ) Model.Items;
+}
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Decline Reasons available matching your search criteria.
+    </div>
+}
+
+<p>
+    @Html.ActionLink( "Add Decline Reason", "AddDeclineReason", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Decline Reason?", @data_edit = "1", @data_id = 0, @data_target = "#declinereasons" } )
+    <span class="loader"></span>
+</p>
+
+<table id="claim-decline-reasons-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#claim-decline-reasons-table_wrapper" data-starting-point=".ap-tabs ul">
+
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="Description" data-column="Description">
+                Description
+            </th>
+            <th data-name="Status" data-column="Status">
+                Status
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                Status status = ( Status ) item.Status;
+
+                String active = status.Equals( Status.Active ) ? "active" : "inactive";
+                String enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.Description
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="DeclineReason">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+                    </td>
+                    <td width="17%">
+                        @Html.ActionLink( "Details", "DeclineReasonDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( "Edit", "EditDeclineReason", new { id = item.Id, returnView = "DeclineReasons" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink( enable, "DeleteDeclineReason", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#declinereasons", @rel = "tipsyE", @title = enable + " this item?" } )
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_DeclineReasonCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
+
+@Html.Partial( "_Paging" )

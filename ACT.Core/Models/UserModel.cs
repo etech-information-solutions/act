@@ -63,6 +63,10 @@ namespace ACT.Core.Models
 
         public List<Role> Roles { get; set; }
 
+        public List<PSP> PSPs { get; set; }
+
+        public List<Client> Clients { get; set; }
+
         #endregion
 
         #region IUser Members

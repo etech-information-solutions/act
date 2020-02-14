@@ -14,14 +14,9 @@ namespace ACT.Data.Models
     
     public partial class PSPProduct
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public PSPProduct()
-        {
-            this.ClientProducts = new HashSet<ClientProduct>();
-        }
-    
         public int Id { get; set; }
         public int PSPId { get; set; }
+        public int ProductId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -33,8 +28,7 @@ namespace ACT.Data.Models
         public Nullable<int> RateUnit { get; set; }
         public int Status { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientProduct> ClientProducts { get; set; }
+        public virtual Product Product { get; set; }
         public virtual PSP PSP { get; set; }
     }
 }

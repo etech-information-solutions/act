@@ -270,5 +270,37 @@ namespace ACT.Core.Services
 
             return model;
         }
+
+        /// <summary>
+        /// Gets a list of clients
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public Dictionary<int, string> List( bool v )
+        {
+            Dictionary<int, string> pspOptions = new Dictionary<int, string>();
+            List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
+
+            List<object> parameters = new List<object>();
+
+            string query = string.Empty;
+
+            query = $"SELECT p.Id AS [TKey], p.CompanyName AS [TValue] FROM [dbo].[PSP] p";
+
+            model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();
+
+            if ( model != null && model.Any() )
+            {
+                foreach ( var k in model )
+                {
+                    if ( pspOptions.Keys.Any( x => x == k.TKey ) )
+                        continue;
+
+                    pspOptions.Add( k.TKey, ( k.TValue ?? "" ).Trim() );
+                }
+            }
+
+            return pspOptions;
+        }
     }
 }

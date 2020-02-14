@@ -287,7 +287,7 @@ namespace ACT.UI.Controllers
                             CreatedOn = DateTime.Now,
                             ModifiedOn = DateTime.Now,
                             ModifiedBy = model.AdminEmail,
-
+                            Status = ( int ) Status.Active,
                         } );
                     }
 
@@ -297,10 +297,10 @@ namespace ACT.UI.Controllers
                     {
                         UserId = user.Id,
                         ClientId = client.Id,
-                        Status = user.Status,
                         CreatedOn = DateTime.Now,
                         ModifiedOn = DateTime.Now,
                         ModifiedBy = model.AdminEmail,
+                        Status = ( int ) Status.Active,
 
                     } );
 
@@ -336,10 +336,10 @@ namespace ACT.UI.Controllers
                     {
                         PSPId = psp.Id,
                         UserId = user.Id,
-                        Status = user.Status,
                         CreatedOn = DateTime.Now,
                         ModifiedOn = DateTime.Now,
-                        ModifiedBy = model.AdminEmail
+                        ModifiedBy = model.AdminEmail,
+                        Status = ( int ) Status.Active,
                     } );
 
                     objectId = psp.Id;

@@ -1,0 +1,98 @@
+﻿@model PSP
+
+@using ACT.Core.Enums;
+@using ACT.Data.Models;
+
+
+<div id="item-details" class="item-details" style="width: auto;">
+
+    <h2>
+        <img alt="" src="@Url.Content( "~/images/info.png" )" />
+        <span>PSP Budget</span>
+    </h2>
+
+    <table id="PSPBudget-table" class="da-table" style="border-bottom: 0;">
+
+        <thead>
+            <tr>
+                <th>Jan</th>
+                <th>Feb</th>
+                <th>Mar</th>
+                <th>Apr</th>
+                <th>May</th>
+                <th>Jun</th>
+                <th>Jul</th>
+                <th>Aug</th>
+                <th>Sep</th>
+                <th>Oct</th>
+                <th>Nov</th>
+                <th>Dec</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>
+                    @Model.PSPBudgets.FirstOrDefault().January
+                </td>
+                <td>
+                    @Model.PSPBudgets.FirstOrDefault().February
+                </td>
+                <td>
+                    @Model.PSPBudgets.FirstOrDefault().March
+                </td>
+                <td>
+                    @Model.PSPBudgets.FirstOrDefault().April
+                </td>
+                <td>
+                    @Model.PSPBudgets.FirstOrDefault().May
+                </td>
+                <td>
+                    @Model.PSPBudgets.FirstOrDefault().June
+                </td>
+                <td>
+                    @Model.PSPBudgets.FirstOrDefault().July
+                </td>
+                <td>
+                    @Model.PSPBudgets.FirstOrDefault().August
+                </td>
+                <td>
+                    @Model.PSPBudgets.FirstOrDefault().September
+                </td>
+                <td>
+                    @Model.PSPBudgets.FirstOrDefault().October
+                </td>
+                <td>
+                    @Model.PSPBudgets.FirstOrDefault().November
+                </td>
+                <td>
+                    @Model.PSPBudgets.FirstOrDefault().December
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <p>
+            @Html.ActionLink( "Edit", "EditPSP", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+
+            @if ( ViewBag.IncludeLayout == null )
+            {
+                <span style="padding: 0 5px;">/</span>
+                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Close</a>
+            }
+        </p>
+    }
+
+    @if ( ViewBag.IncludeLayout != null )
+    {
+        <div class="back-to-list">
+            @Html.ActionLink( "Back to List", "Index" )
+        </div>
+    }
+
+</div>

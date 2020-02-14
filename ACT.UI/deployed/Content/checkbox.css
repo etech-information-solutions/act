@@ -1,0 +1,76 @@
+﻿.checkbox-list
+{
+}
+
+    .checkbox-list ul
+    {
+        float: left;
+        width: 247px;
+        margin: 0 0 0px 0;
+    }
+
+        .checkbox-list ul.even
+        {
+            width: 217px;
+        }
+
+        .checkbox-list ul.inner
+        {
+            margin: 0;
+            padding: 0;
+            float: none;
+            width: 217px;
+        }
+
+        .checkbox-list ul.last
+        {
+            margin-right: 0;
+            border-right: 0 none;
+        }
+
+        .checkbox-list ul li .option
+        {
+            display: block;
+            border-radius: 4px;
+            padding-left: 10px;
+            padding-bottom: 3px;
+            margin: 0 30px 10px 0;
+            border-bottom: 1px dashed #000000;
+        }
+
+        .checkbox-list ul.even li .option
+        {
+            margin-right: 0;
+        }
+
+        .checkbox-list ul.inner li .option
+        {
+            border: 0 none;
+            margin-right: 0;
+        }
+
+    .checkbox-list .option label
+    {
+        display: block;
+        font-size: 11px;
+        margin: -2px 0 0 2px;
+        float: left !important;
+        width: auto !important;
+    }
+
+    .checkbox-list ul li .ptitle
+    {
+        clear: both;
+        display: block;
+        font-weight: bold;
+        margin-bottom: 15px;
+        float: none !important;
+        width: 100% !important;
+        text-transform: uppercase;
+        border-bottom: 1px dashed #fff;
+    }
+
+        .checkbox-list ul li .ptitle input[type="checkbox"]
+        {
+            margin: 2px 2px 0 14px;
+        }

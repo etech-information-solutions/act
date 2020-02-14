@@ -59,16 +59,13 @@ namespace ACT.Core.Services
 
                 string email = ( _currentUser != null && !string.IsNullOrEmpty( _currentUser.Email ) ) ? _currentUser.Email : HttpContext.Current.User.Identity.Name;
 
-                UserModel user = ContextExtensions.GetCachedUserData( email ) as UserModel;
 
-                if ( user == null )
+                if ( !( ContextExtensions.GetCachedUserData( email ) is UserModel user ) )
                 {
                     user = GetUser( email );
                 }
 
-                _currentUser = user ?? new UserModel() { Id = 0 };
-
-                return _currentUser;
+                return _currentUser = user ?? new UserModel() { Id = 0 };
             }
         }
 
@@ -116,9 +113,12 @@ namespace ACT.Core.Services
                           DisplayName = u.Name + " " + u.Surname,
                           NiceCreatedOn = u.CreatedOn,
                           IsAdmin = u.UserRoles.Any( ur => ur.Role.Administration ),
+
                           Roles = u.UserRoles.Select( ur => ur.Role )
                                              .OrderByDescending( r => r.Id )
-                                             .ToList()
+                                             .ToList(),
+                          PSPs = u.PSPUsers.Select( p => p.PSP ).ToList(),
+                          Clients = u.ClientUsers.Select( c => c.Client ).ToList()
                       } ).FirstOrDefault();
 
             if ( model != null )
@@ -171,7 +171,9 @@ namespace ACT.Core.Services
                           IsAdmin = u.UserRoles.Any( ur => ur.Role.Administration ),
                           Roles = u.UserRoles.Select( ur => ur.Role )
                                              .OrderByDescending( r => r.Id )
-                                             .ToList()
+                                             .ToList(),
+                          PSPs = u.PSPUsers.Select( p => p.PSP ).ToList(),
+                          Clients = u.ClientUsers.Select( c => c.Client ).ToList()
                       } ).FirstOrDefault();
 
 

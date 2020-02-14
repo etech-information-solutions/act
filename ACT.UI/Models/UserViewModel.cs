@@ -17,6 +17,12 @@ namespace ACT.UI.Models
         [Display( Name = "Role" )]
         public int RoleId { get; set; }
 
+        [Display( Name = "PSP" )]
+        public int PSPId { get; set; }
+
+        [Display( Name = "Client" )]
+        public int ClientId { get; set; }
+
         public Role Role { get; set; }
 
         [Required]
@@ -54,6 +60,8 @@ namespace ACT.UI.Models
         [Display( Name = "Status" )]
         public Status Status { get; set; }
 
+        public RoleType RoleType { get; set; }
+
         public bool EditMode { get; set; }
 
         #endregion
@@ -67,6 +75,27 @@ namespace ACT.UI.Models
                 using ( RoleService service = new RoleService() )
                 {
                     return service.List();
+                }
+            }
+        }
+
+        public Dictionary<int, string> PSPOptions
+        {
+            get
+            {
+                using ( PSPService pservice = new PSPService() )
+                {
+                    return pservice.List( true );
+                }
+            }
+        }
+        public Dictionary<int, string> ClientOptions
+        {
+            get
+            {
+                using ( ClientService cservice = new ClientService() )
+                {
+                    return cservice.List( true );
                 }
             }
         }

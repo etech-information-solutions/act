@@ -25,12 +25,12 @@ namespace ACT.Core.Services
         /// <returns></returns>
         public override User GetById( int id )
         {
-            User user = context.Users
-                               .Include( "UserRoles" )
-                               .Include( "UserRoles.Role" )
-                               .FirstOrDefault( u => u.Id == id );
-
             OldObject = context.Users.AsNoTracking().FirstOrDefault( u => u.Id == id );
+
+            context.Configuration.LazyLoadingEnabled = true;
+            context.Configuration.ProxyCreationEnabled = true;
+
+            User user = context.Users.FirstOrDefault( u => u.Id == id );
 
             return user;
         }
@@ -86,19 +86,20 @@ namespace ACT.Core.Services
 
             return ( from u in context.Users
 
-                     #region Where
+                         #region Where
 
                      where
                      (
                          // Where
-                         u.UserRoles.Any( ur => ur.Role.Type != ( int ) RoleType.Client ) &&
+                         ( CurrentUser.RoleType == RoleType.PSP ? u.PSPUsers.Any( pu => CurrentUser.PSPs.Any( p => p.Id == pu.PSPId ) ) : true ) &&
+                         ( CurrentUser.RoleType == RoleType.Client ? u.ClientUsers.Any( cu => CurrentUser.PSPs.Any( c => c.Id == cu.ClientId ) ) : true ) &&
 
 
 
                          // Custom Search
                          (
                             ( ( csm.Status != Status.All ) ? u.Status == ( int ) csm.Status : true ) &&
-                            ( ( csm.RoleType != RoleType.All ) ? u.UserRoles.Any( ur => ur.Role.Type == ( int ) csm.RoleType ) : true ) 
+                            ( ( csm.RoleType != RoleType.All ) ? u.UserRoles.Any( ur => ur.Role.Type == ( int ) csm.RoleType ) : true )
                          ) &&
 
 
@@ -132,19 +133,20 @@ namespace ACT.Core.Services
 
             return ( from u in context.Users
 
-                     #region Where
+                    #region Where
 
                      where
                      (
                          // Where
-                         u.UserRoles.Any( ur => ur.Role.Type != ( int ) RoleType.Client ) &&
+                         ( CurrentUser.RoleType == RoleType.PSP ? u.PSPUsers.Any( pu => CurrentUser.PSPs.Any( p => p.Id == pu.PSPId ) ) : true ) &&
+                         ( CurrentUser.RoleType == RoleType.Client ? u.ClientUsers.Any( cu => CurrentUser.PSPs.Any( c => c.Id == cu.ClientId ) ) : true ) &&
 
 
 
                          // Custom Search
                          (
                             ( ( csm.Status != Status.All ) ? u.Status == ( int ) csm.Status : true ) &&
-                            ( ( csm.RoleType != RoleType.All ) ? u.UserRoles.Any( ur => ur.Role.Type == ( int ) csm.RoleType ) : true ) 
+                            ( ( csm.RoleType != RoleType.All ) ? u.UserRoles.Any( ur => ur.Role.Type == ( int ) csm.RoleType ) : true )
                          ) &&
 
 
@@ -279,7 +281,7 @@ namespace ACT.Core.Services
             // Custom Search
 
             #region Custom Search
-            
+
             if ( csm.RoleType != RoleType.All )
             {
                 query = $"{query} AND (u.Type=@csmRoleType) ";

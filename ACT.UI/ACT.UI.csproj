@@ -197,6 +197,7 @@
     <Content Include="Content\modal.css" />
     <Content Include="Content\reset.css" />
     <Content Include="Content\select2.css" />
+    <Content Include="Content\stickyone.css" />
     <Content Include="Content\style.css" />
     <Content Include="Content\table.css" />
     <Content Include="Content\tipsy.css" />
@@ -206,6 +207,7 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Images\accent.png" />
+    <Content Include="Images\act-logo.png" />
     <Content Include="Images\add.png" />
     <Content Include="Images\admin.png" />
     <Content Include="Images\animated-overlay.gif" />
@@ -227,7 +229,6 @@
     <Content Include="Images\bullet.png" />
     <Content Include="Images\calendar.png" />
     <Content Include="Images\campaigns.png" />
-    <Content Include="Images\cash4leads-logo.png" />
     <Content Include="Images\chat-off.png" />
     <Content Include="Images\chat-on.png" />
     <Content Include="Images\checked.png" />
@@ -237,7 +238,6 @@
     <Content Include="Images\csv.gif" />
     <Content Include="Images\dashboard.png" />
     <Content Include="Images\delete.png" />
-    <Content Include="Images\directrewards-logo.png" />
     <Content Include="Images\divider1.gif" />
     <Content Include="Images\docs.png" />
     <Content Include="Images\done.png" />
@@ -303,7 +303,6 @@
     <Content Include="Images\step-arrow.png" />
     <Content Include="Images\steps.png" />
     <Content Include="Images\success.png" />
-    <Content Include="Images\sure-logo.png" />
     <Content Include="Images\thumbs-down.png" />
     <Content Include="Images\thumbs-up.png" />
     <Content Include="Images\tipsy.gif" />
@@ -341,6 +340,8 @@
     <Content Include="Content\fonts\fontawesome-webfont.woff2" />
     <Content Include="Content\fonts\FontAwesome.otf" />
     <Content Include="Content\caret.eot" />
+    <Content Include="Images\act-logo.psd" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
@@ -441,6 +442,12 @@
     <Content Include="Views\Administration\PSPDetails.cshtml" />
     <Content Include="Views\Shared\_PSPCustomSearch.cshtml" />
     <Content Include="Views\Administration\_PSPConfig.cshtml" />
+    <Content Include="Views\Administration\_ApproveDeclinePSP.cshtml" />
+    <Content Include="Views\Administration\_PSPUsers.cshtml" />
+    <Content Include="Views\Administration\_PSPClients.cshtml" />
+    <Content Include="Views\Administration\_PSPProducts.cshtml" />
+    <Content Include="Views\Administration\_PSPInvoices.cshtml" />
+    <Content Include="Views\Administration\_PSPBudgets.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

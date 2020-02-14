@@ -28,7 +28,7 @@ namespace ACT.Core.Services
 
             string query = string.Empty;
 
-            query = $"SELECT c.Id AS [TKey], c.CompanyName AS [TValue] FROM [dbo].[Client] c WHERE c.Status={( int ) PSPClientStatus.Verified}";
+            query = $"SELECT c.Id AS [TKey], c.CompanyName AS [TValue] FROM [dbo].[Client] c";
 
             model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();
 

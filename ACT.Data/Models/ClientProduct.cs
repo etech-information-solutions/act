@@ -38,6 +38,6 @@ namespace ACT.Data.Models
         public virtual Client Client { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientProductMonthly> ClientProductMonthlies { get; set; }
-        public virtual PSPProduct PSPProduct { get; set; }
+        public virtual Product Product { get; set; }
     }
 }

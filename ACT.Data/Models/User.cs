@@ -21,11 +21,11 @@ namespace ACT.Data.Models
             this.PSPUsers = new HashSet<PSPUser>();
             this.Regions = new HashSet<Region>();
             this.Tokens = new HashSet<Token>();
+            this.UserBroadcasts = new HashSet<UserBroadcast>();
             this.UserDocuments = new HashSet<UserDocument>();
             this.UserNotifications = new HashSet<UserNotification>();
             this.UserRoles = new HashSet<UserRole>();
             this.UserTasks = new HashSet<UserTask>();
-            this.UserBroadcasts = new HashSet<UserBroadcast>();
         }
     
         public int Id { get; set; }
@@ -51,6 +51,8 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Token> Tokens { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<UserBroadcast> UserBroadcasts { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserDocument> UserDocuments { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserNotification> UserNotifications { get; set; }
@@ -58,7 +60,5 @@ namespace ACT.Data.Models
         public virtual ICollection<UserRole> UserRoles { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserTask> UserTasks { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<UserBroadcast> UserBroadcasts { get; set; }
     }
 }

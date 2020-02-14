@@ -1,0 +1,169 @@
+﻿@model SystemConfig
+
+@using ACT.Data.Models;
+
+@{
+
+    ViewBag.ViewName = "_SystemConfigs";
+}
+
+
+@Html.Partial( "_Notification" )
+
+
+@if ( Model == null )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        Sorry, it seems that the System Configurations has not yet been pr-configured. Please contact the System Administrator for further help.
+    </div>
+}
+
+<h2 class="uppercase" style="margin-bottom: 0; height: 5px;">
+    <img alt="" src="@Url.Content( "~/images/info.png" )" />
+    <span>System Configuration</span>
+</h2>
+
+<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px;">&nbsp;</div>
+
+<div id="item-details" class="item-details" style="width: auto;">
+
+    <div class="grouped-area">
+
+        <div class="left" style="width: 48%; margin-right: 1%;">
+
+            <div class="display-label">
+                System Contact Email
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.SystemContactEmail )
+            </div>
+
+            <div class="display-label">
+                Finance Contact Email
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.FinancialContactEmail )
+            </div>
+
+            <div class="display-label">
+                Activation Email
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.ActivationEmail )
+            </div>
+
+            <div class="display-label">
+                Correspondence Email
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.CorrespondenceEmail )
+            </div>
+
+            <div class="display-label">
+                System Contact Number
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.ContactNumber )
+            </div>
+
+            <div class="display-label">
+                System Contact Address
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.Address )
+            </div>
+
+            <div class="display-label">
+                Invoice Run Day
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.InvoiceRunDay )
+            </div>
+
+        </div>
+
+        <div class="left" style="width: 48%;">
+
+            <div class="display-label">
+                Auto Logoff
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.AutoLogoff )
+            </div>
+
+            <div class="display-label">
+                Auto Logoff Seconds
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.LogoffSeconds )
+            </div>
+
+            <div class="display-label">
+                Password Change
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.PasswordChange )
+            </div>
+
+            <div class="display-label">
+                Images Location
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.ImagesLocation )
+            </div>
+
+            <div class="display-label">
+                Documents Location
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.DocumentsLocation )
+            </div>
+
+            <div class="display-label">
+                App Download Url
+            </div>
+            <div class="display-field">
+                <a href="@Model.AppDownloadUrl" target="_blank">@Model.AppDownloadUrl</a>
+            </div>
+
+            <div class="display-label">
+                Website Url
+            </div>
+            <div class="display-field">
+                <a href="@Model.WebsiteUrl" target="_blank">@Model.WebsiteUrl</a>
+            </div>
+
+        </div>
+
+        <div class="clear"></div>
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    <div class="grouped-area" style="margin-bottom: 0;">
+
+        <p style="margin-bottom: 0;">
+
+            @Html.ActionLink( "Edit", "EditSystemConfig", new { id = Model.Id }, new { @class = "edit", @rel = "tipsyS", @title = "...edit System Configuration?", @data_edit = "1", @data_id = Model.Id, @data_target = "#systemconfig" } )
+
+            <span style="padding: 0 5px;">/</span>
+
+            <a target="_blank" href="@Url.Action( "Export", new { @type = "systemconfig" } )" rel="tipsyS" title="...export to csv/excel?">
+                <img src="@Url.Content( "~/Images/excel.gif" )" alt="Export to csv/excel?" style="vertical-align: middle;" />
+                Export
+            </a>
+
+            <span style="padding: 0 5px;">/</span>
+
+            <a rel="tipsyS" title="...refresh details?" data-refresh="1" data-target="#systemconfig">
+                <img src="@Url.Content( "~/Images/refresh.png" )" alt="Refresh List?" style="width: 20px; vertical-align: middle;" />
+            </a>
+
+            <span class="loader"></span>
+
+        </p>
+
+    </div>
+
+</div>
