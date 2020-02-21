@@ -27,14 +27,14 @@
 @if (Model == null || !items.Any())
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
-        There are no PSPs  available matching your search criteria.
+        There are no Clients available matching your search criteria.
     </div>
 }
 
 @if (user.IsAdmin)
 {
     <p>
-        @Html.ActionLink("Add PSP", "AddPSP", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new PSP?", @data_edit = "1", @data_id = 0, @data_target = "#psps" })
+        @Html.ActionLink("Add Client", "AddClient", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Client?", @data_edit = "1", @data_id = 0, @data_target = "#psps" })
         <span class="loader"></span>
     </p>
 }
