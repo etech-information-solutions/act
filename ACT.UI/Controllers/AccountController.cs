@@ -411,7 +411,7 @@ namespace ACT.UI.Controllers
 
                 #region Any Uploads
 
-                if ( model.RegistrationFile != null )
+                if ( model.RegistrationFile.File != null )
                 {
                     // Create folder
                     string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/{objectType}/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/" );

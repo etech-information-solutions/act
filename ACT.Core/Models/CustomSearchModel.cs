@@ -67,9 +67,15 @@ namespace ACT.Core.Models
         }
 
         /// <summary>
+        /// Can be used for any entity requiring PSP filter
+        /// </summary>
+        [Display( Name = "PSP" )]
+        public int PSPId { get; set; }
+
+        /// <summary>
         /// Can be used for a Start date range
         /// </summary>
-        [Display( Name = "From Date" )]
+        [ Display( Name = "From Date" )]
         public DateTime? FromDate
         {
             get; set;

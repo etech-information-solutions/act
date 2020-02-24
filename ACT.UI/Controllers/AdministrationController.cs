@@ -975,7 +975,7 @@ namespace ACT.UI.Controllers
                 {
                     ViewBag.Address = address;
                 }
-                if ( address != null )
+                if ( documents != null )
                 {
                     ViewBag.Documents = documents;
                 }
@@ -1328,7 +1328,7 @@ namespace ACT.UI.Controllers
 
                 #region Any Uploads
 
-                if ( model.RegistrationFile != null )
+                if ( model.RegistrationFile.File != null )
                 {
                     // Create folder
                     string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/PSP/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/" );
@@ -2425,6 +2425,602 @@ namespace ACT.UI.Controllers
 
 
 
+        #region Regions
+
+        //
+        // GET: /Administration/RegionDetails/5
+        public ActionResult RegionDetails( int id, bool layout = true )
+        {
+            Region model;
+
+            using ( RegionService service = new RegionService() )
+            {
+                model = service.GetById( id );
+            }
+
+            if ( model == null )
+            {
+                Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                return RedirectToAction( "Index" );
+            }
+
+            if ( layout )
+            {
+                ViewBag.IncludeLayout = true;
+            }
+
+            return View( model );
+        }
+
+        //
+        // GET: /Administration/AddRegion/5
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddRegion()
+        {
+            RegionViewModel model = new RegionViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        //
+        // POST: /Administration/AddRegion/5
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddRegion( RegionViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the Region was not created. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            Region region = new Region();
+
+            using ( RegionService service = new RegionService() )
+            {
+                if ( service.Exist( model.Name, model.PSPId ) )
+                {
+                    // Region already exist!
+                    Notify( $"Sorry, a Region with the Name \"{model.Name}\" already exists for the selected PSP!", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                region.Name = model.Name;
+                region.PSPId = model.PSPId;
+                region.Status = ( int ) model.Status;
+                region.Description = model.Description;
+                region.RegionManagerId = model.RegionManagerId;
+
+                region = service.Create( region );
+
+                Notify( "The Region was successfully created.", NotificationType.Success );
+            }
+
+            return RedirectToAction( "Regions" );
+        }
+
+        //
+        // GET: /Administration/EditRegion/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditRegion( int id )
+        {
+            Region region;
+
+            using ( RegionService service = new RegionService() )
+            {
+                region = service.GetById( id );
+            }
+
+            if ( region == null )
+            {
+                Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                return PartialView( "_AccessDenied" );
+            }
+
+            RegionViewModel model = new RegionViewModel()
+            {
+                Id = region.Id,
+                EditMode = true,
+                Name = region.Name,
+                PSPId = region.PSPId,
+                Description = region.Description,
+                Status = ( Status ) region.Status,
+                RegionManagerId = region.RegionManagerId,
+            };
+
+            return View( model );
+        }
+
+        //
+        // POST: /Administration/EditRegion/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditRegion( RegionViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the selected Region was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            Region region;
+
+            using ( RegionService service = new RegionService() )
+            {
+                region = service.GetById( model.Id );
+
+                if ( region == null )
+                {
+                    Notify( "Sorry, that Region does not exist! Please specify a valid Region Id and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                if ( region.Name != model.Name && region.PSPId != model.PSPId && service.Exist( model.Name, model.PSPId ) )
+                {
+                    // Region already exist!
+                    Notify( $"Sorry, a Region with the Name \"{model.Name}\" already exists for the selected PSP!", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                region.Name = model.Name;
+                region.PSPId = model.PSPId;
+                region.Status = ( int ) model.Status;
+                region.Description = model.Description;
+                region.RegionManagerId = model.RegionManagerId;
+
+                region = service.Update( region );
+
+                Notify( "The selected Region's details were successfully updated.", NotificationType.Success );
+            }
+
+            return RedirectToAction( "Regions" );
+        }
+
+        //
+        // POST: /Administration/DeleteRegion/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteRegion( RegionViewModel model )
+        {
+            Region region;
+
+            using ( RegionService service = new RegionService() )
+            {
+                region = service.GetById( model.Id );
+
+                if ( region == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                region.Status = ( ( ( Status ) region.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.Update( region );
+
+                Notify( "The selected Region was successfully updated.", NotificationType.Success );
+            }
+
+            return RedirectToAction( "Regions" );
+        }
+
+        #endregion
+
+
+
+        #region Products
+
+        //
+        // GET: /Administration/ProductDetails/5
+        public ActionResult ProductDetails( int id, bool layout = true )
+        {
+            using ( ProductService pservice = new ProductService() )
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                Product model = pservice.GetById( id );
+
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return RedirectToAction( "Index" );
+                }
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                List<Document> documents = dservice.List( model.Id, "Product" );
+
+                if ( documents != null )
+                {
+                    ViewBag.Documents = documents;
+                }
+
+                return View( model );
+            }
+        }
+
+        //
+        // GET: /Administration/AddProduct/5
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddProduct()
+        {
+            ProductViewModel model = new ProductViewModel() { EditMode = true, ProductPrices = new List<ProductPriceViewModel>() };
+
+            foreach ( int item in Enum.GetValues( typeof( ProductPriceType ) ) )
+            {
+                ProductPriceType type = ( ProductPriceType ) item;
+
+                model.ProductPrices.Add( new ProductPriceViewModel()
+                {
+                    Type = type,
+                    Status = Status.Active
+                } );
+            }
+
+            return View( model );
+        }
+
+        //
+        // POST: /Administration/AddProduct/5
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddProduct( ProductViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the Product was not created. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            Product product = new Product();
+
+            using ( ProductService pservice = new ProductService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( DocumentService dservice = new DocumentService() )
+            using ( ProductPriceService ppservice = new ProductPriceService() )
+            {
+                #region Validations
+
+                if ( pservice.Exist( model.Name ) )
+                {
+                    // Product already exist!
+                    Notify( $"Sorry, a Product with the Name \"{model.Name}\" already exists!", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                #endregion
+
+                #region Product
+
+                product.Name = model.Name;
+                product.Status = ( int ) model.Status;
+                product.Description = model.Description;
+
+                product = pservice.Create( product );
+
+                #endregion
+
+                #region Product Prices
+
+                if ( model.ProductPrices.NullableAny() )
+                {
+                    foreach ( ProductPriceViewModel price in model.ProductPrices )
+                    {
+                        ProductPrice pp = new ProductPrice()
+                        {
+                            ProductId = product.Id,
+                            Rate = price.Rate ?? 0,
+                            Type = ( int ) price.Type,
+                            RateUnit = price.RateUnit,
+                            FromDate = price.StartDate,
+                            Status = ( int ) price.Status,
+                        };
+
+                        ppservice.Create( pp );
+                    }
+                }
+
+                #endregion
+
+                #region Any Files
+
+                if ( model.File != null )
+                {
+                    // Create folder
+                    string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/Product/{model.Name.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/" );
+
+                    if ( !Directory.Exists( path ) )
+                    {
+                        Directory.CreateDirectory( path );
+                    }
+
+                    string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+
+                    Document doc = new Document()
+                    {
+                        ObjectId = product.Id,
+                        ObjectType = "Product",
+                        Name = model.File.Name,
+                        Category = model.File.Name,
+                        Status = ( int ) Status.Active,
+                        Title = model.File.File.FileName,
+                        Size = model.File.File.ContentLength,
+                        Description = model.File.Description,
+                        Type = Path.GetExtension( model.File.File.FileName ),
+                        Location = $"Product/{model.Name.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/{now}-{model.File.File.FileName}"
+                    };
+
+                    dservice.Create( doc );
+
+                    string fullpath = Path.Combine( path, $"{now}-{model.File.File.FileName}" );
+                    model.File.File.SaveAs( fullpath );
+                }
+
+                #endregion
+
+                scope.Complete();
+
+                Notify( "The Product was successfully created.", NotificationType.Success );
+            }
+
+            return RedirectToAction( "Products" );
+        }
+
+        //
+        // GET: /Administration/EditProduct/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditProduct( int id )
+        {
+            using ( DocumentService dservice = new DocumentService() )
+            using ( ProductService pservice = new ProductService() )
+            {
+                Product product = pservice.GetById( id );
+
+                if ( product == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                List<Document> documents = dservice.List( product.Id, "Product" );
+
+                ProductViewModel model = new ProductViewModel()
+                {
+                    Id = product.Id,
+                    EditMode = true,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Status = ( Status ) product.Status,
+                    File = new FileViewModel()
+                    {
+                        Name = documents?.FirstOrDefault()?.Name,
+                        Id = documents?.FirstOrDefault()?.Id ?? 0,
+                        Extension = documents?.FirstOrDefault()?.Type,
+                        Description = documents?.FirstOrDefault()?.Description,
+                    },
+                    ProductPrices = new List<ProductPriceViewModel>(),
+                };
+
+                foreach ( ProductPrice p in product.ProductPrices )
+                {
+                    model.ProductPrices.Add( new ProductPriceViewModel()
+                    {
+                        Id = p.Id,
+                        Rate = p.Rate,
+                        RateUnit = p.RateUnit,
+                        StartDate = p.FromDate,
+                        ProductId = p.ProductId,
+                        Status = ( Status ) p.Status,
+                        Type = ( ProductPriceType ) p.Type
+                    } );
+                }
+
+                if ( model.ProductPrices.Count < 3 )
+                {
+                    foreach ( int item in Enum.GetValues( typeof( ProductPriceType ) ) )
+                    {
+                        ProductPriceType type = ( ProductPriceType ) item;
+
+                        if ( model.ProductPrices.Any( p => p.Type == type ) ) continue;
+
+                        model.ProductPrices.Add( new ProductPriceViewModel()
+                        {
+                            Type = type,
+                            Status = Status.Active
+                        } );
+                    }
+                }
+
+                return View( model );
+            }
+        }
+
+        //
+        // POST: /Administration/EditProduct/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditProduct( ProductViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the selected Product was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( ProductService pservice = new ProductService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( DocumentService dservice = new DocumentService() )
+            using ( ProductPriceService ppservice = new ProductPriceService() )
+            {
+                Product product = pservice.GetById( model.Id );
+
+                #region Validations
+
+                if ( product == null )
+                {
+                    Notify( "Sorry, that Product does not exist! Please specify a valid Product Id and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                if ( product.Name != model.Name && pservice.Exist( model.Name ) )
+                {
+                    // Product already exist!
+                    Notify( $"Sorry, a Product with the Name \"{model.Name}\" already exists!", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                #endregion
+
+                #region Product
+
+                product.Name = model.Name;
+                product.Status = ( int ) model.Status;
+                product.Description = model.Description;
+
+                product = pservice.Update( product );
+
+                #endregion
+
+                #region Product Prices
+
+                if ( model.ProductPrices.NullableAny() )
+                {
+                    foreach ( ProductPriceViewModel price in model.ProductPrices )
+                    {
+                        ProductPrice pp = ppservice.GetById( price.Id );
+
+                        if ( pp == null )
+                        {
+                            pp = new ProductPrice()
+                            {
+                                ProductId = product.Id,
+                                Rate = price.Rate ?? 0,
+                                Type = ( int ) price.Type,
+                                RateUnit = price.RateUnit,
+                                FromDate = price.StartDate,
+                                Status = ( int ) price.Status,
+                            };
+
+                            ppservice.Create( pp );
+                        }
+                        else
+                        {
+                            pp.Rate = price.Rate ?? 0;
+                            pp.RateUnit = price.RateUnit;
+                            pp.FromDate = price.StartDate;
+                            pp.Status = ( int ) price.Status;
+
+                            ppservice.Update( pp );
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region Any Files
+
+                if ( model.File.File != null )
+                {
+                    // Create folder
+                    string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/Product/{model.Name.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/" );
+
+                    if ( !Directory.Exists( path ) )
+                    {
+                        Directory.CreateDirectory( path );
+                    }
+
+                    string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+
+                    Document doc = dservice.GetById( model.File.Id );
+
+                    if ( doc != null )
+                    {
+                        // Disable this file...
+                        doc.Status = ( int ) Status.Inactive;
+
+                        dservice.Update( doc );
+                    }
+
+                    doc = new Document()
+                    {
+                        ObjectId = product.Id,
+                        ObjectType = "Product",
+                        Name = model.File.Name,
+                        Category = model.File.Name,
+                        Status = ( int ) Status.Active,
+                        Title = model.File.File.FileName,
+                        Size = model.File.File.ContentLength,
+                        Description = model.File.Description,
+                        Type = Path.GetExtension( model.File.File.FileName ),
+                        Location = $"Product/{model.Name.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/{now}-{model.File.File.FileName}"
+                    };
+
+                    dservice.Create( doc );
+
+                    string fullpath = Path.Combine( path, $"{now}-{model.File.File.FileName}" );
+                    model.File.File.SaveAs( fullpath );
+                }
+
+                #endregion
+
+                scope.Complete();
+
+                Notify( "The selected Product's details were successfully updated.", NotificationType.Success );
+            }
+
+            return RedirectToAction( "Products" );
+        }
+
+        //
+        // POST: /Administration/DeleteProduct/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteProduct( ProductViewModel model )
+        {
+            Product product;
+
+            using ( ProductService service = new ProductService() )
+            {
+                product = service.GetById( model.Id );
+
+                if ( product == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                product.Status = ( ( ( Status ) product.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.Update( product );
+
+                Notify( "The selected Product was successfully updated.", NotificationType.Success );
+            }
+
+            return RedirectToAction( "Products" );
+        }
+
+        #endregion
+
+
+
         #region Partial Views
 
 
@@ -2478,6 +3074,60 @@ namespace ACT.UI.Controllers
             PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
             return PartialView( "_PSPs", paging );
+        }
+
+
+        //
+        // POST || GET: /Administration/Regions
+        public ActionResult Regions( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "Regions";
+
+                return PartialView( "_RegionCustomSearch", new CustomSearchModel( "Regions" ) );
+            }
+
+            int total = 0;
+
+            List<RegionCustomModel> model = new List<RegionCustomModel>();
+
+            using ( RegionService service = new RegionService() )
+            {
+                model = service.List1( pm, csm );
+                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+            }
+
+            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+            return PartialView( "_Regions", paging );
+        }
+
+
+        //
+        // POST || GET: /Administration/Products
+        public ActionResult Products( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "Products";
+
+                return PartialView( "_ProductCustomSearch", new CustomSearchModel( "Products" ) );
+            }
+
+            int total = 0;
+
+            List<ProductCustomModel> model = new List<ProductCustomModel>();
+
+            using ( ProductService service = new ProductService() )
+            {
+                model = service.List1( pm, csm );
+                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+            }
+
+            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+            return PartialView( "_Products", paging );
         }
 
 

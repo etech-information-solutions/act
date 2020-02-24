@@ -7,7 +7,7 @@ namespace ACT.Core.Models.Custom
     {
         public int Id { get; set; }
         public int PSPId { get; set; }
-        public int ProductId { get; set; }
+        public int PSPProductId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }

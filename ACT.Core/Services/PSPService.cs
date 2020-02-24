@@ -281,11 +281,17 @@ namespace ACT.Core.Services
             Dictionary<int, string> pspOptions = new Dictionary<int, string>();
             List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
 
-            List<object> parameters = new List<object>();
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+            };
 
-            string query = string.Empty;
+            string query = $"SELECT p.Id AS [TKey], p.CompanyName AS [TValue] FROM [dbo].[PSP] p";
 
-            query = $"SELECT p.Id AS [TKey], p.CompanyName AS [TValue] FROM [dbo].[PSP] p";
+            if ( !CurrentUser.IsAdmin )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu WHERE pu.UserId=@userid AND pu.PSPId=p.Id)";
+            }
 
             model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();
 

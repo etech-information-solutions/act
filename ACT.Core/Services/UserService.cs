@@ -236,14 +236,12 @@ namespace ACT.Core.Services
         /// <returns></returns>
         public int Total1( PagingModel pm, CustomSearchModel csm )
         {
-            string[] qs = ( csm.Query ?? "" ).Split( ' ' );
-
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
                 csm.ToDate = csm.ToDate?.AddDays( 1 );
             }
 
-            CountModel count = new CountModel();
+            CountModel count;
 
             // Parameters
 

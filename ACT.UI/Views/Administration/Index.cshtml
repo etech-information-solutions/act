@@ -1,9 +1,11 @@
-﻿@using ACT.Core.Models;
+﻿
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
 
 @{
     ViewBag.Title = "Administration";
 
-    //UserModel user = User.Get();
+    UserModel user = User.Get();
 }
 
 
@@ -14,28 +16,48 @@
         <li data-hot-spot="1" data-c="Administration" data-t="Users">
             <a data-ap-tab="1" data-target="#users" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Users">Users</a>
         </li>
+
         <li data-hot-spot="1" data-c="Administration" data-t="PSPs">
             <a data-ap-tab="1" data-target="#psps" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PSPs">PSPs</a>
         </li>
+
+        <li data-hot-spot="1" data-c="Administration" data-t="Regions">
+            <a data-ap-tab="1" data-target="#regions" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Regions">Regions</a>
+        </li>
+
+        @if ( user.IsAdmin )
+        {
+            <li data-hot-spot="1" data-c="Administration" data-t="Products">
+                <a data-ap-tab="1" data-target="#products" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Products">Products</a>
+            </li>
+        }
+
         @*<li data-hot-spot="1" data-c="Administration" data-t="Clients">
             <a data-ap-tab="1" data-target="#clients" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Clients">Clients</a>
         </li>*@
+
         <li data-hot-spot="1" data-c="Administration" data-t="AuditLog">
             <a data-ap-tab="1" data-target="#auditlog" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="AuditLog">Audit Log</a>
         </li>
+
         <li data-hot-spot="1" data-c="Administration" data-t="Broadcasts">
             <a data-ap-tab="1" data-target="#broadcasts" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Broadcasts">Broadcasts</a>
         </li>
-        <li data-hot-spot="1" data-c="Administration" data-t="Roles">
-            <a data-ap-tab="1" data-target="#roles" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Roles">Roles</a>
-        </li>
-        <li data-hot-spot="1" data-c="Administration" data-t="SystemConfig">
-            <a data-ap-tab="1" data-target="#systemconfig" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="SystemConfig">System Config</a>
-        </li>
 
-        <li data-hot-spot="1" data-c="Administration" data-t="DeclineReasons">
-            <a data-ap-tab="1" data-target="#declinereasons" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="DeclineReasons">Decline Reasons</a>
-        </li>
+        @if ( user.IsAdmin )
+        {
+            <li data-hot-spot="1" data-c="Administration" data-t="Roles">
+                <a data-ap-tab="1" data-target="#roles" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Roles">Roles</a>
+            </li>
+
+            <li data-hot-spot="1" data-c="Administration" data-t="SystemConfig">
+                <a data-ap-tab="1" data-target="#systemconfig" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="SystemConfig">System Config</a>
+            </li>
+
+            <li data-hot-spot="1" data-c="Administration" data-t="DeclineReasons">
+                <a data-ap-tab="1" data-target="#declinereasons" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="DeclineReasons">Decline Reasons</a>
+            </li>
+        }
 
         <li class="last"></li>
     </ul>
@@ -48,17 +70,25 @@
 
         <div id="psps" class="da-tab none" data-load-url="PSPs"> </div>
 
-        <div id="clients" class="da-tab none" data-load-url="Clients"> </div>
+        @if ( user.IsAdmin )
+        {
+            <div id="products" class="da-tab none" data-load-url="Products"> </div>
+
+            <div id="roles" class="da-tab none" data-load-url="Roles"> </div>
+
+            <div id="systemconfig" class="da-tab none" data-load-url="SystemConfig"> </div>
+
+            <div id="declinereasons" class="da-tab none" data-load-url="DeclineReasons"> </div>
+        }
+
+        <div id="regions" class="da-tab none" data-load-url="Regions"> </div>
+
+        @*<div id="clients" class="da-tab none" data-load-url="Clients"> </div>*@
 
         <div id="auditlog" class="da-tab none" data-load-url="AuditLog"> </div>
 
         <div id="broadcasts" class="da-tab none" data-load-url="Broadcasts"> </div>
 
-        <div id="roles" class="da-tab none" data-load-url="Roles"> </div>
-
-        <div id="systemconfig" class="da-tab none" data-load-url="SystemConfig"> </div>
-
-        <div id="declinereasons" class="da-tab none" data-load-url="DeclineReasons"> </div>
     </div>
 
 </div>

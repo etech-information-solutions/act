@@ -40,7 +40,6 @@
         <EntityTypeShape EntityType="ACTModel.Product" Width="1.5" PointX="8.25" PointY="30.875" />
         <EntityTypeShape EntityType="ACTModel.ProductPrice" Width="1.5" PointX="16.75" PointY="27.5" />
         <EntityTypeShape EntityType="ACTModel.PSP" Width="1.5" PointX="0.75" PointY="18.625" />
-        <EntityTypeShape EntityType="ACTModel.PSPBilling" Width="1.5" PointX="14.5" PointY="24.125" />
         <EntityTypeShape EntityType="ACTModel.PSPBudget" Width="1.5" PointX="3" PointY="40" />
         <EntityTypeShape EntityType="ACTModel.PSPClient" Width="1.5" PointX="10.5" PointY="31.5" />
         <EntityTypeShape EntityType="ACTModel.PSPConfig" Width="1.5" PointX="3" PointY="13.25" />
@@ -98,11 +97,8 @@
         <AssociationConnector Association="ACTModel.FK_Journals_SiteAudit" />
         <AssociationConnector Association="ACTModel.FK_UserNotification_Notification" />
         <AssociationConnector Association="ACTModel.FK_ProductPrices_Products" />
-        <AssociationConnector Association="ACTModel.FK_PSPBilling_Products" />
         <AssociationConnector Association="ACTModel.FK_PSPProduct_Product" />
         <AssociationConnector Association="ACTModel.FK_SiteBilling_Products" />
-        <AssociationConnector Association="ACTModel.FK_ProductPrices_PSPBilling" />
-        <AssociationConnector Association="ACTModel.FK_PSPBilling_PSP" />
         <AssociationConnector Association="ACTModel.FK_PSPBudget_PSP" />
         <AssociationConnector Association="ACTModel.FK_PSPClients_PSP" />
         <AssociationConnector Association="ACTModel.FK_PSPConfigs_PSP" />
@@ -124,6 +120,9 @@
         <AssociationConnector Association="ACTModel.FK_UserNotification_User" />
         <AssociationConnector Association="ACTModel.FK_UserRoles_Users" />
         <AssociationConnector Association="ACTModel.FK_UserTask_User" />
+        <EntityTypeShape EntityType="ACTModel.PSPBilling" Width="1.5" PointX="13.75" PointY="21.375" />
+        <AssociationConnector Association="ACTModel.FK_PSPBilling_PSP" />
+        <AssociationConnector Association="ACTModel.FK_PSPBilling_PSPProducts" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

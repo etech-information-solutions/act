@@ -19,7 +19,6 @@ namespace ACT.Data.Models
         {
             this.ClientProducts = new HashSet<ClientProduct>();
             this.ProductPrices = new HashSet<ProductPrice>();
-            this.PSPBillings = new HashSet<PSPBilling>();
             this.PSPProducts = new HashSet<PSPProduct>();
             this.SiteBillings = new HashSet<SiteBilling>();
         }
@@ -36,8 +35,6 @@ namespace ACT.Data.Models
         public virtual ICollection<ClientProduct> ClientProducts { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ProductPrice> ProductPrices { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<PSPBilling> PSPBillings { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PSPProduct> PSPProducts { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

@@ -14,6 +14,12 @@ namespace ACT.Data.Models
     
     public partial class PSPProduct
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public PSPProduct()
+        {
+            this.PSPBillings = new HashSet<PSPBilling>();
+        }
+    
         public int Id { get; set; }
         public int PSPId { get; set; }
         public int ProductId { get; set; }
@@ -30,5 +36,7 @@ namespace ACT.Data.Models
     
         public virtual Product Product { get; set; }
         public virtual PSP PSP { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<PSPBilling> PSPBillings { get; set; }
     }
 }

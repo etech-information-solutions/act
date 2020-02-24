@@ -42,7 +42,7 @@ namespace ACT.Core.Services
                      (
                          // CUSTOM SEARCH
                          ( ( csm.UserId != 0 ) ? a.UserId == csm.UserId : true ) &&
-                          ( ( csm.ObjectId != 0 ) ? a.ObjectId == csm.ObjectId : true ) &&
+                         ( ( csm.ObjectId != 0 ) ? a.ObjectId == csm.ObjectId : true ) &&
                          ( ( !string.IsNullOrEmpty( csm.TableName ) ) ? a.ActionTable == csm.TableName : true ) &&
                          ( ( !string.IsNullOrEmpty( csm.ControllerName ) ) ? a.Controller == csm.ControllerName : true ) &&
                          ( ( csm.FromDate.HasValue ) ? DbFunctions.TruncateTime( a.CreatedOn ) >= DbFunctions.TruncateTime( csm.FromDate ) : true ) &&

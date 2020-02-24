@@ -595,6 +595,7 @@
           <Property Name="RateUnit" Type="int" />
           <Property Name="FromDate" Type="date" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="Type" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="PSP">
           <Key>
@@ -624,7 +625,7 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="PSPId" Type="int" Nullable="false" />
-          <Property Name="ProductId" Type="int" Nullable="false" />
+          <Property Name="PSPProductId" Type="int" Nullable="false" />
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
@@ -1347,30 +1348,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ProductPrices_PSPBilling">
-          <End Role="PSPBilling" Type="Self.PSPBilling" Multiplicity="1" />
-          <End Role="ProductPrice" Type="Self.ProductPrice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSPBilling">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ProductPrice">
-              <PropertyRef Name="ProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PSPBilling_Products">
-          <End Role="Product" Type="Self.Product" Multiplicity="1" />
-          <End Role="PSPBilling" Type="Self.PSPBilling" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Product">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PSPBilling">
-              <PropertyRef Name="ProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_PSPBilling_PSP">
           <End Role="PSP" Type="Self.PSP" Multiplicity="1" />
           <End Role="PSPBilling" Type="Self.PSPBilling" Multiplicity="*" />
@@ -1380,6 +1357,18 @@
             </Principal>
             <Dependent Role="PSPBilling">
               <PropertyRef Name="PSPId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PSPBilling_PSPProducts">
+          <End Role="PSPProduct" Type="Self.PSPProduct" Multiplicity="1" />
+          <End Role="PSPBilling" Type="Self.PSPBilling" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PSPProduct">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PSPBilling">
+              <PropertyRef Name="PSPProductId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1914,16 +1903,12 @@
             <End Role="Product" EntitySet="Product" />
             <End Role="ProductPrice" EntitySet="ProductPrice" />
           </AssociationSet>
-          <AssociationSet Name="FK_ProductPrices_PSPBilling" Association="Self.FK_ProductPrices_PSPBilling">
-            <End Role="PSPBilling" EntitySet="PSPBilling" />
-            <End Role="ProductPrice" EntitySet="ProductPrice" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PSPBilling_Products" Association="Self.FK_PSPBilling_Products">
-            <End Role="Product" EntitySet="Product" />
-            <End Role="PSPBilling" EntitySet="PSPBilling" />
-          </AssociationSet>
           <AssociationSet Name="FK_PSPBilling_PSP" Association="Self.FK_PSPBilling_PSP">
             <End Role="PSP" EntitySet="PSP" />
+            <End Role="PSPBilling" EntitySet="PSPBilling" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PSPBilling_PSPProducts" Association="Self.FK_PSPBilling_PSPProducts">
+            <End Role="PSPProduct" EntitySet="PSPProduct" />
             <End Role="PSPBilling" EntitySet="PSPBilling" />
           </AssociationSet>
           <AssociationSet Name="FK_PSPBudget_PSP" Association="Self.FK_PSPBudget_PSP">
@@ -2087,7 +2072,6 @@
           <EntitySet Name="Products" EntityType="ACTModel.Product" />
           <EntitySet Name="ProductPrices" EntityType="ACTModel.ProductPrice" />
           <EntitySet Name="PSPs" EntityType="ACTModel.PSP" />
-          <EntitySet Name="PSPBillings" EntityType="ACTModel.PSPBilling" />
           <EntitySet Name="PSPBudgets" EntityType="ACTModel.PSPBudget" />
           <EntitySet Name="PSPClients" EntityType="ACTModel.PSPClient" />
           <EntitySet Name="PSPConfigs" EntityType="ACTModel.PSPConfig" />
@@ -2250,10 +2234,6 @@
             <End Role="Product" EntitySet="Products" />
             <End Role="ProductPrice" EntitySet="ProductPrices" />
           </AssociationSet>
-          <AssociationSet Name="FK_PSPBilling_Products" Association="ACTModel.FK_PSPBilling_Products">
-            <End Role="Product" EntitySet="Products" />
-            <End Role="PSPBilling" EntitySet="PSPBillings" />
-          </AssociationSet>
           <AssociationSet Name="FK_PSPProduct_Product" Association="ACTModel.FK_PSPProduct_Product">
             <End Role="Product" EntitySet="Products" />
             <End Role="PSPProduct" EntitySet="PSPProducts" />
@@ -2261,14 +2241,6 @@
           <AssociationSet Name="FK_SiteBilling_Products" Association="ACTModel.FK_SiteBilling_Products">
             <End Role="Product" EntitySet="Products" />
             <End Role="SiteBilling" EntitySet="SiteBillings" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ProductPrices_PSPBilling" Association="ACTModel.FK_ProductPrices_PSPBilling">
-            <End Role="PSPBilling" EntitySet="PSPBillings" />
-            <End Role="ProductPrice" EntitySet="ProductPrices" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PSPBilling_PSP" Association="ACTModel.FK_PSPBilling_PSP">
-            <End Role="PSP" EntitySet="PSPs" />
-            <End Role="PSPBilling" EntitySet="PSPBillings" />
           </AssociationSet>
           <AssociationSet Name="FK_PSPBudget_PSP" Association="ACTModel.FK_PSPBudget_PSP">
             <End Role="PSP" EntitySet="PSPs" />
@@ -2353,6 +2325,15 @@
           <AssociationSet Name="FK_UserTask_User" Association="ACTModel.FK_UserTask_User">
             <End Role="User" EntitySet="Users" />
             <End Role="UserTask" EntitySet="UserTasks" />
+          </AssociationSet>
+          <EntitySet Name="PSPBillings" EntityType="ACTModel.PSPBilling" />
+          <AssociationSet Name="FK_PSPBilling_PSP" Association="ACTModel.FK_PSPBilling_PSP">
+            <End Role="PSP" EntitySet="PSPs" />
+            <End Role="PSPBilling" EntitySet="PSPBillings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PSPBilling_PSPProducts" Association="ACTModel.FK_PSPBilling_PSPProducts">
+            <End Role="PSPProduct" EntitySet="PSPProducts" />
+            <End Role="PSPBilling" EntitySet="PSPBillings" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Address">
@@ -2987,7 +2968,6 @@
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="ClientProducts" Relationship="ACTModel.FK_ClientProducts_Products" FromRole="Product" ToRole="ClientProduct" />
           <NavigationProperty Name="ProductPrices" Relationship="ACTModel.FK_ProductPrices_Products" FromRole="Product" ToRole="ProductPrice" />
-          <NavigationProperty Name="PSPBillings" Relationship="ACTModel.FK_PSPBilling_Products" FromRole="Product" ToRole="PSPBilling" />
           <NavigationProperty Name="PSPProducts" Relationship="ACTModel.FK_PSPProduct_Product" FromRole="Product" ToRole="PSPProduct" />
           <NavigationProperty Name="SiteBillings" Relationship="ACTModel.FK_SiteBilling_Products" FromRole="Product" ToRole="SiteBilling" />
         </EntityType>
@@ -3005,7 +2985,7 @@
           <Property Name="FromDate" Type="DateTime" Precision="0" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Product" Relationship="ACTModel.FK_ProductPrices_Products" FromRole="ProductPrice" ToRole="Product" />
-          <NavigationProperty Name="PSPBilling" Relationship="ACTModel.FK_ProductPrices_PSPBilling" FromRole="ProductPrice" ToRole="PSPBilling" />
+          <Property Name="Type" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="PSP">
           <Key>
@@ -3028,37 +3008,13 @@
           <Property Name="DeclinedReason" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="ServiceRequired" Type="Int32" Nullable="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="PSPBillings" Relationship="ACTModel.FK_PSPBilling_PSP" FromRole="PSP" ToRole="PSPBilling" />
           <NavigationProperty Name="PSPBudgets" Relationship="ACTModel.FK_PSPBudget_PSP" FromRole="PSP" ToRole="PSPBudget" />
           <NavigationProperty Name="PSPClients" Relationship="ACTModel.FK_PSPClients_PSP" FromRole="PSP" ToRole="PSPClient" />
           <NavigationProperty Name="PSPConfigs" Relationship="ACTModel.FK_PSPConfigs_PSP" FromRole="PSP" ToRole="PSPConfig" />
           <NavigationProperty Name="PSPProducts" Relationship="ACTModel.FK_PSPProducts_PSP" FromRole="PSP" ToRole="PSPProduct" />
           <NavigationProperty Name="PSPUsers" Relationship="ACTModel.FK_PSPUser_PSP" FromRole="PSP" ToRole="PSPUser" />
           <NavigationProperty Name="Regions" Relationship="ACTModel.FK_Regions_PSP" FromRole="PSP" ToRole="Region" />
-        </EntityType>
-        <EntityType Name="PSPBilling">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="PSPId" Type="Int32" Nullable="false" />
-          <Property Name="ProductId" Type="Int32" Nullable="false" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="StatementNumber" Type="Int32" />
-          <Property Name="StatementDate" Type="DateTime" Precision="3" />
-          <Property Name="Rate" Type="Decimal" Precision="19" Scale="4" />
-          <Property Name="Units" Type="Int32" />
-          <Property Name="InvoiceAmount" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
-          <Property Name="PaymentAmount" Type="Decimal" Precision="19" Scale="4" />
-          <Property Name="PaymentDate" Type="DateTime" Precision="3" />
-          <Property Name="ReferenceNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="NominatedAccount" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Status" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Product" Relationship="ACTModel.FK_PSPBilling_Products" FromRole="PSPBilling" ToRole="Product" />
-          <NavigationProperty Name="ProductPrices" Relationship="ACTModel.FK_ProductPrices_PSPBilling" FromRole="PSPBilling" ToRole="ProductPrice" />
-          <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPBilling_PSP" FromRole="PSPBilling" ToRole="PSP" />
+          <NavigationProperty Name="PSPBillings" Relationship="ACTModel.FK_PSPBilling_PSP" FromRole="PSP" ToRole="PSPBilling" />
         </EntityType>
         <EntityType Name="PSPBudget">
           <Key>
@@ -3144,6 +3100,7 @@
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Product" Relationship="ACTModel.FK_PSPProduct_Product" FromRole="PSPProduct" ToRole="Product" />
           <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPProducts_PSP" FromRole="PSPProduct" ToRole="PSP" />
+          <NavigationProperty Name="PSPBillings" Relationship="ACTModel.FK_PSPBilling_PSPProducts" FromRole="PSPProduct" ToRole="PSPBilling" />
         </EntityType>
         <EntityType Name="PSPUser">
           <Key>
@@ -3903,18 +3860,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_PSPBilling_Products">
-          <End Type="ACTModel.Product" Role="Product" Multiplicity="1" />
-          <End Type="ACTModel.PSPBilling" Role="PSPBilling" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Product">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PSPBilling">
-              <PropertyRef Name="ProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_PSPProduct_Product">
           <End Type="ACTModel.Product" Role="Product" Multiplicity="1" />
           <End Type="ACTModel.PSPProduct" Role="PSPProduct" Multiplicity="*" />
@@ -3936,30 +3881,6 @@
             </Principal>
             <Dependent Role="SiteBilling">
               <PropertyRef Name="ProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ProductPrices_PSPBilling">
-          <End Type="ACTModel.PSPBilling" Role="PSPBilling" Multiplicity="1" />
-          <End Type="ACTModel.ProductPrice" Role="ProductPrice" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSPBilling">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ProductPrice">
-              <PropertyRef Name="ProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PSPBilling_PSP">
-          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
-          <End Type="ACTModel.PSPBilling" Role="PSPBilling" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSP">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PSPBilling">
-              <PropertyRef Name="PSPId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4212,6 +4133,53 @@
             </Principal>
             <Dependent Role="UserTask">
               <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="PSPBilling">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PSPId" Type="Int32" Nullable="false" />
+          <Property Name="PSPProductId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="StatementNumber" Type="Int32" />
+          <Property Name="StatementDate" Type="DateTime" Precision="3" />
+          <Property Name="Rate" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="Units" Type="Int32" />
+          <Property Name="InvoiceAmount" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="PaymentAmount" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="PaymentDate" Type="DateTime" Precision="3" />
+          <Property Name="ReferenceNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="NominatedAccount" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPBilling_PSP" FromRole="PSPBilling" ToRole="PSP" />
+          <NavigationProperty Name="PSPProduct" Relationship="ACTModel.FK_PSPBilling_PSPProducts" FromRole="PSPBilling" ToRole="PSPProduct" />
+        </EntityType>
+        <Association Name="FK_PSPBilling_PSP">
+          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
+          <End Type="ACTModel.PSPBilling" Role="PSPBilling" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PSP">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PSPBilling">
+              <PropertyRef Name="PSPId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PSPBilling_PSPProducts">
+          <End Type="ACTModel.PSPProduct" Role="PSPProduct" Multiplicity="1" />
+          <End Type="ACTModel.PSPBilling" Role="PSPBilling" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PSPProduct">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PSPBilling">
+              <PropertyRef Name="PSPProductId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4834,6 +4802,7 @@
           <EntitySetMapping Name="ProductPrices">
             <EntityTypeMapping TypeName="ACTModel.ProductPrice">
               <MappingFragment StoreEntitySet="ProductPrice">
+                <ScalarProperty Name="Type" ColumnName="Type" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="FromDate" ColumnName="FromDate" />
                 <ScalarProperty Name="RateUnit" ColumnName="RateUnit" />
@@ -4865,28 +4834,6 @@
                 <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
                 <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="PSPBillings">
-            <EntityTypeMapping TypeName="ACTModel.PSPBilling">
-              <MappingFragment StoreEntitySet="PSPBilling">
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="NominatedAccount" ColumnName="NominatedAccount" />
-                <ScalarProperty Name="ReferenceNumber" ColumnName="ReferenceNumber" />
-                <ScalarProperty Name="PaymentDate" ColumnName="PaymentDate" />
-                <ScalarProperty Name="PaymentAmount" ColumnName="PaymentAmount" />
-                <ScalarProperty Name="InvoiceAmount" ColumnName="InvoiceAmount" />
-                <ScalarProperty Name="Units" ColumnName="Units" />
-                <ScalarProperty Name="Rate" ColumnName="Rate" />
-                <ScalarProperty Name="StatementDate" ColumnName="StatementDate" />
-                <ScalarProperty Name="StatementNumber" ColumnName="StatementNumber" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
-                <ScalarProperty Name="PSPId" ColumnName="PSPId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -5281,6 +5228,28 @@
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="ObjectType" ColumnName="ObjectType" />
                 <ScalarProperty Name="ObjectId" ColumnName="ObjectId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PSPBillings">
+            <EntityTypeMapping TypeName="ACTModel.PSPBilling">
+              <MappingFragment StoreEntitySet="PSPBilling">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="NominatedAccount" ColumnName="NominatedAccount" />
+                <ScalarProperty Name="ReferenceNumber" ColumnName="ReferenceNumber" />
+                <ScalarProperty Name="PaymentDate" ColumnName="PaymentDate" />
+                <ScalarProperty Name="PaymentAmount" ColumnName="PaymentAmount" />
+                <ScalarProperty Name="InvoiceAmount" ColumnName="InvoiceAmount" />
+                <ScalarProperty Name="Units" ColumnName="Units" />
+                <ScalarProperty Name="Rate" ColumnName="Rate" />
+                <ScalarProperty Name="StatementDate" ColumnName="StatementDate" />
+                <ScalarProperty Name="StatementNumber" ColumnName="StatementNumber" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="PSPProductId" ColumnName="PSPProductId" />
+                <ScalarProperty Name="PSPId" ColumnName="PSPId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
