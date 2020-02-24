@@ -1,0 +1,96 @@
+﻿@model PagingExtension
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+    ViewBag.ShowQuickStructure = true;
+
+    ViewBag.ViewName = "_Subsites";
+
+    UserModel user = User.Get();
+}
+
+
+@Html.Partial("_Notification")
+
+
+@{
+    Int32 count = Model.Start;
+    List<Site> items = (List<Site>)Model.Items;
+    //List<Client> client = (List<Client>)Model.Items;
+    //List<Region> region = (List<Region>)Model.Items;
+}
+
+
+@if (Model == null || !items.Any())
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Sites available matching your search criteria.
+    </div>
+}
+
+    <p>
+        <label for="Client">Browse:</label>
+        @Html.DropDownList("Client", (IEnumerable
+        <SelectListItem>)ViewData["ClientList"])
+        <label for="Site">Browse:</label>
+        @Html.DropDownList("Site", (IEnumerable
+        <SelectListItem>)ViewData["MainSiteList"])
+        @Html.ActionLink("Add Site", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#sites" })
+        <label for="sitesfile">Browse:</label>
+        <input type="file" name="sitesfile" id="sitesfile" />
+        <input type="submit" value="Import Sites" />
+        <span class="loader"></span>
+    </p>
+
+
+<table id="sites-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#users-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="Name" data-column="Name">
+                Main Site Name
+            </th>
+            <th data-name="XCord" data-column="XCord">
+                Site X coordinate
+            </th>
+            <th data-name="YCord" data-column="YCord">
+                Site Y Coordinate
+            </th>
+            <th data-name="Address" data-column="Address">
+                Site Address
+            </th>
+            <th data-name="PostalCode" data-column="PostalCode">
+                Postal Code
+            </th>
+            <th data-name="ContactNo" data-column="ContactNo">
+                Contact Number
+            </th>
+            <th data-name="ContactName" data-column="ContactName">
+                Contact Name
+            </th>
+            <th data-name="RegionId" data-column="RegionId">
+                Region
+            </th>
+            @*<th data-name="Actions">
+                Actions
+            </th>*@
+        </tr>
+    </thead>
+
+    <tbody>
+     
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
+
+@Html.Partial("_Paging")
