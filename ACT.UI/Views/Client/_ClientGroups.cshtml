@@ -1,0 +1,215 @@
+﻿@model PagingExtension
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
+
+@{
+    ViewBag.ShowExport = true;
+    //ViewBag.ShowCustom = true;
+    //ViewBag.ShowQuickStructure = true;
+
+    ViewBag.ViewName = "_ClientGroup";
+
+}
+
+
+@Html.Partial("_Notification")
+
+
+@{
+    UserModel user = User.Get();
+    Int32 count = Model.Start;
+    List<Group> items = (List<Group>)Model.Items;
+}
+
+
+@if (Model == null || !items.Any())
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Groups available matching your search criteria.
+    </div>
+}
+
+
+@if (user.IsAdmin || user.IsPSPAdmin)
+{
+    <p>
+        @Html.ActionLink("Add", "AddGroup", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Group?", @data_edit = "1", @data_id = 0, @data_target = "#clientgoups" })
+        <span class="loader"></span>
+    </p>
+}
+
+<table id="users-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#users-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            @*<th data-name="Count">
+                #
+            </th>*@
+            <th data-name="Name" data-column="Name">
+                Name
+            </th>
+            <th data-name="Cell" data-column="Cell">
+                Group Description
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (Model != null && items != null && items.Count() > 0)
+        {
+            foreach (var item in items)
+            {
+                Status status = (Status)item.Status;
+
+                String active = status.Equals(Status.Active) ? "activated" : "terminated";
+                String enable = status.Equals(Status.Active) ? "Terminate" : "Activate";
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+
+                    @*<td width="1%">
+                        @count
+                    </td>*@
+                    <td style="width: 15%;">
+                        @item.Name
+                    </td>
+                    <td>
+                        @item.Description
+                    </td>
+                    <td width="15%">
+                        @Html.ActionLink("Edit", "EditGroup", new { id = item.Id, returnView = "Users" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+                        @Html.ActionLink(enable, "DeleteGroup", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientgoups", @rel = "tipsyE", @title = enable + " this item?" })
+                    </td>
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+<div class="left" style="width: 42%; margin-right: 2%;">
+    <h3>Excluded from Group</h3>
+    <table id="excluded-table" class="da-table datatable-numberpaging sort fixed-header" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th data-name="Count">
+                    #
+                </th>
+                <th data-name="Name" data-column="Name">
+                    Client Name
+                </th>
+                <th data-name="Cell" data-column="Cell">
+                    Trading As
+                </th>
+                <th data-name="Actions">
+                    Registration No
+                </th>
+            </tr>
+        </thead>
+
+        <tbody id="excludedtabledata">
+            @if (ViewBag.ClientListExcluded.Count > 0)
+            {
+                foreach (var clientItem in ViewBag.ClientListExcluded as IEnumerable<Client>)
+                {
+                    <tr id="tr-@clientItem.Id-item" class="tr-@clientItem.Id-item">
+
+                        <td width="1%">
+                            @count
+                        </td>
+                        <td style="width: 15%;">
+                            @clientItem.CompanyName
+                        </td>
+                        <td>
+                            @clientItem.TradingAs
+                        </td>
+                        <td>
+                            @clientItem.CompanyRegistrationNumber
+                        </td>
+                    </tr>
+
+                    count++;
+                }
+            }
+
+
+        </tbody>
+
+    </table>
+
+</div>
+<div class="left" style="width: 2%; margin-right: 2%;">
+    <a href="#" id="include">
+        >>
+    </a>
+    <br />
+    <br />
+    <a href="#" id="exclude">
+        <<
+    </a>
+</div>
+<div class="left" style="width: 45%; margin-right: 2%;">
+    <h3>Included in Group</h3>
+    <table id="included-table" class="da-table datatable-numberpaging sort fixed-header" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th data-name="Count">
+                    #
+                </th>
+                <th data-name="Name" data-column="Name">
+                    Client Name
+                </th>
+                <th data-name="Cell" data-column="Cell">
+                    Trading As
+                </th>
+                <th data-name="Actions">
+                    Registration No
+                </th>
+            </tr>
+        </thead>
+
+        <tbody id="includedtabledata">
+            @if (ViewBag.ClientListIncluded.Count > 0)
+            {
+                foreach (var clientItem in ViewBag.ClientListIncluded as IEnumerable<Client>)
+                {
+                    <tr id="tr-@clientItem.Id-item" class="tr-@clientItem.Id-item">
+
+                        <td width="1%">
+                            @count
+                        </td>
+                        <td style="width: 15%;">
+                            @clientItem.CompanyName
+                        </td>
+                        <td>
+                            @clientItem.TradingAs
+                        </td>
+                        <td>
+                            @clientItem.CompanyRegistrationNumber
+                        </td>
+                    </tr>
+
+                    count++;
+                }
+            }
+
+
+        </tbody>
+
+    </table>
+
+</div>
+<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+
+@*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
+
+@*@Html.Partial("_Paging")*@

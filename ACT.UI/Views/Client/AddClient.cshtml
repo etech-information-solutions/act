@@ -1,0 +1,254 @@
+﻿@model ClientViewModel
+
+@using ACT.UI.Models;
+
+@{
+    if (ViewBag.IncludeLayout == null)
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Add Role";
+}
+
+
+@Html.Partial("_Notification")
+
+@using (Html.BeginForm("AddClient", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clientlist", @class = "custom-validate", @style = "width: auto;" }))
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content( "~/images/add.png" )" />
+            <span>Add Client</span>
+        </h2>
+
+        @Html.ValidationSummary(true)
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <h2 class="uppercase" style="width: auto;">
+                <img alt="" src="@Url.Content( "~/images/edit.png" )" />
+                <span>Add Client</span>
+            </h2>
+
+            @Html.ValidationSummary(true)
+
+            @Html.HiddenFor(model => model.Id)
+
+            <div class="left" style="width: 33%; margin-right: 4%;">
+
+                <div class="editor-label uppercase">
+                    Client Name
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" })
+                    @Html.ValidationMessageFor(model => model.CompanyName)
+                </div>
+                <div class="editor-label uppercase">
+                    Company Registration Number
+                </div>
+                <div class="editor-field">
+                    @*@Html.TextBoxFor(model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" })
+                    @Html.ValidationMessageFor(model => model.CompanyRegistrationNumber)*@
+                </div>
+
+                <h3>Contact Details</h3>
+                <div class="editor-label uppercase">
+                    Contact Number
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" })
+                    @Html.ValidationMessageFor(model => model.ContactNumber)
+                </div>
+
+                <div class="editor-label uppercase">
+                    Contact Person
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" })
+                    @Html.ValidationMessageFor(model => model.ContactPerson)
+                </div>
+
+
+
+
+
+                <div class="editor-label uppercase">
+                    Company Documents
+                </div>
+                <div class="editor-field">
+                    @*@if (documents != null && documents.Any())
+                {
+                    foreach (Document d in documents)
+                    {
+                        <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
+                            <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+
+                            @d.Name (@d.Type)
+                        </a>
+                    }
+                }*@
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 33%;">
+
+                <div class="editor-label uppercase">
+                    Trading As
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.TradingAs, new { @class = "input", @placeholder = "Enter Trading As details" })
+                    @Html.ValidationMessageFor(model => model.TradingAs)
+                </div>
+                <div class="editor-label uppercase">
+                    VAT Number
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.VATNumber, new { @class = "input", @placeholder = "Enter VAT Number" })
+                    @Html.ValidationMessageFor(model => model.VATNumber)
+                </div>
+
+
+                <h3>&nbsp;</h3>
+
+                <div class="editor-label uppercase">
+                    Email Address
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.Email, new { @class = "input", @placeholder = "Enter Email Address" })
+                    @Html.ValidationMessageFor(model => model.Email)
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 33%; margin-right: 4%;">
+
+                <div class="editor-label uppercase">
+                    Logo
+                </div>
+                <div class="editor-field">
+                </div>
+                <div class="editor-label uppercase">
+                    Uploaded Documents
+                </div>
+                <div class="editor-field">
+                </div>
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+            @*@if (Address != null)
+        {
+            <p>
+                <strong class="uppercase">Your Address</strong>
+            </p>
+
+            <div class="left" style="width: 63%; margin-right: 4%;">
+
+                <div class="editor-label uppercase">
+                    Address Line 1
+                </div>
+                <div class="editor-field">
+                    @address.Addressline1
+                </div>
+
+                <div class="editor-label uppercase">
+                    Address Line 2
+                </div>
+                <div class="editor-field">
+                    @address.Addressline2
+                </div>
+            </div>
+
+            <div class="left" style="width: 33%; margin-right: 4%;">
+                <div class="editor-label uppercase">
+                    Province
+                </div>
+                <div class="editor-field">
+                    @(((Province)address.Province).GetDisplayText())
+                </div>
+
+                <div class="editor-label uppercase">
+                    Town
+                </div>
+                <div class="editor-field">
+                    @address.Town
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 33%; margin-right: 4%;">
+                <div class="editor-label uppercase">
+                    Postal Code
+                </div>
+                <div class="editor-field">
+                    @address.PostalCode
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="message-warn">
+                No address details found. Please edit and add address details.
+            </div>
+        }*@
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+            <p>
+                <strong class="uppercase">KPI</strong>
+            </p>
+            <div class="left" style="width: 48%; margin-right: 4%;">
+                <div class="editor-label uppercase">
+                    Outstanding
+                </div>
+                <div class="editor-field">
+                    @*@address.Addressline1*@
+                </div>
+
+                <div class="editor-label uppercase">
+                    Disputes
+                </div>
+                <div class="editor-field">
+                    @*@address.Addressline1*@
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 48%; margin-right: 4%;">
+                <div class="editor-label uppercase">
+                    Days Outstanding
+                </div>
+                <div class="editor-field">
+                    @*@address.Addressline1*@
+                </div>
+
+                <div class="editor-label uppercase">
+                    Days to Resolve
+                </div>
+                <div class="editor-field">
+                    @*@address.Addressline1*@
+                </div>
+
+            </div>
+
+            <div id="role-functions" class="grouped-area left" style="width: 48%;">
+                @*Add stuff for client data here*@
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-refresh="1" data-target="#clientlist">Cancel</a>
+            </p>
+
+        </div>
+
+    </div>
+}

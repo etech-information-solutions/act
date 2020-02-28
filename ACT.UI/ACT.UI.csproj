@@ -155,12 +155,10 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AddressViewModel.cs" />
-
+    <Compile Include="Models\GroupClientsViewModel.cs" />
     <Compile Include="Models\ProductViewModel.cs" />
     <Compile Include="Models\RegionViewModel.cs" />
-
     <Compile Include="Models\ClientViewModel.cs" />
-
     <Compile Include="Models\BankViewModel.cs" />
     <Compile Include="Models\BroadcastViewModel.cs" />
     <Compile Include="Models\DeclineReasonViewModel.cs" />
@@ -449,7 +447,6 @@
     <Content Include="Views\Administration\PSPDetails.cshtml" />
     <Content Include="Views\Shared\_PSPCustomSearch.cshtml" />
     <Content Include="Views\Administration\_PSPConfig.cshtml" />
-
     <Content Include="Views\Administration\_ApproveDeclinePSP.cshtml" />
     <Content Include="Views\Administration\_PSPUsers.cshtml" />
     <Content Include="Views\Administration\_PSPClients.cshtml" />
@@ -466,18 +463,20 @@
     <Content Include="Views\Administration\ProductDetails.cshtml" />
     <Content Include="Views\Shared\_RegionCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ProductCustomSearch.cshtml" />
-
     <Content Include="Views\Client\Index.cshtml" />
     <Content Include="Views\Client\_ClientHeader.cshtml" />
     <Content Include="Views\Client\_ClientList.cshtml" />
-    <Content Include="Views\Client\AddPSP.cshtml" />
-    <Content Include="Views\Client\_ClientGroup.cshtml" />
+    <Content Include="Views\Client\AddClient.cshtml" />
+    <Content Include="Views\Client\_ClientGroups.cshtml" />
     <Content Include="Views\Client\_ManageSites.cshtml" />
     <Content Include="Views\Client\_LinkProducts.cshtml" />
     <Content Include="Views\Client\_AwaitingActivation.cshtml" />
     <Content Include="Views\Client\_ManageTransporters.cshtml" />
     <Content Include="Views\Client\_Subsites.cshtml" />
-
+    <Content Include="Views\Client\EditClient.cshtml" />
+    <Content Include="Views\Client\AddSite.cshtml" />
+    <Content Include="Views\Client\EditSite.cshtml" />
+    <Content Include="Views\Client\ClientDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

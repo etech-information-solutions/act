@@ -161,7 +161,6 @@ namespace ACT.Core.Services
                      )
 
                      #endregion
-
                      select u ).OrderBy( CreateOrderBy( pm.SortBy, pm.Sort ) )
                                .Skip( pm.Skip )
                                .Take( pm.Take )

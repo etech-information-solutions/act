@@ -7,8 +7,8 @@
 
 @{
     ViewBag.ShowExport = true;
-    ViewBag.ShowCustom = true;
-    ViewBag.ShowQuickStructure = true;
+    //ViewBag.ShowCustom = true;
+    //ViewBag.ShowQuickStructure = true;
 
     ViewBag.ViewName = "_ManageSites";
 
@@ -32,23 +32,40 @@
     </div>
 }
 
+
     <p>
-        @Html.DropDownList("Client", (IEnumerable
-        <SelectListItem>)ViewData["ClientList"])
-        @Html.ActionLink("Add Site", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#sites" })
-        <label for="file">Browse:</label>
-        <input type="file" name="sitesfile" id="sitesfile" />
-        <input type="submit" value="Import Sites"/>
+        <table style="width:100%" border="0">
+            <tr>
+                <td style="width:3%">
+                    <label for="file">Client:</label>
+                </td>
+                <td style="width:15%">
+                    @Html.DropDownList("Client", (IEnumerable
+           <SelectListItem>)ViewBag.ClientList)
+                </td>
+                <td style="width:2%">
+                    @Html.ActionLink("Add", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#sites" })
+                </td>
+                <td style="width:3%">
+                    <label for="file">Browse:</label>
+                </td>
+                <td style="width:35%">
+                    <input type="file" name="sitesfile" id="sitesfile" />
+                </td>
+                <td style="width:10%">
+                    <input type="submit" value="Import Sites" />
+                </td>
+            </tr>
+        </table>
         <span class="loader"></span>
     </p>
 
-
-<table id="sites-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#sites-table_wrapper" data-starting-point=".ap-tabs ul">
+<table id="roles-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#roles-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
-            <th data-name="Count">
+            @*<th data-name="Count">
                 #
-            </th>
+            </th>*@
             <th data-name="RegionId" data-column="RegionId">
                 Region
             </th>
@@ -82,9 +99,9 @@
             <th data-name="SiteBudgets" data-column="SiteBudgets">
                 Subsites Budget
             </th>
-            @*<th data-name="Actions">
-                Actions
-            </th>*@
+            <th data-name="Actions">
+                    Actions
+                </th>
         </tr>
     </thead>
 
@@ -93,70 +110,53 @@
         {
             foreach (var item in items)
             {
-                //Status status = (Status)item.Status;
 
-                //Role role = new Role() { Name = "~/~", Type = -1 };
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
 
-                //if (item.UserRoles.Any())
-                //{
-                //    role = item.UserRoles.FirstOrDefault().Role;
-                //}
+                    @*<td width="1%">
+                        @count
+                    </td>*@
+                    <td style="width: 15%;">
+                        @item.RegionId
+                    </td>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td>
+                        @item.XCord
+                    </td>
+                    <td>
+                        @item.YCord
+                    </td>
+                    <td>
+                        @item.Address
+                    </td>
+                    <td>
+                        @item.PostalCode
+                    </td>
+                    <td>
+                        @item.ContactNo
+                    </td>
+                    <td>
+                        @item.ContactName
+                    </td>
+                    <td>
+                        @item.PlanningPoint
+                    </td>
+                    <td>
+                        @item.SiteType
+                    </td>
+                    <td>
+                        @*@item.SiteBudgets*@
+                    </td>
+                    <td width="15%">
+                            @*@Html.ActionLink("Budgets", "UserDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                //RoleType roleType = (RoleType)role.Type;
+                            @Html.ActionLink("Edit", "EditUser", new { id = item.Id, returnView = "Users" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })*@
 
-                //String active = status.Equals(Status.Active) ? "active" : "inactive";
-                //String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+                        </td>
 
-        <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
-
-            <td width="1%">
-                @count
-            </td>
-            <td style="width: 15%;">
-                @item.RegionId
-            </td>
-            <td>
-                @item.Name
-            </td>
-            <td>
-                @item.XCord
-            </td>
-            <td>
-                @item.YCord
-            </td>
-            <td>
-                @item.Address
-            </td>
-            <td>
-                @item.PostalCode
-            </td>
-            <td>
-                @item.ContactNo
-            </td>
-            <td>
-                @item.ContactName
-            </td>
-            <td>
-                @item.PlanningPoint
-            </td>
-            <td>
-                @item.SiteType
-            </td>
-            <td>
-                @*@item.SiteBudgets*@
-            </td>
-            @*<td width="15%">
-            @Html.ActionLink("Details", "UserDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-
-            @Html.ActionLink("Edit", "EditUser", new { id = item.Id, returnView = "Users" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-
-            @if (user.Email != item.Email)
-            {
-                @Html.ActionLink(enable, "DeleteUser", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#users", @rel = "tipsyE", @title = enable + " this item?" })
-            }
-        </td>*@
-
-        </tr>
+                </tr>
 
                 count++;
             }

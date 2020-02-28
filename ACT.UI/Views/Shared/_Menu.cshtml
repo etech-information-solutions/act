@@ -27,18 +27,18 @@
                     <span>Dashboard</span>
                 </a>
             </li>
-        }
+        }*@
 
         @if ( User.Has( PermissionTo.View, PermissionContext.Client ) )
         {
             <li data-hot-spot="1" data-c="Client" data-t="" class="@(controller.ToLower().Equals( "client" ) ? "current" : "")">
                 <a rel="tipsyW" title="Clients" href="@Url.Action( "Index", "Client" )">
-                    <span>Clients</span>
+                    <span>Client Management</span>
                 </a>
             </li>
         }
 
-        @if ( User.Has( PermissionTo.View, PermissionContext.Customer ) )
+         @*@if ( User.Has( PermissionTo.View, PermissionContext.Customer ) )
         {
             <li data-hot-spot="1" data-c="Customer" data-t="" class="@(controller.ToLower().Equals( "customer" ) ? "current" : "")">
                 <a rel="tipsyW" title="Customers" href="@Url.Action( "Index", "Customer" )">

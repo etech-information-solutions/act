@@ -34,22 +34,39 @@
     </div>
 }
 
-    <p>
-        <label for="Client">Browse:</label>
-        @Html.DropDownList("Client", (IEnumerable
-        <SelectListItem>)ViewData["ClientList"])
-        <label for="Site">Browse:</label>
-        @Html.DropDownList("Site", (IEnumerable
-        <SelectListItem>)ViewData["MainSiteList"])
-        @Html.ActionLink("Add Site", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#sites" })
-        <label for="sitesfile">Browse:</label>
-        <input type="file" name="sitesfile" id="sitesfile" />
-        <input type="submit" value="Import Sites" />
-        <span class="loader"></span>
-    </p>
 
+<p>
+    <table style="width:100%" border="0">
+        <tr>
+            <td style="width:3%">
+                <label for="file">Client:</label><br />
+                <label for="site">Site:</label>
+            </td>
+            <td style="width:15%">
+                @Html.DropDownList("Client", (IEnumerable
+       <SelectListItem>)ViewBag.ClientList)<br />
+                @Html.DropDownList("Site", (IEnumerable
+<SelectListItem>)ViewBag.MainSiteList)
+            </td>
+            <td style="width:2%">
+                <br /><br />
+                @Html.ActionLink("Add", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#sites" })
+            </td>
+            <td style="width:3%">
+                <label for="file">Browse:</label>
+            </td>
+            <td style="width:35%">
+                <input type="file" name="sitesfile" id="sitesfile" />
+            </td>
+            <td style="width:10%">
+                <input type="submit" value="Import Sites" />
+            </td>
+        </tr>
+    </table>
+    <span class="loader"></span>
+</p>
 
-<table id="sites-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#users-table_wrapper" data-starting-point=".ap-tabs ul">
+<table id="roles-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#roles-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
             <th data-name="Count">
@@ -79,18 +96,234 @@
             <th data-name="RegionId" data-column="RegionId">
                 Region
             </th>
-            @*<th data-name="Actions">
-                Actions
-            </th>*@
         </tr>
     </thead>
 
     <tbody>
-     
+        @if (Model != null && items != null && items.Count() > 0)
+        {
+            foreach (var item in items)
+            {
+                //Status status = (Status)item.Status;
+
+                //Role role = new Role() { Name = "~/~", Type = -1 };
+
+                //if (item.UserRoles.Any())
+                //{
+                //    role = item.UserRoles.FirstOrDefault().Role;
+                //}
+
+                //RoleType roleType = (RoleType)role.Type;
+
+                //String active = status.Equals(Status.Active) ? "active" : "inactive";
+                //String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td>
+                        @item.XCord
+                    </td>
+                    <td>
+                        @item.YCord
+                    </td>
+                    <td>
+                        @item.Address
+                    </td>
+                    <td>
+                        @item.PostalCode
+                    </td>
+                    <td>
+                        @item.ContactNo
+                    </td>
+                    <td>
+                        @item.RegionId
+                    </td>
+                </tr>
+
+                count++;
+            }
+        }
     </tbody>
 
 </table>
+<div class="left">
+    <table id="excluded-table" class="da-table fixed-header" data-fixed-header-target="#roles-table_wrapper" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th data-name="Name" data-column="Name">
+                    Site Name
+                </th>
+                <th data-name="XCord" data-column="XCord">
+                    Site X coordinate
+                </th>
+                <th data-name="YCord" data-column="YCord">
+                    Site Y Coordinate
+                </th>
+                <th data-name="Address" data-column="Address">
+                    Site Address
+                </th>
+                <th data-name="PostalCode" data-column="PostalCode">
+                    Postal Code
+                </th>
+                <th data-name="ContactNo" data-column="ContactNo">
+                    Contact Number
+                </th>
+                <th data-name="ContactName" data-column="ContactName">
+                    Contact Name
+                </th>
+                <th data-name="RegionId" data-column="RegionId">
+                    Region
+                </th>
+            </tr>
+        </thead>
 
-@*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
+        <tbody>
+            @if (Model != null && items != null && items.Count() > 0)
+            {
+                foreach (var item in items)
+                {
+                    //Status status = (Status)item.Status;
 
-@Html.Partial("_Paging")
+                    //Role role = new Role() { Name = "~/~", Type = -1 };
+
+                    //if (item.UserRoles.Any())
+                    //{
+                    //    role = item.UserRoles.FirstOrDefault().Role;
+                    //}
+
+                    //RoleType roleType = (RoleType)role.Type;
+
+                    //String active = status.Equals(Status.Active) ? "active" : "inactive";
+                    //String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+
+            <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    @item.XCord
+                </td>
+                <td>
+                    @item.YCord
+                </td>
+                <td>
+                    @item.Address
+                </td>
+                <td>
+                    @item.PostalCode
+                </td>
+                <td>
+                    @item.ContactNo
+                </td>
+                <td>
+                    @item.RegionId
+                </td>
+
+            </tr>
+
+                    count++;
+                }
+            }
+        </tbody>
+
+    </table>
+</div>
+<div class="left">
+    <<
+
+    >>
+
+</div>
+<div class="left">
+    <table id="included-table" class="da-table fixed-header" data-fixed-header-target="#roles-table_wrapper" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th data-name="Name" data-column="Name">
+                    Site Name
+                </th>
+                <th data-name="XCord" data-column="XCord">
+                    Site X coordinate
+                </th>
+                <th data-name="YCord" data-column="YCord">
+                    Site Y Coordinate
+                </th>
+                <th data-name="Address" data-column="Address">
+                    Site Address
+                </th>
+                <th data-name="PostalCode" data-column="PostalCode">
+                    Postal Code
+                </th>
+                <th data-name="ContactNo" data-column="ContactNo">
+                    Contact Number
+                </th>
+                <th data-name="ContactName" data-column="ContactName">
+                    Contact Name
+                </th>
+                <th data-name="RegionId" data-column="RegionId">
+                    Region
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && items != null && items.Count() > 0)
+            {
+                foreach (var item in items)
+                {
+                    //Status status = (Status)item.Status;
+
+                    //Role role = new Role() { Name = "~/~", Type = -1 };
+
+                    //if (item.UserRoles.Any())
+                    //{
+                    //    role = item.UserRoles.FirstOrDefault().Role;
+                    //}
+
+                    //RoleType roleType = (RoleType)role.Type;
+
+                    //String active = status.Equals(Status.Active) ? "active" : "inactive";
+                    //String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+
+            <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    @item.XCord
+                </td>
+                <td>
+                    @item.YCord
+                </td>
+                <td>
+                    @item.Address
+                </td>
+                <td>
+                    @item.PostalCode
+                </td>
+                <td>
+                    @item.ContactNo
+                </td>
+                <td>
+                    @item.RegionId
+                </td>
+
+            </tr>
+
+                    count++;
+                }
+            }
+        </tbody>
+
+    </table>
+
+    @*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
+
+    @Html.Partial("_Paging")

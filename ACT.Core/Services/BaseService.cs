@@ -17,6 +17,7 @@ using ACT.Core.Extension;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace ACT.Core.Services
 {
@@ -201,6 +202,7 @@ namespace ACT.Core.Services
             model.Role = r;
             model.RoleType = ( RoleType ) r.Type;
             model.IsAdmin = ( r.Type == ( int ) RoleType.SuperAdmin );
+            model.IsPSPAdmin = (r.Type == (int)RoleType.PSP);
 
             RoleModel role = new RoleModel()
             {
@@ -617,6 +619,20 @@ namespace ACT.Core.Services
                           .FirstOrDefault();
         }
 
+        /// <summary>
+        /// Gets a list of [select] for the specified table by generic T
+        /// If the constraint column is defined then we'll apply it
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public List<T> ListByColumnWhere(string column = "", object value = null)
+        {
+            return context.Set<T>()
+                          .Where(ColumnWhere(column, value))
+                          .Distinct()
+                          .ToList();
+        }
 
 
         /// <summary>
@@ -796,6 +812,56 @@ namespace ACT.Core.Services
             string strResponse = ( respose != null ) ? new StreamReader( respose.GetResponseStream() ).ReadToEnd() : string.Empty;
 
             return strResponse;
+        }
+
+        public ICollection<T> GetAll()
+        {
+            return context.Set<T>().ToList();
+        }
+
+        public async Task<ICollection<T>> GetAllAsync()
+        {
+            return await context.Set<T>().ToListAsync();
+        }
+
+        public T Get(int id)
+        {
+            return context.Set<T>().Find(id);
+        }
+
+        public async Task<T> GetAsync(int id)
+        {
+            return await context.Set<T>().FindAsync(id);
+        }
+
+        public T Find(Expression<Func<T, bool>> match)
+        {
+            return context.Set<T>().SingleOrDefault(match);
+        }
+
+        public async Task<T> FindAsync(Expression<Func<T, bool>> match)
+        {
+            return await context.Set<T>().SingleOrDefaultAsync(match);
+        }
+
+        public ICollection<T> FindAll(Expression<Func<T, bool>> match)
+        {
+            return context.Set<T>().Where(match).ToList();
+        }
+
+        public async Task<ICollection<T>> FindAllAsync(Expression<Func<T, bool>> match)
+        {
+            return await context.Set<T>().Where(match).ToListAsync();
+        }
+
+        public int Count()
+        {
+            return context.Set<T>().Count();
+        }
+
+        public async Task<int> CountAsync()
+        {
+            return await context.Set<T>().CountAsync();
         }
 
         public void Dispose()
