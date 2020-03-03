@@ -1,6 +1,7 @@
 ﻿@model ClientViewModel
 
 @using ACT.UI.Models;
+@using ACT.Core.Enums;
 
 @{
     if (ViewBag.IncludeLayout == null)
@@ -8,7 +9,7 @@
         Layout = null;
     }
 
-    ViewBag.Title = "Add Role";
+    ViewBag.Title = "Add Client";
 }
 
 
@@ -69,27 +70,6 @@
                     @Html.TextBoxFor(model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" })
                     @Html.ValidationMessageFor(model => model.ContactPerson)
                 </div>
-
-
-
-
-
-                @*<div class="editor-label uppercase">
-                Company Documents
-            </div>
-            <div class="editor-field">
-                @if (documents != null && documents.Any())
-            {
-                foreach (Document d in documents)
-                {
-                    <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
-                        <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
-
-                        @d.Name (@d.Type)
-                    </a>
-                }
-            }
-            </div>*@
 
             </div>
 
@@ -176,9 +156,7 @@
             </p>
 
             <div class="left" style="width: 48%; margin-right: 4%;">
-
-                @Html.HiddenFor(model => model.Address.Id)
-                @Html.HiddenFor(model => model.Address.AddressType)
+                <input id="Address.AddressType" name="Address.AddressType" type="hidden" value="@( ( int ) AddressType.Postal )" />
 
                 <div class="editor-label">
                     @Html.LabelFor(model => model.Address.AddressLine1)
@@ -208,6 +186,7 @@
 
             <div class="left" style="width: 48%;">
 
+
                 <div class="editor-label">
                     @Html.LabelFor(model => model.Address.AddressLine2)
                 </div>
@@ -225,18 +204,14 @@
                         <option value="">-- select</option>
                         @foreach (int p in Enum.GetValues(typeof(Province)))
                         {
-                            Province province = (Province)p;
-
-                            string text = province.GetDisplayText();
+                            string text = ((Province)p).GetDisplayText();
 
                             if (text.ToLower() == "all")
                             {
                                 continue;
                             }
 
-                            string sel = (province == Model.Address.Province) ? "selected=selected" : string.Empty;
-
-                            <option value="@p" @sel>@text</option>
+                            <option value="@p">@text</option>
                         }
                     </select>
 
@@ -253,14 +228,14 @@
                     Outstanding
                 </div>
                 <div class="editor-field">
-                    @*@address.Addressline1*@
+   
                 </div>
 
                 <div class="editor-label uppercase">
                     Disputes
                 </div>
                 <div class="editor-field">
-                    @*@address.Addressline1*@
+                   
                 </div>
 
             </div>
@@ -270,22 +245,18 @@
                     Days Outstanding
                 </div>
                 <div class="editor-field">
-                   @mod
+                    &nbsp;
                 </div>
 
                 <div class="editor-label uppercase">
                     Days to Resolve
                 </div>
                 <div class="editor-field">
-                    @*@address.Addressline1*@
+                
                 </div>
 
             </div>
 
-            <div id="role-functions" class="grouped-area left" style="width: 48%;">
-                @*Add stuff for client data here*@
-
-            </div>
 
             <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
 

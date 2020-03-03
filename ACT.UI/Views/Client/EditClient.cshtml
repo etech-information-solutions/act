@@ -61,28 +61,6 @@
             @Html.TextBoxFor(model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" })
             @Html.ValidationMessageFor(model => model.ContactPerson)
         </div>
-
-
-
-
-
-        @*<div class="editor-label uppercase">
-                Company Documents
-            </div>
-            <div class="editor-field">
-                @if (documents != null && documents.Any())
-                    {
-                        foreach (Document d in documents)
-                        {
-                            <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
-                                <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
-
-                                @d.Name (@d.Type)
-                            </a>
-                        }
-                    }
-            </div>*@
-
     </div>
 
     <div class="left" style="width: 27%; margin-right: 3%;">
@@ -134,7 +112,7 @@
 
             logo.Name (logo.Extension)
         </a>*@
-                <img alt="logo" src="@(String.Format("{0}/{1}", Url.Content("~/Uploads/Documents/Client/Logo/"), logo.Location))@" style="margin-bottom: 2px;" />
+                <img alt="logo" src="@(String.Format("{0}/{1}", Url.Content("~/Uploads/Documents/Client/Logo/"), logo.Location))" style="margin-bottom: 2px;" />
 
             </div>
 
