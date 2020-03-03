@@ -3,60 +3,80 @@
 @using ACT.Data.Models;
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
 
 @{
     ViewBag.ShowExport = true;
-    ViewBag.ShowCustom = true;
-    ViewBag.ShowQuickStructure = true;
+    //ViewBag.ShowCustom = true;
 
-    ViewBag.ViewName = "_ClientList";
-
-    UserModel user = User.Get();
+    ViewBag.ViewName = "_AwaitingActivation";
 }
 
 
-@Html.Partial( "_Notification" )
+@Html.Partial("_Notification")
 
 
 @{
+    UserModel user = User.Get();
+
     Int32 count = Model.Start;
-    List<User> items = ( List<User> ) Model.Items;
+    List<Client> items = (List<Client>)Model.Items;
+
+    ClientService cservice = new ClientService();
+
+
 }
 
 
-@if ( Model == null || !items.Any() )
+@if (Model == null || !items.Any())
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
-        There are no Users  available matching your search criteria.
+        There are no Clients available matching your search criteria.
     </div>
 }
 
-<p>
-    @Html.ActionLink( "Add User", "AddUser", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new user?", @data_edit = "1", @data_id = 0, @data_target = "#users" } )
-    <span class="loader"></span>
-</p>
+@if (user.IsAdmin || user.IsPSPAdmin)
+{
+    <p>
+        @Html.ActionLink("Add", "AddClient", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Client?", @data_edit = "1", @data_id = 0, @data_target = "#clientlist" })
+        <span class="loader"></span>
+    </p>
+}
 
 
-<table id="users-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#users-table_wrapper" data-starting-point=".ap-tabs ul">
+<table id="psps-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#psps-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
-            <th data-name="Count">
-                #
+            @*<th data-name="Count">
+                    #
+                </th>*@
+            <th data-name="CompanyName" data-column="CompanyName">
+                Company Name
             </th>
-            <th data-name="Name" data-column="Name">
-                Name
+            <th data-name="CompanyRegistrationNumber" data-column="CompanyRegistrationNumber">
+                Reg #
             </th>
-            <th data-name="Cell" data-column="Cell">
-                Contact
+            @*<th data-name="Company Type">
+                    Company Type
+                </th>*@
+            <th data-name="Address">
+                Street Address
             </th>
-            <th data-name="Status" data-column="Status">
-                Status
+            <th data-name="Suburb">
+                Suburb
             </th>
-            <th data-name="Type" data-column="Type">
-                Role
+            <th data-name="Suburb">
+                Town/City Province
             </th>
-            <th data-name="LastLogin" data-column="LastLogin">
-                Last Login
+            <th data-name="ContactPerson" data-column="ContactNumber">
+                Contact Number
+            </th>
+            <th data-name="ContactPerson" data-column="ContactPerson">
+                Contact Person
+            </th>
+            <th data-name="Email" data-column="Email">
+                Email
             </th>
             <th data-name="Actions">
                 Actions
@@ -65,63 +85,78 @@
     </thead>
 
     <tbody>
-        @if ( Model != null && items != null && items.Count() > 0 )
+        @if (Model != null && items != null && items.Count() > 0)
         {
-            foreach ( var item in items )
+            foreach (var item in items)
             {
-                Status status = ( Status ) item.Status;
+                Status status = (Status)item.Status;
 
-                Role role = new Role() { Name = "~/~", Type = -1 };
-
-                if ( item.UserRoles.Any() )
+                String active = status.Equals(Status.Active) ? "active" : "inactive";
+                String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+                Address addr = new Address();
+                string addressline1 = "";
+                string suburb = "";
+                string town = "";
+                string province = "";
+                using (AddressService aservice = new AddressService())
                 {
-                    role = item.UserRoles.FirstOrDefault().Role;
+                    addr = aservice.Get(item.Id, "Client");
+                    if (addr != null)
+                    {
+                        province = ((Province)addr.Province).GetDisplayText();
+                        addressline1 = addr.Addressline1;
+                        suburb = addr.Addressline2;
+                        town = addr.Town;
+
+                    }
                 }
-                
-                RoleType roleType = ( RoleType ) role.Type;
 
-                String active = status.Equals( Status.Active ) ? "active" : "inactive";
-                String enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+                    @*<td width="1%">
+                            @count
+                        </td>*@
+                    <td style="width: 15%;">
+                        @item.CompanyName
+                    </td>
+                    <td>
+                        @item.CompanyRegistrationNumber
+                    </td>
+                    @*<td>
+                           &nbsp;
+                        </td>*@
 
-                    <td width="1%">
-                        @count
+                    <td>
+                        @addressline1
+                    </td>
+                    <td>
+                        @suburb
+                    </td>
+                    <td>
+                        @town  @province
+                    </td>
+                    <td>
+                        @item.ContactPerson
+                    </td>
+                    <td>
+                        @item.ContactNumber
                     </td>
                     <td style="width: 15%;">
-                        @item.Name @item.Surname <br />
-                        <i><a href="mailto:@item.Email">@item.Email</a></i>
+                        @item.Email
+                    </td>
 
-                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="User">
-                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
-                            <span></span>
-                        </a>
-                    </td>
-                    <td>
-                        @item.Cell
-                    </td>
-                    <td>
-                        @status.GetDisplayText()
-                    </td>
-                    <td>
-                        @roleType.GetDisplayText()
-                    </td>
-                    <td>
-                        @item.LastLogin
-                    </td>
                     <td width="15%">
-                        @Html.ActionLink( "Details", "UserDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink("Details", "ClientDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        @Html.ActionLink( "Edit", "EditUser", new { id = item.Id, returnView = "Users" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink("Edit", "EditClient", new { id = item.Id, returnView = "ClientList" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        @if ( user.Email != item.Email )
-                        {
-                            @Html.ActionLink( enable, "DeleteUser", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#users", @rel = "tipsyE", @title = enable + " this item?" } )
-                        }
+                        @Html.ActionLink(enable, "DeleteClient", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientlist", @rel = "tipsyE", @title = enable + " this item?" })
+
                     </td>
+
 
                 </tr>
-                
+
                 count++;
             }
         }
@@ -129,6 +164,6 @@
 
 </table>
 
-@*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
+@*@Html.Partial( "_PSPCustomSearch", new ACT.Core.Models.CustomSearchModel( "PSP" ) )*@
 
-@Html.Partial( "_Paging" )
+@Html.Partial("_Paging")

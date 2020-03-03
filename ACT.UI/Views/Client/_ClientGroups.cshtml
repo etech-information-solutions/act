@@ -46,8 +46,8 @@
     <thead>
         <tr>
             @*<th data-name="Count">
-                #
-            </th>*@
+                    #
+                </th>*@
             <th data-name="Name" data-column="Name">
                 Name
             </th>
@@ -73,8 +73,8 @@
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
                     @*<td width="1%">
-                        @count
-                    </td>*@
+                            @count
+                        </td>*@
                     <td style="width: 15%;">
                         @item.Name
                     </td>
@@ -97,7 +97,7 @@
 <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
 <div class="left" style="width: 42%; margin-right: 2%;">
     <h3>Excluded from Group</h3>
-    <table id="groupsexcluded-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#groupsexcluded-table_wrapper" data-starting-point=".ap-tabs ul">
+    <table id="groupsexcluded-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsexcluded-table_wrapper" data-starting-point=".ap-tabs ul">
         <thead>
             <tr>
                 <th data-name="Count">
@@ -146,19 +146,16 @@
     </table>
 
 </div>
-<div class="left" style="width: 2%; margin-right: 2%;">
-    <a href="#" id="include">
-        >>
-    </a>
+<div class="left" style="width: 5%; margin-left: 1%;">
+    <br /><br /><br />
+    <button id="Copy">>></button>
     <br />
     <br />
-    <a href="#" id="exclude">
-        <<
-    </a>
+    <button id="Remove"><<</button>
 </div>
 <div class="left" style="width: 45%; margin-right: 2%;">
     <h3>Included in Group</h3>
-    <table id="groupsincluded-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#groupsincluded-table_wrapper" data-starting-point=".ap-tabs ul">
+    <table id="groupsincluded-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsincluded-table_wrapper" data-starting-point=".ap-tabs ul">
         <thead>
             <tr>
                 <th data-name="Count">
@@ -209,7 +206,255 @@
 </div>
 <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
 
+<script>
+        $(document).ready(function () {
+            var cId = $('#ClientList option:selected').val();
+            var sId = $('#SiteList option:selected').val();
 
+            //var mainTable = $('#excluded-table').dataTable({
+            //    "ajax": "GetSitesForClientSiteExcluded",
+            //    "data": { clientId: cId, siteId: sId },
+            //    "columns": [{
+            //        "data": "id"
+            //    }, {
+            //        "data": "name"
+            //    }, {
+            //        "data": "subtype"
+            //    }, {
+            //        "data": "approximate_count"
+            //    }, {
+            //        "data": "time_created"
+            //    }],
+            //    "columnDefs": [{
+            //        "targets": 0,
+            //        "checkboxes": {
+            //            "selectRow": true
+            //        },
+            //        "render": function (data, type, full, meta) {
+            //            return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+            //        }
+            //    }],
+            //    "scrollY": "200px",
+
+            //}); // mainTable
+
+
+            //Start with first option on both DDLs
+            UpdateGroups(cId, sId);
+
+            $("#ClientList").change(function () {
+                UpdateGroups($('option:selected', this).val());
+            });
+
+
+
+            //$('#excluded-table tbody').on('click', 'tr', function () {
+            //    var source = $('#excluded-table').row(this);
+            //    console.log(source);
+            //    //table2.row.add(source.data()).draw();
+            //    //source.remove().draw();
+            //});
+
+
+            $('#Copy').on('click', function () {
+
+                var message = "";
+                //Loop through all checked CheckBoxes in GridView.
+                $("#groupsexcluded-table input[type=checkbox]:checked").each(function () {
+                    var row = $(this).closest("tr")[0];
+                    message += row.cells[1].innerHTML;
+                    message += "   " + row.cells[2].innerHTML;
+                    message += "   " + row.cells[3].innerHTML;
+                    message += "\n";
+                });
+                alert(message);
+                //var result = $("tr:has(:checked)");
+                //console.log(result);
+                //var tbl_id = $("#excluded-table");
+                //var $elem = $(this)
+                //var r = confirm("Copy to table " + tbl_id + "?");
+                //var table_to_copy = $elem.dataTable();
+                //if (r == true) {
+                //    copyRows(mainTable, table_to_copy);
+                //    alert("Copied!");
+                //} else {
+
+                //}
+
+
+
+                //var tableFrom = $('#excluded-table').DataTable();
+                //var tableTo = $('#included-table').DataTable();
+
+                //var ids = $.map(tableFrom.rows('.selected').data(), function (item) {
+                //    return item[0]
+                //});
+                //console.log(ids)
+                //alert(tableFrom.rows('.selected').data().length + ' row(s) selected');
+
+                //var ids2 = $.map(tableTo.rows('.selected').data(), function (item2) {
+                //    return item2[0]
+                //});
+                //console.log(ids2)
+                //alert(tableTo.rows('.selected').data().length + ' row(s) selected');
+
+
+
+                //var tables = $(".allTable").find("table*[id]").not("#excluded-table");
+                //tables.each(function () {
+                //    console.log(this.id);
+                //    var tbl_id = this.id;
+                //    var $elem = $(this)
+                //    var r = confirm("Copy to table " + tbl_id + "?");
+                //    var table_to_copy = $elem.dataTable();
+                //    var sourceTable = $(".allTable").find("table*[id]").not("#included-table").dataTable();
+                //    if (r == true) {
+                //        copyRows(sourceTable, table_to_copy);
+                //        alert("Copied!");
+                //    } else {
+
+                //    }
+                //});
+
+
+                //
+            });
+
+            $('#Remove').on('click', function () {
+                var tables = $(".allTable").find("table*[id]").not("#groupsincluded-table");
+                tables.each(function () {
+                    console.log(this.id);
+                    var tbl_id = this.id;
+                    var $elem = $(this)
+                    var r = confirm("Remove from table " + tbl_id + "?");
+                    var table_to_copy = $elem.dataTable();
+                    var sourceTable = $(".allTable").find("table*[id]").not("#groupsexcluded-table").dataTable();
+                    if (r == true) {
+                        copyRows(sourceTable, table_to_copy);
+                        alert("Copied!");
+                    } else {
+
+                    }
+                });
+            });
+        });
+
+        function copyRows(fromTable, toTable) {
+            debugger;
+            var $row = fromTable.find(".selected");
+            alert($row);
+            $.each($row, function (k, v) {
+                if (this !== null) {
+                    debugger;
+                    addRow = fromTable.fnGetData(this);
+                    toTable.fnAddData(addRow); // <-- Copy Row
+                    fromTable.fnDeleteRow(this); //<-- Move row, delete main row.
+                } else {
+                    debugger;
+                    alert('Error extracting row');
+                }
+            });
+        }
+
+        function UpdateGroups(cId, sId) {
+            GetIncludedSites(cId, sId);
+            GetExcludedSites(cId, sId);
+        }
+
+        function GetIncludedGroups(cId, gId) {
+            //debugger;
+            var rowDiv = $("#groupsincluded-table tbody");
+            $.ajax({
+                type: "GET",
+                url: "GetGroupsForClientIncluded",
+                data: { clientId: cId, groupId: gId },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    // debugger;
+                    rowDiv.html('');
+                    var result = "";
+                    $.each(data, function (id, group) {
+
+
+                        result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
+                            '<td><input type="checkbox" id="incl_item_id' + site.Id + '" name="incl_item_id' + site.Id + '" /></td>' +
+                            '<td style = "width: 15%;">' +
+                            site.Name +
+                            '</td><td>' +
+                            site.XCord +
+                            '</td><td> ' +
+                            site.YCord +
+                            '</td><td> ' +
+                            site.Address +
+                            '</td><td> ' +
+                            site.PostalCode +
+                            '</td><td> ' +
+                            site.ContactNo +
+                            ' </td><td> ' +
+                            site.ContactName +
+                            '</td><td> ' +
+                            site.RegionId +
+                            '</td></tr>';
+                    });
+                    rowDiv.html(result);
+
+                },
+                error: function (response) {
+                    //  debugger;
+                    alert('error');
+                }
+            });
+
+        }
+
+        function GetExcludedGroups(cId, gId) {
+            // debugger;
+            var rowDiv = $("#groupsexcluded-table tbody");
+            $.ajax({
+                type: "GET",
+                url: "GetGroupsForClientExcluded",
+                data: { clientId: cId, groupId: gId },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                  //  debugger;
+                    rowDiv.html('');
+                    var result = "";
+                    $.each(data, function (id, site) {
+
+
+                        result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
+                            '<td><input type="checkbox" id="excl_item_id' + site.Id + '" name="excl_item_id' + site.Id + '" /></td>' +
+                            '<td style = "width: 15%;">' +
+                            site.Name +
+                            '</td><td>' +
+                            site.XCord +
+                            '</td><td> ' +
+                            site.YCord +
+                            '</td><td> ' +
+                            site.Address +
+                            '</td><td> ' +
+                            site.PostalCode +
+                            '</td><td> ' +
+                            site.ContactNo +
+                            ' </td><td> ' +
+                            site.ContactName +
+                            '</td><td> ' +
+                            site.RegionId +
+                            '</td></tr>';
+                    });
+                    rowDiv.html(result);
+
+                },
+                error: function (response) {
+                    // debugger;
+                    alert('error');
+                }
+            });
+
+        }
+</script>
 @*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
 
 @Html.Partial("_Paging")

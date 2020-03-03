@@ -1,4 +1,4 @@
-﻿@model PSPViewModel
+﻿@model SiteViewModel
 
 @using ACT.UI.Models;
 @using ACT.Core.Enums;
@@ -9,19 +9,19 @@
         Layout = null;
     }
 
-    ViewBag.Title = "Add PSP";
+    ViewBag.Title = "Add Site";
 
 }
 
 @Html.Partial( "_Notification" )
 
-@using ( Html.BeginForm( "AddPSP", "Administration", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#psps", @class = "custom-validate", @style = "width: auto;" } ) )
+@using ( Html.BeginForm( "AddSite", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#psps", @class = "custom-validate", @style = "width: auto;" } ) )
 {
     <div id="edit-item">
 
         <h2 class="uppercase" style="width: auto;">
             <img alt="" src="@Url.Content( "~/images/add.png" )" />
-            <span>Add PSP</span>
+            <span>Add Site</span>
         </h2>
 
         @Html.ValidationSummary( true )
@@ -31,21 +31,21 @@
             <div class="left" style="width: 48%; margin-right: 4%;">
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.CompanyName )
+                    @Html.LabelFor( model => model.Name )
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" } )
-                    @Html.ValidationMessageFor( model => model.CompanyName )
+                    @Html.TextBoxFor( model => model.Name, new { @class = "input", @placeholder = "Enter Site Name" } )
+                    @Html.ValidationMessageFor( model => model.Name)
                 </div>
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.TradingAs )
+                    @Html.LabelFor( model => model.Description )
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.TradingAs, new { @class = "input", @placeholder = "Enter Company Trading Name" } )
-                    @Html.ValidationMessageFor( model => model.TradingAs )
+                    @Html.TextAreaFor( model => model.Description, new { @class = "input", @placeholder = "Enter Site Description" } )
+                    @Html.ValidationMessageFor( model => model.Description)
                 </div>
 
                 <div class="editor-label uppercase">

@@ -313,9 +313,9 @@ namespace ACT.UI.Controllers
                     return PartialView("_AccessDenied");
                 }
 
-                Address address = aservice.Get(client.Id, "PSP");
+                Address address = aservice.Get(client.Id, "Client");
 
-                List<Document> documents = dservice.List(client.Id, "PSP");
+                List<Document> documents = dservice.List(client.Id, "Client");
 
                 EstimatedLoad load = new EstimatedLoad();
 
@@ -388,7 +388,7 @@ namespace ACT.UI.Controllers
             }
            }
 
-        // POST: Client/Edit/5
+        // POST: Client/EditSite/5
         [HttpPost]
         [Requires(PermissionTo.Edit)]
         public ActionResult EditClient(ClientViewModel model, PagingModel pm, bool isstructure = false)
@@ -741,6 +741,397 @@ namespace ACT.UI.Controllers
             return PartialView("_ManageSites", paging);
         }
 
+        // GET: Client/AddSite
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddSite()
+        {
+            SiteViewModel model = new SiteViewModel() { EditMode = true };
+            return View(model);
+        }
+
+
+        // POST: Client/Site
+        [HttpPost]
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddSite(SiteViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    Notify("Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                using (SiteService siteService = new SiteService())
+                using (ClientSiteService csService = new ClientSiteService())
+                using (TransactionScope scope = new TransactionScope())
+                using (AddressService aservice = new AddressService())
+                {
+                    #region Validation
+                    if (!string.IsNullOrEmpty(model.AccountCode) && siteService.ExistByAccountCode(model.AccountCode.Trim()))
+                    {
+                        // Bank already exist!
+                        Notify($"Sorry, a Site with the Account number \"{model.AccountCode}\" already exists!", NotificationType.Error);
+
+                        return View(model);
+                    }
+                    #endregion
+                    #region Create Site
+                    Site site = new Site()
+                    {
+                        Name = model.Name,
+                        Description = model.Description,
+                        XCord = model.XCord,
+                        YCord = model.YCord,
+                        Address = model.Address,
+                        PostalCode = model.PostalCode,
+                        ContactName = model.ContactName,
+                        ContactNo = model.ContactNo,
+                        PlanningPoint = model.PlanningPoint,
+                        SiteType = model.SiteType,
+                        AccountCode = model.AccountCode,
+                        Depot = model.Depot,
+                        SiteCodeChep = model.SiteCodeChep,
+                        Status = (int)model.Status
+                    };
+                    site = siteService.Create(site);
+                    #endregion
+                    #region Add ClientSite
+                    //ClientSite csSite = new ClientSite()
+                    //{
+
+                    //}
+                    #endregion
+                    #region Create Address (s)
+
+                    if (model.FullAddress != null)
+                    {
+                        Address address = new Address()
+                        {
+                            ObjectId = model.Id,
+                            ObjectType = "Site",
+                            Town = model.FullAddress.Town,
+                            Status = (int)Status.Active,
+                            PostalCode = model.FullAddress.PostCode,
+                            Type = (int)model.FullAddress.AddressType,
+                            Addressline1 = model.FullAddress.AddressLine1,
+                            Addressline2 = model.FullAddress.AddressLine2,
+                            Province = (int)model.FullAddress.Province,
+                        };
+
+                        aservice.Create(address);
+                    }
+
+                    #endregion
+
+                    scope.Complete();
+                }
+
+                Notify("The Site was successfully created.", NotificationType.Success);
+                    return RedirectToAction("Client");
+                }
+                    catch
+                    {
+                        return View();
+            }
+        }
+
+        // POST: Client/ImportSites
+        [HttpPost]
+        [Requires(PermissionTo.Create)]
+        public ActionResult ImportSites(SiteViewImportModel file)
+        {
+            try
+            {
+                //if (!ModelState.IsValid)
+                //{
+                //    Notify("Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error);
+
+                //    return View(model);
+                //}
+
+                //using (SiteService siteService = new SiteService())
+                //using (ClientSiteService csService = new ClientSiteService())
+                //using (TransactionScope scope = new TransactionScope())
+                //using (AddressService aservice = new AddressService())
+                //{
+                //    #region Validation
+                //    if (!string.IsNullOrEmpty(model.AccountCode) && siteService.ExistByAccountCode(model.AccountCode.Trim()))
+                //    {
+                //        // Bank already exist!
+                //        Notify($"Sorry, a Site with the Account number \"{model.AccountCode}\" already exists!", NotificationType.Error);
+
+                //        return View(model);
+                //    }
+                //    #endregion
+                //    #region Create Site
+                //    Site site = new Site()
+                //    {
+                //        Name = model.Name,
+                //        Description = model.Description,
+                //        XCord = model.XCord,
+                //        YCord = model.YCord,
+                //        Address = model.Address,
+                //        PostalCode = model.PostalCode,
+                //        ContactName = model.ContactName,
+                //        ContactNo = model.ContactNo,
+                //        PlanningPoint = model.PlanningPoint,
+                //        SiteType = model.SiteType,
+                //        AccountCode = model.AccountCode,
+                //        Depot = model.Depot,
+                //        SiteCodeChep = model.SiteCodeChep,
+                //        Status = (int)model.Status
+                //    };
+                //    site = siteService.Create(site);
+                //    #endregion
+                //    #region Add ClientSite
+                //    //ClientSite csSite = new ClientSite()
+                //    //{
+
+                //    //}
+                //    #endregion
+                //    #region Create Address (s)
+
+                //    if (model.FullAddress != null)
+                //    {
+                //        Address address = new Address()
+                //        {
+                //            ObjectId = model.Id,
+                //            ObjectType = "Site",
+                //            Town = model.FullAddress.Town,
+                //            Status = (int)Status.Active,
+                //            PostalCode = model.FullAddress.PostCode,
+                //            Type = (int)model.FullAddress.AddressType,
+                //            Addressline1 = model.FullAddress.AddressLine1,
+                //            Addressline2 = model.FullAddress.AddressLine2,
+                //            Province = (int)model.FullAddress.Province,
+                //        };
+
+                //        aservice.Create(address);
+                //    }
+
+                //    #endregion
+
+                //    scope.Complete();
+                //}
+
+                Notify("The Site was successfully created.", NotificationType.Success);
+                return RedirectToAction("Client");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+
+
+        // GET: Client/EditSite/5
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditSite(int id)
+        {
+            Site site;
+
+            using (SiteService service = new SiteService())
+            using (AddressService aservice = new AddressService())
+            {
+                site = service.GetById(id);
+
+
+                if (site == null)
+                {
+                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                    return PartialView("_AccessDenied");
+                }
+
+                Address address = aservice.Get(site.Id, "Site");
+
+
+                bool unverified = (site.Status == (int)PSPClientStatus.Unverified);
+
+                SiteViewModel model = new SiteViewModel()
+                {
+                    Id = site.Id,
+                    Name = site.Name,
+                    Description = site.Description,
+                    XCord = site.XCord,
+                    YCord = site.YCord,
+                    Address = site.Address,
+                    PostalCode = site.PostalCode,
+                    ContactName = site.ContactName,
+                    ContactNo = site.ContactNo,
+                    PlanningPoint = site.PlanningPoint,
+                    SiteType = (int)site.SiteType,
+                    AccountCode = site.AccountCode,
+                    Depot = site.Depot,
+                    SiteCodeChep = site.SiteCodeChep,
+                    Status = (int)site.Status,
+                    EditMode = true,
+                    FullAddress = new AddressViewModel()
+                    {
+                        EditMode = true,
+                        Town = address?.Town,
+                        Id = address?.Id ?? 0,
+                        PostCode = address?.PostalCode,
+                        AddressLine1 = address?.Addressline1,
+                        AddressLine2 = address?.Addressline2,
+                        Province = (address != null) ? (Province)address.Province : Province.All,
+                        AddressType = (address != null) ? (AddressType)address.Type : AddressType.Postal,
+                    }
+                };
+                return View(model);
+            }
+        }
+
+        // POST: Client/EditSite/5
+        [HttpPost]
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditSite(SiteViewModel model, PagingModel pm, bool isstructure = false)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    Notify("Sorry, the selected Site was not updated. Please correct all errors and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                Site site;
+
+                using (SiteService service = new SiteService())
+                using (AddressService aservice = new AddressService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    site = service.GetById(model.Id);
+                    Address address = aservice.Get(model.Id, "Client");
+
+
+                    #region Validations
+
+                    if (!string.IsNullOrEmpty(model.AccountCode) && service.ExistByAccountCode(model.AccountCode.Trim()))
+                    {
+                        // Role already exist!
+                        Notify($"Sorry, a Site with the Account Code \"{model.AccountCode} ({model.AccountCode})\" already exists!", NotificationType.Error);
+
+                        return View(model);
+                    }
+
+                    #endregion
+                    #region Update Site
+
+                    // Update Site
+                    site.Id = model.Id;
+                    site.Name = model.Name;
+                    site.Description = model.Description;
+                    site.XCord = model.XCord;
+                    site.YCord = model.YCord;
+                    site.Address = model.Address;
+                    site.PostalCode = model.PostalCode;
+                    site.ContactName = model.ContactName;
+                    site.ContactNo = model.ContactNo;
+                    site.PlanningPoint = model.PlanningPoint;
+                    site.SiteType = (int)model.SiteType;
+                    site.AccountCode = model.AccountCode;
+                    site.Depot = model.Depot;
+                    site.SiteCodeChep = model.SiteCodeChep;
+                    site.Status = (int)model.Status;
+
+                    service.Update(site);
+
+                    #endregion
+                    #region Create Address (s)
+
+                    if (model.FullAddress != null)
+                    {
+                        Address siteAddress = aservice.GetById(model.FullAddress.Id);
+
+                        if (siteAddress == null)
+                        {
+                            siteAddress = new Address()
+                            {
+                                ObjectId = model.Id,
+                                ObjectType = "Site",
+                                Town = model.FullAddress.Town,
+                                Status = (int)Status.Active,
+                                PostalCode = model.FullAddress.PostCode,
+                                Type = (int)model.FullAddress.AddressType,
+                                Addressline1 = model.FullAddress.AddressLine1,
+                                Addressline2 = model.FullAddress.AddressLine2,
+                                Province = (int)model.FullAddress.Province,
+                            };
+
+                            aservice.Create(siteAddress);
+                        }
+                        else
+                        {
+                            siteAddress.Town = model.FullAddress.Town;
+                            siteAddress.PostalCode = model.FullAddress.PostCode;
+                            siteAddress.Type = (int)model.FullAddress.AddressType;
+                            siteAddress.Addressline1 = model.FullAddress.AddressLine1;
+                            siteAddress.Addressline2 = model.FullAddress.AddressLine2;
+                            siteAddress.Province = (int)model.FullAddress.Province;
+
+                            aservice.Update(siteAddress);
+                        }
+                    }
+
+                    #endregion
+
+
+
+                    scope.Complete();
+                }
+
+                Notify("The selected Site details were successfully updated.", NotificationType.Success);
+
+                return RedirectToAction("Client");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // POST: Client/DeleteSite/5
+        [HttpPost]
+        [Requires(PermissionTo.Delete)]
+        public ActionResult DeleteSite(SiteViewModel model)
+        {
+            Site site;
+            try
+            {
+
+                using (SiteService service = new SiteService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    site = service.GetById(model.Id);
+
+                    if (site == null)
+                    {
+                        Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                        return PartialView("_AccessDenied");
+                    }
+
+                    site.Status = (((Status)site.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;
+
+                    service.Update(site);
+                    scope.Complete();
+
+                }
+                Notify("The selected Client was successfully updated.", NotificationType.Success);
+                return RedirectToAction("Client");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
         [HttpPost]
         public string SetSiteStatus(string siteId, string status)
         {
@@ -985,6 +1376,510 @@ namespace ACT.UI.Controllers
             return "true";
         }
 
+        #endregion
+
+        #region Products
+        //
+        // POST || GET: /Client/LinkProducts
+        public ActionResult LinkProducts(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        {
+            if (givecsm)
+            {
+                ViewBag.ViewName = "Products";
+
+                return PartialView("_LinkProducts", new CustomSearchModel("Products"));
+            }
+
+            int total = 0;
+
+            List<Product> model = new List<Product>();
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            using (ProductService service = new ProductService())
+            {
+                model = service.List(pm, csm);
+                total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total1(pm, csm);
+            }
+
+            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+            List<Client> clientList;
+            using (ClientService clientService = new ClientService())
+            {
+                clientList = clientService.GetClientsByPSP(pspId);
+            }
+
+            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.CompanyName
+
+            });
+            ViewBag.ClientList = clientDDL;
+
+            return PartialView("_LinkProducts", paging);
+        }
+
+
+        //
+        // GET: /Client/ProductDetails/5
+        public ActionResult ProductDetails(int id, bool layout = true)
+        {
+            using (ProductService pservice = new ProductService())
+            using (DocumentService dservice = new DocumentService())
+            {
+                Product model = pservice.GetById(id);
+
+                if (model == null)
+                {
+                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                    return RedirectToAction("Index");
+                }
+
+                if (layout)
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                List<Document> documents = dservice.List(model.Id, "Product");
+
+                if (documents != null)
+                {
+                    ViewBag.Documents = documents;
+                }
+
+                return View(model);
+            }
+        }
+
+        //
+        // GET: /Client/AddProduct/5
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddProduct()
+        {
+            ProductViewModel model = new ProductViewModel() { EditMode = true, ProductPrices = new List<ProductPriceViewModel>() };
+
+            foreach (int item in Enum.GetValues(typeof(ProductPriceType)))
+            {
+                ProductPriceType type = (ProductPriceType)item;
+
+                model.ProductPrices.Add(new ProductPriceViewModel()
+                {
+                    Type = type,
+                    Status = Status.Active
+                });
+            }
+
+            return View(model);
+        }
+
+        //
+        // POST: /Client/AddProduct/5
+        [HttpPost]
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddProduct(ProductViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                Notify("Sorry, the Product was not created. Please correct all errors and try again.", NotificationType.Error);
+
+                return View(model);
+            }
+
+            Product product = new Product();
+
+            using (ProductService pservice = new ProductService())
+            using (TransactionScope scope = new TransactionScope())
+            using (DocumentService dservice = new DocumentService())
+            using (ProductPriceService ppservice = new ProductPriceService())
+            {
+                #region Validations
+
+                if (pservice.Exist(model.Name))
+                {
+                    // Product already exist!
+                    Notify($"Sorry, a Product with the Name \"{model.Name}\" already exists!", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                #endregion
+
+                #region Product
+
+                product.Name = model.Name;
+                product.Status = (int)model.Status;
+                product.Description = model.Description;
+
+                product = pservice.Create(product);
+
+                #endregion
+
+                #region Product Prices
+
+                if (model.ProductPrices.NullableAny())
+                {
+                    foreach (ProductPriceViewModel price in model.ProductPrices)
+                    {
+                        ProductPrice pp = new ProductPrice()
+                        {
+                            ProductId = product.Id,
+                            Rate = price.Rate ?? 0,
+                            Type = (int)price.Type,
+                            RateUnit = price.RateUnit,
+                            FromDate = price.StartDate,
+                            Status = (int)price.Status,
+                        };
+
+                        ppservice.Create(pp);
+                    }
+                }
+
+                #endregion
+
+                #region Any Files
+
+                if (model.File != null)
+                {
+                    // Create folder
+                    string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Product/{model.Name.Trim().Replace("/", "_").Replace("\\", "_")}/");
+
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+
+                    string now = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                    Document doc = new Document()
+                    {
+                        ObjectId = product.Id,
+                        ObjectType = "Product",
+                        Name = model.File.Name,
+                        Category = model.File.Name,
+                        Status = (int)Status.Active,
+                        Title = model.File.File.FileName,
+                        Size = model.File.File.ContentLength,
+                        Description = model.File.Description,
+                        Type = Path.GetExtension(model.File.File.FileName),
+                        Location = $"Product/{model.Name.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{model.File.File.FileName}"
+                    };
+
+                    dservice.Create(doc);
+
+                    string fullpath = Path.Combine(path, $"{now}-{model.File.File.FileName}");
+                    model.File.File.SaveAs(fullpath);
+                }
+
+                #endregion
+
+                scope.Complete();
+
+                Notify("The Product was successfully created.", NotificationType.Success);
+            }
+
+            return RedirectToAction("Products");
+        }
+
+        //
+        // GET: /Client/EditProduct/5
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditProduct(int id)
+        {
+            using (DocumentService dservice = new DocumentService())
+            using (ProductService pservice = new ProductService())
+            {
+                Product product = pservice.GetById(id);
+
+                if (product == null)
+                {
+                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                    return PartialView("_AccessDenied");
+                }
+
+                List<Document> documents = dservice.List(product.Id, "Product");
+
+                ProductViewModel model = new ProductViewModel()
+                {
+                    Id = product.Id,
+                    EditMode = true,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Status = (Status)product.Status,
+                    File = new FileViewModel()
+                    {
+                        Name = documents?.FirstOrDefault()?.Name,
+                        Id = documents?.FirstOrDefault()?.Id ?? 0,
+                        Extension = documents?.FirstOrDefault()?.Type,
+                        Description = documents?.FirstOrDefault()?.Description,
+                    },
+                    ProductPrices = new List<ProductPriceViewModel>(),
+                };
+
+                foreach (ProductPrice p in product.ProductPrices)
+                {
+                    model.ProductPrices.Add(new ProductPriceViewModel()
+                    {
+                        Id = p.Id,
+                        Rate = p.Rate,
+                        RateUnit = p.RateUnit,
+                        StartDate = p.FromDate,
+                        ProductId = p.ProductId,
+                        Status = (Status)p.Status,
+                        Type = (ProductPriceType)p.Type
+                    });
+                }
+
+                if (model.ProductPrices.Count < 3)
+                {
+                    foreach (int item in Enum.GetValues(typeof(ProductPriceType)))
+                    {
+                        ProductPriceType type = (ProductPriceType)item;
+
+                        if (model.ProductPrices.Any(p => p.Type == type)) continue;
+
+                        model.ProductPrices.Add(new ProductPriceViewModel()
+                        {
+                            Type = type,
+                            Status = Status.Active
+                        });
+                    }
+                }
+
+                return View(model);
+            }
+        }
+
+        //
+        // POST: /Client/EditProduct/5
+        [HttpPost]
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditProduct(ProductViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                Notify("Sorry, the selected Product was not updated. Please correct all errors and try again.", NotificationType.Error);
+
+                return View(model);
+            }
+
+            using (ProductService pservice = new ProductService())
+            using (TransactionScope scope = new TransactionScope())
+            using (DocumentService dservice = new DocumentService())
+            using (ProductPriceService ppservice = new ProductPriceService())
+            {
+                Product product = pservice.GetById(model.Id);
+
+                #region Validations
+
+                if (product == null)
+                {
+                    Notify("Sorry, that Product does not exist! Please specify a valid Product Id and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                if (product.Name != model.Name && pservice.Exist(model.Name))
+                {
+                    // Product already exist!
+                    Notify($"Sorry, a Product with the Name \"{model.Name}\" already exists!", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                #endregion
+
+                #region Product
+
+                product.Name = model.Name;
+                product.Status = (int)model.Status;
+                product.Description = model.Description;
+
+                product = pservice.Update(product);
+
+                #endregion
+
+                #region Product Prices
+
+                if (model.ProductPrices.NullableAny())
+                {
+                    foreach (ProductPriceViewModel price in model.ProductPrices)
+                    {
+                        ProductPrice pp = ppservice.GetById(price.Id);
+
+                        if (pp == null)
+                        {
+                            pp = new ProductPrice()
+                            {
+                                ProductId = product.Id,
+                                Rate = price.Rate ?? 0,
+                                Type = (int)price.Type,
+                                RateUnit = price.RateUnit,
+                                FromDate = price.StartDate,
+                                Status = (int)price.Status,
+                            };
+
+                            ppservice.Create(pp);
+                        }
+                        else
+                        {
+                            pp.Rate = price.Rate ?? 0;
+                            pp.RateUnit = price.RateUnit;
+                            pp.FromDate = price.StartDate;
+                            pp.Status = (int)price.Status;
+
+                            ppservice.Update(pp);
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region Any Files
+
+                if (model.File.File != null)
+                {
+                    // Create folder
+                    string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Product/{model.Name.Trim().Replace("/", "_").Replace("\\", "_")}/");
+
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+
+                    string now = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                    Document doc = dservice.GetById(model.File.Id);
+
+                    if (doc != null)
+                    {
+                        // Disable this file...
+                        doc.Status = (int)Status.Inactive;
+
+                        dservice.Update(doc);
+                    }
+
+                    doc = new Document()
+                    {
+                        ObjectId = product.Id,
+                        ObjectType = "Product",
+                        Name = model.File.Name,
+                        Category = model.File.Name,
+                        Status = (int)Status.Active,
+                        Title = model.File.File.FileName,
+                        Size = model.File.File.ContentLength,
+                        Description = model.File.Description,
+                        Type = Path.GetExtension(model.File.File.FileName),
+                        Location = $"Product/{model.Name.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{model.File.File.FileName}"
+                    };
+
+                    dservice.Create(doc);
+
+                    string fullpath = Path.Combine(path, $"{now}-{model.File.File.FileName}");
+                    model.File.File.SaveAs(fullpath);
+                }
+
+                #endregion
+
+                scope.Complete();
+
+                Notify("The selected Product's details were successfully updated.", NotificationType.Success);
+            }
+
+            return RedirectToAction("Products");
+        }
+
+        //
+        // POST: /Client/DeleteProduct/5
+        [HttpPost]
+        [Requires(PermissionTo.Delete)]
+        public ActionResult DeleteProduct(ProductViewModel model)
+        {
+            Product product;
+
+            using (ProductService service = new ProductService())
+            {
+                product = service.GetById(model.Id);
+
+                if (product == null)
+                {
+                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                    return PartialView("_AccessDenied");
+                }
+
+                product.Status = (((Status)product.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;
+
+                service.Update(product);
+
+                Notify("The selected Product was successfully updated.", NotificationType.Success);
+            }
+
+            return RedirectToAction("Products");
+        }
+
+        #endregion
+
+        #region Manage Transporters
+        //
+        // GET: /Client/ManageTransporters
+        public ActionResult ManageTransporters(PagingModel pm, CustomSearchModel csm)
+        {
+
+            ViewBag.ViewName = "ManageTransporters";
+
+            int total = 0;
+
+            List<Transporter> model = new List<Transporter>();
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            using (TransporterService service = new TransporterService())
+            {
+                pm.Sort = pm.Sort ?? "DESC";
+                pm.SortBy = pm.SortBy ?? "CreatedOn";
+
+                model = service.List(pm, csm);
+                total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total(pm, csm);
+            }
+
+            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+            
+            return PartialView("_ManageTransporters", paging);
+        }
+
+        #endregion
+
+        #region Awaiting Activation 
+
+        //
+        // POST || GET: /Client/AwaitingActivation
+        public ActionResult AwaitingActivation(PagingModel pm, CustomSearchModel csm)
+        {
+            int total = 0;
+
+            List<Client> model = new List<Client>();
+
+            using (ClientService service = new ClientService())
+            {
+                pm.Sort = pm.Sort ?? "DESC";
+                pm.SortBy = pm.SortBy ?? "CreatedOn";
+                if (CurrentUser.PSPs.Count > 0)
+                {
+                    model = service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
+                }
+                else
+                {
+                    model = null;
+                }
+
+                // var testModel = service.ListByColumn(null, "CompanyRegistrationNumber", "123456");
+                total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total();
+            }
+
+            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+
+
+            return PartialView("_AwaitingActivation", paging);
+        }
         #endregion
 
     }

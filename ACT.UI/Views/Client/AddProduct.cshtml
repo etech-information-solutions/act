@@ -1,0 +1,181 @@
+﻿@model ProductViewModel
+
+@using ACT.UI.Models;
+@using ACT.Core.Enums;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Add Product";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "AddProduct", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#products", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content( "~/images/add.png" )" />
+            <span>Add Product</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="left" style="width: 48%; margin-right: 4%;">
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Name )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Name, new { @placeholder = "Enter Product Name" } )
+                    @Html.ValidationMessageFor( model => model.Name )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Description )
+                </div>
+                <div class="edit-field">
+                    @Html.TextAreaFor( model => model.Description, new { @style = "width: 93%;", @placeholder = "Enter Product Description" } )
+                    @Html.ValidationMessageFor( model => model.Description )
+                </div>
+
+                <div class="editor-label uppercase">
+                    @Html.LabelFor( model => model.File )
+                </div>
+
+                <div class="editor-field" style="margin-bottom: 10px;">
+
+                    <input id="File.File" name="File.File" type="file" value="" data-val-file="1" class="input" />
+                    <input id="File.Name" name="File.Name" type="hidden" value="Product/Service Documentation" />
+                    <input id="File.Description" name="File.Description" class="input" type="hidden" value="Product/Service Documentation" />
+
+                    @Html.ValidationMessageFor( model => model.File )
+
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Status )
+                </div>
+                <div class="edit-field">
+                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.Status )
+                </div>
+
+            </div>
+
+            <div class="left grouped-area" style="width: 44%;">
+
+                <p>
+                    <strong style="color: #002e70; text-transform: uppercase;">Product Price Options</strong>
+                </p>
+
+                @if ( Model.ProductPrices.NullableAny() )
+                {
+                    int i = 0;
+
+                    <ul>
+                        @foreach ( ProductPriceViewModel p in Model.ProductPrices )
+                        {
+                            <li style="border-bottom: 1px dashed #ddd; margin-bottom: 20px; padding-bottom: 4px;">
+
+                                <div class="edit-label">
+                                    <label for="ProductPrices_@p.Type.GetIntValue()-Type">Option</label>
+                                </div>
+                                <div class="edit-field">
+
+                                    <select id="ProductPrices_@p.Type.GetIntValue()-Type" name="ProductPrices[@i].Type" class="chzn" style="width: 98%;">
+
+                                        @foreach ( int t in Enum.GetValues( typeof( ProductPriceType ) ) )
+                                        {
+                                            ProductPriceType type = ( ProductPriceType ) t;
+
+                                            string sel = type == p.Type ? "selected=selected" : "";
+
+                                            <option value="@t" @sel>@type.GetDisplayText()</option>
+                                        }
+
+                                    </select>
+
+                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-Type" data-valmsg-replace="true"></span>
+                                </div>
+
+                                <div class="edit-label">
+                                    <label for="ProductPrices_@p.Type.GetIntValue()-Rate">Rate</label>
+                                </div>
+                                <div class="edit-field">
+                                    <input id="ProductPrices_@p.Type.GetIntValue()-Rate" name="ProductPrices[@i].Rate" type="text" placeholder="Enter price option Rate" />
+                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-Rate" data-valmsg-replace="true"></span>
+                                </div>
+
+                                <div class="edit-label">
+                                    <label for="ProductPrices_@p.Type.GetIntValue()-RateUnit">Rate Unit</label>
+                                </div>
+                                <div class="edit-field">
+                                    <input id="ProductPrices_@p.Type.GetIntValue()-RateUnit" name="ProductPrices[@i].RateUnit" type="text" placeholder="Enter price option Rate Unit" />
+                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-RateUnit" data-valmsg-replace="true"></span>
+                                </div>
+
+                                <div class="edit-label">
+                                    <label for="ProductPrices_@p.Type.GetIntValue()-StartDate">Start Date</label>
+                                </div>
+                                <div class="edit-field">
+                                    <input id="ProductPrices_@p.Type.GetIntValue()-StartDate" name="ProductPrices[@i].StartDate" type="text" class="date-picker" placeholder="Enter price option Start Date" />
+                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-StartDate" data-valmsg-replace="true"></span>
+                                </div>
+
+                                <div class="edit-label">
+                                    <label for="ProductPrices_@p.Type.GetIntValue()-Status">Status</label>
+                                </div>
+                                <div class="edit-field">
+
+                                    <select id="ProductPrices_@p.Type.GetIntValue()-Status" name="ProductPrices[@i].Status" class="chzn" style="width: 98%;">
+
+                                        @foreach ( int t in Enum.GetValues( typeof( Status ) ) )
+                                        {
+                                            Status status = ( Status ) t;
+
+                                            if ( status != Status.Active && status != Status.Inactive )
+                                            {
+                                                continue;
+                                            }
+
+                                            string sel = status == p.Status ? "selected=selected" : "";
+
+                                            <option value="@t" @sel>@status.GetDisplayText()</option>
+                                        }
+
+                                    </select>
+
+                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-Status" data-valmsg-replace="true"></span>
+                                </div>
+
+                            </li>
+
+                            i++;
+                        }
+                    </ul>
+                }
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-refresh="1" data-target="#products">Cancel</a>
+            </p>
+
+        </div>
+
+    </div>
+}
