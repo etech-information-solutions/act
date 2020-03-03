@@ -32,14 +32,23 @@ namespace ACT.Core.Services
         {
             string[] qs = ( csm.Query ?? "" ).Split( ' ' );
 
+            List<int> pspIds = CurrentUser.PSPs.Select( s => s.Id ).ToList();
+            List<int> clientIds = CurrentUser.Clients.Select( s => s.Id ).ToList();
+
             return ( from a in context.AuditLogs
                      join user in context.Users on a.UserId equals user.Id into temp
                      from u in temp.DefaultIfEmpty()
 
-                    #region WHERE
+                     #region WHERE
 
                      where
                      (
+                         // WHERE
+                         (
+                            ( CurrentUser.RoleType == RoleType.PSP ? context.PSPUsers.Any( pu => pu.UserId == a.UserId && pspIds.Contains( pu.PSPId ) ) : true ) &&
+                            ( CurrentUser.RoleType == RoleType.Client ? context.ClientUsers.Any( cu => cu.UserId == a.UserId && clientIds.Contains( cu.ClientId ) ) : true )
+                         ) &&
+
                          // CUSTOM SEARCH
                          ( ( csm.UserId != 0 ) ? a.UserId == csm.UserId : true ) &&
                          ( ( csm.ObjectId != 0 ) ? a.ObjectId == csm.ObjectId : true ) &&
@@ -78,66 +87,76 @@ namespace ACT.Core.Services
         public new List<AuditLogCustomModel> List( PagingModel pm, CustomSearchModel csm )
         {
             string[] qs = ( csm.Query ?? "" ).Split( ' ' );
-            List<AuditLogCustomModel> list = new List<AuditLogCustomModel>();
 
-            list = ( from a in context.AuditLogs
-                     join user in context.Users on a.UserId equals user.Id into temp
-                     from u in temp.DefaultIfEmpty()
+            List<int> pspIds = CurrentUser.PSPs.Select( s => s.Id ).ToList();
+            List<int> clientIds = CurrentUser.Clients.Select( s => s.Id ).ToList();
 
-                     #region WHERE
+            List<AuditLogCustomModel> list = ( from a in context.AuditLogs
+                                                join user in context.Users on a.UserId equals user.Id into temp
+                                                from u in temp.DefaultIfEmpty()
 
-                      where
-                      (
-                          // CUSTOM SEARCH
-                          ( ( csm.UserId != 0 ) ? a.UserId == csm.UserId : true ) &&
-                          ( ( csm.ObjectId != 0 ) ? a.ObjectId == csm.ObjectId : true ) &&
-                          ( ( !string.IsNullOrEmpty( csm.TableName ) ) ? a.ActionTable == csm.TableName : true ) &&
-                          ( ( !string.IsNullOrEmpty( csm.ControllerName ) ) ? a.Controller == csm.ControllerName : true ) &&
-                          ( ( csm.FromDate.HasValue ) ? DbFunctions.TruncateTime( a.CreatedOn ) >= DbFunctions.TruncateTime( csm.FromDate ) : true ) &&
-                          ( ( csm.ToDate.HasValue ) ? DbFunctions.TruncateTime( a.CreatedOn ) <= DbFunctions.TruncateTime( csm.ToDate ) : true ) &&
-                          ( ( csm.ActivityType != ActivityTypes.All ) ? a.Type == ( int ) csm.ActivityType : true ) &&
+                                                #region WHERE
 
-                          // NORMAL QUERY
-                          (
-                              ( qs.Any( q => q != "" ) ? ( qs.Contains( a.Parameters ) || qs.All( q => a.Parameters.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                              ( qs.Any( q => q != "" ) ? ( qs.Contains( a.BeforeImage ) || qs.All( q => a.BeforeImage.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                              ( qs.Any( q => q != "" ) ? ( qs.Contains( a.AfterImage ) || qs.All( q => a.AfterImage.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                              ( qs.Any( q => q != "" ) ? ( qs.Contains( a.Action ) || qs.All( q => a.Action.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                              ( qs.Any( q => q != "" ) ? ( qs.Contains( a.Comments ) || qs.All( q => a.Comments.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                              ( qs.Any( q => q != "" ) ? ( qs.Contains( a.Controller ) || qs.All( q => a.Controller.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                              ( qs.Any( q => q != "" ) ? ( qs.Contains( a.ActionTable ) || qs.All( q => a.ActionTable.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                              ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Name ) || qs.All( q => u.Name.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                              ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Surname ) || qs.All( q => u.Surname.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                              ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Email ) || qs.All( q => u.Email.ToLower().Contains( q.ToLower() ) ) ) : true )
-                          )
-                        )
+                                                where
+                                                (
+                                                    // WHERE
+                                                    (
+                                                        ( CurrentUser.RoleType == RoleType.PSP ? context.PSPUsers.Any( pu => pu.UserId == a.UserId && pspIds.Contains( pu.PSPId ) ) : true ) &&
+                                                        ( CurrentUser.RoleType == RoleType.Client ? context.ClientUsers.Any( cu => cu.UserId == a.UserId && clientIds.Contains( cu.ClientId ) ) : true )
+                                                    ) &&
 
-                     #endregion
+                                                    // CUSTOM SEARCH
 
-                     select new AuditLogCustomModel
-                     {
-                         #region Properties
+                                                    ( ( csm.UserId != 0 ) ? a.UserId == csm.UserId : true ) &&
+                                                    ( ( csm.ObjectId != 0 ) ? a.ObjectId == csm.ObjectId : true ) &&
+                                                    ( ( !string.IsNullOrEmpty( csm.TableName ) ) ? a.ActionTable == csm.TableName : true ) &&
+                                                    ( ( !string.IsNullOrEmpty( csm.ControllerName ) ) ? a.Controller == csm.ControllerName : true ) &&
+                                                    ( ( csm.FromDate.HasValue ) ? DbFunctions.TruncateTime( a.CreatedOn ) >= DbFunctions.TruncateTime( csm.FromDate ) : true ) &&
+                                                    ( ( csm.ToDate.HasValue ) ? DbFunctions.TruncateTime( a.CreatedOn ) <= DbFunctions.TruncateTime( csm.ToDate ) : true ) &&
+                                                    ( ( csm.ActivityType != ActivityTypes.All ) ? a.Type == ( int ) csm.ActivityType : true ) &&
 
-                         Id = a.Id,
-                         Type = a.Type,
-                         UserId = a.UserId,
-                         Action = a.Action,
-                         ObjectId = a.ObjectId,
-                         Comments = a.Comments,
-                         CreatedOn = a.CreatedOn,
-                         Controller = a.Controller,
-                         ModifiedOn = a.ModifiedOn,
-                         Parameters = a.Parameters,
-                         ActionTable = a.ActionTable,
-                         IsAjaxRequest = a.IsAjaxRequest,
+                                                    // NORMAL QUERY
 
-                         User = u
+                                                    (
+                                                        ( qs.Any( q => q != "" ) ? ( qs.Contains( a.Parameters ) || qs.All( q => a.Parameters.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
+                                                        ( qs.Any( q => q != "" ) ? ( qs.Contains( a.BeforeImage ) || qs.All( q => a.BeforeImage.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
+                                                        ( qs.Any( q => q != "" ) ? ( qs.Contains( a.AfterImage ) || qs.All( q => a.AfterImage.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
+                                                        ( qs.Any( q => q != "" ) ? ( qs.Contains( a.Action ) || qs.All( q => a.Action.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
+                                                        ( qs.Any( q => q != "" ) ? ( qs.Contains( a.Comments ) || qs.All( q => a.Comments.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
+                                                        ( qs.Any( q => q != "" ) ? ( qs.Contains( a.Controller ) || qs.All( q => a.Controller.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
+                                                        ( qs.Any( q => q != "" ) ? ( qs.Contains( a.ActionTable ) || qs.All( q => a.ActionTable.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
+                                                        ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Name ) || qs.All( q => u.Name.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
+                                                        ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Surname ) || qs.All( q => u.Surname.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
+                                                        ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Email ) || qs.All( q => u.Email.ToLower().Contains( q.ToLower() ) ) ) : true )
+                                                    )
+                                                )
 
-                         #endregion
-                     } ).OrderBy( CreateOrderBy( pm.SortBy, pm.Sort ) )
-                    .Skip( pm.Skip )
-                    .Take( pm.Take )
-                    .ToList();
+                                                #endregion
+
+                                                select new AuditLogCustomModel
+                                                {
+                                                    #region Properties
+
+                                                    Id = a.Id,
+                                                    Type = a.Type,
+                                                    UserId = a.UserId,
+                                                    Action = a.Action,
+                                                    ObjectId = a.ObjectId,
+                                                    Comments = a.Comments,
+                                                    CreatedOn = a.CreatedOn,
+                                                    Controller = a.Controller,
+                                                    ModifiedOn = a.ModifiedOn,
+                                                    Parameters = a.Parameters,
+                                                    ActionTable = a.ActionTable,
+                                                    IsAjaxRequest = a.IsAjaxRequest,
+
+                                                    User = u
+
+                                                    #endregion
+                                                } ).OrderBy( CreateOrderBy( pm.SortBy, pm.Sort ) )
+                                            .Skip( pm.Skip )
+                                            .Take( pm.Take )
+                                            .ToList();
 
             return list;
         }
@@ -288,7 +307,7 @@ namespace ACT.Core.Services
                 string b = string.Format( "Type={1} {0} Name={2} {0} Version={3} {0} Platform={4} {0} Supports JavaScript={5}", Environment.NewLine,
                                            browser.Type, browser.Browser, browser.Version, browser.Platform, browser.EcmaScriptVersion.ToString() );
 
-                if( userId == 0)
+                if ( userId == 0 )
                 {
                     userId = ( CurrentUser?.Id > 0 ) ? CurrentUser.Id : 0;
                 }

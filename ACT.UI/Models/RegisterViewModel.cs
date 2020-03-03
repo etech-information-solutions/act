@@ -14,7 +14,7 @@ namespace ACT.UI.Models
         public int Id { get; set; }
 
         [Display( Name = "Name of Service Provider" )]
-        public int PSPId { get; set; }
+        public int? PSPId { get; set; }
 
         [Required]
         [Display( Name = "Company Name" )]

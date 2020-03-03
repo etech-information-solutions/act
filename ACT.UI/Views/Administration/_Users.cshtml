@@ -1,6 +1,6 @@
 ﻿@model PagingExtension
 
-@using ACT.Data.Models;
+@using ACT.Core.Models.Custom;
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
 
@@ -20,7 +20,7 @@
 
 @{
     Int32 count = Model.Start;
-    List<User> items = ( List<User> ) Model.Items;
+    List<UserCustomModel> items = ( List<UserCustomModel> ) Model.Items;
 }
 
 
@@ -71,14 +71,7 @@
             {
                 Status status = ( Status ) item.Status;
 
-                Role role = new Role() { Name = "~/~", Type = -1 };
-
-                if ( item.UserRoles.Any() )
-                {
-                    role = item.UserRoles.FirstOrDefault().Role;
-                }
-
-                RoleType roleType = ( RoleType ) role.Type;
+                RoleType roleType = ( RoleType ) item.Type;
 
                 String active = status.Equals( Status.Active ) ? "active" : "inactive";
                 String enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
@@ -104,9 +97,9 @@
                         @status.GetDisplayText()
                     </td>
                     <td>
-                        @roleType.GetDisplayText()
+                        @item.RoleName
 
-                        @if ( roleType == RoleType.Client )
+                        @*@if ( roleType == RoleType.Client )
                         {
                             <div style="border: 1px dashed #fff; border-radius: 4px; padding: 6px; margin-top: 10px;">
 
@@ -140,7 +133,7 @@
                                 </ul>
 
                             </div>
-                        }
+                        }*@
                     </td>
                     <td>
                         @item.LastLogin

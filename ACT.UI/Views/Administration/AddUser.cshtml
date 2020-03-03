@@ -1,8 +1,9 @@
 ﻿@model UserViewModel
 
 @using ACT.UI.Models;
-@using ACT.Core.Models;
 @using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Data.Models;
 
 @{
     if ( ViewBag.IncludeLayout == null )
@@ -17,15 +18,15 @@
     int pspRoleId = Model.RoleOptions.FirstOrDefault( r => r.Type == ( int ) RoleType.PSP )?.Id ?? 0,
         clientRoleId = Model.RoleOptions.FirstOrDefault( r => r.Type == ( int ) RoleType.Client )?.Id ?? 0;
 
-    string disableRole = ( user.RoleType == RoleType.PSP || user.RoleType == RoleType.Client ) ? "1" : "0";
+    List<Role> roleOptions = Model.RoleOptions;
 
     if ( user.RoleType == RoleType.PSP )
     {
-        Model.RoleId = Model.RoleOptions.FirstOrDefault( r => r.Type == ( int ) RoleType.PSP )?.Id ?? 0;
+        roleOptions = Model.RoleOptions.Where( r => r.Type == ( int ) RoleType.PSP ).ToList();
     }
     else if ( user.RoleType == RoleType.Client )
     {
-        Model.RoleId = Model.RoleOptions.FirstOrDefault( r => r.Type == ( int ) RoleType.Client )?.Id ?? 0;
+        roleOptions = Model.RoleOptions.Where( r => r.Type == ( int ) RoleType.Client ).ToList();
     }
 }
 
@@ -82,7 +83,7 @@
                     @Html.LabelFor( model => model.RoleId )
                 </div>
                 <div class="edit-field">
-                    @Html.DropDownListFor( model => model.RoleId, model => Model.RoleOptions, role => role.Id, role => role.Name + " (user)", true, new { @class = "chzn", data_always_disabled = disableRole, data_role = "1", data_psp = "#psp-options", data_psp_role_id = pspRoleId, data_client_role_id = clientRoleId, data_client = "#client-options", @style = "width: 98%;" } )
+                    @Html.DropDownListFor( model => model.RoleId, model => roleOptions, role => role.Id, role => role.Name + " (user)", true, new { @class = "chzn", data_role = "1", data_psp = "#psp-options", data_psp_role_id = pspRoleId, data_client_role_id = clientRoleId, data_client = "#client-options", @style = "width: 98%;" } )
                     @Html.ValidationMessageFor( model => model.RoleId )
                 </div>
 
@@ -91,7 +92,7 @@
                         @Html.LabelFor( model => model.PSPId )
                     </div>
                     <div class="editor-field">
-                        @Html.DropDownListFor( model => model.PSPId, model => model.PSPOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", data_always_disabled = disableRole, @style = "width: 98%;" } )
+                        @Html.DropDownListFor( model => model.PSPId, model => model.PSPOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
                     </div>
                 </div>
 
@@ -100,7 +101,7 @@
                         @Html.LabelFor( model => model.ClientId )
                     </div>
                     <div class="editor-field">
-                        @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", data_always_disabled = disableRole, @style = "width: 98%;" } )
+                        @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
                     </div>
                 </div>
 

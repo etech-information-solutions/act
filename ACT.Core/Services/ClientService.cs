@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using ACT.Core.Enums;
 using ACT.Core.Models;
@@ -24,11 +25,19 @@ namespace ACT.Core.Services
             Dictionary<int, string> clientOptions = new Dictionary<int, string>();
             List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
 
-            List<object> parameters = new List<object>();
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+            };
 
             string query = string.Empty;
 
-            query = $"SELECT c.Id AS [TKey], c.CompanyName AS [TValue] FROM [dbo].[Client] c";
+            query = $"SELECT c.Id AS [TKey], c.CompanyName AS [TValue] FROM [dbo].[Client] c WHERE (1=1)";
+
+            if ( !CurrentUser.IsAdmin )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.UserId=c.Id)";
+            }
 
             model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();
 

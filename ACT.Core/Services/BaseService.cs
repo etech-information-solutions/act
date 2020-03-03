@@ -98,6 +98,7 @@ namespace ACT.Core.Services
                       where
                       (
                         u.Email.Trim() == email.Trim() &&
+                        u.Password == password &&
                         u.Status == ( int ) Status.Active
                       )
                       select new UserModel()

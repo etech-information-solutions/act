@@ -6,7 +6,7 @@ namespace ACT.Core.Models.Custom
     public partial class BroadcastCustomModel
     {
         public int Id { get; set; }
-        public int ObjectId { get; set; }
+        public int? ObjectId { get; set; }
         public string ObjectType { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime ModifiedOn { get; set; }
@@ -15,5 +15,10 @@ namespace ACT.Core.Models.Custom
         public Nullable<DateTime> EndDate { get; set; }
         public string Message { get; set; }
         public int Status { get; set; }
+
+        public int? XRead { get; set; }
+
+        public string PSPName { get; set; }
+        public string ClientName { get; set; }
     }
 }

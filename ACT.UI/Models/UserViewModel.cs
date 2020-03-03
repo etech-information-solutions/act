@@ -18,10 +18,10 @@ namespace ACT.UI.Models
         public int RoleId { get; set; }
 
         [Display( Name = "PSP" )]
-        public int PSPId { get; set; }
+        public int? PSPId { get; set; }
 
         [Display( Name = "Client" )]
-        public int ClientId { get; set; }
+        public int? ClientId { get; set; }
 
         public Role Role { get; set; }
 
@@ -56,7 +56,7 @@ namespace ACT.UI.Models
 
 
 
-        [Required]
+        //[Required]
         [Display( Name = "Status" )]
         public Status Status { get; set; }
 

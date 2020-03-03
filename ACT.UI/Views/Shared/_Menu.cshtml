@@ -20,20 +20,20 @@
             Welcome <strong>@user.Name</strong>
         </li>
 
+        @*@if ( User.Has( PermissionTo.View, PermissionContext.Client ) )
+        {
+            <li data-hot-spot="1" data-c="Client" data-t="" class="@(controller.ToLower().Equals( "client" ) ? "current" : "")">
+                <a rel="tipsyW" title="Clients" href="@Url.Action( "Index", "Client" )">
+                    <span>Clients</span>
+                </a>
+            </li>
+        }*@
+
         @*@if ( User.Has( PermissionTo.View, PermissionContext.DashBoard ) )
         {
             <li class="@(controller.ToLower().Equals( "dashboard" ) ? "current" : "")" data-hot-spot="1" data-c="Dashboard" data-t="">
                 <a rel="tipsyW" title="Dashboard" href="@Url.Action( "Index", "Dashboard" )">
                     <span>Dashboard</span>
-                </a>
-            </li>
-        }
-
-        @if ( User.Has( PermissionTo.View, PermissionContext.Client ) )
-        {
-            <li data-hot-spot="1" data-c="Client" data-t="" class="@(controller.ToLower().Equals( "client" ) ? "current" : "")">
-                <a rel="tipsyW" title="Clients" href="@Url.Action( "Index", "Client" )">
-                    <span>Clients</span>
                 </a>
             </li>
         }
