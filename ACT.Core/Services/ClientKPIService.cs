@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using ACT.Data.Models;
 
 namespace ACT.Core.Services
@@ -9,5 +10,10 @@ namespace ACT.Core.Services
         {
 
         }
+        public ClientKPI GetByPSPId(int id)
+        {
+            return context.ClientKPIs.FirstOrDefault(b => b.ClientId == id);
+        }
+
     }
 }

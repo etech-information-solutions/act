@@ -48,6 +48,8 @@ namespace ACT.Core.Models
 
         public bool IsAdmin { get; set; }
 
+        public bool IsPSPAdmin { get; set; }
+
         public string SelfieUrl { get; set; }
 
         public string IdPassportUrl { get; set; }

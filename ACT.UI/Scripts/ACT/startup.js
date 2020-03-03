@@ -174,6 +174,14 @@ ACT.Init = {
                     bSort: false,
                     bPaginate: false,
                     iDisplayLength: 50,
+                    select: {
+                        style: 'single'
+                        //style: 'multi'
+                    },
+                    //action: function (e, dt, node, config) {
+                    //    var data = oTable.rows({ selected: true }).data();
+                    //    console.log("data---" + data);
+                    //},
                     //"fixedHeader": {
                     //    header: i.hasClass( "fixed-table" )
                     //},
@@ -195,6 +203,14 @@ ACT.Init = {
                 bSort: false,
                 bPaginate: false,
                 iDisplayLength: 50,
+                select: {
+                    style: 'single'
+                    //style: 'multi'
+                },
+                //action: function (e, dt, node, config) {
+                //    var data = oTable.rows({ selected: true }).data();
+                //    console.log("data---" + data);
+                //},
                 //"fixedHeader": {
                 //    header: i.hasClass("fixed-table")
                 //},

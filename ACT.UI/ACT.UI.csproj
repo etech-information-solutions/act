@@ -155,6 +155,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AddressViewModel.cs" />
+    <Compile Include="Models\GroupClientsViewModel.cs" />
     <Compile Include="Models\ProductViewModel.cs" />
     <Compile Include="Models\RegionViewModel.cs" />
     <Compile Include="Models\ClientViewModel.cs" />
@@ -465,13 +466,18 @@
     <Content Include="Views\Client\Index.cshtml" />
     <Content Include="Views\Client\_ClientHeader.cshtml" />
     <Content Include="Views\Client\_ClientList.cshtml" />
-    <Content Include="Views\Client\AddPSP.cshtml" />
-    <Content Include="Views\Client\_ClientGroup.cshtml" />
+    <Content Include="Views\Client\AddClient.cshtml" />
+    <Content Include="Views\Client\_ClientGroups.cshtml" />
     <Content Include="Views\Client\_ManageSites.cshtml" />
     <Content Include="Views\Client\_LinkProducts.cshtml" />
     <Content Include="Views\Client\_AwaitingActivation.cshtml" />
     <Content Include="Views\Client\_ManageTransporters.cshtml" />
     <Content Include="Views\Client\_Subsites.cshtml" />
+    <Content Include="Views\Client\EditClient.cshtml" />
+    <Content Include="Views\Client\AddSite.cshtml" />
+    <Content Include="Views\Client\EditSite.cshtml" />
+    <Content Include="Views\Client\ClientDetails.cshtml" />
+    <Content Include="Views\Client\_bak_SubSites.cshtml" />
     <Content Include="Views\Shared\_BroadcastCustomSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
