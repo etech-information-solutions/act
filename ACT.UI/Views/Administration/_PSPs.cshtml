@@ -198,7 +198,7 @@
                                 </div>
                             }
 
-                            @if ( status != PSPClientStatus.Unverified && user.IsAdmin )
+                            @if ( status != PSPClientStatus.Unverified )
                             {
                                 @Html.ActionLink( "Config", "PSPConfig", new { id = item.Id, returnView = "PSPs" }, new { @class = "setting", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
                             }

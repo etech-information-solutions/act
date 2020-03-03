@@ -282,9 +282,9 @@ namespace ACT.UI.Controllers
                     {
                         client.PSPClients.Add( new PSPClient()
                         {
-                            PSPId = model.PSPId,
                             ClientId = client.Id,
                             CreatedOn = DateTime.Now,
+                            PSPId = model.PSPId.Value,
                             ModifiedOn = DateTime.Now,
                             ModifiedBy = model.AdminEmail,
                             Status = ( int ) Status.Active,
@@ -317,7 +317,7 @@ namespace ACT.UI.Controllers
                     {
                         Email = model.EmailAddress,
                         TradingAs = model.TradingAs,
-                        VATNumber = model.VATNumber,
+                        VATNumber = model.VATNumber, 
                         AdminEmail = model.AdminEmail,
                         CompanyName = model.CompanyName,
                         Description = model.Description,

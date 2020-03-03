@@ -21,5 +21,8 @@ namespace ACT.Core.Models.Custom
         public Nullable<System.DateTime> LastLogin { get; set; }
         public string Password { get; set; }
         public Nullable<System.DateTime> PasswordDate { get; set; }
+
+        public int RoleId { get; set; }
+        public string RoleName { get; set; }
     }
 }

@@ -483,6 +483,7 @@
     <Content Include="Views\Client\AddProduct.cshtml" />
     <Content Include="Views\Client\ProductDetails.cshtml" />
     <Content Include="Views\Client\_LinkProducts.cshtml" />
+    <Content Include="Views\Shared\_BroadcastCustomSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

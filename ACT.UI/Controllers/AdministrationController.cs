@@ -732,11 +732,11 @@ namespace ACT.UI.Controllers
                     user.PSPUsers.Add( new PSPUser()
                     {
                         UserId = user.Id,
-                        PSPId = model.PSPId,
-                        Status = user.Status,
                         CreatedOn = DateTime.Now,
                         ModifiedOn = DateTime.Now,
+                        PSPId = model.PSPId.Value,
                         ModifiedBy = CurrentUser.Email,
+                        Status = ( int ) Status.Active,
                     } );
                 }
                 else if ( role.Type == ( int ) RoleType.Client && model.ClientId > 0 )
@@ -744,11 +744,11 @@ namespace ACT.UI.Controllers
                     user.ClientUsers.Add( new ClientUser()
                     {
                         UserId = user.Id,
-                        Status = user.Status,
                         CreatedOn = DateTime.Now,
-                        ClientId = model.ClientId,
                         ModifiedOn = DateTime.Now,
+                        Status = ( int ) Status.Active,
                         ModifiedBy = CurrentUser.Email,
+                        ClientId = model.ClientId.Value,
 
                     } );
                 }
@@ -805,8 +805,8 @@ namespace ACT.UI.Controllers
                 Surname = user.Surname?.Trim(),
                 Status = ( Status ) user.Status,
                 RoleType = ( RoleType ) user.Type,
-                PSPId = user.PSPUsers.FirstOrDefault( p => p.Status == ( int ) Status.Active )?.PSPId ?? 0,
-                ClientId = user.ClientUsers.FirstOrDefault( p => p.Status == ( int ) Status.Active )?.ClientId ?? 0
+                PSPId = user.PSPUsers.FirstOrDefault()?.PSPId ?? 0,
+                ClientId = user.ClientUsers.FirstOrDefault()?.ClientId ?? 0
             };
 
             return View( model );
@@ -866,12 +866,10 @@ namespace ACT.UI.Controllers
 
                 // Update User
 
-                user.Type = role.Type;
                 user.Cell = model.Cell;
                 user.Name = model.Name;
                 user.Email = model.Email;
                 user.Surname = model.Surname;
-                user.Status = ( int ) model.Status;
 
                 if ( !string.IsNullOrEmpty( model.Password ) )
                 {
@@ -879,30 +877,36 @@ namespace ACT.UI.Controllers
                     user.Password = uservice.GetSha1Md5String( model.Password );
                 }
 
-                if ( role.Type == ( int ) RoleType.PSP && model.PSPId > 0 && !user.PSPUsers.Any( p => p.PSPId == model.PSPId ) )
+                if ( CurrentUser.IsAdmin )
                 {
-                    user.PSPUsers.Add( new PSPUser()
-                    {
-                        UserId = user.Id,
-                        PSPId = model.PSPId,
-                        Status = user.Status,
-                        CreatedOn = DateTime.Now,
-                        ModifiedOn = DateTime.Now,
-                        ModifiedBy = CurrentUser.Email,
-                    } );
-                }
-                else if ( role.Type == ( int ) RoleType.Client && model.ClientId > 0 && !user.ClientUsers.Any( p => p.ClientId == model.ClientId ) )
-                {
-                    user.ClientUsers.Add( new ClientUser()
-                    {
-                        UserId = user.Id,
-                        Status = user.Status,
-                        CreatedOn = DateTime.Now,
-                        ClientId = model.ClientId,
-                        ModifiedOn = DateTime.Now,
-                        ModifiedBy = CurrentUser.Email,
+                    user.Type = role.Type;
+                    user.Status = ( int ) model.Status;
 
-                    } );
+                    if ( role.Type == ( int ) RoleType.PSP && model.PSPId > 0 && !user.PSPUsers.Any( p => p.PSPId == model.PSPId ) )
+                    {
+                        user.PSPUsers.Add( new PSPUser()
+                        {
+                            UserId = user.Id,
+                            Status = user.Status,
+                            CreatedOn = DateTime.Now,
+                            ModifiedOn = DateTime.Now,
+                            PSPId = model.PSPId.Value,
+                            ModifiedBy = CurrentUser.Email,
+                        } );
+                    }
+                    else if ( role.Type == ( int ) RoleType.Client && model.ClientId > 0 && !user.ClientUsers.Any( p => p.ClientId == model.ClientId ) )
+                    {
+                        user.ClientUsers.Add( new ClientUser()
+                        {
+                            UserId = user.Id,
+                            Status = user.Status,
+                            CreatedOn = DateTime.Now,
+                            ModifiedOn = DateTime.Now,
+                            ModifiedBy = CurrentUser.Email,
+                            ClientId = model.ClientId.Value,
+
+                        } );
+                    }
                 }
 
                 user = uservice.Update( user, model.RoleId );
@@ -1950,6 +1954,17 @@ namespace ACT.UI.Controllers
                     StartDate = model.StartDate.Value,
                     Status = ( int ) model.Status
                 };
+
+                if ( CurrentUser.RoleType == RoleType.PSP )
+                {
+                    broadcast.ObjectType = "PSP";
+                    broadcast.ObjectId = CurrentUser.PSPs.FirstOrDefault().Id;
+                }
+                else if ( CurrentUser.RoleType == RoleType.Client )
+                {
+                    broadcast.ObjectType = "Client";
+                    broadcast.ObjectId = CurrentUser.Clients.FirstOrDefault().Id;
+                }
 
                 broadcast = service.Create( broadcast );
 
@@ -3036,12 +3051,12 @@ namespace ACT.UI.Controllers
 
             int total = 0;
 
-            List<User> model = new List<User>();
+            List<UserCustomModel> model;
 
             using ( UserService service = new UserService() )
             {
-                model = service.List( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total( pm, csm );
+                model = service.List1( pm, csm );
+                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
             }
 
             PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
@@ -3162,8 +3177,15 @@ namespace ACT.UI.Controllers
 
         //
         // POST || GET: /Administration/Broadcasts
-        public ActionResult Broadcasts( PagingModel pm, CustomSearchModel csm )
+        public ActionResult Broadcasts( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "_Broadcasts";
+
+                return PartialView( "_BroadcastCustomSearch", new CustomSearchModel( "Broadcast" ) );
+            }
+
             pm.Take = int.MaxValue;
 
             pm.Sort = "DESC";
@@ -3171,12 +3193,12 @@ namespace ACT.UI.Controllers
 
             int total = 0;
 
-            List<Broadcast> model = new List<Broadcast>();
+            List<BroadcastCustomModel> model;
 
             using ( BroadcastService service = new BroadcastService() )
             {
-                model = service.List( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total( pm, csm );
+                model = service.List1( pm, csm );
+                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
             }
 
             PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );

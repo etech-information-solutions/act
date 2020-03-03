@@ -286,7 +286,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
             };
 
-            string query = $"SELECT p.Id AS [TKey], p.CompanyName AS [TValue] FROM [dbo].[PSP] p";
+            string query = $"SELECT p.Id AS [TKey], p.CompanyName AS [TValue] FROM [dbo].[PSP] p WHERE (1=1)";
 
             if ( !CurrentUser.IsAdmin )
             {

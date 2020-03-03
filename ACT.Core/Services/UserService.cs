@@ -8,6 +8,7 @@ using ACT.Core.Models;
 using ACT.Data.Models;
 using System.Data.SqlClient;
 using ACT.Core.Models.Simple;
+using ACT.Core.Models.Custom;
 
 namespace ACT.Core.Services
 {
@@ -72,99 +73,6 @@ namespace ACT.Core.Services
             ContextExtensions.CacheUserData( "simpu_" + id, user );
 
             return user;
-        }
-
-        /// <summary>
-        /// Gets a total list of users using the provided filters
-        /// </summary>
-        /// <param name="pm"></param>
-        /// <param name="csm"></param>
-        /// <returns></returns>
-        public override int Total( PagingModel pm, CustomSearchModel csm )
-        {
-            string[] qs = ( csm.Query ?? "" ).Split( ' ' );
-
-            return ( from u in context.Users
-
-                         #region Where
-
-                     where
-                     (
-                         // Where
-                         ( CurrentUser.RoleType == RoleType.PSP ? u.PSPUsers.Any( pu => CurrentUser.PSPs.Any( p => p.Id == pu.PSPId ) ) : true ) &&
-                         ( CurrentUser.RoleType == RoleType.Client ? u.ClientUsers.Any( cu => CurrentUser.PSPs.Any( c => c.Id == cu.ClientId ) ) : true ) &&
-
-
-
-                         // Custom Search
-                         (
-                            ( ( csm.Status != Status.All ) ? u.Status == ( int ) csm.Status : true ) &&
-                            ( ( csm.RoleType != RoleType.All ) ? u.UserRoles.Any( ur => ur.Role.Type == ( int ) csm.RoleType ) : true )
-                         ) &&
-
-
-
-                         // Normal Search
-                         (
-                            ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Name ) || qs.All( q => u.Name.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                            ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Cell ) || qs.All( q => u.Cell.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                            ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Email ) || qs.All( q => u.Email.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                            ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Surname ) || qs.All( q => u.Surname.ToLower().Contains( q.ToLower() ) ) ) : true )
-                        )
-                     )
-
-                     #endregion
-
-                     select u ).Count();
-        }
-
-        /// <summary>
-        /// Gets a list of users using the provided filters
-        /// </summary>
-        /// <param name="pm"></param>
-        /// <param name="csm"></param>
-        /// <returns></returns>
-        public override List<User> List( PagingModel pm, CustomSearchModel csm )
-        {
-            string[] qs = ( csm.Query ?? "" ).Split( ' ' );
-
-            base.context.Configuration.LazyLoadingEnabled = true;
-            base.context.Configuration.ProxyCreationEnabled = true;
-
-            return ( from u in context.Users
-
-                    #region Where
-
-                     where
-                     (
-                         // Where
-                         ( CurrentUser.RoleType == RoleType.PSP ? u.PSPUsers.Any( pu => CurrentUser.PSPs.Any( p => p.Id == pu.PSPId ) ) : true ) &&
-                         ( CurrentUser.RoleType == RoleType.Client ? u.ClientUsers.Any( cu => CurrentUser.PSPs.Any( c => c.Id == cu.ClientId ) ) : true ) &&
-
-
-
-                         // Custom Search
-                         (
-                            ( ( csm.Status != Status.All ) ? u.Status == ( int ) csm.Status : true ) &&
-                            ( ( csm.RoleType != RoleType.All ) ? u.UserRoles.Any( ur => ur.Role.Type == ( int ) csm.RoleType ) : true )
-                         ) &&
-
-
-
-                         // Normal Search
-                         (
-                            ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Name ) || qs.All( q => u.Name.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                            ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Cell ) || qs.All( q => u.Cell.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                            ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Email ) || qs.All( q => u.Email.ToLower().Contains( q.ToLower() ) ) ) : true ) ||
-                            ( qs.Any( q => q != "" ) ? ( qs.Contains( u.Surname ) || qs.All( q => u.Surname.ToLower().Contains( q.ToLower() ) ) ) : true )
-                        )
-                     )
-
-                     #endregion
-                     select u ).OrderBy( CreateOrderBy( pm.SortBy, pm.Sort ) )
-                               .Skip( pm.Skip )
-                               .Take( pm.Take )
-                               .ToList();
         }
 
         /// <summary>
@@ -250,12 +158,12 @@ namespace ACT.Core.Services
             {
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
-                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmStatus", ( int ) csm.Status ) },
+                { new SqlParameter( "csmRoleType", ( int ) csm.RoleType ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmRoleType", ( int ) csm.RoleType ) },
-                { new SqlParameter( "csmProvince", ( int ) csm.Province ) }
             };
 
             #endregion
@@ -271,7 +179,17 @@ namespace ACT.Core.Services
 
             #region WHERE
 
-            query = $"{query} WHERE (1=1) ";
+            query = $"{query} WHERE (1=1)";
+
+            // Limit to only show PSP for logged in user
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu WHERE u.Id=pu.UserId AND pu.UserId=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE u.Id=cu.UserId AND cu.UserId=@userid) ";
+            }
 
             #endregion
 
@@ -279,14 +197,15 @@ namespace ACT.Core.Services
 
             #region Custom Search
 
+            if ( csm.Status != Status.All )
+            {
+                query = $"{query} AND (u.Status=@csmStatus) ";
+            }
             if ( csm.RoleType != RoleType.All )
             {
                 query = $"{query} AND (u.Type=@csmRoleType) ";
             }
-            if ( csm.Status != Status.All )
-            {
-                query = $"{query} AND (u.Status=@csmAgentStatus) ";
-            }
+
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
                 query = $"{query} AND (u.CreatedOn >= @csmFromDate AND u.CreatedOn <= @csmToDate) ";
@@ -302,9 +221,112 @@ namespace ACT.Core.Services
                     query = $"{query} AND (u.CreatedOn<=@csmToDate) ";
                 }
             }
-            if ( csm.Province != Province.All )
+
+            #endregion
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Address] a WHERE a.ObjectId=u.Id AND a.ObjectType='User' AND a.Province=@csmProvince) ";
+                query = string.Format( @"{0} AND (u.[Name] LIKE '%{1}%' OR
+                                                  u.[Surname] LIKE '%{1}%' OR
+                                                  u.[Email] LIKE '%{1}%' OR
+                                                  u.[Cell] LIKE '%{1}%'
+                                             ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            count = context.Database.SqlQuery<CountModel>( query.Trim(), parameters.ToArray() ).FirstOrDefault();
+
+            return count.Total;
+        }
+
+        /// <summary>
+        /// Gets a list of users using the provided filters
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public List<UserCustomModel> List1( PagingModel pm, CustomSearchModel csm )
+        {
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
+            {
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
+            }
+
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmStatus", ( int ) csm.Status ) },
+                { new SqlParameter( "csmRoleType", ( int ) csm.RoleType ) },
+                { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+            };
+
+            #endregion
+
+            string query = @"SELECT
+                                u.*,
+                                (SELECT TOP 1 ur.RoleId FROM [dbo].[UserRole] ur WHERE u.Id=ur.UserId) AS [RoleId],
+                                (SELECT TOP 1 r.Name FROM [dbo].[UserRole] ur, [dbo].[Role] r WHERE u.Id=ur.UserId AND r.Id=ur.RoleId) AS [RoleName]
+                             FROM
+                                [dbo].[User] u";
+
+            // WHERE
+
+            #region WHERE
+
+            query = $"{query} WHERE (1=1)";
+
+            // Limit to only show PSP for logged in user
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu WHERE u.Id=pu.UserId AND pu.PSPId IN({string.Join( ",", CurrentUser.PSPs.Select( s => s.Id ) )})) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE u.Id=cu.UserId AND cu.ClientId IN({string.Join( ",", CurrentUser.Clients.Select( s => s.Id ) )})) ";
+            }
+
+            #endregion
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.Status != Status.All )
+            {
+                query = $"{query} AND (u.Status=@csmStatus) ";
+            }
+            if ( csm.RoleType != RoleType.All )
+            {
+                query = $"{query} AND (u.Type=@csmRoleType) ";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (u.CreatedOn >= @csmFromDate AND u.CreatedOn <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (u.CreatedOn>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (u.CreatedOn<=@csmToDate) ";
+                }
             }
 
             #endregion
@@ -315,20 +337,24 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (u.Name LIKE '%{1}%' OR
-                                                  u.Surname LIKE '%{1}%' OR
-                                                  u.IdNumber LIKE '%{1}%' OR
-                                                  u.TaxNumber LIKE '%{1}%' OR
-                                                  u.Email LIKE '%{1}%' OR
-                                                  u.Cell LIKE '%{1}%'
+                query = string.Format( @"{0} AND (u.[Name] LIKE '%{1}%' OR
+                                                  u.[Surname] LIKE '%{1}%' OR
+                                                  u.[Email] LIKE '%{1}%' OR
+                                                  u.[Cell] LIKE '%{1}%'
                                              ) ", query, csm.Query.Trim() );
             }
 
             #endregion
 
-            count = context.Database.SqlQuery<CountModel>( query.Trim(), parameters.ToArray() ).FirstOrDefault();
+            // ORDER
 
-            return count.Total;
+            query = $"{query} ORDER BY {pm.SortBy} {pm.Sort}";
+
+            // SKIP, TAKE
+
+            query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
+
+            return context.Database.SqlQuery<UserCustomModel>( query, parameters.ToArray() ).ToList();
         }
 
         /// <summary>

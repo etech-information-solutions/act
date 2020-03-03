@@ -3,6 +3,7 @@
 @using ACT.UI.Models;
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
+@using ACT.Data.Models;
 
 @{
     if ( ViewBag.IncludeLayout == null )
@@ -17,14 +18,16 @@
     int pspRoleId = Model.RoleOptions.FirstOrDefault( r => r.Type == ( int ) RoleType.PSP )?.Id ?? 0,
         clientRoleId = Model.RoleOptions.FirstOrDefault( r => r.Type == ( int ) RoleType.Client )?.Id ?? 0;
 
-    string disableRole = ( user.RoleType == RoleType.PSP || user.RoleType == RoleType.Client ) ? "1" : "0";
+    List<Role> roleOptions = Model.RoleOptions;
 
     if ( user.RoleType == RoleType.PSP )
     {
+        roleOptions = Model.RoleOptions.Where( r => r.Type == ( int ) RoleType.PSP ).ToList();
         Model.RoleId = Model.RoleOptions.FirstOrDefault( r => r.Type == ( int ) RoleType.PSP )?.Id ?? 0;
     }
     else if ( user.RoleType == RoleType.Client )
     {
+        roleOptions = Model.RoleOptions.Where( r => r.Type == ( int ) RoleType.Client ).ToList();
         Model.RoleId = Model.RoleOptions.FirstOrDefault( r => r.Type == ( int ) RoleType.Client )?.Id ?? 0;
     }
 }
@@ -32,7 +35,7 @@
 
 @Html.Partial( "_Notification" )
 
-@using ( Html.BeginForm( "EditUser", "Administration", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#manageusers", @class = "custom-validate", @style = "width: auto;" } ) )
+@using ( Html.BeginForm( "EditUser", "Administration", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#users", @class = "custom-validate", @style = "width: auto;" } ) )
 {
     <div id="edit-item">
 
@@ -85,7 +88,7 @@
                     @Html.LabelFor( model => model.RoleId )
                 </div>
                 <div class="edit-field">
-                    @Html.DropDownListFor( model => model.RoleId, model => Model.RoleOptions, role => role.Id, role => role.Name + " (user)", true, new { @class = "chzn", data_always_disabled = disableRole, data_role = "1", data_psp = "#psp-options", data_psp_role_id = pspRoleId, data_client_role_id = clientRoleId, data_client = "#client-options", @style = "width: 98%;" } )
+                    @Html.DropDownListFor( model => model.RoleId, model => roleOptions, role => role.Id, role => role.Name + " (user)", true, new { @class = "chzn", data_role = "1", data_psp = "#psp-options", data_psp_role_id = pspRoleId, data_client_role_id = clientRoleId, data_client = "#client-options", @style = "width: 98%;" } )
                     @Html.ValidationMessageFor( model => model.RoleId )
                 </div>
 
