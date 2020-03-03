@@ -28,7 +28,9 @@ namespace ACT.UI
                         "~/Scripts/Plugins/jquery.fancybox.js",
                         //"~/Scripts/Plugins/jquery.dataTables.js",
                         "~/Scripts/Plugins/jquery.placeholder.js",
-                        "~/Scripts/Plugins/jquery.dataTables.min.js"/*,
+                        "~/Scripts/Plugins/jquery.dataTables.min.js",
+                        "~/Scripts/Plugins/dataTables.select.min.js"
+                        /*,
                         "~/Scripts/Plugins/dataTables.fixedHeader.min.js"*/ ) );
 
             bundles.Add( new ScriptBundle( "~/bundles/ACT" ).Include(

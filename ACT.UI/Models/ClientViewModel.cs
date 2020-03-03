@@ -17,7 +17,7 @@ namespace ACT.UI.Models
 
         [Required]
         [Display(Name = "Company Registration Number")]
-        [StringLength(15, ErrorMessage = "Only {15} characters are allowed for this field.", MinimumLength = 0)]
+        [StringLength(15, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
         public string CompanyRegistrationNumber { get; set; }
 
         [Required]
@@ -38,14 +38,13 @@ namespace ACT.UI.Models
         [Display(Name = "Business Contact Number")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string ContactNumber { get; set; }
+
         [Required]
         [Display(Name = "Contact Person")]
         [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string ContactPerson { get; set; }
         public string FinancialPerson { get; set; }
-        [Required]
-        [Display(Name = "Administrator Email Address")]
-        [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
+
         public string AdminEmail { get; set; }
 
         [Required]
@@ -53,10 +52,9 @@ namespace ACT.UI.Models
         [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string Email { get; set; }
 
-        [Display(Name = "Select a reason why you're declining this PSP")]
+        [Display(Name = "Select a reason why you're declining this Client")]
         public string DeclinedReason { get; set; }
 
-        [Required]
         [Display(Name = "Service Required")]
         public int ServiceType { get; set; }
 
@@ -70,6 +68,10 @@ namespace ACT.UI.Models
 
         [Display(Name = "Company Documents")]
         public ICollection<FileViewModel> CompanyFile { get; set; }
+
+        [Display(Name = "Company Logo")]
+        public ICollection<FileViewModel> Logo { get; set; }
+
 
         //[Display(Name = "Select a reason why you're declining this Client")]
         //public string DeclineReason { get; set; }

@@ -14,6 +14,7 @@
     //ServiceType type = (ServiceType) Model.;
     Address address = ViewBag.Address;
     List<Document> documents = ViewBag.Documents;
+    List<Document> logo = ViewBag.Logo;
 }
 
 @if ( ViewBag.IncludeLayout != null )
@@ -34,7 +35,7 @@
             </h2>
         }
 
-            <div class="left" style="width: 33%; margin-right: 4%;">
+            <div class="left" style="width: 27%; margin-right: 4%;">
 
                 <div class="display-label">
                     Client Name
@@ -67,11 +68,11 @@
 
 
 
-                <div class="display-label">
+                @*<div class="display-label">
                     Logo
                 </div>
                 <div class="display-field">
-                    @*@if (documents != null && documents.Any())
+                    @if (documents != null && documents.Any())
                     {
                         foreach (Document d in documents)
                         {
@@ -81,14 +82,14 @@
                                 @d.Name (@d.Type)
                             </a>
                         }
-                    }*@
-                </div>
+                    }
+                </div>*@
 
-                <div class="display-label">
+                @*<div class="display-label">
                     Upload Documents
                 </div>
                 <div class="display-field">
-                    @*@if (documents != null && documents.Any())
+                    @if (documents != null && documents.Any())
                     {
                         foreach (Document d in documents)
                         {
@@ -98,37 +99,37 @@
                                 @d.Name (@d.Type)
                             </a>
                         }
-                    }*@
+                    }
+                </div>*@
+
+            </div>
+
+            <div class="left" style="width: 27%; margin-right: 3%;">
+
+                <div class="display-label">
+                    Trading As
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor(model => model.TradingAs)
+                </div>
+                <div class="display-label">
+                    VAT Number
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor(model => model.VATNumber)
+                </div>
+
+
+                <h3>&nbsp;</h3>
+
+                <div class="display-label">
+                    Email Address
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor(model => model.Email)
                 </div>
 
             </div>
-
-        <div class="left" style="width: 33%;">
-
-            <div class="display-label">
-                Trading As
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.TradingAs)
-            </div>
-            <div class="display-label">
-                VAT Number
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.VATNumber)
-            </div>
-
-
-            <h3>&nbsp;</h3>
-
-            <div class="display-label">
-                Email Address
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.Email)
-            </div>
-
-        </div>
 
         <div class="left" style="width: 33%; margin-right: 4%;">
 
@@ -136,11 +137,41 @@
                 Logo
             </div>
             <div class="display-field">
+                @if (logo != null && logo.Any())
+                {
+                    foreach (Document l in logo)
+                    {
+                        <img alt="logo" src="@(String.Format("{0}/{1}", Url.Content("~/Uploads/Documents/Client/Logo/"), l.Location))" style="margin-bottom: 2px;" />
+                        @*<a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )">
+                    <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+
+                    @d.Name (@d.Type)
+                </a>*@
+                    }
+                }
             </div>
             <div class="display-label">
                 Upload Documents
             </div>
             <div class="display-field">
+                @if (documents != null && documents.Count() > 0)
+                {
+                    foreach (Document file in documents)
+                    {
+                        @Html.HiddenFor(model => file.Id)
+
+                        <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
+
+                            <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = file.Id })">
+                                <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
+
+                                file.Name (file.Extension)
+                            </a>
+
+                        </div>
+
+                    }
+                }
             </div>
         </div>
 

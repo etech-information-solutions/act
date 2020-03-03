@@ -49,8 +49,8 @@
                     Company Registration Number
                 </div>
                 <div class="editor-field">
-                    @*@Html.TextBoxFor(model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" })
-                    @Html.ValidationMessageFor(model => model.CompanyRegistrationNumber)*@
+                    @Html.TextBoxFor(model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" })
+                    @Html.ValidationMessageFor(model => model.CompanyRegistrationNumber)
                 </div>
 
                 <h3>Contact Details</h3>
@@ -74,22 +74,22 @@
 
 
 
-                <div class="editor-label uppercase">
-                    Company Documents
-                </div>
-                <div class="editor-field">
-                    @*@if (documents != null && documents.Any())
+                @*<div class="editor-label uppercase">
+                Company Documents
+            </div>
+            <div class="editor-field">
+                @if (documents != null && documents.Any())
+            {
+                foreach (Document d in documents)
                 {
-                    foreach (Document d in documents)
-                    {
-                        <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
-                            <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+                    <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
+                        <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
 
-                            @d.Name (@d.Type)
-                        </a>
-                    }
-                }*@
-                </div>
+                        @d.Name (@d.Type)
+                    </a>
+                }
+            }
+            </div>*@
 
             </div>
 
@@ -129,72 +129,121 @@
                     Logo
                 </div>
                 <div class="editor-field">
+                    <input id="Logo.File" name="Logo.File" type="file" value="" data-val-file="1" class="input" />
+                    <input id="Logo.Name" name="Logo.Name" type="hidden" value="Company File" />
+                    <input id="Logo.Description" name="Logo.Description" class="input" type="hidden" value="Company Logo" />
                 </div>
                 <div class="editor-label uppercase">
-                    Uploaded Documents
-                </div>
-                <div class="editor-field">
+                    <h3>Uploaded Documents</h3>
+                    <div class="editor-field" style="margin-bottom: 10px;">
+                        @if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
+                        {
+                            foreach (FileViewModel companyFile in Model.CompanyFile)
+                            {
+                                @Html.HiddenFor(model => companyFile.Id)
+
+                                <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
+
+                                    <a target="_blank" href="@Url.Action("ViewDocument", "CLient", new { @id = companyFile.Id })">
+                                        <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
+
+                                        companyFile.Name (companyFile.Extension)
+                                    </a>
+
+                                </div>
+
+                            }
+                        }
+
+
+                        <input id="CompanyFile.File" name="CompanyFile.File" type="file" value="" data-val-file="1" class="input" />
+                        <input id="CompanyFile.Name" name="CompanyFile.Name" type="hidden" value="Company File" />
+                        <input id="CompanyFile.Description" name="CompanyFile.Description" class="input" type="hidden" value="Company File" />
+
+                        @*@Html.ValidationMessageFor(model => companyFile.RegistrationFile)*@
+
+                    </div>
                 </div>
             </div>
 
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 
-            @*@if (Address != null)
-        {
+
+
+
             <p>
-                <strong class="uppercase">Your Address</strong>
+                <strong class="uppercase">Address Details</strong>
             </p>
 
-            <div class="left" style="width: 63%; margin-right: 4%;">
+            <div class="left" style="width: 48%; margin-right: 4%;">
 
-                <div class="editor-label uppercase">
-                    Address Line 1
+                @Html.HiddenFor(model => model.Address.Id)
+                @Html.HiddenFor(model => model.Address.AddressType)
+
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.Address.AddressLine1)
                 </div>
                 <div class="editor-field">
-                    @address.Addressline1
+                    @Html.TextBoxFor(model => model.Address.AddressLine1, new { @class = "input", @placeholder = "Enter Company Address Line 1" })
+                    @Html.ValidationMessageFor(model => model.Address.AddressLine1)
                 </div>
 
-                <div class="editor-label uppercase">
-                    Address Line 2
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.Address.Town)
                 </div>
                 <div class="editor-field">
-                    @address.Addressline2
-                </div>
-            </div>
-
-            <div class="left" style="width: 33%; margin-right: 4%;">
-                <div class="editor-label uppercase">
-                    Province
-                </div>
-                <div class="editor-field">
-                    @(((Province)address.Province).GetDisplayText())
+                    @Html.TextBoxFor(model => model.Address.Town, new { @class = "input", @placeholder = "Enter Company Address Town" })
+                    @Html.ValidationMessageFor(model => model.Address.Town)
                 </div>
 
-                <div class="editor-label uppercase">
-                    Town
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.Address.PostCode)
                 </div>
                 <div class="editor-field">
-                    @address.Town
+                    @Html.TextBoxFor(model => model.Address.PostCode, new { @class = "input", @placeholder = "Enter Company Address Postal Code" })
+                    @Html.ValidationMessageFor(model => model.Address.PostCode)
                 </div>
 
             </div>
 
-            <div class="left" style="width: 33%; margin-right: 4%;">
-                <div class="editor-label uppercase">
-                    Postal Code
+            <div class="left" style="width: 48%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.Address.AddressLine2)
                 </div>
                 <div class="editor-field">
-                    @address.PostalCode
+                    @Html.TextBoxFor(model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter Company Address Line 2" })
+                    @Html.ValidationMessageFor(model => model.Address.AddressLine2)
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.Address.Province)
+                </div>
+                <div class="editor-field">
+
+                    <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
+                        <option value="">-- select</option>
+                        @foreach (int p in Enum.GetValues(typeof(Province)))
+                        {
+                            Province province = (Province)p;
+
+                            string text = province.GetDisplayText();
+
+                            if (text.ToLower() == "all")
+                            {
+                                continue;
+                            }
+
+                            string sel = (province == Model.Address.Province) ? "selected=selected" : string.Empty;
+
+                            <option value="@p" @sel>@text</option>
+                        }
+                    </select>
+
+                    @Html.ValidationMessageFor(model => model.Address.Province)
                 </div>
 
             </div>
-        }
-        else
-        {
-            <div class="message-warn">
-                No address details found. Please edit and add address details.
-            </div>
-        }*@
             <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
             <p>
                 <strong class="uppercase">KPI</strong>
@@ -221,7 +270,7 @@
                     Days Outstanding
                 </div>
                 <div class="editor-field">
-                    @*@address.Addressline1*@
+                   @mod
                 </div>
 
                 <div class="editor-label uppercase">

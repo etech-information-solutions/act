@@ -477,6 +477,7 @@
     <Content Include="Views\Client\AddSite.cshtml" />
     <Content Include="Views\Client\EditSite.cshtml" />
     <Content Include="Views\Client\ClientDetails.cshtml" />
+    <Content Include="Views\Client\_bak_SubSites.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

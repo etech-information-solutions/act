@@ -87,7 +87,7 @@ namespace ACT.Core.Services
             return siteList;
         }
 
-        public List<Site> GetSitesByClientsOfPSPIncluded(int pspId, int ClientId)
+        public List<Site> GetSitesByClientsOfPSPIncluded(int pspId, int clientId, int siteId)
         {
             List<Site> siteList;
             siteList = (from p in context.PSPClients
@@ -96,16 +96,17 @@ namespace ACT.Core.Services
                         join e in context.Sites
                         on c.SiteId equals e.Id
                         where p.PSPId == pspId
+                        where c.SiteId == siteId
                         select e).ToList();
 
             return siteList;
         }
 
-        public List<Site> GetSitesByClientsOfPSPExcluded(int pspId, int ClientId)
+        public List<Site> GetSitesByClientsOfPSPExcluded(int pspId, int clientId, int siteId)
         {
             List<Site> siteList;
             List<int> exclList = new List<int>();
-            exclList.Add(ClientId);
+            exclList.Add(clientId);
 
             siteList = (from p in context.PSPClients
                         join c in context.ClientSites
@@ -113,6 +114,7 @@ namespace ACT.Core.Services
                         join e in context.Sites
                         on c.SiteId equals e.Id
                         where p.PSPId == pspId
+                        where c.SiteId == siteId
                         where !exclList.Contains(p.ClientId)
                         select e).ToList();
 

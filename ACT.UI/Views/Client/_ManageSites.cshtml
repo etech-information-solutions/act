@@ -40,8 +40,9 @@
                     <label for="file">Client:</label>
                 </td>
                 <td style="width:15%">
-                    @Html.DropDownList("Client", (IEnumerable
-           <SelectListItem>)ViewBag.ClientList)
+                    @Html.DropDownList("ClientList", "Please Select")
+                    @*@Html.DropDownList("Client", (IEnumerable
+        <SelectListItem>)ViewBag.ClientList)*@
                 </td>
                 <td style="width:2%">
                     @Html.ActionLink("Add", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#sites" })
@@ -60,7 +61,7 @@
         <span class="loader"></span>
     </p>
 
-<table id="roles-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#roles-table_wrapper" data-starting-point=".ap-tabs ul">
+<table id="sites-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#sites-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
             @*<th data-name="Count">

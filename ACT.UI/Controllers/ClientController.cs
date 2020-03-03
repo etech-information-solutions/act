@@ -39,8 +39,13 @@ namespace ACT.UI.Controllers
             {
                 pm.Sort = pm.Sort ?? "DESC";
                 pm.SortBy = pm.SortBy ?? "CreatedOn";
-
-                model = service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
+                if (CurrentUser.PSPs.Count > 0)
+                {
+                    model = service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
+                } else
+                {
+                    model = null;
+                }
 
                 // var testModel = service.ListByColumn(null, "CompanyRegistrationNumber", "123456");
                 total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total();
@@ -61,6 +66,7 @@ namespace ACT.UI.Controllers
             using (ClientService service = new ClientService())
             using (AddressService aservice = new AddressService())
             using (DocumentService dservice = new DocumentService())
+            using (ClientKPIService kservice = new ClientKPIService())
             {
                 model = service.GetById(id);
                 if (model == null)
@@ -71,7 +77,8 @@ namespace ACT.UI.Controllers
                 }
                 Address address = aservice.Get(model.Id, "PSP");
 
-                List<Document> documents = dservice.List(model.Id, "PSP");
+                List<Document> documents = dservice.List(model.Id, "Client");
+                List<Document> logo = dservice.List(model.Id, "ClientLogo");
 
                 if (address != null)
                 {
@@ -80,6 +87,7 @@ namespace ACT.UI.Controllers
                 if (documents != null)
                 {
                     ViewBag.Documents = documents;
+                    ViewBag.Logo = logo;
                 }
             }
 
@@ -230,6 +238,44 @@ namespace ACT.UI.Controllers
 
                             string fullpath = Path.Combine(path, $"{now}-{file.File.FileName}");
                             file.File.SaveAs(fullpath);
+                        }
+                    }
+
+                    #endregion
+
+                    #region Any Logo Uploads
+                    foreach (FileViewModel logo in model.Logo)
+                    {
+                        if (logo.Name != null)
+                        {
+                            // Create folder
+                            string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
+
+                            if (!Directory.Exists(path))
+                            {
+                                Directory.CreateDirectory(path);
+                            }
+
+                            string now = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                            Document doc = new Document()
+                            {
+                                ObjectId = model.Id,
+                                ObjectType = "ClientLogo",
+                                Status = (int)Status.Active,
+                                Name = logo.Name,
+                                Category = logo.Name,
+                                Title = logo.File.FileName,
+                                Size = logo.File.ContentLength,
+                                Description = logo.File.FileName,
+                                Type = Path.GetExtension(logo.File.FileName),
+                                Location = $"Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{logo.File.FileName}"
+                            };
+
+                            dservice.Create(doc);
+
+                            string fullpath = Path.Combine(path, $"{now}-{logo.File.FileName}");
+                            logo.File.SaveAs(fullpath);
                         }
                     }
 
@@ -412,7 +458,7 @@ namespace ACT.UI.Controllers
 
                     #endregion
 
-                    #region Update PSP Budget
+                    #region Update Client Budget
 
                     if (model != null)
                     {
@@ -468,48 +514,100 @@ namespace ACT.UI.Controllers
 
                     if (model.Address != null)
                     {
-                        //    Address address = aservice.GetById(model.Address.Id);
+                        Address clientAddress = aservice.GetById(model.Address.Id);
 
-                        //    if (address == null)
-                        //    {
-                        //        address = new Address()
-                        //        {
-                        //            ObjectId = model.Id,
-                        //            ObjectType = "Client",
-                        //            Town = model.Address.Town,
-                        //            Status = (int)Status.Active,
-                        //            PostalCode = model.Address.PostCode,
-                        //            Type = (int)model.Address.AddressType,
-                        //            Addressline1 = model.Address.AddressLine1,
-                        //            Addressline2 = model.Address.AddressLine2,
-                        //            Province = (int)model.Address.Province,
-                        //        };
+                        if (clientAddress == null)
+                        {
+                            clientAddress = new Address()
+                            {
+                                ObjectId = model.Id,
+                                ObjectType = "CLient",
+                                Town = model.Address.Town,
+                                Status = (int)Status.Active,
+                                PostalCode = model.Address.PostCode,
+                                Type = (int)model.Address.AddressType,
+                                Addressline1 = model.Address.AddressLine1,
+                                Addressline2 = model.Address.AddressLine2,
+                                Province = (int)model.Address.Province,
+                            };
 
-                        //        aservice.Create(address);
-                        //    }
-                        //    else
-                        //    {
-                        //        address.Town = model.Address.Town;
-                        //        address.PostalCode = model.Address.PostCode;
-                        //        address.Type = (int)model.Address.AddressType;
-                        //        address.Addressline1 = model.Address.AddressLine1;
-                        //        address.Addressline2 = model.Address.AddressLine2;
-                        //        address.Province = (int)model.Address.Province;
+                            aservice.Create(clientAddress);
+                        }
+                        else
+                        {
+                            clientAddress.Town = model.Address.Town;
+                            clientAddress.PostalCode = model.Address.PostCode;
+                            clientAddress.Type = (int)model.Address.AddressType;
+                            clientAddress.Addressline1 = model.Address.AddressLine1;
+                            clientAddress.Addressline2 = model.Address.AddressLine2;
+                            clientAddress.Province = (int)model.Address.Province;
 
-                        //        aservice.Update(address);
-                        //    }
-                        //}
+                            aservice.Update(clientAddress);
+                        }
+                    }
+
+                    #endregion
+
+                    #region Any Uploads
+
+                    foreach (FileViewModel file in model.CompanyFile)
+                    {
+                        if (file.Name != null)
+                        {
+                            // Create folder
+                            string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
+
+                            if (!Directory.Exists(path))
+                            {
+                                Directory.CreateDirectory(path);
+                            }
+
+                            string now = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                            Document doc = dservice.GetById(file.Id);
+
+                            if (doc != null)
+                            {
+                                // Disable this file...
+                                doc.Status = (int)Status.Inactive;
+
+                                dservice.Update(doc);
+                            }
+
+                            doc = new Document()
+                            {
+                                ObjectId = model.Id,
+                                ObjectType = "Client",
+                                Status = (int)Status.Active,
+                                Name = file.Name,
+                                Category = file.Name,
+                                Title = file.File.FileName,
+                                Size = file.File.ContentLength,
+                                Description = file.File.FileName,
+                                Type = Path.GetExtension(file.File.FileName),
+                                Location = $"Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{file.File.FileName}"
+
+                            };
+
+                            dservice.Create(doc);
+
+                            string fullpath = Path.Combine(path, $"{now}-{file.File.FileName}");
+                            file.File.SaveAs(fullpath);
+                        }
+                    }                
 
                         #endregion
 
-                        #region Any Uploads
 
-                        foreach (FileViewModel file in model.CompanyFile)
+
+                        #region Any Logosd
+
+                        foreach (FileViewModel logo in model.Logo)
                         {
-                            if (file.Name != null)
+                            if (logo.Name != null)
                             {
                                 // Create folder
-                                string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/PSP/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
+                                string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
 
                                 if (!Directory.Exists(path))
                                 {
@@ -518,7 +616,7 @@ namespace ACT.UI.Controllers
 
                                 string now = DateTime.Now.ToString("yyyyMMddHHmmss");
 
-                                Document doc = dservice.GetById(file.Id);
+                                Document doc = dservice.GetById(logo.Id);
 
                                 if (doc != null)
                                 {
@@ -533,20 +631,20 @@ namespace ACT.UI.Controllers
                                     ObjectId = model.Id,
                                     ObjectType = "Client",
                                     Status = (int)Status.Active,
-                                    Name = file.Name,
-                                    Category = file.Name,
-                                    Title = file.File.FileName,
-                                    Size = file.File.ContentLength,
-                                    Description = file.File.FileName,
-                                    Type = Path.GetExtension(file.File.FileName),
-                                    Location = $"Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{file.File.FileName}"
+                                    Name = logo.Name,
+                                    Category = logo.Name,
+                                    Title = logo.File.FileName,
+                                    Size = logo.File.ContentLength,
+                                    Description = "Logo",
+                                    Type = Path.GetExtension(logo.File.FileName),
+                                    Location = $"Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{logo.File.FileName}"
 
                                 };
 
                                 dservice.Create(doc);
 
-                                string fullpath = Path.Combine(path, $"{now}-{file.File.FileName}");
-                                file.File.SaveAs(fullpath);
+                                string fullpath = Path.Combine(path, $"{now}-{logo.File.FileName}");
+                                logo.File.SaveAs(fullpath);
                             }
                         }
 
@@ -557,8 +655,7 @@ namespace ACT.UI.Controllers
 
                     Notify("The selected Client details were successfully updated.", NotificationType.Success);
 
-                    return RedirectToAction("Client");
-                }
+                    return RedirectToAction("Client");                
             }
             catch
             {
@@ -611,12 +708,12 @@ namespace ACT.UI.Controllers
         public ActionResult ManageSites(PagingModel pm, CustomSearchModel csm)
         {
 
-           //ViewBag.ViewName = "ManageSites";
+           ViewBag.ViewName = "ManageSites";
 
             int total = 0;
 
             List<Site> model = new List<Site>();
-            int pspId = CurrentUser.PSPs.FirstOrDefault().Id;
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             using (SiteService service = new SiteService())
             {
                 pm.Sort = pm.Sort ?? "DESC";
@@ -627,13 +724,39 @@ namespace ACT.UI.Controllers
             }
 
             PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
-
-            using(ClientService clientService = new ClientService())
+            List<Client> clientList;
+            using (ClientService clientService = new ClientService())
             {
-                ViewBag.ClientList = clientService.GetClientsByPSP(pspId);
+                clientList = clientService.GetClientsByPSP(pspId);                
             }
 
+            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.CompanyName
+
+            });
+            ViewBag.ClientList = clientDDL;
+
             return PartialView("_ManageSites", paging);
+        }
+
+        [HttpPost]
+        public string SetSiteStatus(string siteId, string status)
+        {
+            switch (status)
+            {
+                case "Terminate":
+
+                    break;
+                case "Activate":
+
+                    break;
+                default:
+                    break;
+            }
+
+            return "true";
         }
 
         #endregion
@@ -644,41 +767,117 @@ namespace ACT.UI.Controllers
         public ActionResult SubSites(PagingModel pm, CustomSearchModel csm)
         {
 
-            ViewBag.ViewName = "SubSites";
+            ViewBag.ViewName = "_SubSites";
 
             int total = 0;
 
             List<Site> model = new List<Site>();
+            List<Client> clientList;
+            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+            List<Site> mainSiteList;
 
-            using (SiteService service = new SiteService())
-            {
-                pm.Sort = pm.Sort ?? "DESC";
-                pm.SortBy = pm.SortBy ?? "CreatedOn";
-
-                model = service.List();
-                total = model.Count;
-            }
-            int pspId = CurrentUser.PSPs.FirstOrDefault().Id;
+            int pspId = (CurrentUser != null? CurrentUser.PSPs.FirstOrDefault().Id:0);
 
             using (ClientService clientService = new ClientService())
             using (SiteService sitesService = new SiteService())
-            {
-                //ViewBag.ClientListIncluded = clientService.GetClientsByPSPIncludedGroup(pspId, clientGroup.Id);
-                ViewBag.ClientList = clientService.GetClientsByPSP(pspId);
-                List<Site> mainSiteList = sitesService.GetSitesByClientsOfPSP(pspId);
-                ViewBag.MainSiteList = mainSiteList;
-                Site firstSite = mainSiteList.FirstOrDefault();
-                if (mainSiteList != null) {
-                    ViewBag.SubSiteListIncluded = sitesService.GetSitesByClientsOfPSPIncluded(pspId, firstSite.Id);
-                    ViewBag.SubbSiteListExcluded = sitesService.GetSitesByClientsOfPSPExcluded(pspId, firstSite.Id);
-                } else
-                {
-                    ViewBag.SubSiteListIncluded = null;
-                    ViewBag.SubbSiteListExcluded = null;
-                }
-            }
+            {                
+                pm.Sort = pm.Sort ?? "DESC";
+                pm.SortBy = pm.SortBy ?? "CreatedOn";
 
-            return PartialView("_SubSites");
+                model = sitesService.List();
+                total = model.Count;
+
+                mainSiteList = sitesService.GetSitesByClientsOfPSP(pspId);
+                clientList = clientService.GetClientsByPSP(pspId);
+
+                //Site firstSite = mainSiteList.FirstOrDefault();
+                //if (mainSiteList != null) {
+                //    ViewBag.SubSiteListIncluded = sitesService.GetSitesByClientsOfPSPIncluded(pspId, firstSite.Id);
+                //    ViewBag.SubbSiteListExcluded = sitesService.GetSitesByClientsOfPSPExcluded(pspId, firstSite.Id);
+                //} else
+                //{
+                //    ViewBag.SubSiteListIncluded = null;
+                //    ViewBag.SubbSiteListExcluded = null;
+                //}
+            }
+            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.CompanyName
+
+            });
+            ViewBag.ClientList = clientDDL;
+            IEnumerable<SelectListItem> siteListDDL = mainSiteList.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name
+
+            });
+            ViewBag.SiteList = siteListDDL;
+
+
+            return PartialView("_SubSites", paging);
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetSitesForClientSiteIncluded(string clientId, string siteId)
+        {
+            if (clientId != null && clientId != "")
+            {
+                List<Site> sites = null;
+                int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+
+                using (SiteService service = new SiteService())
+                {
+
+                    sites = service.GetSitesByClientsOfPSPIncluded(pspId, int.Parse(clientId), int.Parse(siteId)); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+
+                }
+                //var jsonList = JsonConvert.SerializeObject(sites);
+                return Json(sites, JsonRequestBehavior.AllowGet);
+            } else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetSitesForClientSiteExcluded(string clientId, string siteId)
+        {
+            if (clientId != null && clientId != "")
+            {
+                List<Site> sites = null;
+                int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+
+                using (SiteService service = new SiteService())
+                {
+
+                    sites = service.GetSitesByClientsOfPSPExcluded(pspId, int.Parse(clientId), int.Parse(siteId)); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+
+                }
+                //var jsonList = JsonConvert.SerializeObject(sites);
+                return Json(sites, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public string SetSiteForClientSiteExcluded(string siteId,  string clientId)
+        {
+
+
+            return "true";
+        }
+
+        [HttpPost]
+        public string SetSiteForClientSiteIncluded(string groupId, string clientId)
+        {
+
+
+            return "true";
         }
 
         #endregion
@@ -693,7 +892,7 @@ namespace ACT.UI.Controllers
             int total = 0;
 
             List<Group> model = new List<Group>();
-            int pspId = CurrentUser.PSPs.FirstOrDefault().Id;
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
 
             //get group list, and their associated clients. TRhis woill be extended with an api call to get clients included and excluded as the button is clicked, and as the groups are changed
             using (ClientService clientService = new ClientService())
@@ -724,7 +923,7 @@ namespace ACT.UI.Controllers
         public string GetClientForGroupIncluded(string groupId)
         {
             List<Client> clients;
-            int pspId = CurrentUser.PSPs.FirstOrDefault().Id;
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
 
             using (ClientService clientService = new ClientService())
             {
@@ -740,7 +939,7 @@ namespace ACT.UI.Controllers
         public string GetClientForGroupExcluded(string groupId)
         {
             List<Client> clients;
-            int pspId = CurrentUser.PSPs.FirstOrDefault().Id;
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
 
             using (ClientService clientService = new ClientService())
             {

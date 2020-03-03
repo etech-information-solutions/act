@@ -23,7 +23,9 @@
     Int32 count = Model.Start;
     List<Client> items = (List<Client>)Model.Items;
 
-    //ClientService service = new ClientService();
+    ClientService cservice = new ClientService();
+    
+
 }
 
 
@@ -47,40 +49,34 @@
         <thead>
             <tr>
                 @*<th data-name="Count">
-                    #
-                </th>*@
+            #
+        </th>*@
                 <th data-name="CompanyName" data-column="CompanyName">
                     Company Name
                 </th>
                 <th data-name="CompanyRegistrationNumber" data-column="CompanyRegistrationNumber">
                     Reg #
                 </th>
-                <th data-name="VATNumber" data-column="VATNumber">
-                    VAT #
+                @*<th data-name="Company Type">
+            Company Type
+        </th>*@
+                <th data-name="Address">
+            Street Address
+        </th>
+        <th data-name="Suburb">
+            Suburb
+        </th>
+                <th data-name="Suburb">
+                    Town/City Province
+                </th>
+                <th data-name="ContactPerson" data-column="ContactNumber">
+                    Contact Number
                 </th>
                 <th data-name="ContactPerson" data-column="ContactPerson">
                     Contact Person
                 </th>
-                <th data-name="ServiceRequired" data-column="ServiceRequired">
-                    Service Required
-                </th>
-                <th data-name="Status" data-column="Status">
-                    Status
-                </th>
-                <th data-name="UserCount">
-                    Users
-                </th>
-                <th data-name="ClientCount">
-                    Clients
-                </th>
-                <th data-name="ProductCount">
-                    Products
-                </th>
-                <th data-name="InvoiceCount">
-                    Invoices
-                </th>
-                <th data-name="BudgetCount">
-                    Budget
+                <th data-name="Email" data-column="Email">
+                    Email
                 </th>
                 <th data-name="Actions">
                     Actions
@@ -97,62 +93,69 @@
 
                     String active = status.Equals(Status.Active) ? "active" : "inactive";
                     String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+                    Address addr = new Address();
+                    string addressline1 = "";
+                    string suburb = "";
+                    string town = "";
+                    string province = "";
+                    using (AddressService aservice = new AddressService())
+                    {
+                        addr = aservice.Get(item.Id, "Client");
+                        if (addr != null)
+                        {
+                            province = ((Province)addr.Province).GetDisplayText();
+                            addressline1 = addr.Addressline1;
+                            suburb = addr.Addressline2;
+                            town = addr.Town;                            
 
-                    <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+                        }
+                    }
 
-                        @*<td width="1%">
-                            @count
-                        </td>*@
-                        <td style="width: 15%;">
-                            @item.CompanyName
-                        </td>
-                        <td>
-                            @item.CompanyRegistrationNumber
-                        </td>
-                        <td>
-                            @item.VATNumber
-                        </td>
-                        <td>
-                            @item.ContactPerson
-                        </td>
-                        <td>
-                            @item.ServiceRequired
-                        </td>
-                        <td>
-                            @item.Status
-                        </td>
-                        <td>
-                            &nbsp;
-                            @*@item.ClientUsers.Count*@
-                        </td>
-                        <td>
-                            &nbsp;
-                            @*@item.cLIENTS.Count*@
-                        </td>
-                        <td>
-                            &nbsp;
-                            @*@item.client.Count*@
-                        </td>
-                        <td>
-                            &nbsp;
-                            @*@item.client.Count*@
-                        </td>
-                        <td>
-                            &nbsp;
-                            @*@item.ClientBudgets.Count*@
-                        </td>
+            <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
 
-                        <td width="15%">
-                            @Html.ActionLink("Details", "ClientDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                @*<td width="1%">
+            @count
+        </td>*@
+                <td style="width: 15%;">
+                    @item.CompanyName
+                </td>
+                <td>
+                    @item.CompanyRegistrationNumber
+                </td>
+                @*<td>
+           &nbsp;
+        </td>*@
 
-                            @Html.ActionLink("Edit", "EditClient", new { id = item.Id, returnView = "ClientList" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                <td>
+            @addressline1
+        </td>
+        <td>
+            @suburb
+        </td>
+        <td>
+            @town  @province
+        </td>
+                <td>
+                    @item.ContactPerson
+                </td>
+                <td>
+                    @item.ContactNumber
+                </td>
+                <td style="width: 15%;">
+                    @item.Email
+                </td>
 
-                            @Html.ActionLink(enable, "DeleteClient", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientlist", @rel = "tipsyE", @title = enable + " this item?" })
+                <td width="15%">
+                    @Html.ActionLink("Details", "ClientDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        </td>
+                    @Html.ActionLink("Edit", "EditClient", new { id = item.Id, returnView = "ClientList" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+                    @Html.ActionLink(enable, "DeleteClient", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientlist", @rel = "tipsyE", @title = enable + " this item?" })
+
+                </td>
 
 
-                    </tr>
+            </tr>
 
                     count++;
                 }
@@ -163,4 +166,4 @@
 
 @*@Html.Partial( "_PSPCustomSearch", new ACT.Core.Models.CustomSearchModel( "PSP" ) )*@
 
-@*@Html.Partial("_Paging")*@
+@Html.Partial("_Paging")

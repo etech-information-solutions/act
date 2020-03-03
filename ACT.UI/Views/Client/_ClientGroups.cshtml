@@ -42,7 +42,7 @@
     </p>
 }
 
-<table id="users-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#users-table_wrapper" data-starting-point=".ap-tabs ul">
+<table id="groups-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#groups-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
             @*<th data-name="Count">
@@ -97,7 +97,7 @@
 <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
 <div class="left" style="width: 42%; margin-right: 2%;">
     <h3>Excluded from Group</h3>
-    <table id="excluded-table" class="da-table datatable-numberpaging sort fixed-header" data-starting-point=".ap-tabs ul">
+    <table id="groupsexcluded-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#groupsexcluded-table_wrapper" data-starting-point=".ap-tabs ul">
         <thead>
             <tr>
                 <th data-name="Count">
@@ -116,7 +116,7 @@
         </thead>
 
         <tbody id="excludedtabledata">
-            @if (ViewBag.ClientListExcluded.Count > 0)
+            @if (ViewBag.ClientListExcluded != null)
             {
                 foreach (var clientItem in ViewBag.ClientListExcluded as IEnumerable<Client>)
                 {
@@ -158,7 +158,7 @@
 </div>
 <div class="left" style="width: 45%; margin-right: 2%;">
     <h3>Included in Group</h3>
-    <table id="included-table" class="da-table datatable-numberpaging sort fixed-header" data-starting-point=".ap-tabs ul">
+    <table id="groupsincluded-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#groupsincluded-table_wrapper" data-starting-point=".ap-tabs ul">
         <thead>
             <tr>
                 <th data-name="Count">
@@ -177,7 +177,7 @@
         </thead>
 
         <tbody id="includedtabledata">
-            @if (ViewBag.ClientListIncluded.Count > 0)
+            @if (ViewBag.ClientListIncluded != null)
             {
                 foreach (var clientItem in ViewBag.ClientListIncluded as IEnumerable<Client>)
                 {
@@ -212,4 +212,4 @@
 
 @*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
 
-@*@Html.Partial("_Paging")*@
+@Html.Partial("_Paging")

@@ -7,8 +7,8 @@
 
 @{
     ViewBag.ShowExport = true;
-    ViewBag.ShowCustom = true;
-    ViewBag.ShowQuickStructure = true;
+    //ViewBag.ShowCustom = true;
+    //ViewBag.ShowQuickStructure = true;
 
     ViewBag.ViewName = "_Subsites";
 
@@ -39,14 +39,12 @@
     <table style="width:100%" border="0">
         <tr>
             <td style="width:3%">
-                <label for="file">Client:</label><br />
+                <label for="file">Client:</label><br /><br /><br />
                 <label for="site">Site:</label>
             </td>
             <td style="width:15%">
-                @Html.DropDownList("Client", (IEnumerable
-       <SelectListItem>)ViewBag.ClientList)<br />
-                @Html.DropDownList("Site", (IEnumerable
-<SelectListItem>)ViewBag.MainSiteList)
+                @Html.DropDownList("ClientList")<br /><br />
+                @Html.DropDownList("SiteList")
             </td>
             <td style="width:2%">
                 <br /><br />
@@ -66,264 +64,501 @@
     <span class="loader"></span>
 </p>
 
-<table id="roles-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#roles-table_wrapper" data-starting-point=".ap-tabs ul">
-    <thead>
-        <tr>
-            <th data-name="Count">
-                #
-            </th>
-            <th data-name="Name" data-column="Name">
-                Main Site Name
-            </th>
-            <th data-name="XCord" data-column="XCord">
-                Site X coordinate
-            </th>
-            <th data-name="YCord" data-column="YCord">
-                Site Y Coordinate
-            </th>
-            <th data-name="Address" data-column="Address">
-                Site Address
-            </th>
-            <th data-name="PostalCode" data-column="PostalCode">
-                Postal Code
-            </th>
-            <th data-name="ContactNo" data-column="ContactNo">
-                Contact Number
-            </th>
-            <th data-name="ContactName" data-column="ContactName">
-                Contact Name
-            </th>
-            <th data-name="RegionId" data-column="RegionId">
-                Region
-            </th>
-        </tr>
-    </thead>
+    <table id="subsites-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#subsites-table_wrapper" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th data-name="Count">
+                    #
+                </th>
+                <th data-name="Name" data-column="Name">
+                    Main Site Name
+                </th>
+                <th data-name="XCord" data-column="XCord">
+                    Site X coordinate
+                </th>
+                <th data-name="YCord" data-column="YCord">
+                    Site Y Coordinate
+                </th>
+                <th data-name="Address" data-column="Address">
+                    Site Address
+                </th>
+                <th data-name="PostalCode" data-column="PostalCode">
+                    Postal Code
+                </th>
+                <th data-name="ContactNo" data-column="ContactNo">
+                    Contact Number
+                </th>
+                <th data-name="ContactName" data-column="ContactName">
+                    Contact Name
+                </th>
+                <th data-name="RegionId" data-column="RegionId">
+                    Region
+                </th>
+            </tr>
+        </thead>
 
-    <tbody>
-        @if (Model != null && items != null && items.Count() > 0)
-        {
-            foreach (var item in items)
+        <tbody>
+            @if (Model != null && items != null && items.Count() > 0)
             {
-                //Status status = (Status)item.Status;
+                foreach (var item in items)
+                {
+                    //Status status = (Status)item.Status;
 
-                //Role role = new Role() { Name = "~/~", Type = -1 };
+                    //Role role = new Role() { Name = "~/~", Type = -1 };
 
-                //if (item.UserRoles.Any())
-                //{
-                //    role = item.UserRoles.FirstOrDefault().Role;
+                    //if (item.UserRoles.Any())
+                    //{
+                    //    role = item.UserRoles.FirstOrDefault().Role;
+                    //}
+
+                    //RoleType roleType = (RoleType)role.Type;
+
+                    //String active = status.Equals(Status.Active) ? "active" : "inactive";
+                    //String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+
+                    <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
+                        <td width="1%">
+                            @count
+                        </td>
+                        <td>
+                            @item.Name
+                        </td>
+                        <td>
+                            @item.XCord
+                        </td>
+                        <td>
+                            @item.YCord
+                        </td>
+                        <td>
+                            @item.Address
+                        </td>
+                        <td>
+                            @item.PostalCode
+                        </td>
+                        <td>
+                            @item.ContactNo
+                        </td>
+                        <td>
+                            @item.RegionId
+                        </td>
+                    </tr>
+
+                    count++;
+                }
+            }
+        </tbody>
+
+    </table>
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+    <div class="allTable">
+
+        <div class="left" style="width: 42%; margin-right: 4%;">
+            <table id="excluded-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">@**@
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th data-name="Name" data-column="Name">
+                            Name
+                        </th>
+                        <th data-name="XCord" data-column="XCord">
+                            X coordinate
+                        </th>
+                        <th data-name="YCord" data-column="YCord">
+                            Y Coordinate
+                        </th>
+                        <th data-name="Address" data-column="Address">
+                            Address
+                        </th>
+                        <th data-name="PostalCode" data-column="PostalCode">
+                            Postal Code
+                        </th>
+                        <th data-name="ContactNo" data-column="ContactNo">
+                            Contact Number
+                        </th>
+                        <th data-name="ContactName" data-column="ContactName">
+                            Contact Name
+                        </th>
+                        <th data-name="RegionId" data-column="RegionId">
+                            Region
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody id="excludedtabledata">
+                    @*@if (ViewBag.SubbSiteListExcluded != null)
+                    {
+                        foreach (var siteItem in ViewBag.SubbSiteListExcluded as IEnumerable<Site>)
+                        {
+                            <tr id="tr-@siteItem.Id-item" class="tr-@siteItem.Id-item">
+                                <td style="width: 15%;">
+                                    @siteItem.Name
+                                </td>
+                                <td>
+                                    @siteItem.XCord
+                                </td>
+                                <td>
+                                    @siteItem.YCord
+                                </td>
+                                <td>
+                                    @siteItem.Address
+                                </td>
+                                <td>
+                                    @siteItem.PostalCode
+                                </td>
+                                <td>
+                                    @siteItem.ContactNo
+                                </td>
+                                <td>
+                                    @siteItem.ContactName
+                                </td>
+                                <td>
+                                    @siteItem.RegionId
+                                </td>
+                            </tr>
+
+                            count++;
+                        }
+                    }*@
+
+
+                </tbody>
+
+            </table>
+        </div>
+        <div class="left" style="width: 5%; margin-left: 1%;">
+            <br /><br /><br />
+            <button id="Copy">>></button>
+            <br />
+            <br />
+            <button id="Remove"><<</button>
+        </div>
+        <div class="left" style="width: 43%; margin-right: 2%;">
+            <table id="included-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#included-table_wrapper" data-starting-point=".ap-tabs ul">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th data-name="Name" data-column="Name">
+                            Name
+                        </th>
+                        <th data-name="XCord" data-column="XCord">
+                            X coordinate
+                        </th>
+                        <th data-name="YCord" data-column="YCord">
+                            Y Coordinate
+                        </th>
+                        <th data-name="Address" data-column="Address">
+                            Address
+                        </th>
+                        <th data-name="PostalCode" data-column="PostalCode">
+                            Postal Code
+                        </th>
+                        <th data-name="ContactNo" data-column="ContactNo">
+                            Contact Number
+                        </th>
+                        <th data-name="ContactName" data-column="ContactName">
+                            Contact Name
+                        </th>
+                        <th data-name="RegionId" data-column="RegionId">
+                            Region
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody id="includedtabledata">
+                    @*@if (ViewBag.SubSiteListIncluded != null)
+                    {
+                        foreach (var siteItem in ViewBag.SubSiteListIncluded as IEnumerable<Site>)
+                        {
+                            <tr id="tr-@siteItem.Id-item" class="tr-@siteItem.Id-item">
+                                <td style="width: 15%;">
+                                    @siteItem.Name
+                                </td>
+                                <td>
+                                    @siteItem.XCord
+                                </td>
+                                <td>
+                                    @siteItem.YCord
+                                </td>
+                                <td>
+                                    @siteItem.Address
+                                </td>
+                                <td>
+                                    @siteItem.PostalCode
+                                </td>
+                                <td>
+                                    @siteItem.ContactNo
+                                </td>
+                                <td>
+                                    @siteItem.ContactName
+                                </td>
+                                <td>
+                                    @siteItem.RegionId
+                                </td>
+                            </tr>
+
+                            count++;
+                        }
+                    }*@
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+    <script>
+        $(document).ready(function () {
+            var cId = $('#ClientList option:selected').val();
+            var sId = $('#SiteList option:selected').val();
+
+            //var mainTable = $('#excluded-table').dataTable({
+            //    "ajax": "GetSitesForClientSiteExcluded",
+            //    "data": { clientId: cId, siteId: sId },
+            //    "columns": [{
+            //        "data": "id"
+            //    }, {
+            //        "data": "name"
+            //    }, {
+            //        "data": "subtype"
+            //    }, {
+            //        "data": "approximate_count"
+            //    }, {
+            //        "data": "time_created"
+            //    }],
+            //    "columnDefs": [{
+            //        "targets": 0,
+            //        "checkboxes": {
+            //            "selectRow": true
+            //        },
+            //        "render": function (data, type, full, meta) {
+            //            return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+            //        }
+            //    }],
+            //    "scrollY": "200px",
+
+            //}); // mainTable 
+
+
+            //Start with first option on both DDLs
+            UpdateSites(cId, sId);
+
+            $("#ClientList").change(function () {
+                UpdateSites($('option:selected', this).val(), sId);
+            });
+
+            $("#SiteList").change(function () {
+                UpdateSites(cId, $('option:selected', this).val());
+            });
+
+
+            //$('#excluded-table tbody').on('click', 'tr', function () {
+            //    var source = $('#excluded-table').row(this);
+            //    console.log(source);
+            //    //table2.row.add(source.data()).draw();
+            //    //source.remove().draw();
+            //});
+
+
+            $('#Copy').on('click', function () {
+
+                var message = "";
+                //Loop through all checked CheckBoxes in GridView.
+                $("#excluded-table input[type=checkbox]:checked").each(function () {
+                    var row = $(this).closest("tr")[0];
+                    message += row.cells[1].innerHTML;
+                    message += "   " + row.cells[2].innerHTML;
+                    message += "   " + row.cells[3].innerHTML;
+                    message += "\n";
+                });
+                alert(message);
+                //var result = $("tr:has(:checked)");
+                //console.log(result);
+                //var tbl_id = $("#excluded-table");
+                //var $elem = $(this)
+                //var r = confirm("Copy to table " + tbl_id + "?");
+                //var table_to_copy = $elem.dataTable();
+                //if (r == true) {
+                //    copyRows(mainTable, table_to_copy);
+                //    alert("Copied!");
+                //} else {
+
                 //}
 
-                //RoleType roleType = (RoleType)role.Type;
 
-                //String active = status.Equals(Status.Active) ? "active" : "inactive";
-                //String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+                //var tableFrom = $('#excluded-table').DataTable();
+                //var tableTo = $('#included-table').DataTable();
 
-                    <td width="1%">
-                        @count
-                    </td>
-                    <td>
-                        @item.Name
-                    </td>
-                    <td>
-                        @item.XCord
-                    </td>
-                    <td>
-                        @item.YCord
-                    </td>
-                    <td>
-                        @item.Address
-                    </td>
-                    <td>
-                        @item.PostalCode
-                    </td>
-                    <td>
-                        @item.ContactNo
-                    </td>
-                    <td>
-                        @item.RegionId
-                    </td>
-                </tr>
+                //var ids = $.map(tableFrom.rows('.selected').data(), function (item) {
+                //    return item[0]
+                //});
+                //console.log(ids)
+                //alert(tableFrom.rows('.selected').data().length + ' row(s) selected');
 
-                count++;
-            }
+                //var ids2 = $.map(tableTo.rows('.selected').data(), function (item2) {
+                //    return item2[0]
+                //});
+                //console.log(ids2)
+                //alert(tableTo.rows('.selected').data().length + ' row(s) selected');
+
+
+
+                //var tables = $(".allTable").find("table*[id]").not("#excluded-table");
+                //tables.each(function () {
+                //    console.log(this.id);
+                //    var tbl_id = this.id;
+                //    var $elem = $(this)
+                //    var r = confirm("Copy to table " + tbl_id + "?");
+                //    var table_to_copy = $elem.dataTable();
+                //    var sourceTable = $(".allTable").find("table*[id]").not("#included-table").dataTable();
+                //    if (r == true) {
+                //        copyRows(sourceTable, table_to_copy);
+                //        alert("Copied!");
+                //    } else {
+
+                //    }
+                //});
+
+
+                //
+            });
+
+            $('#Remove').on('click', function () {
+                var tables = $(".allTable").find("table*[id]").not("#included-table");
+                tables.each(function () {
+                    console.log(this.id);
+                    var tbl_id = this.id;
+                    var $elem = $(this)
+                    var r = confirm("Remove from table " + tbl_id + "?");
+                    var table_to_copy = $elem.dataTable();
+                    var sourceTable = $(".allTable").find("table*[id]").not("#excluded-table").dataTable();
+                    if (r == true) {
+                        copyRows(sourceTable, table_to_copy);
+                        alert("Copied!");
+                    } else {
+
+                    }
+                });
+            });
+        });
+
+        function copyRows(fromTable, toTable) {
+            debugger;
+            var $row = fromTable.find(".selected");
+            alert($row);
+            $.each($row, function (k, v) {
+                if (this !== null) {
+                    debugger;
+                    addRow = fromTable.fnGetData(this);
+                    toTable.fnAddData(addRow); // <-- Copy Row
+                    fromTable.fnDeleteRow(this); //<-- Move row, delete main row.
+                } else {
+                    debugger;
+                    alert('Error extracting row');
+                }
+            });
         }
-    </tbody>
 
-</table>
-<div class="left">
-    <table id="excluded-table" class="da-table fixed-header" data-fixed-header-target="#roles-table_wrapper" data-starting-point=".ap-tabs ul">
-        <thead>
-            <tr>
-                <th data-name="Name" data-column="Name">
-                    Site Name
-                </th>
-                <th data-name="XCord" data-column="XCord">
-                    Site X coordinate
-                </th>
-                <th data-name="YCord" data-column="YCord">
-                    Site Y Coordinate
-                </th>
-                <th data-name="Address" data-column="Address">
-                    Site Address
-                </th>
-                <th data-name="PostalCode" data-column="PostalCode">
-                    Postal Code
-                </th>
-                <th data-name="ContactNo" data-column="ContactNo">
-                    Contact Number
-                </th>
-                <th data-name="ContactName" data-column="ContactName">
-                    Contact Name
-                </th>
-                <th data-name="RegionId" data-column="RegionId">
-                    Region
-                </th>
-            </tr>
-        </thead>
+        function UpdateSites(cId, sId) {
+            GetIncludedSites(cId, sId);
+            GetExcludedSites(cId, sId);
+        }
 
-        <tbody>
-            @if (Model != null && items != null && items.Count() > 0)
-            {
-                foreach (var item in items)
-                {
-                    //Status status = (Status)item.Status;
+        function GetIncludedSites(cId, sId) {
+            //debugger;
+            var rowDiv = $("#included-table tbody");
+            $.ajax({
+                type: "GET",
+                url: "GetSitesForClientSiteIncluded",
+                data: { clientId: cId, siteId: sId },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    // debugger;
+                    rowDiv.html('');
+                    var result = "";
+                    $.each(data, function (id, site) {
 
-                    //Role role = new Role() { Name = "~/~", Type = -1 };
 
-                    //if (item.UserRoles.Any())
-                    //{
-                    //    role = item.UserRoles.FirstOrDefault().Role;
-                    //}
+                        result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
+                            '<td><input type="checkbox" id="incl_item_id' + site.Id + '" name="incl_item_id' + site.Id + '" /></td>' +
+                            '<td style = "width: 15%;">' +
+                            site.Name +
+                            '</td><td>' +
+                            site.XCord +
+                            '</td><td> ' +
+                            site.YCord +
+                            '</td><td> ' +
+                            site.Address +
+                            '</td><td> ' +
+                            site.PostalCode +
+                            '</td><td> ' +
+                            site.ContactNo +
+                            ' </td><td> ' +
+                            site.ContactName +
+                            '</td><td> ' +
+                            site.RegionId +
+                            '</td></tr>';
+                    });
+                    rowDiv.html(result);
 
-                    //RoleType roleType = (RoleType)role.Type;
-
-                    //String active = status.Equals(Status.Active) ? "active" : "inactive";
-                    //String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
-
-            <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
-
-                <td>
-                    @item.Name
-                </td>
-                <td>
-                    @item.XCord
-                </td>
-                <td>
-                    @item.YCord
-                </td>
-                <td>
-                    @item.Address
-                </td>
-                <td>
-                    @item.PostalCode
-                </td>
-                <td>
-                    @item.ContactNo
-                </td>
-                <td>
-                    @item.RegionId
-                </td>
-
-            </tr>
-
-                    count++;
+                },
+                error: function (response) {
+                    //  debugger;
+                    alert('error');
                 }
-            }
-        </tbody>
+            });
 
-    </table>
-</div>
-<div class="left">
-    <<
+        }
 
-    >>
+        function GetExcludedSites(cId, sId) {
+            // debugger;
+            var rowDiv = $("#excluded-table tbody");
+            $.ajax({
+                type: "GET",
+                url: "GetSitesForClientSiteExcluded",
+                data: { clientId: cId, siteId: sId },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                  //  debugger;
+                    rowDiv.html('');
+                    var result = "";
+                    $.each(data, function (id, site) {
 
-</div>
-<div class="left">
-    <table id="included-table" class="da-table fixed-header" data-fixed-header-target="#roles-table_wrapper" data-starting-point=".ap-tabs ul">
-        <thead>
-            <tr>
-                <th data-name="Name" data-column="Name">
-                    Site Name
-                </th>
-                <th data-name="XCord" data-column="XCord">
-                    Site X coordinate
-                </th>
-                <th data-name="YCord" data-column="YCord">
-                    Site Y Coordinate
-                </th>
-                <th data-name="Address" data-column="Address">
-                    Site Address
-                </th>
-                <th data-name="PostalCode" data-column="PostalCode">
-                    Postal Code
-                </th>
-                <th data-name="ContactNo" data-column="ContactNo">
-                    Contact Number
-                </th>
-                <th data-name="ContactName" data-column="ContactName">
-                    Contact Name
-                </th>
-                <th data-name="RegionId" data-column="RegionId">
-                    Region
-                </th>
-            </tr>
-        </thead>
 
-        <tbody>
-            @if (Model != null && items != null && items.Count() > 0)
-            {
-                foreach (var item in items)
-                {
-                    //Status status = (Status)item.Status;
+                        result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
+                            '<td><input type="checkbox" id="excl_item_id' + site.Id + '" name="excl_item_id' + site.Id + '" /></td>' +
+                            '<td style = "width: 15%;">' +
+                            site.Name +
+                            '</td><td>' +
+                            site.XCord +
+                            '</td><td> ' +
+                            site.YCord +
+                            '</td><td> ' +
+                            site.Address +
+                            '</td><td> ' +
+                            site.PostalCode +
+                            '</td><td> ' +
+                            site.ContactNo +
+                            ' </td><td> ' +
+                            site.ContactName +
+                            '</td><td> ' +
+                            site.RegionId +
+                            '</td></tr>';
+                    });
+                    rowDiv.html(result);
 
-                    //Role role = new Role() { Name = "~/~", Type = -1 };
-
-                    //if (item.UserRoles.Any())
-                    //{
-                    //    role = item.UserRoles.FirstOrDefault().Role;
-                    //}
-
-                    //RoleType roleType = (RoleType)role.Type;
-
-                    //String active = status.Equals(Status.Active) ? "active" : "inactive";
-                    //String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
-
-            <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
-
-                <td>
-                    @item.Name
-                </td>
-                <td>
-                    @item.XCord
-                </td>
-                <td>
-                    @item.YCord
-                </td>
-                <td>
-                    @item.Address
-                </td>
-                <td>
-                    @item.PostalCode
-                </td>
-                <td>
-                    @item.ContactNo
-                </td>
-                <td>
-                    @item.RegionId
-                </td>
-
-            </tr>
-
-                    count++;
+                },
+                error: function (response) {
+                    // debugger;
+                    alert('error');
                 }
-            }
-        </tbody>
+            });
 
-    </table>
-
+        }
+    </script>
     @*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
 
     @Html.Partial("_Paging")
