@@ -17,27 +17,21 @@
 
 @using (Html.BeginForm("AddClient", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clientlist", @class = "custom-validate", @style = "width: auto;" }))
 {
-    <div id="edit-item">
+<div id="edit-item">
 
-        <h2 class="uppercase" style="width: auto;">
-            <img alt="" src="@Url.Content( "~/images/add.png" )" />
-            <span>Add Client</span>
-        </h2>
+    <h2 class="uppercase" style="width: auto;">
+        <img alt="" src="@Url.Content( "~/images/add.png" )" />
+        <span>Add Client</span>
+    </h2>
 
-        @Html.ValidationSummary(true)
+    @Html.ValidationSummary(true)
 
-        <div id="item-details" class="item-details" style="width: auto;">
+    @Html.HiddenFor(model => model.Id)
 
-            <h2 class="uppercase" style="width: auto;">
-                <img alt="" src="@Url.Content( "~/images/edit.png" )" />
-                <span>Add Client</span>
-            </h2>
+    <div id="item-details" class="item-details" style="width: auto;">
+        <div class="left" style="width: 60%; margin-right: 2%;">
 
-            @Html.ValidationSummary(true)
-
-            @Html.HiddenFor(model => model.Id)
-
-            <div class="left" style="width: 33%; margin-right: 4%;">
+            <div class="left" style="width: 50%; margin-right: 2%;">
 
                 <div class="editor-label uppercase">
                     Client Name
@@ -73,7 +67,7 @@
 
             </div>
 
-            <div class="left" style="width: 33%;">
+            <div class="left" style="width: 45%;">
 
                 <div class="editor-label uppercase">
                     Trading As
@@ -103,57 +97,8 @@
 
             </div>
 
-            <div class="left" style="width: 33%; margin-right: 4%;">
-
-                <div class="editor-label uppercase">
-                    Logo
-                </div>
-                <div class="editor-field">
-                    <input id="Logo.File" name="Logo.File" type="file" value="" data-val-file="1" class="input" />
-                    <input id="Logo.Name" name="Logo.Name" type="hidden" value="Company File" />
-                    <input id="Logo.Description" name="Logo.Description" class="input" type="hidden" value="Company Logo" />
-                </div>
-                <div class="editor-label uppercase">
-                    <h3>Uploaded Documents</h3>
-                    <div class="editor-field" style="margin-bottom: 10px;">
-                        @if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
-                        {
-                            foreach (FileViewModel companyFile in Model.CompanyFile)
-                            {
-                                @Html.HiddenFor(model => companyFile.Id)
-
-                                <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
-
-                                    <a target="_blank" href="@Url.Action("ViewDocument", "CLient", new { @id = companyFile.Id })">
-                                        <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
-
-                                        companyFile.Name (companyFile.Extension)
-                                    </a>
-
-                                </div>
-
-                            }
-                        }
-
-
-                        <input id="CompanyFile.File" name="CompanyFile.File" type="file" value="" data-val-file="1" class="input" />
-                        <input id="CompanyFile.Name" name="CompanyFile.Name" type="hidden" value="Company File" />
-                        <input id="CompanyFile.Description" name="CompanyFile.Description" class="input" type="hidden" value="Company File" />
-
-                        @*@Html.ValidationMessageFor(model => companyFile.RegistrationFile)*@
-
-                    </div>
-                </div>
-            </div>
-
             <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 
-
-
-
-            <p>
-                <strong class="uppercase">Address Details</strong>
-            </p>
 
             <div class="left" style="width: 48%; margin-right: 4%;">
                 <input id="Address.AddressType" name="Address.AddressType" type="hidden" value="@( ( int ) AddressType.Postal )" />
@@ -219,56 +164,176 @@
                 </div>
 
             </div>
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-            <p>
-                <strong class="uppercase">KPI</strong>
-            </p>
-            <div class="left" style="width: 48%; margin-right: 4%;">
-                <div class="editor-label uppercase">
-                    Outstanding
-                </div>
-                <div class="editor-field">
-   
-                </div>
+        </div>
 
-                <div class="editor-label uppercase">
-                    Disputes
-                </div>
-                <div class="editor-field">
-                   
-                </div>
+        <div class="left" style="width: 33%; margin-right: 4%;">
 
+            <div class="editor-label uppercase">
+                Logo
+            </div>
+            <div class="editor-field">
+                <input id="Logo.File" name="Logo.File" type="file" value="" data-val-file="1" class="input" />
+                <input id="Logo.Name" name="Logo.Name" type="hidden" value="Company File" />
+                <input id="Logo.Description" name="Logo.Description" class="input" type="hidden" value="Company Logo" />
+            </div>
+            <div class="editor-label uppercase">
+                <h3>Upload Documents</h3>
+                <div class="editor-field" style="margin-bottom: 10px;">
+                    @if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
+                    {
+                        foreach (FileViewModel companyFile in Model.CompanyFile)
+                        {
+                            @Html.HiddenFor(model => companyFile.Id)
+
+                            <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
+
+                                <a target="_blank" href="@Url.Action("ViewDocument", "CLient", new { @id = companyFile.Id })">
+                                    <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
+
+                                    companyFile.Name (companyFile.Extension)
+                                </a>
+
+                            </div>
+
+                        }
+                    }
+
+
+                    <input id="CompanyFile.File" name="CompanyFile.File" type="file" value="" data-val-file="1" class="input" />
+                    <input id="CompanyFile.Name" name="CompanyFile.Name" type="hidden" value="Company File" />
+                    <input id="CompanyFile.Description" name="CompanyFile.Description" class="input" type="hidden" value="Company File" />
+
+                    @*@Html.ValidationMessageFor(model => companyFile.RegistrationFile)*@
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+        <p>
+            <strong class="uppercase">KPI</strong>
+        </p>
+        <div class="left" style="width: 40%; margin-right: 4%;">
+            <div class="editor-label uppercase">
+                Outstanding
+            </div>
+            <div class="editor-field">
+                <input type="text" class="input" placeholder="KPI Outstanding" />
             </div>
 
-            <div class="left" style="width: 48%; margin-right: 4%;">
-                <div class="editor-label uppercase">
-                    Days Outstanding
-                </div>
-                <div class="editor-field">
-                    &nbsp;
-                </div>
-
-                <div class="editor-label uppercase">
-                    Days to Resolve
-                </div>
-                <div class="editor-field">
-                
-                </div>
-
+            <div class="editor-label uppercase">
+                Disputes
             </div>
-
-
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
-
-            <p>
-                <input id="save-btn" type="submit" value="Save" />
-
-                <span style="padding: 0 5px;">/</span>
-
-                <a data-refresh="1" data-target="#clientlist">Cancel</a>
-            </p>
+            <div class="editor-field">
+                <input type="text" class="input" placeholder="Disputes" />
+            </div>
 
         </div>
 
+        <div class="left" style="width: 40%; margin-right: 4%;">
+            <div class="editor-label uppercase">
+                Days Outstanding
+            </div>
+            <div class="editor-field">
+                <input type="text" class="input" placeholder="Days Outstanding" />
+            </div>
+
+            <div class="editor-label uppercase">
+                Days to Resolve
+            </div>
+            <div class="editor-field">
+                <input type="text" class="input" placeholder="Days to Resolve" />
+            </div>
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+        <p>
+            <strong class="uppercase">Client Budget</strong>
+        </p>
+        <div class="editor-label" style="margin-bottom: 10px;">
+            @Html.LabelFor(model => model.ClientBudget)
+        </div>
+
+        <div class="editor-field">
+
+            <table id="PSPBudget-table" class="da-table" style="border-bottom: 0;">
+
+                <thead>
+                    <tr>
+                        <th>Jan</th>
+                        <th>Feb</th>
+                        <th>Mar</th>
+                        <th>Apr</th>
+                        <th>May</th>
+                        <th>Jun</th>
+                        <th>Jul</th>
+                        <th>Aug</th>
+                        <th>Sep</th>
+                        <th>Oct</th>
+                        <th>Nov</th>
+                        <th>Dec</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @*<tr>
+                        <td>
+                            @Html.TextBoxFor(model => model.ClientBudget.FirstOrDefault().January, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 10" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.ClientBudget.FirstOrDefault().February, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 20" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.ClientBudget.FirstOrDefault().March, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 30" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.ClientBudget.FirstOrDefault().April, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 40" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.ClientBudget.FirstOrDefault().May, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 50" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.ClientBudget.FirstOrDefault().June, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 60" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.ClientBudget.FirstOrDefault().July, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 70" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.ClientBudget.FirstOrDefault().August, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 80" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.ClientBudget.FirstOrDefault().September, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 45" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.ClientBudget.FirstOrDefault().October, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 15" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.ClientBudget.FirstOrDefault().November, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 25" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.ClientBudget.FirstOrDefault().December, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 35" })
+                        </td>
+                    </tr>*@
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+
+        <p>
+            <input id="save-btn" type="submit" value="Save" />
+
+            <span style="padding: 0 5px;">/</span>
+
+            <a data-refresh="1" data-target="#clientlist">Cancel</a>
+        </p>
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
     </div>
+
+</div>
 }

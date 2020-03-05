@@ -4,7 +4,7 @@
 @using ACT.Data.Models;
 
 @{
-    if ( ViewBag.IncludeLayout == null )
+    if (ViewBag.IncludeLayout == null)
     {
         Layout = null;
     }
@@ -17,58 +17,51 @@
     List<Document> logo = ViewBag.Logo;
 }
 
-@if ( ViewBag.IncludeLayout != null )
-{
-    <h2>
-        <img alt="" src="@Url.Content( "~/images/info.png" )" />
-        <span>Client Details</span>
-    </h2>
-}
+<div id="item-details" class="item-details" style="width: auto;">
 
-    <div id="item-details" class="item-details" style="width: auto;">
+    @if (ViewBag.IncludeLayout == null)
+    {
+        <h2>
+            <img alt="" src="@Url.Content( "~/images/info.png" )" />
+            <span>Client</span>
+        </h2>
+    }
 
-        @if (ViewBag.IncludeLayout == null)
-        {
-            <h2>
-                <img alt="" src="@Url.Content( "~/images/info.png" )" />
-                <span>Client</span>
-            </h2>
-        }
+    <div class="left" style="width: 60%; margin-right: 2%;">
+        <div class="left" style="width: 50%; margin-right: 2%;">
 
-            <div class="left" style="width: 27%; margin-right: 4%;">
+            <div class="display-label">
+                Client Name
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.CompanyName)
+            </div>
+            <div class="display-label">
+                Company Registration Number
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.CompanyRegistrationNumber)
+            </div>
 
-                <div class="display-label">
-                    Client Name
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.CompanyName)
-                </div>
-                <div class="display-label">
-                    Company Registration Number
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.CompanyRegistrationNumber)
-                </div>
-
-                <h3>Contact Details</h3>
-                <div class="display-label">
-                    Contact Number
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.ContactNumber)
-                </div>
+            <h3>Contact Details</h3>
+            <div class="display-label">
+                Contact Number
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ContactNumber)
+            </div>
 
 
-                <div class="display-label">
-                    Contact Person
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.ContactPerson)
-                </div>
+            <div class="display-label">
+                Contact Person
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ContactPerson)
+            </div>
 
 
 
-                @*<div class="display-label">
+            @*<div class="display-label">
                     Logo
                 </div>
                 <div class="display-field">
@@ -85,7 +78,7 @@
                     }
                 </div>*@
 
-                @*<div class="display-label">
+            @*<div class="display-label">
                     Upload Documents
                 </div>
                 <div class="display-field">
@@ -102,88 +95,43 @@
                     }
                 </div>*@
 
-            </div>
-
-            <div class="left" style="width: 27%; margin-right: 3%;">
-
-                <div class="display-label">
-                    Trading As
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.TradingAs)
-                </div>
-                <div class="display-label">
-                    VAT Number
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.VATNumber)
-                </div>
-
-
-                <h3>&nbsp;</h3>
-
-                <div class="display-label">
-                    Email Address
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.Email)
-                </div>
-
-            </div>
-
-        <div class="left" style="width: 33%; margin-right: 4%;">
-
-            <div class="display-label">
-                Logo
-            </div>
-            <div class="display-field">
-                @if (logo != null && logo.Any())
-                {
-                    foreach (Document l in logo)
-                    {
-                        <img alt="logo" src="@(String.Format("{0}/{1}", Url.Content("~/Uploads/Documents/Client/Logo/"), l.Location))" style="margin-bottom: 2px;" />
-                        @*<a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )">
-                    <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
-
-                    @d.Name (@d.Type)
-                </a>*@
-                    }
-                }
-            </div>
-            <div class="display-label">
-                Upload Documents
-            </div>
-            <div class="display-field">
-                @if (documents != null && documents.Count() > 0)
-                {
-                    foreach (Document file in documents)
-                    {
-                        @Html.HiddenFor(model => file.Id)
-
-                        <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
-
-                            <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = file.Id })">
-                                <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
-
-                                file.Name (file.Extension)
-                            </a>
-
-                        </div>
-
-                    }
-                }
-            </div>
         </div>
 
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+        <div class="left" style="width: 45%;">
+
+            <div class="display-label">
+                Trading As
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.TradingAs)
+            </div>
+            <div class="display-label">
+                VAT Number
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.VATNumber)
+            </div>
+
+
+            <h3>&nbsp;</h3>
+
+            <div class="display-label">
+                Email Address
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.Email)
+            </div>
+
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
 
         @if (address != null)
         {
-            <p>
-                <strong class="uppercase">Your Address</strong>
-            </p>
 
-            <div class="left" style="width: 63%; margin-right: 4%;">
+            <div class="left" style="width: 48%; margin-right: 4%;">
 
                 <div class="display-label">
                     Address Line 1
@@ -193,36 +141,34 @@
                 </div>
 
                 <div class="display-label">
-                    Address Line 2
-                </div>
-                <div class="display-field">
-                    @address.Addressline2
-                </div>
-            </div>
-
-            <div class="left" style="width: 33%; margin-right: 4%;">
-                <div class="display-label">
-                    Province
-                </div>
-                <div class="display-field">
-                    @(((Province)address.Province).GetDisplayText())
-                </div>
-
-                <div class="display-label">
                     Town
                 </div>
                 <div class="display-field">
                     @address.Town
                 </div>
 
-            </div>
-
-            <div class="left" style="width: 33%; margin-right: 4%;">
                 <div class="display-label">
                     Postal Code
                 </div>
                 <div class="display-field">
                     @address.PostalCode
+                </div>
+
+
+            </div>
+
+            <div class="left" style="width: 48%;">
+                <div class="display-label">
+                    Address Line 2
+                </div>
+                <div class="display-field">
+                    @address.Addressline2
+                </div>
+                <div class="display-label">
+                    Province
+                </div>
+                <div class="display-field">
+                    @(((Province)address.Province).GetDisplayText())
                 </div>
 
             </div>
@@ -233,50 +179,97 @@
                 No address details found. Please edit and add address details.
             </div>
         }
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-        <p>
-            <strong class="uppercase">KPI</strong>
-        </p>
-        <div class="left" style="width: 48%; margin-right: 4%;">
-            <div class="display-label">
-                Outstanding
-            </div>
-            <div class="display-field">
-                @*@address.Addressline1*@
-            </div>
+    </div>
 
-            <div class="display-label">
-                Disputes
-            </div>
-            <div class="display-field">
-                @*@address.Addressline1*@
-            </div>
+    <div class="left" style="width: 33%; margin-right: 4%;">
 
+        <div class="display-label">
+            Logo
+        </div>
+        <div class="display-field">
+            @if (logo != null && logo.Any())
+            {
+                foreach (Document l in logo)
+                {
+                    <img alt="logo" src="@(String.Format("{0}/{1}", Url.Content("~/Uploads/Documents/Client/Logo/"), l.Location))" style="margin-bottom: 2px;" />
+                    @*<a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )">
+                            <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+
+                            @d.Name (@d.Type)
+                        </a>*@
+                }
+            }
+        </div>
+        <div class="display-label">
+            Upload Documents
+        </div>
+        <div class="display-field">
+            @if (documents != null && documents.Count() > 0)
+            {
+                foreach (Document file in documents)
+                {
+                    @Html.HiddenFor(model => file.Id)
+
+                    <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
+
+                        <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = file.Id })">
+                            <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
+
+                            file.Name (file.Extension)
+                        </a>
+
+                    </div>
+
+                }
+            }
+        </div>
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+    <p>
+        <strong class="uppercase">KPI</strong>
+    </p>
+    <div class="left" style="width: 40%; margin-right: 4%;">
+        <div class="display-label">
+            Outstanding
+        </div>
+        <div class="display-field">
+            @*@address.Addressline1*@
         </div>
 
-        <div class="left" style="width: 48%; margin-right: 4%;">
-            <div class="display-label">
-               Days Outstanding
-            </div>
-            <div class="display-field">
-                @*@address.Addressline1*@
-            </div>
-
-            <div class="display-label">
-                Days to Resolve
-            </div>
-            <div class="display-field">
-                @*@address.Addressline1*@
-            </div>
-
+        <div class="display-label">
+            Disputes
+        </div>
+        <div class="display-field">
+            @*@address.Addressline1*@
         </div>
 
-        @if (ViewBag.IncludeLayout == null)
-        {
+    </div>
+
+    <div class="left" style="width: 40%; margin-right: 4%;">
+        <div class="display-label">
+            Days Outstanding
+        </div>
+        <div class="display-field">
+            @*@address.Addressline1*@
+        </div>
+
+        <div class="display-label">
+            Days to Resolve
+        </div>
+        <div class="display-field">
+            @*@address.Addressline1*@
+        </div>
+
+    </div>
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    @if (ViewBag.IncludeLayout == null)
+    {
         <p>
             @Html.ActionLink("Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
-            @Html.ActionLink("View", "ViewBudget", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
-            @Html.ActionLink("Link", "LinkProductsToClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
+            @Html.ActionLink("View Budget", "ViewBudget", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
+            @Html.ActionLink("Link Products to Client", "LinkProductsToClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
 
             @if (ViewBag.IncludeLayout == null)
             {
@@ -284,13 +277,97 @@
                 <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
             }
         </p>
-        }
+    }
 
-        @if (ViewBag.IncludeLayout != null)
-        {
-            <div class="back-to-list">
-                @Html.ActionLink("Back to List", "Index")
-            </div>
-        }
+    @if (ViewBag.IncludeLayout != null)
+    {
+        <div class="back-to-list">
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+    <div id="clientbudgets" style="display:none;">
 
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+        <div class="editor-label" style="margin-bottom: 10px;">
+            @Html.LabelFor(model => model.ClientBudgets)
+        </div>
+
+        <div class="editor-field">
+
+
+            <table id="PSPBudget-table" class="da-table" style="border-bottom: 0;">
+
+                <thead>
+                    <tr>
+                        <th>Jan</th>
+                        <th>Feb</th>
+                        <th>Mar</th>
+                        <th>Apr</th>
+                        <th>May</th>
+                        <th>Jun</th>
+                        <th>Jul</th>
+                        <th>Aug</th>
+                        <th>Sep</th>
+                        <th>Oct</th>
+                        <th>Nov</th>
+                        <th>Dec</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @*@if (model.ClientBudgets != null) {
+                                        @foreach (ClientBudget cbudget in model.ClientBudgets)
+                                        {
+                                            @Html.HiddenFor(model => cbudget)
+                                            <tr>
+                                                <td>
+                                                    @Html.TextBoxFor(model => cbudget.January, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 10" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(model => cbudget.February, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 20" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(model => cbudget.March, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 30" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(model => cbudget.April, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 40" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(model => cbudget.May, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 50" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(model => cbudget.June, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 60" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(model => cbudget.July, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 70" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(model => cbudget.August, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 80" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(model => cbudget.September, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 45" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(model => cbudget.October, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 15" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(model => cbudget.November, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 25" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(model => cbudget.December, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 35" })
+                                                </td>
+                                            </tr>
+                                        }
+                        }*@
+                </tbody>
+
+            </table>
+
+        </div>
     </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+</div>

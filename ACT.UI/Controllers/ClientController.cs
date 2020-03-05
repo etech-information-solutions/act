@@ -119,12 +119,14 @@ namespace ACT.UI.Controllers
                     Notify("Sorry, the Client was not created. Please correct all errors and try again.", NotificationType.Error);
 
                     return View(model);
-                }                
+                }
 
                 using (ClientService service = new ClientService())
+                using (PSPClientService pspservice = new PSPClientService())
                 using (AddressService aservice = new AddressService())
                 using (TransactionScope scope = new TransactionScope())
                 using (DocumentService dservice = new DocumentService())
+                using (ClientKPIService kservice = new ClientKPIService())
                 using (ClientBudgetService bservice = new ClientBudgetService())
                 {
                     #region Validation
@@ -142,43 +144,57 @@ namespace ACT.UI.Controllers
                         Email = model.Email,
                         TradingAs = model.TradingAs,
                         VATNumber = model.VATNumber,
-                        AdminEmail = model.AdminEmail,
+                        AdminEmail = model.Email,
                         CompanyName = model.CompanyName,
-                        Description = model.Description,
+                        Description = model.CompanyName,
                         ContactPerson = model.ContactPerson,
                         ContactNumber = model.ContactNumber,
-                        Status = (int)model.Status,
+                        FinancialPerson = model.ContactPerson,
+                        Status = (int)Status.Active,//model.Status,
+                        ServiceRequired = (int)ServiceType.ManageOwnPallets,
                         //ServiceRequired = (int)model.ServiceRequired,
                         CompanyRegistrationNumber = model.CompanyRegistrationNumber
                     };
                     client = service.Create(client);
                     #endregion
 
+                    #region Create Client PSP link
+                    int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+                    PSPClient pClient = new PSPClient()
+                    {
+                        PSPId = pspId,
+                        ClientId = client.Id,
+                        Status = (int)Status.Active
+                    };
+                    #endregion
+
                     #region Create Client Budget
 
                     if (model.ClientBudget != null)
                     {
-                        ClientBudget budget = new ClientBudget()
+                        foreach (ClientBudget budgetList in model.ClientBudget)
                         {
-                            ClientId = model.Id,
-                            Status = (int)Status.Active,
-                            BudgetYear = DateTime.Now.Year,
-                            January = model.ClientBudget.January,
-                            February = model.ClientBudget.February,
-                            March = model.ClientBudget.March,
-                            April = model.ClientBudget.April,
-                            May = model.ClientBudget.May,
-                            June = model.ClientBudget.June,
-                            July = model.ClientBudget.July,
-                            August = model.ClientBudget.August,
-                            September = model.ClientBudget.September,
-                            October = model.ClientBudget.October,
-                            November = model.ClientBudget.November,
-                            December = model.ClientBudget.December,
+                            ClientBudget budget = new ClientBudget()
+                            {
+                                ClientId = client.Id,
+                                Status = (int)Status.Active,
+                                BudgetYear = DateTime.Now.Year,
+                                January = budgetList.January,
+                                February = budgetList.February,
+                                March = budgetList.March,
+                                April = budgetList.April,
+                                May = budgetList.May,
+                                June = budgetList.June,
+                                July = budgetList.July,
+                                August = budgetList.August,
+                                September = budgetList.September,
+                                October = budgetList.October,
+                                November = budgetList.November,
+                                December = budgetList.December,
+                            };
 
-                        };
-
-                        budget = bservice.Create(budget);
+                            budget = bservice.Create(budget);
+                        }
                     }
 
                     #endregion
@@ -189,7 +205,7 @@ namespace ACT.UI.Controllers
                     {
                         Address address = new Address()
                         {
-                            ObjectId = model.Id,
+                            ObjectId = client.Id,
                             ObjectType = "Client",
                             Town = model.Address.Town,
                             Status = (int)Status.Active,
@@ -206,78 +222,95 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     #region Any Uploads
-                    foreach (FileViewModel file in model.CompanyFile)
+                    if (model.CompanyFile != null)
                     {
-                        if (file.Name != null)
+                        foreach (FileViewModel file in model.CompanyFile)
                         {
-                            // Create folder
-                            string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
-
-                            if (!Directory.Exists(path))
+                            if (file.Name != null)
                             {
-                                Directory.CreateDirectory(path);
+                                // Create folder
+                                string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
+
+                                if (!Directory.Exists(path))
+                                {
+                                    Directory.CreateDirectory(path);
+                                }
+
+                                string now = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                                Document doc = new Document()
+                                {
+                                    ObjectId = client.Id,
+                                    ObjectType = "Client",
+                                    Status = (int)Status.Active,
+                                    Name = file.Name,
+                                    Category = file.Name,
+                                    Title = file.File.FileName,
+                                    Size = file.File.ContentLength,
+                                    Description = file.File.FileName,
+                                    Type = Path.GetExtension(file.File.FileName),
+                                    Location = $"Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{file.File.FileName}"
+                                };
+
+                                dservice.Create(doc);
+
+                                string fullpath = Path.Combine(path, $"{now}-{file.File.FileName}");
+                                file.File.SaveAs(fullpath);
                             }
-
-                            string now = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-                            Document doc = new Document()
-                            {
-                                ObjectId = model.Id,
-                                ObjectType = "Client",
-                                Status = (int)Status.Active,
-                                Name =file.Name,
-                                Category = file.Name,
-                                Title = file.File.FileName,
-                                Size = file.File.ContentLength,
-                                Description = file.File.FileName,
-                                Type = Path.GetExtension(file.File.FileName),
-                                Location = $"Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{file.File.FileName}"
-                            };
-
-                            dservice.Create(doc);
-
-                            string fullpath = Path.Combine(path, $"{now}-{file.File.FileName}");
-                            file.File.SaveAs(fullpath);
                         }
                     }
 
                     #endregion
 
                     #region Any Logo Uploads
-                    foreach (FileViewModel logo in model.Logo)
+                    if (model.Logo != null)
                     {
-                        if (logo.Name != null)
+                        foreach (FileViewModel logo in model.Logo)
                         {
-                            // Create folder
-                            string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
-
-                            if (!Directory.Exists(path))
+                            if (logo.Name != null)
                             {
-                                Directory.CreateDirectory(path);
+                                // Create folder
+                                string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
+
+                                if (!Directory.Exists(path))
+                                {
+                                    Directory.CreateDirectory(path);
+                                }
+
+                                string now = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                                Document doc = new Document()
+                                {
+                                    ObjectId = client.Id,
+                                    ObjectType = "ClientLogo",
+                                    Status = (int)Status.Active,
+                                    Name = logo.Name,
+                                    Category = logo.Name,
+                                    Title = logo.File.FileName,
+                                    Size = logo.File.ContentLength,
+                                    Description = logo.File.FileName,
+                                    Type = Path.GetExtension(logo.File.FileName),
+                                    Location = $"Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{logo.File.FileName}"
+                                };
+
+                                dservice.Create(doc);
+
+                                string fullpath = Path.Combine(path, $"{now}-{logo.File.FileName}");
+                                logo.File.SaveAs(fullpath);
                             }
-
-                            string now = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-                            Document doc = new Document()
-                            {
-                                ObjectId = model.Id,
-                                ObjectType = "ClientLogo",
-                                Status = (int)Status.Active,
-                                Name = logo.Name,
-                                Category = logo.Name,
-                                Title = logo.File.FileName,
-                                Size = logo.File.ContentLength,
-                                Description = logo.File.FileName,
-                                Type = Path.GetExtension(logo.File.FileName),
-                                Location = $"Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{logo.File.FileName}"
-                            };
-
-                            dservice.Create(doc);
-
-                            string fullpath = Path.Combine(path, $"{now}-{logo.File.FileName}");
-                            logo.File.SaveAs(fullpath);
                         }
                     }
+
+                    #endregion
+
+                    #region Create Client Budget
+
+                    //if (model.ClientKPI != null)
+                    //{
+                    //    foreach (ClientKPI kpi in model.ClientKPI)
+                    //    {
+                    //    }
+                    //}
 
                     #endregion
 
@@ -344,22 +377,22 @@ namespace ACT.UI.Controllers
                     //Status = (Status)client.Status,
                     Status = client.Status,
                     EditMode = true,
-                    ClientBudget = new EstimatedLoadViewModel()
-                    {
-                        Id = (unverified) ? 0 : client.ClientBudgets?.FirstOrDefault()?.Id ?? 0,
-                        January = (unverified) ? load.January : client.ClientBudgets?.FirstOrDefault()?.January,
-                        February = (unverified) ? load.February : client.ClientBudgets?.FirstOrDefault()?.February,
-                        March = (unverified) ? load.March : client.ClientBudgets?.FirstOrDefault()?.March,
-                        April = (unverified) ? load.April : client.ClientBudgets?.FirstOrDefault()?.April,
-                        May = (unverified) ? load.May : client.ClientBudgets?.FirstOrDefault()?.May,
-                        June = (unverified) ? load.June : client.ClientBudgets?.FirstOrDefault()?.June,
-                        July = (unverified) ? load.July : client.ClientBudgets?.FirstOrDefault()?.July,
-                        August = (unverified) ? load.August : client.ClientBudgets?.FirstOrDefault()?.August,
-                        September = (unverified) ? load.September : client.ClientBudgets?.FirstOrDefault()?.September,
-                        October = (unverified) ? load.October : client.ClientBudgets?.FirstOrDefault()?.October,
-                        November = (unverified) ? load.November : client.ClientBudgets?.FirstOrDefault()?.November,
-                        December = (unverified) ? load.December : client.ClientBudgets?.FirstOrDefault()?.December,
-                    },
+                    //ClientBudget = new EstimatedLoadViewModel()
+                    //{
+                    //    Id = (unverified) ? 0 : client.ClientBudgets?.FirstOrDefault()?.Id ?? 0,
+                    //    January = (unverified) ? load.January : client.ClientBudgets?.FirstOrDefault()?.January,
+                    //    February = (unverified) ? load.February : client.ClientBudgets?.FirstOrDefault()?.February,
+                    //    March = (unverified) ? load.March : client.ClientBudgets?.FirstOrDefault()?.March,
+                    //    April = (unverified) ? load.April : client.ClientBudgets?.FirstOrDefault()?.April,
+                    //    May = (unverified) ? load.May : client.ClientBudgets?.FirstOrDefault()?.May,
+                    //    June = (unverified) ? load.June : client.ClientBudgets?.FirstOrDefault()?.June,
+                    //    July = (unverified) ? load.July : client.ClientBudgets?.FirstOrDefault()?.July,
+                    //    August = (unverified) ? load.August : client.ClientBudgets?.FirstOrDefault()?.August,
+                    //    September = (unverified) ? load.September : client.ClientBudgets?.FirstOrDefault()?.September,
+                    //    October = (unverified) ? load.October : client.ClientBudgets?.FirstOrDefault()?.October,
+                    //    November = (unverified) ? load.November : client.ClientBudgets?.FirstOrDefault()?.November,
+                    //    December = (unverified) ? load.December : client.ClientBudgets?.FirstOrDefault()?.December,
+                    //},
                     Address = new AddressViewModel()
                     {
                         EditMode = true,
@@ -372,7 +405,44 @@ namespace ACT.UI.Controllers
                         AddressType = (address != null) ? (AddressType)address.Type : AddressType.Postal,
                     }
                 };
-                //foreach (FileViewModel file in client.CompanyFile)
+                if (client.ClientBudgets != null && client.ClientBudgets.Count > 0)
+                {
+                    foreach(ClientBudget budget in client.ClientBudgets)
+                    {
+                        ClientBudget cb = new ClientBudget()
+                        {
+                            Id = (unverified) ? 0 : client.ClientBudgets?.FirstOrDefault()?.Id ?? 0,
+                            January = (unverified) ? load.January : client.ClientBudgets?.FirstOrDefault()?.January,
+                            February = (unverified) ? load.February : client.ClientBudgets?.FirstOrDefault()?.February,
+                            March = (unverified) ? load.March : client.ClientBudgets?.FirstOrDefault()?.March,
+                            April = (unverified) ? load.April : client.ClientBudgets?.FirstOrDefault()?.April,
+                            May = (unverified) ? load.May : client.ClientBudgets?.FirstOrDefault()?.May,
+                            June = (unverified) ? load.June : client.ClientBudgets?.FirstOrDefault()?.June,
+                            July = (unverified) ? load.July : client.ClientBudgets?.FirstOrDefault()?.July,
+                            August = (unverified) ? load.August : client.ClientBudgets?.FirstOrDefault()?.August,
+                            September = (unverified) ? load.September : client.ClientBudgets?.FirstOrDefault()?.September,
+                            October = (unverified) ? load.October : client.ClientBudgets?.FirstOrDefault()?.October,
+                            November = (unverified) ? load.November : client.ClientBudgets?.FirstOrDefault()?.November,
+                            December = (unverified) ? load.December : client.ClientBudgets?.FirstOrDefault()?.December,
+                        };
+                        client.ClientBudgets.Add(cb);
+                    }
+                };
+                //if (client != null && client.ClientBudgets.Count > 0)
+                //{
+                //    foreach (FileViewModel file in client.CompanyFile)
+                //    CompanyFile = new FileViewModel()
+                //    {
+                //        Name = documents?.FirstOrDefault()?.Name,
+                //        Id = documents?.FirstOrDefault()?.Id ?? 0,
+                //        Extension = documents?.FirstOrDefault()?.Type,
+                //        Description = documents?.FirstOrDefault()?.Description,
+                //    },
+
+                //}
+                //if (client.Logo != null && client.ClientBudgets.Count > 0)
+                //{
+                //    foreach (FileViewModel file in client.Logo)
                 //    CompanyFile = new FileViewModel()
                 //    {
                 //        Name = documents?.FirstOrDefault()?.Name,
@@ -412,9 +482,6 @@ namespace ACT.UI.Controllers
                 using (ClientBudgetService bservice = new ClientBudgetService())
                 {
                     client = service.GetById(model.Id);
-                    Address address = aservice.Get(client.Id, "Client");
-
-                    List<Document> documents = dservice.List(client.Id, "Client");
 
                     if (client == null)
                     {
@@ -422,6 +489,14 @@ namespace ACT.UI.Controllers
 
                         return View(model);
                     }
+
+                   // Address address = aservice.Get(client.Id, "Client");
+
+                    List<Document> documents = dservice.List(client.Id, "Client");
+
+                    List<Document> logos = dservice.List(client.Id, "ClientLogo");
+
+
 
                     #region Validations
 
@@ -446,10 +521,10 @@ namespace ACT.UI.Controllers
                     client.VATNumber = model.VATNumber;
                     client.ContactNumber = model.ContactNumber;
                     client.ContactPerson = model.ContactPerson;
-                    client.FinancialPerson = model.FinancialPerson;
+                    client.FinancialPerson = model.ContactPerson;
                     client.Email = model.Email;
-                    client.AdminEmail = model.AdminEmail;
-                    client.DeclinedReason = model.DeclinedReason;
+                    client.AdminEmail = model.Email;
+                    //client.DeclinedReason = model.DeclinedReason;
                     //client.ServiceRequired = model.ServiceRequired;
                     //Status = (Status)model.Status;
                     client.Status = model.Status;
@@ -459,54 +534,54 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     #region Update Client Budget
+                    //Collection of budgets or singular?
+                    //if (model != null)
+                    //{
+                    //    ClientBudget budget = bservice.GetById(model.ClientBudget.Id);
 
-                    if (model != null)
-                    {
-                        ClientBudget budget = bservice.GetById(model.ClientBudget.Id);
+                    //    if (budget == null)
+                    //    {
+                    //        budget = new ClientBudget()
+                    //        {
+                    //            ClientId = model.Id,
+                    //            Status = (int)Status.Active,
+                    //            BudgetYear = DateTime.Now.Year,
+                    //            January = model.ClientBudget.January,
+                    //            February = model.ClientBudget.February,
+                    //            March = model.ClientBudget.March,
+                    //            April = model.ClientBudget.April,
+                    //            May = model.ClientBudget.May,
+                    //            June = model.ClientBudget.June,
+                    //            July = model.ClientBudget.July,
+                    //            August = model.ClientBudget.August,
+                    //            September = model.ClientBudget.September,
+                    //            October = model.ClientBudget.October,
+                    //            November = model.ClientBudget.November,
+                    //            December = model.ClientBudget.December,
 
-                        if (budget == null)
-                        {
-                            budget = new ClientBudget()
-                            {
-                                ClientId = model.Id,
-                                Status = (int)Status.Active,
-                                BudgetYear = DateTime.Now.Year,
-                                January = model.ClientBudget.January,
-                                February = model.ClientBudget.February,
-                                March = model.ClientBudget.March,
-                                April = model.ClientBudget.April,
-                                May = model.ClientBudget.May,
-                                June = model.ClientBudget.June,
-                                July = model.ClientBudget.July,
-                                August = model.ClientBudget.August,
-                                September = model.ClientBudget.September,
-                                October = model.ClientBudget.October,
-                                November = model.ClientBudget.November,
-                                December = model.ClientBudget.December,
+                    //        };
 
-                            };
+                    //        bservice.Create(budget);
+                    //    }
+                    //    else
+                    //    {
+                    //        budget.BudgetYear = DateTime.Now.Year;
+                    //        budget.January = model.ClientBudget.January;
+                    //        budget.February = model.ClientBudget.February;
+                    //        budget.March = model.ClientBudget.March;
+                    //        budget.April = model.ClientBudget.April;
+                    //        budget.May = model.ClientBudget.May;
+                    //        budget.June = model.ClientBudget.June;
+                    //        budget.July = model.ClientBudget.July;
+                    //        budget.August = model.ClientBudget.August;
+                    //        budget.September = model.ClientBudget.September;
+                    //        budget.October = model.ClientBudget.October;
+                    //        budget.November = model.ClientBudget.November;
+                    //        budget.December = model.ClientBudget.December;
 
-                            bservice.Create(budget);
-                        }
-                        else
-                        {
-                            budget.BudgetYear = DateTime.Now.Year;
-                            budget.January = model.ClientBudget.January;
-                            budget.February = model.ClientBudget.February;
-                            budget.March = model.ClientBudget.March;
-                            budget.April = model.ClientBudget.April;
-                            budget.May = model.ClientBudget.May;
-                            budget.June = model.ClientBudget.June;
-                            budget.July = model.ClientBudget.July;
-                            budget.August = model.ClientBudget.August;
-                            budget.September = model.ClientBudget.September;
-                            budget.October = model.ClientBudget.October;
-                            budget.November = model.ClientBudget.November;
-                            budget.December = model.ClientBudget.December;
-
-                            bservice.Update(budget);
-                        }
-                    }
+                    //        bservice.Update(budget);
+                    //    }
+                    //}
 
                     #endregion
 
@@ -549,59 +624,62 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     #region Any Uploads
-
-                    foreach (FileViewModel file in model.CompanyFile)
+                    if (model.CompanyFile != null)
                     {
-                        if (file.Name != null)
+                        foreach (FileViewModel file in model.CompanyFile)
                         {
-                            // Create folder
-                            string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
-
-                            if (!Directory.Exists(path))
+                            if (file.Name != null)
                             {
-                                Directory.CreateDirectory(path);
+                                // Create folder
+                                string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
+
+                                if (!Directory.Exists(path))
+                                {
+                                    Directory.CreateDirectory(path);
+                                }
+
+                                string now = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                                Document doc = dservice.GetById(file.Id);
+
+                                if (doc != null)
+                                {
+                                    // Disable this file...
+                                    doc.Status = (int)Status.Inactive;
+
+                                    dservice.Update(doc);
+                                }
+
+                                doc = new Document()
+                                {
+                                    ObjectId = model.Id,
+                                    ObjectType = "Client",
+                                    Status = (int)Status.Active,
+                                    Name = file.Name,
+                                    Category = file.Name,
+                                    Title = file.File.FileName,
+                                    Size = file.File.ContentLength,
+                                    Description = file.File.FileName,
+                                    Type = Path.GetExtension(file.File.FileName),
+                                    Location = $"Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{file.File.FileName}"
+
+                                };
+
+                                dservice.Create(doc);
+
+                                string fullpath = Path.Combine(path, $"{now}-{file.File.FileName}");
+                                file.File.SaveAs(fullpath);
                             }
-
-                            string now = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-                            Document doc = dservice.GetById(file.Id);
-
-                            if (doc != null)
-                            {
-                                // Disable this file...
-                                doc.Status = (int)Status.Inactive;
-
-                                dservice.Update(doc);
-                            }
-
-                            doc = new Document()
-                            {
-                                ObjectId = model.Id,
-                                ObjectType = "Client",
-                                Status = (int)Status.Active,
-                                Name = file.Name,
-                                Category = file.Name,
-                                Title = file.File.FileName,
-                                Size = file.File.ContentLength,
-                                Description = file.File.FileName,
-                                Type = Path.GetExtension(file.File.FileName),
-                                Location = $"Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{file.File.FileName}"
-
-                            };
-
-                            dservice.Create(doc);
-
-                            string fullpath = Path.Combine(path, $"{now}-{file.File.FileName}");
-                            file.File.SaveAs(fullpath);
                         }
-                    }                
+                    }
 
-                        #endregion
+                    #endregion
 
 
 
-                        #region Any Logosd
-
+                    #region Any Logos
+                    if (model.Logo != null)
+                    {
                         foreach (FileViewModel logo in model.Logo)
                         {
                             if (logo.Name != null)
@@ -647,6 +725,7 @@ namespace ACT.UI.Controllers
                                 logo.File.SaveAs(fullpath);
                             }
                         }
+                    }
 
                         #endregion
 
@@ -1254,6 +1333,25 @@ namespace ACT.UI.Controllers
                 return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
             }
         }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetSiteDetailsForMain( string siteId)
+        {
+            if (siteId != null && siteId != "")
+            {
+                Site site = null;
+                using (SiteService service = new SiteService())
+                {
+                    site = service.GetById(int.Parse(siteId));
+                }
+                return Json(site, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+            
 
         [HttpPost]
         public string SetSiteForClientSiteExcluded(string siteId,  string clientId)
