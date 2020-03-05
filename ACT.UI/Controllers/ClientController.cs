@@ -1234,7 +1234,7 @@ namespace ACT.UI.Controllers
         #region Sub Sites
         //
         // POST || GET: /Client/SubSites
-        public ActionResult SubSites(PagingModel pm, CustomSearchModel csm)
+        public ActionResult SubSites()
         {
 
             ViewBag.ViewName = "_SubSites";
@@ -1243,7 +1243,6 @@ namespace ACT.UI.Controllers
 
             List<Site> model = new List<Site>();
             List<Client> clientList;
-            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
             List<Site> mainSiteList;
 
             int pspId = (CurrentUser != null? CurrentUser.PSPs.FirstOrDefault().Id:0);
@@ -1251,24 +1250,8 @@ namespace ACT.UI.Controllers
             using (ClientService clientService = new ClientService())
             using (SiteService sitesService = new SiteService())
             {                
-                pm.Sort = pm.Sort ?? "DESC";
-                pm.SortBy = pm.SortBy ?? "CreatedOn";
-
-                model = sitesService.List();
-                total = model.Count;
-
                 mainSiteList = sitesService.GetSitesByClientsOfPSP(pspId);
                 clientList = clientService.GetClientsByPSP(pspId);
-
-                //Site firstSite = mainSiteList.FirstOrDefault();
-                //if (mainSiteList != null) {
-                //    ViewBag.SubSiteListIncluded = sitesService.GetSitesByClientsOfPSPIncluded(pspId, firstSite.Id);
-                //    ViewBag.SubbSiteListExcluded = sitesService.GetSitesByClientsOfPSPExcluded(pspId, firstSite.Id);
-                //} else
-                //{
-                //    ViewBag.SubSiteListIncluded = null;
-                //    ViewBag.SubbSiteListExcluded = null;
-                //}
             }
             IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
             {
@@ -1286,7 +1269,7 @@ namespace ACT.UI.Controllers
             ViewBag.SiteList = siteListDDL;
 
 
-            return PartialView("_SubSites", paging);
+            return PartialView("_SubSites");
         }
 
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]

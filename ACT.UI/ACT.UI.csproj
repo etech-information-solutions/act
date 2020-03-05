@@ -484,9 +484,11 @@
     <Content Include="Views\Client\ProductDetails.cshtml" />
     <Content Include="Views\Client\_LinkProducts.cshtml" />
     <Content Include="Views\Shared\_BroadcastCustomSearch.cshtml" />
+    <Content Include="Views\Client\SiteDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Client\partials\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

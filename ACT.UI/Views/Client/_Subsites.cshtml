@@ -6,7 +6,7 @@
 @using ACT.Core.Models.Custom;
 
 @{
-    ViewBag.ShowExport = true;
+    //ViewBag.ShowExport = true;
     //ViewBag.ShowCustom = true;
     //ViewBag.ShowQuickStructure = true;
 
@@ -17,23 +17,6 @@
 
 
 @Html.Partial("_Notification")
-
-
-@{
-    Int32 count = Model.Start;
-    //List<Site> items = (List<Site>)Model.Items;
-    //List<Client> client = (List<Client>)Model.Items;
-    //List<Region> region = (List<Region>)Model.Items;
-}
-
-
-@*@if (Model == null || !items.Any())
-    {
-        <div class="notification message-warn" style="margin-bottom: 20px;">
-            There are no Sites available matching your search criteria.
-        </div>
-    }*@
-
 
 <p>
     <table style="width:100%" border="0">
@@ -474,4 +457,4 @@
 </script>
 @*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
 
-@Html.Partial("_Paging")
+@*@Html.Partial("_Paging")*@
