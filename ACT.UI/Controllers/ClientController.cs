@@ -596,7 +596,7 @@ namespace ACT.UI.Controllers
                             clientAddress = new Address()
                             {
                                 ObjectId = model.Id,
-                                ObjectType = "CLient",
+                                ObjectType = "Client",
                                 Town = model.Address.Town,
                                 Status = (int)Status.Active,
                                 PostalCode = model.Address.PostCode,
@@ -734,7 +734,7 @@ namespace ACT.UI.Controllers
 
                     Notify("The selected Client details were successfully updated.", NotificationType.Success);
 
-                    return RedirectToAction("Client");                
+                    return RedirectToAction("ClientList");                
             }
             catch
             {
@@ -770,7 +770,7 @@ namespace ACT.UI.Controllers
                     
                 }
                 Notify("The selected Client was successfully updated.", NotificationType.Success);
-                return RedirectToAction("Client");
+                return RedirectToAction("ClientList");
             }
             catch
             {

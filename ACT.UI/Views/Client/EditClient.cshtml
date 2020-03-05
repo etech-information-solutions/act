@@ -170,10 +170,10 @@
         <div class="left" style="width: 33%; margin-right: 4%;">
 
             <div class="editor-label uppercase">
-                Logo
+                @Html.LabelFor(model => model.Logo)
             </div>
             <div class="editor-field">
-                @if (Model.Logo != null && Model.Logo.Count() > 0)
+                @if (Model != null && Model.Logo.Count() > 0)
                 {
                     foreach (FileViewModel logo in Model.Logo)
                     {
@@ -197,7 +197,7 @@
                 <input id="Logo.Description" name="Logo.Description" class="input" type="hidden" value="Company Logo" />
             </div>
             <div class="editor-label uppercase">
-                <h3>Uploaded Documents</h3>
+                @Html.LabelFor(model => model.CompanyFile)
                 <div class="editor-field" style="margin-bottom: 10px;">
                     @if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
                     {
