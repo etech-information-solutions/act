@@ -1408,6 +1408,8 @@ namespace ACT.UI.Controllers
             return PartialView("_ClientGroups", paging);
         }
 
+
+
         [HttpPost]
         public string GetClientForGroupIncluded(string groupId)
         {
