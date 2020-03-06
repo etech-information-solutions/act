@@ -37,7 +37,7 @@
                 Name
             </div>
             <div class="display-field">
-                @Html.TextBoxFor(model => model.Name, new { @class = "input", @placeholder = "Enter Site Name" })
+                @Html.TextBoxFor(model => model.Name, new { @class = "input", @placeholder = "Enter Group Name" })
                 @Html.ValidationMessageFor(model => model.Name)
             </div>
 
@@ -45,7 +45,7 @@
                 Description
             </div>
             <div class="display-field">
-                @Html.TextBoxFor(model => model.Description, new { @class = "input", @placeholder = "Enter Site Description" })
+                @Html.TextBoxFor(model => model.Description, new { @class = "input", @placeholder = "Enter Group Description" })
                 @Html.ValidationMessageFor(model => model.Description)
             </div>
            

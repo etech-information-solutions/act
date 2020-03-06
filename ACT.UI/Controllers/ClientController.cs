@@ -1409,6 +1409,176 @@ namespace ACT.UI.Controllers
         }
 
 
+        // GET: Client/AddGroup
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddGroup()
+        {
+            GroupViewModel model = new GroupViewModel() { EditMode = true };
+            return View(model);
+        }
+
+
+        // POST: Client/AddGroup
+        [HttpPost]
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddGroup(GroupViewModel model)
+        {
+            try
+            {
+                
+                if (!ModelState.IsValid)
+                {
+                    Notify("Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                using (GroupService siteService = new GroupService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    #region Create Group
+                    Group group = new Group()
+                    {
+                        Name = model.Name,
+                        Description = model.Description,
+                        Status = (int)model.Status
+                    };
+                    group = siteService.Create(group);
+                    #endregion
+
+                    scope.Complete();
+                }
+
+                Notify("The Group was successfully created.", NotificationType.Success);
+                return RedirectToAction("ClientGroups");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+        
+
+        // GET: Client/EditGroup/5
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditGroup(int id)
+        {
+            Group group;
+
+            using (GroupService service = new GroupService())
+            {
+                group = service.GetById(id);
+
+
+                if (group == null)
+                {
+                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                    return PartialView("_AccessDenied");
+                }
+
+                GroupViewModel model = new GroupViewModel()
+                {
+                    Id = group.Id,
+                    Name = group.Name,
+                    Description = group.Description,
+                    Status = (int)group.Status,
+                    EditMode = true
+                };
+                return View(model);
+            }
+        }
+
+        // POST: Client/EditGroup/5
+        [HttpPost]
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditGroup(GroupViewModel model, PagingModel pm, bool isstructure = false)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    Notify("Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                Group group;
+
+                using (GroupService service = new GroupService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    group = service.GetById(model.Id);
+
+                    #region Update Group
+
+                    // Update Site
+                    group.Id = model.Id;
+                    group.Name = model.Name;
+                    group.Description = model.Description;
+                    group.Status = (int)model.Status;
+
+                    service.Update(group);
+
+                    #endregion
+                   
+
+                    scope.Complete();
+                }
+
+                Notify("The selected Site details were successfully updated.", NotificationType.Success);
+
+                return RedirectToAction("ClientList");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // POST: Client/DeleteGroup/5
+        [HttpPost]
+        [Requires(PermissionTo.Delete)]
+        public ActionResult DeleteGroup(GroupViewModel model)
+        {
+            Group group;
+            ClientGroup clientGroup;
+            try
+            {
+
+                using (GroupService service = new GroupService())
+               // using (ClientGroupService clientgroupservice = new ClientGroupService())
+                    using (TransactionScope scope = new TransactionScope())
+                {
+                    group = service.GetById(model.Id);
+
+                    if (group == null)
+                    {
+                        Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                        return PartialView("_AccessDenied");
+                    }
+
+                    group.Status = (((Status)group.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;
+
+                    //clientGroup = clientgroupservice.GetById(model.Id);
+                    //clientGroup.Status = (((Status)group.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;                    
+
+                    service.Update(group);
+                   // clientgroupservice.Update(clientGroup);
+                    scope.Complete();
+
+                }
+                Notify("The selected Group was successfully updated.", NotificationType.Success);
+                return RedirectToAction("ClientGroups");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+
 
         [HttpPost]
         public string GetClientForGroupIncluded(string groupId)

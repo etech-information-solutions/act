@@ -46,14 +46,17 @@
     <thead>
         <tr>
             @*<th data-name="Count">
-                    #
-                </th>*@
+            #
+        </th>*@
             <th data-name="Name" data-column="Name">
                 Name
             </th>
             <th data-name="Cell" data-column="Cell">
                 Group Description
             </th>
+            @*<th data-name="Cell" data-column="Cell">
+                Status
+            </th>*@
             <th data-name="Actions">
                 Actions
             </th>
@@ -70,23 +73,26 @@
                 String active = status.Equals(Status.Active) ? "activated" : "terminated";
                 String enable = status.Equals(Status.Active) ? "Terminate" : "Activate";
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+        <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
-                    @*<td width="1%">
-                            @count
-                        </td>*@
-                    <td style="width: 15%;">
-                        @item.Name
-                    </td>
-                    <td>
-                        @item.Description
-                    </td>
-                    <td width="15%">
-                        @Html.ActionLink("Edit", "EditGroup", new { id = item.Id, returnView = "Users" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+            @*<td width="1%">
+            @count
+        </td>*@
+            <td style="width: 15%;">
+                @item.Name
+            </td>
+            <td>
+                @item.Description
+            </td>
+            @*<td>
+                (Status)@item.Status
+            </td>*@
+            <td width="15%">
+                @Html.ActionLink("Edit", "EditGroup", new { id = item.Id, returnView = "Users" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        @Html.ActionLink(enable, "DeleteGroup", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientgoups", @rel = "tipsyE", @title = enable + " this item?" })
-                    </td>
-                </tr>
+                @Html.ActionLink(enable, "DeleteGroup", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientgroups", @rel = "tipsyE", @title = enable + " this item?" })
+            </td>
+        </tr>
 
                 count++;
             }
