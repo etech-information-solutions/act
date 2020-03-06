@@ -172,29 +172,29 @@ namespace ACT.UI.Controllers
 
                     if (model.ClientBudget != null)
                     {
-                        foreach (ClientBudget budgetList in model.ClientBudget)
-                        {
+                        //foreach (ClientBudget budgetList in model.ClientBudget)
+                        //{
                             ClientBudget budget = new ClientBudget()
                             {
                                 ClientId = client.Id,
                                 Status = (int)Status.Active,
                                 BudgetYear = DateTime.Now.Year,
-                                January = budgetList.January,
-                                February = budgetList.February,
-                                March = budgetList.March,
-                                April = budgetList.April,
-                                May = budgetList.May,
-                                June = budgetList.June,
-                                July = budgetList.July,
-                                August = budgetList.August,
-                                September = budgetList.September,
-                                October = budgetList.October,
-                                November = budgetList.November,
-                                December = budgetList.December,
+                                January = model.ClientBudget.January,
+                                February = model.ClientBudget.February,
+                                March = model.ClientBudget.March,
+                                April = model.ClientBudget.April,
+                                May = model.ClientBudget.May,
+                                June = model.ClientBudget.June,
+                                July = model.ClientBudget.July,
+                                August = model.ClientBudget.August,
+                                September = model.ClientBudget.September,
+                                October = model.ClientBudget.October,
+                                November = model.ClientBudget.November,
+                                December = model.ClientBudget.December,
                             };
 
                             budget = bservice.Create(budget);
-                        }
+                        //}
                     }
 
                     #endregion
@@ -265,9 +265,9 @@ namespace ACT.UI.Controllers
                     #region Any Logo Uploads
                     if (model.Logo != null)
                     {
-                        foreach (FileViewModel logo in model.Logo)
-                        {
-                            if (logo.Name != null)
+                        //foreach (FileViewModel logo in model.Logo)
+                        //{
+                            if (model.Logo.Name != null)
                             {
                                 // Create folder
                                 string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
@@ -284,21 +284,21 @@ namespace ACT.UI.Controllers
                                     ObjectId = client.Id,
                                     ObjectType = "ClientLogo",
                                     Status = (int)Status.Active,
-                                    Name = logo.Name,
-                                    Category = logo.Name,
-                                    Title = logo.File.FileName,
-                                    Size = logo.File.ContentLength,
-                                    Description = logo.File.FileName,
-                                    Type = Path.GetExtension(logo.File.FileName),
-                                    Location = $"Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{logo.File.FileName}"
+                                    Name = model.Logo.Name,
+                                    Category = model.Logo.Name,
+                                    Title = model.Logo.File.FileName,
+                                    Size = model.Logo.File.ContentLength,
+                                    Description = model.Logo.File.FileName,
+                                    Type = Path.GetExtension(model.Logo.File.FileName),
+                                    Location = $"Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{model.Logo.File.FileName}"
                                 };
 
                                 dservice.Create(doc);
 
-                                string fullpath = Path.Combine(path, $"{now}-{logo.File.FileName}");
-                                logo.File.SaveAs(fullpath);
+                                string fullpath = Path.Combine(path, $"{now}-{model.Logo.File.FileName}");
+                            model.Logo.File.SaveAs(fullpath);
                             }
-                        }
+                        //}
                     }
 
                     #endregion
@@ -317,7 +317,7 @@ namespace ACT.UI.Controllers
                     scope.Complete();
                 }
                 Notify("The Client was successfully created.", NotificationType.Success);
-                return RedirectToAction("Client");
+                return RedirectToAction("ClientList");
             }
             catch
             {
@@ -348,6 +348,7 @@ namespace ACT.UI.Controllers
 
                 Address address = aservice.Get(client.Id, "Client");
 
+                List<Document> logo = dservice.List(client.Id, "ClientLogo");
                 List<Document> documents = dservice.List(client.Id, "Client");
 
                 EstimatedLoad load = new EstimatedLoad();
@@ -407,8 +408,8 @@ namespace ACT.UI.Controllers
                 };
                 if (client.ClientBudgets != null && client.ClientBudgets.Count > 0)
                 {
-                    foreach(ClientBudget budget in client.ClientBudgets)
-                    {
+                    //foreach(ClientBudget budget in client.ClientBudgets)
+                    //{
                         ClientBudget cb = new ClientBudget()
                         {
                             Id = (unverified) ? 0 : client.ClientBudgets?.FirstOrDefault()?.Id ?? 0,
@@ -426,34 +427,50 @@ namespace ACT.UI.Controllers
                             December = (unverified) ? load.December : client.ClientBudgets?.FirstOrDefault()?.December,
                         };
                         client.ClientBudgets.Add(cb);
-                    }
+                    //}
                 };
-                //if (client != null && client.ClientBudgets.Count > 0)
-                //{
-                //    foreach (FileViewModel file in client.CompanyFile)
-                //    CompanyFile = new FileViewModel()
-                //    {
-                //        Name = documents?.FirstOrDefault()?.Name,
-                //        Id = documents?.FirstOrDefault()?.Id ?? 0,
-                //        Extension = documents?.FirstOrDefault()?.Type,
-                //        Description = documents?.FirstOrDefault()?.Description,
-                //    },
+                if (logo != null && logo.Count > 0)
+                {                   
+                    List<FileViewModel> logofvm = new List<FileViewModel>();
+                    foreach (Document doc in logo)
+                    {
+                        FileViewModel tfvm = new FileViewModel()
+                        {
+                            Id = doc.Id,
+                            Location = doc.Location,
+                            Name = doc.Name,
+                            Description = doc.Description
 
-                //}
-                //if (client.Logo != null && client.ClientBudgets.Count > 0)
-                //{
-                //    foreach (FileViewModel file in client.Logo)
-                //    CompanyFile = new FileViewModel()
-                //    {
-                //        Name = documents?.FirstOrDefault()?.Name,
-                //        Id = documents?.FirstOrDefault()?.Id ?? 0,
-                //        Extension = documents?.FirstOrDefault()?.Type,
-                //        Description = documents?.FirstOrDefault()?.Description,
-                //    },
+                        };
+                        logofvm.Add(tfvm);
+                        //model.CompanyFile.Add(fvm);
 
-                //}
+                    }
+                    model.Logo = logofvm.LastOrDefault();
+                }
+                List<FileViewModel> fvm = new List<FileViewModel>();
+                if (documents!=null && documents.Count > 0)
+                {
+                    
+                    foreach (Document doc in documents)
+                    {
+                        FileViewModel tfvm = new FileViewModel()
+                        {
+                            Id = doc.Id,
+                            Location = doc.Location,
+                            Name = doc.Name,
+                            Description = doc.Description
+                            
+                        };
+                        fvm.Add(tfvm);
+                       
+
+                    }
+                    model.CompanyFile = fvm;
+                }
 
 
+                ViewBag.CompanyUploads = fvm;
                 return View(model);
             }
            }
@@ -624,11 +641,11 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     #region Any Uploads
-                    if (model.CompanyFile != null)
+                    if (model.NewCompanyFile != null)
                     {
-                        foreach (FileViewModel file in model.CompanyFile)
-                        {
-                            if (file.Name != null)
+                        //foreach (FileViewModel file in model.CompanyFile)
+                        //{
+                            if (model.NewCompanyFile.Name != null)
                             {
                                 // Create folder
                                 string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
@@ -640,7 +657,7 @@ namespace ACT.UI.Controllers
 
                                 string now = DateTime.Now.ToString("yyyyMMddHHmmss");
 
-                                Document doc = dservice.GetById(file.Id);
+                                Document doc = dservice.GetById(model.NewCompanyFile.Id);
 
                                 if (doc != null)
                                 {
@@ -655,22 +672,22 @@ namespace ACT.UI.Controllers
                                     ObjectId = model.Id,
                                     ObjectType = "Client",
                                     Status = (int)Status.Active,
-                                    Name = file.Name,
-                                    Category = file.Name,
-                                    Title = file.File.FileName,
-                                    Size = file.File.ContentLength,
-                                    Description = file.File.FileName,
-                                    Type = Path.GetExtension(file.File.FileName),
-                                    Location = $"Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{file.File.FileName}"
+                                    Name = model.NewCompanyFile.Name,
+                                    Category = model.NewCompanyFile.Name,
+                                    Title = model.NewCompanyFile.File.FileName,
+                                    Size = model.NewCompanyFile.File.ContentLength,
+                                    Description = model.NewCompanyFile.File.FileName,
+                                    Type = Path.GetExtension(model.NewCompanyFile.File.FileName),
+                                    Location = $"Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{model.NewCompanyFile.File.FileName}"
 
                                 };
 
                                 dservice.Create(doc);
 
-                                string fullpath = Path.Combine(path, $"{now}-{file.File.FileName}");
-                                file.File.SaveAs(fullpath);
+                                string fullpath = Path.Combine(path, $"{now}-{model.NewCompanyFile.File.FileName}");
+                            model.NewCompanyFile.File.SaveAs(fullpath);
                             }
-                        }
+                        //}
                     }
 
                     #endregion
@@ -680,9 +697,9 @@ namespace ACT.UI.Controllers
                     #region Any Logos
                     if (model.Logo != null)
                     {
-                        foreach (FileViewModel logo in model.Logo)
-                        {
-                            if (logo.Name != null)
+                        //foreach (FileViewModel logo in model.Logo)
+                        //{
+                            if (model.Logo.Name != null)
                             {
                                 // Create folder
                                 string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
@@ -694,7 +711,7 @@ namespace ACT.UI.Controllers
 
                                 string now = DateTime.Now.ToString("yyyyMMddHHmmss");
 
-                                Document doc = dservice.GetById(logo.Id);
+                                Document doc = dservice.GetById(model.Logo.Id);
 
                                 if (doc != null)
                                 {
@@ -707,24 +724,24 @@ namespace ACT.UI.Controllers
                                 doc = new Document()
                                 {
                                     ObjectId = model.Id,
-                                    ObjectType = "Client",
+                                    ObjectType = "ClientLogo",
                                     Status = (int)Status.Active,
-                                    Name = logo.Name,
-                                    Category = logo.Name,
-                                    Title = logo.File.FileName,
-                                    Size = logo.File.ContentLength,
+                                    Name = model.Logo.Name,
+                                    Category = model.Logo.Name,
+                                    Title = model.Logo.File.FileName,
+                                    Size = model.Logo.File.ContentLength,
                                     Description = "Logo",
-                                    Type = Path.GetExtension(logo.File.FileName),
-                                    Location = $"Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{logo.File.FileName}"
+                                    Type = Path.GetExtension(model.Logo.File.FileName),
+                                    Location = $"Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{model.Logo.File.FileName}"
 
                                 };
 
                                 dservice.Create(doc);
 
-                                string fullpath = Path.Combine(path, $"{now}-{logo.File.FileName}");
-                                logo.File.SaveAs(fullpath);
+                                string fullpath = Path.Combine(path, $"{now}-{model.Logo.File.FileName}");
+                            model.Logo.File.SaveAs(fullpath);
                             }
-                        }
+                        //}
                     }
 
                         #endregion
@@ -909,7 +926,7 @@ namespace ACT.UI.Controllers
                 }
 
                 Notify("The Site was successfully created.", NotificationType.Success);
-                    return RedirectToAction("Client");
+                    return RedirectToAction("ClientList");
                 }
                     catch
                     {
@@ -997,7 +1014,7 @@ namespace ACT.UI.Controllers
                 //}
 
                 Notify("The Site was successfully created.", NotificationType.Success);
-                return RedirectToAction("Client");
+                return RedirectToAction("ManageSites");
             }
             catch
             {
@@ -1167,7 +1184,7 @@ namespace ACT.UI.Controllers
 
                 Notify("The selected Site details were successfully updated.", NotificationType.Success);
 
-                return RedirectToAction("Client");
+                return RedirectToAction("ClientList");
             }
             catch
             {
@@ -1203,7 +1220,7 @@ namespace ACT.UI.Controllers
 
                 }
                 Notify("The selected Client was successfully updated.", NotificationType.Success);
-                return RedirectToAction("Client");
+                return RedirectToAction("ManageSites");
             }
             catch
             {
@@ -1658,7 +1675,7 @@ namespace ACT.UI.Controllers
                 Notify("The Product was successfully created.", NotificationType.Success);
             }
 
-            return RedirectToAction("Products");
+            return RedirectToAction("LinkProducts");
         }
 
         //
@@ -1867,7 +1884,7 @@ namespace ACT.UI.Controllers
                 Notify("The selected Product's details were successfully updated.", NotificationType.Success);
             }
 
-            return RedirectToAction("Products");
+            return RedirectToAction("LinkProducts");
         }
 
         //
@@ -1896,7 +1913,7 @@ namespace ACT.UI.Controllers
                 Notify("The selected Product was successfully updated.", NotificationType.Success);
             }
 
-            return RedirectToAction("Products");
+            return RedirectToAction("LinkProducts");
         }
 
         #endregion
