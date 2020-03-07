@@ -127,7 +127,7 @@ namespace ACT.UI.Controllers
                 using (TransactionScope scope = new TransactionScope())
                 using (DocumentService dservice = new DocumentService())
                 using (ClientKPIService kservice = new ClientKPIService())
-                using (ClientBudgetService bservice = new ClientBudgetService())
+               // using (ClientBudgetService bservice = new ClientBudgetService())
                 {
                     #region Validation
                     if (!string.IsNullOrEmpty(model.CompanyRegistrationNumber) && service.ExistByCompanyRegistrationNumber(model.CompanyRegistrationNumber.Trim()))
@@ -168,36 +168,36 @@ namespace ACT.UI.Controllers
                     };
                     #endregion
 
-                    #region Create Client Budget
+                    //#region Create Client Budget
 
-                    if (model.ClientBudget != null)
-                    {
-                        //foreach (ClientBudget budgetList in model.ClientBudget)
-                        //{
-                            ClientBudget budget = new ClientBudget()
-                            {
-                                ClientId = client.Id,
-                                Status = (int)Status.Active,
-                                BudgetYear = DateTime.Now.Year,
-                                January = model.ClientBudget.January,
-                                February = model.ClientBudget.February,
-                                March = model.ClientBudget.March,
-                                April = model.ClientBudget.April,
-                                May = model.ClientBudget.May,
-                                June = model.ClientBudget.June,
-                                July = model.ClientBudget.July,
-                                August = model.ClientBudget.August,
-                                September = model.ClientBudget.September,
-                                October = model.ClientBudget.October,
-                                November = model.ClientBudget.November,
-                                December = model.ClientBudget.December,
-                            };
+                    //if (model.ClientBudget != null)
+                    //{
+                    //    //foreach (ClientBudget budgetList in model.ClientBudget)
+                    //    //{
+                    //        ClientBudget budget = new ClientBudget()
+                    //        {
+                    //            ClientId = client.Id,
+                    //            Status = (int)Status.Active,
+                    //            BudgetYear = DateTime.Now.Year,
+                    //            January = model.ClientBudget.January,
+                    //            February = model.ClientBudget.February,
+                    //            March = model.ClientBudget.March,
+                    //            April = model.ClientBudget.April,
+                    //            May = model.ClientBudget.May,
+                    //            June = model.ClientBudget.June,
+                    //            July = model.ClientBudget.July,
+                    //            August = model.ClientBudget.August,
+                    //            September = model.ClientBudget.September,
+                    //            October = model.ClientBudget.October,
+                    //            November = model.ClientBudget.November,
+                    //            December = model.ClientBudget.December,
+                    //        };
 
-                            budget = bservice.Create(budget);
-                        //}
-                    }
+                    //        budget = bservice.Create(budget);
+                    //    //}
+                    //}
 
-                    #endregion
+                    //#endregion
 
                     #region Create Address (s)
 
@@ -406,29 +406,29 @@ namespace ACT.UI.Controllers
                         AddressType = (address != null) ? (AddressType)address.Type : AddressType.Postal,
                     }
                 };
-                if (client.ClientBudgets != null && client.ClientBudgets.Count > 0)
-                {
-                    //foreach(ClientBudget budget in client.ClientBudgets)
-                    //{
-                        ClientBudget cb = new ClientBudget()
-                        {
-                            Id = (unverified) ? 0 : client.ClientBudgets?.FirstOrDefault()?.Id ?? 0,
-                            January = (unverified) ? load.January : client.ClientBudgets?.FirstOrDefault()?.January,
-                            February = (unverified) ? load.February : client.ClientBudgets?.FirstOrDefault()?.February,
-                            March = (unverified) ? load.March : client.ClientBudgets?.FirstOrDefault()?.March,
-                            April = (unverified) ? load.April : client.ClientBudgets?.FirstOrDefault()?.April,
-                            May = (unverified) ? load.May : client.ClientBudgets?.FirstOrDefault()?.May,
-                            June = (unverified) ? load.June : client.ClientBudgets?.FirstOrDefault()?.June,
-                            July = (unverified) ? load.July : client.ClientBudgets?.FirstOrDefault()?.July,
-                            August = (unverified) ? load.August : client.ClientBudgets?.FirstOrDefault()?.August,
-                            September = (unverified) ? load.September : client.ClientBudgets?.FirstOrDefault()?.September,
-                            October = (unverified) ? load.October : client.ClientBudgets?.FirstOrDefault()?.October,
-                            November = (unverified) ? load.November : client.ClientBudgets?.FirstOrDefault()?.November,
-                            December = (unverified) ? load.December : client.ClientBudgets?.FirstOrDefault()?.December,
-                        };
-                        client.ClientBudgets.Add(cb);
-                    //}
-                };
+                //if (client.ClientBudgets != null && client.ClientBudgets.Count > 0)
+                //{
+                //    //foreach(ClientBudget budget in client.ClientBudgets)
+                //    //{
+                //        ClientBudget cb = new ClientBudget()
+                //        {
+                //            Id = (unverified) ? 0 : client.ClientBudgets?.FirstOrDefault()?.Id ?? 0,
+                //            January = (unverified) ? load.January : client.ClientBudgets?.FirstOrDefault()?.January,
+                //            February = (unverified) ? load.February : client.ClientBudgets?.FirstOrDefault()?.February,
+                //            March = (unverified) ? load.March : client.ClientBudgets?.FirstOrDefault()?.March,
+                //            April = (unverified) ? load.April : client.ClientBudgets?.FirstOrDefault()?.April,
+                //            May = (unverified) ? load.May : client.ClientBudgets?.FirstOrDefault()?.May,
+                //            June = (unverified) ? load.June : client.ClientBudgets?.FirstOrDefault()?.June,
+                //            July = (unverified) ? load.July : client.ClientBudgets?.FirstOrDefault()?.July,
+                //            August = (unverified) ? load.August : client.ClientBudgets?.FirstOrDefault()?.August,
+                //            September = (unverified) ? load.September : client.ClientBudgets?.FirstOrDefault()?.September,
+                //            October = (unverified) ? load.October : client.ClientBudgets?.FirstOrDefault()?.October,
+                //            November = (unverified) ? load.November : client.ClientBudgets?.FirstOrDefault()?.November,
+                //            December = (unverified) ? load.December : client.ClientBudgets?.FirstOrDefault()?.December,
+                //        };
+                //        client.ClientBudgets.Add(cb);
+                //    //}
+                //};
                 if (logo != null && logo.Count > 0)
                 {                   
                     List<FileViewModel> logofvm = new List<FileViewModel>();
@@ -496,7 +496,7 @@ namespace ACT.UI.Controllers
                 using (TransactionScope scope = new TransactionScope())
                 using (DocumentService dservice = new DocumentService())
                 using (EstimatedLoadService eservice = new EstimatedLoadService())
-                using (ClientBudgetService bservice = new ClientBudgetService())
+               // using (ClientBudgetService bservice = new ClientBudgetService())
                 {
                     client = service.GetById(model.Id);
 
@@ -550,57 +550,7 @@ namespace ACT.UI.Controllers
 
                     #endregion
 
-                    #region Update Client Budget
-                    //Collection of budgets or singular?
-                    //if (model != null)
-                    //{
-                    //    ClientBudget budget = bservice.GetById(model.ClientBudget.Id);
-
-                    //    if (budget == null)
-                    //    {
-                    //        budget = new ClientBudget()
-                    //        {
-                    //            ClientId = model.Id,
-                    //            Status = (int)Status.Active,
-                    //            BudgetYear = DateTime.Now.Year,
-                    //            January = model.ClientBudget.January,
-                    //            February = model.ClientBudget.February,
-                    //            March = model.ClientBudget.March,
-                    //            April = model.ClientBudget.April,
-                    //            May = model.ClientBudget.May,
-                    //            June = model.ClientBudget.June,
-                    //            July = model.ClientBudget.July,
-                    //            August = model.ClientBudget.August,
-                    //            September = model.ClientBudget.September,
-                    //            October = model.ClientBudget.October,
-                    //            November = model.ClientBudget.November,
-                    //            December = model.ClientBudget.December,
-
-                    //        };
-
-                    //        bservice.Create(budget);
-                    //    }
-                    //    else
-                    //    {
-                    //        budget.BudgetYear = DateTime.Now.Year;
-                    //        budget.January = model.ClientBudget.January;
-                    //        budget.February = model.ClientBudget.February;
-                    //        budget.March = model.ClientBudget.March;
-                    //        budget.April = model.ClientBudget.April;
-                    //        budget.May = model.ClientBudget.May;
-                    //        budget.June = model.ClientBudget.June;
-                    //        budget.July = model.ClientBudget.July;
-                    //        budget.August = model.ClientBudget.August;
-                    //        budget.September = model.ClientBudget.September;
-                    //        budget.October = model.ClientBudget.October;
-                    //        budget.November = model.ClientBudget.November;
-                    //        budget.December = model.ClientBudget.December;
-
-                    //        bservice.Update(budget);
-                    //    }
-                    //}
-
-                    #endregion
+                 
 
                     #region Create Address (s)
 
@@ -795,7 +745,92 @@ namespace ACT.UI.Controllers
             }
         }
 
-   
+
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetClientBudgets(string clientId)
+        {
+            if (clientId != null && clientId != "")
+            {
+                List<ClientBudget> load = null;
+
+                using (ClientBudgetService bservice = new ClientBudgetService())
+                {
+                    load = bservice.ListByColumnWhere("ClientId",int.Parse(clientId));
+                    return Json(load, JsonRequestBehavior.AllowGet);
+                }
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+            }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetClientBudget(BudgetViewModel budget)
+        {
+            //if (clientId != null && clientId != "")
+            //{
+            //    List<ClientBudget> cb = null;
+
+            //    using (ClientBudgetService bservice = new ClientBudgetService())
+            //    {
+
+
+            //Collection of budgets or singular?
+            if (budget != null)
+            {
+                //    ClientBudget budget = bservice.GetById(model.ClientBudget.Id);
+
+                //    if (budget == null)
+                //    {
+                //        budget = new ClientBudget()
+                //        {
+                //            ClientId = model.Id,
+                //            Status = (int)Status.Active,
+                //            BudgetYear = DateTime.Now.Year,
+                //            January = model.ClientBudget.January,
+                //            February = model.ClientBudget.February,
+                //            March = model.ClientBudget.March,
+                //            April = model.ClientBudget.April,
+                //            May = model.ClientBudget.May,
+                //            June = model.ClientBudget.June,
+                //            July = model.ClientBudget.July,
+                //            August = model.ClientBudget.August,
+                //            September = model.ClientBudget.September,
+                //            October = model.ClientBudget.October,
+                //            November = model.ClientBudget.November,
+                //            December = model.ClientBudget.December,
+
+                //        };
+
+                //        bservice.Create(budget);
+                //    }
+                //    else
+                //    {
+                //        budget.BudgetYear = DateTime.Now.Year;
+                //        budget.January = model.ClientBudget.January;
+                //        budget.February = model.ClientBudget.February;
+                //        budget.March = model.ClientBudget.March;
+                //        budget.April = model.ClientBudget.April;
+                //        budget.May = model.ClientBudget.May;
+                //        budget.June = model.ClientBudget.June;
+                //        budget.July = model.ClientBudget.July;
+                //        budget.August = model.ClientBudget.August;
+                //        budget.September = model.ClientBudget.September;
+                //        budget.October = model.ClientBudget.October;
+                //        budget.November = model.ClientBudget.November;
+                //        budget.December = model.ClientBudget.December;
+
+                //        bservice.Update(budget);
+                //    }
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
         #endregion
 
         #region Manage Sites
@@ -1368,6 +1403,8 @@ namespace ACT.UI.Controllers
 
             return "true";
         }
+
+
 
         #endregion
 

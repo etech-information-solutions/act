@@ -258,10 +258,11 @@
 
         <div class="editor-field">
 
-            <table id="PSPBudget-table" class="da-table" style="border-bottom: 0;">
+            <table id="clientBudget-table" class="da-table" style="border-bottom: 0;">
 
                 <thead>
                     <tr>
+                        <th>Year</th>
                         <th>Jan</th>
                         <th>Feb</th>
                         <th>Mar</th>
@@ -277,52 +278,10 @@
                     </tr>
                 </thead>
 
-                <tbody>
-                    @Html.HiddenFor(model => Model.ClientBudget)
-                    <tr>
-                        <td>
-                            @Html.TextBoxFor(model => Model.ClientBudget.BudgetYear, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 2020" })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(model => Model.ClientBudget.January, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 10" })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(model => Model.ClientBudget.February, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 20" })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(model => Model.ClientBudget.March, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 30" })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(model => Model.ClientBudget.April, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 40" })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(model => Model.ClientBudget.May, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 50" })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(model => Model.ClientBudget.June, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 60" })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(model => Model.ClientBudget.July, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 70" })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(model => Model.ClientBudget.August, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 80" })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(model => Model.ClientBudget.September, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 45" })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(model => Model.ClientBudget.October, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 15" })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(model => Model.ClientBudget.November, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 25" })
-                        </td>
-                        <td>
-                            @Html.TextBoxFor(model => Model.ClientBudget.December, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 35" })
-                        </td>
-                    </tr>
-                </tbody>
+                <tbody></tbody>
 
             </table>
+            <a id="savebudget" onclick="SaveBudget()" name="savebudget">Save Budget</a>
 
         </div>
 
@@ -341,3 +300,44 @@
 
 </div>
 }
+
+<script>
+    $(document).ready(function () {
+        var cId = '@Model.Id';
+        //alert('h1' + cId);
+        LoadBudgets(cId);
+
+    });
+
+    function SaveBudget() {
+        alert('Saving Budget Failed, please try again');
+    }
+
+    function LoadBudgets() {
+        var rowDiv = $("#clientBudget-table tbody");
+        rowDiv.html('');
+        //<input class="input" data-val="true" data-val-number="The field BudgetYear must be a number." id="ClientBudget_BudgetYear" name="ClientBudget.BudgetYear" placeholder="E.g 2020" style="padding: 0 5px; width: 87%;" type="number" value="">
+        var fieldcopy = '<input class="input" id="ClientBudget_[FIELDNAME]" style="padding: 0 5px; width: 87%;" type="number" value="[FIELDVALUE]">';
+
+
+                    var tabledata = '<tr id="budg-[fieldname]" name="budg-[fieldname]">';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "BudgetYear").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "January").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "February").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "March").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "April").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "May").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "June").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "July").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "August").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "September").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "October").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "November").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "December").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '</tr>';
+
+
+                rowDiv.html(result);
+    }
+
+</script>
