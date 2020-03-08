@@ -155,6 +155,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AddressViewModel.cs" />
+    <Compile Include="Models\SiteViewImportModel.cs" />
+    <Compile Include="Models\SiteViewModel.cs" />
     <Compile Include="Models\GroupClientsViewModel.cs" />
     <Compile Include="Models\ProductViewModel.cs" />
     <Compile Include="Models\RegionViewModel.cs" />
@@ -484,9 +486,12 @@
     <Content Include="Views\Client\AddProduct.cshtml" />
     <Content Include="Views\Client\EditProduct.cshtml" />
     <Content Include="Views\Client\ProductDetails.cshtml" />
+    <Content Include="Views\Client\_LinkProducts.cshtml" />
+    <Content Include="Views\Shared\_BroadcastCustomSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Client\partials\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

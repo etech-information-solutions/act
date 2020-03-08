@@ -62,15 +62,21 @@ namespace ACT.UI.Models
         public int Status { get; set; }
 
         [Display(Name = "Estimated Loads Per Month")]
-        public EstimatedLoadViewModel ClientBudget { get; set; }
+        public ClientBudget ClientBudget { get; set; }
+        //EstimatedLoadViewModel
 
         public AddressViewModel Address { get; set; }
+
+        public ICollection<ClientKPI> ClientKPI { get; set; }
 
         [Display(Name = "Company Documents")]
         public ICollection<FileViewModel> CompanyFile { get; set; }
 
+        [Display(Name = "Company Documents")]
+        public FileViewModel NewCompanyFile { get; set; }
+
         [Display(Name = "Company Logo")]
-        public ICollection<FileViewModel> Logo { get; set; }
+        public FileViewModel Logo { get; set; }
 
 
         //[Display(Name = "Select a reason why you're declining this Client")]

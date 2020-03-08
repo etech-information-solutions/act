@@ -2,6 +2,7 @@
 
 @using ACT.UI.Models;
 @using ACT.Core.Enums;
+@using ACT.Data.Models;
 
 @{
     if (ViewBag.IncludeLayout == null)
@@ -9,7 +10,7 @@
         Layout = null;
     }
 
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "Edit Client";
 }
 
 
@@ -28,416 +29,387 @@
 
     @Html.HiddenFor(model => model.Id)
 
-    <div class="left" style="width: 27%; margin-right: 4%;">
+    <div class="left" style="width: 60%; margin-right: 2%;">
+        <div class="left" style="width: 50%; margin-right: 2%;">
 
-        <div class="editor-label uppercase">
-            Client Name
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" })
-            @Html.ValidationMessageFor(model => model.CompanyName)
-        </div>
-        <div class="editor-label uppercase">
-            Company Registration Number
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" })
-            @Html.ValidationMessageFor(model => model.CompanyRegistrationNumber)
-        </div>
-
-        <h3>Contact Details</h3>
-        <div class="editor-label uppercase">
-            Contact Number
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" })
-            @Html.ValidationMessageFor(model => model.ContactNumber)
-        </div>
-
-        <div class="editor-label uppercase">
-            Contact Person
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" })
-            @Html.ValidationMessageFor(model => model.ContactPerson)
-        </div>
-    </div>
-
-    <div class="left" style="width: 27%; margin-right: 3%;">
-
-        <div class="editor-label uppercase">
-            Trading As
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.TradingAs, new { @class = "input", @placeholder = "Enter Trading As details" })
-            @Html.ValidationMessageFor(model => model.TradingAs)
-        </div>
-        <div class="editor-label uppercase">
-            VAT Number
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.VATNumber, new { @class = "input", @placeholder = "Enter VAT Number" })
-            @Html.ValidationMessageFor(model => model.VATNumber)
-        </div>
-
-
-        <h3>&nbsp;</h3>
-
-        <div class="editor-label uppercase">
-            Email Address
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.Email, new { @class = "input", @placeholder = "Enter Email Address" })
-            @Html.ValidationMessageFor(model => model.Email)
-        </div>
-
-    </div>
-
-    <div class="left" style="width: 33%; margin-right: 4%;">
-
-        <div class="editor-label uppercase">
-            Logo
-        </div>
-        <div class="editor-field">
-            @if (Model.Logo != null && Model.Logo.Count() > 0)
-            {
-                foreach (FileViewModel logo in Model.Logo)
-                {
-                    @Html.HiddenFor(model => logo.Id)
-
-            <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
-
-                @*<a target="_blank" href="@Url.Action("ViewDocument", "ClientLogo", new { @id = logo.Id })">
-            <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
-
-            logo.Name (logo.Extension)
-        </a>*@
-                <img alt="logo" src="@(String.Format("{0}/{1}", Url.Content("~/Uploads/Documents/Client/Logo/"), logo.Location))" style="margin-bottom: 2px;" />
-
+            <div class="editor-label uppercase">
+                Client Name
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" })
+                @Html.ValidationMessageFor(model => model.CompanyName)
+            </div>
+            <div class="editor-label uppercase">
+                Company Registration Number
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" })
+                @Html.ValidationMessageFor(model => model.CompanyRegistrationNumber)
             </div>
 
-                }
-            }
-            <input id="Logo.File" name="Logo.File" type="file" value="" data-val-file="1" class="input" />
-            <input id="Logo.Name" name="Logo.Name" type="hidden" value="Company File" />
-            <input id="Logo.Description" name="Logo.Description" class="input" type="hidden" value="Company Logo" />
+            <h3>Contact Details</h3>
+            <div class="editor-label uppercase">
+                Contact Number
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" })
+                @Html.ValidationMessageFor(model => model.ContactNumber)
+            </div>
+
+            <div class="editor-label uppercase">
+                Contact Person
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" })
+                @Html.ValidationMessageFor(model => model.ContactPerson)
+            </div>
         </div>
-        <div class="editor-label uppercase">
-            <h3>Uploaded Documents</h3>
-            <div class="editor-field" style="margin-bottom: 10px;">
-                @if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
-                {
-                    foreach (FileViewModel companyFile in Model.CompanyFile)
+
+        <div class="left" style="width: 45%;">
+
+            <div class="editor-label uppercase">
+                Trading As
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.TradingAs, new { @class = "input", @placeholder = "Enter Trading As details" })
+                @Html.ValidationMessageFor(model => model.TradingAs)
+            </div>
+            <div class="editor-label uppercase">
+                VAT Number
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.VATNumber, new { @class = "input", @placeholder = "Enter VAT Number" })
+                @Html.ValidationMessageFor(model => model.VATNumber)
+            </div>
+
+
+            <h3>&nbsp;</h3>
+
+            <div class="editor-label uppercase">
+                Email Address
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.Email, new { @class = "input", @placeholder = "Enter Email Address" })
+                @Html.ValidationMessageFor(model => model.Email)
+            </div>
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+        <div class="left" style="width: 48%; margin-right: 4%;">
+
+            @Html.HiddenFor(model => model.Address.Id)
+            @Html.HiddenFor(model => model.Address.AddressType)
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.Address.AddressLine1)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.Address.AddressLine1, new { @class = "input", @placeholder = "Enter Address Line 1" })
+                @Html.ValidationMessageFor(model => model.Address.AddressLine1)
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.Address.Town)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.Address.Town, new { @class = "input", @placeholder = "Enter Address Town" })
+                @Html.ValidationMessageFor(model => model.Address.Town)
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.Address.PostCode)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.Address.PostCode, new { @class = "input", @placeholder = "Enter Address Postal Code" })
+                @Html.ValidationMessageFor(model => model.Address.PostCode)
+            </div>
+
+        </div>
+
+        <div class="left" style="width: 48%;">
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.Address.AddressLine2)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter Address Line 2" })
+                @Html.ValidationMessageFor(model => model.Address.AddressLine2)
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.Address.Province)
+            </div>
+            <div class="editor-field">
+
+                <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
+                    <option value="">-- select</option>
+                    @foreach (int p in Enum.GetValues(typeof(Province)))
                     {
-                        @Html.HiddenFor(model => companyFile.Id)
+                        Province province = (Province)p;
+
+                        string text = province.GetDisplayText();
+
+                        if (text.ToLower() == "all")
+                        {
+                            continue;
+                        }
+
+                        string sel = (province == Model.Address.Province) ? "selected=selected" : string.Empty;
+
+                        <option value="@p" @sel>@text</option>
+                    }
+                </select>
+
+                @Html.ValidationMessageFor(model => model.Address.Province)
+            </div>
+        </div>
+        </div>
+
+        <div class="left" style="width: 33%; margin-right: 4%;">
+
+            <div class="editor-label uppercase">
+                @Html.LabelFor(model => model.Logo)
+            </div>
+            <div class="editor-field">
+                @if (Model.Logo != null )
+                {
+                    //foreach (FileViewModel logo in Model.Logo)
+                    //{
+                        @Html.HiddenFor(model => model.Logo.Id)
 
                         <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
 
-                            <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = companyFile.Id })">
+                            @*<a target="_blank" href="@Url.Action("ViewDocument", "ClientLogo", new { @id = logo.Id })">
                                 <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
 
-                                companyFile.Name (companyFile.Extension)
-                            </a>
+                                logo.Name (logo.Extension)
+                            </a>*@
+                            <img alt="logo" src="@(String.Format("{0}/{1}", Url.Content("~/Uploads/Documents/Client/Logo/"), Model.Logo.Location))" style="margin-bottom: 2px;" />
 
                         </div>
 
-                    }
+                    //}
                 }
+                <input id="Logo.File" name="Logo.File" type="file" value="" data-val-file="1" class="input" />
+                <input id="Logo.Name" name="Logo.Name" type="hidden" value="Company File" />
+                <input id="Logo.Description" name="Logo.Description" class="input" type="hidden" value="Company Logo" />
+            </div>
+            <div class="editor-label uppercase">
+               Uplaoded Documents
+                <div class="editor-field" style="margin-bottom: 10px;">
+                    @if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
+                    {
+                        foreach (FileViewModel companyFile in Model.CompanyFile)
+                        {
+                            @Html.HiddenFor(model => companyFile.Id)
+
+                            <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
+
+                                <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = companyFile.Id })">
+                                    <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
+
+                                    companyFile.Name (companyFile.Extension)
+                                </a>
+
+                            </div>
+
+                        }
+                    }
 
 
-                <input id="CompanyFile.File" name="CompanyFile.File" type="file" value="" data-val-file="1" class="input" />
-                <input id="CompanyFile.Name" name="CompanyFile.Name" type="hidden" value="Company File" />
-                <input id="CompanyFile.Description" name="CompanyFile.Description" class="input" type="hidden" value="Company File" />
+                    <input id="NewCompanyFile.File" name="NewCompanyFile.File" type="file" value="" data-val-file="1" class="input" />
+                    <input id="NewCompanyFile.Name" name="NewCompanyFile.Name" type="hidden" value="Company File" />
+                    <input id="NewCompanyFile.Description" name="NewCompanyFile.Description" class="input" type="hidden" value="Company File" />
 
-                @*@Html.ValidationMessageFor(model => companyFile.RegistrationFile)*@
+                    @*@Html.ValidationMessageFor(model => companyFile.RegistrationFile)*@
 
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 
-
-
-
-    <p>
-        <strong class="uppercase">Address Details</strong>
-    </p>
-
-    <div class="left" style="width: 48%; margin-right: 4%;">
-
-        @Html.HiddenFor(model => model.Address.Id)
-        @Html.HiddenFor(model => model.Address.AddressType)
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Address.AddressLine1)
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.Address.AddressLine1, new { @class = "input", @placeholder = "Enter Company Address Line 1" })
-            @Html.ValidationMessageFor(model => model.Address.AddressLine1)
-        </div>
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Address.Town)
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.Address.Town, new { @class = "input", @placeholder = "Enter Company Address Town" })
-            @Html.ValidationMessageFor(model => model.Address.Town)
-        </div>
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Address.PostCode)
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.Address.PostCode, new { @class = "input", @placeholder = "Enter Company Address Postal Code" })
-            @Html.ValidationMessageFor(model => model.Address.PostCode)
-        </div>
-
-    </div>
-
-    <div class="left" style="width: 48%;">
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Address.AddressLine2)
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter Company Address Line 2" })
-            @Html.ValidationMessageFor(model => model.Address.AddressLine2)
-        </div>
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Address.Province)
-        </div>
-        <div class="editor-field">
-
-            <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
-                <option value="">-- select</option>
-                @foreach (int p in Enum.GetValues(typeof(Province)))
-                {
-                    Province province = (Province)p;
-
-                    string text = province.GetDisplayText();
-
-                    if (text.ToLower() == "all")
-                    {
-                        continue;
-                    }
-
-                    string sel = (province == Model.Address.Province) ? "selected=selected" : string.Empty;
-
-                    <option value="@p" @sel>@text</option>
-                }
-            </select>
-
-            @Html.ValidationMessageFor(model => model.Address.Province)
-        </div>
-
-    </div>
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-    <p>
-        <strong class="uppercase">KPI</strong>
-    </p>
-    <div class="left" style="width: 48%; margin-right: 4%;">
-        <div class="editor-label uppercase">
-            Outstanding
-        </div>
-        <div class="editor-field">
-            @*@address.Addressline1*@
-        </div>
-
-        <div class="editor-label uppercase">
-            Disputes
-        </div>
-        <div class="editor-field">
-            @*@address.Addressline1*@
-        </div>
-
-    </div>
-
-    <div class="left" style="width: 48%; margin-right: 4%;">
-        <div class="editor-label uppercase">
-            Days Outstanding
-        </div>
-        <div class="editor-field">
-            @*@address.Addressline1*@
-        </div>
-
-        <div class="editor-label uppercase">
-            Days to Resolve
-        </div>
-        <div class="editor-field">
-            @*@address.Addressline1*@
-        </div>
-
-    </div>KPI
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
-
-    <p>
-        <input id="save-btn" type="submit" value="Update" />
-        <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
-    </p>
-
-    @if (ViewBag.IncludeLayout == null)
-    {
         <p>
-            @*@Html.ActionLink("Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })*@
-            @Html.ActionLink("View", "ViewBudget", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
-            @Html.ActionLink("Link", "LinkProductsToClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
+            <strong class="uppercase">KPI</strong>
         </p>
+        <div class="left" style="width: 40%; margin-right: 4%;">
+            <div class="editor-label uppercase">
+                Outstanding
+            </div>
+            <div class="editor-field">
+                <input type="text" class="input" placeholder="KPI Outstanding" />
+            </div>
+
+            <div class="editor-label uppercase">
+                Disputes
+            </div>
+            <div class="editor-field">
+                <input type="text" class="input" placeholder="Disputes" />
+            </div>
+
+        </div>
+
+        <div class="left" style="width: 40%; margin-right: 4%;">
+            <div class="editor-label uppercase">
+                Days Outstanding
+            </div>
+            <div class="editor-field">
+                <input type="text" class="input" placeholder="Days Outstanding" />
+            </div>
+
+            <div class="editor-label uppercase">
+                Days to Resolve
+            </div>
+            <div class="editor-field">
+                <input type="text" class="input" placeholder="Days to Resolve" />
+            </div>
+
+        </div>
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+        <p>
+            <input id="save-btn" type="submit" value="Update" />
+            <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+        </p>
+
+        @if (ViewBag.IncludeLayout == null)
+        {
+            <p>
+                @*@Html.ActionLink("Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })*@
+                @Html.ActionLink("View Budget", "ViewBudget", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
+                @Html.ActionLink("Link Products to Client", "LinkProductsToClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
+            </p>
+        }
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+        <div class="budgets">
+            <div class="editor-label" style="margin-bottom: 10px;">
+                @Html.LabelFor(model => Model.ClientBudget)&nbsp;@Html.ActionLink("Add", "AddBudget", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#clientlist" })
+            </div>
+
+            <div class="editor-field">
+
+
+                <table id="clientBudget-table" class="da-table" style="border-bottom: 0;">
+
+                    <thead>
+                        <tr>
+                            <th>Year</th>
+                            <th>Jan</th>
+                            <th>Feb</th>
+                            <th>Mar</th>
+                            <th>Apr</th>
+                            <th>May</th>
+                            <th>Jun</th>
+                            <th>Jul</th>
+                            <th>Aug</th>
+                            <th>Sep</th>
+                            <th>Oct</th>
+                            <th>Nov</th>
+                            <th>Dec</th>
+                        </tr>
+                    </thead>
+
+                    <tbody></tbody>
+
+                </table>
+                <a id="savebudget" onclick="SaveBudget()" name="savebudget">Save Budget</a>
+            </div>
+        </div>
+
+    </div>
+    <br /><br />
+<script>
+    $(document).ready(function () {
+        var cId = '@Model.Id';
+        //alert('h1' + cId);
+        LoadBudgets(cId);
+
+    });
+
+    function SaveBudget() {
+        alert('Saving Budget Failed, please try again');
+
+
+
     }
 
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+    function LoadBudgets(id) {
+        var rowDiv = $("#clientBudget-table tbody");
+        rowDiv.html('');
+        //<input class="input" data-val="true" data-val-number="The field BudgetYear must be a number." id="ClientBudget_BudgetYear" name="ClientBudget.BudgetYear" placeholder="E.g 2020" style="padding: 0 5px; width: 87%;" type="number" value="">
+        var fieldcopy = '<input class="input" id="ClientBudget_[FIELDNAME]" style="padding: 0 5px; width: 87%;" type="number" value="[FIELDVALUE]">';
 
-    <div class="editor-label" style="margin-bottom: 10px;">
-        @Html.LabelFor(model => model.ClientBudget)
-    </div>
-
-    <div class="editor-field">
-
-        @Html.HiddenFor(model => model.ClientBudget.Id)
-
-        <table id="PSPBudget-table" class="da-table" style="border-bottom: 0;">
-
-            <thead>
-                <tr>
-                    <th>Jan</th>
-                    <th>Feb</th>
-                    <th>Mar</th>
-                    <th>Apr</th>
-                    <th>May</th>
-                    <th>Jun</th>
-                    <th>Jul</th>
-                    <th>Aug</th>
-                    <th>Sep</th>
-                    <th>Oct</th>
-                    <th>Nov</th>
-                    <th>Dec</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr>
-                    <td>
-                        @Html.TextBoxFor(model => model.ClientBudget.January, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 10" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.ClientBudget.February, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 20" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.ClientBudget.March, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 30" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.ClientBudget.April, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 40" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.ClientBudget.May, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 50" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.ClientBudget.June, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 60" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.ClientBudget.July, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 70" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.ClientBudget.August, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 80" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.ClientBudget.September, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 45" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.ClientBudget.October, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 15" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.ClientBudget.November, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 25" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.ClientBudget.December, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 35" })
-                    </td>
-                </tr>
-            </tbody>
-
-        </table>
-
-    </div>
-
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-
-    <p>
-        <strong class="uppercase">Address Details</strong>
-    </p>
-
-    <div class="left" style="width: 48%; margin-right: 4%;">
-
-        @Html.HiddenFor(model => model.Address.Id)
-        @Html.HiddenFor(model => model.Address.AddressType)
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Address.AddressLine1)
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.Address.AddressLine1, new { @class = "input", @placeholder = "Enter Company Address Line 1" })
-            @Html.ValidationMessageFor(model => model.Address.AddressLine1)
-        </div>
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Address.Town)
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.Address.Town, new { @class = "input", @placeholder = "Enter Company Address Town" })
-            @Html.ValidationMessageFor(model => model.Address.Town)
-        </div>
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Address.PostCode)
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.Address.PostCode, new { @class = "input", @placeholder = "Enter Company Address Postal Code" })
-            @Html.ValidationMessageFor(model => model.Address.PostCode)
-        </div>
-
-    </div>
-
-    <div class="left" style="width: 48%;">
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Address.AddressLine2)
-        </div>
-        <div class="editor-field">
-            @Html.TextBoxFor(model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter Company Address Line 2" })
-            @Html.ValidationMessageFor(model => model.Address.AddressLine2)
-        </div>
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Address.Province)
-        </div>
-        <div class="editor-field">
-
-            <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
-                <option value="">-- select</option>
-                @foreach (int p in Enum.GetValues(typeof(Province)))
-                {
-                    Province province = (Province)p;
-
-                    string text = province.GetDisplayText();
-
-                    if (text.ToLower() == "all")
-                    {
-                        continue;
-                    }
-
-                    string sel = (province == Model.Address.Province) ? "selected=selected" : string.Empty;
-
-                    <option value="@p" @sel>@text</option>
+        $.ajax({
+            type: "GET",
+            url: "GetClientBudgets",
+            data: { clientId: id },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                var count = Object.keys(data).length;
+                var result = "";
+                if (count > 0) {
+                    // debugger;                
+                $.each(data, function (id, budget) {
+                    var tabledata = '<tr id="budg-' + budget.Id + '" name="budg-' + budget.Id +'">';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "BudgetYear").replace("[FIELDVALUE]", budget.BudgetYear) + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "January").replace("[FIELDVALUE]", budget.January) + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "February").replace("[FIELDVALUE]", budget.February) + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "March").replace("[FIELDVALUE]", budget.March) + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "April").replace("[FIELDVALUE]", budget.April) + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "May").replace("[FIELDVALUE]", budget.May) + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "June").replace("[FIELDVALUE]", budget.June) + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "July").replace("[FIELDVALUE]", budget.July) + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "August").replace("[FIELDVALUE]", budget.August) + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "September").replace("[FIELDVALUE]", budget.September) + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "October").replace("[FIELDVALUE]", budget.October) + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "November").replace("[FIELDVALUE]", budget.November) + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "December").replace("[FIELDVALUE]", budget.December) + '</td>';
+                    tabledata += '</tr>';
+                    result += tabledata;
+                });
+                    
                 }
-            </select>
+                else {
 
-            @Html.ValidationMessageFor(model => model.Address.Province)
-        </div>
+                    var tabledata = '<tr id="budg-[fieldname]" name="budg-[fieldname]">';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "BudgetYear").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "January").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "February").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "March").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "April").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "May").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "June").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "July").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "August").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "September").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "October").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "November").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "December").replace("[FIELDVALUE]", "0") + '</td>';
+                    tabledata += '</tr>';
 
-    </div>
 
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+                    result = tabledata;
+                }
+                rowDiv.html(result);
 
-</div>
+            },
+            error: function (response) {
+                //  debugger;
+                alert('error');
+            }
+        });
 
-}
+    }
+
+</script>
+
+
+
+
+        }
+
+
