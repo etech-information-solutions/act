@@ -155,8 +155,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AddressViewModel.cs" />
-    <Compile Include="Models\SiteViewImportModel.cs" />
-    <Compile Include="Models\SiteViewModel.cs" />
     <Compile Include="Models\GroupClientsViewModel.cs" />
     <Compile Include="Models\ProductViewModel.cs" />
     <Compile Include="Models\RegionViewModel.cs" />
@@ -177,6 +175,8 @@
     <Compile Include="Models\ResetPasswordViewModel.cs" />
     <Compile Include="Models\RoleViewModel.cs" />
     <Compile Include="Models\PSPConfigViewModel.cs" />
+    <Compile Include="Models\SiteViewImportModel.cs" />
+    <Compile Include="Models\SiteViewModel.cs" />
     <Compile Include="Models\SystemConfigViewModel.cs" />
     <Compile Include="Models\UserViewModel.cs" />
     <Compile Include="Mvc\CustomAuthorizeAttribute.cs" />
@@ -471,6 +471,7 @@
     <Content Include="Views\Client\AddClient.cshtml" />
     <Content Include="Views\Client\_ClientGroups.cshtml" />
     <Content Include="Views\Client\_ManageSites.cshtml" />
+    <Content Include="Views\Client\_LinkProducts.cshtml" />
     <Content Include="Views\Client\_AwaitingActivation.cshtml" />
     <Content Include="Views\Client\_ManageTransporters.cshtml" />
     <Content Include="Views\Client\_Subsites.cshtml" />
@@ -479,11 +480,10 @@
     <Content Include="Views\Client\EditSite.cshtml" />
     <Content Include="Views\Client\ClientDetails.cshtml" />
     <Content Include="Views\Client\_bak_SubSites.cshtml" />
-    <Content Include="Views\Client\EditProduct.cshtml" />
-    <Content Include="Views\Client\AddProduct.cshtml" />
-    <Content Include="Views\Client\ProductDetails.cshtml" />
-    <Content Include="Views\Client\_LinkProducts.cshtml" />
     <Content Include="Views\Shared\_BroadcastCustomSearch.cshtml" />
+    <Content Include="Views\Client\AddProduct.cshtml" />
+    <Content Include="Views\Client\EditProduct.cshtml" />
+    <Content Include="Views\Client\ProductDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
