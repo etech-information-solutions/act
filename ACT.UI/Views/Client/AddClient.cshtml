@@ -20,7 +20,7 @@
 <div id="edit-item">
 
     <h2 class="uppercase" style="width: auto;">
-        <img alt="" src="@Url.Content( "~/images/add.png" )" />
+        <img alt="" src="@Url.Content("~/images/add.png")" />
         <span>Add Client</span>
     </h2>
 
@@ -101,7 +101,7 @@
 
 
             <div class="left" style="width: 48%; margin-right: 4%;">
-                <input id="Address.AddressType" name="Address.AddressType" type="hidden" value="@( ( int ) AddressType.Postal )" />
+                <input id="Address.AddressType" name="Address.AddressType" type="hidden" value="@( (int)AddressType.Postal )" />
 
                 <div class="editor-label">
                     @Html.LabelFor(model => model.Address.AddressLine1)
@@ -248,42 +248,46 @@
 
         </div>
 
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-        <p>
-            <strong class="uppercase">Client Budget</strong>
-        </p>
-        <div class="editor-label" style="margin-bottom: 10px;">
-            @Html.LabelFor(model => model.ClientBudget)
-        </div>
+        @*<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+        <div class="budgets">
+            <p>
+                <strong class="uppercase">Client Budget</strong>
+            </p>
 
-        <div class="editor-field">
+            <div class="editor-label" style="margin-bottom: 10px;">
+                <a id="addrow" href="#" onclick="AddRow();"><i class="fa fa-plus"></i> Add New</a>                
+            </div>
 
-            <table id="clientBudget-table" class="da-table" style="border-bottom: 0;">
 
-                <thead>
-                    <tr>
-                        <th>Year</th>
-                        <th>Jan</th>
-                        <th>Feb</th>
-                        <th>Mar</th>
-                        <th>Apr</th>
-                        <th>May</th>
-                        <th>Jun</th>
-                        <th>Jul</th>
-                        <th>Aug</th>
-                        <th>Sep</th>
-                        <th>Oct</th>
-                        <th>Nov</th>
-                        <th>Dec</th>
-                    </tr>
-                </thead>
+            <div class="editor-field">
 
-                <tbody></tbody>
 
-            </table>
-            <a id="savebudget" onclick="SaveBudget()" name="savebudget">Save Budget</a>
+                <table id="clientBudget-table" class="da-table" style="border-bottom: 0;">
 
-        </div>
+                    <thead>
+                        <tr>
+                            <th style="width: 7%;">Year</th>
+                            <th style="width: 7%;">Jan</th>
+                            <th style="width: 7%;">Feb</th>
+                            <th style="width: 7%;">Mar</th>
+                            <th style="width: 7%;">Apr</th>
+                            <th style="width: 7%;">May</th>
+                            <th style="width: 7%;">Jun</th>
+                            <th style="width: 7%;">Jul</th>
+                            <th style="width: 7%;">Aug</th>
+                            <th style="width: 7%;">Sep</th>
+                            <th style="width: 7%;">Oct</th>
+                            <th style="width: 7%;">Nov</th>
+                            <th style="width: 7%;">Dec</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody></tbody>
+
+                </table>                
+            </div>
+        </div>*@
 
         <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 
@@ -299,7 +303,7 @@
     </div>
 
 </div>
-}
+
 
 <script>
     $(document).ready(function () {
@@ -309,35 +313,75 @@
 
     });
 
-    function SaveBudget() {
-        alert('Saving Budget Failed, please try again');
+    function SaveBudget(id) {
+        debugger;
+        var data = $('#budg-' + id + ' :input').serialize();
+
+        $.ajax({
+            type: 'POST',
+            url: "SetClientBudget",
+            data: data,
+            //data : {'_token':csrfdata,'inputstr': strToSend},
+            beforeSend: function () {
+            },
+            success: function (response) {
+                if (response == "true") {
+                    alert('Budget Saved.');
+
+                } else {
+                    alert('Email Could Not Be Sent. Try again.');
+                }
+            }
+        });
+
+
+    }
+    function SaveBudget(id) {
+        var data = {
+            "Id": id, "ClientId": "0", "BudgetYear": $('#ClientBudget_' + id + '_BudgetYear').val(), "January": $('#ClientBudget_' + id + '_January').val(), "February": $('#ClientBudget_' + id + '_February').val(), "March": $('#ClientBudget_' + id + '_March').val(), "April": $('#ClientBudget_' + id + '_April').val(), "May": $('#ClientBudget_' + id + '_May').val(), "June": $('#ClientBudget_' + id + '_June').val(), "July": $('#ClientBudget_' + id + '_July').val(), "August": $('#ClientBudget_' + id + '_August').val(), "September": $('#ClientBudget_' + id + '_September').val(), "October": $('#ClientBudget_' + id + '_October').val(), "November": $('#ClientBudget_' + id + '_November').val(), "December": $('#ClientBudget_' + id + '_December').val()
+        };
+        $.ajax({
+            type: 'POST',
+            url: "SetClientBudget",
+            data: data,//$(this).serialize(),            
+            success: function (response) {
+                if (response == "True") {
+                    alert('Budget Saved.');
+                } else {
+                    alert('Budget could not be saved. Try again.');
+                }
+            }
+        });
     }
 
-    function LoadBudgets() {
+    function AddRow() {
         var rowDiv = $("#clientBudget-table tbody");
-        rowDiv.html('');
-        //<input class="input" data-val="true" data-val-number="The field BudgetYear must be a number." id="ClientBudget_BudgetYear" name="ClientBudget.BudgetYear" placeholder="E.g 2020" style="padding: 0 5px; width: 87%;" type="number" value="">
-        var fieldcopy = '<input class="input" id="ClientBudget_[FIELDNAME]" style="padding: 0 5px; width: 87%;" type="number" value="[FIELDVALUE]">';
+        //var fieldcopy = '<input class="input" id="ClientBudget_0-[FIELDNAME]-" style="padding: 0 5px; width: 87%;" type="number" value="0">';
+        var fieldvalue = "0";
+        var savecopy = '<a id="savebudget" onclick="SaveBudget(' + fieldvalue + ')" name="savebudget"><i class="fa fa-save"></i></a>';
+        var tabledata = '<tr id="budg-0-row" name="budg-0-row">';//<form id="budg-0-frm" name="budg-0-frm">
+        tabledata += '<td><input class="input" id="ClientBudget_0_BudgetYear" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+        tabledata += '<td><input class="input" id="ClientBudget_0_January" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+        tabledata += '<td><input class="input" id="ClientBudget_0_February" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+        tabledata += '<td><input class="input" id="ClientBudget_0_March" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+        tabledata += '<td><input class="input" id="ClientBudget_0_April" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+        tabledata += '<td><input class="input" id="ClientBudget_0_May" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+        tabledata += '<td><input class="input" id="ClientBudget_0_June" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+        tabledata += '<td><input class="input" id="ClientBudget_0_July" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+        tabledata += '<td><input class="input" id="ClientBudget_0_August" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+        tabledata += '<td><input class="input" id="ClientBudget_0_September" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+        tabledata += '<td><input class="input" id="ClientBudget_0_October" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
+        tabledata += '<td><input class="input" id="ClientBudget_0_November" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
+        tabledata += '<td><input class="input" id="ClientBudget_0_December" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+        tabledata += '<td>' + savecopy.replace("[BUDGETID]", "0") + '</td>';
+        tabledata += '</tr>';
 
 
-                    var tabledata = '<tr id="budg-[fieldname]" name="budg-[fieldname]">';
-                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "BudgetYear").replace("[FIELDVALUE]", "0") + '</td>';
-                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "January").replace("[FIELDVALUE]", "0") + '</td>';
-                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "February").replace("[FIELDVALUE]", "0") + '</td>';
-                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "March").replace("[FIELDVALUE]", "0") + '</td>';
-                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "April").replace("[FIELDVALUE]", "0") + '</td>';
-                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "May").replace("[FIELDVALUE]", "0") + '</td>';
-                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "June").replace("[FIELDVALUE]", "0") + '</td>';
-                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "July").replace("[FIELDVALUE]", "0") + '</td>';
-                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "August").replace("[FIELDVALUE]", "0") + '</td>';
-                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "September").replace("[FIELDVALUE]", "0") + '</td>';
-                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "October").replace("[FIELDVALUE]", "0") + '</td>';
-                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "November").replace("[FIELDVALUE]", "0") + '</td>';
-                    tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "December").replace("[FIELDVALUE]", "0") + '</td>';
-                    tabledata += '</tr>';
+        result = tabledata;
 
+        rowDiv.append(result);
 
-                rowDiv.html(result);
     }
 
 </script>
+}
