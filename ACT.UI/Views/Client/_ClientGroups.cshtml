@@ -41,22 +41,16 @@
         <span class="loader"></span>
     </p>
 }
-
+<input type="hidden" id="selectedgroup" name="selectedgroup" value="0" />
 <table id="groups-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#groups-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
-            @*<th data-name="Count">
-            #
-        </th>*@
-            <th data-name="Name" data-column="Name">
+            <th data-name="Name" data-column="Name" style="width:40%;">
                 Name
             </th>
-            <th data-name="Cell" data-column="Cell">
+            <th data-name="Cell" data-column="Cell" style="width:40%;">
                 Group Description
             </th>
-            @*<th data-name="Cell" data-column="Cell">
-                Status
-            </th>*@
             <th data-name="Actions">
                 Actions
             </th>
@@ -75,20 +69,15 @@
 
         <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
-            @*<td width="1%">
-            @count
-        </td>*@
             <td style="width: 15%;">
                 @item.Name
             </td>
             <td>
                 @item.Description
             </td>
-            @*<td>
-                (Status)@item.Status
-            </td>*@
             <td width="15%">
-                @Html.ActionLink("Edit", "EditGroup", new { id = item.Id, returnView = "Users" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                <input type="radio" id="group_id_@item.Id" onclick="UpdateGroups(@item.Id)" name="groups" value="@item.Id" />
+                @Html.ActionLink("Edit", "EditGroup", new { id = item.Id, returnView = "ClientGroups" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
                 @Html.ActionLink(enable, "DeleteGroup", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientgroups", @rel = "tipsyE", @title = enable + " this item?" })
             </td>
@@ -100,308 +89,133 @@
     </tbody>
 
 </table>
-<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-<div class="left" style="width: 42%; margin-right: 2%;">
-    <h3>Excluded from Group</h3>
-    <table id="groupsexcluded-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsexcluded-table_wrapper" data-starting-point=".ap-tabs ul">
-        <thead>
-            <tr>
-                <th data-name="Count">
-                    #
-                </th>
-                <th data-name="Name" data-column="Name">
-                    Client Name
-                </th>
-                <th data-name="Cell" data-column="Cell">
-                    Trading As
-                </th>
-                <th data-name="Actions">
-                    Registration No
-                </th>
-            </tr>
-        </thead>
+<div id="BottomLists" style="display:none;">
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+    <div class="left" style="width: 42%; margin-right: 2%;">
+        <h3>Excluded from Group</h3>
+        <table id="groupsexcluded-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsexcluded-table_wrapper" data-starting-point=".ap-tabs ul">
+            <thead>
+                <tr>
+                    <th data-name="Name" data-column="Name" style="width:40%;">
+                        Client Name
+                    </th>
+                    <th data-name="TradingAs" data-column="TradingAs" style="width:40%;">
+                        Trading As
+                    </th>
+                    <th data-name="CompanyRegistrationNumber" style="width:15%;">
+                        Registration No
+                    </th>
+                    <th data-name="Actions" style="width:5%;">
+                        Select
+                    </th>
+                </tr>
+            </thead>
 
-        <tbody id="excludedtabledata">
-            @if (ViewBag.ClientListExcluded != null)
-            {
-                foreach (var clientItem in ViewBag.ClientListExcluded as IEnumerable<Client>)
-                {
-                    <tr id="tr-@clientItem.Id-item" class="tr-@clientItem.Id-item">
+            <tbody id="excludedtabledata">
+            </tbody>
 
-                        <td width="1%">
-                            @count
-                        </td>
-                        <td style="width: 15%;">
-                            @clientItem.CompanyName
-                        </td>
-                        <td>
-                            @clientItem.TradingAs
-                        </td>
-                        <td>
-                            @clientItem.CompanyRegistrationNumber
-                        </td>
-                    </tr>
+        </table>
 
-                    count++;
-                }
-            }
+    </div>
+    <div class="left" style="width: 5%; margin-left: 1%;">
+        <br /><br /><br />
+        <button id="Copy">>></button>
+        <br />
+        <br />
+        <button id="Remove"><<</button>
+    </div>
+    <div class="left" style="width: 45%; margin-right: 2%;">
+        <h3>Included in Group</h3>
+        <table id="groupsincluded-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsincluded-table_wrapper" data-starting-point=".ap-tabs ul">
+            <thead>
+                <tr>
+                    <th data-name="Name" data-column="Name" style="width:40%;">
+                        Client Name
+                    </th>
+                    <th data-name="TradingAs" data-column="TradingAs" style="width:40%;">
+                        Trading As
+                    </th>
+                    <th data-name="CompanyRegistrationNumber" style="width:15%;">
+                        Registration No
+                    </th>
+                    <th data-name="Actions" style="width:5%;">
+                        Select
+                    </th>
+                </tr>
+            </thead>
 
+            <tbody id="includedtabledata">
+            </tbody>
 
-        </tbody>
+        </table>
 
-    </table>
-
-</div>
-<div class="left" style="width: 5%; margin-left: 1%;">
-    <br /><br /><br />
-    <button id="Copy">>></button>
-    <br />
-    <br />
-    <button id="Remove"><<</button>
-</div>
-<div class="left" style="width: 45%; margin-right: 2%;">
-    <h3>Included in Group</h3>
-    <table id="groupsincluded-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsincluded-table_wrapper" data-starting-point=".ap-tabs ul">
-        <thead>
-            <tr>
-                <th data-name="Count">
-                    #
-                </th>
-                <th data-name="Name" data-column="Name">
-                    Client Name
-                </th>
-                <th data-name="Cell" data-column="Cell">
-                    Trading As
-                </th>
-                <th data-name="Actions">
-                    Registration No
-                </th>
-            </tr>
-        </thead>
-
-        <tbody id="includedtabledata">
-            @if (ViewBag.ClientListIncluded != null)
-            {
-                foreach (var clientItem in ViewBag.ClientListIncluded as IEnumerable<Client>)
-                {
-                    <tr id="tr-@clientItem.Id-item" class="tr-@clientItem.Id-item">
-
-                        <td width="1%">
-                            @count
-                        </td>
-                        <td style="width: 15%;">
-                            @clientItem.CompanyName
-                        </td>
-                        <td>
-                            @clientItem.TradingAs
-                        </td>
-                        <td>
-                            @clientItem.CompanyRegistrationNumber
-                        </td>
-                    </tr>
-
-                    count++;
-                }
-            }
-
-
-        </tbody>
-
-    </table>
-
+    </div>
 </div>
 <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
 
 <script>
         $(document).ready(function () {
-            var cId = $('#ClientList option:selected').val();
-            var sId = $('#SiteList option:selected').val();
-
-            //var mainTable = $('#excluded-table').dataTable({
-            //    "ajax": "GetSitesForClientSiteExcluded",
-            //    "data": { clientId: cId, siteId: sId },
-            //    "columns": [{
-            //        "data": "id"
-            //    }, {
-            //        "data": "name"
-            //    }, {
-            //        "data": "subtype"
-            //    }, {
-            //        "data": "approximate_count"
-            //    }, {
-            //        "data": "time_created"
-            //    }],
-            //    "columnDefs": [{
-            //        "targets": 0,
-            //        "checkboxes": {
-            //            "selectRow": true
-            //        },
-            //        "render": function (data, type, full, meta) {
-            //            return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
-            //        }
-            //    }],
-            //    "scrollY": "200px",
-
-            //}); // mainTable
-
-
-            //Start with first option on both DDLs
-            UpdateGroups(cId, sId);
-
-            $("#ClientList").change(function () {
-                UpdateGroups($('option:selected', this).val());
-            });
-
-
-
-            //$('#excluded-table tbody').on('click', 'tr', function () {
-            //    var source = $('#excluded-table').row(this);
-            //    console.log(source);
-            //    //table2.row.add(source.data()).draw();
-            //    //source.remove().draw();
-            //});
-
-
             $('#Copy').on('click', function () {
-
-                var message = "";
-                //Loop through all checked CheckBoxes in GridView.
-                $("#groupsexcluded-table input[type=checkbox]:checked").each(function () {
-                    var row = $(this).closest("tr")[0];
-                    message += row.cells[1].innerHTML;
-                    message += "   " + row.cells[2].innerHTML;
-                    message += "   " + row.cells[3].innerHTML;
-                    message += "\n";
-                });
-                alert(message);
-                //var result = $("tr:has(:checked)");
-                //console.log(result);
-                //var tbl_id = $("#excluded-table");
-                //var $elem = $(this)
-                //var r = confirm("Copy to table " + tbl_id + "?");
-                //var table_to_copy = $elem.dataTable();
-                //if (r == true) {
-                //    copyRows(mainTable, table_to_copy);
-                //    alert("Copied!");
-                //} else {
-
-                //}
-
-
-
-                //var tableFrom = $('#excluded-table').DataTable();
-                //var tableTo = $('#included-table').DataTable();
-
-                //var ids = $.map(tableFrom.rows('.selected').data(), function (item) {
-                //    return item[0]
-                //});
-                //console.log(ids)
-                //alert(tableFrom.rows('.selected').data().length + ' row(s) selected');
-
-                //var ids2 = $.map(tableTo.rows('.selected').data(), function (item2) {
-                //    return item2[0]
-                //});
-                //console.log(ids2)
-                //alert(tableTo.rows('.selected').data().length + ' row(s) selected');
-
-
-
-                //var tables = $(".allTable").find("table*[id]").not("#excluded-table");
-                //tables.each(function () {
-                //    console.log(this.id);
-                //    var tbl_id = this.id;
-                //    var $elem = $(this)
-                //    var r = confirm("Copy to table " + tbl_id + "?");
-                //    var table_to_copy = $elem.dataTable();
-                //    var sourceTable = $(".allTable").find("table*[id]").not("#included-table").dataTable();
-                //    if (r == true) {
-                //        copyRows(sourceTable, table_to_copy);
-                //        alert("Copied!");
-                //    } else {
-
-                //    }
-                //});
-
-
-                //
+                var gId = $('#selectedgroup').val();
+                var checkedItem = $('#excludedtabledata input[type=radio]:checked').val();
+                    if (checkedItem != undefined) {
+                        //save it first
+                        SetIncludedGroup(gId,checkedItem);
+                        //then update
+                        UpdateGroups(gId);
+                    } else {
+                        alert('Nothing to Copy is selected');
+                    }
+                //alert(checkedItem);
+               
             });
 
             $('#Remove').on('click', function () {
-                var tables = $(".allTable").find("table*[id]").not("#groupsincluded-table");
-                tables.each(function () {
-                    console.log(this.id);
-                    var tbl_id = this.id;
-                    var $elem = $(this)
-                    var r = confirm("Remove from table " + tbl_id + "?");
-                    var table_to_copy = $elem.dataTable();
-                    var sourceTable = $(".allTable").find("table*[id]").not("#groupsexcluded-table").dataTable();
-                    if (r == true) {
-                        copyRows(sourceTable, table_to_copy);
-                        alert("Copied!");
-                    } else {
-
-                    }
-                });
+                var gId = $('#selectedgroup').val();
+                var checkedItem = $('#includedtabledata input[type=radio]:checked').val();
+                if (checkedItem != undefined) {
+                    //save it first
+                    SetExcludedGroup(gId, checkedItem);
+                    //then update
+                    UpdateGroups(gId);
+                } else {
+                    alert('Nothing to Remove is selected');
+                }
             });
         });
 
-        function copyRows(fromTable, toTable) {
-            debugger;
-            var $row = fromTable.find(".selected");
-            alert($row);
-            $.each($row, function (k, v) {
-                if (this !== null) {
-                    debugger;
-                    addRow = fromTable.fnGetData(this);
-                    toTable.fnAddData(addRow); // <-- Copy Row
-                    fromTable.fnDeleteRow(this); //<-- Move row, delete main row.
-                } else {
-                    debugger;
-                    alert('Error extracting row');
-                }
-            });
+    
+
+    function UpdateGroups(gId) {
+            $('#BottomLists').show();
+            GetIncludedGroups(gId);
+            GetExcludedGroups(gId);
         }
 
-        function UpdateGroups(cId, sId) {
-            GetIncludedSites(cId, sId);
-            GetExcludedSites(cId, sId);
-        }
-
-        function GetIncludedGroups(cId, gId) {
-            //debugger;
+        function GetIncludedGroups(gId) {
+            $('#selectedgroup').val(gId);
             var rowDiv = $("#groupsincluded-table tbody");
             $.ajax({
                 type: "GET",
-                url: "GetGroupsForClientIncluded",
-                data: { clientId: cId, groupId: gId },
+                url: "GetClientsForGroupIncluded",
+                data: { groupId: gId },
                 contentType: "application/json;charset=utf-8",
                 dataType: "json",
                 success: function (data) {
                     // debugger;
                     rowDiv.html('');
                     var result = "";
-                    $.each(data, function (id, group) {
+                    $.each(data, function (id, client) {
 
 
-                        result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
-                            '<td><input type="checkbox" id="incl_item_id' + site.Id + '" name="incl_item_id' + site.Id + '" /></td>' +
-                            '<td style = "width: 15%;">' +
-                            site.Name +
-                            '</td><td>' +
-                            site.XCord +
-                            '</td><td> ' +
-                            site.YCord +
-                            '</td><td> ' +
-                            site.Address +
-                            '</td><td> ' +
-                            site.PostalCode +
-                            '</td><td> ' +
-                            site.ContactNo +
-                            ' </td><td> ' +
-                            site.ContactName +
-                            '</td><td> ' +
-                            site.RegionId +
-                            '</td></tr>';
+                        result += '<tr id="tr-' + client.Id + '" class="tr-' + client.Id + '-item">' +                            
+                            '<td style = "width: 35%;">' +
+                            client.CompanyName +
+                            '</td><td  style = "width: 35%;">' +
+                            client.TradingAs +
+                            '</td><td  style = "width: 20%;"> ' +
+                            client.CompanyRegistrationNumber +
+                            '</td><td><input type="radio" id="incl_item' + client.Id + '" name="incl_item"  value="' + client.Id +'" /></td></tr>';
                     });
                     rowDiv.html(result);
 
@@ -414,41 +228,29 @@
 
         }
 
-        function GetExcludedGroups(cId, gId) {
-            // debugger;
+        function GetExcludedGroups(gId) {
+            $('#selectedgroup').val(gId);
             var rowDiv = $("#groupsexcluded-table tbody");
             $.ajax({
                 type: "GET",
-                url: "GetGroupsForClientExcluded",
-                data: { clientId: cId, groupId: gId },
+                url: "GetClientsForGroupExcluded",
+                data: { groupId: gId },
                 contentType: "application/json;charset=utf-8",
                 dataType: "json",
                 success: function (data) {
                   //  debugger;
                     rowDiv.html('');
                     var result = "";
-                    $.each(data, function (id, site) {
+                    $.each(data, function (id, client) {
 
-
-                        result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
-                            '<td><input type="checkbox" id="excl_item_id' + site.Id + '" name="excl_item_id' + site.Id + '" /></td>' +
-                            '<td style = "width: 15%;">' +
-                            site.Name +
-                            '</td><td>' +
-                            site.XCord +
-                            '</td><td> ' +
-                            site.YCord +
-                            '</td><td> ' +
-                            site.Address +
-                            '</td><td> ' +
-                            site.PostalCode +
-                            '</td><td> ' +
-                            site.ContactNo +
-                            ' </td><td> ' +
-                            site.ContactName +
-                            '</td><td> ' +
-                            site.RegionId +
-                            '</td></tr>';
+                        result += '<tr id="tr-' + client.Id + '" class="tr-' + client.Id + '-item">' +
+                            '<td style = "width: 35%;">' +
+                            client.CompanyName +
+                            '</td><td  style = "width: 35%;">' +
+                            client.TradingAs +
+                            '</td><td  style = "width: 20%;"> ' +
+                            client.CompanyRegistrationNumber +
+                            '</td><td><input type="radio" id="excl_item" name="excl_item" value="' + client.Id+'" /></td></tr>';
                     });
                     rowDiv.html(result);
 
@@ -459,7 +261,44 @@
                 }
             });
 
-        }
+    }
+
+
+    function SetIncludedGroup(gId, cId) {
+        var data = {
+            "groupId": gId, "clientId": cId
+        };
+        $.ajax({
+            type: 'POST',
+            url: "SetClientForGroupIncluded",
+            data: data,//$(this).serialize(),
+            success: function (response) {
+                if (response == "True") {
+                    alert('Group Updated.');
+                } else {
+                    alert('Group could not be saved. Try again.');
+                }
+            }
+        });
+    }
+
+    function SetExcludedGroup(gId, cId) {
+        var data = {
+            "groupId": gId, "clientId": cId
+        };
+        $.ajax({
+            type: 'POST',
+            url: "SetClientForGroupExcluded",
+            data: data,//$(this).serialize(),
+            success: function (response) {
+                if (response == "True") {
+                    alert('Group Updated.');
+                } else {
+                    alert('Group could not be saved. Try again.');
+                }
+            }
+        });
+    }
 </script>
 @*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
 

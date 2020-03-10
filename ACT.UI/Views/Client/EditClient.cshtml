@@ -1,8 +1,11 @@
 ﻿@model ClientViewModel
 
-@using ACT.UI.Models;
-@using ACT.Core.Enums;
 @using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.UI.Models;
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
 
 @{
     if (ViewBag.IncludeLayout == null)
@@ -279,7 +282,7 @@
             <p>
                 @*@Html.ActionLink("Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })*@
                 <a id="viewbudget" href="#" onclick="ViewBudget();"><i class="fa fa-plus"></i> View Budget</a>
-                @Html.ActionLink("Link Products to Client", "LinkProducts", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
+                @Html.ActionLink("Link Products to Client", "LinkProducts", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-@Model.Id-item" })
             </p>
         }
 

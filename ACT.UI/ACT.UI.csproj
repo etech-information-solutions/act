@@ -155,6 +155,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AddressViewModel.cs" />
+    <Compile Include="Models\BudgetViewModel.cs" />
+    <Compile Include="Models\GroupViewModel.cs" />
     <Compile Include="Models\SiteViewImportModel.cs" />
     <Compile Include="Models\SiteViewModel.cs" />
     <Compile Include="Models\GroupClientsViewModel.cs" />
@@ -177,8 +179,6 @@
     <Compile Include="Models\ResetPasswordViewModel.cs" />
     <Compile Include="Models\RoleViewModel.cs" />
     <Compile Include="Models\PSPConfigViewModel.cs" />
-    <Compile Include="Models\SiteViewImportModel.cs" />
-    <Compile Include="Models\SiteViewModel.cs" />
     <Compile Include="Models\SystemConfigViewModel.cs" />
     <Compile Include="Models\UserViewModel.cs" />
     <Compile Include="Mvc\CustomAuthorizeAttribute.cs" />

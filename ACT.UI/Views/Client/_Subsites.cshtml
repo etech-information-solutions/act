@@ -377,8 +377,7 @@
                 $.each(data, function (id, site) {
 
 
-                    result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
-                        '<td><input type="checkbox" id="incl_item_id' + site.Id + '" name="incl_item_id' + site.Id + '" /></td>' +
+                    result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +                        
                         '<td style = "width: 15%;">' +
                         site.Name +
                         '</td><td>' +
@@ -395,7 +394,7 @@
                         site.ContactName +
                         '</td><td> ' +
                         site.RegionId +
-                        '</td></tr>';
+                        '</td><td><input type="checkbox" id="incl_item_id' + site.Id + '" name="incl_item_id' + site.Id + '" /></td></tr>';
                 });
                 rowDiv.html(result);
 
@@ -424,8 +423,7 @@
                 $.each(data, function (id, site) {
 
 
-                    result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
-                        '<td><input type="checkbox" id="excl_item_id' + site.Id + '" name="excl_item_id' + site.Id + '" /></td>' +
+                    result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +                        
                         '<td style = "width: 15%;">' +
                         site.Name +
                         '</td><td>' +
@@ -442,7 +440,7 @@
                         site.ContactName +
                         '</td><td> ' +
                         site.RegionId +
-                        '</td></tr>';
+                        '</td><td><input type="checkbox" id="excl_item_id' + site.Id + '" name="excl_item_id' + site.Id + '" /></td></tr>';
                 });
                 rowDiv.html(result);
 
