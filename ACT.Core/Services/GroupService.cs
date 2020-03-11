@@ -18,13 +18,17 @@ namespace ACT.Core.Services
         {
             List<Group> groupList;
             //context.Roles.FirstOrDefault(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
-            groupList = (from g in context.ClientGroups
-                         join e in context.Groups
-                         on g.GroupId equals e.Id
-                      where g.PSPClient.PSPId == pspId
-                      //where e.Status == (int)Status.Active
-                      //where g.Status == (int)Status.Active
-                         select e).ToList();
+            //groupList = (from g in context.ClientGroups
+            //             join e in context.Groups
+            //             on g.GroupId equals e.Id
+            //          where g.PSPClient.PSPId == pspId
+            //          //where e.Status == (int)Status.Active
+            //          //where g.Status == (int)Status.Active
+            //             select e).ToList();
+            groupList = (from g in context.Groups
+                         //where e.Status == (int)Status.Active
+                         //where g.Status == (int)Status.Active
+                         select g).ToList();
 
             return groupList;
         }

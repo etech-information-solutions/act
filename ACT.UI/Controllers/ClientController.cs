@@ -1570,7 +1570,6 @@ namespace ACT.UI.Controllers
         }
 
         // POST: Client/EditGroup/5
-        [HttpPost]
         [Requires(PermissionTo.Edit)]
         public ActionResult EditGroup(GroupViewModel model, PagingModel pm, bool isstructure = false)
         {
@@ -2293,14 +2292,15 @@ namespace ACT.UI.Controllers
             int total = 0;
 
             List<Client> model = new List<Client>();
-
+            //int pspId = Session[ "UserPSP" ];
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             using (ClientService service = new ClientService())
             {
                 pm.Sort = pm.Sort ?? "DESC";
                 pm.SortBy = pm.SortBy ?? "CreatedOn";
                 if (CurrentUser.PSPs.Count > 0)
                 {
-                    model = service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
+                    model = service.GetClientsByPSPAwaitingActivation(pspId);
                 }
                 else
                 {

@@ -71,6 +71,24 @@ namespace ACT.Core.Services
             return clientList;
         }
 
+
+        public List<Client> GetClientsByPSPAwaitingActivation(int pspId)
+        {
+            List<Client> clientList;
+            List<int> statusList = new List<int>();
+            statusList.Add((int)Status.Pending);
+            statusList.Add((int)Status.Inactive);            
+            //context.Roles.FirstOrDefault(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
+            clientList = (from p in context.PSPClients
+                          join e in context.Clients
+                          on p.ClientId equals e.Id
+                          where p.PSPId == pspId
+                          where statusList.Contains(p.Status)
+                          select e).ToList();
+
+            return clientList;
+        }
+
         public List<Client> GetClientsByPSPIncludedGroup(int pspId, int groupId)
         {
             List<Client> clientList;

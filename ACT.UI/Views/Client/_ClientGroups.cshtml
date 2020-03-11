@@ -37,7 +37,7 @@
 @if (user.IsAdmin || user.IsPSPAdmin)
 {
     <p>
-        @Html.ActionLink("Add", "AddGroup", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Group?", @data_edit = "1", @data_id = 0, @data_target = "#clientgoups" })
+        @Html.ActionLink("Add", "AddGroup", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Group?", @data_edit = "1", @data_id = 0, @data_target = "#clientgroups" })
         <span class="loader"></span>
     </p>
 }

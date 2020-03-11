@@ -4,6 +4,7 @@
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
 @using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
 
 @{
     ViewBag.ShowExport = true;
@@ -118,6 +119,7 @@
                             @count
                         </td>*@
                     <td style="width: 15%;">
+                        using(Regi)
                         @item.RegionId
                     </td>
                     <td>
@@ -153,8 +155,8 @@
                     <td width="15%">
                         @Html.ActionLink("Edit", "EditSite", new { id = item.Id, returnView = "ManageSites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
                         @Html.ActionLink("Budgets", "Budgets", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-                        <a href="#" id="managesubsites" name="managesubsites" onclick="Redir(@item.Id)">Manage Subsites</a>
-                        @*@Html.ActionLink("Manage Subsites", "SubSites", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })*@
+                        @*<a href="#" id="managesubsites" name="managesubsites" onclick="Redir(@item.Id)"><i class="fa fa-config"></i> Manage Subsites</a>*@
+                        @Html.ActionLink("Manage Subsites", "SubSites", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
                     </td>
 
