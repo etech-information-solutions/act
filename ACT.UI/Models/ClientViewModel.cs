@@ -71,10 +71,11 @@ namespace ACT.UI.Models
 
         [Display(Name = "Company Documents")]
         public ICollection<FileViewModel> CompanyFile { get; set; }
-
+        //[Required]
         [Display(Name = "Company Documents")]
         public FileViewModel NewCompanyFile { get; set; }
 
+        //[Required]
         [Display(Name = "Company Logo")]
         public FileViewModel Logo { get; set; }
 

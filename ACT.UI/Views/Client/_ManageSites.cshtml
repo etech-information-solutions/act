@@ -33,40 +33,40 @@
 }
 
 
-    <p>
-        <table style="width:100%" border="0">
-            <tr>
-                <td style="width:3%">
-                    <label for="file">Client:</label>
-                </td>
-                <td style="width:15%">
-                    @Html.DropDownList("ClientList", "Please Select")
-                    @*@Html.DropDownList("Client", (IEnumerable
-        <SelectListItem>)ViewBag.ClientList)*@
-                </td>
-                <td style="width:2%">
-                    @Html.ActionLink("Add", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#sites" })
-                </td>
-                <td style="width:3%">
-                    <label for="file">Browse:</label>
-                </td>
-                <td style="width:35%">
-                    <input type="file" name="sitesfile" id="sitesfile" />
-                </td>
-                <td style="width:10%">
-                    <input type="submit" value="Import Sites" />
-                </td>
-            </tr>
-        </table>
-        <span class="loader"></span>
-    </p>
+<p>
+    <table style="width:100%" border="0">
+        <tr>
+            <td style="width:3%">
+                <label for="file">Client:</label>
+            </td>
+            <td style="width:15%">
+                @Html.DropDownList("ClientList", "Please Select")
+                @*@Html.DropDownList("Client", (IEnumerable
+                    <SelectListItem>)ViewBag.ClientList)*@
+            </td>
+            <td style="width:2%">
+                @Html.ActionLink("Add", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#sites" })
+            </td>
+            <td style="width:3%">
+                <label for="file">Browse:</label>
+            </td>
+            <td style="width:35%">
+                <input type="file" name="sitesfile" id="sitesfile" />
+            </td>
+            <td style="width:10%">
+                <input type="submit" value="Import Sites" />
+            </td>
+        </tr>
+    </table>
+    <span class="loader"></span>
+</p>
 
 <table id="sites-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#sites-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
             @*<th data-name="Count">
-                #
-            </th>*@
+                    #
+                </th>*@
             <th data-name="RegionId" data-column="RegionId">
                 Region
             </th>
@@ -101,8 +101,8 @@
                 Subsites Budget
             </th>
             <th data-name="Actions">
-                    Actions
-                </th>
+                Actions
+            </th>
         </tr>
     </thead>
 
@@ -115,8 +115,8 @@
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
 
                     @*<td width="1%">
-                        @count
-                    </td>*@
+                            @count
+                        </td>*@
                     <td style="width: 15%;">
                         @item.RegionId
                     </td>
@@ -153,8 +153,8 @@
                     <td width="15%">
                         @Html.ActionLink("Edit", "EditSite", new { id = item.Id, returnView = "ManageSites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
                         @Html.ActionLink("Budgets", "Budgets", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-
-                        @Html.ActionLink("Manage Subsites", "Subsites", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        <a href="#" id="managesubsites" name="managesubsites" onclick="Redir(@item.Id)">Manage Subsites</a>
+                        @*@Html.ActionLink("Manage Subsites", "SubSites", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })*@
 
                     </td>
 
@@ -166,7 +166,18 @@
     </tbody>
 
 </table>
-
+<script>
+    function Redir(redirVal) {
+        window.location.href = '@Url.Action("SubSites", "Client")'; //SubSites?siteId=redirVal
+    }
+</script>
+@*<script type="text/javascript">
+$(function(){
+  $("#btnRedirect").click(function(){
+    window.location.href = "@Url.Action("ActionName","Controller")";
+  });
+});
+</script>*@
 @*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
 
 @Html.Partial("_Paging")

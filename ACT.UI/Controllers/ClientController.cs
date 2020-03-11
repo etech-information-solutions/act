@@ -123,11 +123,11 @@ namespace ACT.UI.Controllers
                 }
 
                 using (ClientService service = new ClientService())
-                using (PSPClientService pspservice = new PSPClientService())
+                using (PSPClientService pspclientservice = new PSPClientService())
                 using (AddressService aservice = new AddressService())
                 using (TransactionScope scope = new TransactionScope())
                 using (DocumentService dservice = new DocumentService())
-                using (ClientKPIService kservice = new ClientKPIService())
+                using (ClientKPIService kservice = new ClientKPIService())                    
                 // using (ClientBudgetService bservice = new ClientBudgetService())
                 {
                     #region Validation
@@ -168,6 +168,7 @@ namespace ACT.UI.Controllers
                         ClientId = client.Id,
                         Status = (int)Status.Active
                     };
+                    pClient = pspclientservice.Create(pClient);
                     #endregion
 
                     //#region Create Client Budget
@@ -1270,7 +1271,7 @@ namespace ACT.UI.Controllers
         #region Sub Sites
         //
         // POST || GET: /Client/SubSites
-        public ActionResult SubSites()
+        public ActionResult SubSites(Nullable<int> siteId)
         {
 
             ViewBag.ViewName = "_SubSites";
@@ -1304,6 +1305,7 @@ namespace ACT.UI.Controllers
 
             });
             ViewBag.SiteList = siteListDDL;
+            ViewBag.SelectedSiteId = siteId;
 
 
             return PartialView("_SubSites");
@@ -1376,20 +1378,72 @@ namespace ACT.UI.Controllers
         }
 
 
-        [HttpPost]
-        public string SetSiteForClientSiteExcluded(string mainSiteId, string movedSiteId)
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetSiteForClientSiteExcluded(string mainSiteId, string movedSiteId, string clientId)
         {
+            if (!string.IsNullOrEmpty(mainSiteId) && !string.IsNullOrEmpty(movedSiteId) && !string.IsNullOrEmpty(clientId))
+            {
+                //using (GroupService service = new GroupService())
+                //using (ClientSiteService clientservice = new ClientSiteService())
+                using (SiteService sservice = new SiteService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    Site currentSite = sservice.GetById(int.Parse(movedSiteId));
+                    currentSite.SiteId = null;
+                    sservice.Update(currentSite);
+
+                    //ClientSite site = new ClientSite()
+                    //{
+                    //    Site
+                    //    ClientId = int.Parse(clientId),
+                    //    Status = (int)Status.Active
+                    //};
+                    //clientgroupservice.Create(group);
+
+                    scope.Complete();
+                }
 
 
-            return "true";
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "False", behavior: JsonRequestBehavior.AllowGet);
+            }
         }
 
-        [HttpPost]
-        public string SetSiteForClientSiteIncluded(string mainSiteId, string movedSiteId)
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetSiteForClientSiteIncluded(string mainSiteId, string movedSiteId, string clientId)
         {
+            if (!string.IsNullOrEmpty(mainSiteId) && !string.IsNullOrEmpty(movedSiteId) && !string.IsNullOrEmpty(clientId))
+            {
+                //using (GroupService service = new GroupService())
+                //using (ClientSiteService clientservice = new ClientSiteService())
+                using(SiteService sservice = new SiteService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    Site currentSite = sservice.GetById(int.Parse(movedSiteId));
+                    currentSite.SiteId = int.Parse(mainSiteId);
+                    sservice.Update(currentSite);
+
+                    //ClientSite site = new ClientSite()
+                    //{
+                    //    Site
+                    //    ClientId = int.Parse(clientId),
+                    //    Status = (int)Status.Active
+                    //};
+                    //clientgroupservice.Create(group);
+
+                    scope.Complete();
+                }
 
 
-            return "true";
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "False", behavior: JsonRequestBehavior.AllowGet);
+            }
         }
 
 

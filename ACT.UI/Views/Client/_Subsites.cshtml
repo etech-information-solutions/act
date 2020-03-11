@@ -234,6 +234,7 @@
             $('#Copy').on('click', function () {
                 debugger;
                 //var msId = $('#selectedsite').val();
+                var sId = $('#SiteList option:selected').val();
                 var cId = $('#ClientList option:selected').val();
                 var checkedItem = $('#excludedtabledata input[type=radio]:checked').val();
                 if (checkedItem != undefined) {
@@ -251,6 +252,7 @@
                 debugger;
                 //var msId = $('#selectedsite').val();
                 var cId = $('#ClientList option:selected').val();
+                var sId = $('#SiteList option:selected').val();
                 var checkedItem = $('#includedtabledata input[type=radio]:checked').val();
                 if (checkedItem != undefined) {
                     //save it first
@@ -332,7 +334,7 @@
                             site.ContactName +
                             '</td><td> ' +
                             site.RegionId +
-                            '</td><td><input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" /></td></tr>';
+                            '</td><td><input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" value="'+site.Id+'" /></td></tr>';
                     });
                     rowDiv.html(result);
 
@@ -377,7 +379,7 @@
                             site.ContactName +
                             '</td><td> ' +
                             site.RegionId +
-                            '</td><td><input type="radio" id="excl_item_id' + site.Id + '" name="excl_item" /></td></tr>';
+                            '</td><td><input type="radio" id="excl_item_id' + site.Id + '" name="excl_item" value="' + site.Id +'" /></td></tr>';
                     });
                     rowDiv.html(result);
 

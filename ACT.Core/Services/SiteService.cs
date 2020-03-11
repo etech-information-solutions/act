@@ -96,8 +96,10 @@ namespace ACT.Core.Services
                         join e in context.Sites
                         on c.SiteId equals e.Id
                         where p.PSPId == pspId
+                        where e.SiteId == siteId
                         where c.SiteId == siteId
                         select e).ToList();
+
 
             return siteList;
         }
@@ -115,6 +117,7 @@ namespace ACT.Core.Services
                         on c.SiteId equals e.Id
                         where p.PSPId == pspId
                         where c.SiteId == siteId
+                        where e.SiteId == null
                         where !exclList.Contains(p.ClientId)
                         select e).ToList();
 
