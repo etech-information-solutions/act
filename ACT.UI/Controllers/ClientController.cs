@@ -1746,6 +1746,7 @@ namespace ACT.UI.Controllers
                 {
                     ClientGroup group = new ClientGroup()
                     {
+                        GroupId = int.Parse(groupId),
                         ClientId = int.Parse(clientId),
                         Status = (int)Status.Active
                     };
