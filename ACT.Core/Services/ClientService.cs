@@ -100,11 +100,14 @@ namespace ACT.Core.Services
                           join g in context.ClientGroups
                           on e.Id equals g.ClientId
                           where p.PSPId == pspId
-                          where g.Status == (int)Status.Active
+                          //where g.Status == (int)Status.Active
                           where !exclList.Contains(g.GroupId)
                           select e).ToList();
 
             return clientList;
+            //query = string.Format("{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query);
+
+            //return context.Database.SqlQuery<UserCustomModel>(query, parameters.ToArray()).ToList();
         }
 
         public bool ExistByCompanyRegistrationNumber( string registrationNumber )

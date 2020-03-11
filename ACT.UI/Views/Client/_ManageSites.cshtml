@@ -151,6 +151,7 @@
                         @*@item.SiteBudgets*@
                     </td>
                     <td width="15%">
+                        @Html.ActionLink("Edit", "EditSite", new { id = item.Id, returnView = "ManageSites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
                         @Html.ActionLink("Budgets", "Budgets", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
                         @Html.ActionLink("Manage Subsites", "Subsites", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })

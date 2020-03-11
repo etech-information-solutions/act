@@ -25,5 +25,18 @@ namespace ACT.Core.Services
 
             return grouptList;
         }
+
+        public List<ClientGroup> GetClientGroupsByClientGroup(int groupId, int clientId)
+        {
+            List<ClientGroup> grouptList;
+            //context.Roles.FirstOrDefault(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
+            grouptList = (from g in context.ClientGroups
+                          where g.ClientId == clientId
+                          where g.GroupId == groupId
+                          //where g.Status == (int)Status.Active
+                          select g).ToList();
+
+            return grouptList;
+        }
     }
 }
