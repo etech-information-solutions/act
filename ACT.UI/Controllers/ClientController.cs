@@ -1780,28 +1780,27 @@ namespace ACT.UI.Controllers
         #endregion
 
         #region Products
-        // GET: Client/LinkProducts/5
+        // GET: Client/LinkProductsById/5
         [Requires(PermissionTo.Edit)]
-        public ActionResult LinkProducts(int clientId)
+        public ActionResult LinkProductsById(int clientId, PagingModel pm, CustomSearchModel csm, bool givecsm = false)
         {
             int total = 0;
 
             List<Product> model = new List<Product>();
+            List<Client> clientList;
             //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             using (ProductService service = new ProductService())
+            using (ClientService clientService = new ClientService())
             {
                 model = service.ListByColumnWhere("ClientId", clientId.ToString());
                 total = model.Count;
-            }
-            //
-            //  PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
-            List<Client> clientList;
-            using (ClientService clientService = new ClientService())
-            {
+
                 clientList = clientService.GetClientsByPSP(pspId);
             }
-
+            //
+            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+            
             IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
@@ -1810,7 +1809,7 @@ namespace ACT.UI.Controllers
             });
             ViewBag.ClientList = clientDDL;
 
-            return PartialView("_LinkProducts");
+            return PartialView("_LinkProducts", paging);
         }
         //
         // POST || GET: /Client/LinkProducts
@@ -1826,20 +1825,19 @@ namespace ACT.UI.Controllers
             int total = 0;
 
             List<Product> model = new List<Product>();
+            List<Client> clientList;
             //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             using (ProductService service = new ProductService())
+            using (ClientService clientService = new ClientService())
             {
                 model = service.List(pm, csm);
                 total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total1(pm, csm);
+
+                clientList = clientService.GetClientsByPSP(pspId);
             }
 
             PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
-            List<Client> clientList;
-            using (ClientService clientService = new ClientService())
-            {
-                clientList = clientService.GetClientsByPSP(pspId);
-            }
 
             IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
             {

@@ -113,54 +113,60 @@
             foreach (var item in items)
             {
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+        <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
 
-                    @*<td width="1%">
-                            @count
-                        </td>*@
-                    <td style="width: 15%;">
-                        using(Regi)
-                        @item.RegionId
-                    </td>
-                    <td>
-                        @item.Name
-                    </td>
-                    <td>
-                        @item.XCord
-                    </td>
-                    <td>
-                        @item.YCord
-                    </td>
-                    <td>
-                        @item.Address
-                    </td>
-                    <td>
-                        @item.PostalCode
-                    </td>
-                    <td>
-                        @item.ContactNo
-                    </td>
-                    <td>
-                        @item.ContactName
-                    </td>
-                    <td>
-                        @item.PlanningPoint
-                    </td>
-                    <td>
-                        @item.SiteType
-                    </td>
-                    <td>
-                        @*@item.SiteBudgets*@
-                    </td>
-                    <td width="15%">
-                        @Html.ActionLink("Edit", "EditSite", new { id = item.Id, returnView = "ManageSites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-                        @Html.ActionLink("Budgets", "Budgets", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-                        @*<a href="#" id="managesubsites" name="managesubsites" onclick="Redir(@item.Id)"><i class="fa fa-config"></i> Manage Subsites</a>*@
-                        @Html.ActionLink("Manage Subsites", "SubSites", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+            @*<td width="1%">
+            @count
+        </td>*@
 
-                    </td>
 
-                </tr>
+            @using (RegionService reg = new RegionService())
+            {
+                Region region = reg.GetById((int)item.RegionId);
+            <td style="width: 15%;">
+                @region.Name
+            </td>
+            }
+               
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    @item.XCord
+                </td>
+                <td>
+                    @item.YCord
+                </td>
+                <td>
+                    @item.Address
+                </td>
+                <td>
+                    @item.PostalCode
+                </td>
+                <td>
+                    @item.ContactNo
+                </td>
+                <td>
+                    @item.ContactName
+                </td>
+                <td>
+                    @item.PlanningPoint
+                </td>
+                <td>
+                    @item.SiteType
+                </td>
+                <td>
+                    @*@item.SiteBudgets*@
+                </td>
+                <td width="15%">
+                    @Html.ActionLink("Edit", "EditSite", new { id = item.Id, returnView = "ManageSites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                    @Html.ActionLink("Budgets", "Budgets", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                    @*<a href="#" id="managesubsites" name="managesubsites" onclick="Redir(@item.Id)"><i class="fa fa-config"></i> Manage Subsites</a>*@
+                    @Html.ActionLink("Manage Subsites", "SubSites", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+                </td>
+
+            </tr>
 
                 count++;
             }

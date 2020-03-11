@@ -83,7 +83,7 @@ namespace ACT.Core.Services
                           join e in context.Clients
                           on p.ClientId equals e.Id
                           where p.PSPId == pspId
-                          where statusList.Contains(p.Status)
+                          where statusList.Contains(e.Status)
                           select e).ToList();
 
             return clientList;
