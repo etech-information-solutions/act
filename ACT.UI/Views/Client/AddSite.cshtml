@@ -16,12 +16,16 @@
     }
 
     ViewBag.Title = "Add Site";
+
+    //List<Region> regionOptions = ViewBag.RegionOptions;
+    List<Region> regionOptions = Model.RegionOptions;
+    //regionOptions = Model.RegionOptions.Where(r => r.PSPId == pspId).ToList();
 }
 
 
 @Html.Partial("_Notification")
 
-@using (Html.BeginForm("AddSite", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clientlist", @class = "custom-validate", @style = "width: auto;" }))
+@using (Html.BeginForm("AddSite", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#managesites", @class = "custom-validate", @style = "width: auto;" }))
 {
     <div id="edit-item">
 
@@ -52,13 +56,14 @@
                 @Html.ValidationMessageFor(model => model.Description)
             </div>
             <div class="display-label">
-                Site Type
+                @*Site Type*@
+                Region
             </div>
             <div class="display-field">
-                @*@Html.TextBoxFor(model => model.SiteType, new { @class = "input", @placeholder = "Enter Site Ty[pe" })
-                    @Html.ValidationMessageFor(model => model.SiteType)*@
-                @*@(( ( Site ) Model.Status ).GetDisplayText())*@
-            </div>
+                @*@Html.DropDownListFor(model => model.RegionId, model => model.RegionOptions, region => region.Id, region => region.Name, true, new { @class = "chzn", @style = "width: 98%;" })*@
+                @*@Html.DropDownList("RegionOptions", "Please Select")*@
+                @*@Html.ValidationMessageFor(model => model.RegionId)*@
+             </div>
             <div class="display-label">
                 Account Code
             </div>

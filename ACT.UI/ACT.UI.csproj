@@ -488,6 +488,10 @@
     <Content Include="Views\Client\ProductDetails.cshtml" />
     <Content Include="Views\Client\_LinkProducts.cshtml" />
     <Content Include="Views\Shared\_BroadcastCustomSearch.cshtml" />
+    <Content Include="Views\Client\GroupDetails.cshtml" />
+    <Content Include="Views\Client\SiteDetails.cshtml" />
+    <Content Include="Views\Client\AddGroup.cshtml" />
+    <Content Include="Views\Client\EditGroup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

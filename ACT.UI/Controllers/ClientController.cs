@@ -160,6 +160,7 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     #region Create Client PSP link
+                    //int pspId = Session[ "UserPSP" ];
                     int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
                     PSPClient pClient = new PSPClient()
                     {
@@ -805,6 +806,7 @@ namespace ACT.UI.Controllers
             int total = 0;
 
             List<Site> model = new List<Site>();
+            //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             using (SiteService service = new SiteService())
             {
@@ -837,7 +839,17 @@ namespace ACT.UI.Controllers
         [Requires(PermissionTo.Create)]
         public ActionResult AddSite()
         {
-            SiteViewModel model = new SiteViewModel() { EditMode = true };
+            
+            //int pspId = Session[ "UserPSP" ];
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            List<Region> regionOptions = new List<Region>();
+            using (RegionService service = new RegionService())
+            {
+                regionOptions = service.ListByColumnWhere("PSPId", pspId);
+            }
+            //regionOptions = Model.RegionOptions.Where(r => r.PSPId == pspId).ToList();
+            SiteViewModel model = new SiteViewModel() { EditMode = true, RegionOptions = regionOptions };
+            ViewBag.RegionOptions = regionOptions;            
             return View(model);
         }
 
@@ -877,8 +889,8 @@ namespace ACT.UI.Controllers
                         Description = model.Description,
                         XCord = model.XCord,
                         YCord = model.YCord,
-                        Address = model.Address,
-                        PostalCode = model.PostalCode,
+                        Address = model.FullAddress.AddressLine1 + " " + model.FullAddress.Town + " " + model.FullAddress.PostCode, //model.Address,
+                        PostalCode = model.FullAddress.PostCode,
                         ContactName = model.ContactName,
                         ContactNo = model.ContactNo,
                         PlanningPoint = model.PlanningPoint,
@@ -886,7 +898,8 @@ namespace ACT.UI.Controllers
                         AccountCode = model.AccountCode,
                         Depot = model.Depot,
                         SiteCodeChep = model.SiteCodeChep,
-                        Status = (int)model.Status
+                        Status = (int)model.Status,
+                        RegionId = model.RegionId
                     };
                     site = siteService.Create(site);
                     #endregion
@@ -922,7 +935,7 @@ namespace ACT.UI.Controllers
                 }
 
                 Notify("The Site was successfully created.", NotificationType.Success);
-                return RedirectToAction("ClientList");
+                return RedirectToAction("ManageSites");
             }
             catch
             {
@@ -1025,12 +1038,18 @@ namespace ACT.UI.Controllers
         public ActionResult EditSite(int id)
         {
             Site site;
+            //int pspId = Session[ "UserPSP" ];
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            List<Region> regionOptions = new List<Region>();
+
+
 
             using (SiteService service = new SiteService())
+            using (RegionService rservice = new RegionService())
             using (AddressService aservice = new AddressService())
             {
                 site = service.GetById(id);
-
+                regionOptions = rservice.ListByColumnWhere("PSPId", pspId);
 
                 if (site == null)
                 {
@@ -1056,12 +1075,13 @@ namespace ACT.UI.Controllers
                     ContactName = site.ContactName,
                     ContactNo = site.ContactNo,
                     PlanningPoint = site.PlanningPoint,
-                    SiteType = (int)site.SiteType,
+                    SiteType = 1,//(int)site.SiteType,
                     AccountCode = site.AccountCode,
                     Depot = site.Depot,
                     SiteCodeChep = site.SiteCodeChep,
                     Status = (int)site.Status,
                     EditMode = true,
+                    RegionOptions = regionOptions,
                     FullAddress = new AddressViewModel()
                     {
                         EditMode = true,
@@ -1104,39 +1124,17 @@ namespace ACT.UI.Controllers
 
                     #region Validations
 
-                    if (!string.IsNullOrEmpty(model.AccountCode) && service.ExistByAccountCode(model.AccountCode.Trim()))
-                    {
-                        // Role already exist!
-                        Notify($"Sorry, a Site with the Account Code \"{model.AccountCode} ({model.AccountCode})\" already exists!", NotificationType.Error);
+                    //if (!string.IsNullOrEmpty(model.AccountCode) && service.ExistByAccountCode(model.AccountCode.Trim()))
+                    //{
+                    //    // Role already exist!
+                    //    Notify($"Sorry, a Site with the Account Code \"{model.AccountCode} ({model.AccountCode})\" already exists!", NotificationType.Error);
 
-                        return View(model);
-                    }
-
-                    #endregion
-                    #region Update Site
-
-                    // Update Site
-                    site.Id = model.Id;
-                    site.Name = model.Name;
-                    site.Description = model.Description;
-                    site.XCord = model.XCord;
-                    site.YCord = model.YCord;
-                    site.Address = model.Address;
-                    site.PostalCode = model.PostalCode;
-                    site.ContactName = model.ContactName;
-                    site.ContactNo = model.ContactNo;
-                    site.PlanningPoint = model.PlanningPoint;
-                    site.SiteType = (int)model.SiteType;
-                    site.AccountCode = model.AccountCode;
-                    site.Depot = model.Depot;
-                    site.SiteCodeChep = model.SiteCodeChep;
-                    site.Status = (int)model.Status;
-
-                    service.Update(site);
+                    //    return View(model);
+                    //}
 
                     #endregion
                     #region Create Address (s)
-
+                    string stringAddress = "";
                     if (model.FullAddress != null)
                     {
                         Address siteAddress = aservice.GetById(model.FullAddress.Id);
@@ -1169,9 +1167,34 @@ namespace ACT.UI.Controllers
 
                             aservice.Update(siteAddress);
                         }
+                        stringAddress = model.FullAddress.AddressLine1 + " " + model.FullAddress.Town + " " + model.FullAddress.PostCode;
                     }
 
                     #endregion
+                    #region Update Site
+
+                    // Update Site
+                    site.Id = model.Id;
+                    site.Name = model.Name;
+                    site.Description = model.Description;
+                    site.XCord = model.XCord;
+                    site.YCord = model.YCord;
+                    site.Address = stringAddress;
+                    site.PostalCode = model.FullAddress.PostCode;
+                    site.ContactName = model.ContactName;
+                    site.ContactNo = model.ContactNo;
+                    site.PlanningPoint = model.PlanningPoint;
+                    site.SiteType = (int)model.SiteType;
+                    site.AccountCode = model.AccountCode;
+                    site.Depot = model.Depot;
+                    site.SiteCodeChep = model.SiteCodeChep;
+                    site.Status = (int)model.Status;
+                    site.RegionId = model.RegionId;
+
+                    service.Update(site);
+
+                    #endregion
+                   
 
 
 
@@ -1180,7 +1203,7 @@ namespace ACT.UI.Controllers
 
                 Notify("The selected Site details were successfully updated.", NotificationType.Success);
 
-                return RedirectToAction("ClientList");
+                return RedirectToAction("ManageSites");
             }
             catch
             {
@@ -1258,6 +1281,7 @@ namespace ACT.UI.Controllers
             List<Client> clientList;
             List<Site> mainSiteList;
 
+            //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
 
             using (ClientService clientService = new ClientService())
@@ -1291,6 +1315,7 @@ namespace ACT.UI.Controllers
             if (clientId != null && clientId != "")
             {
                 List<Site> sites = null;
+                //int pspId = Session[ "UserPSP" ];
                 int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
 
                 using (SiteService service = new SiteService())
@@ -1314,6 +1339,7 @@ namespace ACT.UI.Controllers
             if (clientId != null && clientId != "")
             {
                 List<Site> sites = null;
+                //int pspId = Session[ "UserPSP" ];
                 int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
 
                 using (SiteService service = new SiteService())
@@ -1351,7 +1377,7 @@ namespace ACT.UI.Controllers
 
 
         [HttpPost]
-        public string SetSiteForClientSiteExcluded(string siteId, string clientId)
+        public string SetSiteForClientSiteExcluded(string mainSiteId, string movedSiteId)
         {
 
 
@@ -1359,7 +1385,7 @@ namespace ACT.UI.Controllers
         }
 
         [HttpPost]
-        public string SetSiteForClientSiteIncluded(string groupId, string clientId)
+        public string SetSiteForClientSiteIncluded(string mainSiteId, string movedSiteId)
         {
 
 
@@ -1380,6 +1406,7 @@ namespace ACT.UI.Controllers
             int total = 0;
 
             List<Group> model = new List<Group>();
+            //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
 
             //get group list, and their associated clients. TRhis woill be extended with an api call to get clients included and excluded as the button is clicked, and as the groups are changed
@@ -1432,7 +1459,7 @@ namespace ACT.UI.Controllers
                     return View(model);
                 }
 
-                using (GroupService siteService = new GroupService())
+                using (GroupService gService = new GroupService())
                 using (TransactionScope scope = new TransactionScope())
                 {
                     #region Create Group
@@ -1442,7 +1469,7 @@ namespace ACT.UI.Controllers
                         Description = model.Description,
                         Status = (int)model.Status
                     };
-                    group = siteService.Create(group);
+                    group = gService.Create(group);
                     #endregion
 
                     scope.Complete();
@@ -1527,7 +1554,7 @@ namespace ACT.UI.Controllers
 
                 Notify("The selected Site details were successfully updated.", NotificationType.Success);
 
-                return RedirectToAction("ClientList");
+                return RedirectToAction("ClientGroups");
             }
             catch
             {
@@ -1585,6 +1612,7 @@ namespace ACT.UI.Controllers
             if (groupId != null && groupId != "")
             {
                 List<Client> clients;
+                //int pspId = Session[ "UserPSP" ];
                 int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
 
                 using (ClientService clientService = new ClientService())
@@ -1607,6 +1635,7 @@ namespace ACT.UI.Controllers
             if (groupId != null && groupId != "")
             {
                 List<Client> clients;
+                //int pspId = Session[ "UserPSP" ];
                 int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
 
                 using (ClientService clientService = new ClientService())
@@ -1704,6 +1733,7 @@ namespace ACT.UI.Controllers
             int total = 0;
 
             List<Product> model = new List<Product>();
+            //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             using (ProductService service = new ProductService())
             {
@@ -1742,6 +1772,7 @@ namespace ACT.UI.Controllers
             int total = 0;
 
             List<Product> model = new List<Product>();
+            //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             using (ProductService service = new ProductService())
             {
@@ -2180,6 +2211,7 @@ namespace ACT.UI.Controllers
             int total = 0;
 
             List<Transporter> model = new List<Transporter>();
+            //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             using (TransporterService service = new TransporterService())
             {

@@ -48,6 +48,29 @@ namespace ACT.UI.Models
 
         #region Model Options
 
+        public List<Region> RegionOptions
+        {
+            get
+            {
+                using (RegionService service = new RegionService())
+                {
+                    return service.List();
+                }
+            }
+            set
+            { }
+        }
+        //public List<SiteType> TypeOptions
+        //{
+        //    get
+        //    {
+        //        using (SiteTypeService service = new SiteTypeService())
+        //        {
+        //            return service.List();
+        //        }
+        //    }
+        //}
+
 
         #endregion
     }
