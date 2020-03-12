@@ -32,7 +32,7 @@
 }*@
 
 <p>
-    @Html.ActionLink( "Add Transporter", "AddTransporter", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new user?", @data_edit = "1", @data_id = 0, @data_target = "#users" } )
+    @Html.ActionLink( "Add Transporter", "AddTransporter", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new transporter?", @data_edit = "1", @data_id = 0, @data_target = "#managetransporters" } )
     <span class="loader"></span>
 </p>
 
@@ -65,7 +65,51 @@
     </thead>
 
     <tbody>
-      
+        @if (Model != null && items != null && items.Count() > 0)
+        {
+            foreach (var item in items)
+            {
+                Status status = (Status)item.Status;
+
+                String active = status.Equals(Status.Active) ? "active" : "inactive";
+                String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
+                    @*<td width="1%">
+                        @count
+                    </td>*@
+                    <td style="width: 15%;">
+                        @item.Name
+                    </td>
+                    <td>
+                        @item.TradingName
+                    </td>
+                    <td>
+                        @item.RegistrationNumber
+                    </td>
+                    <td>
+                        @item.ContactNumber
+                    </td>
+                    <td>
+                        @item.Email
+                    </td>                    
+
+                    <td width="15%">
+                        @Html.ActionLink("Details", "TransporterDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+                        @Html.ActionLink("Edit", "EditTransporter", new { id = item.Id, returnView = "ManageTransporters" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+                        @Html.ActionLink(enable, "DeleteTransporter", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managetransporters", @rel = "tipsyE", @title = enable + " this item?" })
+
+                    </td>
+
+
+                </tr>
+
+                count++;
+            }
+        }
     </tbody>
 
 </table>

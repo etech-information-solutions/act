@@ -1,0 +1,85 @@
+﻿@model ACT.UI.Models.TransporterViewModel
+
+@using ACT.Core.Enums;
+@using ACT.Data.Models;
+
+@{
+    /**/
+
+    if (ViewBag.IncludeLayout == null)
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Add Transporter";
+}
+
+
+@Html.Partial("_Notification")
+
+@using (Html.BeginForm("AddTransporter", "Client", FormMethod.Post, new { @data_ajax_form = "1", @data_target = "#managetransporters", @class = "custom-validate", @style = "width: auto;" }))
+{
+<div id="edit-item">
+
+    <h2 class="uppercase" style="width: auto;">
+        <img alt="" src="@Url.Content(" ~/images/add.png")" />
+        <span>Add Transporter</span>
+    </h2>
+
+    @Html.ValidationSummary(true)
+
+    @Html.HiddenFor(model => model.Id)
+
+    <div id="item-details" class="item-details" style="width: auto;">
+
+
+
+        <div class="left" style="width: 45%; margin-right: 1%;">
+
+            <div class="display-label">
+                Name
+            </div>
+            <div class="display-field">
+                @Html.TextBoxFor(model => model.Name, new { @class = "input", @placeholder = "Enter Group Name" })
+                @Html.ValidationMessageFor(model => model.Name)
+            </div>
+
+
+
+        </div>
+        <div class="left" style="width: 45%; margin-right: 1%;">
+            <div class="display-label">
+                Description
+            </div>
+            <div class="display-field">
+                @Html.TextBoxFor(model => model.Description, new { @class = "input", @placeholder = "Enter Group Description" })
+                @Html.ValidationMessageFor(model => model.Description)
+            </div>
+        </div>
+            @*<div class="left" style="width: 45%;">
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.Status)
+                </div>
+                <div class="edit-field">
+
+                </div>
+
+            </div>*@
+            @*@(((Status)Model.Status).GetDisplayText())*@
+            @*@Html.EnumDropDownFor(model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" })
+            @Html.ValidationMessageFor(model => model.Status)*@
+
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-refresh="1" data-target="#clientgroups">Cancel</a>
+            </p>
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+        </div>
+    </div>
+    }

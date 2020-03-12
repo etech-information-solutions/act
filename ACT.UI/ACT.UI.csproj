@@ -158,6 +158,7 @@
     <Compile Include="Models\BudgetViewModel.cs" />
     <Compile Include="Models\GroupViewModel.cs" />
     <Compile Include="Models\SiteViewImportModel.cs" />
+    <Compile Include="Models\TransporterViewModel.cs" />
     <Compile Include="Models\SiteViewModel.cs" />
     <Compile Include="Models\GroupClientsViewModel.cs" />
     <Compile Include="Models\ProductViewModel.cs" />
@@ -492,6 +493,9 @@
     <Content Include="Views\Client\SiteDetails.cshtml" />
     <Content Include="Views\Client\AddGroup.cshtml" />
     <Content Include="Views\Client\EditGroup.cshtml" />
+    <Content Include="Views\Client\AddTransporter.cshtml" />
+    <Content Include="Views\Client\EditTransporter.cshtml" />
+    <Content Include="Views\Client\TransporterDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
