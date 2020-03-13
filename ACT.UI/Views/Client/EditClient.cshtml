@@ -148,20 +148,28 @@
 
                     <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 87%;">
                         <option value="">-- select</option>
+                        string prov = (model => model.Address.Province);
                         @foreach (int p in Enum.GetValues(typeof(Province)))
                         {
+                            string text = ((Province)p).GetDisplayText();
                             Province province = (Province)p;
-
-                            string text = province.GetDisplayText();
-
+                            //string prov = "";
                             if (text.ToLower() == "all")
                             {
                                 continue;
                             }
+                            @*else if (text.ToLower() == prov)
+                            {
+                                <option value="p" "selected=selected">text</option>
+                            }
+                            else
+                            {
+                                <option value="p" >text</option>
+                            }*@
 
-                            string sel = (province == Model.Address.Province) ? "selected=selected" : string.Empty;
+                            @*string sel = (province == @prov) ? "selected=selected" : string.Empty;
 
-                            <option value="@p" @sel>@text</option>
+                            <option value="@p" @sel>@text</option>*@
                         }
                     </select>
 
@@ -282,7 +290,7 @@
             <p>
                 @*@Html.ActionLink("Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })*@
                 <a id="viewbudget" href="#" onclick="ViewBudget();"><i class="fa fa-plus"></i> View Budget</a>
-                @Html.ActionLink("Link Products to Client", "LinkProducts", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
+                @Html.ActionLink("Link Products to Client", "LinkProducts", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-Model.Id-item" })
             </p>
         }
 

@@ -173,7 +173,7 @@
                 </div>
                 <div class="editor-field">
                     <input id="Logo.File" name="Logo.File" type="file" value="" data-val-file="1" class="input" />
-                    <input id="Logo.Name" name="Logo.Name" type="hidden" value="Company File" />
+                    <input id="Logo.Name" name="Logo.Name" type="hidden" value="Company Logo" />
                     <input id="Logo.Description" name="Logo.Description" class="input" type="hidden" value="Company Logo" />
                 </div>
                 <div class="editor-label uppercase">
@@ -187,18 +187,18 @@
                                     {
                                 @Html.HiddenFor(model => companyFile.Id)
 
-                                < div style = "border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;" >
+                                <div style = "border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;" >
 
 
-                                     < a target = "_blank" href = "@Url.Action("ViewDocument", "CLient", new { @id = companyFile.Id })" >
+                                     <a target = "_blank" href = "@Url.Action("ViewDocument", "CLient", new { @id = companyFile.Id })" >
 
-                                              < img alt = "download" src = "@Url.Content("~/ Images / download.png")" style = "margin-bottom: 2px;" />
+                                              <img alt = "download" src = "@Url.Content("~/ Images / download.png")" style = "margin-bottom: 2px;" />
 
                                                       companyFile.Name(companyFile.Extension)
-                                                  </ a >
+                                                  </a>
 
 
-                                              </ div >
+                                              </div>
 
                                     }
                                 }

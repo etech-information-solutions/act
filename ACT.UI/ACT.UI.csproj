@@ -496,6 +496,7 @@
     <Content Include="Views\Client\AddTransporter.cshtml" />
     <Content Include="Views\Client\EditTransporter.cshtml" />
     <Content Include="Views\Client\TransporterDetails.cshtml" />
+    <Content Include="Views\Shared\_ClientListCustomSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

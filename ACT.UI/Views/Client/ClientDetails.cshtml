@@ -26,160 +26,198 @@
             <span>Client</span>
         </h2>
     }
+    @Html.HiddenFor(model => model.Id)
+        <div class="left" style="width: 60%; margin-right: 2%;">
+            <div class="left" style="width: 50%; margin-right: 2%;">
 
-    <div class="left" style="width: 60%; margin-right: 2%;">
-        <div class="left" style="width: 50%; margin-right: 2%;">
-
-            <div class="display-label">
-                Client Name
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.CompanyName)
-            </div>
-            <div class="display-label">
-                Company Registration Number
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.CompanyRegistrationNumber)
-            </div>
-
-            <h3>Contact Details</h3>
-            <div class="display-label">
-                Contact Number
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.ContactNumber)
-            </div>
-
-
-            <div class="display-label">
-                Contact Person
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.ContactPerson)
-            </div>
-
-
-
-            @*<div class="display-label">
-                    Logo
+                <div class="display-label">
+                    Client Name
                 </div>
                 <div class="display-field">
-                    @if (documents != null && documents.Any())
+                    @Html.DisplayFor(model => model.CompanyName)
+                </div>
+                <div class="display-label">
+                    Company Registration Number
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor(model => model.CompanyRegistrationNumber)
+                </div>
+
+                <h3>Contact Details</h3>
+                <div class="display-label">
+                    Contact Number
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor(model => model.ContactNumber)
+                </div>
+
+
+                <div class="display-label">
+                    Contact Person
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor(model => model.ContactPerson)
+                </div>
+
+
+
+                @*<div class="display-label">
+                Logo
+            </div>
+            <div class="display-field">
+                @if (documents != null && documents.Any())
+                {
+                    foreach (Document d in documents)
                     {
-                        foreach (Document d in documents)
-                        {
-                            <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
-                                <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+                        <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
+                            <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
 
-                                @d.Name (@d.Type)
-                            </a>
-                        }
+                            @d.Name (@d.Type)
+                        </a>
                     }
-                </div>*@
+                }
+            </div>*@
 
-            @*<div class="display-label">
-                    Upload Documents
-                </div>
-                <div class="display-field">
-                    @if (documents != null && documents.Any())
+                @*<div class="display-label">
+                Upload Documents
+            </div>
+            <div class="display-field">
+                @if (documents != null && documents.Any())
+                {
+                    foreach (Document d in documents)
                     {
-                        foreach (Document d in documents)
-                        {
-                            <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
-                                <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+                        <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
+                            <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
 
-                                @d.Name (@d.Type)
-                            </a>
-                        }
+                            @d.Name (@d.Type)
+                        </a>
                     }
-                </div>*@
+                }
+            </div>*@
 
+            </div>
+
+            <div class="left" style="width: 45%;">
+
+                <div class="display-label">
+                    Trading As
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor(model => model.TradingAs)
+                </div>
+                <div class="display-label">
+                    VAT Number
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor(model => model.VATNumber)
+                </div>
+
+
+                <h3>&nbsp;</h3>
+
+                <div class="display-label">
+                    Email Address
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor(model => model.Email)
+                </div>
+
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+
+            @if (@ViewBag.Address != null)
+            {
+
+                <div class="left" style="width: 48%; margin-right: 4%;">
+
+                    <div class="display-label">
+                        Address Line 1
+                    </div>
+                    <div class="display-field">
+                        @address.Addressline1
+                    </div>
+
+                    <div class="display-label">
+                        Town
+                    </div>
+                    <div class="display-field">
+                        @address.Town
+                    </div>
+
+                    <div class="display-label">
+                        Postal Code
+                    </div>
+                    <div class="display-field">
+                        @address.PostalCode
+                    </div>
+
+
+                </div>
+
+                <div class="left" style="width: 48%;">
+                    <div class="display-label">
+                        Address Line 2
+                    </div>
+                    <div class="display-field">
+                        @address.Addressline2
+                    </div>
+                    <div class="display-label">
+                        Province
+                    </div>
+                    <div class="display-field">
+                        @(((Province)address.Province).GetDisplayText())
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <div class="left" style="width: 48%; margin-right: 4%;">
+
+                    <div class="display-label">
+                        Address Line 1
+                    </div>
+                    <div class="display-field">
+                        &nbsp;
+                    </div>
+
+                    <div class="display-label">
+                        Town
+                    </div>
+                    <div class="display-field">
+                        &nbsp;
+                    </div>
+
+                    <div class="display-label">
+                        Postal Code
+                    </div>
+                    <div class="display-field">
+                        &nbsp;
+                    </div>
+
+
+                </div>
+
+                <div class="left" style="width: 48%;">
+                    <div class="display-label">
+                        Address Line 2
+                    </div>
+                    <div class="display-field">
+                        &nbsp;
+                    </div>
+                    <div class="display-label">
+                        Province
+                    </div>
+                    <div class="display-field">
+                        &nbsp;
+                    </div>
+
+                </div>
+            }
         </div>
-
-        <div class="left" style="width: 45%;">
-
-            <div class="display-label">
-                Trading As
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.TradingAs)
-            </div>
-            <div class="display-label">
-                VAT Number
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.VATNumber)
-            </div>
-
-
-            <h3>&nbsp;</h3>
-
-            <div class="display-label">
-                Email Address
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.Email)
-            </div>
-
-
-        </div>
-
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-
-
-        @if (address != null)
-        {
-
-            <div class="left" style="width: 48%; margin-right: 4%;">
-
-                <div class="display-label">
-                    Address Line 1
-                </div>
-                <div class="display-field">
-                    @address.Addressline1
-                </div>
-
-                <div class="display-label">
-                    Town
-                </div>
-                <div class="display-field">
-                    @address.Town
-                </div>
-
-                <div class="display-label">
-                    Postal Code
-                </div>
-                <div class="display-field">
-                    @address.PostalCode
-                </div>
-
-
-            </div>
-
-            <div class="left" style="width: 48%;">
-                <div class="display-label">
-                    Address Line 2
-                </div>
-                <div class="display-field">
-                    @address.Addressline2
-                </div>
-                <div class="display-label">
-                    Province
-                </div>
-                <div class="display-field">
-                    @(((Province)address.Province).GetDisplayText())
-                </div>
-
-            </div>
-        }
-        else
-        {
-            <div class="message-warn">
-                No address details found. Please edit and add address details.
-            </div>
-        }
-    </div>
 
     <div class="left" style="width: 33%; margin-right: 4%;">
 
@@ -187,11 +225,11 @@
             Logo
         </div>
         <div class="display-field">
-            @if (logo != null && logo.Any())
+            @if (@ViewBag.Logo != null)
             {
-                foreach (Document l in logo)
+                foreach (Document l in @ViewBag.Logo)
                 {
-                    <img alt="logo" src="@(String.Format("{0}/{1}", Url.Content("~/Uploads/Documents/Client/Logo/"), l.Location))" style="margin-bottom: 2px;" />
+                    <img alt="logo" src="@(String.Format("{0}/{1}", Url.Content("~/Uploads/Documents"), l.Location))" style="width:80px;margin-bottom: 2px;" />
                     @*<a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )">
                             <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
 
@@ -204,27 +242,15 @@
             Upload Documents
         </div>
         <div class="display-field">
-            @if (documents != null && documents.Any())
+            @if (@ViewBag.Documents != null)
             {
-                @foreach (Document d in documents)
+                foreach (Document d in @ViewBag.Documents)
                 {
                     <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )">
                         <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
 
                         @d.Name (@d.Type)
                     </a>
-                    @*@Html.HiddenFor(model => file.Id)*@
-
-                    @*<div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
-
-                    <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = file.Id })">
-                        <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
-
-                        file.Name (file.Extension)
-                    </a>
-
-                </div>*@
-
                 }
             }
         </div>
@@ -239,14 +265,14 @@
             Outstanding
         </div>
         <div class="display-field">
-            @*@address.Addressline1*@
+            0
         </div>
 
         <div class="display-label">
             Disputes
         </div>
         <div class="display-field">
-            @*@address.Addressline1*@
+            0
         </div>
 
     </div>
@@ -256,24 +282,63 @@
             Days Outstanding
         </div>
         <div class="display-field">
-            @*@address.Addressline1*@
+            0
         </div>
 
         <div class="display-label">
             Days to Resolve
         </div>
         <div class="display-field">
-            @*@address.Addressline1*@
+            0
         </div>
 
     </div>
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+    <div id="budgets">
+
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+        <div class="editor-label" style="margin-bottom: 10px;">
+            Budgets
+        </div>
+
+        <div class="editor-field">
+            <table id="clientBudget-table" class="da-table" style="border-bottom: 0;">
+
+                <thead>
+                    <tr>
+                        <th style="width: 7%;">Year</th>
+                        <th style="width: 7%;">Jan</th>
+                        <th style="width: 7%;">Feb</th>
+                        <th style="width: 7%;">Mar</th>
+                        <th style="width: 7%;">Apr</th>
+                        <th style="width: 7%;">May</th>
+                        <th style="width: 7%;">Jun</th>
+                        <th style="width: 7%;">Jul</th>
+                        <th style="width: 7%;">Aug</th>
+                        <th style="width: 7%;">Sep</th>
+                        <th style="width: 7%;">Oct</th>
+                        <th style="width: 7%;">Nov</th>
+                        <th style="width: 7%;">Dec</th>
+                    </tr>
+                </thead>
+
+                <tbody></tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
 
     @if (ViewBag.IncludeLayout == null)
     {
         <p>
             @Html.ActionLink("Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
-            @Html.ActionLink("View Budget", "ViewBudget", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
+            @*<a id="viewbudget" href="#" onclick="ViewBudget();"><i class="fa fa-plus"></i> View Budget</a>*@
             @Html.ActionLink("Link Products to Client", "LinkProductsToClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
 
             @if (ViewBag.IncludeLayout == null)
@@ -290,89 +355,65 @@
             @Html.ActionLink("Back to List", "Index")
         </div>
     }
-    <div id="clientbudgets" style="display:none;">
-
-
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-
-        <div class="editor-label" style="margin-bottom: 10px;">
-            @Html.LabelFor(model => model.ClientBudgets)
-        </div>
-
-        <div class="editor-field">
-
-
-            <table id="PSPBudget-table" class="da-table" style="border-bottom: 0;">
-
-                <thead>
-                    <tr>
-                        <th>Jan</th>
-                        <th>Feb</th>
-                        <th>Mar</th>
-                        <th>Apr</th>
-                        <th>May</th>
-                        <th>Jun</th>
-                        <th>Jul</th>
-                        <th>Aug</th>
-                        <th>Sep</th>
-                        <th>Oct</th>
-                        <th>Nov</th>
-                        <th>Dec</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @*@if (model.ClientBudgets != null) {
-                                        @foreach (ClientBudget cbudget in model.ClientBudgets)
-                                        {
-                                            @Html.HiddenFor(model => cbudget)
-                                            <tr>
-                                                <td>
-                                                    @Html.TextBoxFor(model => cbudget.January, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 10" })
-                                                </td>
-                                                <td>
-                                                    @Html.TextBoxFor(model => cbudget.February, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 20" })
-                                                </td>
-                                                <td>
-                                                    @Html.TextBoxFor(model => cbudget.March, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 30" })
-                                                </td>
-                                                <td>
-                                                    @Html.TextBoxFor(model => cbudget.April, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 40" })
-                                                </td>
-                                                <td>
-                                                    @Html.TextBoxFor(model => cbudget.May, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 50" })
-                                                </td>
-                                                <td>
-                                                    @Html.TextBoxFor(model => cbudget.June, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 60" })
-                                                </td>
-                                                <td>
-                                                    @Html.TextBoxFor(model => cbudget.July, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 70" })
-                                                </td>
-                                                <td>
-                                                    @Html.TextBoxFor(model => cbudget.August, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 80" })
-                                                </td>
-                                                <td>
-                                                    @Html.TextBoxFor(model => cbudget.September, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 45" })
-                                                </td>
-                                                <td>
-                                                    @Html.TextBoxFor(model => cbudget.October, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 15" })
-                                                </td>
-                                                <td>
-                                                    @Html.TextBoxFor(model => cbudget.November, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 25" })
-                                                </td>
-                                                <td>
-                                                    @Html.TextBoxFor(model => cbudget.December, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 35" })
-                                                </td>
-                                            </tr>
-                                        }
-                        }*@
-                </tbody>
-
-            </table>
-
-        </div>
-    </div>
-
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 
 </div>
+<script>
+        $(document).ready(function () {
+            var cId = $("#Id").val();
+            LoadBudgets(cId);
+            //$(".budgets").hide();
+
+        });
+
+    function ViewBudget() {
+            $('.budgets').show();
+    };
+
+    function LoadBudgets(id) {
+        var rowDiv = $("#clientBudget-table tbody");
+        rowDiv.html('');
+
+
+        var savecopy = '<a id="savebudget" onclick="SaveBudget([BUDGETID])" name="savebudget"><i class="fa fa-save"></i></a>';
+        $.ajax({
+            type: "GET",
+            url: "GetClientBudgets",
+            data: { clientId: id },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                var count = Object.keys(data).length;
+                var result = "";
+                if (count > 0) {
+                    //var fieldcopy = '<input class="input" id="ClientBudget_[FIELDNAME]-[FIELDVALUE]" style="padding: 0 5px; width: 87%;" type="number" value="[FIELDVALUE]">';
+                    $.each(data, function (id, budget) {
+                        var tabledata = '<tr id="budg-' + budget.Id + '-row" name="budg-' + budget.Id + '">';//<form id="budg-' + budget.Id + '-frm" name="budg-' + budget.Id + '-frm" >
+                        tabledata += '<td>' + budget.BudgetYear + '</td>';
+                        tabledata += '<td>' + budget.January + '</td>';
+                        tabledata += '<td>' + budget.February + '</td>';
+                        tabledata += '<td>' + budget.March + '</td>';
+                        tabledata += '<td>' + budget.April + '</td>';
+                        tabledata += '<td>' + budget.May + '</td>';
+                        tabledata += '<td>' + budget.June + '</td>';
+                        tabledata += '<td>' + budget.July + '</td>';
+                        tabledata += '<td>' + budget.August + '</td>';
+                        tabledata += '<td>' + budget.September + '</td>';
+                        tabledata += '<td>' + budget.October + '</td>';
+                        tabledata += '<td>' + budget.November + '</td>';
+                        tabledata += '<td>' + budget.December + '</td>';
+                        tabledata += '</tr>';
+                        result += tabledata;
+                    });
+
+                }
+
+                rowDiv.html(result);
+
+            },
+            error: function (response) {
+                alert('error');
+            }
+        });
+
+    }
+    </script>

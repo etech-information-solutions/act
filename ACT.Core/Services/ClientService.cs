@@ -63,10 +63,7 @@ namespace ACT.Core.Services
                               join e in context.Clients
                               on p.ClientId equals e.Id
                               where p.PSPId == pspId
-                              select e).ToList();
-                              
-                              
-
+                              select e).Distinct().ToList();
 
             return clientList;
         }

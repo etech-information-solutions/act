@@ -29,8 +29,14 @@ namespace ACT.UI.Controllers
 
         //
         // POST || GET: /Client/ClientList
-        public ActionResult ClientList(PagingModel pm, CustomSearchModel csm)
+        public ActionResult ClientList(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
         {
+            if (givecsm)
+            {
+                ViewBag.ViewName = "ClientList";
+
+                return PartialView("_ClientListCustomSearch", new CustomSearchModel("ClientList"));
+            }
             int total = 0;
 
             List<Client> model = new List<Client>();
@@ -76,7 +82,7 @@ namespace ACT.UI.Controllers
 
                     return RedirectToAction("Index");
                 }
-                Address address = aservice.Get(model.Id, "PSP");
+                Address address = aservice.Get(model.Id, "Client");
 
                 List<Document> documents = dservice.List(model.Id, "Client");
                 List<Document> logo = dservice.List(model.Id, "ClientLogo");
@@ -88,6 +94,9 @@ namespace ACT.UI.Controllers
                 if (documents != null)
                 {
                     ViewBag.Documents = documents;
+                }
+                if (logo != null)
+                {
                     ViewBag.Logo = logo;
                 }
             }
@@ -439,7 +448,7 @@ namespace ACT.UI.Controllers
             }
         }
 
-        // POST: Client/EditSite/5
+        // POST: Client/EditClient/5
         [HttpPost]
         [Requires(PermissionTo.Edit)]
         public ActionResult EditClient(ClientViewModel model, PagingModel pm, bool isstructure = false)
@@ -2488,6 +2497,89 @@ namespace ACT.UI.Controllers
 
             return PartialView("_AwaitingActivation", paging);
         }
+        #endregion
+
+        #region Exports
+
+        //
+        // GET: /Administration/Export
+        public FileContentResult Export(PagingModel pm, CustomSearchModel csm, string type = "configurations")
+        {
+            string csv = "";
+            string filename = string.Format("{0}-{1}.csv", type.ToUpperInvariant(), DateTime.Now.ToString("yyyy_MM_dd_HH_mm"));
+
+            pm.Skip = 0;
+            pm.Take = int.MaxValue;
+
+            switch (type)
+            {
+                case "clientlist":
+                    #region ClientList
+                    csv = String.Format("Id, Company Name, Reg #, Trading As, Vat Number, Contact Number, Contact Person, Email {0}", Environment.NewLine);
+
+                    List<Client> clients = new List<Client>();
+
+                    using (ClientService service = new ClientService())
+                    {
+                        clients = service.List(pm, csm);
+                    }
+
+                    if (clients != null && clients.Any())
+                    {
+                        foreach (Client item in clients)
+                        {
+                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
+                                                csv,
+                                                item.Id,
+                                                item.CompanyName,
+                                                item.CompanyRegistrationNumber,
+                                                item.TradingAs,
+                                                item.VATNumber,
+                                                item.ContactNumber,
+                                                item.ContactPerson,
+                                                item.Email,
+                                                Environment.NewLine);
+                        }
+                    }
+
+
+                    csv = String.Format("Date Created, Start Date, End Date, Status, xRead, Message {0}", Environment.NewLine);
+
+                    List<Broadcast> broadcasts = new List<Broadcast>();
+
+                    using (BroadcastService service = new BroadcastService())
+                    {
+                        broadcasts = service.List(pm, csm);
+                    }
+
+                    if (broadcasts != null && broadcasts.Any())
+                    {
+                        foreach (Broadcast item in broadcasts)
+                        {
+                            Status status = (Status)item.Status;
+
+                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6} {7}",
+                                                csv,
+                                                item.CreatedOn,
+                                                item.StartDate,
+                                                item.EndDate,
+                                                status.GetDisplayText(),
+                                                item.UserBroadcasts.Count,
+                                                item.Message,
+                                                Environment.NewLine);
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                          
+            }
+
+            return File(new System.Text.UTF8Encoding().GetBytes(csv), "text/csv", filename);
+        }
+
         #endregion
 
     }
