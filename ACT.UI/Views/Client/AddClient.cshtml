@@ -181,7 +181,7 @@
                     <div class="editor-field" style="margin-bottom: 10px;">
                         @if (Model != null)
                         {
-                                @if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
+                                if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
                                 {
                                     foreach (FileViewModel companyFile in Model.CompanyFile)
                                     {

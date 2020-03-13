@@ -8,7 +8,7 @@
 
 @{
     ViewBag.ShowExport = true;
-    //ViewBag.ShowCustom = true;
+    ViewBag.ShowCustom = true;
 
     ViewBag.ViewName = "_AwaitingActivation";
 }
@@ -146,9 +146,9 @@
                     </td>
 
                     <td width="15%">
-                        @Html.ActionLink("Details", "ClientDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        @*@Html.ActionLink("Details", "ClientDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        @Html.ActionLink("Edit", "EditClient", new { id = item.Id, returnView = "ClientList" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        @Html.ActionLink("Edit", "EditClient", new { id = item.Id, returnView = "ClientList" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })*@
 
                         @Html.ActionLink(enable, "DeleteClient", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientlist", @rel = "tipsyE", @title = enable + " this item?" })
 

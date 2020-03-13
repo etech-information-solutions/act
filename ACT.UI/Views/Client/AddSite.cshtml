@@ -187,7 +187,7 @@
 
                 <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
                     <option value="">-- select</option>
-                    @foreach (int p in Enum.GetValues(typeof(Province)))
+                    @*@foreach (int p in Enum.GetValues(typeof(Province)))
                     {
                         string text = ((Province)p).GetDisplayText();
 
@@ -197,7 +197,7 @@
                         }
 
                         <option value="@p">@text</option>
-                    }
+                    }*@
                 </select>
 
                 @Html.ValidationMessageFor(model => model.FullAddress.Province)

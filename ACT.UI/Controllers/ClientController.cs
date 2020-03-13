@@ -1260,6 +1260,34 @@ namespace ACT.UI.Controllers
             }
         }
 
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetSitesForClient(string clientId)
+        {
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                List<Site> sites = null;
+                //int pspId = Session[ "UserPSP" ];
+                //int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+
+                using (SiteService service = new SiteService())
+                using (RegionService regionservice = new RegionService())
+                {
+                    List<Region> regions = regionservice.List(new PagingModel(), new CustomSearchModel());
+                    sites = service.GetSitesByClientIncluded(int.Parse(clientId)); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+                    foreach (Site site in sites)
+                    {
+                        site.Region = regions.FirstOrDefault(r => r.Id == site.RegionId);
+                    }
+                }
+                //var jsonList = JsonConvert.SerializeObject(sites);
+                return Json(sites, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
         #endregion
 
         #region Sub Sites

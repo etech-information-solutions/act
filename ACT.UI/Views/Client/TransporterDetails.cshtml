@@ -1,7 +1,6 @@
-﻿@model Transporter
+﻿@model  ACT.Data.Models.Transporter
 
 @using ACT.Core.Enums;
-@using ACT.Data.Models;
 
 @{
     if ( ViewBag.IncludeLayout == null )
@@ -33,21 +32,37 @@
             </div>
 
             <div class="display-label">
-                Description
+                Trading Name
             </div>
             <div class="display-field">
-                @Html.DisplayFor(model => model.Description)
-                @*@(( ( Status ) Model.Status ).GetDisplayText())*@
+                @Html.DisplayFor(model => model.TradingName)
             </div>
-
+            <div class="display-label">
+                Registration Number
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.RegistrationNumber)
+            </div>
         </div>
 
         <div class="left" style="width: 45%;">
             <div class="display-label">
+                Email
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.RegistrationNumber)
+            </div>
+            <div class="display-label">
+                Contact Number
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ContactNumber)
+            </div>
+            <div class="display-label">
                 Status
             </div>
             <div class="display-field">
-                @*@(( ( Site ) Model.Status ).GetDisplayText())*@
+                @(( ( Status ) Model.Status ).GetDisplayText())
             </div>
 
         </div>

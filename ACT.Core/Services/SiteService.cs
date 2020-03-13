@@ -103,6 +103,17 @@ namespace ACT.Core.Services
 
             return siteList;
         }
+        public List<Site> GetSitesByClientIncluded(int clientId)
+        {
+            List<Site> siteList;
+            siteList = (from s in context.Sites
+                        join e in context.ClientSites                        
+                        on s.Id equals e.SiteId
+                        where e.ClientId == clientId
+                        select s).ToList();
+            return siteList;
+        }
+        
 
         public List<Site> GetSitesByClientsOfPSPExcluded(int pspId, int clientId, int siteId)
         {
