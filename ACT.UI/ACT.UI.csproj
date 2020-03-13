@@ -497,6 +497,11 @@
     <Content Include="Views\Client\EditTransporter.cshtml" />
     <Content Include="Views\Client\TransporterDetails.cshtml" />
     <Content Include="Views\Shared\_ClientListCustomSearch.cshtml" />
+    <Content Include="Views\Shared\_ManageSitesCustomSearch.cshtml" />
+    <Content Include="Views\Shared\_LinkProductsCustomSearch.cshtml" />
+    <Content Include="Views\Shared\_AwaitingActivationCustomSearch.cshtml" />
+    <Content Include="Views\Shared\_ManageTransportersCustomSearch.cshtml" />
+    <Content Include="Views\Shared\_ClientGroupsCustomSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

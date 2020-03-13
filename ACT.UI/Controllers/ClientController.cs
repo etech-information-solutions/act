@@ -808,9 +808,14 @@ namespace ACT.UI.Controllers
         #region Manage Sites
         //
         // GET: /Client/ManageSites
-        public ActionResult ManageSites(PagingModel pm, CustomSearchModel csm)
+        public ActionResult ManageSites(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
         {
+            if (givecsm)
+            {
+                ViewBag.ViewName = "ManageSites";
 
+                return PartialView("_ManageSitesCustomSearch", new CustomSearchModel("ManageSites"));
+            }
             ViewBag.ViewName = "ManageSites";
 
             int total = 0;
@@ -1442,10 +1447,15 @@ namespace ACT.UI.Controllers
         #region Client Group
         //
         // GET: /Client/ClientGroups
-        public ActionResult ClientGroups(PagingModel pm, CustomSearchModel csm)
+        public ActionResult ClientGroups(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
         {
-            ViewBag.ViewName = "Group Clients";
+            ViewBag.ViewName = "ClientGroups";
+            if (givecsm)
+            {
+                ViewBag.ViewName = "ClientGroups";
 
+                return PartialView("_ClientGroupsCustomSearch", new CustomSearchModel("ClientGroups"));
+            }
             int total = 0;
 
             List<Group> model = new List<Group>();
@@ -1761,6 +1771,7 @@ namespace ACT.UI.Controllers
         [Requires(PermissionTo.Edit)]
         public ActionResult LinkProductsById(int clientId, PagingModel pm, CustomSearchModel csm, bool givecsm = false)
         {
+
             int total = 0;
 
             List<Product> model = new List<Product>();
@@ -1790,13 +1801,13 @@ namespace ACT.UI.Controllers
         }
         //
         // POST || GET: /Client/LinkProducts
-        public ActionResult LinkProducts(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        public ActionResult LinkProducts(PagingModel pm, CustomSearchModel csm, bool givecsm = true)
         {
             if (givecsm)
             {
                 ViewBag.ViewName = "Products";
 
-                return PartialView("_LinkProducts", new CustomSearchModel("Products"));
+                return PartialView("_LinkProductsCustomSearch", new CustomSearchModel("LinkProducts"));
             }
 
             int total = 0;
@@ -2232,11 +2243,16 @@ namespace ACT.UI.Controllers
         #region Manage Transporters
         //
         // GET: /Client/ManageTransporters
-        public ActionResult ManageTransporters(PagingModel pm, CustomSearchModel csm)
+        public ActionResult ManageTransporters(PagingModel pm, CustomSearchModel csm, bool givecsm = true)
         {
 
             ViewBag.ViewName = "ManageTransporters";
+            if (givecsm)
+            {
+                ViewBag.ViewName = "ManageTransporters";
 
+                return PartialView("_ManageTransportersCustomSearch", new CustomSearchModel("ManageTransporters"));
+            }
             int total = 0;
 
             List<Transporter> model = new List<Transporter>();
@@ -2468,8 +2484,14 @@ namespace ACT.UI.Controllers
 
         //
         // POST || GET: /Client/AwaitingActivation
-        public ActionResult AwaitingActivation(PagingModel pm, CustomSearchModel csm)
+        public ActionResult AwaitingActivation(PagingModel pm, CustomSearchModel csm, bool givecsm = true)
         {
+            if (givecsm)
+            {
+                ViewBag.ViewName = "AwaitingActivation";
+
+                return PartialView("AwaitingActivationCustomSearch", new CustomSearchModel("ManageTransporters"));
+            }
             int total = 0;
 
             List<Client> model = new List<Client>();
@@ -2528,7 +2550,7 @@ namespace ACT.UI.Controllers
                     {
                         foreach (Client item in clients)
                         {
-                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
+                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9}",
                                                 csv,
                                                 item.Id,
                                                 item.CompanyName,
@@ -2543,38 +2565,143 @@ namespace ACT.UI.Controllers
                     }
 
 
-                    csv = String.Format("Date Created, Start Date, End Date, Status, xRead, Message {0}", Environment.NewLine);
+                    #endregion
 
-                    List<Broadcast> broadcasts = new List<Broadcast>();
+                    break;
+                //case "linkproducts":
+                //    #region linkproducts
+                //    csv = String.Format("Id, Company Name, Reg #, Trading As, Vat Number, Contact Number, Contact Person, Email {0}", Environment.NewLine);
 
-                    using (BroadcastService service = new BroadcastService())
+                //    List<Product> product = new List<Product>();
+
+                //    using (ProductService service = new ProductService())
+                //    {
+                //        clients = service.List(pm, csm);
+                //    }
+
+                //    if (clients != null && clients.Any())
+                //    {
+                //        foreach (Client item in clients)
+                //        {
+                //            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
+                //                                csv,
+                //                                item.Id,
+                //                                item.CompanyName,
+                //                                item.CompanyRegistrationNumber,
+                //                                item.TradingAs,
+                //                                item.VATNumber,
+                //                                item.ContactNumber,
+                //                                item.ContactPerson,
+                //                                item.Email,
+                //                                Environment.NewLine);
+                //        }
+                //    }
+
+
+                //    #endregion
+
+                //    break;
+
+                //case "managesites":
+                //    #region ClientList
+                //    csv = String.Format("Id, Company Name, Reg #, Trading As, Vat Number, Contact Number, Contact Person, Email {0}", Environment.NewLine);
+
+                //    List<Client> clients = new List<Client>();
+
+                //    using (ClientService service = new ClientService())
+                //    {
+                //        clients = service.List(pm, csm);
+                //    }
+
+                //    if (clients != null && clients.Any())
+                //    {
+                //        foreach (Client item in clients)
+                //        {
+                //            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
+                //                                csv,
+                //                                item.Id,
+                //                                item.CompanyName,
+                //                                item.CompanyRegistrationNumber,
+                //                                item.TradingAs,
+                //                                item.VATNumber,
+                //                                item.ContactNumber,
+                //                                item.ContactPerson,
+                //                                item.Email,
+                //                                Environment.NewLine);
+                //        }
+                //    }
+
+
+                //    #endregion
+
+                //    break;
+                //case "managetransporters":
+                //    #region ClientList
+                //    csv = String.Format("Id, Company Name, Reg #, Trading As, Vat Number, Contact Number, Contact Person, Email {0}", Environment.NewLine);
+
+                //    List<Client> clients = new List<Client>();
+
+                //    using (ClientService service = new ClientService())
+                //    {
+                //        clients = service.List(pm, csm);
+                //    }
+
+                //    if (clients != null && clients.Any())
+                //    {
+                //        foreach (Client item in clients)
+                //        {
+                //            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
+                //                                csv,
+                //                                item.Id,
+                //                                item.CompanyName,
+                //                                item.CompanyRegistrationNumber,
+                //                                item.TradingAs,
+                //                                item.VATNumber,
+                //                                item.ContactNumber,
+                //                                item.ContactPerson,
+                //                                item.Email,
+                //                                Environment.NewLine);
+                //        }
+                //    }
+
+
+                //    #endregion
+
+                //    break;
+                case "awaitingactivation":
+                    #region AwaitingActivation
+                    csv = String.Format("Id, Company Name, Reg #, Trading As, Vat Number, Contact Number, Contact Person, Email {0}", Environment.NewLine);
+
+                    List<Client> inactiveclients = new List<Client>();
+
+                    using (ClientService service = new ClientService())
                     {
-                        broadcasts = service.List(pm, csm);
+                        inactiveclients = service.List(pm, csm);
                     }
 
-                    if (broadcasts != null && broadcasts.Any())
+                    if (inactiveclients != null && inactiveclients.Any())
                     {
-                        foreach (Broadcast item in broadcasts)
+                        foreach (Client item in inactiveclients)
                         {
-                            Status status = (Status)item.Status;
-
-                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6} {7}",
+                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9}",
                                                 csv,
-                                                item.CreatedOn,
-                                                item.StartDate,
-                                                item.EndDate,
-                                                status.GetDisplayText(),
-                                                item.UserBroadcasts.Count,
-                                                item.Message,
+                                                item.Id,
+                                                item.CompanyName,
+                                                item.CompanyRegistrationNumber,
+                                                item.TradingAs,
+                                                item.VATNumber,
+                                                item.ContactNumber,
+                                                item.ContactPerson,
+                                                item.Email,
                                                 Environment.NewLine);
                         }
                     }
+
 
                     #endregion
 
                     break;
 
-                          
             }
 
             return File(new System.Text.UTF8Encoding().GetBytes(csv), "text/csv", filename);
