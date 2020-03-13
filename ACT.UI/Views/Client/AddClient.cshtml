@@ -179,128 +179,134 @@
                 <div class="editor-label uppercase">
                     <h3>Upload Documents</h3>
                     <div class="editor-field" style="margin-bottom: 10px;">
-                        @if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
+                        @if (Model != null)
                         {
-                            foreach (FileViewModel companyFile in Model.CompanyFile)
-                            {
+                                @if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
+                                {
+                                    foreach (FileViewModel companyFile in Model.CompanyFile)
+                                    {
                                 @Html.HiddenFor(model => companyFile.Id)
 
-                                <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
+                                < div style = "border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;" >
 
-                                    <a target="_blank" href="@Url.Action("ViewDocument", "CLient", new { @id = companyFile.Id })">
-                                        <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
 
-                                        companyFile.Name (companyFile.Extension)
-                                    </a>
+                                     < a target = "_blank" href = "@Url.Action("ViewDocument", "CLient", new { @id = companyFile.Id })" >
 
-                                </div>
+                                              < img alt = "download" src = "@Url.Content("~/ Images / download.png")" style = "margin-bottom: 2px;" />
 
-                            }
+                                                      companyFile.Name(companyFile.Extension)
+                                                  </ a >
+
+
+                                              </ div >
+
+                                    }
+                                }
                         }
 
 
-                        <input id="CompanyFile.File" name="CompanyFile.File" type="file" value="" data-val-file="1" class="input" />
-                        <input id="CompanyFile.Name" name="CompanyFile.Name" type="hidden" value="Company File" />
-                        <input id="CompanyFile.Description" name="CompanyFile.Description" class="input" type="hidden" value="Company File" />
+                                < input id = "CompanyFile.File" name = "CompanyFile.File" type = "file" value = "" data - val - file = "1" class="input" />
+                                <input id = "CompanyFile.Name" name="CompanyFile.Name" type="hidden" value="Company File" />
+                                <input id = "CompanyFile.Description" name="CompanyFile.Description" class="input" type="hidden" value="Company File" />
 
-                        @*@Html.ValidationMessageFor(model => companyFile.RegistrationFile)*@
+                    @*@Html.ValidationMessageFor(model => companyFile.RegistrationFile)*@
 
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-            <p>
-                <strong class="uppercase">KPI</strong>
-            </p>
-            <div class="left" style="width: 40%; margin-right: 4%;">
-                <div class="editor-label uppercase">
-                    Outstanding
-                </div>
-                <div class="editor-field">
-                    <input type="text" class="input" placeholder="KPI Outstanding" />
-                </div>
-
-                <div class="editor-label uppercase">
-                    Disputes
-                </div>
-                <div class="editor-field">
-                    <input type="text" class="input" placeholder="Disputes" />
-                </div>
-
-            </div>
-
-            <div class="left" style="width: 40%; margin-right: 4%;">
-                <div class="editor-label uppercase">
-                    Days Outstanding
-                </div>
-                <div class="editor-field">
-                    <input type="text" class="input" placeholder="Days Outstanding" />
-                </div>
-
-                <div class="editor-label uppercase">
-                    Days to Resolve
-                </div>
-                <div class="editor-field">
-                    <input type="text" class="input" placeholder="Days to Resolve" />
-                </div>
-
-            </div>
-
-            @*<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-                <div class="budgets">
-                    <p>
-                        <strong class="uppercase">Client Budget</strong>
-                    </p>
-
-                    <div class="editor-label" style="margin-bottom: 10px;">
-                        <a id="addrow" href="#" onclick="AddRow();"><i class="fa fa-plus"></i> Add New</a>
-                    </div>
+                                        </div>
+                                    </div>
+                                </div>
 
 
-                    <div class="editor-field">
+                                <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+                                <p>
+                                    <strong class="uppercase">KPI</strong>
+                                </p>
+                                <div class="left" style="width: 40%; margin-right: 4%;">
+                                    <div class="editor-label uppercase">
+                                        Outstanding
+                                    </div>
+                                    <div class="editor-field">
+                                        <input type = "text" class="input" placeholder="KPI Outstanding" />
+                                    </div>
 
+                                    <div class="editor-label uppercase">
+                                        Disputes
+                                    </div>
+                                    <div class="editor-field">
+                                        <input type = "text" class="input" placeholder="Disputes" />
+                                    </div>
 
-                        <table id="clientBudget-table" class="da-table" style="border-bottom: 0;">
+                                </div>
 
-                            <thead>
-                                <tr>
-                                    <th style="width: 7%;">Year</th>
-                                    <th style="width: 7%;">Jan</th>
-                                    <th style="width: 7%;">Feb</th>
-                                    <th style="width: 7%;">Mar</th>
-                                    <th style="width: 7%;">Apr</th>
-                                    <th style="width: 7%;">May</th>
-                                    <th style="width: 7%;">Jun</th>
-                                    <th style="width: 7%;">Jul</th>
-                                    <th style="width: 7%;">Aug</th>
-                                    <th style="width: 7%;">Sep</th>
-                                    <th style="width: 7%;">Oct</th>
-                                    <th style="width: 7%;">Nov</th>
-                                    <th style="width: 7%;">Dec</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
+                                <div class="left" style="width: 40%; margin-right: 4%;">
+                                    <div class="editor-label uppercase">
+                                        Days Outstanding
+                                    </div>
+                                    <div class="editor-field">
+                                        <input type = "text" class="input" placeholder="Days Outstanding" />
+                                    </div>
 
-                            <tbody></tbody>
+                                    <div class="editor-label uppercase">
+                                        Days to Resolve
+                                    </div>
+                                    <div class="editor-field">
+                                        <input type = "text" class="input" placeholder="Days to Resolve" />
+                                    </div>
 
-                        </table>
-                    </div>
-                </div>*@
+                                </div>
 
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+                    @*<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+    <div class="budgets">
+        <p>
+            <strong class="uppercase">Client Budget</strong>
+        </p>
 
-
-            <p>
-                <input id="save-btn" type="submit" value="Save" />
-
-                <span style="padding: 0 5px;">/</span>
-
-                <a data-refresh="1" data-target="#clientlist">Cancel</a>
-            </p>
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+        <div class="editor-label" style="margin-bottom: 10px;">
+            <a id="addrow" href="#" onclick="AddRow();"><i class="fa fa-plus"></i> Add New</a>
         </div>
+
+
+        <div class="editor-field">
+
+
+            <table id="clientBudget-table" class="da-table" style="border-bottom: 0;">
+
+                <thead>
+                    <tr>
+                        <th style="width: 7%;">Year</th>
+                        <th style="width: 7%;">Jan</th>
+                        <th style="width: 7%;">Feb</th>
+                        <th style="width: 7%;">Mar</th>
+                        <th style="width: 7%;">Apr</th>
+                        <th style="width: 7%;">May</th>
+                        <th style="width: 7%;">Jun</th>
+                        <th style="width: 7%;">Jul</th>
+                        <th style="width: 7%;">Aug</th>
+                        <th style="width: 7%;">Sep</th>
+                        <th style="width: 7%;">Oct</th>
+                        <th style="width: 7%;">Nov</th>
+                        <th style="width: 7%;">Dec</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody></tbody>
+
+            </table>
+        </div>
+    </div>*@
+
+                        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+
+                        <p>
+                            <input id="save-btn" type="submit" value="Save" />
+
+                            <span style="padding: 0 5px;">/</span>
+
+                            <a data-refresh="1" data-target="#clientlist">Cancel</a>
+                        </p>
+                        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+                    </div>
 
     </div>
 

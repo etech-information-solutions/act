@@ -251,7 +251,7 @@ namespace ACT.Core.Services
         /// <param name="csm"></param>
         /// <returns></returns>
         public List<UserCustomModel> List1( PagingModel pm, CustomSearchModel csm )
-         {
+        {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
                 csm.ToDate = csm.ToDate?.AddDays( 1 );

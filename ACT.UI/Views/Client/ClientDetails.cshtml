@@ -204,21 +204,26 @@
             Upload Documents
         </div>
         <div class="display-field">
-            @if (documents != null && documents.Count() > 0)
+            @if (documents != null && documents.Any())
             {
-                foreach (Document file in documents)
+                @foreach (Document d in documents)
                 {
-                    @Html.HiddenFor(model => file.Id)
+                    <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )">
+                        <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
 
-                    <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
+                        @d.Name (@d.Type)
+                    </a>
+                    @*@Html.HiddenFor(model => file.Id)*@
 
-                        <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = file.Id })">
-                            <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
+                    @*<div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
 
-                            file.Name (file.Extension)
-                        </a>
+                    <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = file.Id })">
+                        <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
 
-                    </div>
+                        file.Name (file.Extension)
+                    </a>
+
+                </div>*@
 
                 }
             }

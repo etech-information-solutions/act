@@ -82,7 +82,7 @@
             </td>
             <td width="15%">
                 <input type="radio" id="group_id_@item.Id" onclick="UpdateGroups(@item.Id)" name="groups" value="@item.Id" />
-                @Html.ActionLink("Edit", "EditGroup", new { id = item.Id, returnView = "ClientGroups" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                @Html.ActionLink("Edit", "EditGroupGet", new { id = item.Id, returnView = "ClientGroups" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
                 @Html.ActionLink(enable, "DeleteGroup", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientgroups", @rel = "tipsyE", @title = enable + " this item?" })
             </td>

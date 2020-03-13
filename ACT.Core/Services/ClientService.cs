@@ -91,41 +91,20 @@ namespace ACT.Core.Services
 
         public List<Client> GetClientsByPSPIncludedGroup(int pspId, int groupId)
         {
-            List<Client> clientList;
-            //context.Roles.FirstOrDefault(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
-            clientList = (from p in context.PSPClients
-                          join e in context.Clients
-                          on p.ClientId equals e.Id
-                          join g in context.ClientGroups
-                          on e.Id equals g.ClientId
-                          where p.PSPId == pspId
-                          where g.Status == (int)Status.Active
-                          where g.GroupId == groupId
-                          select e).ToList();
+            List<object> parameters = new List<object>();
 
-            return clientList;
+            //return clientList;
+            string query = string.Format("SELECT DISTINCT(Client.Id) as DClientId, Client.* FROM Client LEFT JOIN PSPClient ON Client.Id = PSPClient.ClientID LEFT JOIN ClientGroup ON ClientGroup.ClientId = PSPClient.ClientId WHERE GroupId = {0} AND PSPClient.PSPId = {1}", groupId, pspId);
+
+            return context.Database.SqlQuery<Client>(query, parameters.ToArray()).ToList();
         }
 
         public List<Client> GetClientsByPSPExcludedGroup(int pspId, int groupId)
         {
-            List<Client> clientList;
-            //context.Roles.FirstOrDefault(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
-            List<int> exclList = new List<int>();
-            exclList.Add(groupId);
-            clientList = (from p in context.PSPClients
-                          join e in context.Clients
-                          on p.ClientId equals e.Id
-                          join g in context.ClientGroups
-                          on e.Id equals g.ClientId
-                          where p.PSPId == pspId
-                          //where g.Status == (int)Status.Active
-                          where !exclList.Contains(g.GroupId)
-                          select e).ToList();
+            List<object> parameters = new List<object>();
+            string query = string.Format("SELECT DISTINCT(Client.Id) as DClientId,Client.* FROM Client LEFT JOIN PSPClient ON Client.Id = PSPClient.ClientID WHERE NOT EXISTS (SELECT ClientID FROM ClientGroup WHERE GroupId = {0} AND ClientGroup.ClientId = PSPClient.ClientId) AND PSPClient.PSPId = {1}", groupId, pspId);
 
-            return clientList;
-            //query = string.Format("{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query);
-
-            //return context.Database.SqlQuery<UserCustomModel>(query, parameters.ToArray()).ToList();
+            return context.Database.SqlQuery<Client>(query, parameters.ToArray()).ToList();
         }
 
         public bool ExistByCompanyRegistrationNumber( string registrationNumber )

@@ -1032,8 +1032,6 @@ namespace ACT.UI.Controllers
             }
         }
 
-
-
         // GET: Client/EditSite/5
         [Requires(PermissionTo.Edit)]
         public ActionResult EditSite(int id)
@@ -1246,24 +1244,6 @@ namespace ACT.UI.Controllers
             {
                 return View();
             }
-        }
-
-        [HttpPost]
-        public string SetSiteStatus(string siteId, string status)
-        {
-            switch (status)
-            {
-                case "Terminate":
-
-                    break;
-                case "Activate":
-
-                    break;
-                default:
-                    break;
-            }
-
-            return "true";
         }
 
         #endregion
@@ -1539,9 +1519,9 @@ namespace ACT.UI.Controllers
         }
 
 
-        // GET: Client/EditGroup/5
+        // GET: Client/EditGroupGet/5
         [Requires(PermissionTo.Edit)]
-        public ActionResult EditGroup(int id)
+        public ActionResult EditGroupGet(int id)
         {
             Group group;
 
@@ -1565,7 +1545,7 @@ namespace ACT.UI.Controllers
                     Status = (int)group.Status,
                     EditMode = true
                 };
-                return View(model);
+                return View("EditGroup", model);
             }
         }
 
@@ -1722,8 +1702,7 @@ namespace ACT.UI.Controllers
                     }
                     foreach (ClientGroup g in group)
                     {
-                        g.Status = (int)Status.Inactive;
-                        clientgroupservice.Update(g);
+                        clientgroupservice.Delete(g);
                     }
                     scope.Complete();
                 }
@@ -1741,13 +1720,20 @@ namespace ACT.UI.Controllers
             if (!string.IsNullOrEmpty(groupId) && !string.IsNullOrEmpty(clientId)) {
                 //using (GroupService service = new GroupService())
                 using (ClientGroupService clientgroupservice = new ClientGroupService())
+                using (GroupService groupservice = new GroupService())
+                using (PSPClientService pspclientservice = new PSPClientService())
                 using (TransactionScope scope = new TransactionScope())
                 {
+                    List<PSPClient> pspClientList = pspclientservice.ListByColumnWhere("ClientId", int.Parse(clientId));
+                    Group groupObj = groupservice.GetById(int.Parse(groupId));
+
                     ClientGroup group = new ClientGroup()
                     {
                         GroupId = int.Parse(groupId),
                         ClientId = int.Parse(clientId),
-                        Status = (int)Status.Active
+                        Status = (int)Status.Active,
+                        PSPClient = pspClientList.FirstOrDefault(),
+                        Group = groupObj
                     };
                     clientgroupservice.Create(group);
                     // clientgroupservice.Update(clientGroup);
@@ -1757,24 +1743,6 @@ namespace ACT.UI.Controllers
 
             }        
             return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
-        }
-
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public string SetGroupStatus(string groupId, string status)
-        {
-            switch (status)
-            {
-                case "Terminate":
-
-                    break;
-                case "Activate":
-
-                    break;
-                default:
-                    break;
-            }
-
-            return "true";
         }
 
         #endregion
