@@ -46,7 +46,7 @@ namespace ACT.UI.Controllers
                 pm.Sort = pm.Sort ?? "DESC";
                 pm.SortBy = pm.SortBy ?? "CreatedOn";
                 if (CurrentUser.PSPs.Count > 0)
-                {
+                {                    
                     model = service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
                 }
                 else
@@ -180,36 +180,9 @@ namespace ACT.UI.Controllers
                     pClient = pspclientservice.Create(pClient);
                     #endregion
 
-                    //#region Create Client Budget
-
-                    //if (model.ClientBudget != null)
-                    //{
-                    //    //foreach (ClientBudget budgetList in model.ClientBudget)
-                    //    //{
-                    //        ClientBudget budget = new ClientBudget()
-                    //        {
-                    //            ClientId = client.Id,
-                    //            Status = (int)Status.Active,
-                    //            BudgetYear = DateTime.Now.Year,
-                    //            January = model.ClientBudget.January,
-                    //            February = model.ClientBudget.February,
-                    //            March = model.ClientBudget.March,
-                    //            April = model.ClientBudget.April,
-                    //            May = model.ClientBudget.May,
-                    //            June = model.ClientBudget.June,
-                    //            July = model.ClientBudget.July,
-                    //            August = model.ClientBudget.August,
-                    //            September = model.ClientBudget.September,
-                    //            October = model.ClientBudget.October,
-                    //            November = model.ClientBudget.November,
-                    //            December = model.ClientBudget.December,
-                    //        };
-
-                    //        budget = bservice.Create(budget);
-                    //    //}
-                    //}
-
-                    //#endregion
+                    #region Create Client Budget
+                    //Moved to  seperate API calls to get and set from view
+                    #endregion
 
                     #region Create Address (s)
 
@@ -312,17 +285,6 @@ namespace ACT.UI.Controllers
                         }
                         //}
                     }
-
-                    #endregion
-
-                    #region Create Client Budget
-
-                    //if (model.ClientKPI != null)
-                    //{
-                    //    foreach (ClientKPI kpi in model.ClientKPI)
-                    //    {
-                    //    }
-                    //}
 
                     #endregion
 
@@ -517,7 +479,7 @@ namespace ACT.UI.Controllers
                     client.AdminEmail = model.Email;
                     //client.DeclinedReason = model.DeclinedReason;
                     //client.ServiceRequired = model.ServiceRequired;
-                    //Status = (Status)model.Status;
+                    client.Status = (int)model.Status;
                     client.Status = model.Status;
 
                     service.Update(client);
@@ -719,8 +681,6 @@ namespace ACT.UI.Controllers
             }
         }
 
-
-
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
         public JsonResult GetClientBudgets(string clientId)
         {
@@ -850,6 +810,72 @@ namespace ACT.UI.Controllers
             return PartialView("_ManageSites", paging);
         }
 
+        //
+        // GET: /Client/SiteDetails/5
+        public ActionResult SiteDetails(int id, bool layout = true)
+        {
+            Site site;
+            //int pspId = Session[ "UserPSP" ];
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            List<Region> regionOptions = new List<Region>();
+
+
+
+            using (SiteService service = new SiteService())
+            using (RegionService rservice = new RegionService())
+            using (AddressService aservice = new AddressService())
+            {
+                site = service.GetById(id);
+                regionOptions = rservice.ListByColumnWhere("PSPId", pspId);
+
+                if (site == null)
+                {
+                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                    return PartialView("_AccessDenied");
+                }
+
+                Address address = aservice.Get(site.Id, "Site");
+
+
+                bool unverified = (site.Status == (int)PSPClientStatus.Unverified);
+
+                SiteViewModel model = new SiteViewModel()
+                {
+                    Id = site.Id,
+                    Name = site.Name,
+                    Description = site.Description,
+                    XCord = site.XCord,
+                    YCord = site.YCord,
+                    Address = site.Address,
+                    PostalCode = site.PostalCode,
+                    ContactName = site.ContactName,
+                    ContactNo = site.ContactNo,
+                    PlanningPoint = site.PlanningPoint,
+                    SiteType = 1,//(int)site.SiteType,
+                    AccountCode = site.AccountCode,
+                    Depot = site.Depot,
+                    SiteCodeChep = site.SiteCodeChep,
+                    Status = (int)site.Status,
+                    EditMode = true,
+                    RegionId = site.RegionId,
+                    //RegionOptions = regionOptions,
+                    FullAddress = new AddressViewModel()
+                    {
+                        EditMode = true,
+                        Town = address?.Town,
+                        Id = address?.Id ?? 0,
+                        PostCode = address?.PostalCode,
+                        AddressLine1 = address?.Addressline1,
+                        AddressLine2 = address?.Addressline2,
+                        Province = (address != null) ? (Province)address.Province : Province.All,
+                        AddressType = (address != null) ? (AddressType)address.Type : AddressType.Postal,
+                    }
+                };
+                return View(model);
+            }
+        }
+
         // GET: Client/AddSite
         [Requires(PermissionTo.Create)]
         public ActionResult AddSite()
@@ -861,10 +887,18 @@ namespace ACT.UI.Controllers
             using (RegionService service = new RegionService())
             {
                 regionOptions = service.ListByColumnWhere("PSPId", pspId);
+
+
             }
+            IEnumerable<SelectListItem> regionDDL = regionOptions.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Description
+
+            });
             //regionOptions = Model.RegionOptions.Where(r => r.PSPId == pspId).ToList();
-            SiteViewModel model = new SiteViewModel() { EditMode = true, RegionOptions = regionOptions };
-            ViewBag.RegionOptions = regionOptions;            
+            SiteViewModel model = new SiteViewModel() { EditMode = true };//, RegionOptions = regionOptions
+            ViewBag.RegionOptions = regionDDL;            
             return View(model);
         }
 
@@ -882,6 +916,10 @@ namespace ACT.UI.Controllers
 
                     return View(model);
                 }
+                //get clientId from session as there has to be one for the add button to have appeared in teh first place, grab it and assign sites to this until it changes
+               
+                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
 
                 using (SiteService siteService = new SiteService())
                 using (ClientSiteService csService = new ClientSiteService())
@@ -897,6 +935,7 @@ namespace ACT.UI.Controllers
                         return View(model);
                     }
                     #endregion
+
                     #region Create Site
                     Site site = new Site()
                     {
@@ -918,12 +957,7 @@ namespace ACT.UI.Controllers
                     };
                     site = siteService.Create(site);
                     #endregion
-                    #region Add ClientSite
-                    //ClientSite csSite = new ClientSite()
-                    //{
 
-                    //}
-                    #endregion
                     #region Create Address (s)
 
                     if (model.FullAddress != null)
@@ -940,11 +974,23 @@ namespace ACT.UI.Controllers
                             Addressline2 = model.FullAddress.AddressLine2,
                             Province = (int)model.FullAddress.Province,
                         };
-
                         aservice.Create(address);
                     }
 
                     #endregion
+
+                    //tie Client in Session to New Site
+                    #region Add ClientSite
+                    ClientSite csSite = new ClientSite()
+                    {
+                        ClientId = clientID,
+                        SiteId = site.Id,
+                        AccountingCode = site.AccountCode,
+                        Status = (int)Status.Active
+                    };
+                    csService.Create(csSite);
+                    #endregion
+                    
 
                     scope.Complete();
                 }
@@ -1094,7 +1140,8 @@ namespace ACT.UI.Controllers
                     SiteCodeChep = site.SiteCodeChep,
                     Status = (int)site.Status,
                     EditMode = true,
-                    RegionOptions = regionOptions,
+                    RegionId = site.RegionId,
+                    //RegionOptions = regionOptions,
                     FullAddress = new AddressViewModel()
                     {
                         EditMode = true,
@@ -1266,6 +1313,7 @@ namespace ACT.UI.Controllers
         {
             if (!string.IsNullOrEmpty(clientId))
             {
+                Session["ClientId"] = clientId;//wroite to session to use for adds and updates
                 List<Site> sites = null;
                 //int pspId = Session[ "UserPSP" ];
                 //int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);

@@ -44,16 +44,22 @@
                 @Html.DropDownList("ClientList", "Please Select")
             </td>
             <td style="width:2%">
-                @Html.ActionLink("Add", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#sites" })
+                @Html.ActionLink("Add", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#managesites" })
+            </td>
+            <td style="width:5%">
+                &nbsp;
             </td>
             <td style="width:3%">
-                <label for="file">Browse:</label>
+                <label for="file" class="importlabel">Browse:</label>
             </td>
-            <td style="width:35%">
-                <input type="file" name="sitesfile" id="sitesfile" />
+            <td style="width:55%">
+                <input type="file" name="sitesfile" id="sitesfile" class="importfile"/>
             </td>
             <td style="width:10%">
-                <input type="submit" value="Import Sites" />
+                <input type="submit" value="Import Sites" class="importbutton"/>
+            </td>
+            <td style="width:7%">
+                <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "sitetemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
             </td>
         </tr>
     </table>
@@ -187,8 +193,26 @@ $(function(){
 @*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
 <script>
     $(document).ready(function () {
+        $('.add').hide();
+        $('.importlabel').hide();
+        $('.importbutton').hide();
+        $('.importfile').hide();
+
+
         $("#ClientList").change(function () {
-            GetIncludedSites($('option:selected', this).val());
+            var cId = parseInt($('option:selected', this).val());
+            if (cId > 0) {
+                $('.add').show();
+                $('.importlabel').show();
+                $('.importbutton').show();
+                $('.importfile').show();
+                GetIncludedSites(cId);
+            } else {
+                $('.add').hide();
+                $('.importlabel').hide();
+                $('.importbutton').hide();
+                $('.importfile').hide();
+            }
         });
     });
 
@@ -206,9 +230,9 @@ $(function(){
                 rowDiv.html('');
                 var result = "";
                 $.each(data, function (id, site) {
-                    var actionStr = '<a class="info" data-details="1" data-id="' + site.Id + '" data-target=".tr-' + site.Id + '-item" href="/Client/ClientDetails/' + site.Id + '"> Details</a>' +
-                        '<a class="edit" data-edit="1" data-id="' + site.Id + '" data-target=".tr-5-item" href = "/Client/EditClient/5?returnView=ManageSites">Edit</a > ' +
-                        '<a class="warn" data-delete="1" data-id="' + site.Id + '" data-refresh-target="#managesites" data-target="#tr-' + site.Id + '-item" href="/Client/DeleteClient/' + site.Id + '" rel="tipsyE" title="Disable this item?" > Disable</a > ';
+                    var actionStr = '<a class="info" data-details="1" data-id="' + site.Id + '" data-target=".tr-' + site.Id + '-item" href="/Client/SiteDetails/' + site.Id + '"> Details</a>' +
+                        '<a class="edit" data-edit="1" data-id="' + site.Id + '" data-target=".tr-5-item" href = "/Client/EditSite/' + site.Id + '?returnView=ManageSites">Edit</a > ' +
+                        '<a class="warn" data-delete="1" data-id="' + site.Id + '" data-refresh-target="#managesites" data-target="#tr-' + site.Id + '-item" href="/Client/DeleteSite/' + site.Id + '" rel="tipsyE" title="Disable this item?" > Disable</a > ';
 
                     result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
                         '<td style = "width: 15%;">' +

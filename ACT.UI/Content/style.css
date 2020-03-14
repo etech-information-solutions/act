@@ -535,6 +535,15 @@ input[type="checkbox"].input-validation-error {
     border-bottom: 1px solid #cacaca;
 }
 
+.display-fieldnb {
+    width: 96%;
+    padding: 10px;
+    /*border-radius: 4px;*/
+    position: relative;
+    background: #ffffff;
+    margin: 5px 0 10px 0;
+}
+
 
 
 
