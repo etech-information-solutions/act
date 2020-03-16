@@ -27,197 +27,197 @@
         </h2>
     }
     @Html.HiddenFor(model => model.Id)
-        <div class="left" style="width: 60%; margin-right: 2%;">
-            <div class="left" style="width: 50%; margin-right: 2%;">
+    <div class="left" style="width: 60%; margin-right: 2%;">
+        <div class="left" style="width: 50%; margin-right: 2%;">
 
-                <div class="display-label">
-                    Client Name
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.CompanyName)
-                </div>
-                <div class="display-label">
-                    Company Registration Number
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.CompanyRegistrationNumber)
-                </div>
-
-                <h3>Contact Details</h3>
-                <div class="display-label">
-                    Contact Number
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.ContactNumber)
-                </div>
-
-
-                <div class="display-label">
-                    Contact Person
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.ContactPerson)
-                </div>
-
-
-
-                @*<div class="display-label">
-                Logo
+            <div class="display-label">
+                Client Name
             </div>
             <div class="display-field">
-                @if (documents != null && documents.Any())
-                {
-                    foreach (Document d in documents)
-                    {
-                        <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
-                            <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
-
-                            @d.Name (@d.Type)
-                        </a>
-                    }
-                }
-            </div>*@
-
-                @*<div class="display-label">
-                Upload Documents
+                @Html.DisplayFor(model => model.CompanyName)
+            </div>
+            <div class="display-label">
+                Company Registration Number
             </div>
             <div class="display-field">
-                @if (documents != null && documents.Any())
-                {
-                    foreach (Document d in documents)
+                @Html.DisplayFor(model => model.CompanyRegistrationNumber)
+            </div>
+
+            <h3>Contact Details</h3>
+            <div class="display-label">
+                Contact Number
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ContactNumber)
+            </div>
+
+
+            <div class="display-label">
+                Contact Person
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ContactPerson)
+            </div>
+
+
+
+            @*<div class="display-label">
+                    Logo
+                </div>
+                <div class="display-field">
+                    @if (documents != null && documents.Any())
                     {
-                        <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
-                            <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+                        foreach (Document d in documents)
+                        {
+                            <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
+                                <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
 
-                            @d.Name (@d.Type)
-                        </a>
+                                @d.Name (@d.Type)
+                            </a>
+                        }
                     }
-                }
-            </div>*@
+                </div>*@
 
-            </div>
-
-            <div class="left" style="width: 45%;">
-
-                <div class="display-label">
-                    Trading As
+            @*<div class="display-label">
+                    Upload Documents
                 </div>
                 <div class="display-field">
-                    @Html.DisplayFor(model => model.TradingAs)
-                </div>
-                <div class="display-label">
-                    VAT Number
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.VATNumber)
-                </div>
+                    @if (documents != null && documents.Any())
+                    {
+                        foreach (Document d in documents)
+                        {
+                            <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
+                                <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
 
+                                @d.Name (@d.Type)
+                            </a>
+                        }
+                    }
+                </div>*@
 
-                <h3>&nbsp;</h3>
-
-                <div class="display-label">
-                    Email Address
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.Email)
-                </div>
-
-
-            </div>
-
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-
-
-            @if (@ViewBag.Address != null)
-            {
-
-                <div class="left" style="width: 48%; margin-right: 4%;">
-
-                    <div class="display-label">
-                        Address Line 1
-                    </div>
-                    <div class="display-field">
-                        @address.Addressline1
-                    </div>
-
-                    <div class="display-label">
-                        Town
-                    </div>
-                    <div class="display-field">
-                        @address.Town
-                    </div>
-
-                    <div class="display-label">
-                        Postal Code
-                    </div>
-                    <div class="display-field">
-                        @address.PostalCode
-                    </div>
-
-
-                </div>
-
-                <div class="left" style="width: 48%;">
-                    <div class="display-label">
-                        Address Line 2
-                    </div>
-                    <div class="display-field">
-                        @address.Addressline2
-                    </div>
-                    <div class="display-label">
-                        Province
-                    </div>
-                    <div class="display-field">
-                        @(((Province)address.Province).GetDisplayText())
-                    </div>
-
-                </div>
-            }
-            else
-            {
-                <div class="left" style="width: 48%; margin-right: 4%;">
-
-                    <div class="display-label">
-                        Address Line 1
-                    </div>
-                    <div class="display-field">
-                        &nbsp;
-                    </div>
-
-                    <div class="display-label">
-                        Town
-                    </div>
-                    <div class="display-field">
-                        &nbsp;
-                    </div>
-
-                    <div class="display-label">
-                        Postal Code
-                    </div>
-                    <div class="display-field">
-                        &nbsp;
-                    </div>
-
-
-                </div>
-
-                <div class="left" style="width: 48%;">
-                    <div class="display-label">
-                        Address Line 2
-                    </div>
-                    <div class="display-field">
-                        &nbsp;
-                    </div>
-                    <div class="display-label">
-                        Province
-                    </div>
-                    <div class="display-field">
-                        &nbsp;
-                    </div>
-
-                </div>
-            }
         </div>
+
+        <div class="left" style="width: 45%;">
+
+            <div class="display-label">
+                Trading As
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.TradingAs)
+            </div>
+            <div class="display-label">
+                VAT Number
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.VATNumber)
+            </div>
+
+
+            <h3>&nbsp;</h3>
+
+            <div class="display-label">
+                Email Address
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.Email)
+            </div>
+
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+
+        @if (@ViewBag.Address != null)
+        {
+
+            <div class="left" style="width: 48%; margin-right: 4%;">
+
+                <div class="display-label">
+                    Address Line 1
+                </div>
+                <div class="display-field">
+                    @address.Addressline1
+                </div>
+
+                <div class="display-label">
+                    Town
+                </div>
+                <div class="display-field">
+                    @address.Town
+                </div>
+
+                <div class="display-label">
+                    Postal Code
+                </div>
+                <div class="display-field">
+                    @address.PostalCode
+                </div>
+
+
+            </div>
+
+            <div class="left" style="width: 48%;">
+                <div class="display-label">
+                    Address Line 2
+                </div>
+                <div class="display-field">
+                    @address.Addressline2
+                </div>
+                <div class="display-label">
+                    Province
+                </div>
+                <div class="display-field">
+                    @(((Province)address.Province).GetDisplayText())
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="left" style="width: 48%; margin-right: 4%;">
+
+                <div class="display-label">
+                    Address Line 1
+                </div>
+                <div class="display-field">
+                    &nbsp;
+                </div>
+
+                <div class="display-label">
+                    Town
+                </div>
+                <div class="display-field">
+                    &nbsp;
+                </div>
+
+                <div class="display-label">
+                    Postal Code
+                </div>
+                <div class="display-field">
+                    &nbsp;
+                </div>
+
+
+            </div>
+
+            <div class="left" style="width: 48%;">
+                <div class="display-label">
+                    Address Line 2
+                </div>
+                <div class="display-field">
+                    &nbsp;
+                </div>
+                <div class="display-label">
+                    Province
+                </div>
+                <div class="display-field">
+                    &nbsp;
+                </div>
+
+            </div>
+        }
+    </div>
 
     <div class="left" style="width: 33%; margin-right: 4%;">
 
@@ -260,39 +260,78 @@
     <p>
         <strong class="uppercase">KPI</strong>
     </p>
-    <div class="left" style="width: 40%; margin-right: 4%;">
-        <div class="display-label">
-            Outstanding
-        </div>
-        <div class="display-field">
-            0
+    @if (@ViewBag.KPI != null)
+    {
+        <div class="left" style="width: 40%; margin-right: 4%;">
+            <div class="display-label">
+                Outstanding
+            </div>
+            <div class="display-field">
+                @ViewBag.KPI.OutstandingPallets
+            </div>
+
+            <div class="display-label">
+                Disputes
+            </div>
+            <div class="display-field">
+                @ViewBag.KPI.Disputes
+            </div>
+
         </div>
 
-        <div class="display-label">
-            Disputes
+        <div class="left" style="width: 40%; margin-right: 4%;">
+            <div class="display-label">
+                Days Outstanding
+            </div>
+            <div class="display-field">
+                0
+            </div>
+
+            <div class="display-label">
+                Days to Resolve
+            </div>
+            <div class="display-field">
+                0
+            </div>
+
         </div>
-        <div class="display-field">
-            0
+    }
+    else
+    {
+        <div class="left" style="width: 40%; margin-right: 4%;">
+            <div class="display-label">
+                Outstanding
+            </div>
+            <div class="display-field">
+                0
+            </div>
+
+            <div class="display-label">
+                Disputes
+            </div>
+            <div class="display-field">
+                0
+            </div>
+
         </div>
 
-    </div>
+        <div class="left" style="width: 40%; margin-right: 4%;">
+            <div class="display-label">
+                Days Outstanding
+            </div>
+            <div class="display-field">
+                0
+            </div>
 
-    <div class="left" style="width: 40%; margin-right: 4%;">
-        <div class="display-label">
-            Days Outstanding
-        </div>
-        <div class="display-field">
-            0
-        </div>
+            <div class="display-label">
+                Days to Resolve
+            </div>
+            <div class="display-field">
+                0
+            </div>
 
-        <div class="display-label">
-            Days to Resolve
         </div>
-        <div class="display-field">
-            0
-        </div>
-
-    </div>
+    }
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
     <div id="budgets">
 
@@ -336,15 +375,15 @@
 
     @if (ViewBag.IncludeLayout == null)
     {
-    <p>
-        @Html.ActionLink("Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })        
-        <a class="info" href="#" onclick="LinkToProducts('@Model.Id')"><i class="fa fa-link"></i>Link Products</a>            
+        <p>
+            @Html.ActionLink("Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
+            <a class="info" href="#" onclick="LinkToProducts('@Model.Id')"><i class="fa fa-link"></i>Link Products</a>
             @if (ViewBag.IncludeLayout == null)
             {
                 <span style="padding: 0 5px;">/</span>
                 <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
             }
-    </p>
+        </p>
     }
 
     @if (ViewBag.IncludeLayout != null)
@@ -370,7 +409,7 @@
     function LinkToProducts(id) {
         $.ajax({
             type: 'POST',
-            url: "SetClientBudget",
+            url: "SetClient",
             data: { "ClientId": id },
             success: function (response) {
                 window.location.href = 'Index#linkproducts';

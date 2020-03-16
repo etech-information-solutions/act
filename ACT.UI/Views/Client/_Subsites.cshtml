@@ -28,13 +28,14 @@
                 </td>
                 <td style="width:15%">
                     @Html.DropDownList("ClientList", "Please Select")<br /><br />
-                    @Html.DropDownList("SiteList", "Please Select")
+                    @*@Html.DropDownList("SiteList")*@
+                    @Html.DropDownList("ClientSiteList", Enumerable.Empty<SelectListItem>(), "Please Select")
                 </td>
                 <td style="width:2%">
                     @if (user.IsAdmin || user.IsPSPAdmin)
                     {
                         <br /><br />
-                        @Html.ActionLink("Add", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#sites" })
+                        @Html.ActionLink("Add", "AddSite", new { sourceview = "SubSites" }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#subsites" })
                     }
                 </td>
                 <td style="width:5%">
@@ -131,7 +132,7 @@
     <div id="BottomLists" style="display:none;">
         <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
 
-        <div class="left" style="width: 42%; margin-right: 4%;">
+        <div class="left" style="width: 35%; margin-right: 4%;">
             <p>
                 <strong class="uppercase">Excluded Sites</strong>
             </p>
@@ -171,14 +172,14 @@
 
             </table>
         </div>
-        <div class="left" style="width: 5%; margin-left: 1%;">
+        <div class="left" style="width: 5%; margin-left: 10%; margin-right: 10px;">
             <br /><br /><br />
             <button id="Copy">>></button>
             <br />
             <br />
             <button id="Remove"><<</button>
         </div>
-        <div class="left" style="width: 43%; margin-right: 2%;">
+        <div class="left" style="width: 35%; margin-right: 2%;">
             <p>
                 <strong class="uppercase">Included Sites</strong>
             </p>
@@ -221,6 +222,10 @@
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
     <script>
         $(document).ready(function () {
+            $('.add').hide();
+            $('.importlabel').hide();
+            $('.importbutton').hide();
+            $('#postedFile').hide();
             //var cId = $('#ClientList option:selected').val();
             //var sId = $('#SiteList option:selected').val();
 
@@ -228,26 +233,31 @@
             //UpdateSites(cId, sId);
 
             $("#ClientList").change(function () {
-               // debugger;
-                var sId = $('#SiteList option:selected').val();
-                UpdateSites($('option:selected', this).val(), sId);
+               //debugger;
+                var cId = $('option:selected', this).val();
+                GetSiteListForClient(cId);
+                //UpdateSites($('option:selected', this).val(), sId);
             });
 
-            $("#SiteList").change(function () {
+            $("#ClientSiteList").change(function () {
               //  debugger;
                 var cId = $('#ClientList option:selected').val();
                 UpdateSites(cId, $('option:selected', this).val());
+                $('.add').show();
+                $('.importlabel').show();
+                $('.importbutton').show();
+                $('#postedFile').show();
             });
 
             $('#Copy').on('click', function () {
                // debugger;
                 //var msId = $('#selectedsite').val();
-                var sId = $('#SiteList option:selected').val();
+                var sId = $('#ClientSiteList option:selected').val();
                 var cId = $('#ClientList option:selected').val();
                 var checkedItem = $('#excludedtabledata input[type=radio]:checked').val();
                 if (checkedItem != undefined) {
                     //save it first
-                    SetIncludedSite(sId, checkedItem);
+                    SetIncludedSite(sId, checkedItem, cId);
                     //then update
                     UpdateSites(cId, sId);
                 } else {
@@ -260,11 +270,11 @@
               //  debugger;
                 //var msId = $('#selectedsite').val();
                 var cId = $('#ClientList option:selected').val();
-                var sId = $('#SiteList option:selected').val();
+                var sId = $('#ClientSiteList option:selected').val();
                 var checkedItem = $('#includedtabledata input[type=radio]:checked').val();
                 if (checkedItem != undefined) {
                     //save it first
-                    SetExcludedSite(sId, checkedItem);
+                    SetExcludedSite(sId, checkedItem, cId);
                     //then update
                     UpdateSites(cId, sId);
                 } else {
@@ -274,14 +284,48 @@
         });
 
         function UpdateSites(cId, sId) {
-            debugger;
+            //debugger;
             if (sId != '' && cId != '') {
                 $('#mainsitedetails').show();
                 $('#BottomLists').show();
+                //GetSiteListForClient(cId);
                 GetSiteDetailsForMain(sId);
                 GetIncludedSites(cId, sId);
                 GetExcludedSites(cId, sId);
             }
+        }
+
+        function GetSiteListForClient(cId) {
+            var options = $("#ClientSiteList");
+            options.empty();
+            $.ajax({
+                type: "GET",
+                url: "GetSiteListForClient",
+                data: { clientId: cId },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    //console.log(data);
+                    var obj = JSON.parse(data.data);
+                    options.append($("<option />").val('0').text('Please Select'));
+                    $.each(obj, function (id, site) {
+                        options.append($("<option />").val(site.Id).text(site.Name));
+                    });
+                    //$('span.sitename').text(data.Name);
+                    //$('span.contactname').text(data.ContactName);
+                    //$('span.contactnumber').text(data.ContactNo);
+                    //$('span.accountcode').text(data.AccountCode);
+                    //$('span.sitedepot').text(data.Depot);
+                    //$('span.sitexcoord').text(data.XCord);
+                    //$('span.siteycoord').text(data.YCord);
+                    //$('span.siteaddress').text(data.Address + '\n' + data.PostalCode);
+                    //$('span.siteregion').text(data.RegionId);
+                    //$('#selectedsite').val(data.Id);
+                },
+                error: function (response) {
+                    alert('Error retrieving site details');
+                }
+            });
         }
 
         function GetSiteDetailsForMain(sId) {
@@ -399,9 +443,9 @@
 
         }
 
-        function SetIncludedSite(msId, sId) {
+        function SetIncludedSite(msId, sId, cId) {
             var data = {
-                "mainSiteId": msId, "movedSiteId": sId
+                "mainSiteId": msId, "movedSiteId": sId, "clientId": cId
             };
             $.ajax({
                 type: 'POST',
@@ -417,9 +461,9 @@
             });
         }
 
-        function SetExcludedSite(msId, sId) {
+        function SetExcludedSite(msId, sId, cId) {
             var data = {
-                "mainSiteId": msId, "movedSiteId": sId
+                "mainSiteId": msId, "movedSiteId": sId, "clientId": cId
             };
             $.ajax({
                 type: 'POST',

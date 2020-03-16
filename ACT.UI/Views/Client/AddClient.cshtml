@@ -176,7 +176,7 @@
                     <input id="Logo.Name" name="Logo.Name" type="hidden" value="Company Logo" />
                     <input id="Logo.Description" name="Logo.Description" class="input" type="hidden" value="Company Logo" />
                 </div>
-                <div class="editor-label uppercase">
+                @*<div class="editor-label uppercase">
                     <h3>Upload Documents</h3>
                     <div class="editor-field" style="margin-bottom: 10px;">
                         @if (Model != null)
@@ -207,12 +207,12 @@
 
                                 <input id = "CompanyFile.File" name= "CompanyFile.File" type="file" value="" data-val-file="1" class="input" />
                                 <input id = "CompanyFile.Name" name="CompanyFile.Name" type="hidden" value="Company File" />
-                                <input id = "CompanyFile.Description" name="CompanyFile.Description" class="input" type="hidden" value="Company File" />
+                                <input id = "CompanyFile.Description" name="CompanyFile.Description" class="input" type="hidden" value="Company File" />*@
 
                     @*@Html.ValidationMessageFor(model => companyFile.RegistrationFile)*@
 
-                                        </div>
-                                    </div>
+                                        @*</div>
+                                    </div>*@
                                 </div>
 
 
@@ -225,14 +225,17 @@
                                         Outstanding
                                     </div>
                                     <div class="editor-field">
-                                        <input type = "text" class="input" placeholder="KPI Outstanding" />
+                                        @Html.TextBoxFor(model => model.KPIOutstanding, new { @class = "input", @placeholder = "Enter KPI Outstanding" })
+                                        @Html.ValidationMessageFor(model => model.KPIOutstanding)
+                                        @*<input type="text" class="input" placeholder="KPI Outstanding" />*@
                                     </div>
 
                                     <div class="editor-label uppercase">
                                         Disputes
                                     </div>
                                     <div class="editor-field">
-                                        <input type = "text" class="input" placeholder="Disputes" />
+                                        @Html.TextBoxFor(model => model.KPIDisputes, new { @class = "input", @placeholder = "Enter KPI Outstanding" })
+                                        @Html.ValidationMessageFor(model => model.KPIDisputes)
                                     </div>
 
                                 </div>
@@ -242,14 +245,16 @@
                                         Days Outstanding
                                     </div>
                                     <div class="editor-field">
-                                        <input type = "text" class="input" placeholder="Days Outstanding" />
+                                        @Html.TextBoxFor(model => model.KPIDaysOutstanding, new { @class = "input", @placeholder = "Enter KPI Outstanding" })
+                                        @Html.ValidationMessageFor(model => model.KPIDaysOutstanding)
                                     </div>
 
                                     <div class="editor-label uppercase">
                                         Days to Resolve
                                     </div>
                                     <div class="editor-field">
-                                        <input type = "text" class="input" placeholder="Days to Resolve" />
+                                        @Html.TextBoxFor(model => model.KPIDaysToResolve, new { @class = "input", @placeholder = "Enter KPI Outstanding" })
+                                        @Html.ValidationMessageFor(model => model.KPIDaysToResolve)
                                     </div>
 
                                 </div>
@@ -319,29 +324,33 @@
 
     });
 
-    function SaveBudget(id) {
-        debugger;
-        var data = $('#budg-' + id + ' :input').serialize();
+    //function SaveBudget(id) {
+    //    debugger;
+    //    var data = $('#budg-' + id + ' :input').serialize();
 
-        $.ajax({
-            type: 'POST',
-            url: "SetClientBudget",
-            data: data,
-            //data : {'_token':csrfdata,'inputstr': strToSend},
-            beforeSend: function () {
-            },
-            success: function (response) {
-                if (response == "true") {
-                    alert('Budget Saved.');
+    //    $.ajax({
+    //        type: 'POST',
+    //        url: "SetClientBudget",
+    //        data: data,
+    //        //data : {'_token':csrfdata,'inputstr': strToSend},
+    //        beforeSend: function () {
+    //        },
+    //        success: function (response) {
+    //            if (response == "true") {
+    //                alert('Budget Saved.');
 
-                } else {
-                    alert('Email Could Not Be Sent. Try again.');
-                }
-            }
-        });
+    //            } else {
+    //                alert('Email Could Not Be Sent. Try again.');
+    //            }
+    //        }
+    //    });
 
 
-    }
+    //}
+
+        function LoadBudgets(cId) {
+
+        }
     function SaveBudget(id) {
         var data = {
             "Id": id, "ClientId": "0", "BudgetYear": $('#ClientBudget_' + id + '_BudgetYear').val(), "January": $('#ClientBudget_' + id + '_January').val(), "February": $('#ClientBudget_' + id + '_February').val(), "March": $('#ClientBudget_' + id + '_March').val(), "April": $('#ClientBudget_' + id + '_April').val(), "May": $('#ClientBudget_' + id + '_May').val(), "June": $('#ClientBudget_' + id + '_June').val(), "July": $('#ClientBudget_' + id + '_July').val(), "August": $('#ClientBudget_' + id + '_August').val(), "September": $('#ClientBudget_' + id + '_September').val(), "October": $('#ClientBudget_' + id + '_October').val(), "November": $('#ClientBudget_' + id + '_November').val(), "December": $('#ClientBudget_' + id + '_December').val()

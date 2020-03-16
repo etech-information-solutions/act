@@ -87,17 +87,27 @@ namespace ACT.Core.Services
             return siteList;
         }
 
-        public List<Site> GetSitesByClientsOfPSPIncluded(int pspId, int clientId, int siteId)
+        public List<Site> GetSitesByClients(int clientId)
         {
             List<Site> siteList;
-            siteList = (from p in context.PSPClients
-                        join c in context.ClientSites
-                        on p.ClientId equals c.ClientId
+            siteList = (from c in context.ClientSites                       
                         join e in context.Sites
                         on c.SiteId equals e.Id
-                        where p.PSPId == pspId
-                        where e.SiteId == siteId
-                        where c.SiteId == siteId
+                        where c.ClientId == clientId
+                        select e).ToList();
+
+            return siteList;
+        }
+        
+
+        public List<Site> GetSitesByClientsIncluded(int clientId, int siteId)
+        {
+            List<Site> siteList;
+            siteList = (from c in context.ClientSites
+                        join e in context.Sites
+                        on c.SiteId equals e.Id
+                        where c.ClientId == clientId
+                       where e.SiteId == siteId
                         select e).ToList();
 
 
@@ -115,21 +125,18 @@ namespace ACT.Core.Services
         }
         
 
-        public List<Site> GetSitesByClientsOfPSPExcluded(int pspId, int clientId, int siteId)
+        public List<Site> GetSitesByClientsExcluded(int clientId, int siteId)
         {
             List<Site> siteList;
             List<int> exclList = new List<int>();
-            exclList.Add(clientId);
+            exclList.Add(siteId);
 
-            siteList = (from p in context.PSPClients
-                        join c in context.ClientSites
-                        on p.ClientId equals c.ClientId
+            siteList = (from c in context.ClientSites
                         join e in context.Sites
                         on c.SiteId equals e.Id
-                        where p.PSPId == pspId
-                        where c.SiteId == siteId
+                        where c.ClientId == clientId
                         where e.SiteId == null
-                        where !exclList.Contains(p.ClientId)
+                        where !exclList.Contains(c.SiteId)
                         select e).ToList();
 
             return siteList;

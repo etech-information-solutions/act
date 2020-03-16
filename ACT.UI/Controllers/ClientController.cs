@@ -41,6 +41,7 @@ namespace ACT.UI.Controllers
             int total = 0;
 
             List<Client> model = new List<Client>();
+            List<ClientViewModel> viewModel = new List<ClientViewModel>();
 
             using (ClientService service = new ClientService())
             {
@@ -49,6 +50,25 @@ namespace ACT.UI.Controllers
                 if (CurrentUser.PSPs.Count > 0)
                 {                    
                     model = service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
+                    foreach (Client cl in model)
+                    {
+                        ClientViewModel vm = new ClientViewModel()
+                        {
+                            Id = cl.Id,
+                            CompanyName = cl.CompanyName,
+                            CompanyRegistrationNumber = cl.CompanyRegistrationNumber,
+                            TradingAs = cl.TradingAs,
+                            Description = cl.Description,
+                            VATNumber = cl.VATNumber,
+                            ContactNumber = cl.ContactNumber,
+                            ContactPerson = cl.ContactPerson,
+                            AdminEmail = cl.AdminEmail,
+                            FinancialPerson = cl.FinancialPerson,
+                            Email = cl.Email,
+                            Status = cl.Status,
+                        };
+                        viewModel.Add(vm);
+                    }
                 }
                 else
                 {
@@ -56,10 +76,10 @@ namespace ACT.UI.Controllers
                 }
 
                 // var testModel = service.ListByColumn(null, "CompanyRegistrationNumber", "123456");
-                total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total();
+                total = (viewModel.Count < pm.Take && pm.Skip == 0) ? viewModel.Count : service.Total();
             }
 
-            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+            PagingExtension paging = PagingExtension.Create(viewModel, total, pm.Skip, pm.Take, pm.Page);
 
 
             return PartialView("_ClientList", paging);
@@ -83,10 +103,12 @@ namespace ACT.UI.Controllers
 
                     return RedirectToAction("Index");
                 }
+                Session["ClientId"] = id;
                 Address address = aservice.Get(model.Id, "Client");
 
                 List<Document> documents = dservice.List(model.Id, "Client");
                 List<Document> logo = dservice.List(model.Id, "ClientLogo");
+                ClientKPI kpi = kservice.GetByColumnWhere("ClientId", id);
 
                 if (address != null)
                 {
@@ -99,6 +121,10 @@ namespace ACT.UI.Controllers
                 if (logo != null)
                 {
                     ViewBag.Logo = logo;
+                }
+                if(kpi != null)
+                {
+                    ViewBag.KPI = kpi;
                 }
             }
 
@@ -137,7 +163,7 @@ namespace ACT.UI.Controllers
                 using (AddressService aservice = new AddressService())
                 using (TransactionScope scope = new TransactionScope())
                 using (DocumentService dservice = new DocumentService())
-                using (ClientKPIService kservice = new ClientKPIService())                    
+                using (ClientKPIService kpiservice = new ClientKPIService())                    
                 // using (ClientBudgetService bservice = new ClientBudgetService())
                 {
                     #region Validation
@@ -208,94 +234,146 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     #region Any Uploads
-                    if (model.CompanyFile != null)
-                    {
-                        foreach (FileViewModel file in model.CompanyFile)
-                        {
-                            if (file.Name != null)
-                            {
-                                // Create folder
-                                string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
+                    //moved to clientlist
+                    //if (model.CompanyFile != null)
+                    //{
+                    //    foreach (FileViewModel file in model.CompanyFile)
+                    //    {
+                    //        if (file.Name != null)
+                    //        {
+                    //            // Create folder
+                    //            string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
 
-                                if (!Directory.Exists(path))
-                                {
-                                    Directory.CreateDirectory(path);
-                                }
+                    //            if (!Directory.Exists(path))
+                    //            {
+                    //                Directory.CreateDirectory(path);
+                    //            }
 
-                                string now = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    //            string now = DateTime.Now.ToString("yyyyMMddHHmmss");
 
-                                Document doc = new Document()
-                                {
-                                    ObjectId = client.Id,
-                                    ObjectType = "Client",
-                                    Status = (int)Status.Active,
-                                    Name = file.Name,
-                                    Category = file.Name,
-                                    Title = file.File.FileName,
-                                    Size = file.File.ContentLength,
-                                    Description = file.File.FileName,
-                                    Type = Path.GetExtension(file.File.FileName),
-                                    Location = $"Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{file.File.FileName}"
-                                };
+                    //            Document doc = new Document()
+                    //            {
+                    //                ObjectId = client.Id,
+                    //                ObjectType = "Client",
+                    //                Status = (int)Status.Active,
+                    //                Name = file.Name,
+                    //                Category = file.Name,
+                    //                Title = file.File.FileName,
+                    //                Size = file.File.ContentLength,
+                    //                Description = file.File.FileName,
+                    //                Type = Path.GetExtension(file.File.FileName),
+                    //                Location = $"Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{file.File.FileName}"
+                    //            };
 
-                                dservice.Create(doc);
+                    //            dservice.Create(doc);
 
-                                string fullpath = Path.Combine(path, $"{now}-{file.File.FileName}");
-                                file.File.SaveAs(fullpath);
-                            }
-                        }
-                    }
+                    //            string fullpath = Path.Combine(path, $"{now}-{file.File.FileName}");
+                    //            file.File.SaveAs(fullpath);
+                    //        }
+                    //    }
+                    //}
 
                     #endregion
 
                     #region Any Logo Uploads
-                    if (model.Logo != null)
+                    if (model.Logo != null && model.Logo.File != null)
                     {
-                        //foreach (FileViewModel logo in model.Logo)
-                        //{
-                        if (model.Logo.Name != null)
+                        // Create folder
+                        string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
+
+                        if (!Directory.Exists(path))
                         {
-                            // Create folder
-                            string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
-
-                            if (!Directory.Exists(path))
-                            {
-                                Directory.CreateDirectory(path);
-                            }
-
-                            string now = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-                            Document doc = new Document()
-                            {
-                                ObjectId = client.Id,
-                                ObjectType = "ClientLogo",
-                                Status = (int)Status.Active,
-                                Name = model.Logo.Name,
-                                Category = model.Logo.Name,
-                                Title = model.Logo.File.FileName,
-                                Size = model.Logo.File.ContentLength,
-                                Description = model.Logo.File.FileName,
-                                Type = Path.GetExtension(model.Logo.File.FileName),
-                                Location = $"Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{model.Logo.File.FileName}"
-                            };
-
-                            dservice.Create(doc);
-
-                            string fullpath = Path.Combine(path, $"{now}-{model.Logo.File.FileName}");
-                            model.Logo.File.SaveAs(fullpath);
+                            Directory.CreateDirectory(path);
                         }
-                        //}
+
+                        string now = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                        Document doc = new Document()
+                        {
+                            ObjectId = client.Id,
+                            ObjectType = "Client",
+                            Status = (int)Status.Active,
+                            Name = model.Logo.Name,
+                            Category = model.Logo.Name,
+                            Title = model.Logo.File.FileName,
+                            Size = model.Logo.File.ContentLength,
+                            Description = model.Logo.Description,
+                            Type = Path.GetExtension(model.Logo.File.FileName),
+                            Location = $"Client/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{model.Logo.File.FileName}"
+                        };
+
+                        dservice.Create(doc);
+
+                        string fullpath = Path.Combine(path, $"{now}-{model.Logo.File.FileName}");
+                        model.Logo.File.SaveAs(fullpath);
                     }
+                    //if (model.Logo != null)
+                    //{
+                    //    //foreach (FileViewModel logo in model.Logo)
+                    //    //{
+                    //    if (model.Logo.Name != null)
+                    //    {
+                    //        // Create folder
+                    //        string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
+
+                    //        if (!Directory.Exists(path))
+                    //        {
+                    //            Directory.CreateDirectory(path);
+                    //        }
+
+                    //        string now = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                    //        Document doc = new Document()
+                    //        {
+                    //            ObjectId = client.Id,
+                    //            ObjectType = "ClientLogo",
+                    //            Status = (int)Status.Active,
+                    //            Name = model.Logo.Name,
+                    //            Category = model.Logo.Name,
+                    //            Title = model.Logo.File.FileName,
+                    //            Size = model.Logo.File.ContentLength,
+                    //            Description = model.Logo.File.FileName,
+                    //            Type = Path.GetExtension(model.Logo.File.FileName),
+                    //            Location = $"Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{model.Logo.File.FileName}"
+                    //        };
+
+                    //        dservice.Create(doc);
+
+                    //        string fullpath = Path.Combine(path, $"{now}-{model.Logo.File.FileName}");
+                    //        model.Logo.File.SaveAs(fullpath);
+                    //    }
+                    //    //}
+                    //}
 
                     #endregion
+
+                    #region KPI
+                    if (model.KPIDisputes > 0)
+                    {
+  
+                        ClientKPI newKPI = new ClientKPI()
+                        {
+                            ClientId = client.Id,
+                            Disputes = model.KPIDisputes,
+                            OutstandingPallets = model.KPIOutstanding,
+                            Passons = 0, //TODO: Fix
+                            MonthlyCost = 0, //TODO: Fix
+                            Status = (int)Status.Active
+                        };
+                        kpiservice.Create(newKPI);
+                       
+                    }
+                    #endregion
+
 
                     scope.Complete();
                 }
                 Notify("The Client was successfully created.", NotificationType.Success);
                 return RedirectToAction("ClientList");
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }
@@ -310,6 +388,7 @@ namespace ACT.UI.Controllers
             using (AddressService aservice = new AddressService())
             using (DocumentService dservice = new DocumentService())
             using (EstimatedLoadService eservice = new EstimatedLoadService())
+            using (ClientKPIService kpiservice = new ClientKPIService())
             {
                 client = service.GetById(id);
 
@@ -320,11 +399,13 @@ namespace ACT.UI.Controllers
 
                     return PartialView("_AccessDenied");
                 }
-
+                Session["ClientId"] = id;
                 Address address = aservice.Get(client.Id, "Client");
 
                 List<Document> logo = dservice.List(client.Id, "ClientLogo");
                 List<Document> documents = dservice.List(client.Id, "Client");
+
+                ClientKPI kpi = kpiservice.GetByColumnWhere("ClientId", client.Id);
 
                 EstimatedLoad load = new EstimatedLoad();
 
@@ -363,7 +444,11 @@ namespace ACT.UI.Controllers
                         AddressLine2 = address?.Addressline2,
                         Province = (address != null) ? (Province)address.Province : Province.All,
                         AddressType = (address != null) ? (AddressType)address.Type : AddressType.Postal,
-                    }
+                    },
+                    KPIDisputes = (kpi!=null?kpi.Disputes:0),
+                    KPIOutstanding = (kpi != null ? kpi.OutstandingPallets : 0),
+                    KPIDaysToResolve = 0, //TODO: FIx
+                    KPIDaysOutstanding = 0,//TODO: FIx
                 };
                 if (logo != null && logo.Count > 0)
                 {
@@ -384,13 +469,13 @@ namespace ACT.UI.Controllers
                     }
                     model.Logo = logofvm.LastOrDefault();
                 }
-                List<FileViewModel> fvm = new List<FileViewModel>();
+                List<Document> fvm = new List<Document>();
                 if (documents != null && documents.Count > 0)
                 {
 
                     foreach (Document doc in documents)
                     {
-                        FileViewModel tfvm = new FileViewModel()
+                        Document tfvm = new Document()
                         {
                             Id = doc.Id,
                             Location = doc.Location,
@@ -432,6 +517,7 @@ namespace ACT.UI.Controllers
                 using (TransactionScope scope = new TransactionScope())
                 using (DocumentService dservice = new DocumentService())
                 using (EstimatedLoadService eservice = new EstimatedLoadService())
+                using (ClientKPIService kpiservice = new ClientKPIService())
                 // using (ClientBudgetService bservice = new ClientBudgetService())
                 {
                     client = service.GetById(model.Id);
@@ -450,7 +536,7 @@ namespace ACT.UI.Controllers
 
                     List<Document> logos = dservice.List(client.Id, "ClientLogo");
 
-
+                    
 
                     #region Validations
 
@@ -528,6 +614,7 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     #region Any Uploads
+                    /*
                     if (model.NewCompanyFile != null)
                     {
                         //foreach (FileViewModel file in model.CompanyFile)
@@ -575,12 +662,11 @@ namespace ACT.UI.Controllers
                             model.NewCompanyFile.File.SaveAs(fullpath);
                         }
                         //}
-                    }
+                        
+                    }*/
 
                     #endregion
-
-
-
+                   
                     #region Any Logos
                     if (model.Logo != null)
                     {
@@ -633,6 +719,39 @@ namespace ACT.UI.Controllers
 
                     #endregion
 
+                    #region ClientKPIs
+                    if (model.KPIDisputes > 0)
+                    {
+                        List<ClientKPI> kpi = kpiservice.ListByColumnWhere("ClientID", model.Id);
+                        if (kpi != null)
+                        {
+                            foreach (ClientKPI k in kpi)
+                            {
+                                k.OutstandingPallets = model.KPIOutstanding;
+                                k.Disputes = model.KPIDisputes;
+                                //k.KPIDaysOutstanding = model.KPIDaysOutstanding;
+                                //k.KPIDaysToResolve = model.KPIDaysToResolve;
+
+                                kpiservice.Update(k);
+                            }
+                        }
+                        else
+                        {
+                            ClientKPI newKPI = new ClientKPI()
+                            {
+                                ClientId = client.Id,
+                                Disputes = model.KPIDisputes,
+                                OutstandingPallets = model.KPIOutstanding,
+                                Passons = 0, //TODO: Fix
+                                MonthlyCost = 0, //TODO: Fix
+                                Status = (int)Status.Active
+                            };
+                            kpiservice.Create(newKPI);
+                        }
+                    }
+
+                    #endregion
+
                     scope.Complete();
                 }
 
@@ -640,8 +759,9 @@ namespace ACT.UI.Controllers
 
                 return RedirectToAction("ClientList");
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }
@@ -676,8 +796,9 @@ namespace ACT.UI.Controllers
                 Notify("The selected Client was successfully updated.", NotificationType.Success);
                 return RedirectToAction("ClientList");
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }
@@ -784,6 +905,10 @@ namespace ACT.UI.Controllers
             List<Site> model = new List<Site>();
             //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+            int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            //string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
+            //int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
             using (SiteService service = new SiteService())
             {
                 pm.Sort = pm.Sort ?? "DESC";
@@ -794,10 +919,18 @@ namespace ACT.UI.Controllers
             }
 
             PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
-            List<Client> clientList;
+            List<Client> clientList = new List<Client>(); ;
             using (ClientService clientService = new ClientService())
             {
-                clientList = clientService.GetClientsByPSP(pspId);
+                if (clientID > 0)
+                {
+                    Client chosenClient = clientService.GetById(clientID);
+                    clientList.Add(chosenClient);
+                }
+                else
+                {
+                    clientList = clientService.GetClientsByPSP(pspId);
+                }
             }
 
             IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
@@ -813,21 +946,19 @@ namespace ACT.UI.Controllers
 
         //
         // GET: /Client/SiteDetails/5
-        public ActionResult SiteDetails(int id, bool layout = true)
+        public ActionResult SiteDetails(int id, string sourceView, bool layout = true)
         {
             Site site;
             //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             List<Region> regionOptions = new List<Region>();
 
-
-
             using (SiteService service = new SiteService())
             using (RegionService rservice = new RegionService())
             using (AddressService aservice = new AddressService())
             {
                 site = service.GetById(id);
-                regionOptions = rservice.ListByColumnWhere("PSPId", pspId);
+               // regionOptions = rservice.ListByColumnWhere("PSPId", pspId);
 
                 if (site == null)
                 {
@@ -860,26 +991,34 @@ namespace ACT.UI.Controllers
                     Status = (int)site.Status,
                     EditMode = true,
                     RegionId = site.RegionId,
+                    SourceView = sourceView,
                     //RegionOptions = regionOptions,
-                    FullAddress = new AddressViewModel()
-                    {
-                        EditMode = true,
-                        Town = address?.Town,
-                        Id = address?.Id ?? 0,
-                        PostCode = address?.PostalCode,
-                        AddressLine1 = address?.Addressline1,
-                        AddressLine2 = address?.Addressline2,
-                        Province = (address != null) ? (Province)address.Province : Province.All,
-                        AddressType = (address != null) ? (AddressType)address.Type : AddressType.Postal,
-                    }
+                    //FullAddress = new AddressViewModel()
+                    //{
+                    //    EditMode = true,
+                    //    Town = address?.Town,
+                    //    Id = address?.Id ?? 0,
+                    //    PostCode = address?.PostalCode,
+                    //    AddressLine1 = address?.Addressline1,
+                    //    AddressLine2 = address?.Addressline2,
+                    //    Province = (address != null) ? (Province)address.Province : Province.All,
+                    //    AddressType = (address != null) ? (AddressType)address.Type : AddressType.Postal,
+                    //}
+
                 };
+                if (layout)
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+                ViewBag.Address = address;
+               // ViewBag.RegionOptions = regionOptions;
                 return View(model);
             }
         }
 
         // GET: Client/AddSite
         [Requires(PermissionTo.Create)]
-        public ActionResult AddSite()
+        public ActionResult AddSite(string sourceView)
         {
             
             //int pspId = Session[ "UserPSP" ];
@@ -898,8 +1037,16 @@ namespace ACT.UI.Controllers
 
             });
             //regionOptions = Model.RegionOptions.Where(r => r.PSPId == pspId).ToList();
-            SiteViewModel model = new SiteViewModel() { EditMode = true };//, RegionOptions = regionOptions
-            ViewBag.RegionOptions = regionDDL;            
+            SiteViewModel model = new SiteViewModel() { EditMode = true, SourceView = sourceView };//, RegionOptions = regionOptions
+            ViewBag.RegionOptions = regionDDL;
+            //if (sourceView == "ManageSites")
+            //{
+            //    return RedirectToAction("ManageSites");
+            //}
+            //else
+            //{
+            //    return RedirectToAction("SubSites");
+            //}
             return View(model);
         }
 
@@ -921,6 +1068,9 @@ namespace ACT.UI.Controllers
                
                 string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
                 int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+
+                string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
+                int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
 
                 using (SiteService siteService = new SiteService())
                 using (ClientSiteService csService = new ClientSiteService())
@@ -956,6 +1106,10 @@ namespace ACT.UI.Controllers
                         Status = (int)model.Status,
                         RegionId = model.RegionId
                     };
+                    if (SiteID > 0)
+                    {
+                        site.SiteId = SiteID;
+                    }
                     site = siteService.Create(site);
                     #endregion
 
@@ -997,10 +1151,18 @@ namespace ACT.UI.Controllers
                 }
 
                 Notify("The Site was successfully created.", NotificationType.Success);
-                return RedirectToAction("ManageSites");
+                if (model.SourceView == "ManageSites")
+                {
+                    return RedirectToAction("ManageSites");
+                }
+                else
+                {
+                    return RedirectToAction("SubSites");
+                }
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }
@@ -1009,21 +1171,17 @@ namespace ACT.UI.Controllers
 
         // GET: Client/EditSite/5
         [Requires(PermissionTo.Edit)]
-        public ActionResult EditSite(int id)
+        public ActionResult EditSite(int id) //, string sourceView
         {
             Site site;
             //int pspId = Session[ "UserPSP" ];
-            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-            List<Region> regionOptions = new List<Region>();
-
-
 
             using (SiteService service = new SiteService())
             using (RegionService rservice = new RegionService())
             using (AddressService aservice = new AddressService())
             {
                 site = service.GetById(id);
-                regionOptions = rservice.ListByColumnWhere("PSPId", pspId);
+                //regionOptions = rservice.ListByColumnWhere("PSPId", pspId);
 
                 if (site == null)
                 {
@@ -1033,7 +1191,6 @@ namespace ACT.UI.Controllers
                 }
 
                 Address address = aservice.Get(site.Id, "Site");
-
 
                 bool unverified = (site.Status == (int)PSPClientStatus.Unverified);
 
@@ -1067,8 +1224,33 @@ namespace ACT.UI.Controllers
                         AddressLine2 = address?.Addressline2,
                         Province = (address != null) ? (Province)address.Province : Province.All,
                         AddressType = (address != null) ? (AddressType)address.Type : AddressType.Postal,
-                    }
+                    },
+                    SourceView = "ManageSites",
                 };
+
+                //SiteViewModel model = new SiteViewModel() { EditMode = true, SourceView = sourceView };//, RegionOptions = regionOptions
+                //int pspId = Session[ "UserPSP" ];
+                int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+                List<Region> regionOptions = new List<Region>();
+
+                regionOptions = rservice.ListByColumnWhere("PSPId", pspId);
+
+                IEnumerable<SelectListItem> regionDDL = regionOptions.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Description
+
+                });
+                ViewBag.RegionOptions = regionDDL;
+                //if (sourceView == "ManageSites")
+                //{
+                //    return RedirectToAction("ManageSites");
+                //}
+                //else
+                //{
+                //    return RedirectToAction("SubSites");
+                //}
+
                 return View(model);
             }
         }
@@ -1180,8 +1362,9 @@ namespace ACT.UI.Controllers
 
                 return RedirectToAction("ManageSites");
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }
@@ -1216,8 +1399,9 @@ namespace ACT.UI.Controllers
                 Notify("The selected Client was successfully updated.", NotificationType.Success);
                 return RedirectToAction("ManageSites");
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }
@@ -1229,7 +1413,7 @@ namespace ACT.UI.Controllers
             if (!string.IsNullOrEmpty(clientId))
             {
                 Session["ClientId"] = clientId;//wroite to session to use for adds and updates
-                List<Site> sites = null;
+                List<Site> sites = new List<Site>();
                 //int pspId = Session[ "UserPSP" ];
                 //int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
 
@@ -1240,11 +1424,19 @@ namespace ACT.UI.Controllers
                     sites = service.GetSitesByClientIncluded(int.Parse(clientId)); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
                     foreach (Site site in sites)
                     {
-                        site.Region = regions.FirstOrDefault(r => r.Id == site.RegionId);
+                        if (site.RegionId != null)
+                        {
+                            site.Region = regions.FirstOrDefault(r => r.Id == site.RegionId);
+                        } else
+                        {
+                            site.Region = null;
+                        }
                     }
                 }
                 //var jsonList = JsonConvert.SerializeObject(sites);
-                return Json(sites, JsonRequestBehavior.AllowGet);
+                //return Json(sites, JsonRequestBehavior.AllowGet);
+                var data = JsonConvert.SerializeObject(sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+                return Json(new { data = data }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -1264,17 +1456,30 @@ namespace ACT.UI.Controllers
             int total = 0;
 
             List<Site> model = new List<Site>();
-            List<Client> clientList;
+            List<Client> clientList = new List<Client>();
             List<Site> mainSiteList;
 
             //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+            int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            //string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
+            //int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
 
             using (ClientService clientService = new ClientService())
             using (SiteService sitesService = new SiteService())
             {
-                mainSiteList = sitesService.GetSitesByClientsOfPSP(pspId);
-                clientList = clientService.GetClientsByPSP(pspId);
+                if (clientID > 0)
+                {
+                    Client chosenClient = clientService.GetById(clientID);
+                    clientList.Add(chosenClient);
+                }
+                else
+                {
+
+                    //mainSiteList = sitesService.GetSitesByClientsOfPSP(pspId);
+                    clientList = clientService.GetClientsByPSP(pspId);
+                }
             }
             IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
             {
@@ -1283,13 +1488,13 @@ namespace ACT.UI.Controllers
 
             });
             ViewBag.ClientList = clientDDL;
-            IEnumerable<SelectListItem> siteListDDL = mainSiteList.Select(c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.Name
+            //IEnumerable<SelectListItem> siteListDDL = mainSiteList.Select(c => new SelectListItem
+            //{
+            //    Value = c.Id.ToString(),
+            //    Text = c.Name
 
-            });
-            ViewBag.SiteList = siteListDDL;
+            //});
+           // ViewBag.SiteList = siteListDDL;
             ViewBag.SelectedSiteId = siteId;
 
 
@@ -1297,18 +1502,50 @@ namespace ACT.UI.Controllers
         }
 
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult GetSitesForClientSiteIncluded(string clientId, string siteId)
+        public JsonResult GetSiteListForClient(string clientId)
         {
             if (clientId != null && clientId != "")
             {
+                Session["ClientId"] = clientId;
                 List<Site> sites = null;
+
                 //int pspId = Session[ "UserPSP" ];
                 int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
 
                 using (SiteService service = new SiteService())
+                using (ClientSiteService cservice = new ClientSiteService())
                 {
 
-                    sites = service.GetSitesByClientsOfPSPIncluded(pspId, int.Parse(clientId), int.Parse(siteId)); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+
+                    sites = service.GetSitesByClients(int.Parse(clientId)); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+
+                }
+                //var jsonList = JsonConvert.SerializeObject(sites);
+                //return Json(sites, JsonRequestBehavior.AllowGet);
+                var data = JsonConvert.SerializeObject(sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+                return Json(new { data = data }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetSitesForClientSiteIncluded(string clientId, string siteId)
+        {
+            if (clientId != null && clientId != "")
+            {
+                Session["ClientId"] = clientId;
+                Session["SiteId"] = siteId;
+                List<Site> sites = null;
+                //int pspId = Session[ "UserPSP" ];
+               // int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+
+                using (SiteService service = new SiteService())
+                {
+
+                    sites = service.GetSitesByClientsIncluded(int.Parse(clientId), int.Parse(siteId)); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
 
                 }
                 //var jsonList = JsonConvert.SerializeObject(sites);
@@ -1323,16 +1560,18 @@ namespace ACT.UI.Controllers
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
         public JsonResult GetSitesForClientSiteExcluded(string clientId, string siteId)
         {
-            if (clientId != null && clientId != "")
+            if (!string.IsNullOrEmpty(clientId) && !string.IsNullOrEmpty(siteId) )
             {
+                Session["ClientId"] = clientId;
+                Session["SiteId"] = siteId;
                 List<Site> sites = null;
                 //int pspId = Session[ "UserPSP" ];
-                int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+                //int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
 
                 using (SiteService service = new SiteService())
                 {
 
-                    sites = service.GetSitesByClientsOfPSPExcluded(pspId, int.Parse(clientId), int.Parse(siteId)); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+                    sites = service.GetSitesByClientsExcluded(int.Parse(clientId), int.Parse(siteId)); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
 
                 }
                 //var jsonList = JsonConvert.SerializeObject(sites);
@@ -1349,6 +1588,8 @@ namespace ACT.UI.Controllers
         {
             if (siteId != null && siteId != "")
             {
+                //Session["ClientId"] = clientId;
+                Session["SiteId"] = siteId;
                 Site site = null;
                 using (SiteService service = new SiteService())
                 {
@@ -1368,6 +1609,8 @@ namespace ACT.UI.Controllers
         {
             if (!string.IsNullOrEmpty(mainSiteId) && !string.IsNullOrEmpty(movedSiteId) && !string.IsNullOrEmpty(clientId))
             {
+                //Session["ClientId"] = clientId;
+                Session["SiteId"] = mainSiteId;
                 //using (GroupService service = new GroupService())
                 //using (ClientSiteService clientservice = new ClientSiteService())
                 using (SiteService sservice = new SiteService())
@@ -1402,9 +1645,11 @@ namespace ACT.UI.Controllers
         {
             if (!string.IsNullOrEmpty(mainSiteId) && !string.IsNullOrEmpty(movedSiteId) && !string.IsNullOrEmpty(clientId))
             {
+                //Session["ClientId"] = clientId;
+                Session["SiteId"] = mainSiteId;
                 //using (GroupService service = new GroupService())
                 //using (ClientSiteService clientservice = new ClientSiteService())
-                using(SiteService sservice = new SiteService())
+                using (SiteService sservice = new SiteService())
                 using (TransactionScope scope = new TransactionScope())
                 {
                     Site currentSite = sservice.GetById(int.Parse(movedSiteId));
@@ -1431,7 +1676,88 @@ namespace ACT.UI.Controllers
             }
         }
 
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetSiteBudgets(string siteId)
+        {
+            if (siteId != null && siteId != "")
+            {
+                List<SiteBudget> load = null;
 
+                using (SiteBudgetService bservice = new SiteBudgetService())
+                {
+                    load = bservice.ListByColumnWhere("SiteId", int.Parse(siteId));
+                    return Json(load, JsonRequestBehavior.AllowGet);
+                }
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetSiteBudget(string Id, string SiteId, string BudgetYear, string January, string February, string March, string April, string May, string June, string July, string August, string September, string October, string November, string December)
+        {
+            if (Id != null)
+            {
+                using (SiteBudgetService bservice = new SiteBudgetService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    //Collection of budgets or singular?
+                    if (int.Parse(Id) > 0)
+                    {
+                        SiteBudget budget = bservice.GetById(int.Parse(Id));
+
+                        budget.SiteId = int.Parse(SiteId);
+                        budget.Status = (int)Status.Active;
+                        budget.BudgetYear = DateTime.Now.Year;
+                        budget.January = int.Parse(January);
+                        budget.February = int.Parse(February);
+                        budget.March = int.Parse(March);
+                        budget.April = int.Parse(April);
+                        budget.May = int.Parse(May);
+                        budget.June = int.Parse(June);
+                        budget.July = int.Parse(July);
+                        budget.August = int.Parse(August);
+                        budget.September = int.Parse(September);
+                        budget.October = int.Parse(October);
+                        budget.November = int.Parse(November);
+                        budget.December = int.Parse(December);
+
+
+
+                        bservice.Update(budget);
+                    }
+                    else
+                    {
+                        SiteBudget budget = new SiteBudget();
+                        budget.SiteId = int.Parse(SiteId);
+                        budget.BudgetYear = DateTime.Now.Year;
+                        budget.January = int.Parse(January);
+                        budget.February = int.Parse(February);
+                        budget.March = int.Parse(March);
+                        budget.April = int.Parse(April);
+                        budget.May = int.Parse(May);
+                        budget.June = int.Parse(June);
+                        budget.July = int.Parse(July);
+                        budget.August = int.Parse(August);
+                        budget.September = int.Parse(September);
+                        budget.October = int.Parse(October);
+                        budget.November = int.Parse(November);
+                        budget.December = int.Parse(December);
+
+                        bservice.Create(budget);
+                    }
+                    scope.Complete();
+                }
+
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
 
         #endregion
 
@@ -1522,8 +1848,9 @@ namespace ACT.UI.Controllers
                 Notify("The Group was successfully created.", NotificationType.Success);
                 return RedirectToAction("ClientGroups");
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }
@@ -1599,8 +1926,9 @@ namespace ACT.UI.Controllers
 
                 return RedirectToAction("ClientGroups");
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }
@@ -1641,8 +1969,9 @@ namespace ACT.UI.Controllers
                 Notify("The selected Group was successfully updated.", NotificationType.Success);
                 return RedirectToAction("ClientGroups");
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }
@@ -2383,8 +2712,9 @@ namespace ACT.UI.Controllers
                 Notify("The Transporter was successfully created.", NotificationType.Success);
                 return RedirectToAction("ManageTransporters");
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }
@@ -2492,8 +2822,9 @@ namespace ACT.UI.Controllers
 
                 return RedirectToAction("ManageTransporters");
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }
@@ -2528,8 +2859,9 @@ namespace ACT.UI.Controllers
                 Notify("The selected Transporter was successfully updated.", NotificationType.Success);
                 return RedirectToAction("ManageSites");
             }
-            catch
+            catch (Exception ex)
             {
+                ViewBag.Message = ex.Message;
                 return View();
             }
         }
@@ -2772,6 +3104,14 @@ namespace ACT.UI.Controllers
 
         [HttpPost]
         // GET: /Client/ImportSites
+        public ActionResult ImportSubSites(ImportFileModel model)
+        {
+
+            return View() ;
+        }
+
+        [HttpPost]
+        // GET: /Client/ImportSites
         public ActionResult ImportSites(HttpPostedFileBase postedFile)
         {
             if (postedFile != null)
@@ -2788,6 +3128,8 @@ namespace ACT.UI.Controllers
                 try { 
                     string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
                     int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                    string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
+                    int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
 
                     using (var sreader = new StreamReader(postedFile.InputStream))
                     using (SiteService siteService = new SiteService())
@@ -2820,6 +3162,7 @@ namespace ACT.UI.Controllers
                                 Site site = new Site()
                                 {
                                     Name = rows[0].ToString(),
+                                    
                                     Description = rows[1].ToString(),
                                     XCord = rows[1].ToString(),
                                     YCord = rows[2].ToString(),
@@ -2835,6 +3178,10 @@ namespace ACT.UI.Controllers
                                     Status = (int)Status.Pending,
                                     RegionId = regionId
                                 };
+                                //For Subsites
+                                if (SiteID > 0) {
+                                    site.SiteId = SiteID;
+                                }
                                 site = siteService.Create(site);
                                 #endregion
 

@@ -74,6 +74,7 @@
     <Compile Include="Attributes\ViewModelBindingAttribute.cs" />
     <Compile Include="Encryption\Encryption.cs" />
     <Compile Include="Enums\ActivityTypes.cs" />
+    <Compile Include="Enums\SiteType.cs" />
     <Compile Include="Enums\ServiceType.cs" />
     <Compile Include="Enums\CancellationReason.cs" />
     <Compile Include="Enums\DinnerClaimRejectionReasons.cs" />

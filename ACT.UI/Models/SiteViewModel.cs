@@ -39,6 +39,7 @@ namespace ACT.UI.Models
         public int Status { get; set; }
         public bool EditMode { get; set; }
 
+        public string SourceView { get; set; }
 
         public AddressViewModel FullAddress { get; set; }
 

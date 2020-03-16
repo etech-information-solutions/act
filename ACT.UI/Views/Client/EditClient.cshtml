@@ -1,4 +1,4 @@
-﻿@model ClientViewModel
+﻿s@model ClientViewModel
 
 @using ACT.Data.Models;
 @using ACT.Core.Enums;
@@ -148,24 +148,26 @@
 
                     <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 87%;">
                         <option value="">-- select</option>
-                        string prov = (model => model.Address.Province);
+                        @*@string prov = (model => model.Address.Province);*@
                         @foreach (int p in Enum.GetValues(typeof(Province)))
                         {
+                            string provinceText = Model.Address.Province.ToString().Trim().ToLower();
                             string text = ((Province)p).GetDisplayText();
+                            string ltext = text.Trim().ToLower();
                             Province province = (Province)p;
                             //string prov = "";
                             if (text.ToLower() == "all")
                             {
                                 continue;
                             }
-                            @*else if (text.ToLower() == prov)
+                            else if (text.Trim().ToLower() == provinceText)
                             {
-                                <option value="p" "selected=selected">text</option>
+                                <option value="@p" selected="selected">@text</option>
                             }
                             else
                             {
-                                <option value="p" >text</option>
-                            }*@
+                                <option value="@p" >@text</option>
+                            }
 
                             @*string sel = (province == @prov) ? "selected=selected" : string.Empty;
 
@@ -210,29 +212,44 @@
             <div class="editor-label uppercase">
                 Uploaded Documents
                 <div class="editor-field" style="margin-bottom: 10px;">
-                    @if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
+                    @*@if (Model.CompanyFile != null && model.CompanyFile.Count() > 0)
                     {
-                        foreach (FileViewModel companyFile in Model.CompanyFile)
-                        {
-                            @Html.HiddenFor(model => companyFile.Id)
+                        <div id="supporting-@model.Id-docs" class="none">
+                        <ul class="list">
+                            @foreach (var d in model.CompanyFile.Where(s => s.Status == (Int32)Status.Active))
+                            {
+                                <li style="line-height: 20px;">
+                                    <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )" target="_blank">
+                                        @d.Name (@d.Type)
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    }*@
+       @if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
+        {
+            foreach (Document companyFile in Model.CompanyFile.Where(s=>s.Status == (Int32)Status.Active))
+            {
+                @Html.HiddenFor(model => companyFile.Id)
 
-                            <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
+                <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
 
-                                <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = companyFile.Id })">
-                                    <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
+                    <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = companyFile.Id })">
+                        <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
 
-                                    companyFile.Name (companyFile.Extension)
-                                </a>
+                        companyFile.Name (companyFile.Extension)
+                    </a>
 
-                            </div>
+                </div>
 
-                        }
-                    }
+            }
+        }
 
 
-                    <input id="NewCompanyFile.File" name="NewCompanyFile.File" type="file" value="" data-val-file="1" class="input" />
-                    <input id="NewCompanyFile.Name" name="NewCompanyFile.Name" type="hidden" value="Company File" />
-                    <input id="NewCompanyFile.Description" name="NewCompanyFile.Description" class="input" type="hidden" value="Company File" />
+        @*<input id="NewCompanyFile.File" name="NewCompanyFile.File" type="file" value="" data-val-file="1" class="input" />
+        <input id="NewCompanyFile.Name" name="NewCompanyFile.Name" type="hidden" value="Company File" />
+        <input id="NewCompanyFile.Description" name="NewCompanyFile.Description" class="input" type="hidden" value="Company File" />*@
 
                     @*@Html.ValidationMessageFor(model => companyFile.RegistrationFile)*@
 
@@ -250,14 +267,17 @@
                 Outstanding
             </div>
             <div class="editor-field">
-                <input type="text" class="input" placeholder="KPI Outstanding" />
+                @Html.TextBoxFor(model => model.KPIOutstanding, new { @class = "input", @placeholder = "Enter Outstanding KPI" })
+                @Html.ValidationMessageFor(model => model.KPIOutstanding)
+                
             </div>
 
             <div class="editor-label uppercase">
                 Disputes
             </div>
             <div class="editor-field">
-                <input type="text" class="input" placeholder="Disputes" />
+                @Html.TextBoxFor(model => model.KPIDisputes, new { @class = "input", @placeholder = "Enter KPI Disputes" })
+                @Html.ValidationMessageFor(model => model.KPIDisputes)               
             </div>
 
         </div>
@@ -267,14 +287,14 @@
                 Days Outstanding
             </div>
             <div class="editor-field">
-                <input type="text" class="input" placeholder="Days Outstanding" />
+                <input type="text" class="input" placeholder="Days Outstanding" value="0" />
             </div>
 
             <div class="editor-label uppercase">
                 Days to Resolve
             </div>
             <div class="editor-field">
-                <input type="text" class="input" placeholder="Days to Resolve" />
+                <input type="text" class="input" placeholder="Days to Resolve" value="0" />
             </div>
 
         </div>

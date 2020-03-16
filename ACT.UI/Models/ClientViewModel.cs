@@ -68,12 +68,17 @@ namespace ACT.UI.Models
         public AddressViewModel Address { get; set; }
 
         public ICollection<ClientKPI> ClientKPI { get; set; }
+        public Nullable<decimal> KPIOutstanding { get; set; }
+        public Nullable<decimal> KPIDisputes { get; set; }
+        public Nullable<decimal> KPIDaysOutstanding { get; set; }
+        public int KPIDaysToResolve { get; set; }
 
         [Display(Name = "Company Documents")]
-        public ICollection<FileViewModel> CompanyFile { get; set; }
+        //public ICollection<FileViewModel> CompanyFile { get; set; }
+        public List<Document> CompanyFile { get; set; }
         //[Required]
-        [Display(Name = "Company Documents")]
-        public FileViewModel NewCompanyFile { get; set; }
+        //[Display(Name = "Company Documents")]
+        //public FileViewModel NewCompanyFile { get; set; }
 
         //[Required]
         [Display(Name = "Company Logo")]

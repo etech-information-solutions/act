@@ -156,6 +156,7 @@
     </Compile>
     <Compile Include="Models\AddressViewModel.cs" />
     <Compile Include="Models\BudgetViewModel.cs" />
+    <Compile Include="Models\ImportFileModel.cs" />
     <Compile Include="Models\GroupViewModel.cs" />
     <Compile Include="Models\SiteViewImportModel.cs" />
     <Compile Include="Models\TransporterViewModel.cs" />

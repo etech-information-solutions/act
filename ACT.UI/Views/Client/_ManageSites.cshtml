@@ -34,7 +34,7 @@
 }
 
 
-@using (Html.BeginForm("ImportSites", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @style = "width: auto;" }))
+@using (Html.BeginForm("ImportSites", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#managesites", @class = "custom-validate", @style = "width: auto;", id = "importsites" }))
 {
     <p>
         <table style="width:100%" border="0">
@@ -46,7 +46,7 @@
                     @Html.DropDownList("ClientList", "Please Select")
                 </td>
                 <td style="width:2%">
-                    @Html.ActionLink("Add", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#managesites" })
+                    @Html.ActionLink("Add", "AddSite", new { sourceview = "ManageSites" }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#managesites" })
                 </td>
                 <td style="width:5%">
                     &nbsp;
@@ -69,205 +69,145 @@
     </p>
 }
 
-    <table id="sites-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#sites-table_wrapper" data-starting-point=".ap-tabs ul">
-        <thead>
-            <tr>
-                @*<th data-name="Count">
-                        #
-                    </th>*@
-                <th data-name="RegionId" data-column="RegionId">
-                    Region
+<table id="sites-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#sites-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            @*<th data-name="Count">
+                    #
+                </th>*@
+            <th data-name="RegionId" data-column="RegionId">
+                Region
+            </th>
+            <th data-name="Name" data-column="Name">
+                Site Name
+            </th>
+            <th data-name="XCord" data-column="XCord">
+                Site X Coordinate
+            </th>
+            <th data-name="YCord" data-column="YCord">
+                Site Y Coordinate
+            </th>
+            <th data-name="Address" data-column="Address">
+                Site Address
+            </th>
+            <th data-name="PostalCode" data-column="PostalCode">
+                Postal Code
+            </th>
+            <th data-name="ContactNo" data-column="ContactNo">
+                Contact Number
+            </th>
+            <th data-name="ContactName" data-column="ContactName">
+                Contact Name
+            </th>
+            <th data-name="PlanningPoint" data-column="PlanningPoint">
+                Planning Point
+            </th>
+            @*<th data-name="SiteType" data-column="SiteType">
+                    Site Type
                 </th>
-                <th data-name="Name" data-column="Name">
-                    Site Name
-                </th>
-                <th data-name="XCord" data-column="XCord">
-                    Site X Coordinate
-                </th>
-                <th data-name="YCord" data-column="YCord">
-                    Site Y Coordinate
-                </th>
-                <th data-name="Address" data-column="Address">
-                    Site Address
-                </th>
-                <th data-name="PostalCode" data-column="PostalCode">
-                    Postal Code
-                </th>
-                <th data-name="ContactNo" data-column="ContactNo">
-                    Contact Number
-                </th>
-                <th data-name="ContactName" data-column="ContactName">
-                    Contact Name
-                </th>
-                <th data-name="PlanningPoint" data-column="PlanningPoint">
-                    Planning Point
-                </th>
-                @*<th data-name="SiteType" data-column="SiteType">
-                        Site Type
-                    </th>
-                    <th data-name="SiteBudgets" data-column="SiteBudgets">
-                        Subsites Budget
-                    </th>*@
-                <th data-name="Actions">
-                    Actions
-                </th>
-            </tr>
-        </thead>
+                <th data-name="SiteBudgets" data-column="SiteBudgets">
+                    Subsites Budget
+                </th>*@
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
 
-        <tbody>
-            @*@if (Model != null && items != null && items.Count() > 0)
-                {
-                    foreach (var item in items)
-                    {
+    <tbody></tbody>
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">*@
-
-            @*<td width="1%">
-                    @count
-                </td>*@
-
-
-            @*@using (RegionService reg = new RegionService())
-                {
-                    Region region = reg.GetById((int)item.RegionId);
-                <td style="width: 15%;">
-                    @region.Name
-                </td>
-                }
-
-                    <td>
-                        @item.Name
-                    </td>
-                    <td>
-                        @item.XCord
-                    </td>
-                    <td>
-                        @item.YCord
-                    </td>
-                    <td>
-                        @item.Address
-                    </td>
-                    <td>
-                        @item.PostalCode
-                    </td>
-                    <td>
-                        @item.ContactNo
-                    </td>
-                    <td>
-                        @item.ContactName
-                    </td>
-                    <td>
-                        @item.PlanningPoint
-                    </td>
-                    <td>
-                        @item.SiteType
-                    </td>
-                    <td>*@
-            @*@item.SiteBudgets*@
-            @*</td>
-                <td width="15%">*@
-            @*@Html.ActionLink("Edit", "EditSite", new { id = item.Id, returnView = "ManageSites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-                @Html.ActionLink("Budgets", "Budgets", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })*@
-            @*<a href="#" id="managesubsites" name="managesubsites" onclick="Redir(@item.Id)"><i class="fa fa-config"></i> Manage Subsites</a>*@
-            @*@Html.ActionLink("Manage Subsites", "SubSites", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-
-                        </td>
-
-                    </tr>
-
-                        count++;
-                    }
-                }*@
-        </tbody>
-
-    </table>
-    <script>
+</table>
+<script>
     function Redir(redirVal) {
         window.location.href = '@Url.Action("SubSites", "Client")'; //SubSites?siteId=redirVal
     }
-    </script>
-    @*<script type="text/javascript">
-        $(function(){
-          $("#btnRedirect").click(function(){
-            window.location.href = "@Url.Action("ActionName","Controller")";
-          });
+</script>
+@*<script type="text/javascript">
+    $(function(){
+      $("#btnRedirect").click(function(){
+        window.location.href = "@Url.Action("ActionName","Controller")";
+      });
+    });
+    </script>*@
+@*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
+<script>
+    $(document).ready(function () {
+        $('.add').hide();
+        $('.importlabel').hide();
+        $('.importbutton').hide();
+        $('#postedFile').hide();
+
+
+        $("#ClientList").change(function () {
+            var cId = parseInt($('option:selected', this).val());
+            if (cId > 0) {
+                $('.add').show();
+                $('.importlabel').show();
+                $('.importbutton').show();
+                $('#postedFile').show();
+                GetIncludedSites(cId);
+            } else {
+                $('.add').hide();
+                $('.importlabel').hide();
+                $('.importbutton').hide();
+                $('#postedFile').hide();
+            }
         });
-        </script>*@
-    @*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
-    <script>
-        $(document).ready(function () {
-            $('.add').hide();
-            $('.importlabel').hide();
-            $('.importbutton').hide();
-            $('#postedFile').hide();
+    });
 
+    function GetIncludedSites(cId) {
+        //debugger;
+        var rowDiv = $("#sites-table tbody");
+        $.ajax({
+            type: "GET",
+            url: "GetSitesForClient",
+            data: { clientId: cId },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                //debugger;
+                var obj = JSON.parse(data.data);
+                rowDiv.html('');
+                var result = "";
+                $.each(obj, function (id, site) {
 
-            $("#ClientList").change(function () {
-                var cId = parseInt($('option:selected', this).val());
-                if (cId > 0) {
-                    $('.add').show();
-                    $('.importlabel').show();
-                    $('.importbutton').show();
-                    $('#postedFile').show();
-                    GetIncludedSites(cId);
-                } else {
-                    $('.add').hide();
-                    $('.importlabel').hide();
-                    $('.importbutton').hide();
-                    $('#postedFile').hide();
-                }
-            });
+                    var actionStr = '<a class="info" data-details="1" data-id="' + site.Id + '" data-target=".tr-' + site.Id + '-item" href="/Client/SiteDetails/' + site.Id + '"> Details</a>' +
+                        '<a class="edit" data-edit="1" data-id="' + site.Id + '" data-target=".tr-5-item" href = "/Client/EditSite/' + site.Id + '?returnView=ManageSites">Edit</a > ' +
+                        '<a class="warn" data-delete="1" data-id="' + site.Id + '" data-refresh-target="#managesites" data-target="#tr-' + site.Id + '-item" href="/Client/DeleteSite/' + site.Id + '" rel="tipsyE" title="Disable this item?" > Disable</a > ';
+                    var regionname = "";
+                    if (site.Region !== undefined && site.Region !== null) {
+                        regionname = site.Region.Name;
+                    }
+                    result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
+                        '<td style = "width: 15%;">' +
+                        regionname +
+                        '</td><td>' +
+                        site.Name +
+                        '</td><td>' +
+                        site.XCord +
+                        '</td><td> ' +
+                        site.YCord +
+                        '</td><td> ' +
+                        site.Address +
+                        '</td><td> ' +
+                        site.PostalCode +
+                        '</td><td> ' +
+                        site.ContactNo +
+                        ' </td><td> ' +
+                        site.ContactName +
+                        '</td><td> ' +
+                        site.PlanningPoint +
+                        '</td><td>' + actionStr + '</td></tr>';//<input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" value="' + site.Id + '" />
+                });
+                rowDiv.html(result);
+
+            },
+            error: function (response) {
+
+                alert('Error retrieving sites');
+            }
         });
 
-        function GetIncludedSites(cId) {
-            //debugger;
-            var rowDiv = $("#sites-table tbody");
-            $.ajax({
-                type: "GET",
-                url: "GetSitesForClient",
-                data: { clientId: cId },
-                contentType: "application/json;charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                  //  debugger;
-                    rowDiv.html('');
-                    var result = "";
-                    $.each(data, function (id, site) {
-                    //    debugger;
-                        var actionStr = '<a class="info" data-details="1" data-id="' + site.Id + '" data-target=".tr-' + site.Id + '-item" href="/Client/SiteDetails/' + site.Id + '"> Details</a>' +
-                            '<a class="edit" data-edit="1" data-id="' + site.Id + '" data-target=".tr-5-item" href = "/Client/EditSite/' + site.Id + '?returnView=ManageSites">Edit</a > ' +
-                            '<a class="warn" data-delete="1" data-id="' + site.Id + '" data-refresh-target="#managesites" data-target="#tr-' + site.Id + '-item" href="/Client/DeleteSite/' + site.Id + '" rel="tipsyE" title="Disable this item?" > Disable</a > ';
-
-                        result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
-                            '<td style = "width: 15%;">' +
-                            site.Region.Name +
-                            '</td><td>' +
-                            site.Name +
-                            '</td><td>' +
-                            site.XCord +
-                            '</td><td> ' +
-                            site.YCord +
-                            '</td><td> ' +
-                            site.Address +
-                            '</td><td> ' +
-                            site.PostalCode +
-                            '</td><td> ' +
-                            site.ContactNo +
-                            ' </td><td> ' +
-                            site.ContactName +
-                            '</td><td> ' +
-                            site.PlanningPoint +
-                            '</td><td>' + actionStr + '</td></tr>';//<input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" value="' + site.Id + '" />
-                    });
-                    rowDiv.html(result);
-
-                },
-                error: function (response) {
-
-                    alert('Error retrieving sites');
-                }
-            });
-
-        }
-    </script>
-    @Html.Partial("_Paging")
+    }
+</script>
+@Html.Partial("_Paging")

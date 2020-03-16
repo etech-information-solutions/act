@@ -15,8 +15,9 @@
     ViewBag.Title = "Edit Site";
     Address address = ViewBag.Address;
 
-    //List<Region> regionOptions = ViewBag.RegionOptions;
-    List<Region> regionOptions = Model.RegionOptions;
+    List<Region> regionOptions = ViewBag.RegionOptions;
+    List<SiteType> siteTypes = ViewBag.RegionOptions;
+    //List<Region> regionOptions = Model.RegionOptions;
     //regionOptions = Model.RegionOptions.Where(r => r.PSPId == pspId).ToList();
 
 }
@@ -24,203 +25,366 @@
 
 @Html.Partial("_Notification")
 
-@using (Html.BeginForm("EditSite", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clientlist", @class = "custom-validate", @style = "width: auto;" }))
+@using (Html.BeginForm("EditSite", "Site", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#sitelist", @class = "custom-validate", @style = "width: auto;" }))
 {
-    <div id="edit-item">
+<div id="edit-item">
 
-        <h2 class="uppercase" style="width: auto;">
-            <img alt="" src="@Url.Content("~/images/edit.png")" />
-            <span>Edit Site</span>
-        </h2>
+    <h2 class="uppercase" style="width: auto;">
+        <img alt="" src="@Url.Content("~/images/edit.png")" />
+        <span>Edit Site</span>
+    </h2>
 
-        @Html.ValidationSummary(true)
+    @Html.ValidationSummary(true)
 
-        @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.SourceView)
 
-        <div class="left" style="width: 45%; margin-right: 1%;">
+    <div class="left" style="width: 45%; margin-right: 1%;">
 
-            <div class="display-label">
-                Name
-            </div>
-            <div class="display-field">
-                @Html.TextBoxFor(model => model.Name, new { @class = "input", @placeholder = "Enter Site Name" })
-                @Html.ValidationMessageFor(model => model.Name)
-            </div>
+        <div class="display-label">
+            Name
+        </div>
+        <div class="display-field">
+            @Html.TextBoxFor(model => model.Name, new { @class = "input", @placeholder = "Enter Site Name" })
+            @Html.ValidationMessageFor(model => model.Name)
+        </div>
 
-            <div class="display-label">
-                Description
-            </div>
-            <div class="display-field">
-                @Html.TextBoxFor(model => model.Description, new { @class = "input", @placeholder = "Enter Site Description" })
-                @Html.ValidationMessageFor(model => model.Description)
-            </div>
-            <div class="display-label">
-                @*Site Type*@
-                Region
-            </div>
-            <div class="display-field">
-                @Html.DropDownListFor(model => model.RegionId, model => model.RegionOptions, region => region.Id, region => region.Name, true, new { @class = "chzn", @style = "width: 98%;" })
-                @*@Html.DropDownList("RegionOptions", "Please Select")*@
-                @Html.ValidationMessageFor(model => model.RegionId)
-            </div>
-            <div class="display-label">
-                Site Type
-            </div>
-            <div class="display-field">
-                @*@Html.TextBoxFor(model => model.SiteType, new { @class = "input", @placeholder = "Enter Site Ty[pe" })
+        <div class="display-label">
+            Description
+        </div>
+        <div class="display-field">
+            @Html.TextBoxFor(model => model.Description, new { @class = "input", @placeholder = "Enter Site Description" })
+            @Html.ValidationMessageFor(model => model.Description)
+        </div>
+        <div class="display-label">
+            Region
+        </div>
+        <div class="display-field">
+            @*@Html.DropDownListFor(model => model.RegionId, model => model.RegionOptions, region => region.Id, region => region.Name, true, new { @class = "chzn", @style = "width: 98%;" })*@
+            @Html.DropDownList("RegionOptions", "Please Select")
+            @*@Html.ValidationMessageFor(model => model.RegionId)*@
+        </div>
+        <div class="display-label">
+            Site Type
+        </div>
+        <div class="display-field">
+            @*@Html.TextBoxFor(model => model.SiteType, new { @class = "input", @placeholder = "Enter Site Ty[pe" })
             @Html.ValidationMessageFor(model => model.SiteType)*@
-                @*@(( ( Site ) Model.Status ).GetDisplayText())*@
-            </div>
-            <div class="display-label">
-                Account Code
-            </div>
-            <div class="display-field">
-                @Html.TextBoxFor(model => model.AccountCode, new { @class = "input", @placeholder = "Enter Account Code" })
-                @Html.ValidationMessageFor(model => model.AccountCode)
-                @*@Html.DisplayFor( model => model.UserRoles.FirstOrDefault().Role.Name )*@
-            </div>
-
-            <div class="display-label">
-                Planning Point
-            </div>
-            <div class="display-field">
-                @Html.TextBoxFor(model => model.PlanningPoint, new { @class = "input", @placeholder = "Enter Planning Point" })
-                @Html.ValidationMessageFor(model => model.PlanningPoint)
-            </div>
-
-            <div class="display-label">
-                Depot
-            </div>
-            <div class="display-field">
-                @Html.TextBoxFor(model => model.Depot, new { @class = "input", @placeholder = "Enter Depot" })
-                @Html.ValidationMessageFor(model => model.Depot)
-            </div>
-
-            <div class="display-label">
-                Chep SiteCode
-            </div>
-            <div class="display-field">
-                @Html.TextBoxFor(model => model.SiteCodeChep, new { @class = "input", @placeholder = "EnterChep Site Code" })
-                @Html.ValidationMessageFor(model => model.SiteCodeChep)
-            </div>
-
+            @*@(( ( Site ) Model.Status ).GetDisplayText())*@
+        </div>
+        <div class="display-label">
+            Account Code
+        </div>
+        <div class="display-field">
+            @Html.TextBoxFor(model => model.AccountCode, new { @class = "input", @placeholder = "Enter Account Code" })
+            @Html.ValidationMessageFor(model => model.AccountCode)
+            @*@Html.DisplayFor( model => model.UserRoles.FirstOrDefault().Role.Name )*@
         </div>
 
-        <div class="left" style="width: 45%;">
-            <h3>Contact Details</h3>
-            <div class="display-label">
-                Contact Number
-            </div>
-            <div class="display-field">
-                @Html.TextBoxFor(model => model.ContactNo, new { @class = "input", @placeholder = "Enter Contact Number" })
-                @Html.ValidationMessageFor(model => model.ContactNo)
-            </div>
-
-
-            <div class="display-label">
-                Contact Person
-            </div>
-            <div class="display-field">
-                @Html.TextBoxFor(model => model.ContactName, new { @class = "input", @placeholder = "Enter Contact Name" })
-                @Html.ValidationMessageFor(model => model.ContactName)
-            </div>
-            <h3>Contact Details</h3>
-            <div class="display-label">
-                X Coordinates
-            </div>
-            <div class="display-field">
-                @Html.TextBoxFor(model => model.XCord, new { @class = "input", @placeholder = "Enter X Coordinates" })
-                @Html.ValidationMessageFor(model => model.XCord)
-            </div>
-
-
-            <div class="display-label">
-                Y Coordinates
-            </div>
-            <div class="display-field">
-                @Html.TextBoxFor(model => model.YCord, new { @class = "input", @placeholder = "Enter Y Coordinates" })
-                @Html.ValidationMessageFor(model => model.YCord)
-            </div>
-
+        <div class="display-label">
+            Planning Point
         </div>
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+        <div class="display-field">
+            @Html.TextBoxFor(model => model.PlanningPoint, new { @class = "input", @placeholder = "Enter Planning Point" })
+            @Html.ValidationMessageFor(model => model.PlanningPoint)
+        </div>
+        <div class="display-label">
+            Depot
+        </div>
+        <div class="editor-field">
+            @Html.DropDownListFor(model => model.Depot, (new[] { new SelectListItem { Text = "No", Value = "No" }, new SelectListItem { Text = "Yes", Value = "Yes" } }), new { @class = "chzn", @style = "width: 98%;" })
+        </div>
+        @*<div class="display-label">
+            Depot
+        </div>
+        <div class="display-field">
+            @Html.TextBoxFor(model => model.Depot, new { @class = "input", @placeholder = "Enter Depot" })
+            @Html.ValidationMessageFor(model => model.Depot)
+    </div>*@
 
-
-        <div class="left" style="width: 48%; margin-right: 4%;">
-
-            @Html.HiddenFor(model => model.FullAddress.Id)
-            @Html.HiddenFor(model => model.FullAddress.AddressType)
-
-            <div class="editor-label">
-                @Html.LabelFor(model => model.FullAddress.AddressLine1)
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.FullAddress.AddressLine1, new { @class = "input", @placeholder = "Enter Site Address Line 1" })
-                @Html.ValidationMessageFor(model => model.FullAddress.AddressLine1)
-            </div>
-
-            <div class="editor-label">
-                @Html.LabelFor(model => model.FullAddress.Town)
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.FullAddress.Town, new { @class = "input", @placeholder = "Enter Site Address Town" })
-                @Html.ValidationMessageFor(model => model.FullAddress.Town)
-            </div>
-
-            <div class="editor-label">
-                @Html.LabelFor(model => model.FullAddress.PostCode)
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.FullAddress.PostCode, new { @class = "input", @placeholder = "Enter Site Address Postal Code" })
-                @Html.ValidationMessageFor(model => model.FullAddress.PostCode)
-            </div>
-
-
+        <div class="display-label">
+            Chep SiteCode
+        </div>
+        <div class="display-field">
+            @Html.TextBoxFor(model => model.SiteCodeChep, new { @class = "input", @placeholder = "EnterChep Site Code" })
+            @Html.ValidationMessageFor(model => model.SiteCodeChep)
         </div>
 
-        <div class="left" style="width: 48%;">
-            <div class="editor-label">
-                @Html.LabelFor(model => model.FullAddress.AddressLine2)
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.FullAddress.AddressLine2, new { @class = "input", @placeholder = "Enter Site Address Line 2" })
-                @Html.ValidationMessageFor(model => model.FullAddress.AddressLine2)
-            </div>
+    </div>
 
-            <div class="editor-label">
-                @Html.LabelFor(model => model.FullAddress.Province)
-            </div>
-            <div class="editor-field">
+    <div class="left" style="width: 45%;">
+        <h3>Contact Details</h3>
+        <div class="display-label">
+            Contact Number
+        </div>
+        <div class="display-field">
+            @Html.TextBoxFor(model => model.ContactNo, new { @class = "input", @placeholder = "Enter Contact Number" })
+            @Html.ValidationMessageFor(model => model.ContactNo)
+        </div>
 
-                <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
-                    <option value="">-- select</option>
-                    @foreach (int p in Enum.GetValues(typeof(Province)))
+
+        <div class="display-label">
+            Contact Person
+        </div>
+        <div class="display-field">
+            @Html.TextBoxFor(model => model.ContactName, new { @class = "input", @placeholder = "Enter Contact Name" })
+            @Html.ValidationMessageFor(model => model.ContactName)
+        </div>
+        <h3>Contact Details</h3>
+        <div class="display-label">
+            X Coordinates
+        </div>
+        <div class="display-field">
+            @Html.TextBoxFor(model => model.XCord, new { @class = "input", @placeholder = "Enter X Coordinates" })
+            @Html.ValidationMessageFor(model => model.XCord)
+        </div>
+
+
+        <div class="display-label">
+            Y Coordinates
+        </div>
+        <div class="display-field">
+            @Html.TextBoxFor(model => model.YCord, new { @class = "input", @placeholder = "Enter Y Coordinates" })
+            @Html.ValidationMessageFor(model => model.YCord)
+        </div>
+
+    </div>
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+
+    <div class="left" style="width: 48%; margin-right: 4%;">
+
+        @Html.HiddenFor(model => model.FullAddress.Id)
+        @Html.HiddenFor(model => model.FullAddress.AddressType)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.FullAddress.AddressLine1)
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.FullAddress.AddressLine1, new { @class = "input", @placeholder = "Enter Site Address Line 1" })
+            @Html.ValidationMessageFor(model => model.FullAddress.AddressLine1)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.FullAddress.Town)
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.FullAddress.Town, new { @class = "input", @placeholder = "Enter Site Address Town" })
+            @Html.ValidationMessageFor(model => model.FullAddress.Town)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.FullAddress.PostCode)
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.FullAddress.PostCode, new { @class = "input", @placeholder = "Enter Site Address Postal Code" })
+            @Html.ValidationMessageFor(model => model.FullAddress.PostCode)
+        </div>
+
+
+    </div>
+
+    <div class="left" style="width: 48%;">
+        <div class="editor-label">
+            @Html.LabelFor(model => model.FullAddress.AddressLine2)
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.FullAddress.AddressLine2, new { @class = "input", @placeholder = "Enter Site Address Line 2" })
+            @Html.ValidationMessageFor(model => model.FullAddress.AddressLine2)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.FullAddress.Province)
+        </div>
+        <div class="editor-field">
+
+            <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
+                <option value="">-- select</option>
+                @foreach (int p in Enum.GetValues(typeof(Province)))
+                {
+                    Province province = (Province)p;
+
+                    string text = province.GetDisplayText();
+
+                    if (text.ToLower() == "all")
                     {
-                        Province province = (Province)p;
-
-                        string text = province.GetDisplayText();
-
-                        if (text.ToLower() == "all")
-                        {
-                            continue;
-                        }
-
-                        string sel = (province == Model.FullAddress.Province) ? "selected=selected" : string.Empty;
-
-                        <option value="@p" @sel>@text</option>
+                        continue;
                     }
-                </select>
 
-                @Html.ValidationMessageFor(model => model.FullAddress.Province)
-            </div>
+                    string sel = (province == Model.FullAddress.Province) ? "selected=selected" : string.Empty;
 
+                    <option value="@p" @sel>@text</option>
+                }
+            </select>
+
+            @Html.ValidationMessageFor(model => model.FullAddress.Province)
+        </div>
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+    <div class="budgets">
+
+        <p>
+            <strong class="uppercase">Site Budget</strong>
+        </p>
+
+        <div class="editor-label" style="margin-bottom: 10px;">
+            <a id="addrow" href="#" onclick="AddRow();"><i class="fa fa-plus"></i> Add New</a>
+        </div>
+
+        <div class="editor-field">
+
+
+            <table id="siteBudget-table" class="da-table" style="border-bottom: 0;">
+
+                <thead>
+                    <tr>
+                        <th style="width: 7%;">Year</th>
+                        <th style="width: 7%;">Jan</th>
+                        <th style="width: 7%;">Feb</th>
+                        <th style="width: 7%;">Mar</th>
+                        <th style="width: 7%;">Apr</th>
+                        <th style="width: 7%;">May</th>
+                        <th style="width: 7%;">Jun</th>
+                        <th style="width: 7%;">Jul</th>
+                        <th style="width: 7%;">Aug</th>
+                        <th style="width: 7%;">Sep</th>
+                        <th style="width: 7%;">Oct</th>
+                        <th style="width: 7%;">Nov</th>
+                        <th style="width: 7%;">Dec</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody></tbody>
+
+            </table>
+            @*<a id="savebudget" onclick="SaveBudget()" name="savebudget"><i class="fa fa-save"></i>Save Budget</a>*@
         </div>
     </div>
+
+</div>
 
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
 
     <p>
+        <a id="viewbudget" href="#" onclick="ViewBudget();"><i class="fa fa-plus"></i> View Budget</a>
         <input id="save-btn" type="submit" value="Update" />
         <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
     </p>
+
+    <script>
+        $(document).ready(function () {
+            var cId = $("#Id").val();
+            LoadBudgets(cId);
+            $(".budgets").hide();
+
+        });
+
+        function ViewBudget() {
+            $('.budgets').show();
+        };
+
+        function SaveBudget(id) {
+            var cId = $("#Id").val();
+            var data = {
+                "Id": id, "SiteId": cId, "BudgetYear": $('#SiteBudget_' + id + '_BudgetYear').val(), "January": $('#SiteBudget_' + id + '_January').val(), "February": $('#SiteBudget_' + id + '_February').val(), "March": $('#SiteBudget_' + id + '_March').val(), "April": $('#SiteBudget_' + id + '_April').val(), "May": $('#SiteBudget_' + id + '_May').val(), "June": $('#SiteBudget_' + id + '_June').val(), "July": $('#SiteBudget_' + id + '_July').val(), "August": $('#SiteBudget_' + id + '_August').val(), "September": $('#SiteBudget_' + id + '_September').val(), "October": $('#SiteBudget_' + id + '_October').val(), "November": $('#SiteBudget_' + id + '_November').val(), "December": $('#SiteBudget_' + id + '_December').val()
+            };
+            $.ajax({
+                type: 'POST',
+                url: "SetSiteBudget",
+                data: data,//$(this).serialize(),
+                success: function (response) {
+                    if (response == "True") {
+                        alert('Budget Saved.');
+                    } else {
+                        alert('Budget could not be saved. Try again.');
+                    }
+                }
+            });
+
+
+        }
+
+        function AddRow() {
+            var rowDiv = $("#siteBudget-table tbody");
+            //var fieldcopy = '<input class="input" id="SiteBudget_0-[FIELDNAME]-" style="padding: 0 5px; width: 87%;" type="number" value="0">';
+            var fieldvalue = "0";
+            var savecopy = '<a id="savebudget" onclick="SaveBudget(' + fieldvalue + ')" name="savebudget"><i class="fa fa-save"></i></a>';
+            var tabledata = '<tr id="budg-0-row" name="budg-0-row">';//<form id="budg-0-frm" name="budg-0-frm">
+            tabledata += '<td><input class="input" id="SiteBudget_0_BudgetYear" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_January" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_February" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_March" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_April" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_May" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_June" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_July" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_August" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_September" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_October" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_November" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_December" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td>' + savecopy.replace("[BUDGETID]", "0") + '</td>';
+            tabledata += '</tr>';
+
+
+            result = tabledata;
+
+            rowDiv.append(result);
+
+        }
+
+        function LoadBudgets(id) {
+            var rowDiv = $("#siteBudget-table tbody");
+            rowDiv.html('');
+
+
+            var savecopy = '<a id="savebudget" onclick="SaveBudget([BUDGETID])" name="savebudget"><i class="fa fa-save"></i></a>';
+            $.ajax({
+                type: "GET",
+                url: "GetSiteBudgets",
+                data: { siteId: id },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    var count = Object.keys(data).length;
+                    var result = "";
+                    if (count > 0) {
+                        //var fieldcopy = '<input class="input" id="SiteBudget_[FIELDNAME]-[FIELDVALUE]" style="padding: 0 5px; width: 87%;" type="number" value="[FIELDVALUE]">';
+                        $.each(data, function (id, budget) {
+                            var tabledata = '<tr id="budg-' + budget.Id + '-row" name="budg-' + budget.Id + '">';//<form id="budg-' + budget.Id + '-frm" name="budg-' + budget.Id + '-frm" >
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_BudgetYear" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.BudgetYear + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_January" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.January + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_February" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.February + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_March" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.March + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_April" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.April + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_May" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.May + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_June" style="padding: 0 5px; width:87%;" type="number" value="' + budget.June + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_July" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.July + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_August" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.August + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_September" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.September + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_October" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.October + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_November" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.November + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_December" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.December + '"></td>';
+                            //tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "December").replace("[FIELDVALUE]", //budget.December) + '</td>';
+                            tabledata += '<td>' + savecopy.replace("[BUDGETID]", budget.Id) + '</td>';
+                            tabledata += '</tr>';
+                            result += tabledata;
+                        });
+
+                    }
+
+                    rowDiv.html(result);
+
+                },
+                error: function (response) {
+                    alert('error');
+                }
+            });
+
+        }
+
+    </script>
 }

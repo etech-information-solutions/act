@@ -639,6 +639,21 @@ namespace ACT.Core.Services
                           .ToList();
         }
 
+        /// <summary>
+        /// Gets a list of [select] for the specified table by generic T
+        /// If the constraint column is defined then we'll apply it
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public T GetByColumnWhere(string column = "", object value = null)
+        {
+            return context.Set<T>()
+                          .Where(ColumnWhere(column, value))                          
+                          .Distinct()
+                          .FirstOrDefault();
+        }
+
 
         /// <summary>
         /// Deletes an existing entity
