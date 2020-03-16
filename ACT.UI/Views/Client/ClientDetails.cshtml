@@ -336,17 +336,15 @@
 
     @if (ViewBag.IncludeLayout == null)
     {
-        <p>
-            @Html.ActionLink("Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
-            @*<a id="viewbudget" href="#" onclick="ViewBudget();"><i class="fa fa-plus"></i> View Budget</a>*@
-            @Html.ActionLink("Link Products to Client", "LinkProductsToClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
-
+    <p>
+        @Html.ActionLink("Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })        
+        <a class="info" href="#" onclick="LinkToProducts('@Model.Id')"><i class="fa fa-link"></i>Link Products</a>            
             @if (ViewBag.IncludeLayout == null)
             {
                 <span style="padding: 0 5px;">/</span>
                 <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
             }
-        </p>
+    </p>
     }
 
     @if (ViewBag.IncludeLayout != null)
@@ -368,6 +366,20 @@
     function ViewBudget() {
             $('.budgets').show();
     };
+
+    function LinkToProducts(id) {
+        $.ajax({
+            type: 'POST',
+            url: "SetClientBudget",
+            data: { "ClientId": id },
+            success: function (response) {
+                window.location.href = 'Index#linkproducts';
+                location.reload();
+            }
+        });
+
+
+    }
 
     function LoadBudgets(id) {
         var rowDiv = $("#clientBudget-table tbody");

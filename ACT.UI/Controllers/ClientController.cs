@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Transactions;
 using System.Web.Mvc;
+using System.Web;
 using Newtonsoft.Json;
 
 namespace ACT.UI.Controllers
@@ -1004,93 +1005,7 @@ namespace ACT.UI.Controllers
             }
         }
 
-        // POST: Client/ImportSites
-        [HttpPost]
-        [Requires(PermissionTo.Create)]
-        public ActionResult ImportSites(SiteViewImportModel file)
-        {
-            try
-            {
-                //if (!ModelState.IsValid)
-                //{
-                //    Notify("Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error);
-
-                //    return View(model);
-                //}
-
-                //using (SiteService siteService = new SiteService())
-                //using (ClientSiteService csService = new ClientSiteService())
-                //using (TransactionScope scope = new TransactionScope())
-                //using (AddressService aservice = new AddressService())
-                //{
-                //    #region Validation
-                //    if (!string.IsNullOrEmpty(model.AccountCode) && siteService.ExistByAccountCode(model.AccountCode.Trim()))
-                //    {
-                //        // Bank already exist!
-                //        Notify($"Sorry, a Site with the Account number \"{model.AccountCode}\" already exists!", NotificationType.Error);
-
-                //        return View(model);
-                //    }
-                //    #endregion
-                //    #region Create Site
-                //    Site site = new Site()
-                //    {
-                //        Name = model.Name,
-                //        Description = model.Description,
-                //        XCord = model.XCord,
-                //        YCord = model.YCord,
-                //        Address = model.Address,
-                //        PostalCode = model.PostalCode,
-                //        ContactName = model.ContactName,
-                //        ContactNo = model.ContactNo,
-                //        PlanningPoint = model.PlanningPoint,
-                //        SiteType = model.SiteType,
-                //        AccountCode = model.AccountCode,
-                //        Depot = model.Depot,
-                //        SiteCodeChep = model.SiteCodeChep,
-                //        Status = (int)model.Status
-                //    };
-                //    site = siteService.Create(site);
-                //    #endregion
-                //    #region Add ClientSite
-                //    //ClientSite csSite = new ClientSite()
-                //    //{
-
-                //    //}
-                //    #endregion
-                //    #region Create Address (s)
-
-                //    if (model.FullAddress != null)
-                //    {
-                //        Address address = new Address()
-                //        {
-                //            ObjectId = model.Id,
-                //            ObjectType = "Site",
-                //            Town = model.FullAddress.Town,
-                //            Status = (int)Status.Active,
-                //            PostalCode = model.FullAddress.PostCode,
-                //            Type = (int)model.FullAddress.AddressType,
-                //            Addressline1 = model.FullAddress.AddressLine1,
-                //            Addressline2 = model.FullAddress.AddressLine2,
-                //            Province = (int)model.FullAddress.Province,
-                //        };
-
-                //        aservice.Create(address);
-                //    }
-
-                //    #endregion
-
-                //    scope.Complete();
-                //}
-
-                Notify("The Site was successfully created.", NotificationType.Success);
-                return RedirectToAction("ManageSites");
-            }
-            catch
-            {
-                return View();
-            }
-        }
+       
 
         // GET: Client/EditSite/5
         [Requires(PermissionTo.Edit)]
@@ -1842,42 +1757,26 @@ namespace ACT.UI.Controllers
 
         #endregion
 
+
         #region Products
-        // GET: Client/LinkProductsById/5
-        [Requires(PermissionTo.Edit)]
-        public ActionResult LinkProductsById(int clientId, PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetClient(string ClientId)
         {
-
-            int total = 0;
-
-            List<Product> model = new List<Product>();
-            List<Client> clientList;
-            //int pspId = Session[ "UserPSP" ];
-            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-            using (ProductService service = new ProductService())
-            using (ClientService clientService = new ClientService())
+            if (ClientId != null)
             {
-                model = service.ListByColumnWhere("ClientId", clientId.ToString());
-                total = model.Count;
-
-                clientList = clientService.GetClientsByPSP(pspId);
+                Session["ClientId"] = ClientId;
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
             }
-            //
-            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
-            
-            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            else
             {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            });
-            ViewBag.ClientList = clientDDL;
-
-            return PartialView("_LinkProducts", paging);
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
         }
+
+
         //
         // POST || GET: /Client/LinkProducts
-        public ActionResult LinkProducts(PagingModel pm, CustomSearchModel csm, bool givecsm = true)
+        public ActionResult LinkProducts(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
         {
             if (givecsm)
             {
@@ -1889,16 +1788,25 @@ namespace ACT.UI.Controllers
             int total = 0;
 
             List<Product> model = new List<Product>();
-            List<Client> clientList;
+            List<Client> clientList = new List<Client>();
             //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
             using (ProductService service = new ProductService())
             using (ClientService clientService = new ClientService())
             {
                 model = service.List(pm, csm);
                 total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total1(pm, csm);
-
-                clientList = clientService.GetClientsByPSP(pspId);
+                if (clientId > 0)
+                {
+                    Client client = clientService.GetById(clientId);
+                    clientList.Add(client);
+                }
+                else
+                {
+                    clientList = clientService.GetClientsByPSP(pspId);
+                }
             }
 
             PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
@@ -1986,6 +1894,7 @@ namespace ACT.UI.Controllers
             using (ProductService pservice = new ProductService())
             using (TransactionScope scope = new TransactionScope())
             using (DocumentService dservice = new DocumentService())
+            using (ClientProductService pcservice = new ClientProductService())
             using (ProductPriceService ppservice = new ProductPriceService())
             {
                 #region Validations
@@ -2030,6 +1939,26 @@ namespace ACT.UI.Controllers
                     }
                 }
 
+                #endregion
+
+                #region Product to Client
+                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                ClientProduct clientproduct = new ClientProduct()
+                {
+                    ClientId = clientID,
+                    ProductId = product.Id,
+                    ProductDescription = product.Description,
+                    ActiveDate = product.CreatedOn,
+                    HireRate = 0,
+                    LostRate = 0,
+                    IssueRate = 0,
+                    PassonRate = 0,
+                    PassonDays = 0,
+                    Status = product.Status,
+
+                };
+                pcservice.Create(clientproduct);
                 #endregion
 
                 #region Any Files
@@ -2314,12 +2243,64 @@ namespace ACT.UI.Controllers
             return RedirectToAction("LinkProducts");
         }
 
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetProductsForClient(string clientId)
+        {
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                Session["ClientId"] = clientId;//wroite to session to use for adds and updates
+                List<ProductCustomModel> products = null;
+                //int pspId = Session[ "UserPSP" ];
+                //int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+
+                using (ProductService service = new ProductService())
+                {
+                    products = service.List1(new PagingModel(), new CustomSearchModel(), int.Parse(clientId));
+                }
+                //ProductPrice price = new ProductPrice();
+
+                //using (ProductPriceService aservice = new ProductPriceService())
+                //{
+                //    foreach (ProductCustomModel prod in products)
+                //    {
+                //        string hrate = "";
+                //        string irate = "";
+                //        string lrate = "";
+                //        string pocost = "";
+                //        price = aservice.Get(prod.Id);
+                //        if (price != null)
+                //        {
+                //            hrate = price.RateUnit.ToString() + ' ' + price.Rate.ToString();
+                //            irate = price.RateUnit.ToString() + ' ' + price.Rate.ToString();
+                //            lrate = price.RateUnit.ToString() + ' ' + price.Rate.ToString();
+                //            pocost = price.RateUnit.ToString() + ' ' + price.Rate.ToString();
+
+                //        }
+
+                //        Status status = (Status)prod.Status;
+                //        String active = status.Equals(Status.Active) ? "active" : "inactive";
+                //        String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+
+
+                //    }
+                //}
+
+
+                //var jsonList = JsonConvert.SerializeObject(sites);
+                return Json(products, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
         #endregion
 
         #region Manage Transporters
         //
         // GET: /Client/ManageTransporters
-        public ActionResult ManageTransporters(PagingModel pm, CustomSearchModel csm, bool givecsm = true)
+        public ActionResult ManageTransporters(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
         {
 
             ViewBag.ViewName = "ManageTransporters";
@@ -2560,13 +2541,13 @@ namespace ACT.UI.Controllers
 
         //
         // POST || GET: /Client/AwaitingActivation
-        public ActionResult AwaitingActivation(PagingModel pm, CustomSearchModel csm, bool givecsm = true)
+        public ActionResult AwaitingActivation(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
         {
             if (givecsm)
             {
                 ViewBag.ViewName = "AwaitingActivation";
 
-                return PartialView("AwaitingActivationCustomSearch", new CustomSearchModel("ManageTransporters"));
+                return PartialView("_AwaitingActivationCustomSearch", new CustomSearchModel("AwaitingActivation"));
             }
             int total = 0;
 
@@ -2626,7 +2607,7 @@ namespace ACT.UI.Controllers
                     {
                         foreach (Client item in clients)
                         {
-                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9}",
+                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10}",
                                                 csv,
                                                 item.Id,
                                                 item.CompanyName,
@@ -2636,6 +2617,41 @@ namespace ACT.UI.Controllers
                                                 item.ContactNumber,
                                                 item.ContactPerson,
                                                 item.Email,
+                                                (Status)(int)item.Status,
+                                                Environment.NewLine);
+                        }
+                    }
+
+
+                    #endregion
+
+                    break;
+                case "awaitingactivation":
+                    #region AwaitingActivation
+                    csv = String.Format("Id, Company Name, Reg #, Trading As, Vat Number, Contact Number, Contact Person, Email {0}", Environment.NewLine);
+
+                    List<Client> inactiveclients = new List<Client>();
+
+                    using (ClientService service = new ClientService())
+                    {
+                        inactiveclients = service.List(pm, csm);
+                    }
+
+                    if (inactiveclients != null && inactiveclients.Any())
+                    {
+                        foreach (Client item in inactiveclients)
+                        {
+                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10}",
+                                                csv,
+                                                item.Id,
+                                                item.CompanyName,
+                                                item.CompanyRegistrationNumber,
+                                                item.TradingAs,
+                                                item.VATNumber,
+                                                item.ContactNumber,
+                                                item.ContactPerson,
+                                                item.Email,
+                                                (Status)(int)item.Status,
                                                 Environment.NewLine);
                         }
                     }
@@ -2744,44 +2760,155 @@ namespace ACT.UI.Controllers
                 //    #endregion
 
                 //    break;
-                case "awaitingactivation":
-                    #region AwaitingActivation
-                    csv = String.Format("Id, Company Name, Reg #, Trading As, Vat Number, Contact Number, Contact Person, Email {0}", Environment.NewLine);
-
-                    List<Client> inactiveclients = new List<Client>();
-
-                    using (ClientService service = new ClientService())
-                    {
-                        inactiveclients = service.List(pm, csm);
-                    }
-
-                    if (inactiveclients != null && inactiveclients.Any())
-                    {
-                        foreach (Client item in inactiveclients)
-                        {
-                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9}",
-                                                csv,
-                                                item.Id,
-                                                item.CompanyName,
-                                                item.CompanyRegistrationNumber,
-                                                item.TradingAs,
-                                                item.VATNumber,
-                                                item.ContactNumber,
-                                                item.ContactPerson,
-                                                item.Email,
-                                                Environment.NewLine);
-                        }
-                    }
-
-
-                    #endregion
-
-                    break;
 
             }
 
             return File(new System.Text.UTF8Encoding().GetBytes(csv), "text/csv", filename);
         }
+
+        #endregion
+
+        #region General
+
+        [HttpPost]
+        // GET: /Client/ImportSites
+        public ActionResult ImportSites(HttpPostedFileBase postedFile)
+        {
+            if (postedFile != null)
+            {
+                string fileExtension = Path.GetExtension(postedFile.FileName);
+
+                //Validate uploaded file and return error.
+                if (fileExtension != ".csv")
+                {
+                    ViewBag.Message = "Please select the csv file with .csv extension";
+                    return View();
+                }
+
+                try { 
+                    string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                    int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+
+                    using (var sreader = new StreamReader(postedFile.InputStream))
+                    using (SiteService siteService = new SiteService())
+                    using (ClientSiteService csService = new ClientSiteService())
+                    using (TransactionScope scope = new TransactionScope())
+                    using (AddressService aservice = new AddressService())                
+                    {
+                        //First line is header. If header is not passed in csv then we can neglect the below line.
+                        string[] headers = sreader.ReadLine().Split(',');
+                        //Loop through the records
+                        while (!sreader.EndOfStream)
+                        {
+                            string[] rows = sreader.ReadLine().Split(',');
+
+                            #region Validation
+                            if (!string.IsNullOrEmpty(rows[13].ToString()) && !siteService.ExistByAccountCode(rows[13].ToString().Trim()))
+                            {
+
+                                int regionId = 0;
+                                if (!string.IsNullOrEmpty(rows[16].ToString()))
+                                {
+                                    regionId = int.Parse(rows[16].ToString());
+                                }
+                                int provinceId = 0;
+                                if (!string.IsNullOrEmpty(rows[8].ToString()))
+                                {
+                                    provinceId = int.Parse(rows[8].ToString());
+                                }
+                                #region Create Site
+                                Site site = new Site()
+                                {
+                                    Name = rows[0].ToString(),
+                                    Description = rows[1].ToString(),
+                                    XCord = rows[1].ToString(),
+                                    YCord = rows[2].ToString(),
+                                    Address = rows[3].ToString() + " " + rows[4].ToString() + " " + rows[5].ToString() + " " + rows[6].ToString() + " " + rows[7].ToString() + " " + rows[8].ToString(),
+                                    PostalCode = rows[7].ToString(),
+                                    ContactName = rows[10].ToString(),
+                                    ContactNo = rows[9].ToString(),
+                                    PlanningPoint = rows[11].ToString(),
+                                    SiteType = 1,//(int).parse(rows[12].ToString()),
+                                    AccountCode = rows[13].ToString(),
+                                    Depot = rows[14].ToString(),
+                                    SiteCodeChep = rows[15].ToString(),
+                                    Status = (int)Status.Pending,
+                                    RegionId = regionId
+                                };
+                                site = siteService.Create(site);
+                                #endregion
+
+                                #region Create Address (s)
+
+                                if (!string.IsNullOrEmpty(rows[3].ToString()))
+                                {
+                                    Address address = new Address()
+                                    {
+                                        ObjectId = site.Id,
+                                        ObjectType = "Site",
+                                        Town = rows[5].ToString(),
+                                        Status = (int)Status.Active,
+                                        PostalCode = rows[6].ToString(),
+                                        Type = (int)AddressType.Postal,
+                                        Addressline1 = rows[3].ToString(),
+                                        Addressline2 = rows[4].ToString(),
+                                        Province = provinceId,
+                                    };
+                                    aservice.Create(address);
+                                }
+
+                                #endregion
+
+                                //tie Client in Session to New Site
+                                #region Add ClientSite
+                                ClientSite csSite = new ClientSite()
+                                {
+                                    ClientId = clientID,
+                                    SiteId = site.Id,
+                                    AccountingCode = site.AccountCode,
+                                    Status = (int)Status.Active
+                                };
+                                csService.Create(csSite);
+                                #endregion
+
+
+                             
+
+                            }                        
+                            #endregion
+                    }
+                        scope.Complete();
+                    }
+
+   
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.Message = ex.Message;
+                }
+            } else
+            {
+               
+            }
+            return RedirectToAction("Index", "Client");
+        }
+
+
+        //private bool UploadProductFile(HttpPostedFileBase FileUpload)
+        //{
+        //    // get the file stream in a readable way
+        //    StreamReader reader = new StreamReader(FileUpload.InputStream);
+
+        //    // get a DataTable representing the passed string
+        //    System.Data.DataTable dt = ProcessCSV(reader.ReadToEnd());
+
+        //    // for each row, compose the statement
+        //    bool success = true;
+        //    foreach (System.Data.DataRow row in dt.Rows)
+        //        success = db.InsertProdutInfo(row);
+
+        //    return success;
+        //}
 
         #endregion
 

@@ -36,16 +36,16 @@
     </div>
 }
 
-@if (user.IsAdmin || user.IsPSPAdmin)
+@*@if (user.IsAdmin || user.IsPSPAdmin)
 {
     <p>
         @Html.ActionLink("Add", "AddClient", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Client?", @data_edit = "1", @data_id = 0, @data_target = "#clientlist" })
         <span class="loader"></span>
     </p>
-}
+}*@
 
 
-<table id="psps-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#psps-table_wrapper" data-starting-point=".ap-tabs ul">
+<table id="awaitingactivation-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#awaitingactivation-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
             @*<th data-name="Count">
@@ -146,11 +146,11 @@
                     </td>
 
                     <td width="15%">
-                        @*@Html.ActionLink("Details", "ClientDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        @Html.ActionLink("Details", "ClientDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        @Html.ActionLink("Edit", "EditClient", new { id = item.Id, returnView = "ClientList" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })*@
+                        @Html.ActionLink("Edit", "EditClient", new { id = item.Id, returnView = "AwaitingActivation" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        @Html.ActionLink(enable, "DeleteClient", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientlist", @rel = "tipsyE", @title = enable + " this item?" })
+                        @Html.ActionLink(enable, "DeleteClient", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#awaitingactivation", @rel = "tipsyE", @title = enable + " this item?" })
 
                     </td>
 

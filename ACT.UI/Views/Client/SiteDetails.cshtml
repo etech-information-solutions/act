@@ -117,7 +117,7 @@
         </div>
         @using (RegionService reg = new RegionService())
         {
-        Region region = reg.GetById((int)model.RegionId);
+        Region region = reg.GetById((int)Model.RegionId);
         <td style="width: 15%;">
             @region.Name
         </td>

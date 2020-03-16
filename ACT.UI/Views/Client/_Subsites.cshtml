@@ -17,108 +17,116 @@
 
 
 @Html.Partial("_Notification")
-
-<p>
-    <table style="width:100%" border="0">
-        <tr>
-            <td style="width:3%">
-                <label for="file">Client:</label><br /><br /><br />
-                <label for="site">Site:</label>
-            </td>
-            <td style="width:15%">
-                @Html.DropDownList("ClientList", "Please Select")<br /><br />
-                @Html.DropDownList("SiteList", "Please Select")
-            </td>
-            <td style="width:2%">
-                @if (user.IsAdmin || user.IsPSPAdmin)
-                {
-                    <br /><br />
-                    @Html.ActionLink("Add", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#sites" })
-                }
+@using (Html.BeginForm("ImportSites", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @style = "width: auto;" }))
+{
+    <p>
+        <table style="width:100%" border="0">
+            <tr>
+                <td style="width:3%">
+                    <label for="file">Client:</label><br /><br /><br />
+                    <label for="site">Site:</label>
                 </td>
-            <td style="width:3%">
-                <label for="file">Browse:</label>
-            </td>
-            <td style="width:35%">
-                <input type="file" name="sitesfile" id="sitesfile" />
-            </td>
-            <td style="width:10%">
-                <input type="submit" value="Import Sites" />
-            </td>
-        </tr>
-    </table>
-    <span class="loader"></span>
-</p>
+                <td style="width:15%">
+                    @Html.DropDownList("ClientList", "Please Select")<br /><br />
+                    @Html.DropDownList("SiteList", "Please Select")
+                </td>
+                <td style="width:2%">
+                    @if (user.IsAdmin || user.IsPSPAdmin)
+                    {
+                        <br /><br />
+                        @Html.ActionLink("Add", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#sites" })
+                    }
+                </td>
+                <td style="width:5%">
+                    &nbsp;
+                </td>
+                <td style="width:3%">
+                    <label for="file" class="importlabel">Browse:</label>
+                </td>
+                <td style="width:55%">
+                    <input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" />
+                </td>
+                <td style="width:10%">
+                    <input type="submit" value="Import Sites" class="importbutton" />
+                </td>
+                <td style="width:7%">
+                    <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "sitetemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
+                </td>
+            </tr>
+        </table>
+        <span class="loader"></span>
+    </p>
+}
 
-@*<input type="hidden" id="selectedsite" name="selectedsite" value="0" />*@
-<div id="mainsitedetails" style="display:none;">
-    <div class="left" style="width: 27%; margin-right: 2%;">
+    @*<input type="hidden" id="selectedsite" name="selectedsite" value="0" />*@
+    <div id="mainsitedetails" style="display:none;">
+        <div class="left" style="width: 27%; margin-right: 2%;">
 
-        <div class="display-label">
-            Site Name
-        </div>
-        <div class="display-field">
-            <span class="sitename"></span>
-        </div>
-        <div class="display-label">
-            Account Code
-        </div>
-        <div class="display-field">
-            <span class="accountcode"></span>
-        </div>
-        <div class="display-label">
-            Depot
-        </div>
-        <div class="display-field">
-            <span class="sitedepot"></span>
-        </div>
+            <div class="display-label">
+                Site Name
+            </div>
+            <div class="display-field">
+                <span class="sitename"></span>
+            </div>
+            <div class="display-label">
+                Account Code
+            </div>
+            <div class="display-field">
+                <span class="accountcode"></span>
+            </div>
+            <div class="display-label">
+                Depot
+            </div>
+            <div class="display-field">
+                <span class="sitedepot"></span>
+            </div>
 
-    </div>
-
-    <div class="left" style="width: 27%; margin-right: 2%;">
-        <div class="display-label">
-            Contact Person
-        </div>
-        <div class="display-field">
-            <span class="contactname"></span>
-        </div>
-        <div class="display-label">
-            Contact Number
-        </div>
-        <div class="display-field">
-            <span class="contactnumber"></span>
-        </div>
-        <div class="display-label">
-            Region
-        </div>
-        <div class="display-field">
-            <span class="siteregion"></span>
-        </div>
-    </div>
-
-    <div class="left" style="width: 27%; margin-right: 2%;">
-
-        <div class="display-label">
-            Site X Coordinate
-        </div>
-        <div class="display-field">
-            <span class="sitexcoord"></span>
-        </div>
-        <div class="display-label">
-            Site Y Coordinate
-        </div>
-        <div class="display-field">
-            <span class="siteycoord"></span>
-        </div>
-        <div class="display-label">
-            Address
-        </div>
-        <div class="display-field">
-            <span class="siteaddress"></span>
         </div>
 
+        <div class="left" style="width: 27%; margin-right: 2%;">
+            <div class="display-label">
+                Contact Person
+            </div>
+            <div class="display-field">
+                <span class="contactname"></span>
+            </div>
+            <div class="display-label">
+                Contact Number
+            </div>
+            <div class="display-field">
+                <span class="contactnumber"></span>
+            </div>
+            <div class="display-label">
+                Region
+            </div>
+            <div class="display-field">
+                <span class="siteregion"></span>
+            </div>
+        </div>
 
-    </div>
+        <div class="left" style="width: 27%; margin-right: 2%;">
+
+            <div class="display-label">
+                Site X Coordinate
+            </div>
+            <div class="display-field">
+                <span class="sitexcoord"></span>
+            </div>
+            <div class="display-label">
+                Site Y Coordinate
+            </div>
+            <div class="display-field">
+                <span class="siteycoord"></span>
+            </div>
+            <div class="display-label">
+                Address
+            </div>
+            <div class="display-field">
+                <span class="siteaddress"></span>
+            </div>
+
+
+        </div>
     </div>
     <div id="BottomLists" style="display:none;">
         <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
@@ -220,19 +228,19 @@
             //UpdateSites(cId, sId);
 
             $("#ClientList").change(function () {
-                debugger;
+               // debugger;
                 var sId = $('#SiteList option:selected').val();
                 UpdateSites($('option:selected', this).val(), sId);
             });
 
             $("#SiteList").change(function () {
-                debugger;
+              //  debugger;
                 var cId = $('#ClientList option:selected').val();
                 UpdateSites(cId, $('option:selected', this).val());
             });
 
             $('#Copy').on('click', function () {
-                debugger;
+               // debugger;
                 //var msId = $('#selectedsite').val();
                 var sId = $('#SiteList option:selected').val();
                 var cId = $('#ClientList option:selected').val();
@@ -249,7 +257,7 @@
             });
 
             $('#Remove').on('click', function () {
-                debugger;
+              //  debugger;
                 //var msId = $('#selectedsite').val();
                 var cId = $('#ClientList option:selected').val();
                 var sId = $('#SiteList option:selected').val();
@@ -334,7 +342,7 @@
                             site.ContactName +
                             '</td><td> ' +
                             site.RegionId +
-                            '</td><td><input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" value="'+site.Id+'" /></td></tr>';
+                            '</td><td><input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" value="' + site.Id + '" /></td></tr>';
                     });
                     rowDiv.html(result);
 
@@ -379,7 +387,7 @@
                             site.ContactName +
                             '</td><td> ' +
                             site.RegionId +
-                            '</td><td><input type="radio" id="excl_item_id' + site.Id + '" name="excl_item" value="' + site.Id +'" /></td></tr>';
+                            '</td><td><input type="radio" id="excl_item_id' + site.Id + '" name="excl_item" value="' + site.Id + '" /></td></tr>';
                     });
                     rowDiv.html(result);
 

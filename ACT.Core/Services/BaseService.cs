@@ -134,6 +134,10 @@ namespace ACT.Core.Services
 
                 //context.Entry( user ).State = EntityState.Modified;
                 //context.SaveChanges();
+                //if (model.PSPs.Any())
+                //{
+                //    System.Web.Session["UserPSP"] = model.PSPs.FirstOrDefault() .ToString();
+                //}
 
                 ContextExtensions.CacheUserData( model.Email, model );
             }
