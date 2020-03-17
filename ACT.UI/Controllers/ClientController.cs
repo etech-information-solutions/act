@@ -48,8 +48,8 @@ namespace ACT.UI.Controllers
                 pm.Sort = pm.Sort ?? "DESC";
                 pm.SortBy = pm.SortBy ?? "CreatedOn";
                 if (CurrentUser.PSPs.Count > 0)
-                {                    
-                    model = service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
+                {
+                    model = service.List1(pm,csm);//service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
                     foreach (Client cl in model)
                     {
                         ClientViewModel vm = new ClientViewModel()
@@ -358,6 +358,8 @@ namespace ACT.UI.Controllers
                             OutstandingPallets = model.KPIOutstanding,
                             Passons = 0, //TODO: Fix
                             MonthlyCost = 0, //TODO: Fix
+                            ResolveDays = model.KPIDaysToResolve,
+                            OutstandingDays = model.KPIDaysOutstanding,
                             Status = (int)Status.Active
                         };
                         kpiservice.Create(newKPI);
@@ -447,8 +449,8 @@ namespace ACT.UI.Controllers
                     },
                     KPIDisputes = (kpi!=null?kpi.Disputes:0),
                     KPIOutstanding = (kpi != null ? kpi.OutstandingPallets : 0),
-                    KPIDaysToResolve = 0, //TODO: FIx
-                    KPIDaysOutstanding = 0,//TODO: FIx
+                    KPIDaysToResolve = (kpi != null ? kpi.ResolveDays : 0),
+                    KPIDaysOutstanding = (kpi != null ? kpi.OutstandingDays : 0),
                 };
                 if (logo != null && logo.Count > 0)
                 {
@@ -668,7 +670,7 @@ namespace ACT.UI.Controllers
                     #endregion
                    
                     #region Any Logos
-                    if (model.Logo != null)
+                    if (model.Logo.File != null)
                     {
                         //foreach (FileViewModel logo in model.Logo)
                         //{
@@ -729,8 +731,8 @@ namespace ACT.UI.Controllers
                             {
                                 k.OutstandingPallets = model.KPIOutstanding;
                                 k.Disputes = model.KPIDisputes;
-                                //k.KPIDaysOutstanding = model.KPIDaysOutstanding;
-                                //k.KPIDaysToResolve = model.KPIDaysToResolve;
+                                k.OutstandingDays = model.KPIDaysOutstanding;
+                                k.ResolveDays = model.KPIDaysToResolve;
 
                                 kpiservice.Update(k);
                             }
@@ -1206,7 +1208,7 @@ namespace ACT.UI.Controllers
                     ContactName = site.ContactName,
                     ContactNo = site.ContactNo,
                     PlanningPoint = site.PlanningPoint,
-                    SiteType = 1,//(int)site.SiteType,
+                    SiteType = (int)site.SiteType,
                     AccountCode = site.AccountCode,
                     Depot = site.Depot,
                     SiteCodeChep = site.SiteCodeChep,
@@ -2071,8 +2073,8 @@ namespace ACT.UI.Controllers
                         GroupId = int.Parse(groupId),
                         ClientId = int.Parse(clientId),
                         Status = (int)Status.Active,
-                        PSPClient = pspClientList.FirstOrDefault(),
-                        Group = groupObj
+                        //PSPClient = pspClientList.FirstOrDefault(),
+                        //Group = groupObj
                     };
                     clientgroupservice.Create(group);
                     // clientgroupservice.Update(clientGroup);
@@ -2932,7 +2934,7 @@ namespace ACT.UI.Controllers
 
                     using (ClientService service = new ClientService())
                     {
-                        clients = service.List(pm, csm);
+                        clients = service.List1(pm, csm);
                     }
 
                     if (clients != null && clients.Any())

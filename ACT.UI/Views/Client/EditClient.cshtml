@@ -287,14 +287,16 @@
                 Days Outstanding
             </div>
             <div class="editor-field">
-                <input type="text" class="input" placeholder="Days Outstanding" value="0" />
+                @Html.TextBoxFor(model => model.KPIDaysOutstanding, new { @class = "input", @placeholder = "Enter KPI Days Outstanding" })
+                @Html.ValidationMessageFor(model => model.KPIDaysOutstanding)
             </div>
 
             <div class="editor-label uppercase">
                 Days to Resolve
             </div>
             <div class="editor-field">
-                <input type="text" class="input" placeholder="Days to Resolve" value="0" />
+                @Html.TextBoxFor(model => model.KPIDaysToResolve, new { @class = "input", @placeholder = "Enter KPI Days to Resolve" })
+                @Html.ValidationMessageFor(model => model.KPIDaysToResolve)
             </div>
 
         </div>

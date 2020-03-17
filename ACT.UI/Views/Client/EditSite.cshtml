@@ -15,8 +15,8 @@
     ViewBag.Title = "Edit Site";
     Address address = ViewBag.Address;
 
-    List<Region> regionOptions = ViewBag.RegionOptions;
-    List<SiteType> siteTypes = ViewBag.RegionOptions;
+    IEnumerable<SelectListItem> regionOptions = ViewBag.RegionOptions;
+    //List<SiteType> siteTypes = ViewBag.RegionOptions;
     //List<Region> regionOptions = Model.RegionOptions;
     //regionOptions = Model.RegionOptions.Where(r => r.PSPId == pspId).ToList();
 
@@ -60,16 +60,43 @@
             Region
         </div>
         <div class="display-field">
+
             @*@Html.DropDownListFor(model => model.RegionId, model => model.RegionOptions, region => region.Id, region => region.Name, true, new { @class = "chzn", @style = "width: 98%;" })*@
-            @Html.DropDownList("RegionOptions", "Please Select")
+            @*@Html.DropDownList("RegionOptions", "Please Select")*@
             @*@Html.ValidationMessageFor(model => model.RegionId)*@
         </div>
         <div class="display-label">
             Site Type
         </div>
         <div class="display-field">
+            <select id="SiteType" name="SiteType" class="chzn" required="required" style="width: 87%;">
+                <option value="">-- select</option>
+                @*@string prov = (model => model.Address.Province);*@
+                @foreach (int p in Enum.GetValues(typeof(SiteType)))
+                {
+                    string text = ((SiteType)p).GetDisplayText();
+                    SiteType type = (SiteType)p;
+                    //string prov = "";
+                    if (text.ToLower() == "all")
+                    {
+                        continue;
+                    }
+                    else if (p == Model.SiteType)
+                    {
+                        <option value="@p" selected="selected">@text</option>
+                    }
+                    else
+                    {
+                        <option value="@p">@text</option>
+                    }
+
+                    @*string sel = (province == @prov) ? "selected=selected" : string.Empty;
+
+                <option value="@p" @sel>@text</option>*@
+                }
+            </select>
             @*@Html.TextBoxFor(model => model.SiteType, new { @class = "input", @placeholder = "Enter Site Ty[pe" })
-            @Html.ValidationMessageFor(model => model.SiteType)*@
+        @Html.ValidationMessageFor(model => model.SiteType)*@
             @*@(( ( Site ) Model.Status ).GetDisplayText())*@
         </div>
         <div class="display-label">

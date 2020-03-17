@@ -23,6 +23,8 @@ namespace ACT.Data.Models
         public Nullable<decimal> OutstandingPallets { get; set; }
         public Nullable<decimal> Passons { get; set; }
         public Nullable<decimal> MonthlyCost { get; set; }
+        public Nullable<int> OutstandingDays { get; set; }
+        public Nullable<int> ResolveDays { get; set; }
         public int Status { get; set; }
     
         public virtual Client Client { get; set; }

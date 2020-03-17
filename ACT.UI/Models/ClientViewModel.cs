@@ -70,8 +70,8 @@ namespace ACT.UI.Models
         public ICollection<ClientKPI> ClientKPI { get; set; }
         public Nullable<decimal> KPIOutstanding { get; set; }
         public Nullable<decimal> KPIDisputes { get; set; }
-        public Nullable<decimal> KPIDaysOutstanding { get; set; }
-        public int KPIDaysToResolve { get; set; }
+        public Nullable<int> KPIDaysOutstanding { get; set; }
+        public Nullable<int> KPIDaysToResolve { get; set; }
 
         [Display(Name = "Company Documents")]
         //public ICollection<FileViewModel> CompanyFile { get; set; }
