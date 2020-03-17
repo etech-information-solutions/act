@@ -32,7 +32,7 @@ namespace ACT.UI.Models
         public string ContactNo { get; set; }
         public string ContactName { get; set; }
         public string PlanningPoint { get; set; }
-        public Nullable<int> SiteType { get; set; }
+        public int SiteType { get; set; }
         public string AccountCode { get; set; }
         public string Depot { get; set; }
         public string SiteCodeChep { get; set; }

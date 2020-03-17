@@ -1,4 +1,4 @@
-﻿@model SiteViewModel
+﻿@model Site
 
 @using ACT.Data.Models;
 @using ACT.Core.Enums;
@@ -14,6 +14,8 @@
 
     ViewBag.Title = "Site Details";
     Address address = ViewBag.Address;
+    SiteType st = (SiteType)Model.SiteType;
+    string sttext = st.GetDisplayText();
     //Region regionOptions = ViewBag.RegionOptions;
 }
 
@@ -48,8 +50,8 @@
             Site Type
         </div>
         <div class="display-field">
-            @Html.DisplayFor(model => model.SiteType)
-            @*@(( ( Site ) Model.Status ).GetDisplayText())*@
+            @sttext
+            @Html.HiddenFor(model => model.SiteType)
         </div>
         <div class="display-label">
             Account Code
@@ -117,13 +119,15 @@
         <div class="display-label">
             Region
         </div>
-        @using (RegionService reg = new RegionService())
-        {
-            Region region = reg.GetById((int)Model.RegionId);
-            <td style="width: 15%;">
-                @region.Name
-            </td>
-        }
+        <div class="display-field">
+            @using (RegionService reg = new RegionService())
+            {
+                Region region = reg.GetById((int)Model.RegionId);
+                <td style="width: 15%;">
+                    @region.Name
+                </td>
+            }
+        </div>
 
     </div>
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
@@ -262,23 +266,23 @@
 
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
 
-    @if (ViewBag.IncludeLayout == null)
-    {
-        <p>
-            @Html.ActionLink("Edit", "EditSite", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
+    @*@if (ViewBag.IncludeLayout == null)
+        {*@
+    <p>
+        @Html.ActionLink("Edit", "EditSite", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
 
-            @if (ViewBag.IncludeLayout == null)
-            {
-                <span style="padding: 0 5px;">/</span>
-                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
-            }
-        </p>
-    }
+        @if (ViewBag.IncludeLayout == null)
+        {
+            <span style="padding: 0 5px;">/</span>
+            <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
+        }
+    </p>
+    @*}*@
 
     @if (ViewBag.IncludeLayout != null)
     {
         <div class="back-to-list">
-            @Html.ActionLink("Back to List", "_ManageSites")
+            @Html.ActionLink("Back to List", "Index")
         </div>
     }
 
@@ -303,7 +307,7 @@
         var savecopy = '<a id="savebudget" onclick="SaveBudget([BUDGETID])" name="savebudget"><i class="fa fa-save"></i></a>';
         $.ajax({
             type: "GET",
-            url: "GetSiteBudgets",
+            url: "GetSiteBudgetList",
             data: { siteId: id },
             contentType: "application/json;charset=utf-8",
             dataType: "json",
@@ -337,7 +341,7 @@
 
             },
             error: function (response) {
-                alert('error');
+                alert('Error Retrieving Budgets');
             }
         });
 

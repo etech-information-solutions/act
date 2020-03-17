@@ -10,12 +10,14 @@
     if (ViewBag.IncludeLayout == null)
     {
         Layout = null;
+
+        ViewBag.Title = "Edit Site";
     }
 
-    ViewBag.Title = "Edit Site";
+
     Address address = ViewBag.Address;
 
-    IEnumerable<SelectListItem> regionOptions = ViewBag.RegionOptions;
+    //IEnumerable<SelectListItem> regionOptions = ViewBag.RegionOptions;
     //List<SiteType> siteTypes = ViewBag.RegionOptions;
     //List<Region> regionOptions = Model.RegionOptions;
     //regionOptions = Model.RegionOptions.Where(r => r.PSPId == pspId).ToList();
@@ -25,7 +27,7 @@
 
 @Html.Partial("_Notification")
 
-@using (Html.BeginForm("EditSite", "Site", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#sitelist", @class = "custom-validate", @style = "width: auto;" }))
+@using (Html.BeginForm("EditSite", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#managesites", @class = "custom-validate", @style = "width: auto;", id = "editsite" }))
 {
 <div id="edit-item">
 
@@ -60,7 +62,25 @@
             Region
         </div>
         <div class="display-field">
+            <select id="RegionId" name="RegionId" class="chzn" required="required" style="width: 87%;">
+                <option value="">-- select</option>
+                @*@string prov = (model => model.Address.Province);*@
+                @foreach (var p in ViewBag.RegionOptions)
+                {                    
+                     if (int.Parse(p.Value) == Model.RegionId)
+                    {
+                        <option value="@p.Value" selected="selected">@p.Text</option>
+                    }
+                    else
+                    {
+                        <option value="@p.Value">@p.Text</option>
+                    }
 
+                    @*string sel = (province == @prov) ? "selected=selected" : string.Empty;
+
+                <option value="@p" @sel>@text</option>*@
+                }
+            </select>
             @*@Html.DropDownListFor(model => model.RegionId, model => model.RegionOptions, region => region.Id, region => region.Name, true, new { @class = "chzn", @style = "width: 98%;" })*@
             @*@Html.DropDownList("RegionOptions", "Please Select")*@
             @*@Html.ValidationMessageFor(model => model.RegionId)*@
@@ -71,12 +91,10 @@
         <div class="display-field">
             <select id="SiteType" name="SiteType" class="chzn" required="required" style="width: 87%;">
                 <option value="">-- select</option>
-                @*@string prov = (model => model.Address.Province);*@
                 @foreach (int p in Enum.GetValues(typeof(SiteType)))
                 {
                     string text = ((SiteType)p).GetDisplayText();
                     SiteType type = (SiteType)p;
-                    //string prov = "";
                     if (text.ToLower() == "all")
                     {
                         continue;
@@ -89,15 +107,8 @@
                     {
                         <option value="@p">@text</option>
                     }
-
-                    @*string sel = (province == @prov) ? "selected=selected" : string.Empty;
-
-                <option value="@p" @sel>@text</option>*@
                 }
             </select>
-            @*@Html.TextBoxFor(model => model.SiteType, new { @class = "input", @placeholder = "Enter Site Ty[pe" })
-        @Html.ValidationMessageFor(model => model.SiteType)*@
-            @*@(( ( Site ) Model.Status ).GetDisplayText())*@
         </div>
         <div class="display-label">
             Account Code
@@ -363,7 +374,7 @@
 
         }
 
-        function LoadBudgets(id) {
+        function LoadBudgets(sId) {
             var rowDiv = $("#siteBudget-table tbody");
             rowDiv.html('');
 
@@ -371,8 +382,8 @@
             var savecopy = '<a id="savebudget" onclick="SaveBudget([BUDGETID])" name="savebudget"><i class="fa fa-save"></i></a>';
             $.ajax({
                 type: "GET",
-                url: "GetSiteBudgets",
-                data: { siteId: id },
+                url: "GetSiteBudgetList",
+                data: { siteId: sId },
                 contentType: "application/json;charset=utf-8",
                 dataType: "json",
                 success: function (data) {
@@ -407,7 +418,7 @@
 
                 },
                 error: function (response) {
-                    alert('error');
+                   alert('Error Retrieving Budgets');
                 }
             });
 

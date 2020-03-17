@@ -948,7 +948,7 @@ namespace ACT.UI.Controllers
 
         //
         // GET: /Client/SiteDetails/5
-        public ActionResult SiteDetails(int id, string sourceView, bool layout = true)
+        public ActionResult SiteDetails(int id, string sourceView = "ManageSites", bool layout = true)
         {
             Site site;
             //int pspId = Session[ "UserPSP" ];
@@ -974,7 +974,7 @@ namespace ACT.UI.Controllers
 
                 bool unverified = (site.Status == (int)PSPClientStatus.Unverified);
 
-                SiteViewModel model = new SiteViewModel()
+                Site model = new Site()
                 {
                     Id = site.Id,
                     Name = site.Name,
@@ -986,14 +986,14 @@ namespace ACT.UI.Controllers
                     ContactName = site.ContactName,
                     ContactNo = site.ContactNo,
                     PlanningPoint = site.PlanningPoint,
-                    SiteType = 1,//(int)site.SiteType,
+                    SiteType = (int)site.SiteType,
                     AccountCode = site.AccountCode,
                     Depot = site.Depot,
                     SiteCodeChep = site.SiteCodeChep,
                     Status = (int)site.Status,
-                    EditMode = true,
+                   // EditMode = true,
                     RegionId = site.RegionId,
-                    SourceView = sourceView,
+                   // SourceView = sourceView,
                     //RegionOptions = regionOptions,
                     //FullAddress = new AddressViewModel()
                     //{
@@ -1022,25 +1022,23 @@ namespace ACT.UI.Controllers
         [Requires(PermissionTo.Create)]
         public ActionResult AddSite(string sourceView)
         {
-            
+
             //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            //regionOptions = Model.RegionOptions.Where(r => r.PSPId == pspId).ToList();
+            SiteViewModel model = new SiteViewModel() { EditMode = true, SourceView = sourceView };//, RegionOptions = regionOptions
             List<Region> regionOptions = new List<Region>();
-            using (RegionService service = new RegionService())
-            {
-                regionOptions = service.ListByColumnWhere("PSPId", pspId);
+            using (RegionService rservice = new RegionService()) {
+                regionOptions = rservice.ListByColumnWhere("PSPId", pspId);
 
-
-            }
             IEnumerable<SelectListItem> regionDDL = regionOptions.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.Description
 
             });
-            //regionOptions = Model.RegionOptions.Where(r => r.PSPId == pspId).ToList();
-            SiteViewModel model = new SiteViewModel() { EditMode = true, SourceView = sourceView };//, RegionOptions = regionOptions
             ViewBag.RegionOptions = regionDDL;
+
             //if (sourceView == "ManageSites")
             //{
             //    return RedirectToAction("ManageSites");
@@ -1050,6 +1048,7 @@ namespace ACT.UI.Controllers
             //    return RedirectToAction("SubSites");
             //}
             return View(model);
+        }
         }
 
 
@@ -1101,7 +1100,7 @@ namespace ACT.UI.Controllers
                         ContactName = model.ContactName,
                         ContactNo = model.ContactNo,
                         PlanningPoint = model.PlanningPoint,
-                        SiteType = model.SiteType,
+                        SiteType = (int)model.SiteType,
                         AccountCode = model.AccountCode,
                         Depot = model.Depot,
                         SiteCodeChep = model.SiteCodeChep,
@@ -1177,7 +1176,7 @@ namespace ACT.UI.Controllers
         {
             Site site;
             //int pspId = Session[ "UserPSP" ];
-
+            bool layout = true; //temporarily while i figure out why the table edit doesnt work
             using (SiteService service = new SiteService())
             using (RegionService rservice = new RegionService())
             using (AddressService aservice = new AddressService())
@@ -1252,7 +1251,10 @@ namespace ACT.UI.Controllers
                 //{
                 //    return RedirectToAction("SubSites");
                 //}
-
+                if (layout)
+                {
+                    ViewBag.IncludeLayout = true;
+                }
                 return View(model);
             }
         }
@@ -1679,7 +1681,7 @@ namespace ACT.UI.Controllers
         }
 
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult GetSiteBudgets(string siteId)
+        public JsonResult GetSiteBudgetList(string siteId)
         {
             if (siteId != null && siteId != "")
             {
