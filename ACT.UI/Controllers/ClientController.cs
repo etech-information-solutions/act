@@ -737,22 +737,24 @@ namespace ACT.UI.Controllers
             //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-            int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
             //string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
             //int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
 
-            List<Client> clientList = new List<Client>(); ;
+            List<Client> clientList = new List<Client>();
             using (ClientService clientService = new ClientService())
             {
-                if (clientID > 0)
-                {
-                    Client chosenClient = clientService.GetById(clientID);
-                    clientList.Add(chosenClient);
-                }
-                else
-                {
-                    clientList = clientService.GetClientsByPSP(pspId);                    
-                }
+            clientList = clientService.List1(new PagingModel(), new CustomSearchModel() { ClientId = clientId });
+
+            //    if (clientID > 0)
+            //    {
+            //        Client chosenClient = clientService.GetById(clientID);
+            //        clientList.Add(chosenClient);
+            //    }
+            //    else
+            //    {
+            //        clientList = clientService.GetClientsByPSP(pspId);                    
+            //    }
             }
 
             IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
@@ -766,9 +768,9 @@ namespace ACT.UI.Controllers
             {
                 pm.Sort = pm.Sort ?? "DESC";
                 pm.SortBy = pm.SortBy ?? "CreatedOn";
-                if (clientID > 0)
+                if (clientId > 0)
                 {
-                    csm.ClientId = clientID;
+                    csm.ClientId = clientId;
                     
                 }
                 model = service.List1(pm, csm);               
@@ -1316,24 +1318,24 @@ namespace ACT.UI.Controllers
             //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-            int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
             //string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
             //int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
 
             using (ClientService clientService = new ClientService())
-            using (SiteService sitesService = new SiteService())
             {
-                if (clientID > 0)
-                {
-                    Client chosenClient = clientService.GetById(clientID);
-                    clientList.Add(chosenClient);
-                }
-                else
-                {
+                clientList = clientService.List1(new PagingModel(), new CustomSearchModel() { ClientId = clientId });
+                //if (clientID > 0)
+                //{
+                //    Client chosenClient = clientService.GetById(clientID);
+                //    clientList.Add(chosenClient);
+                //}
+                //else
+                //{
 
-                    //mainSiteList = sitesService.GetSitesByClientsOfPSP(pspId);
-                    clientList = clientService.GetClientsByPSP(pspId);
-                }
+                //    //mainSiteList = sitesService.GetSitesByClientsOfPSP(pspId);
+                //    clientList = clientService.GetClientsByPSP(pspId);
+                //}
             }
             IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
             {
@@ -1583,6 +1585,24 @@ namespace ACT.UI.Controllers
         public ActionResult AddGroup()
         {
             GroupViewModel model = new GroupViewModel() { EditMode = true };
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            List<Client> clientList = new List<Client>();
+            //TODO
+            using (ClientService clientService = new ClientService())
+            {
+                clientList = clientService.List1(new PagingModel(), new CustomSearchModel() { ClientId = clientId });
+            }
+
+            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.CompanyName
+
+            });
+            ViewBag.ClientList = clientDDL;
+
             return View(model);
         }
 
@@ -1603,6 +1623,7 @@ namespace ACT.UI.Controllers
                 }
 
                 using (GroupService gService = new GroupService())
+                using (ClientGroupService cgservice = new ClientGroupService())
                 using (TransactionScope scope = new TransactionScope())
                 {
                     #region Create Group
@@ -1613,6 +1634,24 @@ namespace ACT.UI.Controllers
                         Status = (int)model.Status
                     };
                     group = gService.Create(group);
+                    #endregion
+
+                    #region Create Group Client Links
+                    if (!string.IsNullOrEmpty(model.GroupClientList)){
+                        String[] clientList = model.GroupClientList.Split(',');
+                        foreach(string itm in clientList)
+                        {
+                            if (!string.IsNullOrEmpty(itm)) {
+                                ClientGroup client = new ClientGroup()
+                                {
+                                    ClientId = int.Parse(itm),
+                                    GroupId = group.Id,
+                                    Status = (int)Status.Active
+                                };
+                                cgservice.Create(client);
+                            }
+                        }
+                    }
                     #endregion
 
                     scope.Complete();
@@ -1833,10 +1872,12 @@ namespace ACT.UI.Controllers
                 //using (GroupService service = new GroupService())
                 using (ClientGroupService clientgroupservice = new ClientGroupService())
                 using (GroupService groupservice = new GroupService())
-                using (PSPClientService pspclientservice = new PSPClientService())
+                //using (PSPClientService pspclientservice = new PSPClientService())
+                using (ClientService clientService = new ClientService())
                 using (TransactionScope scope = new TransactionScope())
                 {
-                    List<PSPClient> pspClientList = pspclientservice.ListByColumnWhere("ClientId", int.Parse(clientId));
+                    //clientList = clientService.List1(new PagingModel(), new CustomSearchModel() { ClientId = clientId });
+                    //List<PSPClient> pspClientList = pspclientservice.ListByColumnWhere("ClientId", int.Parse(clientId));
                     Group groupObj = groupservice.GetById(int.Parse(groupId));
 
                     ClientGroup group = new ClientGroup()
@@ -1900,15 +1941,16 @@ namespace ACT.UI.Controllers
             {
                 model = service.List(pm, csm);
                 total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total1(pm, csm);
-                if (clientId > 0)
-                {
-                    Client client = clientService.GetById(clientId);
-                    clientList.Add(client);
-                }
-                else
-                {
-                    clientList = clientService.GetClientsByPSP(pspId);
-                }
+                //if (clientId > 0)
+                //{
+                //    Client client = clientService.GetById(clientId);
+                //    clientList.Add(client);
+                //}
+                //else
+                //{
+                //  clientList = clientService.GetClientsByPSP(pspId);
+                clientList = clientService.List1(new PagingModel(), new CustomSearchModel() { ClientId = clientId });
+                //}
             }
 
             PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);

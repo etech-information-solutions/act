@@ -25,6 +25,7 @@ namespace ACT.UI.Models
         public string Description { get; set; }
         public int Status { get; set; }
         public bool EditMode { get; set; }
+        public string GroupClientList { get; set; }
 
         #endregion
 
