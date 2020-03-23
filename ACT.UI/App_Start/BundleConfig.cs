@@ -29,7 +29,8 @@ namespace ACT.UI
                         //"~/Scripts/Plugins/jquery.dataTables.js",
                         "~/Scripts/Plugins/jquery.placeholder.js",
                         "~/Scripts/Plugins/jquery.dataTables.min.js",
-                        "~/Scripts/Plugins/dataTables.select.min.js"
+                        "~/Scripts/Plugins/dataTables.select.min.js",
+                        "~/Scripts/Plugins/toastr.min.js"
                         /*,
                         "~/Scripts/Plugins/dataTables.fixedHeader.min.js"*/ ) );
 
@@ -40,7 +41,7 @@ namespace ACT.UI
                         "~/Scripts/ACT/loader.js",
                         "~/Scripts/ACT/stickyone.js",
                         "~/Scripts/ACT/validation.js",
-                        "~/Scripts/ACT/startup.js" ) );
+                        "~/Scripts/ACT/startup.js") );
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at https://modernizr.com to pick only the tests you need.
@@ -64,7 +65,8 @@ namespace ACT.UI
                 "~/Content/stickyone.css",
                 "~/Content/font-awesome.css",
                 "~/Content/jquery.fancybox.css",
-                "~/Content/fixedHeader.dataTables.min.css" ) );
+                "~/Content/fixedHeader.dataTables.min.css",
+                "~/Content/toastr.min.css") );
 
             bundles.Add( new StyleBundle( "~/Content/jqueryui" ).Include( "~/Content/jquery-ui-1.10.4.custom.css" ) );
         }

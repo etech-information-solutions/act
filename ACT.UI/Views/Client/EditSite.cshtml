@@ -67,7 +67,7 @@
                 @*@string prov = (model => model.Address.Province);*@
                 @foreach (var p in ViewBag.RegionOptions)
                 {                    
-                     if (int.Parse(p.Value) == Model.RegionId)
+                    if (Model.RegionId != null && int.Parse(p.Value) == Model.RegionId)
                     {
                         <option value="@p.Value" selected="selected">@p.Text</option>
                     }
@@ -131,6 +131,7 @@
         </div>
         <div class="editor-field">
             @Html.DropDownListFor(model => model.Depot, (new[] { new SelectListItem { Text = "No", Value = "No" }, new SelectListItem { Text = "Yes", Value = "Yes" } }), new { @class = "chzn", @style = "width: 98%;" })
+            @Html.ValidationMessageFor(model => model.Depot)
         </div>
         @*<div class="display-label">
             Depot
@@ -151,7 +152,6 @@
     </div>
 
     <div class="left" style="width: 45%;">
-        <h3>Contact Details</h3>
         <div class="display-label">
             Contact Number
         </div>
@@ -168,7 +168,6 @@
             @Html.TextBoxFor(model => model.ContactName, new { @class = "input", @placeholder = "Enter Contact Name" })
             @Html.ValidationMessageFor(model => model.ContactName)
         </div>
-        <h3>Contact Details</h3>
         <div class="display-label">
             X Coordinates
         </div>

@@ -15,5 +15,7 @@ namespace ACT.Core.Models.Custom
         public Nullable<decimal> Passons { get; set; }
         public Nullable<decimal> MonthlyCost { get; set; }
         public int Status { get; set; }
+        public Nullable<int> OutstandingDays { get; set; }
+        public Nullable<int> ResolveDays { get; set; }
     }
 }

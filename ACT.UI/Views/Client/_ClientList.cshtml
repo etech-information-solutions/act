@@ -152,7 +152,7 @@
                     @Html.ActionLink("Edit", "EditClient", new { id = item.Id, returnView = "ClientList" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
                     @Html.ActionLink(enable, "DeleteClient", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientlist", @rel = "tipsyE", @title = enable + " this item?" })
-                    <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                    @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
                         @if (item.CompanyFile != null && item.CompanyFile.Any(s => s.Status == (Int32)Status.Active))
                         {
@@ -172,7 +172,7 @@
                                 </ul>
                             </div>
                         }
-                        </div>
+                        </div>*@
                 </td>
 
 

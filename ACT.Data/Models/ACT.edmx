@@ -244,6 +244,8 @@
           <Property Name="Passons" Type="numeric" Precision="18" Scale="0" />
           <Property Name="MonthlyCost" Type="money" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="OutstandingDays" Type="int" />
+          <Property Name="ResolveDays" Type="int" />          
         </EntityType>
         <EntityType Name="ClientLoad">
           <Key>
@@ -2600,6 +2602,8 @@
           <Property Name="Passons" Type="Decimal" Precision="18" Scale="0" />
           <Property Name="MonthlyCost" Type="Decimal" Precision="19" Scale="4" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="OutstandingDays" Type="Int32" />
+          <Property Name="ResolveDays" Type="Int32" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientKPIs_Clients" FromRole="ClientKPI" ToRole="Client" />
         </EntityType>
         <EntityType Name="ClientLoad">
@@ -4430,6 +4434,8 @@
           <EntitySetMapping Name="ClientKPIs">
             <EntityTypeMapping TypeName="ACTModel.ClientKPI">
               <MappingFragment StoreEntitySet="ClientKPI">
+                <ScalarProperty Name="ResolveDays" ColumnName="ResolveDays" />
+                <ScalarProperty Name="OutstandingDays" ColumnName="OutstandingDays" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="MonthlyCost" ColumnName="MonthlyCost" />
                 <ScalarProperty Name="Passons" ColumnName="Passons" />

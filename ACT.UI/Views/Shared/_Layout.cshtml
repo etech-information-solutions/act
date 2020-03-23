@@ -17,10 +17,11 @@
 
     <link href="~/Images/favicon.png" rel="shortcut icon" type="image/x-icon" />
 
-    @Styles.Render( "~/Content/css" )
-    @Styles.Render( "~/Content/jqueryui" )
-    @Scripts.Render( "~/bundles/modernizr" )
-    @Scripts.Render( "~/bundles/jquery" )
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/jqueryui")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+ 
 </head>
 <body>
 
@@ -28,7 +29,7 @@
 
         <div class="@(Request.IsAuthenticated ? "logged-in" : "")">
 
-            @if ( Request.IsAuthenticated )
+            @if (Request.IsAuthenticated)
             {
                 @*<div id="my-account" class="header my-account" style="border-bottom: 1px solid #eee1e0;">
 
@@ -63,21 +64,21 @@
             else
             {
                 @*<div class="logo @(Request.IsAuthenticated ? "logged-in" : "")">
-                        <a href="@Url.Action( "Login", "Account" )">
-                            <img alt="ACT - Pallets" src="@Url.Content( "~/images/act-logo.png" )" />
-                        </a>
-                    </div>*@
+                    <a href="@Url.Action( "Login", "Account" )">
+                        <img alt="ACT - Pallets" src="@Url.Content( "~/images/act-logo.png" )" />
+                    </a>
+                </div>*@
             }
 
             <div class="sep @(Request.IsAuthenticated ? "logged-in" : "")"></div>
 
         </div>
 
-        @if ( Request.IsAuthenticated )
+        @if (Request.IsAuthenticated)
         {
             <div id="side-bar" class="side-bar @(Request.IsAuthenticated ? "logged-in" : "")">
 
-                @Html.Partial( "_Menu" )
+                @Html.Partial("_Menu")
 
                 <div class="clear"></div>
 
@@ -86,9 +87,9 @@
 
         <div id="main-content" class="content @(Request.IsAuthenticated ? "logged-in" : "")" style="margin-bottom: 0;">
 
-            @Html.Partial( "_Notification" )
+            @Html.Partial("_Notification")
 
-            @if ( Request.IsAuthenticated )
+            @if (Request.IsAuthenticated)
             {
                 @*<strong class="main-title">@ViewBag.Title</strong>*@
             }
@@ -110,13 +111,21 @@
 
         </footer>
 
-    </div>
+        <div id="dialog-select" title="Select Client" style="margin-top: 300px; margin-left:auto;">
+            <div id="modalform" class="editor-field" style="display:none;">
+
+                        <select id="client" name="client">
+                            <option value="">Select Client</option>
+                        </select>
+                </div>
+            </div>
+        </div>
 
 
-    @Html.Partial( "_Modal" )
-    @Html.Partial( "_StickyOne" )
-    @Html.Partial( "_AutoLogout" )
-    @Html.Partial( "_Announcement" )
+    @Html.Partial("_Modal")
+    @Html.Partial("_StickyOne")
+    @Html.Partial("_AutoLogout")
+    @Html.Partial("_Announcement")
 
     @{
         String h = "",
@@ -127,37 +136,37 @@
 
         String[] ms = new String[] { "-1" };
 
-        String absoluteUrlBase = Request.Url.Scheme + "://" + Request.Url.Host + ( Request.Url.IsDefaultPort ? "" : ":" + Request.Url.Port );
+        String absoluteUrlBase = Request.Url.Scheme + "://" + Request.Url.Host + (Request.Url.IsDefaultPort ? "" : ":" + Request.Url.Port);
 
-        if ( VariableExtension.SystemRules.AutoLogoff && Request.IsAuthenticated )
+        if (VariableExtension.SystemRules.AutoLogoff && Request.IsAuthenticated)
         {
-            Decimal asec = ( VariableExtension.SystemRules.LogoffSeconds - 180 );
+            Decimal asec = (VariableExtension.SystemRules.LogoffSeconds - 180);
 
             // Lets find hours
-            Decimal t = ( asec / 60 / 60 );
+            Decimal t = (asec / 60 / 60);
 
-            h = String.Format( "{0}h", ( Int32 ) t );
+            h = String.Format("{0}h", (Int32)t);
 
             // Lets find minutes
-            t = ( asec / 60 ) - ( ( Int32 ) t * 60 );
+            t = (asec / 60) - ((Int32)t * 60);
 
-            m = String.Format( "{0}m", ( Int32 ) t );
+            m = String.Format("{0}m", (Int32)t);
 
             // Lets find seconds
-            t = ( Int32 ) ( t / 60 );
+            t = (Int32)(t / 60);
 
-            s = String.Format( "{0}s", Math.Round( t, 0 ) );
+            s = String.Format("{0}s", Math.Round(t, 0));
 
-            alo = String.Format( "{0}{1}{2}", h, m, s );
+            alo = String.Format("{0}{1}{2}", h, m, s);
         }
 
         Int32 ate = 0;
 
-        String a = ( ViewBag.AccessTokenExpiry != null ) ? ( ( Int32 ) ViewBag.AccessTokenExpiry ).ToString() : "abcd";
+        String a = (ViewBag.AccessTokenExpiry != null) ? ((Int32)ViewBag.AccessTokenExpiry).ToString() : "abcd";
 
-        if ( ViewBag.AccessTokenExpiry != null && Int32.TryParse( a, out ate ) )
+        if (ViewBag.AccessTokenExpiry != null && Int32.TryParse(a, out ate))
         {
-            atr = ( TimeSpan.FromSeconds( ( ate - 60 ) ).TotalMilliseconds ).ToString();
+            atr = (TimeSpan.FromSeconds((ate - 60)).TotalMilliseconds).ToString();
         }
     }
 
@@ -170,12 +179,49 @@
             var cas = "@( ( Request.IsAuthenticated ) ? VariableExtension.SystemRules.LogoffSeconds : 0)";
     </script>
 
-    @Scripts.Render( "~/bundles/jqueryval" )
-    @Scripts.Render( "~/bundles/jqueryui" )
-    @Scripts.Render( "~/bundles/plugins" )
-    @Scripts.Render( "~/bundles/act" )
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/plugins")
+    @Scripts.Render("~/bundles/act")
 
     <div id="empty-div" style="display: none;"></div>
+    
+    <script>
+        $(function () {
+            /*
+            $("body").keydown(function (e) {
+                e.preventDefault();
+                $("#modalform").show();
+                var keyCode = e.keyCode || e.which;
+                if (keyCode == 113) {
+                    //toastr["success"]("test message", "hello");
+                    $("#dialog-select").dialog({
+                        height: 200,
+                        width: 400,
+                        'padding-left': '30%',
+                        modal: true,
+                        //position: {
+                        //    my: "center bottom",
+                        //    at: "center top",
+                        //    of: $("#submitbutton"),
+                        //    within: $(".container")
+                        //},
+                        buttons: {
+                            "Delete all items": function () {
+                                $(this).dialog("close");
+                            },
+                            Cancel: function () {
+                                $(this).dialog("close");
+                            }
+                        }
 
+                    });
+                }
+                $("#ui-dialog").css("margin-left", "35%");
+                console.log(keyCode);
+            });
+            */
+        });
+    </script>
 </body>
 </html>

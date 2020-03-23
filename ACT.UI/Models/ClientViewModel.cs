@@ -73,9 +73,9 @@ namespace ACT.UI.Models
         public Nullable<int> KPIDaysOutstanding { get; set; }
         public Nullable<int> KPIDaysToResolve { get; set; }
 
-        [Display(Name = "Company Documents")]
+        //[Display(Name = "Company Documents")]
         //public ICollection<FileViewModel> CompanyFile { get; set; }
-        public List<Document> CompanyFile { get; set; }
+        //public List<Document> CompanyFile { get; set; }
         //[Required]
         //[Display(Name = "Company Documents")]
         //public FileViewModel NewCompanyFile { get; set; }

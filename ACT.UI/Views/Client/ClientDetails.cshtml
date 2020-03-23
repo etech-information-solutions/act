@@ -23,7 +23,7 @@
     {
         <h2>
             <img alt="" src="@Url.Content( "~/images/info.png" )" />
-            <span>Client</span>
+            <span>Client Details</span>
         </h2>
     }
     @Html.HiddenFor(model => model.Id)
@@ -58,42 +58,6 @@
             <div class="display-field">
                 @Html.DisplayFor(model => model.ContactPerson)
             </div>
-
-
-
-            @*<div class="display-label">
-                    Logo
-                </div>
-                <div class="display-field">
-                    @if (documents != null && documents.Any())
-                    {
-                        foreach (Document d in documents)
-                        {
-                            <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
-                                <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
-
-                                @d.Name (@d.Type)
-                            </a>
-                        }
-                    }
-                </div>*@
-
-            @*<div class="display-label">
-                    Upload Documents
-                </div>
-                <div class="display-field">
-                    @if (documents != null && documents.Any())
-                    {
-                        foreach (Document d in documents)
-                        {
-                            <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
-                                <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
-
-                                @d.Name (@d.Type)
-                            </a>
-                        }
-                    }
-                </div>*@
 
         </div>
 
@@ -242,7 +206,8 @@
             Upload Documents
         </div>
         <div class="display-field">
-            @if (@ViewBag.Documents != null)
+            <div id="documentsdiv"></div>
+                @*@if (@ViewBag.Documents != null)
             {
                 foreach (Document d in @ViewBag.Documents)
                 {
@@ -252,9 +217,9 @@
                         @d.Name (@d.Type)
                     </a>
                 }
-            }
+            }*@
+            </div>
         </div>
-    </div>
 
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
     <p>
@@ -399,12 +364,26 @@
             var cId = $("#Id").val();
             LoadBudgets(cId);
             //$(".budgets").hide();
-
+            populateDocs(cId, "client");
         });
 
     function ViewBudget() {
             $('.budgets').show();
     };
+
+    function populateDocs(id, doctype) {
+
+        $.ajax({
+
+            url: '@Url.Action("CompanyFiles", "Client")',
+            type: "GET",
+            dataType: "html",
+            data: { objId: id, objType:doctype },//this is as per your requirement
+            success: function (data) {
+                $('#documentsdiv').html(data);
+            },
+        });
+    }
 
     function LinkToProducts(id) {
         $.ajax({

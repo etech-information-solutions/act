@@ -156,6 +156,7 @@
     </Compile>
     <Compile Include="Models\AddressViewModel.cs" />
     <Compile Include="Models\BudgetViewModel.cs" />
+    <Compile Include="Models\ObjectDocumentsViewModel.cs" />
     <Compile Include="Models\ImportFileModel.cs" />
     <Compile Include="Models\GroupViewModel.cs" />
     <Compile Include="Models\SiteViewImportModel.cs" />
@@ -337,6 +338,7 @@
     <Content Include="Images\warning.png" />
     <Content Include="Images\wireless-signal.png" />
     <Content Include="Scripts\ACT\act.js" />
+    <Content Include="Scripts\ACT\shortcut.js" />
     <Content Include="Scripts\ACT\loader.js" />
     <Content Include="Scripts\ACT\modal.js" />
     <Content Include="Scripts\ACT\startup.js" />
@@ -505,10 +507,12 @@
     <Content Include="Views\Shared\_AwaitingActivationCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ManageTransportersCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ClientGroupsCustomSearch.cshtml" />
+    <Content Include="Views\Client\partials\_ManageSitesList.cshtml" />
+    <Content Include="Views\Client\bak_ManageSites.cshtml" />
+    <Content Include="Views\Shared\_ListDocuments.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Client\partials\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

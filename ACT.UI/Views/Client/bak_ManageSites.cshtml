@@ -5,7 +5,6 @@
 @using ACT.Core.Models;
 @using ACT.Core.Models.Custom;
 @using ACT.Core.Services;
-@using System.Linq;
 
 @{
     ViewBag.ShowExport = true;
@@ -69,126 +68,54 @@
         <span class="loader"></span>
     </p>
 }    
+        <table id="sites-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#sites-table_wrapper" data-starting-point=".ap-tabs ul">
+            <thead>
+                <tr>
+                    @*<th data-name="Count">
+                        #
+                    </th>*@
+                    <th data-name="RegionId" data-column="RegionId">
+                        Region
+                    </th>
+                    <th data-name="Name" data-column="Name">
+                        Site Name
+                    </th>
+                    <th data-name="XCord" data-column="XCord">
+                        Site X Coordinate
+                    </th>
+                    <th data-name="YCord" data-column="YCord">
+                        Site Y Coordinate
+                    </th>
+                    <th data-name="Address" data-column="Address">
+                        Site Address
+                    </th>
+                    <th data-name="PostalCode" data-column="PostalCode">
+                        Postal Code
+                    </th>
+                    <th data-name="ContactNo" data-column="ContactNo">
+                        Contact Number
+                    </th>
+                    <th data-name="ContactName" data-column="ContactName">
+                        Contact Name
+                    </th>
+                    <th data-name="PlanningPoint" data-column="PlanningPoint">
+                        Planning Point
+                    </th>
+                    @*<th data-name="SiteType" data-column="SiteType">
+                        Site Type
+                    </th>
+                    <th data-name="SiteBudgets" data-column="SiteBudgets">
+                        Subsites Budget
+                    </th>*@
+                    <th data-name="Actions">
+                        Actions
+                    </th>
+                </tr>
+            </thead>
 
-<div id="managesiteslist">
+            <tbody></tbody>
 
-</div>
-<table id="sites-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#sites-table_wrapper" data-starting-point=".ap-tabs ul">
-    <thead>
-        <tr>
-            <th data-name="Count">
-                #
-            </th>
-            <th data-name="RegionId" data-column="RegionId">
-                Region
-            </th>
-            <th data-name="Name" data-column="Name">
-                Site Name
-            </th>
-            <th data-name="XCord" data-column="XCord">
-                Site X Coordinate
-            </th>
-            <th data-name="YCord" data-column="YCord">
-                Site Y Coordinate
-            </th>
-            <th data-name="Address" data-column="Address">
-                Site Address
-            </th>
-            <th data-name="PostalCode" data-column="PostalCode">
-                Postal Code
-            </th>
-            <th data-name="ContactNo" data-column="ContactNo">
-                Contact Number
-            </th>
-            <th data-name="ContactName" data-column="ContactName">
-                Contact Name
-            </th>
-            <th data-name="PlanningPoint" data-column="PlanningPoint">
-                Planning Point
-            </th>
-            <th data-name="SiteType" data-column="SiteType">
-                    Site Type
-                </th>
-            <th data-name="Actions">
-                Actions
-            </th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @if (Model != null && items != null && items.Count() > 0)
-        {
-            foreach (var item in items)
-            {
-                Status status = (Status)item.Status;
-
-                String active = status.Equals(Status.Active) ? "active" : "inactive";
-                String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
-
-                string regionName = "N/A";
-                if (item.RegionId != null) {
-                    using (RegionService reg = new RegionService())
-                    {
-                        Region region = reg.GetById((int)item.RegionId);
-                        regionName = region.Name;
-                    }
-                }
-                string siteTypeName = "N/A";
-                if (item.SiteType!=null)
-                {
-                    siteTypeName = ((SiteType)item.SiteType).GetDisplayText();
-                }
-
-        <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
-            <td width="1%">
-                @item.Id
-            </td>
-            <td>
-                @regionName
-            </td>
-            <td>
-                @item.Name
-            </td>
-            <td>
-                @item.XCord
-            </td>
-            <td>
-                @item.YCord
-            </td>
-            <td>
-                @item.Address
-            </td>
-            <td>
-                @item.PostalCode
-            </td>
-            <td>
-                @item.ContactNo
-            </td>
-            <td>
-                @item.ContactName
-            </td>
-            <td>
-                @item.PlanningPoint
-            </td>
-            <td>
-                @siteTypeName
-            </td>
-            <td>
-                @Html.ActionLink("Details", "SiteDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-
-            @Html.ActionLink("Edit", "EditSite", new { id = item.Id, returnView = "ManageSites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-
-            @Html.ActionLink(enable, "DeleteSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managesites", @rel = "tipsyE", @title = enable + " this item?" })
-            </td>
-        </tr>
-
-                count++;
-            }
-        }
-
-        </tbody>
-
-    </table>
+        </table>
         <script>
     function Redir(redirVal) {
         window.location.href = '@Url.Action("SubSites", "Client")'; //SubSites?siteId=redirVal
@@ -217,24 +144,13 @@
                         $('.importlabel').show();
                         $('.importbutton').show();
                         $('#postedFile').show();
-                        //GetIncludedSites(cId);
+                        GetIncludedSites(cId);
                     } else {
                         $('.add').hide();
                         $('.importlabel').hide();
                         $('.importbutton').hide();
                         $('#postedFile').hide();
                     }
-
-                    .ajax({
-                        type: 'POST',
-                        url: "SetClient",
-                        data: { "ClientId": id },
-                        success: function (response) {
-                            window.location.href = 'Index#managesites';
-                            location.reload();
-                        }
-                    });
-
                 });
             });
 

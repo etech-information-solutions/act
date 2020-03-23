@@ -1882,7 +1882,92 @@ namespace ACT.UI.Controllers
             }
         }
 
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetPSPBudgets(string PSPId)
+        {
+            if (PSPId != null && PSPId != "")
+            {
+                List<ClientBudget> load = null;
+
+                using (ClientBudgetService bservice = new ClientBudgetService())
+                {
+                    load = bservice.ListByColumnWhere("PSPId", int.Parse(PSPId));
+                    // return Json(load.Any(l => l.Status == (int)Status.Active), JsonRequestBehavior.AllowGet);
+                    return Json(load, JsonRequestBehavior.AllowGet);
+                }
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetPSPBudget(string Id, string PSPId, string BudgetYear, string January, string February, string March, string April, string May, string June, string July, string August, string September, string October, string November, string December)
+        {
+            if (Id != null)
+            {
+                using (PSPBudgetService bservice = new PSPBudgetService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    //Collection of budgets or singular?
+                    if (int.Parse(Id) > 0)
+                    {
+                        PSPBudget budget = bservice.GetById(int.Parse(Id));
+
+                        budget.PSPId = int.Parse(PSPId);
+                        budget.Status = (int)Status.Active;
+                        budget.BudgetYear = DateTime.Now.Year;
+                        budget.January = int.Parse(January);
+                        budget.February = int.Parse(February);
+                        budget.March = int.Parse(March);
+                        budget.April = int.Parse(April);
+                        budget.May = int.Parse(May);
+                        budget.June = int.Parse(June);
+                        budget.July = int.Parse(July);
+                        budget.August = int.Parse(August);
+                        budget.September = int.Parse(September);
+                        budget.October = int.Parse(October);
+                        budget.November = int.Parse(November);
+                        budget.December = int.Parse(December);
+                        budget.Status = (int)Status.Active;
+
+
+                        bservice.Update(budget);
+                    }
+                    else
+                    {
+                        PSPBudget budget = new PSPBudget();
+                        budget.PSPId = int.Parse(PSPId);
+                        budget.BudgetYear = DateTime.Now.Year;
+                        budget.January = int.Parse(January);
+                        budget.February = int.Parse(February);
+                        budget.March = int.Parse(March);
+                        budget.April = int.Parse(April);
+                        budget.May = int.Parse(May);
+                        budget.June = int.Parse(June);
+                        budget.July = int.Parse(July);
+                        budget.August = int.Parse(August);
+                        budget.September = int.Parse(September);
+                        budget.October = int.Parse(October);
+                        budget.November = int.Parse(November);
+                        budget.December = int.Parse(December);
+                        budget.Status = (int)Status.Active;
+
+                        bservice.Create(budget);
+                    }
+                    scope.Complete();
+                }
+
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
         #endregion
+
 
 
 

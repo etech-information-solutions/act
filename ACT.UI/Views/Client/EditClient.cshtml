@@ -151,16 +151,16 @@
                         @*@string prov = (model => model.Address.Province);*@
                         @foreach (int p in Enum.GetValues(typeof(Province)))
                         {
-                            string provinceText = Model.Address.Province.ToString().Trim().ToLower();
+                            string provinceText = Model.Address.Province.ToString().ToLower().Replace(" ", "");
                             string text = ((Province)p).GetDisplayText();
-                            string ltext = text.Trim().ToLower();
+                            string ltext = text.ToLower().Replace(" ","");
                             Province province = (Province)p;
                             //string prov = "";
                             if (text.ToLower() == "all")
                             {
                                 continue;
                             }
-                            else if (text.Trim().ToLower() == provinceText)
+                            else if (ltext == provinceText)
                             {
                                 <option value="@p" selected="selected">@text</option>
                             }
@@ -186,24 +186,23 @@
                 @Html.LabelFor(model => model.Logo)
             </div>
             <div class="editor-field">
-                @if (Model.Logo != null)
+                @if (@ViewBag.Logo != null)
                 {
-                    //foreach (FileViewModel logo in Model.Logo)
-                    //{
+                    foreach (Document l in @ViewBag.Logo)
+                    {
                     @Html.HiddenFor(model => model.Logo.Id)
 
-                    <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
+                <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
 
-                        @*<a target="_blank" href="@Url.Action("ViewDocument", "ClientLogo", new { @id = logo.Id })">
-                                <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
+                    @*<a target="_blank" href="@Url.Action("ViewDocument", "ClientLogo", new { @id = logo.Id })">
+            <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
 
-                                logo.Name (logo.Extension)
-                            </a>*@
-                        <img alt="logo" src="@(String.Format("{0}/{1}", Url.Content("~/Uploads/Documents/Client/Logo/"), Model.Logo.Location))" style="margin-bottom: 2px;" />
+            logo.Name (logo.Extension)
+        </a>*@                    
+                    <img alt="logo" src="@(String.Format("{0}/{1}", Url.Content("~/Uploads/Documents"), l.Location))" style="width:80px;margin-bottom: 2px;" />
+                </div>
 
-                    </div>
-
-                    //}
+                    }
                 }
                 <input id="Logo.File" name="Logo.File" type="file" value="" data-val-file="1" class="input" />
                 <input id="Logo.Name" name="Logo.Name" type="hidden" value="Company File" />
@@ -211,46 +210,32 @@
             </div>
             <div class="editor-label uppercase">
                 Uploaded Documents
-                <div class="editor-field" style="margin-bottom: 10px;">
-                    @*@if (Model.CompanyFile != null && model.CompanyFile.Count() > 0)
-                    {
-                        <div id="supporting-@model.Id-docs" class="none">
-                        <ul class="list">
-                            @foreach (var d in model.CompanyFile.Where(s => s.Status == (Int32)Status.Active))
+                <div class="editor-field" style="margin-bottom: 10px;" id="companydocslist" name="companydocslist">                  
+                    <div id="documentsdiv">
+                        @*@if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
                             {
-                                <li style="line-height: 20px;">
-                                    <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )" target="_blank">
-                                        @d.Name (@d.Type)
-                                    </a>
-                                </li>
-                            }
-                        </ul>
+                                foreach (Document companyFile in Model.CompanyFile.Where(s => s.Status == (Int32)Status.Active))
+                                {
+                                    @Html.HiddenFor(model => companyFile.Id)
+
+                                    <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
+
+                                        <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = companyFile.Id })">
+                                            <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
+
+                                            companyFile.Name (companyFile.Extension)
+                                        </a>
+
+                                    </div>
+
+                                }
+                            }*@
                     </div>
-                    }*@
-       @if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
-        {
-            foreach (Document companyFile in Model.CompanyFile.Where(s=>s.Status == (Int32)Status.Active))
-            {
-                @Html.HiddenFor(model => companyFile.Id)
-
-                <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
-
-                    <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = companyFile.Id })">
-                        <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
-
-                        companyFile.Name (companyFile.Extension)
-                    </a>
-
-                </div>
-
-            }
-        }
-
-
-        @*<input id="NewCompanyFile.File" name="NewCompanyFile.File" type="file" value="" data-val-file="1" class="input" />
+                    <input id="companyfile" name="companyfile" type="file" value="" data-val-file="1" class="input" />
+                    <span id="uploaded_file"></span>
+                    @*<input id="NewCompanyFile.File" name="NewCompanyFile.File" type="file" value="" data-val-file="1" class="input" />
         <input id="NewCompanyFile.Name" name="NewCompanyFile.Name" type="hidden" value="Company File" />
         <input id="NewCompanyFile.Description" name="NewCompanyFile.Description" class="input" type="hidden" value="Company File" />*@
-
                     @*@Html.ValidationMessageFor(model => companyFile.RegistrationFile)*@
 
                 </div>
@@ -367,8 +352,60 @@
             var cId = $("#Id").val();
             LoadBudgets(cId);
             $(".budgets").hide();
+            populateDocs(cId, "client");
+
+            $(document).on('change', '#companyfile', function () {
+                debugger;
+                var name = document.getElementById("companyfile").files[0].name;
+                var form_data = new FormData();
+                var ext = name.split('.').pop().toLowerCase();
+                if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx']) == -1) {
+                    alert("Invalid File");
+                }
+                var oFReader = new FileReader();
+                oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
+                var f = document.getElementById("companyfile").files[0];
+                var fsize = f.size || f.fileSize;
+                if (fsize > 2000000) {
+                    alert("File Size is too large");
+                }
+                else {
+                    form_data.append("file", document.getElementById('companyfile').files[0]);
+                    form_data.append("clientId", $("#Id").val());                    
+                    $.ajax({
+                        url: "Upload?clientId="+cId,
+                        method: "POST",
+                        data: form_data,
+                        contentType: false,
+                        cache: false,
+                        processData: false,
+                        beforeSend: function () {
+                            $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
+                        },
+                        success: function (data) {
+                            //$('#uploaded_file').html(data);
+                            populateDocs(cId, "client");
+                            $('#uploaded_file').html("<label class='text-success'></label>");
+                        }
+                    });
+                }
+            });
 
         });
+        function populateDocs(id, doctype) {
+
+            $.ajax({
+
+                url: '@Url.Action("CompanyFiles", "Client")',
+                type: "GET",
+                dataType: "html",
+                data: { objId: id, objType:doctype },//this is as per your requirement
+                success: function (data) {
+                    $('#documentsdiv').html(data);
+                },
+            });
+        }
+
 
         function ViewBudget() {
             $('.budgets').show();
@@ -433,7 +470,7 @@
             $.ajax({
                 type: "GET",
                 url: "GetClientBudgets",
-                data: { clientId: id },
+                data: { ClientId: id },
                 contentType: "application/json;charset=utf-8",
                 dataType: "json",
                 success: function (data) {

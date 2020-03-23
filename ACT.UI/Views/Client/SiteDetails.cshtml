@@ -30,62 +30,60 @@
         </h2>
     }
     @Html.HiddenFor(model => model.Id)
-    <div class="left" style="width: 45%; margin-right: 1%;">
+        <div class="left" style="width: 45%; margin-right: 1%;">
+            <div class="display-label">
+                Name
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.Name)
+            </div>
 
-        <div class="display-label">
-            Name
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor(model => model.Name)
-        </div>
+            <div class="display-label">
+                Description
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.Description)
+                @*@(( ( Status ) Model.Status ).GetDisplayText())*@
+            </div>
+            <div class="display-label">
+                Site Type
+            </div>
+            <div class="display-field">
+                @sttext
+                @Html.HiddenFor(model => model.SiteType)
+            </div>
+            <div class="display-label">
+                Account Code
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.AccountCode)
+                @*@Html.DisplayFor( model => model.UserRoles.FirstOrDefault().Role.Name )*@
+            </div>
 
-        <div class="display-label">
-            Description
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor(model => model.Description)
-            @*@(( ( Status ) Model.Status ).GetDisplayText())*@
-        </div>
-        <div class="display-label">
-            Site Type
-        </div>
-        <div class="display-field">
-            @sttext
-            @Html.HiddenFor(model => model.SiteType)
-        </div>
-        <div class="display-label">
-            Account Code
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor(model => model.AccountCode)
-            @*@Html.DisplayFor( model => model.UserRoles.FirstOrDefault().Role.Name )*@
-        </div>
+            <div class="display-label">
+                Planning Point
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.PlanningPoint)
+            </div>
 
-        <div class="display-label">
-            Planning Point
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor(model => model.PlanningPoint)
-        </div>
+            <div class="display-label">
+                Depot
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.Depot)
+            </div>
 
-        <div class="display-label">
-            Depot
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor(model => model.Depot)
-        </div>
+            <div class="display-label">
+                Chep SiteCode
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.SiteCodeChep)
+            </div>
 
-        <div class="display-label">
-            Chep SiteCode
         </div>
-        <div class="display-field">
-            @Html.DisplayFor(model => model.SiteCodeChep)
-        </div>
-
-    </div>
 
     <div class="left" style="width: 45%;">
-        <h3>Contact Details</h3>
         <div class="display-label">
             Contact Number
         </div>
@@ -100,7 +98,6 @@
         <div class="display-field">
             @Html.DisplayFor(model => model.ContactName)
         </div>
-        <h3>Contact Details</h3>
         <div class="display-label">
             X Coordinates
         </div>
@@ -226,9 +223,6 @@
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
     <div id="budgets">
 
-
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-
         <div class="editor-label" style="margin-bottom: 10px;">
             Budgets
         </div>
@@ -259,12 +253,9 @@
             </table>
 
         </div>
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
     </div>
 
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-
-
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
 
     @*@if (ViewBag.IncludeLayout == null)
         {*@
