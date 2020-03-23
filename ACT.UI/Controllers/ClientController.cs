@@ -1597,7 +1597,7 @@ namespace ACT.UI.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    Notify("Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error);
+                    Notify("Sorry, the Group was not created. Please correct all errors and try again.", NotificationType.Error);
 
                     return View(model);
                 }
@@ -1681,8 +1681,8 @@ namespace ACT.UI.Controllers
 
                     #region Update Group
 
-                    // Update Site
-                    group.Id = model.Id;
+                    // Update Group
+                    //group.Id = model.Id;
                     group.Name = model.Name;
                     group.Description = model.Description;
                     group.Status = (int)model.Status;
@@ -1695,7 +1695,7 @@ namespace ACT.UI.Controllers
                     scope.Complete();
                 }
 
-                Notify("The selected Site details were successfully updated.", NotificationType.Success);
+                Notify("The selected Group details were successfully updated.", NotificationType.Success);
 
                 return RedirectToAction("ClientGroups");
             }
