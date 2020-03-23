@@ -29,7 +29,7 @@
 
             </div>
 
-            <div class="left" style="width: 49%;">
+            <div class="right" style="width: 49%;">
 
                 <div class="editor-label">
                     @Html.LabelFor(model => model.ToDate)
@@ -38,6 +38,15 @@
                     @Html.TextBoxFor(model => model.ToDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
                 </div>
 
+            </div>
+
+            <div class="left" style="width: 48%;">
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.ClientStatus)
+                </div>
+                <div class="editor-field">
+                    @Html.EnumDropDownFor( model => model.ClientStatus, false, true, new { @class = "chzn", @style = "width: 100%;" } )
+                </div>
             </div>
 
             <div class="clear"></div>

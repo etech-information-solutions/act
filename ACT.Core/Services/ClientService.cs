@@ -79,7 +79,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmProductId", csm.ProductId ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmPSPClientStatus", ( int ) csm.PSPClientStatus ) },
+                { new SqlParameter( "csmClientStatus", ( int ) csm.ClientStatus ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
@@ -119,10 +119,10 @@ namespace ACT.Core.Services
             //{
             //    query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPProduct] pp WHERE p.Id=pp.PSPId AND pp.ProductId=@csmProductId) ";
             //}
-            //if (csm.PSPClientStatus != Enums.PSPClientStatus.All)
-            //{
-            //    query = $"{query} AND (p.Status=@csmPSPClientStatus) ";
-            //}
+            if (csm.ClientStatus != Enums.Status.All)
+            {
+                query = $"{query} AND (p.Status=@csmClientStatus) ";
+            }
 
             if (csm.FromDate.HasValue && csm.ToDate.HasValue)
             {

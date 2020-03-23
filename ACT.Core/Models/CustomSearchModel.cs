@@ -158,6 +158,13 @@ namespace ACT.Core.Models
             set;
         }
 
+        [Display(Name = "Status")]
+        public Status ClientStatus
+        {
+            get;
+            set;
+        }
+
         public decimal? Amount { get; set; }
 
         [Display( Name = "Object Id" )]
