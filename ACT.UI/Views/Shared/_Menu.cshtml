@@ -27,10 +27,15 @@
                     <span>Dashboard</span>
                 </a>
             </li>
-        }*@
+        }*@        
+            @if (User.Has(PermissionTo.View, PermissionContext.Client))
+            {
+            <li>
+                Select Client
+                <select id="ClientList" name="ClientList"></select>
+                <br />
+            </li>
 
-        @if ( User.Has( PermissionTo.View, PermissionContext.Client ) )
-        {
             <li data-hot-spot="1" data-c="Client" data-t="" class="@(controller.ToLower().Equals( "client" ) ? "current" : "")">
                 <a rel="tipsyW" title="Clients" href="@Url.Action( "Index", "Client" )">
                     <span>Client Management</span>
@@ -38,7 +43,7 @@
             </li>
         }
 
-         @*@if ( User.Has( PermissionTo.View, PermissionContext.Customer ) )
+        @*@if ( User.Has( PermissionTo.View, PermissionContext.Customer ) )
         {
             <li data-hot-spot="1" data-c="Customer" data-t="" class="@(controller.ToLower().Equals( "customer" ) ? "current" : "")">
                 <a rel="tipsyW" title="Customers" href="@Url.Action( "Index", "Customer" )">
@@ -74,34 +79,84 @@
             </li>
         }*@
 
-        @if ( User.Has( PermissionTo.View, PermissionContext.Administration ) )
-        {
-            <li data-hot-spot="1" data-c="SystemAdministration" data-t="" class="@(controller.ToLower().Equals( "administration" ) ? "current" : "")">
-                <a rel="tipsyW" title="Administration" href="@Url.Action( "Index", "Administration" )">
-                    <span>Administration</span>
+            @if (User.Has(PermissionTo.View, PermissionContext.Administration))
+            {
+                <li data-hot-spot="1" data-c="SystemAdministration" data-t="" class="@(controller.ToLower().Equals( "administration" ) ? "current" : "")">
+                    <a rel="tipsyW" title="Administration" href="@Url.Action( "Index", "Administration" )">
+                        <span>Administration</span>
+                    </a>
+                </li>
+            }
+
+            @*@if ( User.Has( PermissionTo.View, PermissionContext.Reports ) )
+            {
+                <li data-hot-spot="1" data-c="Report" data-t="" class="@(controller.ToLower().Equals( "report" ) ? "current" : "")">
+                    <a rel="tipsyW" title="Reports" href="@Url.Action( "Index", "Report" )">
+                        <span>Reports</span>
+                    </a>
+                </li>
+            }*@
+
+            <li style="border-top: 5px solid #f5f5f5; border-bottom: 5px solid #f5f5f5;">
+                <a class="red-bg" href="@Url.Action( "LogOff", "Account" )" style="padding: 10px 20px;">
+                    LOGOUT
                 </a>
             </li>
-        }
 
-        @*@if ( User.Has( PermissionTo.View, PermissionContext.Reports ) )
-        {
-            <li data-hot-spot="1" data-c="Report" data-t="" class="@(controller.ToLower().Equals( "report" ) ? "current" : "")">
-                <a rel="tipsyW" title="Reports" href="@Url.Action( "Index", "Report" )">
-                    <span>Reports</span>
-                </a>
-            </li>
-        }*@
-
-        <li style="border-top: 5px solid #f5f5f5; border-bottom: 5px solid #f5f5f5;">
-            <a class="red-bg" href="@Url.Action( "LogOff", "Account" )" style="padding: 10px 20px;">
-                LOGOUT
-            </a>
-        </li>
-
-    </ul>
+        </ul>
 
     <div class="clear"></div>
 
 
+    <script>
+        $(document).ready(function () {
+            GetClientList();
 
+            $("#ClientList").change(function () {
+                var cId = $('option:selected', this).val();
+                SetClient(cId);
+            });
+        });
+
+        function GetClientList() {
+            var options = $("#ClientList");
+            options.empty();
+            $.ajax({
+                type: "GET",
+                url: "GetClientList",
+                //data: { clientId: cId },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {                    
+                   // var obj = JSON.parse(data);
+                   debugger;
+                   //if (data.length > 1) {
+                        options.append($("<option />").val('0').text('Please Select'));
+                        $.each(data, function (id, model) {
+                            options.append($("<option />").val(model.Value).text(model.Text));
+                        });
+                    //} else {
+                    //   $.each(data, function (id, model) {
+                    //       options.append($("<option />").val(model.Value).text(model.Text));
+                    //   });
+                    //}
+                },
+                error: function (response) {
+                    alert('Error retrieving client details');
+                }
+            });
+        }
+
+        function SetClient(cId) {
+             $.ajax({
+                 type: 'POST',
+                 url: "SetClient",
+                 data: { "ClientId": cId },
+                 success: function (response) {
+                     //window.location.href = 'Index#managesites';
+                     location.reload();
+                 }
+             });
+        }
+    </script>
 </div>

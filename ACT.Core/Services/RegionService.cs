@@ -122,7 +122,7 @@ namespace ACT.Core.Services
         /// <param name="pm"></param>
         /// <param name="csm"></param>
         /// <returns></returns>
-        public List<RegionCustomModel> List1( PagingModel pm, CustomSearchModel csm )
+        public List<RegionCustomModel> ListCSM( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {

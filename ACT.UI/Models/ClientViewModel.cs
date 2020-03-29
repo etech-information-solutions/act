@@ -38,19 +38,26 @@ namespace ACT.UI.Models
         [Display(Name = "Business Contact Number")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string ContactNumber { get; set; }
-
         [Required]
         [Display(Name = "Contact Person")]
         [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string ContactPerson { get; set; }
-        public string FinancialPerson { get; set; }
-
-        public string AdminEmail { get; set; }
-
         [Required]
         [Display(Name = "Email Address")]
         [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string Email { get; set; }
+
+        [Required]
+        [Display(Name = "Administrator Name")]
+        [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
+        public string FinancialPerson { get; set; }
+
+        [Required]
+        [Display(Name = "Administrator Email")]
+        [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
+        public string AdminEmail { get; set; }
+
+
 
         [Display(Name = "Select a reason why you're declining this Client")]
         public string DeclinedReason { get; set; }

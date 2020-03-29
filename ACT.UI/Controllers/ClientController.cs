@@ -45,11 +45,26 @@ namespace ACT.UI.Controllers
 
             using (ClientService service = new ClientService())
             {
-                pm.Sort = pm.Sort ?? "DESC";
-                pm.SortBy = pm.SortBy ?? "CreatedOn";
+                pm.Sort = pm.Sort ?? "ASC";
+                pm.SortBy = pm.SortBy ?? "Name";
+                csm.Status = Status.Active;
+                csm.ClientStatus = Status.Active;
+                if (CurrentUser == null)
+                {
+                    Notify("Sorry, it seems the session had expired. Please log in again.", NotificationType.Error);
+
+                    return RedirectToAction("Index", "Administration"); //Return to login as session is invalid
+                }
                 if (CurrentUser.PSPs.Count > 0)
                 {
-                    model = service.List1(pm,csm);//service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
+                    string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                    int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                    if (clientId > 0)
+                    {
+                        csm.ClientId = clientId;
+                    }
+
+                    model = service.ListCSM(pm,csm);//service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
                     foreach (Client cl in model)
                     {
                         ClientViewModel vm = new ClientViewModel()
@@ -180,13 +195,13 @@ namespace ACT.UI.Controllers
                     {
                         Email = model.Email,
                         TradingAs = model.TradingAs,
-                        VATNumber = model.VATNumber,
-                        AdminEmail = model.Email,
+                        VATNumber = model.VATNumber,                        
                         CompanyName = model.CompanyName,
                         Description = model.CompanyName,
                         ContactPerson = model.ContactPerson,
                         ContactNumber = model.ContactNumber,
-                        FinancialPerson = model.ContactPerson,
+                        FinancialPerson = model.FinancialPerson, //regional manager
+                        AdminEmail = model.AdminEmail,
                         Status = (int)Status.Active,//model.Status,
                         ServiceRequired = (int)ServiceType.ManageOwnPallets,
                         //ServiceRequired = (int)model.ServiceRequired,
@@ -269,44 +284,7 @@ namespace ACT.UI.Controllers
                         string fullpath = Path.Combine(path, $"{now}-{model.Logo.File.FileName}");
                         model.Logo.File.SaveAs(fullpath);
                     }
-                    //if (model.Logo != null)
-                    //{
-                    //    //foreach (FileViewModel logo in model.Logo)
-                    //    //{
-                    //    if (model.Logo.Name != null)
-                    //    {
-                    //        // Create folder
-                    //        string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/");
-
-                    //        if (!Directory.Exists(path))
-                    //        {
-                    //            Directory.CreateDirectory(path);
-                    //        }
-
-                    //        string now = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-                    //        Document doc = new Document()
-                    //        {
-                    //            ObjectId = client.Id,
-                    //            ObjectType = "ClientLogo",
-                    //            Status = (int)Status.Active,
-                    //            Name = model.Logo.Name,
-                    //            Category = model.Logo.Name,
-                    //            Title = model.Logo.File.FileName,
-                    //            Size = model.Logo.File.ContentLength,
-                    //            Description = model.Logo.File.FileName,
-                    //            Type = Path.GetExtension(model.Logo.File.FileName),
-                    //            Location = $"Client/Logo/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{model.Logo.File.FileName}"
-                    //        };
-
-                    //        dservice.Create(doc);
-
-                    //        string fullpath = Path.Combine(path, $"{now}-{model.Logo.File.FileName}");
-                    //        model.Logo.File.SaveAs(fullpath);
-                    //    }
-                    //    //}
-                    //}
-
+                 
                     #endregion
 
                     #region KPI
@@ -390,7 +368,7 @@ namespace ACT.UI.Controllers
                     VATNumber = client.VATNumber,
                     ContactNumber = client.ContactNumber,
                     ContactPerson = client.ContactPerson,
-                    FinancialPerson = client.ContactPerson,
+                    FinancialPerson = client.FinancialPerson,
                     Email = client.Email,
                     AdminEmail = client.AdminEmail,
                     DeclinedReason = client.DeclinedReason,
@@ -435,29 +413,8 @@ namespace ACT.UI.Controllers
                     ViewBag.Logo = logo;
                 }
                 //Removed for validation purposes
-                //List<Document> fvm = new List<Document>();
-                //if (documents != null && documents.Count > 0)
-                //{
+                //Documents moved to seperate AJAX calls
 
-                //    foreach (Document doc in documents)
-                //    {
-                //        Document tfvm = new Document()
-                //        {
-                //            Id = doc.Id,
-                //            Location = doc.Location,
-                //            Name = doc.Name,
-                //            Description = doc.Description
-
-                //        };
-                //        fvm.Add(tfvm);
-
-
-                //    }
-                //    model.CompanyFile = fvm;
-                //}
-
-
-               // ViewBag.CompanyUploads = fvm;
                 return View(model);
             }
         }
@@ -524,9 +481,9 @@ namespace ACT.UI.Controllers
                     client.VATNumber = model.VATNumber;
                     client.ContactNumber = model.ContactNumber;
                     client.ContactPerson = model.ContactPerson;
-                    client.FinancialPerson = model.ContactPerson;
+                    client.FinancialPerson = model.FinancialPerson;
                     client.Email = model.Email;
-                    client.AdminEmail = model.Email;
+                    client.AdminEmail = model.AdminEmail;
                     //client.DeclinedReason = model.DeclinedReason;
                     //client.ServiceRequired = model.ServiceRequired;
                     client.Status = (int)model.Status;
@@ -744,17 +701,17 @@ namespace ACT.UI.Controllers
             List<Client> clientList = new List<Client>();
             using (ClientService clientService = new ClientService())
             {
-            clientList = clientService.List1(new PagingModel(), new CustomSearchModel() { ClientId = clientId });
+                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, ClientStatus = Status.Active });
 
-            //    if (clientID > 0)
-            //    {
-            //        Client chosenClient = clientService.GetById(clientID);
-            //        clientList.Add(chosenClient);
-            //    }
-            //    else
-            //    {
-            //        clientList = clientService.GetClientsByPSP(pspId);                    
-            //    }
+                //    if (clientID > 0)
+                //    {
+                //        Client chosenClient = clientService.GetById(clientID);
+                //        clientList.Add(chosenClient);
+                //    }
+                //    else
+                //    {
+                //        clientList = clientService.GetClientsByPSP(pspId);                    
+                //    }
             }
 
             IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
@@ -762,7 +719,7 @@ namespace ACT.UI.Controllers
                 Value = c.Id.ToString(),
                 Text = c.CompanyName
 
-            });            
+            });     
             ViewBag.ClientList = clientDDL;
             using (SiteService service = new SiteService())
             {
@@ -773,8 +730,9 @@ namespace ACT.UI.Controllers
                     csm.ClientId = clientId;
                     
                 }
-                model = service.List1(pm, csm);               
+                model = service.ListCSM(pm, csm);               
                 total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total(pm, csm);
+
             }
 
             PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
@@ -1324,7 +1282,7 @@ namespace ACT.UI.Controllers
 
             using (ClientService clientService = new ClientService())
             {
-                clientList = clientService.List1(new PagingModel(), new CustomSearchModel() { ClientId = clientId });
+                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, ClientStatus = Status.Active });
                 //if (clientID > 0)
                 //{
                 //    Client chosenClient = clientService.GetById(clientID);
@@ -1592,7 +1550,7 @@ namespace ACT.UI.Controllers
             //TODO
             using (ClientService clientService = new ClientService())
             {
-                clientList = clientService.List1(new PagingModel(), new CustomSearchModel() { ClientId = clientId });
+                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId,ClientStatus = Status.Active });
             }
 
             IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
@@ -1876,7 +1834,7 @@ namespace ACT.UI.Controllers
                 using (ClientService clientService = new ClientService())
                 using (TransactionScope scope = new TransactionScope())
                 {
-                    //clientList = clientService.List1(new PagingModel(), new CustomSearchModel() { ClientId = clientId });
+                    //clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId });
                     //List<PSPClient> pspClientList = pspclientservice.ListByColumnWhere("ClientId", int.Parse(clientId));
                     Group groupObj = groupservice.GetById(int.Parse(groupId));
 
@@ -1902,19 +1860,7 @@ namespace ACT.UI.Controllers
 
 
         #region Products
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult SetClient(string ClientId)
-        {
-            if (ClientId != null)
-            {
-                Session["ClientId"] = ClientId;
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
-            }
-        }
+
 
 
         //
@@ -1949,7 +1895,7 @@ namespace ACT.UI.Controllers
                 //else
                 //{
                 //  clientList = clientService.GetClientsByPSP(pspId);
-                clientList = clientService.List1(new PagingModel(), new CustomSearchModel() { ClientId = clientId });
+                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, ClientStatus = Status.Active });
                 //}
             }
 
@@ -2399,7 +2345,7 @@ namespace ACT.UI.Controllers
 
                 using (ProductService service = new ProductService())
                 {
-                    products = service.List1(new PagingModel(), new CustomSearchModel(), int.Parse(clientId));
+                    products = service.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = int.Parse(clientId), ClientStatus = Status.Active });
                 }
                 //ProductPrice price = new ProductPrice();
 
@@ -2439,250 +2385,7 @@ namespace ACT.UI.Controllers
             }
         }
 
-        #endregion
-
-        #region Manage Transporters
-        //
-        // GET: /Client/ManageTransporters
-        public ActionResult ManageTransporters(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
-        {
-
-            ViewBag.ViewName = "ManageTransporters";
-            if (givecsm)
-            {
-                ViewBag.ViewName = "ManageTransporters";
-
-                return PartialView("_ManageTransportersCustomSearch", new CustomSearchModel("ManageTransporters"));
-            }
-            int total = 0;
-
-            List<Transporter> model = new List<Transporter>();
-            //int pspId = Session[ "UserPSP" ];
-            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-            using (TransporterService service = new TransporterService())
-            {
-                pm.Sort = pm.Sort ?? "DESC";
-                pm.SortBy = pm.SortBy ?? "CreatedOn";
-
-                model = service.List(pm, csm);
-                total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total(pm, csm);
-            }
-
-            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
-
-            return PartialView("_ManageTransporters", paging);
-        }
-
-        // GET: Client/AddTransporter
-        [Requires(PermissionTo.Create)]
-        public ActionResult AddTransporter()
-        {
-            TransporterViewModel model = new TransporterViewModel() { EditMode = true };
-            return View(model);
-        }
-
-
-        // POST: Client/Transporter
-        [HttpPost]
-        [Requires(PermissionTo.Create)]
-        public ActionResult AddTransporter(TransporterViewModel model)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    Notify("Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error);
-
-                    return View(model);
-                }
-
-                using (TransporterService siteService = new TransporterService())
-                using (TransactionScope scope = new TransactionScope())
-                {
-                    //#region Validation
-                    //if (!string.IsNullOrEmpty(model.RegistrationNumber) && siteService.ExistByName(model.RegistrationNumber.Trim()))
-                    //{
-                    //    // Bank already exist!
-                    //    Notify($"Sorry, a Site with the Account number \"{model.AccountCode}\" already exists!", NotificationType.Error);
-
-                    //    return View(model);
-                    //}
-                    //#endregion
-                    #region Create Transporter
-                    Transporter site = new Transporter()
-                    {
-                        Name = model.Name,
-                        TradingName = model.TradingName,
-                        RegistrationNumber = model.RegistrationNumber,
-                        Email = model.Email,
-                        ContactNumber = model.ContactNumber,
-                        Status = (int)Status.Active
-                    };
-                    site = siteService.Create(site);
-                    #endregion
-
-                    scope.Complete();
-                }
-
-                Notify("The Transporter was successfully created.", NotificationType.Success);
-                return RedirectToAction("ManageTransporters");
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
-        }
-
-   
-
-        // GET: Client/EditTransporter/5
-        [Requires(PermissionTo.Edit)]
-        public ActionResult EditTransporter(int id)
-        {
-            Transporter site;
-            //int pspId = Session[ "UserPSP" ];
-            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-
-
-
-            using (TransporterService service = new TransporterService())
-            using (AddressService aservice = new AddressService())
-            {
-                site = service.GetById(id);            
-
-                if (site == null)
-                {
-                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
-
-                    return PartialView("_AccessDenied");
-                }
-
-                Address address = aservice.Get(site.Id, "Site");
-
-
-                bool unverified = (site.Status == (int)PSPClientStatus.Unverified);
-
-                TransporterViewModel model = new TransporterViewModel()
-                {
-                    Id = site.Id,
-                    Name = site.Name,
-                    TradingName = site.TradingName,
-                    RegistrationNumber = site.RegistrationNumber,
-                    Email = site.Email,
-                    ContactNumber = site.ContactNumber,
-                   // Status = (int)Status.Active
-                    Status = (int)site.Status,
-                    EditMode = true
-                };
-                return View(model);
-            }
-        }
-
-        // POST: Client/EditTransporter/5
-        [HttpPost]
-        [Requires(PermissionTo.Edit)]
-        public ActionResult EditTransporter(TransporterViewModel model, PagingModel pm, bool isstructure = false)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    Notify("Sorry, the selected Transporter was not updated. Please correct all errors and try again.", NotificationType.Error);
-
-                    return View(model);
-                }
-
-                Transporter site;
-
-                using (TransporterService service = new TransporterService())
-                using (TransactionScope scope = new TransactionScope())
-                {
-                    site = service.GetById(model.Id);
-
-
-                    #region Validations
-
-                    //if (!string.IsNullOrEmpty(model.AccountCode) && service.ExistByAccountCode(model.AccountCode.Trim()))
-                    //{
-                    //    // Role already exist!
-                    //    Notify($"Sorry, a Site with the Account Code \"{model.AccountCode} ({model.AccountCode})\" already exists!", NotificationType.Error);
-
-                    //    return View(model);
-                    //}
-
-                    #endregion
-                    #region Update Transporter
-
-                    // Update Transporter
-                    site.Id = model.Id;
-                    site.Name = model.Name;
-                    site.RegistrationNumber = model.RegistrationNumber;
-                    site.Email = model.Email;
-                    site.ContactNumber = model.ContactNumber;
-                    site.TradingName = model.TradingName;
-                    site.Status = (int)model.Status;
-
-                    service.Update(site);
-
-                    #endregion
-
-
-
-
-                    scope.Complete();
-                }
-
-                Notify("The selected Transporter details were successfully updated.", NotificationType.Success);
-
-                return RedirectToAction("ManageTransporters");
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
-        }
-
-        // POST: Client/DeleteTransporter/5
-        [HttpPost]
-        [Requires(PermissionTo.Delete)]
-        public ActionResult DeleteTransporter(SiteViewModel model)
-        {
-            Transporter site;
-            try
-            {
-
-                using (TransporterService service = new TransporterService())
-                using (TransactionScope scope = new TransactionScope())
-                {
-                    site = service.GetById(model.Id);
-
-                    if (site == null)
-                    {
-                        Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
-
-                        return PartialView("_AccessDenied");
-                    }
-
-                    site.Status = (((Status)site.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;
-
-                    service.Update(site);
-                    scope.Complete();
-
-                }
-                Notify("The selected Transporter was successfully updated.", NotificationType.Success);
-                return RedirectToAction("ManageSites");
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
-        }
-
-
-        #endregion
+        #endregion    
 
         #region Awaiting Activation 
 
@@ -2747,7 +2450,7 @@ namespace ACT.UI.Controllers
 
                     using (ClientService service = new ClientService())
                     {
-                        clients = service.List1(pm, csm);
+                        clients = service.ListCSM(pm, csm);
                     }
 
                     if (clients != null && clients.Any())
@@ -2815,7 +2518,7 @@ namespace ACT.UI.Controllers
 
                     using (SiteService service = new SiteService())
                     {
-                        siteList = service.List1(pm, csm);
+                        siteList = service.ListCSM(pm, csm);
                     }
 
                     if (siteList != null && siteList.Any())
@@ -2954,7 +2657,407 @@ namespace ACT.UI.Controllers
 
         #endregion
 
+        #region Clients
+
+        //
+        // POST || GET: /Client/ClientKPIs
+        public ActionResult ClienKPIs(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        {
+            if (givecsm)
+            {
+                ViewBag.ViewName = "ClientKPIs";
+
+               return PartialView("_ClientKPIsCustomSearch", new CustomSearchModel("ClientKPIs"));
+            }
+            int total = 0;
+
+            List<ClientKPI> model = new List<ClientKPI>();
+            List<ClientKPIViewModel> viewModel = new List<ClientKPIViewModel>();
+
+            using (ClientKPIService service = new ClientKPIService())
+            using (ClientService clientservice = new ClientService())
+            {
+                pm.Sort = pm.Sort ?? "ASC";
+                pm.SortBy = pm.SortBy ?? "Name";
+                csm.Status = Status.Active;
+                csm.ClientStatus = Status.Active;
+                if (CurrentUser == null)
+                {
+                    Notify("Sorry, it seems the session had expired. Please log in again.", NotificationType.Error);
+
+                    return RedirectToAction("Index", "Administration"); //Return to login as session is invalid
+                }
+                if (CurrentUser.PSPs.Count > 0)
+                {
+                    string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                    int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                    if (clientId > 0)
+                    {
+                        csm.ClientId = clientId;
+                    }
+
+                    model = service.ListCSM(pm, csm);//service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
+                    
+                    foreach (ClientKPI cl in model)
+                    {
+                        Client client = clientservice.GetById(cl.ClientId);
+                        ClientKPIViewModel vm = new ClientKPIViewModel()
+                        {
+                            Id = cl.Id,
+                            ClientName = client.CompanyName,
+                            TradingAs = client.TradingAs,
+                            Description = cl.Description,
+                            Weight = cl.Weight,
+                            TargetAmount = cl.TargetAmount,
+                            TargetPeriod = cl.TargetPeriod,
+                            Status = cl.Status,
+                            //Disputes = cl.Disputes,
+                            //OutstandingDays = cl.OutstandingDays,
+                            //OutstandingPallets = cl.OutstandingPallets,
+                            //Passons = cl.Passons,
+                            //MonthlyCost = cl.MonthlyCost,
+                            //ResolveDays = cl.ResolveDays,
+                        };
+                        viewModel.Add(vm);
+                    }
+                }
+                else
+                {
+                    model = null;
+                }
+
+                // var testModel = service.ListByColumn(null, "CompanyRegistrationNumber", "123456");
+                total = (viewModel.Count < pm.Take && pm.Skip == 0) ? viewModel.Count : service.Total();
+            }
+
+            PagingExtension paging = PagingExtension.Create(viewModel, total, pm.Skip, pm.Take, pm.Page);
+
+
+            return PartialView("_ClientKPIs", paging);
+        }
+
+        //
+        // GET: /Client/ClientDetails/5
+        public ActionResult KPIDetails(int id, bool layout = true)
+        {
+            ClientKPI model = new ClientKPI();
+            Client client = new Client();
+            ClientKPIViewModel kpiview = new ClientKPIViewModel();
+            using (ClientService service = new ClientService())
+            using (ClientKPIService kservice = new ClientKPIService())
+            {
+                
+                model = kservice.GetById(id);
+                if (model == null)
+                {
+                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                    return RedirectToAction("Index");
+                }
+                client = service.GetById(model.ClientId);
+
+                //repopulate the view model
+                kpiview.Description = model.Description;
+                kpiview.Id = model.Id;
+                kpiview.ClientId = model.ClientId;
+                kpiview.ClientName = client.CompanyName;
+                kpiview.TradingAs = client.TradingAs;
+                kpiview.Disputes = model.Disputes;
+                kpiview.OutstandingDays = model.OutstandingDays;
+                kpiview.OutstandingPallets = model.OutstandingPallets;
+                kpiview.Passons = model.Passons;
+                kpiview.MonthlyCost = model.MonthlyCost;
+                kpiview.ResolveDays = model.ResolveDays;
+                kpiview.Status = model.Status;
+                kpiview.Weight = model.Weight;
+                kpiview.TargetAmount = model.TargetAmount;
+                kpiview.TargetPeriod = model.TargetPeriod;               
+            }
+
+            if (layout)
+            {
+                ViewBag.IncludeLayout = true;
+            }
+
+            return View(kpiview);
+        }
+
+        // GET: Client/AddKPI
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddKPI()
+        {
+            ClientKPIViewModel model = new ClientKPIViewModel() { EditMode = true };
+            return View(model);
+        }
+
+        // POST: Client/AddKPI
+        [HttpPost]
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddKPI(ClientKPIViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    Notify("Sorry, the Client KPI was not created. Please correct all errors and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+                
+                using (TransactionScope scope = new TransactionScope())
+                using (ClientKPIService kpiservice = new ClientKPIService())
+                // using (ClientBudgetService bservice = new ClientBudgetService())
+                {
+                    #region Validation
+                    //if (!string.IsNullOrEmpty(model) && service.ExistByCompanyRegistrationNumber(model.CompanyRegistrationNumber.Trim()))
+                    //{
+                    //    // Bank already exist!
+                    //    Notify($"Sorry, a Client with the Registration number \"{model.CompanyRegistrationNumber}\" already exists!", NotificationType.Error);
+
+                    //    return View(model);
+                    //}
+                    #endregion
+                    #region Create ClientKPI
+                    ClientKPI clientkpi = new ClientKPI()
+                    {
+                        Description = model.Description,
+                        ClientId = model.ClientId,
+                        //Disputes = model.Disputes,
+                        //OutstandingPallets = model.OutstandingPallets,
+                        //Passons = model.Passons,
+                        //MonthlyCost = model.MonthlyCost,
+                        //OutstandingDays = model.OutstandingDays,
+                        //ResolveDays = model.ResolveDays,
+                        Status = (int)Status.Active,//model.Status,
+                        Weight = model.Weight,
+                        TargetAmount = model.TargetAmount,
+                        TargetPeriod = model.TargetPeriod
+                    };
+                    ClientKPI kpimodel = kpiservice.Create(clientkpi);
+                    #endregion
+
+                    scope.Complete();
+                }
+                Notify("The Client KPI was successfully created.", NotificationType.Success);
+                return RedirectToAction("ClientList");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+        // GET: Client/EditKPI/5
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditKPI(int id)
+        {
+            ClientKPI clientkpi;
+
+            using (ClientService clientservice = new ClientService())
+            using (ClientKPIService kpiservice = new ClientKPIService())
+            {
+                clientkpi = kpiservice.GetById(id);
+
+                if (clientkpi == null)
+                {
+                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                    return PartialView("_AccessDenied");
+                }
+                Client client = clientservice.Get(clientkpi.ClientId);
+                ClientKPIViewModel model = new ClientKPIViewModel()
+                {
+                    Description = clientkpi.Description,
+                    Id = clientkpi.Id,
+                    ClientId = clientkpi.ClientId,
+                    ClientName = client.CompanyName,
+                    TradingAs = client.TradingAs,
+                    Disputes = clientkpi.Disputes,
+                    OutstandingDays = clientkpi.OutstandingDays,
+                    OutstandingPallets = clientkpi.OutstandingPallets,
+                    Passons = clientkpi.Passons,
+                    MonthlyCost = clientkpi.MonthlyCost,
+                    ResolveDays = clientkpi.ResolveDays,
+                    Status = clientkpi.Status,
+                    Weight = clientkpi.Weight,
+                    TargetAmount = clientkpi.TargetAmount,
+                    TargetPeriod = clientkpi.TargetPeriod,
+                    EditMode = true                   
+                    };
+
+
+                return View(model);
+            }
+        }
+
+        // POST: Client/EditKPI/5
+        [HttpPost]
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditKPI(ClientKPIViewModel model, PagingModel pm, bool isstructure = false)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    Notify("Sorry, the selected Client was not updated. Please correct all errors and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                ClientKPI kpiview;
+
+                using (TransactionScope scope = new TransactionScope())
+                using (ClientKPIService kpiservice = new ClientKPIService())
+                // using (ClientBudgetService bservice = new ClientBudgetService())
+                {
+                    kpiview = kpiservice.GetById(model.Id);
+
+                    if (kpiview == null)
+                    {
+                        Notify("Sorry, that Client KPI does not exist! Please specify a valid Role Id and try again.", NotificationType.Error);
+
+                        return View(model);
+                    }
+
+                    #region Update Client KPI
+
+                    // Update Client KPI
+                    kpiview.Description = model.Description;
+                    kpiview.Id = model.Id;
+                    kpiview.ClientId = model.ClientId;
+                    kpiview.Disputes = model.Disputes;
+                    kpiview.OutstandingDays = model.OutstandingDays;
+                    kpiview.OutstandingPallets = model.OutstandingPallets;
+                    kpiview.Passons = model.Passons;
+                    kpiview.MonthlyCost = model.MonthlyCost;
+                    kpiview.ResolveDays = model.ResolveDays;
+                    kpiview.Status = model.Status;
+                    kpiview.Weight = model.Weight;
+                    kpiview.TargetAmount = model.TargetAmount;
+                    kpiview.TargetPeriod = model.TargetPeriod;
+
+                    kpiservice.Update(kpiview);
+
+                    #endregion
+
+                    scope.Complete();
+                }
+
+                Notify("The selected Client details were successfully updated.", NotificationType.Success);
+
+                return RedirectToAction("ClientList");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+        // POST: Client/DeleteKPI/5
+        [HttpPost]
+        [Requires(PermissionTo.Delete)]
+        public ActionResult DeleteKPI(ClientViewModel model)
+        {
+            ClientKPI clientkpi;
+            try
+            {
+
+                using (ClientKPIService service = new ClientKPIService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    clientkpi = service.GetById(model.Id);
+
+                    if (clientkpi == null)
+                    {
+                        Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                        return PartialView("_AccessDenied");
+                    }
+
+                    clientkpi.Status = (((Status)clientkpi.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;
+
+                    service.Update(clientkpi);
+                    scope.Complete();
+
+                }
+                Notify("The selected Client KPI was successfully updated.", NotificationType.Success);
+                return RedirectToAction("ClientList");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+
+        #endregion
+
         #region General
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetClient(string ClientId)
+        {
+            if (ClientId != null)
+            {
+                Session["ClientId"] = ClientId;
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        /*
+             Returns a general list of all active clients allowed in the current context to be selected from
+            */
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetClientList()
+        {
+
+            List<Client> model = new List<Client>();
+            PagingModel pm = new PagingModel();
+            CustomSearchModel csm = new CustomSearchModel();
+
+            using (ClientService service = new ClientService())
+            {
+                pm.Sort = pm.Sort ?? "ASC";
+                pm.SortBy = pm.SortBy ?? "Name";
+                csm.Status = Status.Active;
+                csm.ClientStatus = Status.Active;
+                //Dont filter list if session is set so users caan choose a new client to edit
+                //string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                //int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                //if (clientId > 0)
+                //{
+                //    csm.ClientId = clientId;
+                //}
+
+                model = service.ListCSM(pm, csm);
+                //if (model.Any()) {//redo to get full list                
+                //    csm.ClientId = 0;
+                //    model = service.ListCSM(pm, csm);
+                //}
+            }
+            if (model.Any())
+            {
+                IEnumerable<SelectListItem> clientDDL = model.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.CompanyName
+
+                });
+
+
+                return Json(clientDDL, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
 
         [HttpPost]
         // GET: /Client/ImportSites
@@ -3072,16 +3175,11 @@ namespace ACT.UI.Controllers
                                 csService.Create(csSite);
                                 #endregion
 
-
-                             
-
                             }                        
                             #endregion
                     }
                         scope.Complete();
                     }
-
-   
                 }
                 catch (Exception ex)
                 {
@@ -3094,38 +3192,6 @@ namespace ACT.UI.Controllers
             return RedirectToAction("Index", "Client");
         }
 
-
-        //private bool UploadProductFile(HttpPostedFileBase FileUpload)
-        //{
-        //    // get the file stream in a readable way
-        //    StreamReader reader = new StreamReader(FileUpload.InputStream);
-
-        //    // get a DataTable representing the passed string
-        //    System.Data.DataTable dt = ProcessCSV(reader.ReadToEnd());
-
-        //    // for each row, compose the statement
-        //    bool success = true;
-        //    foreach (System.Data.DataRow row in dt.Rows)
-        //        success = db.InsertProdutInfo(row);
-
-        //    return success;
-        //}
-
-        //public ActionResult UploadFile()
-        //{
-        //    var httpPostedFileBase = Request.Files["FileName"];
-        //    if (httpPostedFileBase != null && httpPostedFileBase.ContentLength > 0)
-        //    {
-        //        string extension = System.IO.Path.GetExtension(httpPostedFileBase.FileName);
-        //        string path1 = string.Format("{0}/{1}", Server.MapPath("~/SavedFiles"), extension);
-        //        if (System.IO.File.Exists(path1))
-        //            System.IO.File.Delete(path1);
-
-        //        httpPostedFileBase.SaveAs(path1);
-        //    }
-        //    ViewData["Status"] = "Success";
-        //    return View("Index");
-        //}
 
         public JsonResult Upload(int clientId=0)
         {
@@ -3383,6 +3449,25 @@ namespace ACT.UI.Controllers
                 return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
             }
         }
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetClientDetail(string clientId)
+        {
+            if (clientId != null && clientId != "")
+            {
+                Client client = null;
+
+                using (ClientService bservice = new ClientService())
+                {
+                    client = bservice.GetById(int.Parse(clientId));
+                    return Json(client, JsonRequestBehavior.AllowGet);
+                }
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
 
 
 

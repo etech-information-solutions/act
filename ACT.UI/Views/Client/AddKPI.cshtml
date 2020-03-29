@@ -1,0 +1,134 @@
+﻿@model ACT.UI.Models.ClientKPIViewModel
+
+@using ACT.Core.Enums;
+
+@{
+    /**/
+
+    if (ViewBag.IncludeLayout == null)
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Add Client KPI";
+}
+
+
+@Html.Partial("_Notification")
+
+@using (Html.BeginForm("AddKPI", "Client", FormMethod.Post, new { @data_ajax_form = "1", @data_target = "#clientkpis", @class = "custom-validate", @style = "width: auto;" }))
+{    
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content(" ~/images/add.png")" />
+            <span>Add KPI</span>
+        </h2>
+
+        @Html.ValidationSummary(true)
+
+        <div id="item-details" class="item-details" style="width: auto;">            
+            <p>
+                <strong class="uppercase">KPI</strong>
+            </p>
+            <div class="left" style="width: 40%; margin-right: 4%;">
+                <div class="display-label">
+                    Client Name
+                </div>
+                <div class="display-field">
+                    @Html.DropDownList("ClientList", "Please Select")
+                </div>
+            </div>
+
+            <div class="left" style="width: 40%; margin-right: 4%;">
+                <div class="display-label">
+                    Trading As
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor(model => model.TradingAs, new { @class = "input", @placeholder = "Trading As", disabled="disabled" })
+                </div>
+            </div>
+
+            <div class="clear" style="height: 10px;">&nbsp;</div>
+            <div class="left" style="width: 90%; margin-right: 4%;">
+                <div class="display-label">
+                    KPI Description
+                </div>
+                <div class="display-field">
+                    @Html.TextBoxFor(model => model.Description, new { @class = "input", @placeholder = "Enter KPI Description" })
+                    @Html.ValidationMessageFor(model => model.Description)
+                </div>
+            </div>
+            <div class="clear" style="height: 10px;">&nbsp;</div>
+            <div class="left" style="width: 40%; margin-right: 4%;">
+                <div class="display-label">
+                    Weighted Percentage
+                </div>
+                <div class="display-field">
+                    @Html.TextBoxFor(model => model.Weight, new { @class = "input", @placeholder = "Enter Weighted Percentage", type = "number", min = "0", step = "0.01", max="100" })
+                    @Html.ValidationMessageFor(model => model.Weight) %
+                </div>
+                <div class="display-label">
+                    Target Value
+                </div>
+                <div class="display-field">
+                    @Html.TextBoxFor(model => model.TargetAmount, new { @class = "input", @placeholder = "Enter Target Amount", type = "number", min = "0", step = "1" })
+                    @Html.ValidationMessageFor(model => model.TargetAmount)
+                </div>
+
+                <div class="display-label">
+                    Target Period
+                </div>
+                <div class="display-field">
+                    <select id="SiteType" name="SiteType" class="chzn" required="required" style="width: 100%;">
+                        <option value="">-- select</option>
+                        @foreach (int p in Enum.GetValues(typeof(TargetPeriod)))
+                        {
+                            string text = ((TargetPeriod)p).GetDisplayText();
+
+                            <option value="@p">@text</option>
+                        }
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-refresh="1" data-target="#clientkpis">Cancel</a>
+            </p>
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+        </div>
+    </div>
+}
+    <script>
+ $(document).ready(function () {
+     $("#ClientList").change(function () {
+         var client = $('option:selected', this).val();
+         GetClientDetail(client);
+     });
+
+     function GetClientDetail(cId) {
+         var TradingAs = document.getElementById("TradingAs");
+         $.ajax({
+             type: "GET",
+             url: "GetClientDetail",
+             data: { clientId: cId },
+             contentType: "application/json;charset=utf-8",
+             dataType: "json",
+             success: function (data) {
+                 TradingAs.val(data.TradingAs);
+             },
+             error: function (response) {
+                 alert('Error Retrieving Client Detail');
+             }
+         });
+
+     }
+});
+    </script>

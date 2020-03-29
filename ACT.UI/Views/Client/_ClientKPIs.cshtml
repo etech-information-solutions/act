@@ -1,0 +1,113 @@
+﻿@model PagingExtension
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
+@using ACT.UI.Models;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_ClientKPIs";
+}
+
+
+@Html.Partial("_Notification")
+
+
+@{
+    UserModel user = User.Get();
+
+    Int32 count = Model.Start;
+    List<ClientKPIViewModel> items = (List<ClientKPIViewModel>)Model.Items;
+}
+
+
+@if (Model == null || !items.Any())
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Client KPIs available matching your search criteria.
+    </div>
+}
+
+@if (user.IsAdmin || user.IsPSPAdmin)
+{
+    <p>
+        @Html.ActionLink("Add", "AddKPI", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Client KPI?", @data_edit = "1", @data_id = 0, @data_target = "#clientkpis" })
+        <span class="loader"></span>
+    </p>
+}
+
+
+    <table id="clientlist-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#clientlist-table_wrapper" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th data-name="CompanyName" data-column="CompanyName">
+                    Client Name
+                </th>
+                <th data-name="Description" data-column="Description">
+                    KPI Description
+                </th>
+                <th data-name="Weight">
+                    Weighted %
+                </th>
+                <th data-name="Suburb">
+                    target Amount
+                </th>
+                <th data-name="Suburb">
+                    Target Period
+                </th>
+                <th data-name="Actions">
+                    Actions
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && items != null && items.Count() > 0)
+            {
+                foreach (var item in items)
+                {
+                    Status status = (Status)item.Status;
+
+                    String active = status.Equals(Status.Active) ? "active" : "inactive";
+                    String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+
+            <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+                <td style="width: 15%;">
+                    @item.ClientName
+                </td>
+                <td>
+                    @item.Description
+                </td>
+                <td>
+                    @item.Weight
+                </td>
+                <td>
+                    @item.TargetAmount
+                </td>
+                <td style="width: 15%;">
+                    @(((TargetPeriod)item.TargetPeriod).GetDisplayText())
+                </td>
+
+                <td width="15%">
+                    @Html.ActionLink("Details", "KPIDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+                    @Html.ActionLink("Edit", "EditKPI", new { id = item.Id, returnView = "ClientKPIs" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+                    @Html.ActionLink(enable, "DeleteKPI", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientkpis", @rel = "tipsyE", @title = enable + " this item?" })
+                </td>
+
+
+            </tr>
+
+                    count++;
+                }
+            }
+        </tbody>
+
+    </table>
+@Html.Partial("_Paging")

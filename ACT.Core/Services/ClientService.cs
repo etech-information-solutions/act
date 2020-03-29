@@ -61,7 +61,7 @@ namespace ACT.Core.Services
         /// <param name="pm"></param>
         /// <param name="csm"></param>
         /// <returns></returns>
-        public List<Client> List1(PagingModel pm, CustomSearchModel csm)
+        public List<Client> ListCSM(PagingModel pm, CustomSearchModel csm)
         {
             if (csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date)
             {
@@ -111,19 +111,18 @@ namespace ACT.Core.Services
 
             #region Custom Search
 
-            if (csm.ClientId != 0)
+            if (csm.ClientId > 0)
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE p.Id=pc.PSPId AND pc.ClientId=@csmClientId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE p.Id=pc.ClientId AND pc.ClientId=@csmClientId) ";
             }
             //if (csm.ProductId != 0)
             //{
             //    query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPProduct] pp WHERE p.Id=pp.PSPId AND pp.ProductId=@csmProductId) ";
             //}
-            if (csm.ClientStatus != Enums.Status.All)
+            if (csm.ClientStatus != Status.All)
             {
                 query = $"{query} AND (p.Status=@csmClientStatus) ";
             }
-
             if (csm.FromDate.HasValue && csm.ToDate.HasValue)
             {
                 query = $"{query} AND (p.CreatedOn >= @csmFromDate AND p.CreatedOn <= @csmToDate) ";

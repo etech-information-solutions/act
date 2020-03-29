@@ -30,14 +30,15 @@ namespace ACT.UI
                         "~/Scripts/Plugins/jquery.placeholder.js",
                         "~/Scripts/Plugins/jquery.dataTables.min.js",
                         "~/Scripts/Plugins/dataTables.select.min.js",
-                        "~/Scripts/Plugins/toastr.min.js"
+                        "~/Scripts/Plugins/toastr.min.js",
+                        "~/Scripts/Plugins/jquery.modal.min.js"
                         /*,
                         "~/Scripts/Plugins/dataTables.fixedHeader.min.js"*/ ) );
 
             bundles.Add( new ScriptBundle( "~/bundles/ACT" ).Include(
                         "~/Scripts/ACT/act.js",
                         "~/Scripts/ACT/ui.js",
-                        "~/Scripts/ACT/modal.js",
+                       // "~/Scripts/ACT/modal.js",
                         "~/Scripts/ACT/loader.js",
                         "~/Scripts/ACT/stickyone.js",
                         "~/Scripts/ACT/validation.js",
@@ -56,7 +57,7 @@ namespace ACT.UI
                 "~/Content/tipsy.css",
                 "~/Content/style.css",
                 "~/Content/menu.css",
-                "~/Content/modal.css",
+               // "~/Content/modal.css",
                 "~/Content/table.css",
                 "~/Content/ap-tabs.css",
                 "~/Content/ap-tabs.css",
@@ -66,7 +67,8 @@ namespace ACT.UI
                 "~/Content/font-awesome.css",
                 "~/Content/jquery.fancybox.css",
                 "~/Content/fixedHeader.dataTables.min.css",
-                "~/Content/toastr.min.css") );
+                "~/Content/toastr.min.css",
+                "~/Content/jquery.modal.min.css") );
 
             bundles.Add( new StyleBundle( "~/Content/jqueryui" ).Include( "~/Content/jquery-ui-1.10.4.custom.css" ) );
         }

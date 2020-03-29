@@ -66,7 +66,7 @@
                 <option value="">-- select</option>
                 @*@string prov = (model => model.Address.Province);*@
                 @foreach (var p in ViewBag.RegionOptions)
-                {                    
+                {
                     if (Model.RegionId != null && int.Parse(p.Value) == Model.RegionId)
                     {
                         <option value="@p.Value" selected="selected">@p.Text</option>
@@ -78,7 +78,7 @@
 
                     @*string sel = (province == @prov) ? "selected=selected" : string.Empty;
 
-                <option value="@p" @sel>@text</option>*@
+                        <option value="@p" @sel>@text</option>*@
                 }
             </select>
             @*@Html.DropDownListFor(model => model.RegionId, model => model.RegionOptions, region => region.Id, region => region.Name, true, new { @class = "chzn", @style = "width: 98%;" })*@
@@ -134,12 +134,12 @@
             @Html.ValidationMessageFor(model => model.Depot)
         </div>
         @*<div class="display-label">
-            Depot
-        </div>
-        <div class="display-field">
-            @Html.TextBoxFor(model => model.Depot, new { @class = "input", @placeholder = "Enter Depot" })
-            @Html.ValidationMessageFor(model => model.Depot)
-    </div>*@
+                    Depot
+                </div>
+                <div class="display-field">
+                    @Html.TextBoxFor(model => model.Depot, new { @class = "input", @placeholder = "Enter Depot" })
+                    @Html.ValidationMessageFor(model => model.Depot)
+            </div>*@
 
         <div class="display-label">
             Chep SiteCode
@@ -172,7 +172,7 @@
             X Coordinates
         </div>
         <div class="display-field">
-            @Html.TextBoxFor(model => model.XCord, new { @class = "input", @placeholder = "Enter X Coordinates" })
+            @Html.TextBoxFor(model => model.XCord, new { @readonly = "readonly",@class = "input", @placeholder = "Enter X Coordinates" })
             @Html.ValidationMessageFor(model => model.XCord)
         </div>
 
@@ -181,13 +181,21 @@
             Y Coordinates
         </div>
         <div class="display-field">
-            @Html.TextBoxFor(model => model.YCord, new { @class = "input", @placeholder = "Enter Y Coordinates" })
+            @Html.TextBoxFor(model => model.YCord, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Y Coordinates" })
             @Html.ValidationMessageFor(model => model.YCord)
         </div>
 
     </div>
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-
+    <div class="left" style="width: 90%; margin-right: 4%;">
+        <div id="locationField">
+            <input id="autocomplete"
+                   placeholder="Enter your address"
+                   onFocus="geolocate()"
+                   type="text" />
+        </div>
+    </div>
+    <div class="clear" style="height: 10px;">&nbsp;</div>
 
     <div class="left" style="width: 48%; margin-right: 4%;">
 
@@ -195,26 +203,26 @@
         @Html.HiddenFor(model => model.FullAddress.AddressType)
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.FullAddress.AddressLine1)
+            Street Address
         </div>
         <div class="editor-field">
-            @Html.TextBoxFor(model => model.FullAddress.AddressLine1, new { @class = "input", @placeholder = "Enter Site Address Line 1" })
+            @Html.TextBoxFor(model => model.FullAddress.AddressLine1, new { @readonly = "readonly",@class = "input", @placeholder = "Enter Site Address Line 1" })
             @Html.ValidationMessageFor(model => model.FullAddress.AddressLine1)
         </div>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.FullAddress.Town)
+            Town/City
         </div>
         <div class="editor-field">
-            @Html.TextBoxFor(model => model.FullAddress.Town, new { @class = "input", @placeholder = "Enter Site Address Town" })
+            @Html.TextBoxFor(model => model.FullAddress.Town, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Site Address Town" })
             @Html.ValidationMessageFor(model => model.FullAddress.Town)
         </div>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.FullAddress.PostCode)
+            Postal Code
         </div>
         <div class="editor-field">
-            @Html.TextBoxFor(model => model.FullAddress.PostCode, new { @class = "input", @placeholder = "Enter Site Address Postal Code" })
+            @Html.TextBoxFor(model => model.FullAddress.PostCode, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Site Address Postal Code" })
             @Html.ValidationMessageFor(model => model.FullAddress.PostCode)
         </div>
 
@@ -223,19 +231,19 @@
 
     <div class="left" style="width: 48%;">
         <div class="editor-label">
-            @Html.LabelFor(model => model.FullAddress.AddressLine2)
+            Suburb/Area
         </div>
         <div class="editor-field">
-            @Html.TextBoxFor(model => model.FullAddress.AddressLine2, new { @class = "input", @placeholder = "Enter Site Address Line 2" })
+            @Html.TextBoxFor(model => model.FullAddress.AddressLine2, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Site Address Line 2" })
             @Html.ValidationMessageFor(model => model.FullAddress.AddressLine2)
         </div>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.FullAddress.Province)
+            Province
         </div>
         <div class="editor-field">
 
-            <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
+            @*<select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
                 <option value="">-- select</option>
                 @foreach (int p in Enum.GetValues(typeof(Province)))
                 {
@@ -252,8 +260,9 @@
 
                     <option value="@p" @sel>@text</option>
                 }
-            </select>
+            </select>*@
 
+            @Html.TextBoxFor(model => model.FullAddress.Province, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Province" })
             @Html.ValidationMessageFor(model => model.FullAddress.Province)
         </div>
 
@@ -277,7 +286,8 @@
 
                 <thead>
                     <tr>
-                        <th style="width: 7%;">Year</th>
+                        <th style="width: 6%;">Year</th>
+                        <th style="width: 7%;">Total</th>
                         <th style="width: 7%;">Jan</th>
                         <th style="width: 7%;">Feb</th>
                         <th style="width: 7%;">Mar</th>
@@ -351,6 +361,7 @@
             var savecopy = '<a id="savebudget" onclick="SaveBudget(' + fieldvalue + ')" name="savebudget"><i class="fa fa-save"></i></a>';
             var tabledata = '<tr id="budg-0-row" name="budg-0-row">';//<form id="budg-0-frm" name="budg-0-frm">
             tabledata += '<td><input class="input" id="SiteBudget_0_BudgetYear" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_Total" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
             tabledata += '<td><input class="input" id="SiteBudget_0_January" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
             tabledata += '<td><input class="input" id="SiteBudget_0_February" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
             tabledata += '<td><input class="input" id="SiteBudget_0_March" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
@@ -391,8 +402,10 @@
                     if (count > 0) {
                         //var fieldcopy = '<input class="input" id="SiteBudget_[FIELDNAME]-[FIELDVALUE]" style="padding: 0 5px; width: 87%;" type="number" value="[FIELDVALUE]">';
                         $.each(data, function (id, budget) {
+                            var total = (budget.January + budget.February + budget.March + budget.April + budget.May + budget.June + budget.July + budget.August + budget.September + budget.October + budget.November + budget.December);
                             var tabledata = '<tr id="budg-' + budget.Id + '-row" name="budg-' + budget.Id + '">';//<form id="budg-' + budget.Id + '-frm" name="budg-' + budget.Id + '-frm" >
                             tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_BudgetYear" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.BudgetYear + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_Total" style="padding: 0 5px; width: 87%;" type="number" value="' + total + '"></td>';
                             tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_January" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.January + '"></td>';
                             tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_February" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.February + '"></td>';
                             tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_March" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.March + '"></td>';
@@ -417,11 +430,87 @@
 
                 },
                 error: function (response) {
-                   alert('Error Retrieving Budgets');
+                    alert('Error Retrieving Budgets');
                 }
             });
 
         }
 
     </script>
+
+    <script>
+        //The Google Stuff
+
+        // This sample uses the Autocomplete widget to help the user select a
+        // place, then it retrieves the address components associated with that
+        // place, and then it populates the form fields with those details.
+        // This sample requires the Places library. Include the libraries=places
+        // parameter when you first load the API. For example:
+        // <script
+        // src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+
+        var placeSearch, autocomplete;
+
+        var componentForm = {
+            street_number: 'short_name',
+            route: 'long_name',
+            locality: 'long_name',
+            administrative_area_level_1: 'short_name',
+            country: 'long_name',
+            postal_code: 'short_name'
+        };
+
+        function initAutocomplete() {
+            // Create the autocomplete object, restricting the search predictions to
+            // geographical location types.
+            autocomplete = new google.maps.places.Autocomplete(
+                document.getElementById('autocomplete'), { types: ['geocode'] });
+
+            // Avoid paying for data that you don't need by restricting the set of
+            // place fields that are returned to just the address components.
+            autocomplete.setFields(['address_component']);
+
+            // When the user selects an address from the drop-down, populate the
+            // address fields in the form.
+            autocomplete.addListener('place_changed', fillInAddress);
+        }
+
+        function fillInAddress() {
+            // Get the place details from the autocomplete object.
+            var place = autocomplete.getPlace();
+
+            for (var component in componentForm) {
+                document.getElementById(component).value = '';
+                document.getElementById(component).disabled = false;
+            }
+
+            // Get each component of the address from the place details,
+            // and then fill-in the corresponding field on the form.
+            for (var i = 0; i < place.address_components.length; i++) {
+                var addressType = place.address_components[i].types[0];
+                if (componentForm[addressType]) {
+                    var val = place.address_components[i][componentForm[addressType]];
+                    document.getElementById(addressType).value = val;
+                }
+            }
+        }
+
+        // Bias the autocomplete object to the user's geographical location,
+        // as supplied by the browser's 'navigator.geolocation' object.
+        function geolocate() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var geolocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    var circle = new google.maps.Circle(
+                        { center: geolocation, radius: position.coords.accuracy });
+                    autocomplete.setBounds(circle.getBounds());
+                });
+            }
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAHhY-pRI1pA4IfrX27Upxl-JOfL5IsvY8rem&libraries=places&callback=initAutocomplete"
+            async defer></script>
 }

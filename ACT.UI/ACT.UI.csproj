@@ -156,6 +156,7 @@
     </Compile>
     <Compile Include="Models\AddressViewModel.cs" />
     <Compile Include="Models\BudgetViewModel.cs" />
+    <Compile Include="Models\ClientKPIViewModel.cs" />
     <Compile Include="Models\ObjectDocumentsViewModel.cs" />
     <Compile Include="Models\ImportFileModel.cs" />
     <Compile Include="Models\GroupViewModel.cs" />
@@ -474,14 +475,13 @@
     <Content Include="Views\Shared\_RegionCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ProductCustomSearch.cshtml" />
     <Content Include="Views\Client\Index.cshtml" />
-    <Content Include="Views\Client\_ClientHeader.cshtml" />
     <Content Include="Views\Client\_ClientList.cshtml" />
     <Content Include="Views\Client\AddClient.cshtml" />
     <Content Include="Views\Client\_ClientGroups.cshtml" />
     <Content Include="Views\Client\_ManageSites.cshtml" />
     <Content Include="Views\Client\_LinkProducts.cshtml" />
     <Content Include="Views\Client\_AwaitingActivation.cshtml" />
-    <Content Include="Views\Client\_ManageTransporters.cshtml" />
+    <Content Include="Views\Administration\_ManageTransporters.cshtml" />
     <Content Include="Views\Client\_Subsites.cshtml" />
     <Content Include="Views\Client\EditClient.cshtml" />
     <Content Include="Views\Client\AddSite.cshtml" />
@@ -498,9 +498,9 @@
     <Content Include="Views\Client\SiteDetails.cshtml" />
     <Content Include="Views\Client\AddGroup.cshtml" />
     <Content Include="Views\Client\EditGroup.cshtml" />
-    <Content Include="Views\Client\AddTransporter.cshtml" />
-    <Content Include="Views\Client\EditTransporter.cshtml" />
-    <Content Include="Views\Client\TransporterDetails.cshtml" />
+    <Content Include="Views\Administration\AddTransporter.cshtml" />
+    <Content Include="Views\Administration\EditTransporter.cshtml" />
+    <Content Include="Views\Administration\TransporterDetails.cshtml" />
     <Content Include="Views\Shared\_ClientListCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ManageSitesCustomSearch.cshtml" />
     <Content Include="Views\Shared\_LinkProductsCustomSearch.cshtml" />
@@ -510,6 +510,11 @@
     <Content Include="Views\Client\partials\_ManageSitesList.cshtml" />
     <Content Include="Views\Client\bak_ManageSites.cshtml" />
     <Content Include="Views\Shared\_ListDocuments.cshtml" />
+    <Content Include="Views\Client\_ClientKPIs.cshtml" />
+    <Content Include="Views\Shared\_ClientKPIsCustomSearch.cshtml" />
+    <Content Include="Views\Client\AddKPI.cshtml" />
+    <Content Include="Views\Client\EditKPI.cshtml" />
+    <Content Include="Views\Client\KPIDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

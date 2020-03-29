@@ -114,7 +114,7 @@ namespace ACT.Core.Services
             return model.Total;
         }
 
-        public List<BroadcastCustomModel> List1( PagingModel pm, CustomSearchModel csm )
+        public List<BroadcastCustomModel> ListCSM( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {

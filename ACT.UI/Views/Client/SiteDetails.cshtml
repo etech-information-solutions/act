@@ -136,14 +136,14 @@
         <div class="left" style="width: 48%; margin-right: 4%;">
 
             <div class="display-label">
-                Address Line 1
+                Street Address
             </div>
             <div class="display-field">
                 @address.Addressline1
             </div>
 
             <div class="display-label">
-                Town
+                Town/City
             </div>
             <div class="display-field">
                 @address.Town
@@ -161,7 +161,7 @@
 
         <div class="left" style="width: 48%;">
             <div class="display-label">
-                Address Line 2
+                Suburb/Area
             </div>
             <div class="display-field">
                 @address.Addressline2
@@ -180,14 +180,14 @@
         <div class="left" style="width: 48%; margin-right: 4%;">
 
             <div class="display-label">
-                Address Line 1
+                Street Address
             </div>
             <div class="display-field">
                 &nbsp;
             </div>
 
             <div class="display-label">
-                Town
+                Town/City
             </div>
             <div class="display-field">
                 &nbsp;
@@ -205,7 +205,7 @@
 
         <div class="left" style="width: 48%;">
             <div class="display-label">
-                Address Line 2
+                Suburb/Area
             </div>
             <div class="display-field">
                 &nbsp;
@@ -232,8 +232,8 @@
 
                 <thead>
                     <tr>
-                        <th style="width: 7%;">Year</th>
-                        <th style="width: 7%;">Jan</th>
+                        <th style="width: 6%;">Year</th>
+                        <th style="width: 7%;">Total</th>
                         <th style="width: 7%;">Feb</th>
                         <th style="width: 7%;">Mar</th>
                         <th style="width: 7%;">Apr</th>
@@ -308,8 +308,10 @@
                 if (count > 0) {
                     //var fieldcopy = '<input class="input" id="ClientBudget_[FIELDNAME]-[FIELDVALUE]" style="padding: 0 5px; width: 87%;" type="number" value="[FIELDVALUE]">';
                     $.each(data, function (id, budget) {
+                        var total = (budget.January + budget.February + budget.March + budget.April + budget.May + budget.June + budget.July + budget.August + budget.September + budget.October + budget.November + budget.December);
                         var tabledata = '<tr id="budg-' + budget.Id + '-row" name="budg-' + budget.Id + '">';//<form id="budg-' + budget.Id + '-frm" name="budg-' + budget.Id + '-frm" >
                         tabledata += '<td>' + budget.BudgetYear + '</td>';
+                        tabledata += '<td>' + total + '</td>';
                         tabledata += '<td>' + budget.January + '</td>';
                         tabledata += '<td>' + budget.February + '</td>';
                         tabledata += '<td>' + budget.March + '</td>';

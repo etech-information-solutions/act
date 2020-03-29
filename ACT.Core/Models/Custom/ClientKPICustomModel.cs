@@ -17,5 +17,9 @@ namespace ACT.Core.Models.Custom
         public int Status { get; set; }
         public Nullable<int> OutstandingDays { get; set; }
         public Nullable<int> ResolveDays { get; set; }
+        public Nullable<decimal> Weight { get; set; }
+        public Nullable<decimal> TargetAmount { get; set; }
+        public Nullable<int> TargetPeriod { get; set; }
+
     }
 }

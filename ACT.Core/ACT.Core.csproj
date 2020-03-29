@@ -81,6 +81,7 @@
     <Compile Include="Enums\JournalType.cs" />
     <Compile Include="Enums\PSPClientStatus.cs" />
     <Compile Include="Enums\ProductPriceType.cs" />
+    <Compile Include="Enums\TargetPeriod.cs" />
     <Compile Include="Enums\TransferStatus.cs" />
     <Compile Include="Enums\RewardStatus.cs" />
     <Compile Include="Enums\Income.cs" />

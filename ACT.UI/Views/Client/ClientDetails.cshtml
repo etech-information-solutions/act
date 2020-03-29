@@ -29,7 +29,7 @@
     @Html.HiddenFor(model => model.Id)
     <div class="left" style="width: 60%; margin-right: 2%;">
         <div class="left" style="width: 50%; margin-right: 2%;">
-
+            <h3>Client Details</h3>
             <div class="display-label">
                 Client Name
             </div>
@@ -45,24 +45,31 @@
 
             <h3>Contact Details</h3>
             <div class="display-label">
-                Contact Number
+                Name
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ContactPerson)
+            </div>
+            <div class="display-label">
+                Number
             </div>
             <div class="display-field">
                 @Html.DisplayFor(model => model.ContactNumber)
             </div>
 
 
+            <h3>Administrator Details</h3>
             <div class="display-label">
-                Contact Person
+                Name
             </div>
             <div class="display-field">
-                @Html.DisplayFor(model => model.ContactPerson)
+                @Html.DisplayFor(model => model.FinancialPerson)
             </div>
 
         </div>
 
         <div class="left" style="width: 45%;">
-
+            <h3>&nbsp;</h3>
             <div class="display-label">
                 Trading As
             </div>
@@ -86,6 +93,13 @@
                 @Html.DisplayFor(model => model.Email)
             </div>
 
+            <h3>&nbsp;</h3>
+            <div class="display-label">
+                Email
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.AdminEmail)
+            </div>
 
         </div>
 
@@ -105,7 +119,7 @@
                 </div>
 
                 <div class="display-label">
-                    Town
+                    Town/City
                 </div>
                 <div class="display-field">
                     @address.Town
@@ -123,7 +137,7 @@
 
             <div class="left" style="width: 48%;">
                 <div class="display-label">
-                    Address Line 2
+                    Suburb/Area
                 </div>
                 <div class="display-field">
                     @address.Addressline2
@@ -142,14 +156,14 @@
             <div class="left" style="width: 48%; margin-right: 4%;">
 
                 <div class="display-label">
-                    Address Line 1
+                    Street Address
                 </div>
                 <div class="display-field">
                     &nbsp;
                 </div>
 
                 <div class="display-label">
-                    Town
+                    Town/City
                 </div>
                 <div class="display-field">
                     &nbsp;
@@ -167,7 +181,7 @@
 
             <div class="left" style="width: 48%;">
                 <div class="display-label">
-                    Address Line 2
+                    Suburb/Area
                 </div>
                 <div class="display-field">
                     &nbsp;
@@ -221,12 +235,10 @@
             </div>
         </div>
 
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+    @*<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
     <p>
         <strong class="uppercase">KPI</strong>
     </p>
-    @if (@ViewBag.KPI != null)
-    {
         <div class="left" style="width: 40%; margin-right: 4%;">
             <div class="display-label">
                 Outstanding
@@ -259,49 +271,9 @@
                 @ViewBag.KPI.ResolveDays
             </div>
 
-        </div>
-    }
-    else
-    {
-        <div class="left" style="width: 40%; margin-right: 4%;">
-            <div class="display-label">
-                Outstanding
-            </div>
-            <div class="display-field">
-                0
-            </div>
-
-            <div class="display-label">
-                Disputes
-            </div>
-            <div class="display-field">
-                0
-            </div>
-
-        </div>
-
-        <div class="left" style="width: 40%; margin-right: 4%;">
-            <div class="display-label">
-                Days Outstanding
-            </div>
-            <div class="display-field">
-                0
-            </div>
-
-            <div class="display-label">
-                Days to Resolve
-            </div>
-            <div class="display-field">
-                0
-            </div>
-
-        </div>
-    }
+        </div>*@  
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-    <div id="budgets">
-
-
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+    <div id="budgets">        
 
         <div class="editor-label" style="margin-bottom: 10px;">
             Budgets
@@ -312,7 +284,8 @@
 
                 <thead>
                     <tr>
-                        <th style="width: 7%;">Year</th>
+                        <th style="width: 6%;">Year</th>
+                        <th style="width: 7%;">Total</th>
                         <th style="width: 7%;">Jan</th>
                         <th style="width: 7%;">Feb</th>
                         <th style="width: 7%;">Mar</th>
@@ -342,7 +315,7 @@
     {
         <p>
             @Html.ActionLink("Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
-            <a class="info" href="#" onclick="LinkToProducts('@Model.Id')"><i class="fa fa-link"></i>Link Products</a>
+            <a href="#" onclick="LinkToProducts('@Model.Id')"><i class="fa fa-link"></i>Link Products</a>
             @if (ViewBag.IncludeLayout == null)
             {
                 <span style="padding: 0 5px;">/</span>
@@ -417,8 +390,10 @@
                 if (count > 0) {
                     //var fieldcopy = '<input class="input" id="ClientBudget_[FIELDNAME]-[FIELDVALUE]" style="padding: 0 5px; width: 87%;" type="number" value="[FIELDVALUE]">';
                     $.each(data, function (id, budget) {
+                        var total = (budget.January + budget.February + budget.March + budget.April + budget.May + budget.June + budget.July + budget.August + budget.September + budget.October + budget.November + budget.December);
                         var tabledata = '<tr id="budg-' + budget.Id + '-row" name="budg-' + budget.Id + '">';//<form id="budg-' + budget.Id + '-frm" name="budg-' + budget.Id + '-frm" >
                         tabledata += '<td>' + budget.BudgetYear + '</td>';
+                        tabledata += '<td>' + total + '</td>';
                         tabledata += '<td>' + budget.January + '</td>';
                         tabledata += '<td>' + budget.February + '</td>';
                         tabledata += '<td>' + budget.March + '</td>';

@@ -106,7 +106,7 @@ namespace ACT.Core.Services
         /// <param name="pm"></param>
         /// <param name="csm"></param>
         /// <returns></returns>
-        public List<ProductCustomModel> List1( PagingModel pm, CustomSearchModel csm, int clientId = 0 )
+        public List<ProductCustomModel> ListCSM( PagingModel pm, CustomSearchModel csm)
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
@@ -125,7 +125,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "clientid", clientId > 0 ? clientId : 0 ) },
+                //{ new SqlParameter( "clientid", clientId > 0 ? clientId : 0 ) },
             };
 
             #endregion
@@ -146,7 +146,7 @@ namespace ACT.Core.Services
             #endregion
 
             #region WHERE IF CLIENT
-            if (clientId > 0)
+            if (csm.ClientId > 0)
             {
                 query = $"{query} AND EXISTS (SELECT Id FROM [dbo].[ClientProduct] cp WHERE cp.ProductId = p.Id AND cp.ClientId = @clientid)";
             }

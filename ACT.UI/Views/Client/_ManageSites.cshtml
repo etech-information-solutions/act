@@ -32,6 +32,12 @@
     <div class="notification message-warn" style="margin-bottom: 20px;">
         There are no Sites available matching your search criteria.
     </div>
+} else
+{
+    @*@if (items.Count == 1)
+    {
+
+    }*@
 }
 
 
@@ -208,6 +214,8 @@
                 $('.importlabel').hide();
                 $('.importbutton').hide();
                 $('#postedFile').hide();
+                //Clean Site List
+                SortCients();
 
 
                 $("#ClientList").change(function () {
@@ -225,7 +233,7 @@
                         $('#postedFile').hide();
                     }
 
-                    .ajax({
+                    $.ajax({
                         type: 'POST',
                         url: "SetClient",
                         data: { "ClientId": id },
@@ -237,6 +245,17 @@
 
                 });
             });
+
+            function SortClients() {
+                var x = document.getElementById("ClientList");
+                debugger;
+                if (x.length > 1) {
+                    for (var i = 0; i < x.length; i++) {
+                        if (x.options[i].value == "")
+                            x.remove(i);
+                    }
+                }
+            }
 
             function GetIncludedSites(cId) {
                 //debugger;
