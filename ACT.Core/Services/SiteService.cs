@@ -75,6 +75,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
             };
 
             #endregion
@@ -103,7 +104,7 @@ namespace ACT.Core.Services
                         select e).ToList();
                  */
                 //add to mke sure only correct sites are seen            
-                query = $"{query} AND EXISTS(SELECT 1 FROM[dbo].[PSPUser] pu LEFT JOIN[dbo].[PSPClient] pc ON pc.PSPId = pu.PSPId LEFT JOIN [dbo].[ClientSite] cs ON cs.ClientId=pc.ClientId WHERE pc.ClientId = p.Id AND pu.UserId = @userid) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM[dbo].[PSPUser] pu LEFT JOIN[dbo].[PSPClient] pc ON pc.PSPId = pu.PSPId LEFT JOIN [dbo].[ClientSite] cs ON cs.ClientId=pc.ClientId WHERE pu.UserId = @userid) ";
                 //query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu WHERE p.Id=pu.PSPId AND pu.UserId=@userid) ";
             }
 
@@ -117,6 +118,11 @@ namespace ACT.Core.Services
             {
                 //query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE p.Id=pc.PSPId AND pc.ClientId=@csmClientId) ";
                 query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] pc WHERE p.Id=pc.SiteId AND pc.ClientId=@csmClientId) ";
+            }
+            if (csm.SiteId != 0)
+            {
+                //query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE p.Id=pc.PSPId AND pc.ClientId=@csmClientId) ";
+                query = $"{query} AND p.Id=@csmSiteId ";
             }
             //if (csm.ProductId != 0)
             //{
@@ -242,7 +248,33 @@ namespace ACT.Core.Services
 
             return siteList;
         }
+
+        public List<Site> GetSitesByClients(int clientId, int siteId)
+        {
+            List<Site> siteList;
+            siteList = (from c in context.ClientSites
+                        join e in context.Sites
+                        on c.SiteId equals e.Id
+                        where c.ClientId == clientId
+                        where c.SiteId == siteId
+                        select e).ToList();
+
+            return siteList;
+        }
+
+        public int GetClientBySite(int siteId)
+        {
+            int clientId;
+            clientId = (from c in context.ClientSites
+             where c.SiteId == siteId
+             where c.Status == (int)Status.Active
+             select c.ClientId).FirstOrDefault();
+
+
+            return clientId;
+        }
         
+
 
         public List<Site> GetSitesByClientsIncluded(int clientId, int siteId)
         {
@@ -286,10 +318,31 @@ namespace ACT.Core.Services
             return siteList;
         }
 
+        public int CountSubSitesBySite(int siteId)
+        {
+
+            //return 0;
+            //me_employees.Count(me => me.me_login_name == this.me_login_name && me.me_pkey != this.me_pkey);
+            //return context.Sites.Count(s => s.SiteId == siteId && s.Status = (int)Status.Active);
+            int siteCount = (from c in context.Sites
+                             where c.SiteId == siteId
+                             where c.Status == (int)Status.Active
+                             select c).Count();
+
+            return siteCount;
+        }
+
 
         public bool ExistByAccountCode(string accCode)
         {
             return context.Sites.Any(c => c.AccountCode == accCode);
+        }
+
+        public bool ExistByXYCoords(string xcoord, string ycoord)
+        {
+            bool bExists = false;
+            bExists = context.Sites.Any(c => c.XCord == xcoord && c.YCord == ycoord);
+            return bExists;
         }
     }
 }

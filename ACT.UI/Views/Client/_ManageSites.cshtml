@@ -24,6 +24,7 @@
 @{
     Int32 count = Model.Start;
     List<Site> items = (List<Site>)Model.Items;
+
 }
 
 
@@ -32,15 +33,16 @@
     <div class="notification message-warn" style="margin-bottom: 20px;">
         There are no Sites available matching your search criteria.
     </div>
-} else
-{
-    @*@if (items.Count == 1)
-    {
-
-    }*@
 }
 
-
+@if (ViewBag.ContextualMode)
+{
+    <input type="hidden" id="context" name="context" value="1" />
+}
+else
+{
+    <input type="hidden" id="context" name="context" value="0" />
+}
 @using (Html.BeginForm("ImportSites", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#managesites", @class = "custom-validate", @style = "width: auto;", id = "importsites" }))
 {
     <p>
@@ -50,7 +52,14 @@
                     <label for="file">Client:</label>
                 </td>
                 <td style="width:15%">
-                    @Html.DropDownList("ClientList", "Please Select")
+                    @if (ViewBag.ContextualMode)
+                    {
+                        @Html.DropDownList("ClientList")
+                    }
+                    else
+                    {
+                        @Html.DropDownList("ClientList", "All Clients")
+                    }
                 </td>
                 <td style="width:2%">
                     @Html.ActionLink("Add", "AddSite", new { sourceview = "ManageSites" }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#managesites" })
@@ -74,7 +83,7 @@
         </table>
         <span class="loader"></span>
     </p>
-}    
+}
 
 <div id="managesiteslist">
 
@@ -113,8 +122,11 @@
                 Planning Point
             </th>
             <th data-name="SiteType" data-column="SiteType">
-                    Site Type
-                </th>
+                Site Type
+            </th>
+            <th data-name="SiteType" data-column="SubSites">
+                Subsites
+            </th>
             <th data-name="Actions">
                 Actions
             </th>
@@ -132,7 +144,8 @@
                 String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
 
                 string regionName = "N/A";
-                if (item.RegionId != null) {
+                if (item.RegionId != null && item.RegionId > 0)
+                {
                     using (RegionService reg = new RegionService())
                     {
                         Region region = reg.GetById((int)item.RegionId);
@@ -140,176 +153,235 @@
                     }
                 }
                 string siteTypeName = "N/A";
-                if (item.SiteType!=null)
+                if (item.SiteType != null)
                 {
                     siteTypeName = ((SiteType)item.SiteType).GetDisplayText();
                 }
+                int subSitesCount = 0;
+                using (SiteService sservice = new SiteService())
+                {
+                    subSitesCount = sservice.CountSubSitesBySite(item.Id);
+                }
 
-        <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
-            <td width="1%">
-                @item.Id
-            </td>
-            <td>
-                @regionName
-            </td>
-            <td>
-                @item.Name
-            </td>
-            <td>
-                @item.XCord
-            </td>
-            <td>
-                @item.YCord
-            </td>
-            <td>
-                @item.Address
-            </td>
-            <td>
-                @item.PostalCode
-            </td>
-            <td>
-                @item.ContactNo
-            </td>
-            <td>
-                @item.ContactName
-            </td>
-            <td>
-                @item.PlanningPoint
-            </td>
-            <td>
-                @siteTypeName
-            </td>
-            <td>
-                @Html.ActionLink("Details", "SiteDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-            @Html.ActionLink("Edit", "EditSite", new { id = item.Id, returnView = "ManageSites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+                    <td width="1%">
+                        @item.Id
+                    </td>
+                    <td>
+                        @regionName
+                    </td>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td>
+                        @item.XCord
+                    </td>
+                    <td>
+                        @item.YCord
+                    </td>
+                    <td>
+                        @item.Address
+                    </td>
+                    <td>
+                        @item.PostalCode
+                    </td>
+                    <td>
+                        @item.ContactNo
+                    </td>
+                    <td>
+                        @item.ContactName
+                    </td>
+                    <td>
+                        @item.PlanningPoint
+                    </td>
+                    <td>
+                        @siteTypeName
+                    </td>
 
-            @Html.ActionLink(enable, "DeleteSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managesites", @rel = "tipsyE", @title = enable + " this item?" })
-            </td>
-        </tr>
+                    <td>
+                        @subSitesCount
+                    </td>
+
+
+                    <td>
+                        @Html.ActionLink("Details", "SiteDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+                        @Html.ActionLink("Edit", "EditSite", new { id = item.Id, returnView = "ManageSites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+                        @Html.ActionLink(enable, "DeleteSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managesites", @rel = "tipsyE", @title = enable + " this item?" })
+                        <a href="#" onclick="LinkToSubSites('@item.Id')"><i class="fa fa-link"></i>Subsites</a>
+                    </td>
+                </tr>
 
                 count++;
             }
         }
 
-        </tbody>
+    </tbody>
 
-    </table>
-        <script>
+</table>
+<script>
     function Redir(redirVal) {
         window.location.href = '@Url.Action("SubSites", "Client")'; //SubSites?siteId=redirVal
     }
-        </script>
-        @*<script type="text/javascript">
-        $(function(){
-          $("#btnRedirect").click(function(){
-            window.location.href = "@Url.Action("ActionName","Controller")";
-          });
-        });
-        </script>*@
-        @*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
-        <script>
-            $(document).ready(function () {
+</script>
+@*<script type="text/javascript">
+    $(function(){
+      $("#btnRedirect").click(function(){
+        window.location.href = "@Url.Action("ActionName","Controller")";
+      });
+    });
+    </script>*@
+@*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
+<script>
+    $(document).ready(function () {
+        var cId = parseInt($("#ClientListSiteManage").val());
+        var context = $("#context").val();
+        if (context == "0") {
+            $('.add').hide();
+            $('.importlabel').hide();
+            $('.importbutton').hide();
+            $('#postedFile').hide();
+        }
+        //Clean Site List
+        // SetClient(cId);
+        //SortClients();
+
+
+        $("#ClientList").change(function () {
+            //debugger;
+            var cId = parseInt($('option:selected', this).val());
+            SetClient(cId);
+            if (cId > 0) {
+                $('.add').show();
+                $('.importlabel').show();
+                $('.importbutton').show();
+                $('#postedFile').show();
+                //GetIncludedSites(cId);
+            } else {
                 $('.add').hide();
                 $('.importlabel').hide();
                 $('.importbutton').hide();
                 $('#postedFile').hide();
-                //Clean Site List
-                SortCients();
-
-
-                $("#ClientList").change(function () {
-                    var cId = parseInt($('option:selected', this).val());
-                    if (cId > 0) {
-                        $('.add').show();
-                        $('.importlabel').show();
-                        $('.importbutton').show();
-                        $('#postedFile').show();
-                        //GetIncludedSites(cId);
-                    } else {
-                        $('.add').hide();
-                        $('.importlabel').hide();
-                        $('.importbutton').hide();
-                        $('#postedFile').hide();
-                    }
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "SetClient",
-                        data: { "ClientId": id },
-                        success: function (response) {
-                            window.location.href = 'Index#managesites';
-                            location.reload();
-                        }
-                    });
-
-                });
-            });
-
-            function SortClients() {
-                var x = document.getElementById("ClientList");
-                debugger;
-                if (x.length > 1) {
-                    for (var i = 0; i < x.length; i++) {
-                        if (x.options[i].value == "")
-                            x.remove(i);
-                    }
-                }
             }
 
-            function GetIncludedSites(cId) {
-                //debugger;
-                var rowDiv = $("#sites-table tbody");
-                $.ajax({
-                    type: "GET",
-                    url: "GetSitesForClient",
-                    data: { clientId: cId },
-                    contentType: "application/json;charset=utf-8",
-                    dataType: "json",
-                    success: function (data) {
-                        //debugger;
-                        var obj = JSON.parse(data.data);
-                        rowDiv.html('');
-                        var result = "";
-                        $.each(obj, function (id, site) {
+            //$.ajax({
+            //    type: 'POST',
+            //    url: "SetClient",
+            //    data: { "ClientId": id },
+            //    success: function (response) {
+            //        window.location.href = 'Index#managesites';
+            //        location.reload();
+            //    }
+            //});
 
-                            var actionStr = '<a class="info" data-details="1" data-id="' + site.Id + '" data-target=".tr-' + site.Id + '-item" href="/Client/SiteDetails/' + site.Id + '"> Details</a>' +
-                                '<a class="edit" data-edit="1" data-id="' + site.Id + '" data-target=".tr-' + site.Id + '-item" href = "/Client/EditSite/' + site.Id + '?returnView=ManageSites">Edit</a > ' +
-                                '<a class="warn" data-delete="1" data-id="' + site.Id + '" data-refresh-target="#managesites" data-target="#tr-' + site.Id + '-item" href="/Client/DeleteSite/' + site.Id + '" rel="tipsyE" title="Disable this item?" > Disable</a > ';
-                            var regionname = "";
-                            if (site.Region !== undefined && site.Region !== null) {
-                                regionname = site.Region.Name;
-                            }
-                            result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item" role="row">' +
-                                '<td style = "width: 15%;">' +
-                                regionname +
-                                '</td><td>' +
-                                site.Name +
-                                '</td><td>' +
-                                site.XCord +
-                                '</td><td> ' +
-                                site.YCord +
-                                '</td><td> ' +
-                                site.Address +
-                                '</td><td> ' +
-                                site.PostalCode +
-                                '</td><td> ' +
-                                site.ContactNo +
-                                ' </td><td> ' +
-                                site.ContactName +
-                                '</td><td> ' +
-                                site.PlanningPoint +
-                                '</td><td>' + actionStr + '</td></tr>';//<input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" value="' + site.Id + '" />
-                        });
-                        rowDiv.html(result);
+        });
+    });
 
-                    },
-                    error: function (response) {
-
-                        alert('Error retrieving sites');
-                    }
-                });
-
+    function SortClients() {
+        var x = document.getElementById("ClientListSiteManage");
+        if (x.length > 1) {
+            for (var i = 0; i < x.length; i++) {
+                if (x.options[i].value == "0")
+                    x.remove(i);
             }
-        </script>
-        @Html.Partial("_Paging")
+        }
+    }
+    function SetClient(cId) {
+        $.ajax({
+            type: 'POST',
+            url: "SetClient",
+            data: { "ClientId": cId },
+            success: function (response) {
+                //window.location.href = 'Index#managesites';
+                //location.reload();
+                GetIncludedSites(cId);
+            }
+        });
+    }
+    function SetSite(sId) {
+        $.ajax({
+            type: 'POST',
+            url: "SetClientSite",
+            data: { "SiteId": sId },
+            success: function (response) {
+                //window.location.href = 'Index#managesites';
+                //location.reload();
+                //GetIncludedSites(cId);
+            }
+        });
+    }
+    function LinkToSubSites(id) {
+        debugger;
+        var cId = $('#ClientList option:selected').val();
+        //SetClient(cId);
+        $.ajax({
+            type: 'POST',
+            url: "SetClientSite",
+            data: { "SiteId": id },
+            success: function (response) {
+                window.location.href = 'Index#subsites';
+                location.reload();
+            }
+        });
+    }
+
+    function GetIncludedSites(cId) {
+        // SetClient(cId);
+        location.reload();
+        //debugger;
+        //var rowDiv = $("#sites-table tbody");
+        //$.ajax({
+        //    type: "GET",
+        //    url: "GetSitesForClient",
+        //    data: { clientId: cId },
+        //    contentType: "application/json;charset=utf-8",
+        //    dataType: "json",
+        //    success: function (data) {
+        //        //debugger;
+        //        var obj = JSON.parse(data.data);
+        //        rowDiv.html('');
+        //        var result = "";
+        //        $.each(obj, function (id, site) {
+
+        //            var actionStr = '<a class="info" data-details="1" data-id="' + site.Id + '" data-target=".tr-' + site.Id + '-item" href="/Client/SiteDetails/' + site.Id + '"> Details</a>' +
+        //                '<a class="edit" data-edit="1" data-id="' + site.Id + '" data-target=".tr-' + site.Id + '-item" href = "/Client/EditSite/' + site.Id + '?returnView=ManageSites">Edit</a > ' +
+        //                '<a class="warn" data-delete="1" data-id="' + site.Id + '" data-refresh-target="#managesites" data-target="#tr-' + site.Id + '-item" href="/Client/DeleteSite/' + site.Id + '" rel="tipsyE" title="Disable this item?" > Disable</a > ';
+        //            var regionname = "";
+        //            if (site.Region !== undefined && site.Region !== null) {
+        //                regionname = site.Region.Name;
+        //            }
+        //            result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item" role="row">' +
+        //                '<td style = "width: 15%;">' +
+        //                regionname +
+        //                '</td><td>' +
+        //                site.Name +
+        //                '</td><td>' +
+        //                site.XCord +
+        //                '</td><td> ' +
+        //                site.YCord +
+        //                '</td><td> ' +
+        //                site.Address +
+        //                '</td><td> ' +
+        //                site.PostalCode +
+        //                '</td><td> ' +
+        //                site.ContactNo +
+        //                ' </td><td> ' +
+        //                site.ContactName +
+        //                '</td><td> ' +
+        //                site.PlanningPoint +
+        //                '</td><td>' + actionStr + '</td></tr>';//<input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" value="' + site.Id + '" />
+        //        });
+        //        rowDiv.html(result);
+
+        //    },
+        //    error: function (response) {
+
+        //        alert('Error retrieving sites');
+        //    }
+        //});
+
+    }
+</script>
+@Html.Partial("_Paging")

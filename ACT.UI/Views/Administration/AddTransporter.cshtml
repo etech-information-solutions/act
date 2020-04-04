@@ -22,7 +22,7 @@
 <div id="edit-item">
 
     <h2 class="uppercase" style="width: auto;">
-        <img alt="" src="@Url.Content(" ~/images/add.png")" />
+        <img alt="" src="@Url.Content("~/images/add.png")" />
         <span>Add Transporter</span>
     </h2>
 
@@ -40,7 +40,7 @@
                 Name
             </div>
             <div class="display-field">
-                @Html.TextBoxFor(model => model.Name, new { @class = "input", @placeholder = "Enter Group Name" })
+                @Html.TextBoxFor(model => model.Name, new { @class = "input", @placeholder = "Enter Transporter Name" })
                 @Html.ValidationMessageFor(model => model.Name)
             </div>
             <div class="display-label">

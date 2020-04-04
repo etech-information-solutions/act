@@ -42,18 +42,26 @@
                 <label for="file">Client:</label>
             </td>
             <td style="width:15%">
-                @Html.DropDownList("ClientList", "Please Select")
+                @if (ViewBag.ContextualMode)
+                {
+                    @Html.DropDownList("ClientList")
+                }
+                else
+                {
+                    @Html.DropDownList("ClientList", "All Clients")
+                }
             </td>
-            <td style="width:2%">
-                @Html.ActionLink("Add", "AddProduct", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new product?", @data_edit = "1", @data_id = 0, @data_target = "#linkproducts" })
+            <td style="width:16%">
+                <a href="#" onclick="LinkClientToProducts()"><i class="fa fa-link"></i>Link Client to Product</a>
+                @*@Html.ActionLink("Add", "AddProduct", new { }, new { @class = "add", @rel = "tipsyS", @title = "Link Client to product?", @data_edit = "1", @data_id = 0, @data_target = "#linkproducts" })*@
             </td>
             <td style="width:3%">
                 &nbsp;
             </td>
-            <td style="width:35%">
+            <td style="width:5%">
                 &nbsp;
             </td>
-            <td style="width:10%">
+            <td style="width:5%">
                 &nbsp;
             </td>
         </tr>
@@ -68,6 +76,9 @@
             </th>
             <th data-name="XCord" data-column="XCord">
                 Product Name
+            </th>
+            <th data-name="XCord" data-column="XCord">
+                Product Prices
             </th>
             <th data-name="YCord" data-column="YCord">
                 Hire Rate
@@ -88,7 +99,7 @@
     </thead>
 
     <tbody>
-        @*@if (Model != null && items != null && items.Count() > 0)
+        @if (Model != null && items != null && items.Count() > 0)
         {
             foreach (var item in items)
             {
@@ -138,6 +149,7 @@
                         @pocost
                     </td>                    
                     <td width="15%">
+                        <input type="radio" id="productId_@item.Id" name="productslist" value="@item.Id" /><!--onclick="LinkClientToProducts(@item.Id)"-->
                         @Html.ActionLink("History", "HistoryDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
                         @Html.ActionLink(enable, "DeleteProduct", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#linkproducts", @rel = "tipsyE", @title = enable + " this item?" })
@@ -151,7 +163,7 @@
 
                 count++;
             }
-        }*@
+        }
     </tbody>
 
 </table>
@@ -159,19 +171,45 @@
 @*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
 <script>
     $(document).ready(function () {
-        $('.add').hide();
+        //$('.add').hide();
 
 
-        $("#ClientList").change(function () {
-            var cId = parseInt($('option:selected', this).val());
-            if (cId > 0) {
-                $('.add').show();
-                GetIncludedProducts(cId);
-            } else {
-                $('.add').hide();
-            }
-        });
+        //$("#ClientList").change(function () {
+        //    var cId = parseInt($('option:selected', this).val());
+        //    if (cId > 0) {
+        //        $('.add').show();
+        //        GetIncludedProducts(cId);
+        //    } else {
+        //        $('.add').hide();
+        //    }
+        //});
     });
+
+    function LinkClientToProducts() {
+        var cId = $('#ClientList option:selected').val();
+        var cText = $('#ClientList option:selected').text();
+        var r = confirm("Please confirm you wish to link " + cText + " to product(s)!");
+        if (r == true) {
+            //SetClient(cId);
+            $.ajax({
+                type: 'POST',
+                url: "SetClientSite",
+                data: { "SiteId": id },
+                success: function (response) {
+                    window.location.href = 'Index#subsites';
+                    location.reload();
+                }
+            });
+
+
+        } else {
+
+
+
+        }
+       
+
+    }
 
     function GetIncludedProducts(cId) {
         //debugger;

@@ -24,12 +24,12 @@
 }
 
 
-@*@if ( Model == null || !items.Any() )
+@if ( Model == null || !items.Any() )
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
-        There are no Users  available matching your search criteria.
+        There are no Transporters available matching your search criteria.
     </div>
-}*@
+}
 
 <p>
     @Html.ActionLink( "Add Transporter", "AddTransporter", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new transporter?", @data_edit = "1", @data_id = 0, @data_target = "#managetransporters" } )
@@ -75,10 +75,6 @@
                 String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
-
-                    @*<td width="1%">
-                        @count
-                    </td>*@
                     <td style="width: 15%;">
                         @item.Name
                     </td>
@@ -101,7 +97,8 @@
                         @Html.ActionLink("Edit", "EditTransporter", new { id = item.Id, returnView = "ManageTransporters" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
                         @Html.ActionLink(enable, "DeleteTransporter", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managetransporters", @rel = "tipsyE", @title = enable + " this item?" })
-
+                        <a href="#" onclick="ContactsModal('@item.Id')"><i class="fa fa-phone"></i>Contacts</a>
+                        <a href="#" onclick="VehiclesModal('@item.Id')"><i class="fa fa-truck"></i>Vehicles</a>
                     </td>
 
 

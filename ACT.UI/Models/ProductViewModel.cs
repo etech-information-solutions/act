@@ -32,6 +32,7 @@ namespace ACT.UI.Models
         public List<ProductPriceViewModel> ProductPrices { get; set; }
 
         public bool EditMode { get; set; }
+        public bool ContextualMode { get; set; }
 
         #endregion
 

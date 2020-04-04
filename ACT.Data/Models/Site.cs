@@ -39,6 +39,10 @@ namespace ACT.Data.Models
         public string PostalCode { get; set; }
         public string ContactNo { get; set; }
         public string ContactName { get; set; }
+        public string FinanceContactNo { get; set; }
+        public string FinanceContact { get; set; }
+        public string ReceivingContactNo { get; set; }
+        public string ReceivingContact { get; set; }
         public string PlanningPoint { get; set; }
         public Nullable<int> SiteType { get; set; }
         public string AccountCode { get; set; }

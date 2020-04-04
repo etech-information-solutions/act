@@ -43,6 +43,14 @@ namespace ACT.UI.Models
         [Display( Name = "Status" )]
         public Status Status { get; set; }
 
+        [Display(Name = "Longitude")]
+        [StringLength(30, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        public string Longitude { get; set; }
+        [Display(Name = "Latitude")]
+        [StringLength(30, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        public string Latitude { get; set; }
+
+
         public bool EditMode { get; set; }
 
         #endregion

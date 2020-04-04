@@ -26,6 +26,8 @@ namespace ACT.UI.Models
         public int Status { get; set; }
         public bool EditMode { get; set; }
         public string GroupClientList { get; set; }
+        public bool ContextualMode { get; set; }
+
 
         #endregion
 

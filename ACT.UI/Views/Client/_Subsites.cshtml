@@ -17,6 +17,22 @@
 
 
 @Html.Partial("_Notification")
+@if (ViewBag.ContextualMode)
+{
+    <input type="hidden" id="context" name="context" value="1" />
+}
+else
+{
+    <input type="hidden" id="context" name="context" value="0" />
+}
+@if (ViewBag.ContextualModeSite)
+{
+    <input type="hidden" id="contextsite" name="contextsite" value="1" />
+}
+else
+{
+    <input type="hidden" id="contextsite" name="contextsite" value="0" />
+}
 @using (Html.BeginForm("ImportSites", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @style = "width: auto;" }))
 {
     <p>
@@ -27,9 +43,36 @@
                     <label for="site">Site:</label>
                 </td>
                 <td style="width:15%">
-                    @Html.DropDownList("ClientList", "Please Select")<br /><br />
+                    @if (ViewBag.ContextualMode)
+                    {
+                        @Html.DropDownList("ClientList")
+                    }
+                    else
+                    {
+                        @Html.DropDownList("ClientList", "All Clients")
+                    }
+                    @*@Html.DropDownList("ClientList", "Please Select")<br /><br />*@
                     @*@Html.DropDownList("SiteList")*@
-                    @Html.DropDownList("ClientSiteList", Enumerable.Empty<SelectListItem>(), "Please Select")
+                    @*@if (ViewBag.ContextualModeSite)
+        {
+            @Html.DropDownList("ClientSiteList")
+        }
+        else
+        {
+            @Html.DropDownList("ClientSiteList", "All Sites")
+        }*@
+                    <br />
+                    <br />
+                    <br />
+                    @if (ViewBag.ContextualModeSite)
+                    {
+                        @Html.DropDownList("ClientSiteList")
+                    }
+                    else
+                    {
+                        @Html.DropDownList("ClientSiteList", "All Sites")
+                    }
+                    @*@Html.DropDownList("ClientSiteList", Enumerable.Empty<SelectListItem>(), "All Sites")*@
                 </td>
                 <td style="width:2%">
                     @if (user.IsAdmin || user.IsPSPAdmin)
@@ -59,426 +102,461 @@
     </p>
 }
 
-    @*<input type="hidden" id="selectedsite" name="selectedsite" value="0" />*@
-    <div id="mainsitedetails" style="display:none;">
-        <div class="left" style="width: 27%; margin-right: 2%;">
+@*<input type="hidden" id="selectedsite" name="selectedsite" value="0" />*@
+<div id="mainsitedetails" style="display:none;">
+    <div class="left" style="width: 27%; margin-right: 2%;">
 
-            <div class="display-label">
-                Site Name
-            </div>
-            <div class="display-field">
-                <span class="sitename"></span>
-            </div>
-            <div class="display-label">
-                Account Code
-            </div>
-            <div class="display-field">
-                <span class="accountcode"></span>
-            </div>
-            <div class="display-label">
-                Depot
-            </div>
-            <div class="display-field">
-                <span class="sitedepot"></span>
-            </div>
-
+        <div class="display-label">
+            Site Name
+        </div>
+        <div class="display-field">
+            <span class="sitename"></span>
+        </div>
+        <div class="display-label">
+            Account Code
+        </div>
+        <div class="display-field">
+            <span class="accountcode"></span>
+        </div>
+        <div class="display-label">
+            Depot
+        </div>
+        <div class="display-field">
+            <span class="sitedepot"></span>
         </div>
 
-        <div class="left" style="width: 27%; margin-right: 2%;">
-            <div class="display-label">
-                Contact Person
-            </div>
-            <div class="display-field">
-                <span class="contactname"></span>
-            </div>
-            <div class="display-label">
-                Contact Number
-            </div>
-            <div class="display-field">
-                <span class="contactnumber"></span>
-            </div>
-            <div class="display-label">
-                Region
-            </div>
-            <div class="display-field">
-                <span class="siteregion"></span>
-            </div>
+    </div>
+
+    <div class="left" style="width: 27%; margin-right: 2%;">
+        <div class="display-label">
+            Contact Person
         </div>
-
-        <div class="left" style="width: 27%; margin-right: 2%;">
-
-            <div class="display-label">
-                Site X Coordinate
-            </div>
-            <div class="display-field">
-                <span class="sitexcoord"></span>
-            </div>
-            <div class="display-label">
-                Site Y Coordinate
-            </div>
-            <div class="display-field">
-                <span class="siteycoord"></span>
-            </div>
-            <div class="display-label">
-                Address
-            </div>
-            <div class="display-field">
-                <span class="siteaddress"></span>
-            </div>
-
-
+        <div class="display-field">
+            <span class="contactname"></span>
+        </div>
+        <div class="display-label">
+            Contact Number
+        </div>
+        <div class="display-field">
+            <span class="contactnumber"></span>
+        </div>
+        <div class="display-label">
+            Region
+        </div>
+        <div class="display-field">
+            <span class="siteregion"></span>
         </div>
     </div>
-    <div id="BottomLists" style="display:none;">
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
 
-        <div class="left" style="width: 35%; margin-right: 4%;">
-            <p>
-                <strong class="uppercase">Excluded Sites</strong>
-            </p>
-            <table id="excluded-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
-                <thead>
-                    <tr>
+    <div class="left" style="width: 27%; margin-right: 2%;">
 
-                        <th data-name="Name" data-column="Name">
-                            Name
-                        </th>
-                        <th data-name="XCord" data-column="XCord">
-                            X coordinate
-                        </th>
-                        <th data-name="YCord" data-column="YCord">
-                            Y Coordinate
-                        </th>
-                        <th data-name="Address" data-column="Address">
-                            Address
-                        </th>
-                        <th data-name="PostalCode" data-column="PostalCode">
-                            Postal Code
-                        </th>
-                        <th data-name="ContactNo" data-column="ContactNo">
-                            Contact Number
-                        </th>
-                        <th data-name="ContactName" data-column="ContactName">
-                            Contact Name
-                        </th>
-                        <th data-name="RegionId" data-column="RegionId">
-                            Region
-                        </th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <tbody id="excludedtabledata"></tbody>
-
-            </table>
+        <div class="display-label">
+            Site X Coordinate
         </div>
-        <div class="left" style="width: 5%; margin-left: 10%; margin-right: 10px;">
-            <br /><br /><br />
-            <button id="Copy">>></button>
-            <br />
-            <br />
-            <button id="Remove"><<</button>
+        <div class="display-field">
+            <span class="sitexcoord"></span>
         </div>
-        <div class="left" style="width: 35%; margin-right: 2%;">
-            <p>
-                <strong class="uppercase">Included Sites</strong>
-            </p>
-            <table id="included-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
-                <thead>
-                    <tr>
-
-                        <th data-name="Name" data-column="Name">
-                            Name
-                        </th>
-                        <th data-name="XCord" data-column="XCord">
-                            X coordinate
-                        </th>
-                        <th data-name="YCord" data-column="YCord">
-                            Y Coordinate
-                        </th>
-                        <th data-name="Address" data-column="Address">
-                            Address
-                        </th>
-                        <th data-name="PostalCode" data-column="PostalCode">
-                            Postal Code
-                        </th>
-                        <th data-name="ContactNo" data-column="ContactNo">
-                            Contact Number
-                        </th>
-                        <th data-name="ContactName" data-column="ContactName">
-                            Contact Name
-                        </th>
-                        <th data-name="RegionId" data-column="RegionId">
-                            Region
-                        </th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <tbody id="includedtabledata"></tbody>
-            </table>
+        <div class="display-label">
+            Site Y Coordinate
         </div>
+        <div class="display-field">
+            <span class="siteycoord"></span>
+        </div>
+        <div class="display-label">
+            Address
+        </div>
+        <div class="display-field">
+            <span class="siteaddress"></span>
+        </div>
+
+
     </div>
+</div>
+<div id="BottomLists" style="display:none;">
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-    <script>
-        $(document).ready(function () {
+
+    <div class="left" style="width: 35%; margin-right: 4%;">
+        <p>
+            <strong class="uppercase">Excluded Sites</strong>
+        </p>
+        <table id="excluded-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
+            <thead>
+                <tr>
+
+                    <th data-name="Name" data-column="Name">
+                        Name
+                    </th>
+                    <th data-name="XCord" data-column="XCord">
+                        X coordinate
+                    </th>
+                    <th data-name="YCord" data-column="YCord">
+                        Y Coordinate
+                    </th>
+                    <th data-name="Address" data-column="Address">
+                        Address
+                    </th>
+                    <th data-name="PostalCode" data-column="PostalCode">
+                        Postal Code
+                    </th>
+                    <th data-name="ContactNo" data-column="ContactNo">
+                        Contact Number
+                    </th>
+                    <th data-name="ContactName" data-column="ContactName">
+                        Contact Name
+                    </th>
+                    <th data-name="RegionId" data-column="RegionId">
+                        Region
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody id="excludedtabledata"></tbody>
+
+        </table>
+    </div>
+    <div class="left" style="width: 5%; margin-left: 10%; margin-right: 10px;">
+        <br /><br /><br />
+        <button id="Copy">>></button>
+        <br />
+        <br />
+        <button id="Remove"><<</button>
+    </div>
+    <div class="left" style="width: 35%; margin-right: 2%;">
+        <p>
+            <strong class="uppercase">Included Sites</strong>
+        </p>
+        <table id="included-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
+            <thead>
+                <tr>
+
+                    <th data-name="Name" data-column="Name">
+                        Name
+                    </th>
+                    <th data-name="XCord" data-column="XCord">
+                        X coordinate
+                    </th>
+                    <th data-name="YCord" data-column="YCord">
+                        Y Coordinate
+                    </th>
+                    <th data-name="Address" data-column="Address">
+                        Address
+                    </th>
+                    <th data-name="PostalCode" data-column="PostalCode">
+                        Postal Code
+                    </th>
+                    <th data-name="ContactNo" data-column="ContactNo">
+                        Contact Number
+                    </th>
+                    <th data-name="ContactName" data-column="ContactName">
+                        Contact Name
+                    </th>
+                    <th data-name="RegionId" data-column="RegionId">
+                        Region
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody id="includedtabledata"></tbody>
+        </table>
+    </div>
+</div>
+<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+<script>
+    $(document).ready(function () {
+        var context = $("#context").val();
+        var contextsite = $("#contextsite").val();
+        
+        if (context == "0") {
             $('.add').hide();
             $('.importlabel').hide();
             $('.importbutton').hide();
             $('#postedFile').hide();
-            //var cId = $('#ClientList option:selected').val();
-            //var sId = $('#SiteList option:selected').val();
-
-            //Start with first option on both DDLs
-            //UpdateSites(cId, sId);
-
-            $("#ClientList").change(function () {
-               //debugger;
-                var cId = $('option:selected', this).val();
+        } else {
+            var cId = $('#ClientList option:selected').val();
+            if (contextsite == "0") {
                 GetSiteListForClient(cId);
-                //UpdateSites($('option:selected', this).val(), sId);
-            });
-
-            $("#ClientSiteList").change(function () {
-              //  debugger;
-                var cId = $('#ClientList option:selected').val();
-                UpdateSites(cId, $('option:selected', this).val());
-                $('.add').show();
-                $('.importlabel').show();
-                $('.importbutton').show();
-                $('#postedFile').show();
-            });
-
-            $('#Copy').on('click', function () {
-               // debugger;
-                //var msId = $('#selectedsite').val();
-                var sId = $('#ClientSiteList option:selected').val();
-                var cId = $('#ClientList option:selected').val();
-                var checkedItem = $('#excludedtabledata input[type=radio]:checked').val();
-                if (checkedItem != undefined) {
-                    //save it first
-                    SetIncludedSite(sId, checkedItem, cId);
-                    //then update
-                    UpdateSites(cId, sId);
-                } else {
-                    alert('Nothing to Copy is selected');
-                }
-                //alert(checkedItem);
-            });
-
-            $('#Remove').on('click', function () {
-              //  debugger;
-                //var msId = $('#selectedsite').val();
-                var cId = $('#ClientList option:selected').val();
-                var sId = $('#ClientSiteList option:selected').val();
-                var checkedItem = $('#includedtabledata input[type=radio]:checked').val();
-                if (checkedItem != undefined) {
-                    //save it first
-                    SetExcludedSite(sId, checkedItem, cId);
-                    //then update
-                    UpdateSites(cId, sId);
-                } else {
-                    alert('Nothing to Remove is selected');
-                }
-            });
-        });
-
-        function UpdateSites(cId, sId) {
-            //debugger;
-            if (sId != '' && cId != '') {
-                $('#mainsitedetails').show();
-                $('#BottomLists').show();
-                //GetSiteListForClient(cId);
-                GetSiteDetailsForMain(sId);
-                GetIncludedSites(cId, sId);
-                GetExcludedSites(cId, sId);
             }
         }
-
-        function GetSiteListForClient(cId) {
-            var options = $("#ClientSiteList");
-            options.empty();
-            $.ajax({
-                type: "GET",
-                url: "GetSiteListForClient",
-                data: { clientId: cId },
-                contentType: "application/json;charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                    //console.log(data);
-                    var obj = JSON.parse(data.data);
-                    options.append($("<option />").val('0').text('Please Select'));
-                    $.each(obj, function (id, site) {
-                        options.append($("<option />").val(site.Id).text(site.Name));
-                    });
-                    //$('span.sitename').text(data.Name);
-                    //$('span.contactname').text(data.ContactName);
-                    //$('span.contactnumber').text(data.ContactNo);
-                    //$('span.accountcode').text(data.AccountCode);
-                    //$('span.sitedepot').text(data.Depot);
-                    //$('span.sitexcoord').text(data.XCord);
-                    //$('span.siteycoord').text(data.YCord);
-                    //$('span.siteaddress').text(data.Address + '\n' + data.PostalCode);
-                    //$('span.siteregion').text(data.RegionId);
-                    //$('#selectedsite').val(data.Id);
-                },
-                error: function (response) {
-                    alert('Error retrieving site details');
-                }
-            });
-        }
-
-        function GetSiteDetailsForMain(sId) {
-            $.ajax({
-                type: "GET",
-                url: "GetSiteDetailsForMain",
-                data: { siteId: sId },
-                contentType: "application/json;charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                    $('span.sitename').text(data.Name);
-                    $('span.contactname').text(data.ContactName);
-                    $('span.contactnumber').text(data.ContactNo);
-                    $('span.accountcode').text(data.AccountCode);
-                    $('span.sitedepot').text(data.Depot);
-                    $('span.sitexcoord').text(data.XCord);
-                    $('span.siteycoord').text(data.YCord);
-                    $('span.siteaddress').text(data.Address + '\n' + data.PostalCode);
-                    $('span.siteregion').text(data.RegionId);
-                    $('#selectedsite').val(data.Id);
-                },
-                error: function (response) {
-                    alert('Error retrieving site details');
-                }
-            });
-        }
-
-        function GetIncludedSites(cId, sId) {
+        if (contextsite == "1") {
             //debugger;
-            var rowDiv = $("#included-table tbody");
-            $.ajax({
-                type: "GET",
-                url: "GetSitesForClientSiteIncluded",
-                data: { clientId: cId, siteId: sId },
-                contentType: "application/json;charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                    // debugger;
-                    rowDiv.html('');
-                    var result = "";
-                    $.each(data, function (id, site) {
-
-
-                        result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
-                            '<td style = "width: 15%;">' +
-                            site.Name +
-                            '</td><td>' +
-                            site.XCord +
-                            '</td><td> ' +
-                            site.YCord +
-                            '</td><td> ' +
-                            site.Address +
-                            '</td><td> ' +
-                            site.PostalCode +
-                            '</td><td> ' +
-                            site.ContactNo +
-                            ' </td><td> ' +
-                            site.ContactName +
-                            '</td><td> ' +
-                            site.RegionId +
-                            '</td><td><input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" value="' + site.Id + '" /></td></tr>';
-                    });
-                    rowDiv.html(result);
-
-                },
-                error: function (response) {
-
-                    alert('Error retrieving sites');
-                }
-            });
-
+            var cId = $('#ClientList option:selected').val();
+            var sId = $('#ClientSiteList option:selected').val();
+            UpdateSites(cId, sId);
         }
+        //var cId = $('#ClientList option:selected').val();
+        //var sId = $('#SiteList option:selected').val();
 
-        function GetExcludedSites(cId, sId) {
+        //Start with first option on both DDLs
+        //UpdateSites(cId, sId);
+
+        $("#ClientList").change(function () {
+            //debugger;
+            var cId = $('option:selected', this).val();
+            GetSiteListForClient(cId);
+            //UpdateSites($('option:selected', this).val(), sId);
+        });
+
+        $("#ClientSiteList").change(function () {
+            //  debugger;
+            var cId = $('#ClientList option:selected').val();
+            $('.add').show();
+            $('.importlabel').show();
+            $('.importbutton').show();
+            $('#postedFile').show();
+            UpdateSites(cId, $('option:selected', this).val());
+        });
+
+        $('#Copy').on('click', function () {
             // debugger;
-            var rowDiv = $("#excluded-table tbody");
-            $.ajax({
-                type: "GET",
-                url: "GetSitesForClientSiteExcluded",
-                data: { clientId: cId, siteId: sId },
-                contentType: "application/json;charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                    rowDiv.html('');
-                    var result = "";
-                    $.each(data, function (id, site) {
+            //var msId = $('#selectedsite').val();
+            var sId = $('#ClientSiteList option:selected').val();
+            var cId = $('#ClientList option:selected').val();
+            var checkedItem = $('#excludedtabledata input[type=radio]:checked').val();
+            if (checkedItem != undefined) {
+                //save it first
+                SetIncludedSite(sId, checkedItem, cId);
+                //then update
+                UpdateSites(cId, sId);
+            } else {
+                alert('Nothing to Copy is selected');
+            }
+            //alert(checkedItem);
+        });
 
+        $('#Remove').on('click', function () {
+            //  debugger;
+            //var msId = $('#selectedsite').val();
+            var cId = $('#ClientList option:selected').val();
+            var sId = $('#ClientSiteList option:selected').val();
+            var checkedItem = $('#includedtabledata input[type=radio]:checked').val();
+            if (checkedItem != undefined) {
+                //save it first
+                SetExcludedSite(sId, checkedItem, cId);
+                //then update
+                UpdateSites(cId, sId);
+            } else {
+                alert('Nothing to Remove is selected');
+            }
+        });
+    });
 
-                        result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
-                            '<td style = "width: 15%;">' +
-                            site.Name +
-                            '</td><td>' +
-                            site.XCord +
-                            '</td><td> ' +
-                            site.YCord +
-                            '</td><td> ' +
-                            site.Address +
-                            '</td><td> ' +
-                            site.PostalCode +
-                            '</td><td> ' +
-                            site.ContactNo +
-                            ' </td><td> ' +
-                            site.ContactName +
-                            '</td><td> ' +
-                            site.RegionId +
-                            '</td><td><input type="radio" id="excl_item_id' + site.Id + '" name="excl_item" value="' + site.Id + '" /></td></tr>';
-                    });
-                    rowDiv.html(result);
+    function UpdateSites(cId, sId) {
+       // debugger;
+        if (sId != '' && cId != '') {
+            SetSite(sId);
 
-                },
-                error: function (response) {
-                    alert('Error retrieving sites');
-                }
-            });
-
+            $('#mainsitedetails').show();
+            $('#BottomLists').show();
+            //GetSiteListForClient(cId);
+            GetSiteDetailsForMain(sId);
+            GetIncludedSites(cId, sId);
+            GetExcludedSites(cId, sId);
         }
+    }
 
-        function SetIncludedSite(msId, sId, cId) {
-            var data = {
-                "mainSiteId": msId, "movedSiteId": sId, "clientId": cId
-            };
-            $.ajax({
-                type: 'POST',
-                url: "SetSiteForClientSiteIncluded",
-                data: data,
-                success: function (response) {
-                    if (response == "True") {
-                        alert('Site Updated.');
-                    } else {
-                        alert('Site could not be saved. Try again.');
-                    }
+    function GetSiteListForClient(cId) {
+       // debugger;
+        var options = $("#ClientSiteList");
+        options.empty();
+        $.ajax({
+            type: "GET",
+            url: "GetSiteListForClient",
+            data: { clientId: cId },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                //console.log(data);
+                var obj = JSON.parse(data.data);
+                options.append($("<option />").val('0').text('Please Select'));
+                $.each(obj, function (id, site) {
+                    options.append($("<option />").val(site.Id).text(site.Name));
+                });
+                //$('span.sitename').text(data.Name);
+                //$('span.contactname').text(data.ContactName);
+                //$('span.contactnumber').text(data.ContactNo);
+                //$('span.accountcode').text(data.AccountCode);
+                //$('span.sitedepot').text(data.Depot);
+                //$('span.sitexcoord').text(data.XCord);
+                //$('span.siteycoord').text(data.YCord);
+                //$('span.siteaddress').text(data.Address + '\n' + data.PostalCode);
+                //$('span.siteregion').text(data.RegionId);
+                //$('#selectedsite').val(data.Id);
+            },
+            error: function (response) {
+                alert('Error retrieving site details');
+            }
+        });
+    }
+
+    function GetSiteDetailsForMain(sId) {
+        $.ajax({
+            type: "GET",
+            url: "GetSiteDetailsForMain",
+            data: { siteId: sId },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                var obj = JSON.parse(data.data);
+                $('span.sitename').text(obj.Name);
+                $('span.contactname').text(obj.ContactName);
+                $('span.contactnumber').text(obj.ContactNo);
+                $('span.accountcode').text(obj.AccountCode);
+                $('span.sitedepot').text(obj.Depot);
+                $('span.sitexcoord').text(obj.XCord);
+                $('span.siteycoord').text(obj.YCord);
+                $('span.siteaddress').text(obj.Address + '\n' + obj.PostalCode);
+                $('span.siteregion').text(obj.RegionId);
+                $('#selectedsite').val(obj.Id);
+            },
+            error: function (response) {
+                alert('Error retrieving site details');
+            }
+        });
+    }
+
+    function GetIncludedSites(cId, sId) {
+        //debugger;
+        var rowDiv = $("#included-table tbody");
+        $.ajax({
+            type: "GET",
+            url: "GetSitesForClientSiteIncluded",
+            data: { clientId: cId, siteId: sId },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                // debugger;
+                var obj = JSON.parse(data.data);
+                rowDiv.html('');
+                var result = "";
+                $.each(obj, function (id, site) {
+
+
+                    result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
+                        '<td style = "width: 15%;">' +
+                        site.Name +
+                        '</td><td>' +
+                        site.XCord +
+                        '</td><td> ' +
+                        site.YCord +
+                        '</td><td> ' +
+                        site.Address +
+                        '</td><td> ' +
+                        site.PostalCode +
+                        '</td><td> ' +
+                        site.ContactNo +
+                        ' </td><td> ' +
+                        site.ContactName +
+                        '</td><td> ' +
+                        site.RegionId +
+                        '</td><td><input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" value="' + site.Id + '" /></td></tr>';
+                });
+                rowDiv.html(result);
+
+            },
+            error: function (response) {
+
+                alert('Error retrieving sites');
+            }
+        });
+
+    }
+
+    function GetExcludedSites(cId, sId) {
+        // debugger;
+        var rowDiv = $("#excluded-table tbody");
+        $.ajax({
+            type: "GET",
+            url: "GetSitesForClientSiteExcluded",
+            data: { clientId: cId, siteId: sId },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                var obj = JSON.parse(data.data);
+                rowDiv.html('');
+                var result = "";
+                $.each(obj, function (id, site) {
+
+
+                    result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
+                        '<td style = "width: 15%;">' +
+                        site.Name +
+                        '</td><td>' +
+                        site.XCord +
+                        '</td><td> ' +
+                        site.YCord +
+                        '</td><td> ' +
+                        site.Address +
+                        '</td><td> ' +
+                        site.PostalCode +
+                        '</td><td> ' +
+                        site.ContactNo +
+                        ' </td><td> ' +
+                        site.ContactName +
+                        '</td><td> ' +
+                        site.RegionId +
+                        '</td><td><input type="radio" id="excl_item_id' + site.Id + '" name="excl_item" value="' + site.Id + '" /></td></tr>';
+                });
+                rowDiv.html(result);
+
+            },
+            error: function (response) {
+                alert('Error retrieving sites');
+            }
+        });
+
+    }
+
+    function SetIncludedSite(msId, sId, cId) {
+        var data = {
+            "mainSiteId": msId, "movedSiteId": sId, "clientId": cId
+        };
+        $.ajax({
+            type: 'POST',
+            url: "SetSiteForClientSiteIncluded",
+            data: data,
+            success: function (response) {
+                if (response == "True") {
+                    alert('Site Updated.');
+                } else {
+                    alert('Site could not be saved. Try again.');
                 }
-            });
-        }
+            }
+        });
+    }
 
-        function SetExcludedSite(msId, sId, cId) {
-            var data = {
-                "mainSiteId": msId, "movedSiteId": sId, "clientId": cId
-            };
-            $.ajax({
-                type: 'POST',
-                url: "SetSiteForClientSiteExcluded",
-                data: data,
-                success: function (response) {
-                    if (response == "True") {
-                        alert('Site Updated.');
-                    } else {
-                        alert('Site could not be saved. Try again.');
-                    }
+    function SetExcludedSite(msId, sId, cId) {
+        var data = {
+            "mainSiteId": msId, "movedSiteId": sId, "clientId": cId
+        };
+        $.ajax({
+            type: 'POST',
+            url: "SetSiteForClientSiteExcluded",
+            data: data,
+            success: function (response) {
+                if (response == "True") {
+                    alert('Site Updated.');
+                } else {
+                    alert('Site could not be saved. Try again.');
                 }
-            });
-        }
-    </script>
-    @*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
+            }
+        });
+    }
 
-    @*@Html.Partial("_Paging")*@
+    function SetSite(sId) {
+        $.ajax({
+            type: 'POST',
+            url: "SetSite",
+            data: { "SiteId": sId },
+            success: function (response) {
+                //window.location.href = 'Index#managesites';
+                //location.reload();
+                //GetIncludedSites(cId);
+            }
+        });
+    }
+</script>
+@*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
+
+@*@Html.Partial("_Paging")*@

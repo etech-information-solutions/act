@@ -17,70 +17,76 @@
 @Html.Partial("_Notification")
 
 @using (Html.BeginForm("AddKPI", "Client", FormMethod.Post, new { @data_ajax_form = "1", @data_target = "#clientkpis", @class = "custom-validate", @style = "width: auto;" }))
-{    
+{
     <div id="edit-item">
 
         <h2 class="uppercase" style="width: auto;">
-            <img alt="" src="@Url.Content(" ~/images/add.png")" />
+            <img alt="" src="@Url.Content("~/images/edit.png")" />
             <span>Add KPI</span>
         </h2>
 
         @Html.ValidationSummary(true)
 
-        <div id="item-details" class="item-details" style="width: auto;">            
+        <div id="item-details" class="item-details" style="width: auto;">
             <p>
                 <strong class="uppercase">KPI</strong>
             </p>
             <div class="left" style="width: 40%; margin-right: 4%;">
-                <div class="display-label">
+                <div class="editor-label">
                     Client Name
                 </div>
-                <div class="display-field">
-                    @Html.DropDownList("ClientList", "Please Select")
+                <div class="editor-field">
+                    @Html.DropDownListFor(model => model.ClientId,
+                                  new SelectList(ViewBag.ClientList, "Value", "Text"),
+                                  "Please Select",
+                                  new { @class = "form-control", @onchange= "ClientListChanged()" })
+                    @*@Html.DropDownList("ClientList", "Please Select", new { @onchange = "ClientListChanged(this.value)" })*@
                 </div>
             </div>
 
             <div class="left" style="width: 40%; margin-right: 4%;">
-                <div class="display-label">
+                <div class="editor-label">
                     Trading As
                 </div>
-                <div class="display-field">
-                    @Html.DisplayFor(model => model.TradingAs, new { @class = "input", @placeholder = "Trading As", disabled="disabled" })
+                <div class="editor-field">
+                    <input type="text" id="TradingAs" name="TradingAs" value="Client Trading As" readonly="readonly" />
+                    @*@Html.DisplayFor(model => model.TradingAs, new { @class = "input", @placeholder = "Trading As", disabled = "disabled" })*@
                 </div>
             </div>
 
             <div class="clear" style="height: 10px;">&nbsp;</div>
             <div class="left" style="width: 90%; margin-right: 4%;">
-                <div class="display-label">
+                <div class="editor-label">
                     KPI Description
                 </div>
-                <div class="display-field">
-                    @Html.TextBoxFor(model => model.Description, new { @class = "input", @placeholder = "Enter KPI Description" })
-                    @Html.ValidationMessageFor(model => model.Description)
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.KPIDescription, new { @class = "input", @placeholder = "Enter KPI Description" })
+                    @Html.ValidationMessageFor(model => model.KPIDescription)
                 </div>
             </div>
             <div class="clear" style="height: 10px;">&nbsp;</div>
             <div class="left" style="width: 40%; margin-right: 4%;">
-                <div class="display-label">
-                    Weighted Percentage
+                <div class="editor-label">
+                    Weighted Percentage(%)
                 </div>
-                <div class="display-field">
-                    @Html.TextBoxFor(model => model.Weight, new { @class = "input", @placeholder = "Enter Weighted Percentage", type = "number", min = "0", step = "0.01", max="100" })
-                    @Html.ValidationMessageFor(model => model.Weight) %
+                <div class="editor-field">
+                    <input type="number" id="Weight" name="Weight" class="input" maxlength="3" min="0" max="100" step="1" value="0" placeholder="Enter Weighted Percentage no more than 100%" />
+                    @*@Html.TextBoxFor(model => model.Weight, new { @class = "input", @placeholder = "Enter Weighted Percentage", @maxlength = "3", type = "number", min = 0, step = 1, max = 100 })*@
+                    @Html.ValidationMessageFor(model => model.Weight)
                 </div>
-                <div class="display-label">
+                <div class="editor-label">
                     Target Value
                 </div>
-                <div class="display-field">
+                <div class="editor-field">
                     @Html.TextBoxFor(model => model.TargetAmount, new { @class = "input", @placeholder = "Enter Target Amount", type = "number", min = "0", step = "1" })
                     @Html.ValidationMessageFor(model => model.TargetAmount)
                 </div>
 
-                <div class="display-label">
+                <div class="editor-label">
                     Target Period
                 </div>
-                <div class="display-field">
-                    <select id="SiteType" name="SiteType" class="chzn" required="required" style="width: 100%;">
+                <div class="editor-field">
+                    <select id="TargetPeriod" name="TargetPeriod" class="chzn" required="required" style="width: 100%;">
                         <option value="">-- select</option>
                         @foreach (int p in Enum.GetValues(typeof(TargetPeriod)))
                         {
@@ -105,30 +111,39 @@
             <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
         </div>
     </div>
-}
     <script>
- $(document).ready(function () {
-     $("#ClientList").change(function () {
-         var client = $('option:selected', this).val();
-         GetClientDetail(client);
-     });
+        $(document).ready(function () {
+            //$("#ClientList").change(function () {
+            //    alert('h1');
+            //    var client = $('option:selected', this).val();
+            //    GetClientDetail(client);
+            //});
+        });
 
-     function GetClientDetail(cId) {
-         var TradingAs = document.getElementById("TradingAs");
-         $.ajax({
-             type: "GET",
-             url: "GetClientDetail",
-             data: { clientId: cId },
-             contentType: "application/json;charset=utf-8",
-             dataType: "json",
-             success: function (data) {
-                 TradingAs.val(data.TradingAs);
-             },
-             error: function (response) {
-                 alert('Error Retrieving Client Detail');
-             }
-         });
+        function ClientListChanged() {
+            //debugger;
+            var client = $('#ClientId').val();            
+            GetClientDetail(client);
 
-     }
-});
+        }
+
+        function GetClientDetail(cId) {
+            
+            var TradingAs = document.getElementById("TradingAs");
+            $.ajax({
+                type: "GET",
+                url: "GetClientDetail",
+                data: { clientId: cId },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {                    
+                    $('#TradingAs').val(data.TradingAs);                    
+                },
+                error: function (response) {
+                    alert('Error Retrieving Client Detail');
+                }
+            });
+
+        }
     </script>
+}

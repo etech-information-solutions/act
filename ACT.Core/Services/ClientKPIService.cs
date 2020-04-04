@@ -62,7 +62,7 @@ namespace ACT.Core.Services
                 if (!CurrentUser.IsAdmin)
                 {
                     //add to mke sure only correct sites are seen            
-                    query = $"{query} AND EXISTS(SELECT 1 FROM[dbo].[PSPUser] pu LEFT JOIN[dbo].[PSPClient] pc ON pc.PSPId = pu.PSPId LEFT JOIN [dbo].[ClientKPI] cs ON cs.ClientId=pc.ClientId WHERE pc.ClientId = p.Id AND pu.UserId = @userid) ";
+                    query = $"{query} AND EXISTS(SELECT 1 FROM[dbo].[PSPUser] pu LEFT JOIN[dbo].[PSPClient] pc ON pc.PSPId = pu.PSPId LEFT JOIN [dbo].[ClientKPI] cs ON cs.ClientId=pc.ClientId WHERE pc.ClientId = p.ClientId AND pu.UserId = @userid) ";
                     //query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu WHERE p.Id=pu.PSPId AND pu.UserId=@userid) ";
                 }
 
@@ -75,7 +75,7 @@ namespace ACT.Core.Services
                 if (csm.ClientId != 0)
                 {
                     //query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE p.Id=pc.PSPId AND pc.ClientId=@csmClientId) ";
-                    query = $"{query} AND p.ClientId=@csmClientId) ";
+                    query = $"{query} AND p.ClientId=@csmClientId ";
                 }
                 //if (csm.ProductId != 0)
                 //{

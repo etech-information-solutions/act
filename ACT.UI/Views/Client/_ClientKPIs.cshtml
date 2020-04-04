@@ -11,7 +11,7 @@
     ViewBag.ShowExport = true;
     ViewBag.ShowCustom = true;
 
-    ViewBag.ViewName = "_ClientKPIs";
+    ViewBag.ViewName = "_ClientKPIS";
 }
 
 
@@ -76,12 +76,14 @@
                     String active = status.Equals(Status.Active) ? "active" : "inactive";
                     String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
 
+                    String targetPeriod = (item.TargetPeriod!=null ? (((TargetPeriod)item.TargetPeriod).GetDisplayText()) : "");
+
             <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
                 <td style="width: 15%;">
                     @item.ClientName
                 </td>
                 <td>
-                    @item.Description
+                    @item.KPIDescription
                 </td>
                 <td>
                     @item.Weight
@@ -90,13 +92,13 @@
                     @item.TargetAmount
                 </td>
                 <td style="width: 15%;">
-                    @(((TargetPeriod)item.TargetPeriod).GetDisplayText())
+                    @targetPeriod
                 </td>
 
                 <td width="15%">
                     @Html.ActionLink("Details", "KPIDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                    @Html.ActionLink("Edit", "EditKPI", new { id = item.Id, returnView = "ClientKPIs" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                    @Html.ActionLink("Edit", "EditKPI", new { id = item.Id, returnView = "ClientKPIS" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
                     @Html.ActionLink(enable, "DeleteKPI", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientkpis", @rel = "tipsyE", @title = enable + " this item?" })
                 </td>

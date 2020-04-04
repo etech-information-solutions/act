@@ -192,18 +192,18 @@
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="BudgetYear" Type="int" />
-          <Property Name="January" Type="int" />
-          <Property Name="February" Type="int" />
-          <Property Name="March" Type="int" />
-          <Property Name="April" Type="int" />
-          <Property Name="May" Type="int" />
-          <Property Name="June" Type="int" />
-          <Property Name="July" Type="int" />
-          <Property Name="August" Type="int" />
-          <Property Name="September" Type="int" />
-          <Property Name="October" Type="int" />
-          <Property Name="November" Type="int" />
-          <Property Name="December" Type="int" />
+          <Property Name="January"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="February"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="March"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="April"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="May"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="June"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="July"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="August"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="September"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="October"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="November"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="December"  Type="numeric" Precision="18" Scale="0" />
           <Property Name="Status" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="ClientGroup">
@@ -245,7 +245,11 @@
           <Property Name="MonthlyCost" Type="money" />
           <Property Name="Status" Type="int" Nullable="false" />
           <Property Name="OutstandingDays" Type="int" />
-          <Property Name="ResolveDays" Type="int" />          
+          <Property Name="ResolveDays" Type="int" />
+          <Property Name="Weight" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="TargetAmount" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="TargetPeriod" Type="int" />
+          <Property Name="KPIDescription" Type="varchar" MaxLength="250" />
         </EntityType>
         <EntityType Name="ClientLoad">
           <Key>
@@ -483,18 +487,18 @@
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="ObjectId" Type="int" />
           <Property Name="ObjectType" Type="varchar" MaxLength="50" />
-          <Property Name="January" Type="int" />
-          <Property Name="February" Type="int" />
-          <Property Name="March" Type="int" />
-          <Property Name="April" Type="int" />
-          <Property Name="May" Type="int" />
-          <Property Name="June" Type="int" />
-          <Property Name="July" Type="int" />
-          <Property Name="August" Type="int" />
-          <Property Name="September" Type="int" />
-          <Property Name="October" Type="int" />
-          <Property Name="November" Type="int" />
-          <Property Name="December" Type="int" />
+          <Property Name="January"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="February"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="March"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="April"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="May"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="June"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="July"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="August"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="September"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="October"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="November"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="December"  Type="numeric" Precision="18" Scale="0" />
         </EntityType>
         <EntityType Name="Group">
           <Key>
@@ -652,18 +656,18 @@
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="BudgetYear" Type="int" Nullable="false" />
-          <Property Name="January" Type="int" />
-          <Property Name="February" Type="int" />
-          <Property Name="March" Type="int" />
-          <Property Name="April" Type="int" />
-          <Property Name="May" Type="int" />
-          <Property Name="June" Type="int" />
-          <Property Name="July" Type="int" />
-          <Property Name="August" Type="int" />
-          <Property Name="September" Type="int" />
-          <Property Name="October" Type="int" />
-          <Property Name="November" Type="int" />
-          <Property Name="December" Type="int" />
+          <Property Name="January"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="February"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="March"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="April"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="May"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="June"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="July"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="August"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="September"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="October"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="November"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="December"  Type="numeric" Precision="18" Scale="0" />
           <Property Name="Status" Type="int" />
         </EntityType>
         <EntityType Name="PSPClient">
@@ -782,6 +786,10 @@
           <Property Name="PostalCode" Type="char" MaxLength="10" />
           <Property Name="ContactNo" Type="varchar" MaxLength="50" />
           <Property Name="ContactName" Type="varchar" MaxLength="50" />
+          <Property Name="FinanceContactNo" Type="varchar" MaxLength="50" />
+          <Property Name="FinanceContact" Type="varchar" MaxLength="50" />
+          <Property Name="ReceivingContactNo" Type="varchar" MaxLength="50" />
+          <Property Name="ReceivingContact" Type="varchar" MaxLength="50" />          
           <Property Name="PlanningPoint" Type="varchar" MaxLength="50" />
           <Property Name="SiteType" Type="int" />
           <Property Name="AccountCode" Type="varchar" MaxLength="50" />
@@ -839,18 +847,18 @@
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="BudgetYear" Type="int" Nullable="false" />
-          <Property Name="January" Type="int" />
-          <Property Name="February" Type="int" />
-          <Property Name="March" Type="int" />
-          <Property Name="April" Type="int" />
-          <Property Name="May" Type="int" />
-          <Property Name="June" Type="int" />
-          <Property Name="July" Type="int" />
-          <Property Name="August" Type="int" />
-          <Property Name="September" Type="int" />
-          <Property Name="October" Type="int" />
-          <Property Name="November" Type="int" />
-          <Property Name="December" Type="int" />
+          <Property Name="January"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="February"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="March"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="April"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="May"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="June"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="July"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="August"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="September"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="October"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="November"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="December"  Type="numeric" Precision="18" Scale="0" />
           <Property Name="Status" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="SystemConfig">
@@ -2545,18 +2553,18 @@
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="BudgetYear" Type="Int32" />
-          <Property Name="January" Type="Int32" />
-          <Property Name="February" Type="Int32" />
-          <Property Name="March" Type="Int32" />
-          <Property Name="April" Type="Int32" />
-          <Property Name="May" Type="Int32" />
-          <Property Name="June" Type="Int32" />
-          <Property Name="July" Type="Int32" />
-          <Property Name="August" Type="Int32" />
-          <Property Name="September" Type="Int32" />
-          <Property Name="October" Type="Int32" />
-          <Property Name="November" Type="Int32" />
-          <Property Name="December" Type="Int32" />
+          <Property Name="January"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="February" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="March"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="April"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="May"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="June"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="July"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="August"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="September"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="October"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="November"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="December"  Type="Decimal" Precision="18" Scale="0" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientBudget_Clients" FromRole="ClientBudget" ToRole="Client" />
         </EntityType>
@@ -2604,6 +2612,10 @@
           <Property Name="Status" Type="Int32" Nullable="false" />
           <Property Name="OutstandingDays" Type="Int32" />
           <Property Name="ResolveDays" Type="Int32" />
+          <Property Name="Weight" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="TargetAmount" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="TargetPeriod" Type="Int32" />     
+          <Property Name="KPIDescription" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientKPIs_Clients" FromRole="ClientKPI" ToRole="Client" />
         </EntityType>
         <EntityType Name="ClientLoad">
@@ -2864,18 +2876,18 @@
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="ObjectId" Type="Int32" />
           <Property Name="ObjectType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="January" Type="Int32" />
-          <Property Name="February" Type="Int32" />
-          <Property Name="March" Type="Int32" />
-          <Property Name="April" Type="Int32" />
-          <Property Name="May" Type="Int32" />
-          <Property Name="June" Type="Int32" />
-          <Property Name="July" Type="Int32" />
-          <Property Name="August" Type="Int32" />
-          <Property Name="September" Type="Int32" />
-          <Property Name="October" Type="Int32" />
-          <Property Name="November" Type="Int32" />
-          <Property Name="December" Type="Int32" />
+          <Property Name="January"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="February" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="March"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="April"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="May"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="June"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="July"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="August"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="September"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="October"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="November"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="December"  Type="Decimal" Precision="18" Scale="0" />
         </EntityType>
         <EntityType Name="Group">
           <Key>
@@ -3030,18 +3042,18 @@
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="BudgetYear" Type="Int32" Nullable="false" />
-          <Property Name="January" Type="Int32" />
-          <Property Name="February" Type="Int32" />
-          <Property Name="March" Type="Int32" />
-          <Property Name="April" Type="Int32" />
-          <Property Name="May" Type="Int32" />
-          <Property Name="June" Type="Int32" />
-          <Property Name="July" Type="Int32" />
-          <Property Name="August" Type="Int32" />
-          <Property Name="September" Type="Int32" />
-          <Property Name="October" Type="Int32" />
-          <Property Name="November" Type="Int32" />
-          <Property Name="December" Type="Int32" />
+          <Property Name="January"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="February" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="March"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="April"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="May"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="June"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="July"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="August"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="September"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="October"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="November"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="December"  Type="Decimal" Precision="18" Scale="0" />
           <Property Name="Status" Type="Int32" />
           <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPBudget_PSP" FromRole="PSPBudget" ToRole="PSP" />
         </EntityType>
@@ -3174,6 +3186,10 @@
           <Property Name="PostalCode" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="ContactNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="ContactName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FinanceContactNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FinanceContact" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ReceivingContactNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ReceivingContact" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="PlanningPoint" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="SiteType" Type="Int32" />
           <Property Name="AccountCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
@@ -3243,18 +3259,18 @@
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="BudgetYear" Type="Int32" Nullable="false" />
-          <Property Name="January" Type="Int32" />
-          <Property Name="February" Type="Int32" />
-          <Property Name="March" Type="Int32" />
-          <Property Name="April" Type="Int32" />
-          <Property Name="May" Type="Int32" />
-          <Property Name="June" Type="Int32" />
-          <Property Name="July" Type="Int32" />
-          <Property Name="August" Type="Int32" />
-          <Property Name="September" Type="Int32" />
-          <Property Name="October" Type="Int32" />
-          <Property Name="November" Type="Int32" />
-          <Property Name="December" Type="Int32" />
+          <Property Name="January"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="February" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="March"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="April"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="May"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="June"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="July"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="August"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="September"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="October"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="November"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="December"  Type="Decimal" Precision="18" Scale="0" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Site" Relationship="ACTModel.FK_SiteBudgets_Sites" FromRole="SiteBudget" ToRole="Site" />
         </EntityType>
@@ -4434,6 +4450,10 @@
           <EntitySetMapping Name="ClientKPIs">
             <EntityTypeMapping TypeName="ACTModel.ClientKPI">
               <MappingFragment StoreEntitySet="ClientKPI">
+                <ScalarProperty Name="KPIDescription" ColumnName="KPIDescription" />
+                <ScalarProperty Name="TargetPeriod" ColumnName="TargetPeriod" />
+                <ScalarProperty Name="TargetAmount" ColumnName="TargetAmount" />
+                <ScalarProperty Name="Weight" ColumnName="Weight" />
                 <ScalarProperty Name="ResolveDays" ColumnName="ResolveDays" />
                 <ScalarProperty Name="OutstandingDays" ColumnName="OutstandingDays" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
@@ -4976,6 +4996,10 @@
           <EntitySetMapping Name="Sites">
             <EntityTypeMapping TypeName="ACTModel.Site">
               <MappingFragment StoreEntitySet="Site">
+                <ScalarProperty Name="ReceivingContact" ColumnName="ReceivingContact" />
+                <ScalarProperty Name="ReceivingContactNo" ColumnName="ReceivingContactNo" />
+                <ScalarProperty Name="FinanceContact" ColumnName="FinanceContact" />
+                <ScalarProperty Name="FinanceContactNo" ColumnName="FinanceContactNo" />                
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="SiteCodeChep" ColumnName="SiteCodeChep" />
                 <ScalarProperty Name="Depot" ColumnName="Depot" />

@@ -33,7 +33,7 @@ namespace ACT.UI.Models
         public Status Status { get; set; }
 
         public bool EditMode { get; set; }
-
+        public bool ContextualMode { get; set; }
         #endregion
 
 

@@ -40,30 +40,30 @@
 
     @Html.HiddenFor(model => model.Id)
     @Html.HiddenFor(model => model.SourceView)
+    @Html.HiddenFor(model => model.Status)
 
     <div class="left" style="width: 45%; margin-right: 1%;">
-
-        <div class="display-label">
+        <h3>Site Details</h3>
+        <div class="editor-label">
             Name
         </div>
-        <div class="display-field">
+        <div class="editor-field">
             @Html.TextBoxFor(model => model.Name, new { @class = "input", @placeholder = "Enter Site Name" })
             @Html.ValidationMessageFor(model => model.Name)
         </div>
 
-        <div class="display-label">
+        <div class="editor-label">
             Description
         </div>
-        <div class="display-field">
+        <div class="editor-field">
             @Html.TextBoxFor(model => model.Description, new { @class = "input", @placeholder = "Enter Site Description" })
             @Html.ValidationMessageFor(model => model.Description)
         </div>
-        <div class="display-label">
+        <div class="editor-label">
             Region
         </div>
-        <div class="display-field">
+        <div class="editor-field">
             <select id="RegionId" name="RegionId" class="chzn" required="required" style="width: 87%;">
-                <option value="">-- select</option>
                 @*@string prov = (model => model.Address.Province);*@
                 @foreach (var p in ViewBag.RegionOptions)
                 {
@@ -78,19 +78,19 @@
 
                     @*string sel = (province == @prov) ? "selected=selected" : string.Empty;
 
-                        <option value="@p" @sel>@text</option>*@
+                    <option value="@p" @sel>@text</option>*@
                 }
             </select>
             @*@Html.DropDownListFor(model => model.RegionId, model => model.RegionOptions, region => region.Id, region => region.Name, true, new { @class = "chzn", @style = "width: 98%;" })*@
             @*@Html.DropDownList("RegionOptions", "Please Select")*@
             @*@Html.ValidationMessageFor(model => model.RegionId)*@
         </div>
-        <div class="display-label">
+        <br />
+        <div class="editor-label">
             Site Type
         </div>
-        <div class="display-field">
+        <div class="editor-field">
             <select id="SiteType" name="SiteType" class="chzn" required="required" style="width: 87%;">
-                <option value="">-- select</option>
                 @foreach (int p in Enum.GetValues(typeof(SiteType)))
                 {
                     string text = ((SiteType)p).GetDisplayText();
@@ -110,41 +110,40 @@
                 }
             </select>
         </div>
-        <div class="display-label">
+        <br />
+        <div class="editor-label">
             Account Code
         </div>
-        <div class="display-field">
+        <div class="editor-field">
             @Html.TextBoxFor(model => model.AccountCode, new { @class = "input", @placeholder = "Enter Account Code" })
             @Html.ValidationMessageFor(model => model.AccountCode)
             @*@Html.DisplayFor( model => model.UserRoles.FirstOrDefault().Role.Name )*@
         </div>
 
-        <div class="display-label">
-            Planning Point
+        <div class="editor-label">
+            Planning Point/Code
         </div>
-        <div class="display-field">
+        <div class="editor-field">
             @Html.TextBoxFor(model => model.PlanningPoint, new { @class = "input", @placeholder = "Enter Planning Point" })
             @Html.ValidationMessageFor(model => model.PlanningPoint)
         </div>
-        <div class="display-label">
-            Depot
+        <div class="editor-label">
+            Depot Code
         </div>
-        <div class="editor-field">
+        @*<div class="editor-field">
             @Html.DropDownListFor(model => model.Depot, (new[] { new SelectListItem { Text = "No", Value = "No" }, new SelectListItem { Text = "Yes", Value = "Yes" } }), new { @class = "chzn", @style = "width: 98%;" })
             @Html.ValidationMessageFor(model => model.Depot)
-        </div>
-        @*<div class="display-label">
-                    Depot
-                </div>
-                <div class="display-field">
-                    @Html.TextBoxFor(model => model.Depot, new { @class = "input", @placeholder = "Enter Depot" })
-                    @Html.ValidationMessageFor(model => model.Depot)
-            </div>*@
+        </div>*@
 
-        <div class="display-label">
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.Depot, new { @class = "input", @placeholder = "Enter Depot Code" })
+            @Html.ValidationMessageFor(model => model.Depot)
+        </div>
+
+        <div class="editor-label">
             Chep SiteCode
         </div>
-        <div class="display-field">
+        <div class="editor-field">
             @Html.TextBoxFor(model => model.SiteCodeChep, new { @class = "input", @placeholder = "EnterChep Site Code" })
             @Html.ValidationMessageFor(model => model.SiteCodeChep)
         </div>
@@ -152,35 +151,83 @@
     </div>
 
     <div class="left" style="width: 45%;">
-        <div class="display-label">
-            Contact Number
+        <h3>Contact Details</h3>
+
+        <div class="editor-label">
+            Owner Contact Name
         </div>
-        <div class="display-field">
-            @Html.TextBoxFor(model => model.ContactNo, new { @class = "input", @placeholder = "Enter Contact Number" })
+
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.ContactName, new { @class = "input", @placeholder = "Enter Owner Contact Name" })
+            @Html.ValidationMessageFor(model => model.ContactName)
+        </div>
+
+        <div class="editor-label">
+            Owner Contact Number
+        </div>
+
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.ContactNo, new { @class = "input", @placeholder = "Enter Owner Contact Number" })
             @Html.ValidationMessageFor(model => model.ContactNo)
         </div>
 
 
-        <div class="display-label">
-            Contact Person
+
+        <div class="editor-label">
+            Finance Contact Name
         </div>
-        <div class="display-field">
-            @Html.TextBoxFor(model => model.ContactName, new { @class = "input", @placeholder = "Enter Contact Name" })
-            @Html.ValidationMessageFor(model => model.ContactName)
+
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.FinanceContact, new { @class = "input", @placeholder = "Enter Finance Contact Name" })
+            @Html.ValidationMessageFor(model => model.FinanceContact)
         </div>
-        <div class="display-label">
-            X Coordinates
+
+        <div class="editor-label">
+            Finance Contact Number
         </div>
-        <div class="display-field">
-            @Html.TextBoxFor(model => model.XCord, new { @readonly = "readonly",@class = "input", @placeholder = "Enter X Coordinates" })
+
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.FinanceContactNo, new { @class = "input", @placeholder = "Enter Finance Contact Number" })
+            @Html.ValidationMessageFor(model => model.FinanceContactNo)
+        </div>
+
+        <div class="editor-label">
+            Receiving Contact Name
+        </div>
+
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.ReceivingContact, new { @class = "input", @placeholder = "Enter Receiving Contact Name" })
+            @Html.ValidationMessageFor(model => model.ReceivingContact)
+        </div>
+
+        <div class="editor-label">
+            Receiving Contact Number
+        </div>
+
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.ReceivingContactNo, new { @class = "input", @placeholder = "Enter Receiving Contact Number" })
+            @Html.ValidationMessageFor(model => model.ReceivingContactNo)
+        </div>
+
+
+
+
+
+
+        <h3>Coordinates</h3>
+        <div class="editor-label">
+            X Coordinate
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.XCord, new { @readonly = "readonly", @class = "input", @placeholder = "Enter X Coordinates" })
             @Html.ValidationMessageFor(model => model.XCord)
         </div>
 
 
-        <div class="display-label">
-            Y Coordinates
+        <div class="editor-label">
+            Y Coordinate
         </div>
-        <div class="display-field">
+        <div class="editor-field">
             @Html.TextBoxFor(model => model.YCord, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Y Coordinates" })
             @Html.ValidationMessageFor(model => model.YCord)
         </div>
@@ -189,6 +236,7 @@
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
     <div class="left" style="width: 90%; margin-right: 4%;">
         <div id="locationField">
+            Type your address below:
             <input id="autocomplete"
                    placeholder="Enter your address"
                    onFocus="geolocate()"
@@ -206,7 +254,7 @@
             Street Address
         </div>
         <div class="editor-field">
-            @Html.TextBoxFor(model => model.FullAddress.AddressLine1, new { @readonly = "readonly",@class = "input", @placeholder = "Enter Site Address Line 1" })
+            @Html.TextBoxFor(model => model.FullAddress.AddressLine1, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Site Address Line 1" })
             @Html.ValidationMessageFor(model => model.FullAddress.AddressLine1)
         </div>
 
@@ -242,33 +290,65 @@
             Province
         </div>
         <div class="editor-field">
+            <select id="FullAddress.Province" name="FullAddress.Province" required="required" style="width: 87%;">
+                <!--class="chzn"-->
+                <option value="">-- select</option>
+                @if (Model.FullAddress != null)
+                {
+                    foreach (int p in Enum.GetValues(typeof(Province)))
+                    {
+                        string provinceText = Model.FullAddress.Province.ToString().ToLower().Replace(" ", "");
+                        string text = ((Province)p).GetDisplayText();
+                        string ltext = text.ToLower().Replace(" ", "");
+                        ltext = ltext.Replace("-", "");
+                        Province province = (Province)p;
+                        //string prov = "";
+                        //if (text.ToLower() == "all")
+                        //{
+                        //    continue;
+                        //}
+                        //else
+                        if (ltext == provinceText)
+                        {
+                            <option value="@p" selected="selected">@text</option>
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (int p in Enum.GetValues(typeof(Province)))
+                    {
+                        string text = ((Province)p).GetDisplayText();
+                        <option value="@p">@text</option>
+                    }
+                }
+                </select>
 
             @*<select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
-                <option value="">-- select</option>
-                @foreach (int p in Enum.GetValues(typeof(Province)))
-                {
-                    Province province = (Province)p;
-
-                    string text = province.GetDisplayText();
-
-                    if (text.ToLower() == "all")
+                    <option value="">-- select</option>
+                    @foreach (int p in Enum.GetValues(typeof(Province)))
                     {
-                        continue;
+                        Province province = (Province)p;
+
+                        string text = province.GetDisplayText();
+
+                        if (text.ToLower() == "all")
+                        {
+                            continue;
+                        }
+
+                        string sel = (province == Model.FullAddress.Province) ? "selected=selected" : string.Empty;
+
+                        <option value="@p" @sel>@text</option>
                     }
+                </select>*@
 
-                    string sel = (province == Model.FullAddress.Province) ? "selected=selected" : string.Empty;
-
-                    <option value="@p" @sel>@text</option>
-                }
-            </select>*@
-
-            @Html.TextBoxFor(model => model.FullAddress.Province, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Province" })
-            @Html.ValidationMessageFor(model => model.FullAddress.Province)
+            @*@Html.TextBoxFor(model => model.FullAddress.Province, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Province" })*@
+            @*@Html.ValidationMessageFor(model => model.FullAddress.Province)*@
         </div>
 
     </div>
-
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
     <div class="budgets">
 
         <p>
@@ -280,8 +360,6 @@
         </div>
 
         <div class="editor-field">
-
-
             <table id="siteBudget-table" class="da-table" style="border-bottom: 0;">
 
                 <thead>
@@ -303,23 +381,28 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-
                 <tbody></tbody>
-
             </table>
-            @*<a id="savebudget" onclick="SaveBudget()" name="savebudget"><i class="fa fa-save"></i>Save Budget</a>*@
         </div>
+        <br />
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
     </div>
 
-</div>
-
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
-
     <p>
-        <a id="viewbudget" href="#" onclick="ViewBudget();"><i class="fa fa-plus"></i> View Budget</a>
+
         <input id="save-btn" type="submit" value="Update" />
         <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
     </p>
+    @if (ViewBag.IncludeLayout == null)
+    {
+    <p>
+        <a id="viewbudget" href="#" onclick="ViewBudget();"><i class="fa fa-plus"></i> View Budget</a>
+        <a href="#" onclick="LinkToSubSites('@Model.Id')"><i class="fa fa-link"></i>Subsites</a>
+    </p>
+    }
+</div>
+
+
 
     <script>
         $(document).ready(function () {
@@ -358,22 +441,22 @@
             var rowDiv = $("#siteBudget-table tbody");
             //var fieldcopy = '<input class="input" id="SiteBudget_0-[FIELDNAME]-" style="padding: 0 5px; width: 87%;" type="number" value="0">';
             var fieldvalue = "0";
-            var savecopy = '<a id="savebudget" onclick="SaveBudget(' + fieldvalue + ')" name="savebudget"><i class="fa fa-save"></i></a>';
+            var savecopy = '<a id="savebudget" onclick="SaveBudget(' + fieldvalue + ')" name="savebudget"><i class="fa fa-save"></i></a>';            
             var tabledata = '<tr id="budg-0-row" name="budg-0-row">';//<form id="budg-0-frm" name="budg-0-frm">
             tabledata += '<td><input class="input" id="SiteBudget_0_BudgetYear" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td><input class="input" id="SiteBudget_0_Total" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td><input class="input" id="SiteBudget_0_January" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td><input class="input" id="SiteBudget_0_February" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td><input class="input" id="SiteBudget_0_March" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td><input class="input" id="SiteBudget_0_April" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td><input class="input" id="SiteBudget_0_May" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td><input class="input" id="SiteBudget_0_June" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td><input class="input" id="SiteBudget_0_July" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td><input class="input" id="SiteBudget_0_August" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td><input class="input" id="SiteBudget_0_September" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td><input class="input" id="SiteBudget_0_October" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td><input class="input" id="SiteBudget_0_November" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td><input class="input" id="SiteBudget_0_December" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_BudgetTotal" onchange="updateBudgets(0, \'BudgetTotal\',' + fieldvalue + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_January" onchange="updateBudgets(0, \'January\',' + fieldvalue + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_February" onchange="updateBudgets(0, \'February\',' + fieldvalue + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_March" onchange="updateBudgets(0, \'March\',' + fieldvalue + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_April" onchange="updateBudgets(0, \'April\',' + fieldvalue + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_May" onchange="updateBudgets(0, \'May\',' + fieldvalue + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_June" onchange="updateBudgets(0, \'June\',' + fieldvalue + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_July" onchange="updateBudgets(0, \'July\',' + fieldvalue + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_August" onchange="updateBudgets(0, \'August\',' + fieldvalue + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_September" onchange="updateBudgets(0, \'September\',' + fieldvalue + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_October" onchange="updateBudgets(0, \'October\',' + fieldvalue + ')" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_November" onchange="updateBudgets(0, \'November\',' + fieldvalue + ')" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
+            tabledata += '<td><input class="input" id="SiteBudget_0_December" onchange="updateBudgets(0, \'December\',' + fieldvalue + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
             tabledata += '<td>' + savecopy.replace("[BUDGETID]", "0") + '</td>';
             tabledata += '</tr>';
 
@@ -400,25 +483,23 @@
                     var count = Object.keys(data).length;
                     var result = "";
                     if (count > 0) {
-                        //var fieldcopy = '<input class="input" id="SiteBudget_[FIELDNAME]-[FIELDVALUE]" style="padding: 0 5px; width: 87%;" type="number" value="[FIELDVALUE]">';
                         $.each(data, function (id, budget) {
                             var total = (budget.January + budget.February + budget.March + budget.April + budget.May + budget.June + budget.July + budget.August + budget.September + budget.October + budget.November + budget.December);
-                            var tabledata = '<tr id="budg-' + budget.Id + '-row" name="budg-' + budget.Id + '">';//<form id="budg-' + budget.Id + '-frm" name="budg-' + budget.Id + '-frm" >
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_BudgetYear" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.BudgetYear + '"></td>';
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_Total" style="padding: 0 5px; width: 87%;" type="number" value="' + total + '"></td>';
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_January" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.January + '"></td>';
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_February" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.February + '"></td>';
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_March" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.March + '"></td>';
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_April" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.April + '"></td>';
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_May" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.May + '"></td>';
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_June" style="padding: 0 5px; width:87%;" type="number" value="' + budget.June + '"></td>';
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_July" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.July + '"></td>';
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_August" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.August + '"></td>';
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_September" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.September + '"></td>';
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_October" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.October + '"></td>';
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_November" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.November + '"></td>';
-                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_December" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.December + '"></td>';
-                            //tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "December").replace("[FIELDVALUE]", //budget.December) + '</td>';
+                            var tabledata = '<tr id="budg-' + budget.Id + '-row" name="budg-' + budget.Id + '">';
+                            tabledata += '<td><input class="input" disabled="disabled"  id="SiteBudget_' + budget.Id + '_BudgetYear" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.BudgetYear + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_BudgetTotal" onchange="updateBudgets(' + budget.Id + ', \'BudgetTotal\',' + Math.ceil(total) + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + total + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_January" onchange="updateBudgets(' + budget.Id + ', \'January\',' + budget.January + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.January + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_February" onchange="updateBudgets(' + budget.Id + ', \'February\',' + budget.February + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.February + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_March" onchange="updateBudgets(' + budget.Id + ', \'March\',' + budget.March + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.March + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_April" onchange="updateBudgets(' + budget.Id + ', \'April\',' + budget.April + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.April + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_May" onchange="updateBudgets(' + budget.Id + ', \'May\',' + budget.May + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.May + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_June" onchange="updateBudgets(' + budget.Id + ', \'June\',' + budget.June + ')" style="padding: 0 5px; width:87%;" type="number" value="' + budget.June + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_July" onchange="updateBudgets(' + budget.Id + ', \'July\',' + budget.July + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.July + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_August" onchange="updateBudgets(' + budget.Id + ', \'August\',' + budget.August + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.August + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_September" onchange="updateBudgets(' + budget.Id + ', \'September\',' + budget.September + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.September + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_October" onchange="updateBudgets(' + budget.Id + ', \'October\',' + budget.October + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.October + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_November" onchange="updateBudgets(' + budget.Id + ', \'November\',' + budget.November + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.November + '"></td>';
+                            tabledata += '<td><input class="input" id="SiteBudget_' + budget.Id + '_December" onchange="updateBudgets(' + budget.Id + ', \'December\',' + budget.December + ')" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.December + '"></td>';
                             tabledata += '<td>' + savecopy.replace("[BUDGETID]", budget.Id) + '</td>';
                             tabledata += '</tr>';
                             result += tabledata;
@@ -436,67 +517,171 @@
 
         }
 
+        function updateBudgets(elemtId, type, oldval) {
+            var total = $("#SiteBudget_" + elemtId + "_BudgetTotal").val();
+            if (type == "BudgetTotal") {
+                var totaleach = total / 12;
+                totaleach = parseFloat(totaleach).toFixed(2);
+
+                //$("#ClientBudget_" + elemtId + "_BudgetTotal").val(totaleach);
+                $("#SiteBudget_" + elemtId + "_January").val(totaleach);
+                $("#SiteBudget_" + elemtId + "_February").val(totaleach);
+                $("#SiteBudget_" + elemtId + "_March").val(totaleach);
+                $("#SiteBudget_" + elemtId + "_April").val(totaleach);
+                $("#SiteBudget_" + elemtId + "_May").val(totaleach);
+                $("#SiteBudget_" + elemtId + "_June").val(totaleach);
+                $("#SiteBudget_" + elemtId + "_July").val(totaleach);
+                $("#SiteBudget_" + elemtId + "_August").val(totaleach);
+                $("#SiteBudget_" + elemtId + "_September").val(totaleach);
+                $("#SiteBudget_" + elemtId + "_October").val(totaleach);
+                $("#SiteBudget_" + elemtId + "_November").val(totaleach);
+                $("#SiteBudget_" + elemtId + "_December").val(totaleach);
+            } else {
+                var newval = $("#SiteBudget_" + elemtId + "_" + type).val();
+                total = (parseFloat(total).toFixed(2) - parseFloat(oldval).toFixed(2)) + parseFloat(newval).toFixed(2);
+                $("#SiteBudget_" + elemtId + "_BudgetTotal").val(Math.ceil(total));
+            }
+        }
+
+        function LinkToSubSites(id) {
+            $.ajax({
+                type: 'POST',
+                url: "SetSite",
+                data: { "SiteId": id },
+                success: function (response) {
+                    window.location.href = 'Index#subsites';
+                    location.reload();
+                }
+            });
+        }
+
     </script>
 
     <script>
         //The Google Stuff
-
-        // This sample uses the Autocomplete widget to help the user select a
-        // place, then it retrieves the address components associated with that
-        // place, and then it populates the form fields with those details.
-        // This sample requires the Places library. Include the libraries=places
-        // parameter when you first load the API. For example:
-        // <script
-        // src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
-
         var placeSearch, autocomplete;
 
         var componentForm = {
             street_number: 'short_name',
             route: 'long_name',
+            sublocality_level_1: 'long_name',
+            sublocality_level_2: 'long_name',
             locality: 'long_name',
-            administrative_area_level_1: 'short_name',
-            country: 'long_name',
+            administrative_area_level_2: 'long_name',
+            administrative_area_level_1: 'long_name',
+            //country: 'long_name',
             postal_code: 'short_name'
         };
+        var componentFormFields = {
+            street_number: 'FullAddress_AddressLine1',
+            route: 'FullAddress_AddressLine1',
+            locality: 'FullAddress_Town',
+            sublocality_level_1: 'FullAddress_AddressLine2',
+            sublocality_level_2: 'FullAddress_AddressLine2',
+            administrative_area_level_2: 'FullAddress.Province',
+            administrative_area_level_1: 'FullAddress.Province',
+            //country: 'long_name',
+            postal_code: 'FullAddress_PostCode'
+        };
+
 
         function initAutocomplete() {
-            // Create the autocomplete object, restricting the search predictions to
-            // geographical location types.
             autocomplete = new google.maps.places.Autocomplete(
                 document.getElementById('autocomplete'), { types: ['geocode'] });
-
-            // Avoid paying for data that you don't need by restricting the set of
-            // place fields that are returned to just the address components.
             autocomplete.setFields(['address_component']);
-
-            // When the user selects an address from the drop-down, populate the
-            // address fields in the form.
             autocomplete.addListener('place_changed', fillInAddress);
         }
 
         function fillInAddress() {
-            // Get the place details from the autocomplete object.
             var place = autocomplete.getPlace();
+            var fullAddress = "";
 
             for (var component in componentForm) {
-                document.getElementById(component).value = '';
-                document.getElementById(component).disabled = false;
+                document.getElementById(componentFormFields[component]).value = '';
+                document.getElementById(componentFormFields[component]).disabled = false;
             }
-
-            // Get each component of the address from the place details,
-            // and then fill-in the corresponding field on the form.
             for (var i = 0; i < place.address_components.length; i++) {
                 var addressType = place.address_components[i].types[0];
                 if (componentForm[addressType]) {
                     var val = place.address_components[i][componentForm[addressType]];
-                    document.getElementById(addressType).value = val;
+                    if (addressType == "route") {
+                        var streetaddress = document.getElementById("FullAddress_AddressLine1");
+                        document.getElementById("FullAddress_AddressLine1").value = streetaddress.value + " " + val;
+                    } else {
+                        //debugger;
+                        if (addressType == "administrative_area_level_1") {
+                            var idx = -1;
+                            switch (val) {
+                                case "Eastern Cape":
+                                    idx = 0;
+                                    break;
+                                case "Free State":
+                                    idx = 1;
+                                    break;
+                                case "Gauteng":
+                                    idx = 2;
+                                    break;
+                                case "KwaZulu-Natal":
+                                    idx = 3;
+                                    break;
+                                case "Limpopo":
+                                    idx = 4;
+                                    break;
+                                case "Mpumalanga":
+                                    idx = 5;
+                                    break;
+                                case "Northern Cape":
+                                    idx = 67;
+                                    break;
+                                case "North West":
+                                    idx = 7;
+                                    break;
+                                case "Western Cape":
+                                    idx = 8;
+                                    break;
+                                case "Western Cape":
+                                    idx = 8;
+                                    break;
+                                default:
+                                // code block
+                            }
+                            //setSelectedIndex(document.getElementById("Address.Province"), idx);
+                            document.getElementById("FullAddress.Province").options.length = 0;
+                            var opt = document.createElement("option");
+
+                            // Assign text and value to Option object
+                            opt.text = val;
+                            opt.value = idx;
+
+                            // Add an Option object to Drop Down List Box
+                            //select.options.add(opt);
+                            document.getElementById("FullAddress.Province").options.add(opt);
+                        } else {
+                            document.getElementById(componentFormFields[addressType]).value = val;
+                        }
+                        //document.getElementById(componentFormFields[addressType]).value = val;
+                    }
                 }
+                //TODO: Enable Coordinates until test is on HTTPS
+                $("#FullAddress_AddressLine1").attr("readonly", false);
+                $("#FullAddress_Town").attr("readonly", false);
+                $("#FullAddress_AddressLine2").attr("readonly", false);
+                $("#FullAddress_PostCode").attr("readonly", false);
+                $("#FullAddress.Province").attr("readonly", true);
+                $("#XCord").attr("readonly", false);
+                $("#YCord").attr("readonly", false);
+                //change for 1st element
+                //if (i == 0) {
+                //    fullAddress = place.address_components[i].long_name;
+                //} else {
+                //    fullAddress = fullAddress + "," + place.address_components[i].long_name;
+                //}
+
+
             }
+            //alert(fullAddress);
         }
 
-        // Bias the autocomplete object to the user's geographical location,
-        // as supplied by the browser's 'navigator.geolocation' object.
         function geolocate() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
@@ -504,13 +689,31 @@
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     };
+                    console.log(geolocation.lat);
+                    console.log(geolocation.lng);
+                    populateXY(geolocation.lng, geolocation.lat);
                     var circle = new google.maps.Circle(
                         { center: geolocation, radius: position.coords.accuracy });
                     autocomplete.setBounds(circle.getBounds());
                 });
             }
         }
+        function populateXY(X, Y) {
+            X = parseFloat(X).toFixed(4);
+            Y = parseFloat(Y).toFixed(4);
+            $('#XCord').val(X);
+            $('#YCord').val(Y);
+            $("#XCord").attr("readonly", true);
+            $("#YCord").attr("readonly", true);
+        }
+            //function setSelectedIndex(s, i) {
+            //    debugger;
+            //    s.options[i].selected = true;
+
+            //    return;
+
+            //}
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAHhY-pRI1pA4IfrX27Upxl-JOfL5IsvY8rem&libraries=places&callback=initAutocomplete"
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeQFyrVUFUjsQOK_RdtfAC57jMJkc_3Co&libraries=places&callback=initAutocomplete"
             async defer></script>
 }

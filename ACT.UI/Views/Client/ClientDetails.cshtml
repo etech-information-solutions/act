@@ -393,7 +393,7 @@
                         var total = (budget.January + budget.February + budget.March + budget.April + budget.May + budget.June + budget.July + budget.August + budget.September + budget.October + budget.November + budget.December);
                         var tabledata = '<tr id="budg-' + budget.Id + '-row" name="budg-' + budget.Id + '">';//<form id="budg-' + budget.Id + '-frm" name="budg-' + budget.Id + '-frm" >
                         tabledata += '<td>' + budget.BudgetYear + '</td>';
-                        tabledata += '<td>' + total + '</td>';
+                        tabledata += '<td>' + Math.ceil(total) + '</td>';
                         tabledata += '<td>' + budget.January + '</td>';
                         tabledata += '<td>' + budget.February + '</td>';
                         tabledata += '<td>' + budget.March + '</td>';

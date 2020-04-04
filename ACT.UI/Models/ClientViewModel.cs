@@ -96,6 +96,7 @@ namespace ACT.UI.Models
         //public string DeclineReason { get; set; }
 
         public bool EditMode { get; set; }
+        public bool ContextualMode { get; set; }
 
         #endregion
 

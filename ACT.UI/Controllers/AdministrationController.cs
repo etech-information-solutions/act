@@ -3621,7 +3621,7 @@ namespace ACT.UI.Controllers
             {
                 Session["ClientId"] = ClientId;
                 return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
-            }
+            } 
             else
             {
                 return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);

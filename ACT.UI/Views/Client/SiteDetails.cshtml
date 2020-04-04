@@ -25,12 +25,13 @@
     @if (ViewBag.IncludeLayout == null)
     {
         <h2>
-            <img alt="" src="@Url.Content( " ~/images/info.png" )" />
+            <img alt="" src="@Url.Content( "~/images/info.png" )" />
             <span>Site Details</span>
         </h2>
     }
     @Html.HiddenFor(model => model.Id)
         <div class="left" style="width: 45%; margin-right: 1%;">
+            <h3>Site Details</h3>
             <div class="display-label">
                 Name
             </div>
@@ -44,6 +45,18 @@
             <div class="display-field">
                 @Html.DisplayFor(model => model.Description)
                 @*@(( ( Status ) Model.Status ).GetDisplayText())*@
+            </div>
+            <div class="display-label">
+                Region
+            </div>
+            <div class="display-field">
+                @using (RegionService reg = new RegionService())
+                {
+                    Region region = reg.GetById((int)Model.RegionId);
+                    <td style="width: 15%;">
+                        @region.Name
+                    </td>
+                }
             </div>
             <div class="display-label">
                 Site Type
@@ -61,14 +74,14 @@
             </div>
 
             <div class="display-label">
-                Planning Point
+                Planning Point/Code
             </div>
             <div class="display-field">
                 @Html.DisplayFor(model => model.PlanningPoint)
             </div>
 
             <div class="display-label">
-                Depot
+                Depot Code
             </div>
             <div class="display-field">
                 @Html.DisplayFor(model => model.Depot)
@@ -83,50 +96,72 @@
 
         </div>
 
-    <div class="left" style="width: 45%;">
-        <div class="display-label">
-            Contact Number
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor(model => model.ContactNo)
-        </div>
+        <div class="left" style="width: 45%;">
+            <h3>Contact Details</h3>
+
+            <div class="display-label">
+                Owner Contact Name
+            </div>
+
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ContactName)
+            </div>
+            <div class="display-label">
+                Owner Contact Number
+            </div>
+
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ContactNo)
+            </div>
+
+            <div class="display-label">
+                Finance Contact Name
+            </div>
+
+            <div class="display-field">
+                @Html.DisplayFor(model => model.FinanceContact)
+            </div>
+            <div class="display-label">
+                Finance Contact Number
+            </div>
+
+            <div class="display-field">
+                @Html.DisplayFor(model => model.FinanceContactNo)
+            </div>
+
+            <div class="display-label">
+                Receiving Contact Name
+            </div>
+
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ReceivingContact)
+            </div>
+            <div class="display-label">
+                Receiving Contact Number
+            </div>
+
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ReceivingContactNo)
+            </div>
 
 
-        <div class="display-label">
-            Contact Person
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor(model => model.ContactName)
-        </div>
-        <div class="display-label">
-            X Coordinates
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor(model => model.XCord)
-        </div>
+            <h3>Coordinates</h3>
+            <div class="display-label">
+                X Coordinate
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.XCord)
+            </div>
 
 
-        <div class="display-label">
-            Y Coordinates
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor(model => model.YCord)
-        </div>
+            <div class="display-label">
+                Y Coordinate
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.YCord)
+            </div>
 
-        <div class="display-label">
-            Region
         </div>
-        <div class="display-field">
-            @using (RegionService reg = new RegionService())
-            {
-                Region region = reg.GetById((int)Model.RegionId);
-                <td style="width: 15%;">
-                    @region.Name
-                </td>
-            }
-        </div>
-
-    </div>
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 
 
@@ -234,6 +269,7 @@
                     <tr>
                         <th style="width: 6%;">Year</th>
                         <th style="width: 7%;">Total</th>
+                        <th style="width: 7%;">Jan</th>
                         <th style="width: 7%;">Feb</th>
                         <th style="width: 7%;">Mar</th>
                         <th style="width: 7%;">Apr</th>

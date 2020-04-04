@@ -19,7 +19,7 @@ namespace ACT.Data.Models
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
-        public string Description { get; set; }
+        public string KPIDescription { get; set; }
         public Nullable<decimal> Disputes { get; set; }
         public Nullable<decimal> OutstandingPallets { get; set; }
         public Nullable<decimal> Passons { get; set; }

@@ -654,6 +654,29 @@ namespace ACT.Core.Services
                           .FirstOrDefault();
         }
 
+        /// <summary>
+        /// A bit of a hack but relevant
+        /// Gets a list of [select] for the specified table by generic T
+        /// If the constraint column is defined then we'll apply it
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="value"></param>
+        /// <param name="column2"></param>
+        /// <param name="value2"></param>/// 
+        /// <returns></returns>
+        public T GetByColumnsWhere(string column = "", object value = null, string column2 = "", object value2 = null)
+        {
+            if (!string.IsNullOrEmpty(column) && !string.IsNullOrEmpty(column2))
+            {
+                return context.Set<T>()
+                              .Where(ColumnWhere(column, value))
+                              .Where(ColumnWhere(column2, value2))
+                              .Distinct()
+                              .FirstOrDefault();
+            }
+            else return null;
+        }
+
 
         /// <summary>
         /// Deletes an existing entity

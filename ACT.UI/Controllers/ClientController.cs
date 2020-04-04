@@ -55,8 +55,8 @@ namespace ACT.UI.Controllers
 
                     return RedirectToAction("Index", "Administration"); //Return to login as session is invalid
                 }
-                if (CurrentUser.PSPs.Count > 0)
-                {
+                //if (CurrentUser.PSPs.Count > 0)
+                //{
                     string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
                     int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
                     if (clientId > 0)
@@ -84,11 +84,11 @@ namespace ACT.UI.Controllers
                         };
                         viewModel.Add(vm);
                     }
-                }
-                else
-                {
-                    model = null;
-                }
+                //}
+                //else
+                //{
+                //    model = null;
+                //}
 
                 // var testModel = service.ListByColumn(null, "CompanyRegistrationNumber", "123456");
                 total = (viewModel.Count < pm.Take && pm.Skip == 0) ? viewModel.Count : service.Total();
@@ -118,7 +118,7 @@ namespace ACT.UI.Controllers
 
                     return RedirectToAction("Index");
                 }
-                Session["ClientId"] = id;
+               // Session["ClientId"] = id;
                 Address address = aservice.Get(model.Id, "Client");
 
                 List<Document> documents = dservice.List(model.Id, "Client");
@@ -172,6 +172,9 @@ namespace ACT.UI.Controllers
 
                     return View(model);
                 }
+
+                //On adding Client, reset the client session variable so that the client list can load fully
+                Session["ClientId"] = null;
 
                 using (ClientService service = new ClientService())
                 using (PSPClientService pspclientservice = new PSPClientService())
@@ -229,7 +232,8 @@ namespace ACT.UI.Controllers
                     #region Create Address (s)
 
                     if (model.Address != null)
-                    {
+                    {                        
+                        //Enum.TryParse(model.Address.Province.ToString().Replace(" ", "").Replace("-", ""), out Province mappedProvinceVal);
                         Address address = new Address()
                         {
                             ObjectId = client.Id,
@@ -241,6 +245,7 @@ namespace ACT.UI.Controllers
                             Addressline1 = model.Address.AddressLine1,
                             Addressline2 = model.Address.AddressLine2,
                             Province = (int)model.Address.Province,
+                           // Province = (int)mappedProvinceVal,
                         };
 
                         aservice.Create(address);
@@ -288,23 +293,23 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     #region KPI
-                    if (model.KPIDisputes > 0)
-                    {
+                    //if (model.KPIDisputes > 0)
+                    //{
   
-                        ClientKPI newKPI = new ClientKPI()
-                        {
-                            ClientId = client.Id,
-                            Disputes = model.KPIDisputes,
-                            OutstandingPallets = model.KPIOutstanding,
-                            Passons = 0, //TODO: Fix
-                            MonthlyCost = 0, //TODO: Fix
-                            ResolveDays = model.KPIDaysToResolve,
-                            OutstandingDays = model.KPIDaysOutstanding,
-                            Status = (int)Status.Active
-                        };
-                        kpiservice.Create(newKPI);
+                    //    ClientKPI newKPI = new ClientKPI()
+                    //    {
+                    //        ClientId = client.Id,
+                    //        Disputes = model.KPIDisputes,
+                    //        OutstandingPallets = model.KPIOutstanding,
+                    //        Passons = 0, //TODO: Fix
+                    //        MonthlyCost = 0, //TODO: Fix
+                    //        ResolveDays = model.KPIDaysToResolve,
+                    //        OutstandingDays = model.KPIDaysOutstanding,
+                    //        Status = (int)Status.Active
+                    //    };
+                    //    kpiservice.Create(newKPI);
                        
-                    }
+                    //}
                     #endregion
 
 
@@ -341,7 +346,7 @@ namespace ACT.UI.Controllers
 
                     return PartialView("_AccessDenied");
                 }
-                Session["ClientId"] = id;
+                //Session["ClientId"] = id;
                 Address address = aservice.Get(client.Id, "Client");
 
                 List<Document> logo = dservice.List(client.Id, "ClientLogo");
@@ -373,7 +378,6 @@ namespace ACT.UI.Controllers
                     AdminEmail = client.AdminEmail,
                     DeclinedReason = client.DeclinedReason,
                     //ServiceRequired = client.ServiceRequired,
-                    //Status = (Status)client.Status,
                     Status = client.Status,
                     EditMode = true,
                     Address = new AddressViewModel()
@@ -499,9 +503,11 @@ namespace ACT.UI.Controllers
                     if (model.Address != null)
                     {
                         Address clientAddress = aservice.GetById(model.Address.Id);
+                        //Enum.TryParse(model.Address.Province.ToString().Replace(" ", "").Replace("-", ""), out Province mappedProvinceVal);
 
                         if (clientAddress == null)
                         {
+
                             clientAddress = new Address()
                             {
                                 ObjectId = model.Id,
@@ -513,6 +519,7 @@ namespace ACT.UI.Controllers
                                 Addressline1 = model.Address.AddressLine1,
                                 Addressline2 = model.Address.AddressLine2,
                                 Province = (int)model.Address.Province,
+                                //Province = (int)mappedProvinceVal,
                             };
 
                             aservice.Create(clientAddress);
@@ -525,6 +532,7 @@ namespace ACT.UI.Controllers
                             clientAddress.Addressline1 = model.Address.AddressLine1;
                             clientAddress.Addressline2 = model.Address.AddressLine2;
                             clientAddress.Province = (int)model.Address.Province;
+                            //clientAddress.Province = (int)mappedProvinceVal;
 
                             aservice.Update(clientAddress);
                         }
@@ -589,35 +597,35 @@ namespace ACT.UI.Controllers
 
                     #endregion
 
-                    #region ClientKPIs
-                    if (model.KPIDisputes > 0)
-                    {
-                        ClientKPI kpi = kpiservice.GetByColumnWhere("ClientId", model.Id);
-                        if (kpi != null)
-                        {
-                            //foreach (ClientKPI k in kpi) {                            
-                                kpi.OutstandingPallets = model.KPIOutstanding;
-                                kpi.Disputes = model.KPIDisputes;
-                                kpi.OutstandingDays = model.KPIDaysOutstanding;
-                                kpi.ResolveDays = model.KPIDaysToResolve;
+                    #region ClientKPIS
+                    //if (model.KPIDisputes > 0)
+                    //{
+                    //    ClientKPI kpi = kpiservice.GetByColumnWhere("ClientId", model.Id);
+                    //    if (kpi != null)
+                    //    {
+                    //        //foreach (ClientKPI k in kpi) {                            
+                    //            kpi.OutstandingPallets = model.KPIOutstanding;
+                    //            kpi.Disputes = model.KPIDisputes;
+                    //            kpi.OutstandingDays = model.KPIDaysOutstanding;
+                    //            kpi.ResolveDays = model.KPIDaysToResolve;
 
-                                kpiservice.Update(kpi);
-                            //}
-                        }
-                        else
-                        {
-                            ClientKPI newKPI = new ClientKPI()
-                            {
-                                ClientId = client.Id,
-                                Disputes = model.KPIDisputes,
-                                OutstandingPallets = model.KPIOutstanding,
-                                Passons = 0, //TODO: Fix
-                                MonthlyCost = 0, //TODO: Fix
-                                Status = (int)Status.Active
-                            };
-                            kpiservice.Create(newKPI);
-                        }
-                    }
+                    //            kpiservice.Update(kpi);
+                    //        //}
+                    //    }
+                    //    else
+                    //    {
+                    //        ClientKPI newKPI = new ClientKPI()
+                    //        {
+                    //            ClientId = client.Id,
+                    //            Disputes = model.KPIDisputes,
+                    //            OutstandingPallets = model.KPIOutstanding,
+                    //            Passons = 0, //TODO: Fix
+                    //            MonthlyCost = 0, //TODO: Fix
+                    //            Status = (int)Status.Active
+                    //        };
+                    //        kpiservice.Create(newKPI);
+                    //    }
+                    //}
 
                     #endregion
 
@@ -641,6 +649,9 @@ namespace ACT.UI.Controllers
         public ActionResult DeleteClient(ClientViewModel model)
         {
             Client client;
+
+            //On deleting Client, reset the client session variable so that the client list can load fully
+            Session["ClientId"] = null;
             try
             {
 
@@ -695,6 +706,8 @@ namespace ACT.UI.Controllers
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
             //string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
             //int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
 
@@ -703,15 +716,6 @@ namespace ACT.UI.Controllers
             {
                 clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, ClientStatus = Status.Active });
 
-                //    if (clientID > 0)
-                //    {
-                //        Client chosenClient = clientService.GetById(clientID);
-                //        clientList.Add(chosenClient);
-                //    }
-                //    else
-                //    {
-                //        clientList = clientService.GetClientsByPSP(pspId);                    
-                //    }
             }
 
             IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
@@ -721,14 +725,14 @@ namespace ACT.UI.Controllers
 
             });     
             ViewBag.ClientList = clientDDL;
+            //Now get sites for the contextual list
             using (SiteService service = new SiteService())
             {
-                pm.Sort = pm.Sort ?? "DESC";
-                pm.SortBy = pm.SortBy ?? "CreatedOn";
+                pm.Sort = pm.Sort ?? "ASC";
+                pm.SortBy = pm.SortBy ?? "Name";
                 if (clientId > 0)
                 {
                     csm.ClientId = clientId;
-                    
                 }
                 model = service.ListCSM(pm, csm);               
                 total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total(pm, csm);
@@ -792,7 +796,7 @@ namespace ACT.UI.Controllers
                     SiteCodeChep = site.SiteCodeChep,
                     Status = (int)site.Status,
                    // EditMode = true,
-                    RegionId = site.RegionId,
+                    RegionId = (site.RegionId!=null?site.RegionId:-1),
                    // SourceView = sourceView,
                     //RegionOptions = regionOptions,
                     //FullAddress = new AddressViewModel()
@@ -830,7 +834,7 @@ namespace ACT.UI.Controllers
             List<Region> regionOptions = new List<Region>();
             using (RegionService rservice = new RegionService()) {
                 regionOptions = rservice.ListByColumnWhere("PSPId", pspId);
-
+                    
             IEnumerable<SelectListItem> regionDDL = regionOptions.Select(c => new SelectListItem
             {
                 Value = c.Id.ToString(),
@@ -857,7 +861,21 @@ namespace ACT.UI.Controllers
         [Requires(PermissionTo.Create)]
         public ActionResult AddSite(SiteViewModel model)
         {
-            try
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            List<Region> regionOptions = new List<Region>();
+            using (RegionService rservice = new RegionService())
+            {
+                regionOptions = rservice.ListByColumnWhere("PSPId", pspId);
+            }
+                IEnumerable<SelectListItem> regionDDL = regionOptions.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Description
+
+                });
+                ViewBag.RegionOptions = regionDDL;
+
+                try
             {
                 if (!ModelState.IsValid)
                 {
@@ -869,9 +887,38 @@ namespace ACT.UI.Controllers
                
                 string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
                 int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-
+                //for subsites to add subsites under a mainsite
                 string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
                 int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
+                int siteType = 1;
+                // decimal latitudeY = decimal.Parse(model.YCord);
+                //latitudeY = decimal.Round(latitudeY, 4);                
+                //decimal longitudeX = decimal.Parse(model.XCord);
+                //longitudeX = decimal.Round(longitudeX, 4);
+                string strLatY = model.YCord;
+                decimal latitudeY = 0;
+                try
+                {
+                    decimal.TryParse(model.YCord, out latitudeY);
+                    latitudeY = decimal.Round(latitudeY, 4);
+                    strLatY = (latitudeY != 0 ? latitudeY.ToString() : strLatY);
+                }
+                catch (Exception ex)
+                {
+                    //ViewBag.Message = string.Concat(rows[3].ToString(), " ", ex.Message);
+                }
+                string strLngX = model.XCord;
+                decimal longitudeX = 0;
+                try
+                {
+                    decimal.TryParse(model.XCord, out longitudeX);
+                    longitudeX = decimal.Round(longitudeX, 4);
+                    strLngX = (longitudeX!=0?longitudeX.ToString(): strLngX);
+                }
+                catch (Exception ex)
+                {
+                   // ViewBag.Message = string.Concat(model.XCord, " ", ex.Message);
+                }
 
                 using (SiteService siteService = new SiteService())
                 using (ClientSiteService csService = new ClientSiteService())
@@ -879,12 +926,18 @@ namespace ACT.UI.Controllers
                 using (AddressService aservice = new AddressService())
                 {
                     #region Validation
-                    if (!string.IsNullOrEmpty(model.AccountCode) && siteService.ExistByAccountCode(model.AccountCode.Trim()))
+                    Site existingSite = null;
+                    //if (!string.IsNullOrEmpty(model.AccountCode) && siteService.ExistByAccountCode(model.AccountCode.Trim()))
+                    if (!string.IsNullOrEmpty(strLngX) && siteService.ExistByXYCoords(strLngX, strLatY))
                     {
-                        // Bank already exist!
-                        Notify($"Sorry, a Site with the Account number \"{model.AccountCode}\" already exists!", NotificationType.Error);
+                        //Notify($"Sorry, a Site with the same X Y Coordinates already exists \"{model.XCord}\" already exists!", NotificationType.Error);
+                        //return View(model);
 
-                        return View(model);
+                        //rather than pass back to view, we will create the new site as a subsite of the existing site. 
+                        //Get the existing site first
+                        existingSite = siteService.GetByColumnsWhere("XCord", strLngX, "YCord", strLatY);
+                        SiteID = existingSite.Id;//This is the existing site retrieved by mapping same X and Y coord, read that into the model.SiteId which makes the new site a child site
+                        siteType = 2;//Mark teh site as a subsite by default
                     }
                     #endregion
 
@@ -893,19 +946,23 @@ namespace ACT.UI.Controllers
                     {
                         Name = model.Name,
                         Description = model.Description,
-                        XCord = model.XCord,
-                        YCord = model.YCord,
+                        XCord = strLngX,
+                        YCord = strLatY,
                         Address = model.FullAddress.AddressLine1 + " " + model.FullAddress.Town + " " + model.FullAddress.PostCode, //model.Address,
                         PostalCode = model.FullAddress.PostCode,
                         ContactName = model.ContactName,
                         ContactNo = model.ContactNo,
                         PlanningPoint = model.PlanningPoint,
-                        SiteType = (int)model.SiteType,
+                        SiteType = (model.SiteType>0?(int)model.SiteType:siteType),
                         AccountCode = model.AccountCode,
                         Depot = model.Depot,
                         SiteCodeChep = model.SiteCodeChep,
-                        Status = (int)model.Status,
-                        RegionId = model.RegionId
+                        Status = (int)Status.Active,
+                        RegionId = model.RegionId,
+                        FinanceContact = model.FinanceContact,
+                        ReceivingContact = model.ReceivingContact,
+                        FinanceContactNo = model.FinanceContactNo,
+                        ReceivingContactNo = model.ReceivingContactNo,
                     };
                     if (SiteID > 0)
                     {
@@ -920,15 +977,17 @@ namespace ACT.UI.Controllers
                     {
                         Address address = new Address()
                         {
-                            ObjectId = model.Id,
+                            ObjectId = site.Id,
                             ObjectType = "Site",
                             Town = model.FullAddress.Town,
                             Status = (int)Status.Active,
                             PostalCode = model.FullAddress.PostCode,
-                            Type = (int)model.FullAddress.AddressType,
+                            Type = (int)AddressType.Postal,
                             Addressline1 = model.FullAddress.AddressLine1,
                             Addressline2 = model.FullAddress.AddressLine2,
                             Province = (int)model.FullAddress.Province,
+                            Longitude = strLngX,
+                            Latitude = strLatY
                         };
                         aservice.Create(address);
                     }
@@ -995,27 +1054,35 @@ namespace ACT.UI.Controllers
 
                 bool unverified = (site.Status == (int)PSPClientStatus.Unverified);
 
-                SiteViewModel model = new SiteViewModel()
+                    SiteViewModel model = new SiteViewModel()
+                    {
+                        Id = site.Id,
+                        Name = site.Name,
+                        Description = site.Description,
+                        XCord = site.XCord,
+                        YCord = site.YCord,
+                        Address = site.Address,
+                        PostalCode = site.PostalCode,
+                        ContactName = site.ContactName,
+                        ContactNo = site.ContactNo,
+                        PlanningPoint = site.PlanningPoint,
+                        SiteType = (site.SiteType != null ? (int)site.SiteType : (int)SiteType.Depot),
+                        AccountCode = site.AccountCode,
+                        Depot = site.Depot,
+                        SiteCodeChep = site.SiteCodeChep,
+                        Status = (int)site.Status,
+                        FinanceContact = site.FinanceContact,
+                        FinanceContactNo = site.FinanceContactNo,
+                        ReceivingContact = site.ReceivingContact,
+                        ReceivingContactNo = site.ReceivingContactNo,
+                        EditMode = true,
+                        RegionId = (site.RegionId.HasValue ? site.RegionId : null),
+                        //RegionOptions = regionOptions,
+                        SourceView = "ManageSites",
+                    };
+                if (address != null)
                 {
-                    Id = site.Id,
-                    Name = site.Name,
-                    Description = site.Description,
-                    XCord = site.XCord,
-                    YCord = site.YCord,
-                    Address = site.Address,
-                    PostalCode = site.PostalCode,
-                    ContactName = site.ContactName,
-                    ContactNo = site.ContactNo,
-                    PlanningPoint = site.PlanningPoint,
-                    SiteType = (site.SiteType!=null?(int)site.SiteType:(int)SiteType.MainSite),
-                    AccountCode = site.AccountCode,
-                    Depot = site.Depot,
-                    SiteCodeChep = site.SiteCodeChep,
-                    Status = (int)site.Status,
-                    EditMode = true,
-                    RegionId = (site.RegionId.HasValue?site.RegionId:null),
-                //RegionOptions = regionOptions,
-                FullAddress = new AddressViewModel()
+                    model.FullAddress = new AddressViewModel()
                     {
                         EditMode = true,
                         Town = address?.Town,
@@ -1025,9 +1092,10 @@ namespace ACT.UI.Controllers
                         AddressLine2 = address?.Addressline2,
                         Province = (address != null) ? (Province)address.Province : Province.All,
                         AddressType = (address != null) ? (AddressType)address.Type : AddressType.Postal,
-                    },
-                    SourceView = "ManageSites",
-                };                
+                        Longitude = address.Longitude,
+                        Latitude = address.Latitude
+                    };
+                }
 
                 //SiteViewModel model = new SiteViewModel() { EditMode = true, SourceView = sourceView };//, RegionOptions = regionOptions
                 //int pspId = Session[ "UserPSP" ];
@@ -1064,6 +1132,21 @@ namespace ACT.UI.Controllers
         [Requires(PermissionTo.Edit)]
         public ActionResult EditSite(SiteViewModel model, PagingModel pm, bool isstructure = false)
         {
+
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            List<Region> regionOptions = new List<Region>();
+            using (RegionService rservice = new RegionService())
+            {
+                regionOptions = rservice.ListByColumnWhere("PSPId", pspId);
+            }
+            IEnumerable<SelectListItem> regionDDL = regionOptions.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Description
+
+            });
+            ViewBag.RegionOptions = regionDDL;
+
             try
             {
                 if (!ModelState.IsValid)
@@ -1082,7 +1165,6 @@ namespace ACT.UI.Controllers
                     site = service.GetById(model.Id);
                     Address address = aservice.Get(model.Id, "Client");
 
-
                     #region Validations
 
                     //if (!string.IsNullOrEmpty(model.AccountCode) && service.ExistByAccountCode(model.AccountCode.Trim()))
@@ -1092,8 +1174,40 @@ namespace ACT.UI.Controllers
 
                     //    return View(model);
                     //}
-
                     #endregion
+
+                    //stuff changed, lets redo this
+                    string strLatY = model.YCord;
+                    string strLngX = model.XCord;
+
+                    if (site.XCord != strLngX)
+                    {                       
+                        decimal latitudeY = 0;
+                        try
+                        {
+                            decimal.TryParse(model.YCord, out latitudeY);
+                            latitudeY = decimal.Round(latitudeY, 4);
+                            strLatY = (latitudeY != 0 ? latitudeY.ToString() : strLatY);
+                        }
+                        catch (Exception ex)
+                        {
+                            //ViewBag.Message = string.Concat(rows[3].ToString(), " ", ex.Message);
+                        }
+                       
+                        decimal longitudeX = 0;
+                        try
+                        {
+                            decimal.TryParse(model.XCord, out longitudeX);
+                            longitudeX = decimal.Round(longitudeX, 4);
+                            strLngX = (longitudeX != 0 ? longitudeX.ToString() : strLngX);
+                        }
+                        catch (Exception ex)
+                        {
+                            // ViewBag.Message = string.Concat(model.XCord, " ", ex.Message);
+                        }
+
+                    }
+
                     #region Create Address (s)
                     string stringAddress = "";
                     if (model.FullAddress != null)
@@ -1113,6 +1227,8 @@ namespace ACT.UI.Controllers
                                 Addressline1 = model.FullAddress.AddressLine1,
                                 Addressline2 = model.FullAddress.AddressLine2,
                                 Province = (int)model.FullAddress.Province,
+                                Longitude = strLngX,
+                                Latitude =strLatY
                             };
 
                             aservice.Create(siteAddress);
@@ -1125,21 +1241,22 @@ namespace ACT.UI.Controllers
                             siteAddress.Addressline1 = model.FullAddress.AddressLine1;
                             siteAddress.Addressline2 = model.FullAddress.AddressLine2;
                             siteAddress.Province = (int)model.FullAddress.Province;
+                            siteAddress.Longitude = strLngX;
+                            siteAddress.Latitude = strLatY;
 
                             aservice.Update(siteAddress);
                         }
                         stringAddress = model.FullAddress.AddressLine1 + " " + model.FullAddress.Town + " " + model.FullAddress.PostCode;
                     }
-
                     #endregion
+                                        
                     #region Update Site
-
                     // Update Site
                     site.Id = model.Id;
                     site.Name = model.Name;
                     site.Description = model.Description;
-                    site.XCord = model.XCord;
-                    site.YCord = model.YCord;
+                    site.XCord = strLngX;
+                    site.YCord = strLatY;
                     site.Address = stringAddress;
                     site.PostalCode = model.FullAddress.PostCode;
                     site.ContactName = model.ContactName;
@@ -1151,14 +1268,14 @@ namespace ACT.UI.Controllers
                     site.SiteCodeChep = model.SiteCodeChep;
                     site.Status = (int)model.Status;
                     site.RegionId = model.RegionId;
+                    site.FinanceContact = model.FinanceContact;
+                    site.ReceivingContact = model.ReceivingContact;
+                    site.FinanceContactNo = model.FinanceContactNo;
+                    site.ReceivingContactNo = model.ReceivingContactNo;
 
                     service.Update(site);
 
-                    #endregion
-                   
-
-
-
+                    #endregion                  
                     scope.Complete();
                 }
 
@@ -1248,8 +1365,8 @@ namespace ACT.UI.Controllers
             }
         }
 
-        // POST || GET: /Client/SubSites
-        public ActionResult GetSIteList(Nullable<int> siteId)
+        // POST || GET: /Client/GetSiteList
+        public ActionResult GetSiteList(Nullable<int> siteId)
         {
 
 
@@ -1262,7 +1379,7 @@ namespace ACT.UI.Controllers
         #region Sub Sites
         //
         // POST || GET: /Client/SubSites
-        public ActionResult SubSites(Nullable<int> siteId)
+        public ActionResult SubSites(int siteId = 0)
         {
 
             ViewBag.ViewName = "_SubSites";
@@ -1277,23 +1394,28 @@ namespace ACT.UI.Controllers
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-            //string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
-            //int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
 
+            string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
+            siteId =  (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
+
+            //check if site is in session but client is not, then retrieve clientid to pass through as context
+            if (clientId == 0 && siteId>0)
+            {
+                if (siteId > 0)
+                {
+                    using (SiteService service = new SiteService())
+                    {
+                        clientId = service.GetClientBySite(siteId);
+                    }
+                    //Session["ClientId"] = clientId;
+                }
+            }
+
+            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
             using (ClientService clientService = new ClientService())
             {
                 clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, ClientStatus = Status.Active });
-                //if (clientID > 0)
-                //{
-                //    Client chosenClient = clientService.GetById(clientID);
-                //    clientList.Add(chosenClient);
-                //}
-                //else
-                //{
-
-                //    //mainSiteList = sitesService.GetSitesByClientsOfPSP(pspId);
-                //    clientList = clientService.GetClientsByPSP(pspId);
-                //}
             }
             IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
             {
@@ -1302,13 +1424,21 @@ namespace ACT.UI.Controllers
 
             });
             ViewBag.ClientList = clientDDL;
-            //IEnumerable<SelectListItem> siteListDDL = mainSiteList.Select(c => new SelectListItem
-            //{
-            //    Value = c.Id.ToString(),
-            //    Text = c.Name
+            
+            ViewBag.ContextualModeSite = (siteId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
 
-            //});
-           // ViewBag.SiteList = siteListDDL;
+            using (SiteService service = new SiteService())
+            {                
+                mainSiteList = service.ListCSM(new PagingModel() { Sort = "ASC", SortBy = "Name" }, new CustomSearchModel() { SiteId = siteId, ClientId = clientId });
+
+            }
+            IEnumerable<SelectListItem> siteDDL = mainSiteList.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name
+
+            });
+            ViewBag.ClientSiteList = siteDDL;
             ViewBag.SelectedSiteId = siteId;
 
 
@@ -1324,14 +1454,17 @@ namespace ACT.UI.Controllers
                 List<Site> sites = null;
 
                 //int pspId = Session[ "UserPSP" ];
-                int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+                //int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+                string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
+                int siteId = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
 
                 using (SiteService service = new SiteService())
                 using (ClientSiteService cservice = new ClientSiteService())
                 {
-
-
-                    sites = service.GetSitesByClients(int.Parse(clientId)); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+                    if (siteId>0)
+                        sites = service.GetSitesByClients(int.Parse(clientId), siteId);
+                    else
+                        sites = service.GetSitesByClients(int.Parse(clientId));
 
                 }
                 //var jsonList = JsonConvert.SerializeObject(sites);
@@ -1350,8 +1483,13 @@ namespace ACT.UI.Controllers
         {
             if (clientId != null && clientId != "")
             {
+                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                int currentClientId = (!string.IsNullOrEmpty(clientId) ? int.Parse(clientId) : (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0));
+
                 Session["ClientId"] = clientId;
-                Session["SiteId"] = siteId;
+                string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
+                int currentSiteId = (!string.IsNullOrEmpty(siteId) ? int.Parse(siteId) : (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0));
+                Session["SiteId"] = currentSiteId;
                 List<Site> sites = null;
                 //int pspId = Session[ "UserPSP" ];
                // int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
@@ -1359,11 +1497,12 @@ namespace ACT.UI.Controllers
                 using (SiteService service = new SiteService())
                 {
 
-                    sites = service.GetSitesByClientsIncluded(int.Parse(clientId), int.Parse(siteId)); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+                    sites = service.GetSitesByClientsIncluded(currentClientId, currentSiteId); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
 
                 }
                 //var jsonList = JsonConvert.SerializeObject(sites);
-                return Json(sites, JsonRequestBehavior.AllowGet);
+                var data = JsonConvert.SerializeObject(sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+                return Json(new { data = data }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -1376,8 +1515,13 @@ namespace ACT.UI.Controllers
         {
             if (!string.IsNullOrEmpty(clientId) && !string.IsNullOrEmpty(siteId) )
             {
+                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                int currentClientId = (!string.IsNullOrEmpty(clientId) ? int.Parse(clientId) : (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0));
+
                 Session["ClientId"] = clientId;
-                Session["SiteId"] = siteId;
+                string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
+                int currentSiteId = (!string.IsNullOrEmpty(siteId) ? int.Parse(siteId) : (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0));
+                Session["SiteId"] = currentSiteId;
                 List<Site> sites = null;
                 //int pspId = Session[ "UserPSP" ];
                 //int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
@@ -1385,11 +1529,12 @@ namespace ACT.UI.Controllers
                 using (SiteService service = new SiteService())
                 {
 
-                    sites = service.GetSitesByClientsExcluded(int.Parse(clientId), int.Parse(siteId)); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+                    sites = service.GetSitesByClientsExcluded(currentClientId, currentSiteId); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
 
                 }
-                //var jsonList = JsonConvert.SerializeObject(sites);
-                return Json(sites, JsonRequestBehavior.AllowGet);
+                //return Json(sites, JsonRequestBehavior.AllowGet);
+                var data = JsonConvert.SerializeObject(sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+                return Json(new { data = data }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -1403,13 +1548,15 @@ namespace ACT.UI.Controllers
             if (siteId != null && siteId != "")
             {
                 //Session["ClientId"] = clientId;
-                Session["SiteId"] = siteId;
+               // Session["SiteId"] = siteId;
                 Site site = null;
                 using (SiteService service = new SiteService())
                 {
                     site = service.GetById(int.Parse(siteId));
                 }
-                return Json(site, JsonRequestBehavior.AllowGet);
+                //return Json(site, JsonRequestBehavior.AllowGet);
+                var data = JsonConvert.SerializeObject(site, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+                return Json(new { data = data }, JsonRequestBehavior.AllowGet);
             }
             else
             {
@@ -1511,7 +1658,8 @@ namespace ACT.UI.Controllers
             List<Group> model = new List<Group>();
             //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-
+            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
             //get group list, and their associated clients. TRhis woill be extended with an api call to get clients included and excluded as the button is clicked, and as the groups are changed
             using (ClientService clientService = new ClientService())
             //using (ClientGroupService clientGroupService = new ClientGroupService())
@@ -1520,11 +1668,11 @@ namespace ACT.UI.Controllers
                 pm.Sort = pm.Sort ?? "DESC";
                 pm.SortBy = pm.SortBy ?? "Name";
 
-                model = groupService.GetGroupsByPSP(pspId);
+                model = groupService.GetGroupsByPSP(pspId, new CustomSearchModel() { ClientId = clientId });
                 total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : groupService.Total();
 
                 //get the specific list of clients that exists for the first group, to render the tables, will use an api call to change it accordingly after reselection
-                Group clientGroup = groupService.GetGroupsByPSP(pspId).FirstOrDefault();
+                //Group clientGroup = groupService.GetGroupsByPSP(pspId).FirstOrDefault();
                 //if (clientGroup != null)
                 //{
                 //    ViewBag.ClientListIncluded = clientService.GetClientsByPSPIncludedGroup(pspId, clientGroup.Id);
@@ -1546,6 +1694,8 @@ namespace ACT.UI.Controllers
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
             List<Client> clientList = new List<Client>();
             //TODO
             using (ClientService clientService = new ClientService())
@@ -1560,6 +1710,7 @@ namespace ACT.UI.Controllers
 
             });
             ViewBag.ClientList = clientDDL;
+
 
             return View(model);
         }
@@ -1589,7 +1740,7 @@ namespace ACT.UI.Controllers
                     {
                         Name = model.Name,
                         Description = model.Description,
-                        Status = (int)model.Status
+                        Status = (int)Status.Active
                     };
                     group = gService.Create(group);
                     #endregion
@@ -1597,9 +1748,13 @@ namespace ACT.UI.Controllers
                     #region Create Group Client Links
                     if (!string.IsNullOrEmpty(model.GroupClientList)){
                         String[] clientList = model.GroupClientList.Split(',');
+                        string lastId = "0";
                         foreach(string itm in clientList)
                         {
-                            if (!string.IsNullOrEmpty(itm)) {
+                            //test to see if its not been added before
+                            ClientGroup checkCG = cgservice.GetByColumnsWhere("ClientId", int.Parse(itm), "GroupId", group.Id);
+
+                            if (!string.IsNullOrEmpty(itm) && itm != lastId && checkCG == null) {
                                 ClientGroup client = new ClientGroup()
                                 {
                                     ClientId = int.Parse(itm),
@@ -1608,6 +1763,7 @@ namespace ACT.UI.Controllers
                                 };
                                 cgservice.Create(client);
                             }
+                            lastId = itm;
                         }
                     }
                     #endregion
@@ -1756,11 +1912,12 @@ namespace ACT.UI.Controllers
                 List<Client> clients;
                 //int pspId = Session[ "UserPSP" ];
                 int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-
+                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
                 using (ClientService clientService = new ClientService())
                 {
 
-                    clients = clientService.GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+                    clients = clientService.GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, ClientStatus = Status.Active });
 
                 }
                 return Json(clients, JsonRequestBehavior.AllowGet);
@@ -1779,11 +1936,13 @@ namespace ACT.UI.Controllers
                 List<Client> clients;
                 //int pspId = Session[ "UserPSP" ];
                 int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
 
                 using (ClientService clientService = new ClientService())
                 {
 
-                    clients = clientService.GetClientsByPSPExcludedGroup(pspId, int.Parse(groupId));
+                    clients = clientService.GetClientsByPSPExcludedGroup(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, ClientStatus = Status.Active });
 
                 }
                 return Json(clients, JsonRequestBehavior.AllowGet);
@@ -1830,25 +1989,29 @@ namespace ACT.UI.Controllers
                 //using (GroupService service = new GroupService())
                 using (ClientGroupService clientgroupservice = new ClientGroupService())
                 using (GroupService groupservice = new GroupService())
-                //using (PSPClientService pspclientservice = new PSPClientService())
                 using (ClientService clientService = new ClientService())
                 using (TransactionScope scope = new TransactionScope())
                 {
-                    //clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId });
-                    //List<PSPClient> pspClientList = pspclientservice.ListByColumnWhere("ClientId", int.Parse(clientId));
-                    Group groupObj = groupservice.GetById(int.Parse(groupId));
-
-                    ClientGroup group = new ClientGroup()
+                    ClientGroup checkCG = clientgroupservice.GetByColumnsWhere(groupId, clientId);//check this link doesnt already exist, ignore if it does
+                    //Group groupObj = groupservice.GetById(int.Parse(groupId));
+                    if (checkCG == null)
                     {
-                        GroupId = int.Parse(groupId),
-                        ClientId = int.Parse(clientId),
-                        Status = (int)Status.Active,
-                        //PSPClient = pspClientList.FirstOrDefault(),
-                        //Group = groupObj
-                    };
-                    clientgroupservice.Create(group);
-                    // clientgroupservice.Update(clientGroup);
-                    scope.Complete();
+                        ClientGroup cgroup = new ClientGroup()
+                        {
+                            GroupId = int.Parse(groupId),
+                            ClientId = int.Parse(clientId),
+                            Status = (int)Status.Active,
+                        };
+                        clientgroupservice.Create(cgroup);
+
+                        scope.Complete();
+                    } //nothing to do here if the group is already linekd  to the same client
+                    else
+                    {
+                        //just update status to make sure its visible and active, maybe it was disabled
+                        checkCG.Status = (int)Status.Active;
+                        clientgroupservice.Update(checkCG);
+                    }
                 }
 
 
@@ -1882,6 +2045,8 @@ namespace ACT.UI.Controllers
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
             using (ProductService service = new ProductService())
             using (ClientService clientService = new ClientService())
             {
@@ -2403,19 +2568,22 @@ namespace ACT.UI.Controllers
 
             List<Client> model = new List<Client>();
             //int pspId = Session[ "UserPSP" ];
-            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            //int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+
+            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            if (clientId > 0)
+            {
+               // csm.ClientId = clientId;
+            }
+
             using (ClientService service = new ClientService())
             {
-                pm.Sort = pm.Sort ?? "DESC";
-                pm.SortBy = pm.SortBy ?? "CreatedOn";
-                if (CurrentUser.PSPs.Count > 0)
-                {
-                    model = service.GetClientsByPSPAwaitingActivation(pspId);
-                }
-                else
-                {
-                    model = null;
-                }
+                pm.Sort = pm.Sort ?? "ASC";
+                pm.SortBy = pm.SortBy ?? "Companyname";
+               // csm.PSPClientStatus = PSPClientStatus.Rejected;//Status 2
+               // csm.Status = Status.Pending;
+                model = service.ListAwaitingActivation(pm, csm);//service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
 
                 // var testModel = service.ListByColumn(null, "CompanyRegistrationNumber", "123456");
                 total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total();
@@ -2660,14 +2828,14 @@ namespace ACT.UI.Controllers
         #region Clients
 
         //
-        // POST || GET: /Client/ClientKPIs
-        public ActionResult ClienKPIs(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        // POST || GET: /Client/ClientKPIS
+        public ActionResult ClientKPIS(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
         {
             if (givecsm)
             {
-                ViewBag.ViewName = "ClientKPIs";
+                ViewBag.ViewName = "ClientKPIS";
 
-               return PartialView("_ClientKPIsCustomSearch", new CustomSearchModel("ClientKPIs"));
+               return PartialView("_ClientKPISCustomSearch", new CustomSearchModel("ClientKPIS"));
             }
             int total = 0;
 
@@ -2706,7 +2874,7 @@ namespace ACT.UI.Controllers
                             Id = cl.Id,
                             ClientName = client.CompanyName,
                             TradingAs = client.TradingAs,
-                            Description = cl.Description,
+                            KPIDescription = cl.KPIDescription,
                             Weight = cl.Weight,
                             TargetAmount = cl.TargetAmount,
                             TargetPeriod = cl.TargetPeriod,
@@ -2733,7 +2901,7 @@ namespace ACT.UI.Controllers
             PagingExtension paging = PagingExtension.Create(viewModel, total, pm.Skip, pm.Take, pm.Page);
 
 
-            return PartialView("_ClientKPIs", paging);
+            return PartialView("_ClientKPIS", paging);
         }
 
         //
@@ -2757,7 +2925,7 @@ namespace ACT.UI.Controllers
                 client = service.GetById(model.ClientId);
 
                 //repopulate the view model
-                kpiview.Description = model.Description;
+                kpiview.KPIDescription = model.KPIDescription;
                 kpiview.Id = model.Id;
                 kpiview.ClientId = model.ClientId;
                 kpiview.ClientName = client.CompanyName;
@@ -2787,6 +2955,23 @@ namespace ACT.UI.Controllers
         public ActionResult AddKPI()
         {
             ClientKPIViewModel model = new ClientKPIViewModel() { EditMode = true };
+            List<Client> clientList = new List<Client>();
+            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            using (ClientService clientService = new ClientService())
+            {
+                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, ClientStatus = Status.Active });
+            }
+
+            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.CompanyName
+
+            });
+            ViewBag.ClientList = clientDDL;
             return View(model);
         }
 
@@ -2820,7 +3005,7 @@ namespace ACT.UI.Controllers
                     #region Create ClientKPI
                     ClientKPI clientkpi = new ClientKPI()
                     {
-                        Description = model.Description,
+                        KPIDescription = model.KPIDescription,
                         ClientId = model.ClientId,
                         //Disputes = model.Disputes,
                         //OutstandingPallets = model.OutstandingPallets,
@@ -2839,7 +3024,7 @@ namespace ACT.UI.Controllers
                     scope.Complete();
                 }
                 Notify("The Client KPI was successfully created.", NotificationType.Success);
-                return RedirectToAction("ClientList");
+                return RedirectToAction("ClientKPIS");
             }
             catch (Exception ex)
             {
@@ -2868,7 +3053,7 @@ namespace ACT.UI.Controllers
                 Client client = clientservice.Get(clientkpi.ClientId);
                 ClientKPIViewModel model = new ClientKPIViewModel()
                 {
-                    Description = clientkpi.Description,
+                    KPIDescription = clientkpi.KPIDescription,
                     Id = clientkpi.Id,
                     ClientId = clientkpi.ClientId,
                     ClientName = client.CompanyName,
@@ -2923,7 +3108,7 @@ namespace ACT.UI.Controllers
                     #region Update Client KPI
 
                     // Update Client KPI
-                    kpiview.Description = model.Description;
+                    kpiview.KPIDescription = model.KPIDescription;
                     kpiview.Id = model.Id;
                     kpiview.ClientId = model.ClientId;
                     kpiview.Disputes = model.Disputes;
@@ -2944,9 +3129,9 @@ namespace ACT.UI.Controllers
                     scope.Complete();
                 }
 
-                Notify("The selected Client details were successfully updated.", NotificationType.Success);
+                Notify("The selected Client KPI details were successfully updated.", NotificationType.Success);
 
-                return RedirectToAction("ClientList");
+                return RedirectToAction("ClientKPIS");
             }
             catch (Exception ex)
             {
@@ -2983,7 +3168,7 @@ namespace ACT.UI.Controllers
 
                 }
                 Notify("The selected Client KPI was successfully updated.", NotificationType.Success);
-                return RedirectToAction("ClientList");
+                return RedirectToAction("ClientKPIS");
             }
             catch (Exception ex)
             {
@@ -3061,10 +3246,47 @@ namespace ACT.UI.Controllers
 
         [HttpPost]
         // GET: /Client/ImportSites
-        public ActionResult ImportSubSites(ImportFileModel model)
+        public ActionResult ImportSubSites(HttpPostedFileBase postedFile)
         {
 
-            return View() ;
+            return RedirectToAction("ImportSites", "Client");
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetSite(string SiteId)
+        {
+            if (SiteId != null)
+            {
+                Session["SiteId"] = SiteId;
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetClientSite(string SiteId)
+        {
+            if (SiteId != null)
+            {
+                int clientId = 0;
+                if (int.Parse(SiteId) > 0)
+                {
+                    using (SiteService service = new SiteService())
+                    {
+                        clientId = service.GetClientBySite(int.Parse(SiteId));
+                    }
+                    Session["ClientId"] = clientId;
+                }
+                Session["SiteId"] = SiteId;
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
         }
 
         [HttpPost]
@@ -3085,6 +3307,7 @@ namespace ACT.UI.Controllers
                 try { 
                     string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
                     int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                    //for subsites to load tehse sites under a main site
                     string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
                     int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
 
@@ -3101,39 +3324,90 @@ namespace ACT.UI.Controllers
                         {
                             string[] rows = sreader.ReadLine().Split(',');
 
-                            #region Validation
-                            if (!string.IsNullOrEmpty(rows[13].ToString()) && !siteService.ExistByAccountCode(rows[13].ToString().Trim()))
-                            {
+                            int siteType = 1;
 
-                                int regionId = 0;
+                            string strLatY = rows[3].ToString();
+                            decimal latitudeY = 0;
+                            try
+                            {
+                                decimal.TryParse(rows[3].ToString(), out latitudeY);
+                                latitudeY = decimal.Round(latitudeY, 4);
+                                strLatY = (latitudeY != 0 ? latitudeY.ToString() : strLatY);
+                            }
+                            catch (Exception ex)
+                            {
+                                ViewBag.Message = string.Concat(rows[3].ToString(), " ", ex.Message);
+                            }
+                            string strLngX = rows[2].ToString();
+                            decimal longitudeX = 0;
+                            try
+                            {
+                                decimal.TryParse(rows[2].ToString(), out longitudeX);
+                                longitudeX = decimal.Round(longitudeX, 4);
+                                strLngX = (longitudeX != 0 ? longitudeX.ToString() : strLngX);
+                            }
+                            catch (Exception ex)
+                            {
+                                ViewBag.Message = string.Concat(rows[3].ToString()," ",ex.Message);
+                            }
+
+                            Site existingSite = null;
+                            #region Validation
+                            if (!string.IsNullOrEmpty(strLngX) && siteService.ExistByXYCoords(strLngX, strLatY))
+                            {
+                                //Notify($"Sorry, a Site with the same X Y Coordinates already exists \"{model.XCord}\" already exists!", NotificationType.Error);
+                                //return View(model);
+
+                                //rather than pass back to view, we will create the new site as a subsite of the existing site. 
+                                //Get the existing site first
+                                existingSite = siteService.GetByColumnsWhere("XCord", strLngX, "YCord", strLatY);
+                                SiteID = existingSite.Id;//This is the existing site retrieved by mapping same X and Y coord, read that into the model.SiteId which makes the new site a child site
+                                siteType = 2;//Mark teh site as a subsite by default
+                            }
+
+                            int regionId = 0;
                                 if (!string.IsNullOrEmpty(rows[16].ToString()))
                                 {
                                     regionId = int.Parse(rows[16].ToString());
-                                }
+                                } 
                                 int provinceId = 0;
+                                string provinceName = "";
                                 if (!string.IsNullOrEmpty(rows[8].ToString()))
                                 {
-                                    provinceId = int.Parse(rows[8].ToString());
+                                    int.TryParse(rows[8].ToString(), out provinceId);
+                                    try
+                                    {
+                                        if (provinceId > 0) {
+                                            provinceName = ((Province)provinceId).GetDisplayText();
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        ViewBag.Message = string.Concat(rows[8].ToString(), " ", ex.Message);
+                                    }
                                 }
                                 #region Create Site
                                 Site site = new Site()
                                 {
                                     Name = rows[0].ToString(),
-                                    
                                     Description = rows[1].ToString(),
-                                    XCord = rows[1].ToString(),
-                                    YCord = rows[2].ToString(),
-                                    Address = rows[3].ToString() + " " + rows[4].ToString() + " " + rows[5].ToString() + " " + rows[6].ToString() + " " + rows[7].ToString() + " " + rows[8].ToString(),
+                                    XCord = strLngX,
+                                    YCord = strLatY,
+                                    Address = rows[4].ToString() + " " + rows[5].ToString() + " " + rows[6].ToString() + " " + rows[7].ToString() + " " + provinceName,
                                     PostalCode = rows[7].ToString(),
                                     ContactName = rows[10].ToString(),
                                     ContactNo = rows[9].ToString(),
                                     PlanningPoint = rows[11].ToString(),
-                                    SiteType = 1,//(int).parse(rows[12].ToString()),
+                                    SiteType = siteType,
                                     AccountCode = rows[13].ToString(),
                                     Depot = rows[14].ToString(),
                                     SiteCodeChep = rows[15].ToString(),
                                     Status = (int)Status.Pending,
-                                    RegionId = regionId
+                                    RegionId = regionId,
+                                    FinanceContact = rows[17].ToString(),
+                                    FinanceContactNo = rows[18].ToString(),
+                                    ReceivingContact = rows[19].ToString(),
+                                    ReceivingContactNo = rows[20].ToString(),
                                 };
                                 //For Subsites
                                 if (SiteID > 0) {
@@ -3175,21 +3449,25 @@ namespace ACT.UI.Controllers
                                 csService.Create(csSite);
                                 #endregion
 
-                            }                        
-                            #endregion
-                    }
+                            }
+                        #endregion
                         scope.Complete();
                     }
+                       
                 }
                 catch (Exception ex)
                 {
                     ViewBag.Message = ex.Message;
                 }
+                finally
+                {
+
+                }
             } else
             {
                
             }
-            return RedirectToAction("Index", "Client");
+            return RedirectToAction("ManageSites", "Client");
         }
 
 
@@ -3319,19 +3597,19 @@ namespace ACT.UI.Controllers
                         ClientBudget budget = bservice.GetById(int.Parse(Id));
 
                         budget.ClientId = int.Parse(ClientId);
-                        budget.BudgetYear = DateTime.Now.Year;
-                        budget.January = int.Parse(January);
-                        budget.February = int.Parse(February);
-                        budget.March = int.Parse(March);
-                        budget.April = int.Parse(April);
-                        budget.May = int.Parse(May);
-                        budget.June = int.Parse(June);
-                        budget.July = int.Parse(July);
-                        budget.August = int.Parse(August);
-                        budget.September = int.Parse(September);
-                        budget.October = int.Parse(October);
-                        budget.November = int.Parse(November);
-                        budget.December = int.Parse(December);
+                        budget.BudgetYear = int.Parse(BudgetYear);
+                        budget.January = decimal.Parse(January);
+                        budget.February = decimal.Parse(February);
+                        budget.March = decimal.Parse(March);
+                        budget.April = decimal.Parse(April);
+                        budget.May = decimal.Parse(May);
+                        budget.June = decimal.Parse(June);
+                        budget.July = decimal.Parse(July);
+                        budget.August = decimal.Parse(August);
+                        budget.September = decimal.Parse(September);
+                        budget.October = decimal.Parse(October);
+                        budget.November = decimal.Parse(November);
+                        budget.December = decimal.Parse(December);
                         budget.Status = (int)Status.Active;
 
                         bservice.Update(budget);
@@ -3340,19 +3618,19 @@ namespace ACT.UI.Controllers
                     {
                         ClientBudget budget = new ClientBudget();
                         budget.ClientId = int.Parse(ClientId);
-                        budget.BudgetYear = DateTime.Now.Year;
-                        budget.January = int.Parse(January);
-                        budget.February = int.Parse(February);
-                        budget.March = int.Parse(March);
-                        budget.April = int.Parse(April);
-                        budget.May = int.Parse(May);
-                        budget.June = int.Parse(June);
-                        budget.July = int.Parse(July);
-                        budget.August = int.Parse(August);
-                        budget.September = int.Parse(September);
-                        budget.October = int.Parse(October);
-                        budget.November = int.Parse(November);
-                        budget.December = int.Parse(December);
+                        budget.BudgetYear = int.Parse(BudgetYear);
+                        budget.January = decimal.Parse(January);
+                        budget.February = decimal.Parse(February);
+                        budget.March = decimal.Parse(March);
+                        budget.April = decimal.Parse(April);
+                        budget.May = decimal.Parse(May);
+                        budget.June = decimal.Parse(June);
+                        budget.July = decimal.Parse(July);
+                        budget.August = decimal.Parse(August);
+                        budget.September = decimal.Parse(September);
+                        budget.October = decimal.Parse(October);
+                        budget.November = decimal.Parse(November);
+                        budget.December = decimal.Parse(December);
                         budget.Status = (int)Status.Active;
 
                         bservice.Create(budget);
@@ -3401,19 +3679,19 @@ namespace ACT.UI.Controllers
                         SiteBudget budget = bservice.GetById(int.Parse(Id));
 
                         budget.SiteId = int.Parse(SiteId);
-                        budget.BudgetYear = DateTime.Now.Year;
-                        budget.January = int.Parse(January);
-                        budget.February = int.Parse(February);
-                        budget.March = int.Parse(March);
-                        budget.April = int.Parse(April);
-                        budget.May = int.Parse(May);
-                        budget.June = int.Parse(June);
-                        budget.July = int.Parse(July);
-                        budget.August = int.Parse(August);
-                        budget.September = int.Parse(September);
-                        budget.October = int.Parse(October);
-                        budget.November = int.Parse(November);
-                        budget.December = int.Parse(December);
+                        budget.BudgetYear = int.Parse(BudgetYear);
+                        budget.January = decimal.Parse(January);
+                        budget.February = decimal.Parse(February);
+                        budget.March = decimal.Parse(March);
+                        budget.April = decimal.Parse(April);
+                        budget.May = decimal.Parse(May);
+                        budget.June = decimal.Parse(June);
+                        budget.July = decimal.Parse(July);
+                        budget.August = decimal.Parse(August);
+                        budget.September = decimal.Parse(September);
+                        budget.October = decimal.Parse(October);
+                        budget.November = decimal.Parse(November);
+                        budget.December = decimal.Parse(December);
                         budget.Status = (int)Status.Active;
 
                         bservice.Update(budget);
@@ -3422,19 +3700,19 @@ namespace ACT.UI.Controllers
                     {
                         SiteBudget budget = new SiteBudget();
                         budget.SiteId = int.Parse(SiteId);
-                        budget.BudgetYear = DateTime.Now.Year;
-                        budget.January = int.Parse(January);
-                        budget.February = int.Parse(February);
-                        budget.March = int.Parse(March);
-                        budget.April = int.Parse(April);
-                        budget.May = int.Parse(May);
-                        budget.June = int.Parse(June);
-                        budget.July = int.Parse(July);
-                        budget.August = int.Parse(August);
-                        budget.September = int.Parse(September);
-                        budget.October = int.Parse(October);
-                        budget.November = int.Parse(November);
-                        budget.December = int.Parse(December);
+                        budget.BudgetYear = int.Parse(BudgetYear);
+                        budget.January = decimal.Parse(January);
+                        budget.February = decimal.Parse(February);
+                        budget.March = decimal.Parse(March);
+                        budget.April = decimal.Parse(April);
+                        budget.May = decimal.Parse(May);
+                        budget.June = decimal.Parse(June);
+                        budget.July = decimal.Parse(July);
+                        budget.August = decimal.Parse(August);
+                        budget.September = decimal.Parse(September);
+                        budget.October = decimal.Parse(October);
+                        budget.November = decimal.Parse(November);
+                        budget.December = decimal.Parse(December);
                         budget.Status = (int)Status.Active;
 
                         bservice.Create(budget);

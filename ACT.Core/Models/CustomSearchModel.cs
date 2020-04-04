@@ -49,6 +49,15 @@ namespace ACT.Core.Models
         }
 
         /// <summary>
+        /// Can be used as a selected Client 
+        /// </summary>
+        [Display(Name = "Site")]
+        public int SiteId
+        {
+            get; set;
+        }
+
+        /// <summary>
         /// Can be used as a selected Product 
         /// </summary>
         [Display( Name = "Product" )]
