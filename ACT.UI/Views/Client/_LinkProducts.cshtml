@@ -24,7 +24,7 @@
 
 @{
     Int32 count = Model.Start;
-    List<Product> items = (List<Product>)Model.Items;
+    List<ProductCustomModel> items = (List<ProductCustomModel>)Model.Items;
 }
 
 
@@ -52,7 +52,7 @@
                 }
             </td>
             <td style="width:16%">
-                <a href="#" onclick="LinkClientToProducts()"><i class="fa fa-link"></i>Link Client to Product</a>
+                <a href="#" id="Add" name="Add" title="Link Client to Products" onclick="LinkClientToProducts()"><i class="fa fa-link"></i>Link Client to Product</a>
                 @*@Html.ActionLink("Add", "AddProduct", new { }, new { @class = "add", @rel = "tipsyS", @title = "Link Client to product?", @data_edit = "1", @data_id = 0, @data_target = "#linkproducts" })*@
             </td>
             <td style="width:3%">
@@ -77,9 +77,9 @@
             <th data-name="XCord" data-column="XCord">
                 Product Name
             </th>
-            <th data-name="XCord" data-column="XCord">
+            @*<th data-name="XCord" data-column="XCord">
                 Product Prices
-            </th>
+            </th>*@
             <th data-name="YCord" data-column="YCord">
                 Hire Rate
             </th>
@@ -114,10 +114,10 @@
                     price = aservice.Get(item.Id);
                     if (price != null)
                     {
-                        hrate = price.RateUnit.ToString() + ' ' + price.Rate.ToString();
-                        irate = price.RateUnit.ToString() + ' ' + price.Rate.ToString();
-                        lrate = price.RateUnit.ToString() + ' ' + price.Rate.ToString();
-                        pocost = price.RateUnit.ToString() + ' ' + price.Rate.ToString();
+                        hrate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+                        irate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+                        lrate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+                        pocost = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
 
                     }
                 }
@@ -133,9 +133,9 @@
                     <td>
                         @item.Description
                     </td>
-                    <td>
+                    @*<td>
                         @item.ProductPrices
-                    </td>
+                    </td>*@
                     <td>
                         @hrate
                     </td>
@@ -149,15 +149,17 @@
                         @pocost
                     </td>                    
                     <td width="15%">
-                        <input type="radio" id="productId_@item.Id" name="productslist" value="@item.Id" /><!--onclick="LinkClientToProducts(@item.Id)"-->
-                        @Html.ActionLink("History", "HistoryDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        <input type="checkbox" id="@item.Id" name="productslist" class="prodlist" value="@item.Id" /><!--onclick="LinkClientToProducts(@item.Id)"-->
+                        @if (ViewBag.ContextualMode)
+                        {
+                            @Html.ActionLink("Edit", "EditProduct", new { id = item.Id, returnView = "LinkProducts" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        @Html.ActionLink(enable, "DeleteProduct", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#linkproducts", @rel = "tipsyE", @title = enable + " this item?" })
+                            @Html.ActionLink(enable, "DeleteProduct", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#linkproducts", @rel = "tipsyE", @title = enable + " this item?" })
 
-                        @Html.ActionLink("Edit", "EditProduct", new { id = item.Id, returnView = "LinkProducts" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                            @Html.ActionLink("History", "HistoryDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        }
 
-
-                    </td>
+                        </td>
 
                 </tr>
 
@@ -171,7 +173,7 @@
 @*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
 <script>
     $(document).ready(function () {
-        //$('.add').hide();
+        $('.add').hide();
 
 
         //$("#ClientList").change(function () {
@@ -190,76 +192,97 @@
         var cText = $('#ClientList option:selected').text();
         var r = confirm("Please confirm you wish to link " + cText + " to product(s)!");
         if (r == true) {
-            //SetClient(cId);
-            $.ajax({
-                type: 'POST',
-                url: "SetClientSite",
-                data: { "SiteId": id },
-                success: function (response) {
-                    window.location.href = 'Index#subsites';
-                    location.reload();
-                }
+            var clicked = 0;
+            $(".productslist").each(function () {
+                if ($(this).is(':checked')) {
+                    var id = $(this).attr("id");
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "LinkClientToProduct",
+                        data: { "clientId": cId, "productId": id },
+                        success: function (response) {
+//do nothing at first
+                        }
+                    });
+                    clicked += 1;
+                }                
             });
-
-
+            if (clicked > 0) {
+                alert("clicked = " +clicked);
+                //refresh the pager and set the cutrrent client in context so that they can edit the amounts
+                SetClient(cId);
+                location.reload();
+            } else {
+                alert("No Product Options were selected to link to the Client. Please select and try again.");
+            }
         } else {
-
-
-
+            //do nothing, they cancelled
         }
-       
-
     }
 
-    function GetIncludedProducts(cId) {
-        //debugger;
-        var rowDiv = $("#products-table tbody");
+    function SetClient(cId) {
         $.ajax({
-            type: "GET",
-            url: "GetProductsForClient",
-            data: { clientId: cId },
-            contentType: "application/json;charset=utf-8",
-            dataType: "json",
-            success: function (data) {
-                // debugger;
-                rowDiv.html('');
-                var result = "";
-                $.each(data, function (id, site) {
-                    var actionStr = '<a class="info" data-details="1" data-id="' + site.Id + '" data-target=".tr-' + site.Id + '-item" href="/Client/SiteDetails/' + site.Id + '"> Details</a>' +
-                        '<a class="edit" data-edit="1" data-id="' + site.Id + '" data-target=".tr-5-item" href = "/Client/EditSite/' + site.Id + '?returnView=ManageSites">Edit</a > ' +
-                        '<a class="warn" data-delete="1" data-id="' + site.Id + '" data-refresh-target="#managesites" data-target="#tr-' + site.Id + '-item" href="/Client/DeleteSite/' + site.Id + '" rel="tipsyE" title="Disable this item?" > Disable</a > ';
-/*
-                    result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
-                        '<td style = "width: 15%;">' +
-                        site.Region.Name +
-                        '</td><td>' +
-                        site.Name +
-                        '</td><td>' +
-                        site.XCord +
-                        '</td><td> ' +
-                        site.YCord +
-                        '</td><td> ' +
-                        site.Address +
-                        '</td><td> ' +
-                        site.PostalCode +
-                        '</td><td> ' +
-                        site.ContactNo +
-                        ' </td><td> ' +
-                        site.ContactName +
-                        '</td><td> ' +
-                        site.PlanningPoint +
-                        '</td><td>' + actionStr + '</td></tr>';//<input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" value="' + site.Id + '" />
-                        */
-                });
-                rowDiv.html(result);
-
-            },
-            error: function (response) {
-
-                alert('Error retrieving sites');
+            type: 'POST',
+            url: "SetClient",
+            data: { "ClientId": cId },
+            success: function (response) {
+                //window.location.href = 'Index#managesites';
+                //location.reload();
+                GetIncludedSites(cId);
             }
         });
-
     }
+
+//    function GetIncludedProducts(cId) {
+//        //debugger;
+//        var rowDiv = $("#products-table tbody");
+//        $.ajax({
+//            type: "GET",
+//            url: "GetProductsForClient",
+//            data: { clientId: cId },
+//            contentType: "application/json;charset=utf-8",
+//            dataType: "json",
+//            success: function (data) {
+//                // debugger;
+//                rowDiv.html('');
+//                var result = "";
+//                $.each(data, function (id, site) {
+//                    var actionStr = '<a class="info" data-details="1" data-id="' + site.Id + '" data-target=".tr-' + site.Id + '-item" href="/Client/SiteDetails/' + site.Id + '"> Details</a>' +
+//                        '<a class="edit" data-edit="1" data-id="' + site.Id + '" data-target=".tr-5-item" href = "/Client/EditSite/' + site.Id + '?returnView=ManageSites">Edit</a > ' +
+//                        '<a class="warn" data-delete="1" data-id="' + site.Id + '" data-refresh-target="#managesites" data-target="#tr-' + site.Id + '-item" href="/Client/DeleteSite/' + site.Id + '" rel="tipsyE" title="Disable this item?" > Disable</a > ';
+///*
+//                    result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
+//                        '<td style = "width: 15%;">' +
+//                        site.Region.Name +
+//                        '</td><td>' +
+//                        site.Name +
+//                        '</td><td>' +
+//                        site.XCord +
+//                        '</td><td> ' +
+//                        site.YCord +
+//                        '</td><td> ' +
+//                        site.Address +
+//                        '</td><td> ' +
+//                        site.PostalCode +
+//                        '</td><td> ' +
+//                        site.ContactNo +
+//                        ' </td><td> ' +
+//                        site.ContactName +
+//                        '</td><td> ' +
+//                        site.PlanningPoint +
+//                        '</td><td>' + actionStr + '</td></tr>';//<input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" value="' + site.Id + '" />
+//                        */
+//                });
+//                rowDiv.html(result);
+
+//            },
+//            error: function (response) {
+
+//                alert('Error retrieving sites');
+//            }
+//        });
+
+//    }
 </script>
 @Html.Partial("_Paging")

@@ -2039,7 +2039,7 @@ namespace ACT.UI.Controllers
 
             int total = 0;
 
-            List<Product> model = new List<Product>();
+            List<ProductCustomModel> model = new List<ProductCustomModel>();
             List<Client> clientList = new List<Client>();
             //int pspId = Session[ "UserPSP" ];
             int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
@@ -2050,18 +2050,20 @@ namespace ACT.UI.Controllers
             using (ProductService service = new ProductService())
             using (ClientService clientService = new ClientService())
             {
-                model = service.List(pm, csm);
+                model = service.ListCSM(pm, csm);
                 total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total1(pm, csm);
-                //if (clientId > 0)
-                //{
-                //    Client client = clientService.GetById(clientId);
-                //    clientList.Add(client);
-                //}
-                //else
-                //{
-                //  clientList = clientService.GetClientsByPSP(pspId);
-                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, ClientStatus = Status.Active });
-                //}
+                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientStatus = Status.Active });
+            }
+
+            if (clientId > 0) { //if its client specific pull it from the ClientProduct table instead and show whats relevant
+                using (ClientProductService cpservice = new ClientProductService()) {
+                    csm.ClientId = clientId;
+                    csm.Status = Status.Active;
+
+                    //List<ProductCustomModel> cpmodel
+                     model = cpservice.ListCSM(pm, csm);
+                }
+
             }
 
             PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
@@ -3288,6 +3290,42 @@ namespace ACT.UI.Controllers
                 return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
             }
         }
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult LinkClientToProduct(string client, string product)
+        {
+            if (!string.IsNullOrEmpty(client) && !string.IsNullOrEmpty(product))
+            {
+                int clientId, productId = 0;
+                int.TryParse(client, out clientId);
+                int.TryParse(product, out productId);
+
+                if (int.Parse(client) > 0)
+                {
+                    using (ProductService prodservice = new ProductService())
+                    using (ClientProductService service = new ClientProductService())
+                    {
+                        Product pcm = prodservice.GetById(productId);
+                        if (pcm != null) {
+                            ClientProduct cg = new ClientProduct()
+                            {
+                                ClientId = clientId,
+                                ProductId = productId,
+                                HireRate = pcm.ProductPrices
+
+
+
+                            }
+                        }
+                    }
+                }
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+        
 
         [HttpPost]
         // GET: /Client/ImportSites
