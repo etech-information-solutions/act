@@ -104,20 +104,42 @@
             foreach (var item in items)
             {
 
-                ProductPrice price = new ProductPrice();
+                List<ProductPrice> prices = new List<ProductPrice>();
                 string hrate = "";
                 string irate = "";
                 string lrate = "";
                 string pocost = "";
                 using (ProductPriceService aservice = new ProductPriceService())
                 {
-                    price = aservice.Get(item.Id);
-                    if (price != null)
+                    prices = aservice.ListByColumnWhere("ProductId", item.Id);
+
+                    if (prices != null)
                     {
-                        hrate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
-                        irate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
-                        lrate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
-                        pocost = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+                        foreach (ProductPrice price in prices)
+                        {
+                            switch (price.Type)
+                            {
+                                case (int)ProductPriceType.Hire:
+                                    hrate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+                                    //hrate = price.Rate;
+                                    //hrateunit = price.RateUnit;
+                                    break;
+                                case (int)ProductPriceType.Issue:
+                                    irate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+                                    //irate = price.Rate;
+                                    //irateunit = price.RateUnit;
+                                    break;
+                                case (int)ProductPriceType.Lost:
+                                    lrate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+                                    //lrate = price.Rate;
+                                    //lrateunit = price.RateUnit;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+
+                        //pocost = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
 
                     }
                 }
@@ -148,8 +170,8 @@
                     <td>
                         @pocost
                     </td>                    
-                    <td width="15%">
-                        <input type="checkbox" id="@item.Id" name="productslist" class="prodlist" value="@item.Id" /><!--onclick="LinkClientToProducts(@item.Id)"-->
+                    <td width="15%">                       
+
                         @if (ViewBag.ContextualMode)
                         {
                             @Html.ActionLink("Edit", "EditProduct", new { id = item.Id, returnView = "LinkProducts" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
@@ -157,9 +179,12 @@
                             @Html.ActionLink(enable, "DeleteProduct", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#linkproducts", @rel = "tipsyE", @title = enable + " this item?" })
 
                             @Html.ActionLink("History", "HistoryDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                                } else
+                                {
+                                   <input type="checkbox" id="@item.Id" name="productslist" class="prodlist" value="@item.Id" />
                         }
 
-                        </td>
+                    </td>
 
                 </tr>
 
@@ -193,14 +218,15 @@
         var r = confirm("Please confirm you wish to link " + cText + " to product(s)!");
         if (r == true) {
             var clicked = 0;
-            $(".productslist").each(function () {
+           // debugger;
+            $(".prodlist").each(function () {
                 if ($(this).is(':checked')) {
                     var id = $(this).attr("id");
 
                     $.ajax({
                         type: 'POST',
                         url: "LinkClientToProduct",
-                        data: { "clientId": cId, "productId": id },
+                        data: { "client": cId, "product": id },
                         success: function (response) {
 //do nothing at first
                         }
@@ -209,7 +235,7 @@
                 }                
             });
             if (clicked > 0) {
-                alert("clicked = " +clicked);
+                alert(clicked + ' Products Linked Successfully to ' + cText);
                 //refresh the pager and set the cutrrent client in context so that they can edit the amounts
                 SetClient(cId);
                 location.reload();

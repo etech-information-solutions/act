@@ -1,9 +1,10 @@
 ﻿@model PagingExtension
 
-@using ACT.Core.Models.Custom;
+@using ACT.Data.Models;
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
-
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
 @{
     ViewBag.ShowExport = true;
     ViewBag.ShowCustom = true;
@@ -13,14 +14,14 @@
 }
 
 
-@Html.Partial( "_Notification" )
+@Html.Partial("_Notification")
 
 @{
     Int32 count = Model.Start;
-    List<ProductCustomModel> items = ( List<ProductCustomModel> ) Model.Items;
+    List<ProductCustomModel> items = (List<ProductCustomModel>)Model.Items;
 }
 
-@if ( Model == null || !items.Any() )
+@if (Model == null || !items.Any())
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
         There are no Products available matching your search criteria.
@@ -28,7 +29,7 @@
 }
 
 <p>
-    @Html.ActionLink( "Add Product", "AddProduct", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Product?", @data_edit = "1", @data_id = 0, @data_target = "#products" } )
+    @Html.ActionLink("Add Product", "AddProduct", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Product?", @data_edit = "1", @data_id = 0, @data_target = "#products" })
     <span class="loader"></span>
 </p>
 
@@ -58,14 +59,56 @@
     </thead>
 
     <tbody>
-        @if ( Model != null && items != null && items.Count() > 0 )
+        @if (Model != null && items != null && items.Count() > 0)
         {
-            foreach ( var item in items )
+            foreach (var item in items)
             {
-                Status status = ( Status ) item.Status;
+                Status status = (Status)item.Status;
 
-                String active = status.Equals( Status.Active ) ? "active" : "inactive";
-                String enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+                String active = status.Equals(Status.Active) ? "active" : "inactive";
+                String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+
+                List<ProductPrice> prices = new List<ProductPrice>();
+                string hrate = "";
+                string irate = "";
+                string lrate = "";
+                string pocost = "";
+                using (ProductPriceService aservice = new ProductPriceService())
+                {
+                    prices = aservice.ListByColumnWhere("ProductId", item.Id);
+
+                    if (prices != null)
+                    {
+                        foreach (ProductPrice price in prices)
+                        {
+                            switch (price.Type)
+                            {
+                                case (int)ProductPriceType.Hire:
+                                    hrate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+                                    //hrate = price.Rate;
+                                    //hrateunit = price.RateUnit;
+                                    break;
+                                case (int)ProductPriceType.Issue:
+                                    irate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+                                    //irate = price.Rate;
+                                    //irateunit = price.RateUnit;
+                                    break;
+                                case (int)ProductPriceType.Lost:
+                                    lrate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+                                    //lrate = price.Rate;
+                                    //lrateunit = price.RateUnit;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+
+                        //pocost = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+
+                    }
+                }
+
+
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
@@ -87,18 +130,22 @@
                         @status.GetDisplayText()
                     </td>
                     <td>
-                        @if ( item.ProductPriceCount > 0 )
+                        Hire @hrate<br />
+                        Issue @irate<br />
+                        Lost @lrate<br />
+                        Passon @pocost
+                        @if (item.ProductPriceCount > 0)
                         {
-                            @Html.ActionLink( item.ProductPriceCount.ToString(), "ProductDetails", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            @Html.ActionLink(item.ProductPriceCount.ToString(), "ProductDetails", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
                         }
                     </td>
                     <td width="17%">
-                        @Html.ActionLink( "Details", "ProductDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink("Details", "ProductDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        @Html.ActionLink( "Edit", "EditProduct", new { id = item.Id, returnView = "Products" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                        @Html.ActionLink( enable, "DeleteProduct", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#products", @rel = "tipsyE", @title = enable + " this item?" } )
+                        @Html.ActionLink("Edit", "EditProduct", new { id = item.Id, returnView = "Products" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        @Html.ActionLink(enable, "DeleteProduct", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#products", @rel = "tipsyE", @title = enable + " this item?" })
 
-                        @if ( item.Documents != null && item.Documents.Any( s => s.Status == ( Int32 ) Status.Active ) )
+                        @if (item.Documents != null && item.Documents.Any(s => s.Status == (Int32)Status.Active))
                         {
                             <div style="border-top: 1px dashed #7368e3; padding-top: 8px; margin-top: 10px;">
                                 <a class="docs" data-sticky-one="1" data-target="#supporting-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Supporting Documents">
@@ -106,7 +153,7 @@
                                 </a>
                                 <div id="supporting-@item.Id-docs" class="none">
                                     <ul class="list">
-                                        @foreach ( var d in item.Documents.Where( s => s.Status == ( Int32 ) Status.Active ) )
+                                        @foreach (var d in item.Documents.Where(s => s.Status == (Int32)Status.Active))
                                         {
                                             <li style="line-height: 20px;">
                                                 <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )" target="_blank">
@@ -132,4 +179,4 @@
 
 @*@Html.Partial( "_ProductCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
 
-@Html.Partial( "_Paging" )
+@Html.Partial("_Paging")

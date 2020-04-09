@@ -2024,7 +2024,92 @@ namespace ACT.UI.Controllers
 
         #region Products
 
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult LinkClientToProduct(string client, string product)
+        {
+            if (!string.IsNullOrEmpty(client) && !string.IsNullOrEmpty(product))
+            {
+                int clientId, productId = 0;
+                int.TryParse(client, out clientId);
+                int.TryParse(product, out productId);
 
+                if (int.Parse(client) > 0)
+                {
+                    using (ProductService service = new ProductService())
+                    using (ClientProductService cpservice = new ClientProductService())
+                    using (TransactionScope scope = new TransactionScope())
+                    {
+                        ProductCustomModel pcm = service.ListCSM(new PagingModel(), new CustomSearchModel()).FirstOrDefault(p => p.Id == productId);//get the list and then pick one out based on the productId passed in                        
+                        if (pcm != null)
+                        {
+                            List<ProductPrice> prices = new List<ProductPrice>();
+                            decimal hrate = 0;
+                            int? hrateunit = 0;
+                            decimal irate = 0;
+                            int? irateunit = 0;
+                            decimal lrate = 0;
+                            int? lrateunit = 0;
+                            decimal pocost = 0;
+                            int pocostunit = 0;
+                            //get the individual prices to copy over
+                            using (ProductPriceService aservice = new ProductPriceService())
+                            {
+                                prices = aservice.ListByColumnWhere("ProductId", productId);
+                                if (prices != null)
+                                {
+                                    foreach (ProductPrice price in prices)
+                                    {
+                                        switch (price.Type)
+                                        {
+                                            case (int)ProductPriceType.Hire:
+                                                hrate = price.Rate;
+                                                hrateunit = price.RateUnit;
+                                                break;
+                                            case (int)ProductPriceType.Issue:
+                                                irate = price.Rate;
+                                                irateunit = price.RateUnit;
+                                                break;
+                                            case (int)ProductPriceType.Lost:
+                                                lrate = price.Rate;
+                                                lrateunit = price.RateUnit;
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            ClientProduct testcp = cpservice.GetByColumnsWhere("ProductId", productId, "ClientId", clientId);
+                            if (testcp == null)
+                            {
+                                //set the client product up
+                                ClientProduct cg = new ClientProduct()
+                                {
+                                    ClientId = clientId,
+                                    ProductId = productId,
+                                    ActiveDate = DateTime.Now,
+                                    ProductDescription = pcm.Description,
+                                    HireRate = hrate,
+                                    IssueRate = irate,
+                                    LostRate = lrate,
+                                    PassonDays = 0, //to be edited by client
+                                    PassonRate = pocost,
+                                    Status = (int)Status.Active
+                                };
+                                cpservice.Create(cg); //save the clientproduct
+                            }
+                        }
+                        scope.Complete();
+                    }
+                }
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
 
         //
         // POST || GET: /Client/LinkProducts
@@ -2052,7 +2137,7 @@ namespace ACT.UI.Controllers
             {
                 model = service.ListCSM(pm, csm);
                 total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total1(pm, csm);
-                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientStatus = Status.Active });
+                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientStatus = Status.Active, ClientId = clientId });
             }
 
             if (clientId > 0) { //if its client specific pull it from the ClientProduct table instead and show whats relevant
@@ -3290,42 +3375,7 @@ namespace ACT.UI.Controllers
                 return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
             }
         }
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult LinkClientToProduct(string client, string product)
-        {
-            if (!string.IsNullOrEmpty(client) && !string.IsNullOrEmpty(product))
-            {
-                int clientId, productId = 0;
-                int.TryParse(client, out clientId);
-                int.TryParse(product, out productId);
-
-                if (int.Parse(client) > 0)
-                {
-                    using (ProductService prodservice = new ProductService())
-                    using (ClientProductService service = new ClientProductService())
-                    {
-                        Product pcm = prodservice.GetById(productId);
-                        if (pcm != null) {
-                            ClientProduct cg = new ClientProduct()
-                            {
-                                ClientId = clientId,
-                                ProductId = productId,
-                                HireRate = pcm.ProductPrices
-
-
-
-                            }
-                        }
-                    }
-                }
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
-            }
-        }
-        
+           
 
         [HttpPost]
         // GET: /Client/ImportSites
