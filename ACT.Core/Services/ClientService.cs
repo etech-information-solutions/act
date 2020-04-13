@@ -79,10 +79,16 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmProductId", csm.ProductId ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmClientStatus", ( int ) csm.ClientStatus ) },
+                { new SqlParameter( "csmStatus", ( int ) csm.Status ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+
+                { new SqlParameter( "csmName", csm.Name ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmDescription", csm.Description ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmReferenceNumber", csm.ReferenceNumber ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmContactNumber", csm.ContactNumber ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmContacName", csm.ContactName ?? ( object ) DBNull.Value ) },
             };
 
             #endregion
@@ -119,9 +125,35 @@ namespace ACT.Core.Services
             //{
             //    query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPProduct] pp WHERE p.Id=pp.PSPId AND pp.ProductId=@csmProductId) ";
             //}
-            if (csm.ClientStatus != Status.All)
+
+            if (!string.IsNullOrEmpty(csm.Name))
             {
-                query = $"{query} AND (p.Status=@csmClientStatus) ";
+                query = string.Format(@"{0} AND (p.[CompanyName] LIKE '%{1}%' OR p.[TradingAs] LIKE '%{1}%')", query, csm.Name);
+            }
+
+            if (!string.IsNullOrEmpty(csm.Description))
+            {
+                query = string.Format(@"{0} AND (p.[Description] LIKE '%{1}%' OR p.[CompanyName] LIKE '%{1}%' OR p.[TradingAs] LIKE '%{1}%')", query, csm.Description);
+            }
+
+            if (!string.IsNullOrEmpty(csm.ContactName))
+            {
+                query = string.Format(@"{0} AND (p.[ContactPerson] LIKE '%{1}%' OR p.[AdminPerson] LIKE '%{1}%' OR p.[FinancialPerson] LIKE '%{1}%') ", query, csm.ContactName);
+            }
+
+            if (!string.IsNullOrEmpty(csm.ContactNumber))
+            {
+                query = string.Format(@"{0} AND (p.[ContactNumber] LIKE '%{1}%' OR p.[Email] LIKE '%{1}%' OR p.[AdminEmail] LIKE '%{1}%' OR p.[FinPersonEmail] LIKE '%{1}%') ", query, csm.ContactNumber);
+            }
+
+            if (!string.IsNullOrEmpty(csm.ReferenceNumber))
+            {
+                query = string.Format(@"{0} AND (p.[ChepReference] LIKE '%{1}%' OR p.[VATNumber] LIKE '%{1}%' OR p.[CompanyRegistrationNumber] LIKE '%{1}%')", query, csm.ReferenceNumber);
+            }
+
+            if (csm.Status != Status.All)
+            {
+                query = $"{query} AND (p.Status=@csmStatus) ";
             }
             if (csm.FromDate.HasValue && csm.ToDate.HasValue)
             {
@@ -210,7 +242,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmProductId", csm.ProductId ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmClientStatus", ( int ) csm.ClientStatus ) },
+                { new SqlParameter( "csmClientStatus", ( int ) csm.Status ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
@@ -287,7 +319,10 @@ namespace ACT.Core.Services
                                                   p.[ContactNumber] LIKE '%{1}%' OR
                                                   p.[ContactPerson] LIKE '%{1}%' OR
                                                   p.[Email] LIKE '%{1}%' OR
-                                                  p.[AdminEmail] LIKE '%{1}%'
+                                                  p.[AdminEmail] LIKE '%{1}%' OR
+                                                 p.[AdminPerson] LIKE '%{1}%' OR
+                                                 p.[FinPersonEmail] LIKE '%{1}%' OR
+                                                 p.[ChepReference] LIKE '%{1}%'
                                              ) ", query, csm.Query.Trim());
             }
 
@@ -344,7 +379,7 @@ namespace ACT.Core.Services
             List<object> parameters = new List<object>()
             {
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
-                { new SqlParameter( "csmClientStatus", ( int ) csm.ClientStatus ) },
+                { new SqlParameter( "csmClientStatus", ( int ) csm.Status ) },
             };
 
             #endregion
@@ -358,7 +393,7 @@ namespace ACT.Core.Services
                 query = $"{query} AND c.Id=@csmClientId ";
             }
 
-            if (csm.ClientStatus != Status.All)
+            if (csm.Status != Status.All)
             {
                 query = $"{query} AND (c.Status=@csmClientStatus) ";
             }
@@ -373,7 +408,7 @@ namespace ACT.Core.Services
             List<object> parameters = new List<object>()
             {
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
-                { new SqlParameter( "csmClientStatus", ( int ) csm.ClientStatus ) },
+                { new SqlParameter( "csmClientStatus", ( int ) csm.Status ) },
             };
 
             #endregion
@@ -386,7 +421,7 @@ namespace ACT.Core.Services
                 query = $"{query} AND c.Id=@csmClientId ";
             }
 
-            if (csm.ClientStatus != Status.All)
+            if (csm.Status != Status.All)
             {
                 query = $"{query} AND (c.Status=@csmClientStatus) ";
             }

@@ -33,72 +33,80 @@ else
 {
     <input type="hidden" id="contextsite" name="contextsite" value="0" />
 }
-@using (Html.BeginForm("ImportSites", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @style = "width: auto;" }))
+@using (Html.BeginForm("ImportSubSites", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @style = "width: auto;" }))
 {
+    @if (ViewBag.ContextualModeSite)
+    {
+        <input type="hidden" id="SiteId" name="SiteId" value="0" />
+    }
+    else
+    {
+        <input type="hidden" id="SiteId" name="SiteId" value="0" />
+    }
     <p>
-        <table style="width:100%" border="0">
-            <tr>
-                <td style="width:3%">
-                    <label for="file">Client:</label><br /><br /><br />
-                    <label for="site">Site:</label>
-                </td>
-                <td style="width:15%">
-                    @if (ViewBag.ContextualMode)
-                    {
-                        @Html.DropDownList("ClientList")
-                    }
-                    else
-                    {
-                        @Html.DropDownList("ClientList", "All Clients")
-                    }
-                    @*@Html.DropDownList("ClientList", "Please Select")<br /><br />*@
-                    @*@Html.DropDownList("SiteList")*@
-                    @*@if (ViewBag.ContextualModeSite)
-        {
-            @Html.DropDownList("ClientSiteList")
-        }
-        else
-        {
-            @Html.DropDownList("ClientSiteList", "All Sites")
-        }*@
-                    <br />
-                    <br />
-                    <br />
-                    @if (ViewBag.ContextualModeSite)
+    <table style="width:100%" border="0">
+        <tr>
+            <td style="width:3%">
+                <label for="file">Client:</label><br /><br /><br />
+                <label for="site">Site:</label>
+            </td>
+            <td style="width:15%">
+                @if (ViewBag.ContextualMode)
+                {
+                    @Html.DropDownList("ClientList")
+                }
+                else
+                {
+                    @Html.DropDownList("ClientList", "All Clients")
+                }
+                @*@Html.DropDownList("ClientList", "Please Select")<br /><br />*@
+                @*@Html.DropDownList("SiteList")*@
+                @*@if (ViewBag.ContextualModeSite)
                     {
                         @Html.DropDownList("ClientSiteList")
                     }
                     else
                     {
                         @Html.DropDownList("ClientSiteList", "All Sites")
-                    }
-                    @*@Html.DropDownList("ClientSiteList", Enumerable.Empty<SelectListItem>(), "All Sites")*@
-                </td>
-                <td style="width:2%">
-                    @if (user.IsAdmin || user.IsPSPAdmin)
-                    {
-                        <br /><br />
-                        @Html.ActionLink("Add", "AddSite", new { sourceview = "SubSites" }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#subsites" })
-                    }
-                </td>
-                <td style="width:5%">
-                    &nbsp;
-                </td>
-                <td style="width:3%">
-                    <label for="file" class="importlabel">Browse:</label>
-                </td>
-                <td style="width:55%">
-                    <input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" />
-                </td>
-                <td style="width:10%">
-                    <input type="submit" value="Import Sites" class="importbutton" />
-                </td>
-                <td style="width:7%">
-                    <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "sitetemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
-                </td>
-            </tr>
-        </table>
-        <span class="loader"></span>
+                    }*@
+                <br />
+                <br />
+                <br />
+                @if (ViewBag.ContextualModeSite)
+                {
+                    @Html.DropDownList("ClientSiteList")
+                }
+                else
+                {
+                    @Html.DropDownList("ClientSiteList", "All Sites")
+                }
+                @*@Html.DropDownList("ClientSiteList", Enumerable.Empty<SelectListItem>(), "All Sites")*@
+            </td>
+            <td style="width:2%">
+                @if (user.IsAdmin || user.IsPSPAdmin)
+                {
+                    <br /><br />
+                    @Html.ActionLink("Add", "AddSite", new { sourceview = "SubSites" }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#subsites" })
+                }
+            </td>
+            <td style="width:5%">
+                &nbsp;
+            </td>
+            <td style="width:3%">
+                <label for="file" class="importlabel">Browse:</label>
+            </td>
+            <td style="width:55%">
+                <input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" />
+            </td>
+            <td style="width:10%">
+                <input type="submit" value="Import Sub Sites" class="importbutton" />
+            </td>
+            <td style="width:7%">
+                <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "sitetemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
+            </td>
+        </tr>
+    </table>
+    <span class="loader"></span>
     </p>
 }
 
@@ -267,7 +275,7 @@ else
     $(document).ready(function () {
         var context = $("#context").val();
         var contextsite = $("#contextsite").val();
-        
+
         if (context == "0") {
             $('.add').hide();
             $('.importlabel').hide();
@@ -343,7 +351,7 @@ else
     });
 
     function UpdateSites(cId, sId) {
-       // debugger;
+        // debugger;
         if (sId != '' && cId != '') {
             SetSite(sId);
 
@@ -357,7 +365,7 @@ else
     }
 
     function GetSiteListForClient(cId) {
-       // debugger;
+        // debugger;
         var options = $("#ClientSiteList");
         options.empty();
         $.ajax({

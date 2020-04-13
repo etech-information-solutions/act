@@ -29,34 +29,53 @@ namespace ACT.UI.Models
         [Display(Name = "Trading As")]
         [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string TradingAs { get; set; }
+
         [Display(Name = "Description")]
         [StringLength(500, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string Description { get; set; }
+
         [Display(Name = "VAT Number")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string VATNumber { get; set; }
-        [Display(Name = "Business Contact Number")]
+
+        [Display(Name = "Chep Reference")]
+        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
+        public string ChepReference { get; set; }
+
+        [Display(Name = "Contact Number")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string ContactNumber { get; set; }
+
         [Required]
         [Display(Name = "Contact Person")]
         [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string ContactPerson { get; set; }
+
         [Required]
-        [Display(Name = "Email Address")]
+        [Display(Name = " Contact Person Email")]
         [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string Email { get; set; }
 
         [Required]
         [Display(Name = "Administrator Name")]
         [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
-        public string FinancialPerson { get; set; }
+        public string AdminPerson { get; set; }
 
         [Required]
         [Display(Name = "Administrator Email")]
         [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string AdminEmail { get; set; }
 
+
+        [Required]
+        [Display(Name = " Financial Person Name")]
+        [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
+        public string FinancialPerson { get; set; }
+
+        [Required]
+        [Display(Name = "Financial Person Email")]
+        [StringLength(200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
+        public string FinPersonEmail { get; set; }
 
 
         [Display(Name = "Select a reason why you're declining this Client")]

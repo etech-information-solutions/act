@@ -37,44 +37,17 @@
                 @Html.DisplayFor(model => model.CompanyName)
             </div>
             <div class="display-label">
-                Company Registration Number
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.CompanyRegistrationNumber)
-            </div>
-
-            <h3>Contact Details</h3>
-            <div class="display-label">
-                Name
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.ContactPerson)
-            </div>
-            <div class="display-label">
-                Number
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.ContactNumber)
-            </div>
-
-
-            <h3>Administrator Details</h3>
-            <div class="display-label">
-                Name
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.FinancialPerson)
-            </div>
-
-        </div>
-
-        <div class="left" style="width: 45%;">
-            <h3>&nbsp;</h3>
-            <div class="display-label">
                 Trading As
             </div>
             <div class="display-field">
                 @Html.DisplayFor(model => model.TradingAs)
+            </div>
+
+            <div class="display-label">
+                Company Registration Number
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.CompanyRegistrationNumber)
             </div>
             <div class="display-label">
                 VAT Number
@@ -82,24 +55,67 @@
             <div class="display-field">
                 @Html.DisplayFor(model => model.VATNumber)
             </div>
+            <div class="display-label">
+                Chep Reference
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ChepReference)
+            </div>
+        </div>
 
+        <div class="left" style="width: 45%;">
 
-            <h3>&nbsp;</h3>
+            <h3>Contact Details</h3>
+
 
             <div class="display-label">
-                Email Address
+                Contact Person Name
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ContactPerson)
+            </div>
+            <div class="display-label">
+                Contact Person Number
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ContactNumber)
+            </div>
+            <div class="display-label">
+                Contact Person Email
             </div>
             <div class="display-field">
                 @Html.DisplayFor(model => model.Email)
             </div>
 
-            <h3>&nbsp;</h3>
+
             <div class="display-label">
-                Email
+                Administrator Name
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.AdminPerson)
+            </div>
+            <div class="display-label">
+                Administrator Email
             </div>
             <div class="display-field">
                 @Html.DisplayFor(model => model.AdminEmail)
             </div>
+
+
+            <div class="display-label">
+                Financial Person Name
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.FinancialPerson)
+            </div>
+            <div class="display-label">
+                Financial Person Email
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.FinPersonEmail)
+            </div>
+
+
 
         </div>
 

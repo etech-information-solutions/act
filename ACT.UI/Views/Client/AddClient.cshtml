@@ -19,7 +19,7 @@
 {
     <div id="edit-item">
 
-        <h2 class="uppercase" style="width: auto;">
+        <h2 class="" style="width: auto;">
             <img alt="" src="@Url.Content("~/images/add.png")" />
             <span>Add Client</span>
         </h2>
@@ -33,60 +33,29 @@
 
                 <div class="left" style="width: 50%; margin-right: 2%;">
                     <h3>Client Details</h3>
-                    <div class="editor-label uppercase">
+                    <div class="editor-label ">
                         Client Name
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" })
                         @Html.ValidationMessageFor(model => model.CompanyName)
                     </div>
-                    <div class="editor-label uppercase">
-                        Company Registration Number
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" })
-                        @Html.ValidationMessageFor(model => model.CompanyRegistrationNumber)
-                    </div>
-
-                    <h3>Contact Details</h3>
-                    <div class="editor-label uppercase">
-                        Name
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" })
-                        @Html.ValidationMessageFor(model => model.ContactPerson)
-                    </div>
-                    <div class="editor-label uppercase">
-                        Number
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" })
-                        @Html.ValidationMessageFor(model => model.ContactNumber)
-                    </div>
-
-
-                    <h3>Administrator Details</h3>
-                    <div class="editor-label uppercase">
-                        Name
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.FinancialPerson, new { @class = "input", @placeholder = "Enter Name" })
-                        @Html.ValidationMessageFor(model => model.FinancialPerson)
-                    </div>
-
-
-                </div>
-
-                <div class="left" style="width: 45%;">
-                    <h3>&nbsp;</h3>
-                    <div class="editor-label uppercase">
+                    <div class="editor-label ">
                         Trading As
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.TradingAs, new { @class = "input", @placeholder = "Enter Trading As details" })
                         @Html.ValidationMessageFor(model => model.TradingAs)
                     </div>
-                    <div class="editor-label uppercase">
+
+                    <div class="editor-label ">
+                        Company Registration Number
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" })
+                        @Html.ValidationMessageFor(model => model.CompanyRegistrationNumber)
+                    </div>
+                    <div class="editor-label ">
                         VAT Number
                     </div>
                     <div class="editor-field">
@@ -94,27 +63,75 @@
                         @Html.ValidationMessageFor(model => model.VATNumber)
                     </div>
 
+                    <div class="editor-label ">
+                        Chep Reference
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.ChepReference, new { @class = "input", @placeholder = "Enter Chep reference Number" })
+                        @Html.ValidationMessageFor(model => model.ChepReference)
+                    </div>
+                </div>
 
-                    <h3>&nbsp;</h3>
+                <div class="left" style="width: 45%;">
+                    <h3>Contact Details</h3>
 
-                    <div class="editor-label uppercase">
-                        Email Address
+
+
+                    <div class="editor-label ">
+                        Contact Person Name
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" })
+                        @Html.ValidationMessageFor(model => model.ContactPerson)
+                    </div>
+                    <div class="editor-label ">
+                        Contact Person Number
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" })
+                        @Html.ValidationMessageFor(model => model.ContactNumber)
+                    </div>
+                    <div class="editor-label ">
+                        Contact Person Email
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.Email, new { @class = "input", @placeholder = "Enter Email Address", type = "email" })
                         @Html.ValidationMessageFor(model => model.Email)
                     </div>
 
-                    <h3>&nbsp;</h3>
-                    <h3>&nbsp;</h3>
-                    <h3>&nbsp;</h3>
-                    <h3>&nbsp;</h3>
-                    <div class="editor-label uppercase">
-                        Email
+
+
+                    <div class="editor-label ">
+                        Administrator Name
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.AdminPerson, new { @class = "input", @placeholder = "Enter Name" })
+                        @Html.ValidationMessageFor(model => model.AdminPerson)
+                    </div>
+
+                    <div class="editor-label">
+                        Administrator Email
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.AdminEmail, new { @class = "input", @placeholder = "Enter Email Address", type = "email" })
                         @Html.ValidationMessageFor(model => model.AdminEmail)
+                    </div>
+
+
+
+                    <div class="editor-label ">
+                        Financial Person Name
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.FinancialPerson, new { @class = "input", @placeholder = "Enter Name" })
+                        @Html.ValidationMessageFor(model => model.FinancialPerson)
+                    </div>
+                    <div class="editor-label">
+                        Financial Person Email
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.FinPersonEmail, new { @class = "input", @placeholder = "Enter Email Address", type = "email" })
+                        @Html.ValidationMessageFor(model => model.FinPersonEmail)
                     </div>
                 </div>
 
@@ -199,7 +216,7 @@
 
             <div class="left" style="width: 33%; margin-right: 4%;">
 
-                <div class="editor-label uppercase">
+                <div class="editor-label ">
                     Logo
                 </div>
                 <div class="editor-field">
@@ -215,10 +232,10 @@
             @*<button id="managekpis" name="managekpis">Manage KPIs</button>
                 <div id="ex1" class="modal">
                     <p>
-                        <strong class="uppercase">KPI</strong>
+                        <strong class="">KPI</strong>
                     </p>
                     <div class="left" style="width: 40%; margin-right: 4%;">
-                        <div class="editor-label uppercase">
+                        <div class="editor-label ">
                             Outstanding
                         </div>
                         <div class="editor-field">
@@ -226,7 +243,7 @@
                             @Html.ValidationMessageFor(model => model.KPIOutstanding)
                         </div>
 
-                        <div class="editor-label uppercase">
+                        <div class="editor-label ">
                             Disputes
                         </div>
                         <div class="editor-field">
@@ -237,7 +254,7 @@
                     </div>
 
                     <div class="left" style="width: 40%; margin-right: 4%;">
-                        <div class="editor-label uppercase">
+                        <div class="editor-label ">
                             Days Outstanding
                         </div>
                         <div class="editor-field">
@@ -245,7 +262,7 @@
                             @Html.ValidationMessageFor(model => model.KPIDaysOutstanding)
                         </div>
 
-                        <div class="editor-label uppercase">
+                        <div class="editor-label ">
                             Days to Resolve
                         </div>
                         <div class="editor-field">

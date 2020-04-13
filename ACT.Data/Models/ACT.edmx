@@ -168,6 +168,9 @@
           <Property Name="DeclinedReason" Type="varchar" MaxLength="500" />
           <Property Name="ServiceRequired" Type="int" Nullable="false" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="ChepReference" Type="varchar" MaxLength="50" />
+          <Property Name="AdminPerson" Type="varchar" MaxLength="50" />
+          <Property Name="FinPersonEmail" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ClientAuthorisation">
           <Key>
@@ -2519,6 +2522,9 @@
           <Property Name="DeclinedReason" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="ServiceRequired" Type="Int32" Nullable="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="ChepReference" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="AdminPerson" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FinPersonEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />          
           <NavigationProperty Name="ClientBudgets" Relationship="ACTModel.FK_ClientBudget_Clients" FromRole="Client" ToRole="ClientBudget" />
           <NavigationProperty Name="ClientKPIs" Relationship="ACTModel.FK_ClientKPIs_Clients" FromRole="Client" ToRole="ClientKPI" />
           <NavigationProperty Name="ClientLoads" Relationship="ACTModel.FK_ClientLoads_Clients" FromRole="Client" ToRole="ClientLoad" />
@@ -4362,6 +4368,9 @@
           <EntitySetMapping Name="Clients">
             <EntityTypeMapping TypeName="ACTModel.Client">
               <MappingFragment StoreEntitySet="Client">
+                <ScalarProperty Name="ChepReference" ColumnName="ChepReference" />
+                <ScalarProperty Name="AdminPerson" ColumnName="AdminPerson" />
+                <ScalarProperty Name="FinPersonEmail" ColumnName="FinPersonEmail" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="ServiceRequired" ColumnName="ServiceRequired" />
                 <ScalarProperty Name="DeclinedReason" ColumnName="DeclinedReason" />

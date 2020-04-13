@@ -41,7 +41,7 @@ namespace ACT.Core.Services
             List<object> parameters = new List<object>()
             {
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
-                { new SqlParameter( "csmClientStatus", ( int ) csm.ClientStatus ) },
+                { new SqlParameter( "csmClientStatus", ( int ) csm.Status ) },
             };
 
             #endregion

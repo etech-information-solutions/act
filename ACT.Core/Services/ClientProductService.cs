@@ -21,7 +21,7 @@ namespace ACT.Core.Services
             /// <param name="pm"></param>
             /// <param name="csm"></param>
             /// <returns></returns>
-            public List<ProductCustomModel> ListCSM(PagingModel pm, CustomSearchModel csm)
+            public List<ClientProductCustomModel> ListCSM(PagingModel pm, CustomSearchModel csm)
             {
                 if (csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date)
                 {
@@ -39,6 +39,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 //{ new SqlParameter( "clientid", clientId > 0 ? clientId : 0 ) },
             };
@@ -46,11 +47,12 @@ namespace ACT.Core.Services
                 #endregion
 
                 string query = @"SELECT
-                                p.*,
+                                p.*, pr.*,
                                 (SELECT COUNT(1) FROM [dbo].[ProductPrice] pp WHERE pp.ProductId=p.Id) AS [ProductPriceCount],
-                                (SELECT COUNT(1) FROM [dbo].[Document] d WHERE p.Id=d.ObjectId AND d.ObjectType='Product') AS [DocumentCount]
+                                (SELECT COUNT(1) FROM [dbo].[Document] d WHERE p.Id=d.ObjectId AND d.ObjectType='Product') AS [DocumentCount],
+                                cc.*
                              FROM
-                                [dbo].[ClientProduct] p";
+                                [dbo].[ClientProduct] p LEFT JOIN [dbo].[Product] pr ON pr.Id = p.ProductId LEFT JOIN [dbo].[Client] cc ON cc.Id = p.ClientId";
 
                 // WHERE
 
@@ -63,7 +65,7 @@ namespace ACT.Core.Services
                 #region WHERE IF CLIENT
                 if (csm.ClientId > 0)
                 {
-                    query = $"{query} AND p.ClientId = @clientid ";
+                    query = $"{query} AND p.ClientId = @csmClientId ";
                 }
 
                 #endregion
@@ -106,19 +108,19 @@ namespace ACT.Core.Services
 
                 // ORDER
 
-                query = $"{query} ORDER BY {pm.SortBy} {pm.Sort}";
+                query = $"{query} ORDER BY p.{pm.SortBy} {pm.Sort}";
 
                 // SKIP, TAKE
 
                 query = string.Format("{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query);
 
-                List<ProductCustomModel> model = context.Database.SqlQuery<ProductCustomModel>(query, parameters.ToArray()).ToList();
+                List<ClientProductCustomModel> model = context.Database.SqlQuery<ClientProductCustomModel>(query, parameters.ToArray()).ToList();
 
                 if (model.NullableAny(p => p.DocumentCount > 0))
                 {
                     using (DocumentService dservice = new DocumentService())
                     {
-                        foreach (ProductCustomModel item in model.Where(p => p.DocumentCount > 0))
+                        foreach (ClientProductCustomModel item in model.Where(p => p.DocumentCount > 0))
                         {
                             item.Documents = dservice.List(item.Id, "Product");
                         }

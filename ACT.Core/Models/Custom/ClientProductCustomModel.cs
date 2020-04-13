@@ -1,4 +1,6 @@
 
+using System.Collections.Generic;
+using ACT.Data.Models;
 namespace ACT.Core.Models.Custom
 {
     using System;
@@ -19,5 +21,13 @@ namespace ACT.Core.Models.Custom
         public Nullable<decimal> PassonRate { get; set; }
         public Nullable<int> PassonDays { get; set; }
         public int Status { get; set; }
+    
+        public string Name { get; set; }
+        public string CompanyName { get; set; }
+        public int? ProductPriceCount { get; set; }
+
+        public int? DocumentCount { get; set; }
+
+        public List<Document> Documents { get; set; }
     }
 }

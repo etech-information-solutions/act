@@ -67,6 +67,15 @@ namespace ACT.Core.Models
         }
 
         /// <summary>
+        /// Can be used as a selected Product 
+        /// </summary>
+        [Display(Name = "Region")]
+        public int RegionId
+        {
+            get; set;
+        }
+
+        /// <summary>
         /// Can be used for any entity requiring bank filter
         /// </summary>
         [Display( Name = "Bank" )]
@@ -145,6 +154,60 @@ namespace ACT.Core.Models
         }
 
         /// <summary>
+        /// A custom Generic Name Search
+        /// </summary>
+        [Display(Name = "Generic Name Search")]
+        public string Name
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// A custom Generic Description Search
+        /// </summary>
+        [Display(Name = "Generic Description Search")]
+        public string Description
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// A custom Generic Description Search
+        /// </summary>
+        [Display(Name = "Generic Reference Number Search")]
+        public string ReferenceNumber
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// A custom Generic Description Search
+        /// </summary>
+        [Display(Name = "Generic Contact Name Search")]
+        public string ContactName
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// A custom Generic Description Search
+        /// </summary>
+        [Display(Name = "Generic Contact Number  Search")]
+        public string ContactNumber
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// A custom Generic Description Search
+        /// </summary>
+        [Display(Name = "SitePlanningPoint Search")]
+        public string SitePlanningPoint
+        {
+            get; set;
+        }
+
+        /// <summary>
         /// Status
         /// </summary>
         [Display( Name = "Status" )]
@@ -162,13 +225,6 @@ namespace ACT.Core.Models
 
         [Display( Name = "Status" )]
         public PSPClientStatus PSPClientStatus
-        {
-            get;
-            set;
-        }
-
-        [Display(Name = "Status")]
-        public Status ClientStatus
         {
             get;
             set;
@@ -245,6 +301,8 @@ namespace ACT.Core.Models
 
         public Dictionary<int, string> ProductOptions { get; set; }
 
+        public Dictionary<int, string> RegionOptions { get; set; }
+
         public List<string> TableNameOptions
         {
             get
@@ -300,6 +358,15 @@ namespace ACT.Core.Models
                     }
 
                     break;
+
+                case "Regions":
+
+                    using (RegionService cservice = new RegionService())
+                    {
+                        RegionOptions = cservice.List(true);
+                    }
+
+                    break;
             }
         }
 
@@ -313,7 +380,7 @@ namespace ACT.Core.Models
             this.DocumentType = DocumentType.All;
             this.ActivityType = ActivityTypes.All;
             this.InvoiceStatus = InvoiceStatus.All;
-            this.PSPClientStatus = PSPClientStatus.All;
+            this.PSPClientStatus = PSPClientStatus.All;            
         }
     }
 }

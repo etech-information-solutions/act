@@ -19,25 +19,21 @@
         @using (Ajax.BeginForm(action, new { }, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = action.ToLower(), OnBegin = "ACT.UI.BeginCustomSearch($('#sticky-one form'), true);", OnComplete = "ACT.UI.CompleteCustomSearch();" }, new { @style = "width: auto; padding: 0;" }))
         {
             <div class="left" style="width: 49%; margin-right: 1%;">
-
                 <div class="editor-label">
-                    @Html.LabelFor(model => model.FromDate)
+                    Product Name
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.FromDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
+                    @Html.TextBoxFor(model => model.Name, new { @placeholder = "Search Product Name", @style = "width: 86%;" })
                 </div>
-
             </div>
 
             <div class="left" style="width: 49%;">
-
                 <div class="editor-label">
-                    @Html.LabelFor(model => model.ToDate)
+                   Product Description
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.ToDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
+                    @Html.TextBoxFor(model => model.Description, new { @placeholder = "Search Product Description", @style = "width: 86%;" })
                 </div>
-
             </div>
 
             <div class="clear"></div>

@@ -3644,7 +3644,6 @@ namespace ACT.UI.Controllers
                 pm.Sort = pm.Sort ?? "ASC";
                 pm.SortBy = pm.SortBy ?? "Name";
                 csm.Status = Status.Active;
-                csm.ClientStatus = Status.Active;
                 //Dont filter list if session is set so users caan choose a new client to edit
                 //string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
                 //int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);

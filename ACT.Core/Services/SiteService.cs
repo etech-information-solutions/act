@@ -76,6 +76,8 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmRegion", csm.RegionId ) },               
+                
             };
 
             #endregion
@@ -124,6 +126,33 @@ namespace ACT.Core.Services
                 //query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE p.Id=pc.PSPId AND pc.ClientId=@csmClientId) ";
                 query = $"{query} AND p.Id=@csmSiteId ";
             }
+            if (csm.RegionId != 0)
+            {
+                //query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE p.Id=pc.PSPId AND pc.ClientId=@csmClientId) ";
+                query = $"{query} AND p.RegionId=@csmRegion ";
+            }
+
+
+            if (!string.IsNullOrEmpty(csm.SitePlanningPoint))
+            {
+                query = string.Format(@"{0} AND (p.[SitePlanningPoint] LIKE '%{1}%' OR p.[XCord] LIKE '%{1}% OR p.[YCord] LIKE '%{1}%)", query, csm.SitePlanningPoint);
+            }
+
+            if (!string.IsNullOrEmpty(csm.ContactName))
+            {
+                query = string.Format(@"{0} AND (p.[ContactName] LIKE '%{1}%' OR p.[ReceivingContact] LIKE '%{1}%' OR p.[FinanceContact] LIKE '%{1}%') ", query, csm.ContactName);
+            }
+
+            if (!string.IsNullOrEmpty(csm.ContactNumber))
+            {
+                query = string.Format(@"{0} AND (p.[ContactNo] LIKE '%{1}%' OR p.[FinanceContactNo] LIKE '%{1}%' OR p.[ReceivingContactNo] LIKE '%{1}%') ", query, csm.ContactNumber);
+            }
+
+            if (!string.IsNullOrEmpty(csm.ReferenceNumber))
+            {
+                query = string.Format(@"{0} AND (p.[AccountCode] LIKE '%{1}%' OR p.[SiteCodeChep] LIKE '%{1}%')", query, csm.ReferenceNumber);
+            }
+
             //if (csm.ProductId != 0)
             //{
             //    query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPProduct] pp WHERE p.Id=pp.PSPId AND pp.ProductId=@csmProductId) ";
