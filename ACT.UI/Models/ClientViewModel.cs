@@ -116,6 +116,7 @@ namespace ACT.UI.Models
 
         public bool EditMode { get; set; }
         public bool ContextualMode { get; set; }
+        public string DocsList { get; set; }
 
         #endregion
 

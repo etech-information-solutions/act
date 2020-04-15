@@ -17,288 +17,322 @@
 
 @using (Html.BeginForm("AddClient", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clientlist", @class = "custom-validate", @style = "width: auto;" }))
 {
-    <div id="edit-item">
+<div id="edit-item">
 
-        <h2 class="" style="width: auto;">
-            <img alt="" src="@Url.Content("~/images/add.png")" />
-            <span>Add Client</span>
-        </h2>
+    <h2 class="" style="width: auto;">
+        <img alt="" src="@Url.Content("~/images/add.png")" />
+        <span>Add Client</span>
+    </h2>
 
-        @Html.ValidationSummary(true)
+    @Html.ValidationSummary(true)
 
-        @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.DocsList)
+    <input type="hidden" id="docslist" name="docslist" value="0" />
 
-        <div id="item-details" class="item-details" style="width: auto;">
-            <div class="left" style="width: 60%; margin-right: 2%;">
+    <div id="item-details" class="item-details" style="width: auto;">
+        <div class="left" style="width: 60%; margin-right: 2%;">
 
-                <div class="left" style="width: 50%; margin-right: 2%;">
-                    <h3>Client Details</h3>
-                    <div class="editor-label ">
-                        Client Name
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" })
-                        @Html.ValidationMessageFor(model => model.CompanyName)
-                    </div>
-                    <div class="editor-label ">
-                        Trading As
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.TradingAs, new { @class = "input", @placeholder = "Enter Trading As details" })
-                        @Html.ValidationMessageFor(model => model.TradingAs)
-                    </div>
-
-                    <div class="editor-label ">
-                        Company Registration Number
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" })
-                        @Html.ValidationMessageFor(model => model.CompanyRegistrationNumber)
-                    </div>
-                    <div class="editor-label ">
-                        VAT Number
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.VATNumber, new { @class = "input", @placeholder = "Enter VAT Number" })
-                        @Html.ValidationMessageFor(model => model.VATNumber)
-                    </div>
-
-                    <div class="editor-label ">
-                        Chep Reference
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.ChepReference, new { @class = "input", @placeholder = "Enter Chep reference Number" })
-                        @Html.ValidationMessageFor(model => model.ChepReference)
-                    </div>
+            <div class="left" style="width: 50%; margin-right: 2%;">
+                <h3>Client Details</h3>
+                <div class="editor-label ">
+                    Client Name
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" })
+                    @Html.ValidationMessageFor(model => model.CompanyName)
+                </div>
+                <div class="editor-label ">
+                    Trading As
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.TradingAs, new { @class = "input", @placeholder = "Enter Trading As details" })
+                    @Html.ValidationMessageFor(model => model.TradingAs)
                 </div>
 
-                <div class="left" style="width: 45%;">
-                    <h3>Contact Details</h3>
+                <div class="editor-label ">
+                    Company Registration Number
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" })
+                    @Html.ValidationMessageFor(model => model.CompanyRegistrationNumber)
+                </div>
+                <div class="editor-label ">
+                    VAT Number
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.VATNumber, new { @class = "input", @placeholder = "Enter VAT Number" })
+                    @Html.ValidationMessageFor(model => model.VATNumber)
+                </div>
+
+                <div class="editor-label ">
+                    Chep Reference
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.ChepReference, new { @class = "input", @placeholder = "Enter Chep reference Number" })
+                    @Html.ValidationMessageFor(model => model.ChepReference)
+                </div>
+            </div>
+
+            <div class="left" style="width: 45%;">
+                <h3>Contact Details</h3>
 
 
+
+                <div class="editor-label ">
+                    Contact Person Name
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" })
+                    @Html.ValidationMessageFor(model => model.ContactPerson)
+                </div>
+                <div class="editor-label ">
+                    Contact Person Number
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" })
+                    @Html.ValidationMessageFor(model => model.ContactNumber)
+                </div>
+                <div class="editor-label ">
+                    Contact Person Email
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.Email, new { @class = "input", @placeholder = "Enter Email Address", type = "email" })
+                    @Html.ValidationMessageFor(model => model.Email)
+                </div>
+
+
+
+                <div class="editor-label ">
+                    Administrator Name
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.AdminPerson, new { @class = "input", @placeholder = "Enter Name" })
+                    @Html.ValidationMessageFor(model => model.AdminPerson)
+                </div>
+
+                <div class="editor-label">
+                    Administrator Email
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.AdminEmail, new { @class = "input", @placeholder = "Enter Email Address", type = "email" })
+                    @Html.ValidationMessageFor(model => model.AdminEmail)
+                </div>
+
+
+
+                <div class="editor-label ">
+                    Financial Person Name
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.FinancialPerson, new { @class = "input", @placeholder = "Enter Name" })
+                    @Html.ValidationMessageFor(model => model.FinancialPerson)
+                </div>
+                <div class="editor-label">
+                    Financial Person Email
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.FinPersonEmail, new { @class = "input", @placeholder = "Enter Email Address", type = "email" })
+                    @Html.ValidationMessageFor(model => model.FinPersonEmail)
+                </div>
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+            <div class="left" style="width: 90%; margin-right: 4%;">
+                <div id="locationField">
+                    Type your address below:
+                    <input id="autocomplete"
+                           placeholder="Enter your address"
+                           onFocus="geolocate()"
+                           type="text" />
+                </div>
+            </div>
+            <div class="clear" style="height: 10px;">&nbsp;</div>
+            <div class="left" style="width: 48%; margin-right: 4%;">
+                <input id="Address.AddressType" name="Address.AddressType" type="hidden" value="@( (int)AddressType.Postal )" />
+
+                <div class="editor-label">
+                    Street Address
+                </div>
+                <div class="editor-field">
+                    @*<input type="text" id="street_number" style="width:15%;" name="street_number" readonly="readonly" value="" />*@
+                    @Html.TextBoxFor(model => model.Address.AddressLine1, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
+                    @Html.ValidationMessageFor(model => model.Address.AddressLine1)
+                </div>
+
+                <div class="editor-label">
+                    Town/City
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.Address.Town, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Town/City" })
+                    @Html.ValidationMessageFor(model => model.Address.Town)
+                </div>
+
+                <div class="editor-label">
+                    Postal Code
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.Address.PostCode, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Postal Code" })
+                    @Html.ValidationMessageFor(model => model.Address.PostCode)
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 48%;">
+
+
+                <div class="editor-label">
+                    Suburb/Area
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.Address.AddressLine2, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Suburb/Area " })
+                    @Html.ValidationMessageFor(model => model.Address.AddressLine2)
+                </div>
+
+                <div class="editor-label">
+                    Province
+                </div>
+                <div class="editor-field">
+
+                    <select id="Address_Province" name="Address_Province" required="required" style="width: 100%;">
+                        <!--class="chzn"-->
+                        <option value="">-- select</option>
+                        @*@foreach (int p in Enum.GetValues(typeof(Province)))
+                            {
+                                string text = ((Province)p).GetDisplayText();
+
+                                if (text.ToLower() == "all")
+                                {
+                                    continue;
+                                }
+
+                                <option value="@p">@text</option>
+                            }*@
+                    </select>
+                    @*@Html.TextBoxFor(model => model.Address.Province, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Province" })*@
+                    @*@Html.ValidationMessageFor(model => model.Address.Province)*@
+                </div>
+
+            </div>
+        </div>
+
+        <div class="left" style="width: 33%; margin-right: 4%;">
+
+            <div class="editor-label ">
+                Logo
+            </div>
+            <div class="editor-field">
+                <input id="Logo.File" name="Logo.File" type="file" value="" data-val-file="1" class="input" />
+                <input id="Logo.Name" name="Logo.Name" type="hidden" value="Company Logo" />
+                <input id="Logo.Description" name="Logo.Description" class="input" type="hidden" value="Company Logo" />
+            </div>
+
+            <br /><br /><br />
+            <div class="editor-label">
+                Upload Documents
+                <div class="editor-field" style="margin-bottom: 10px;" id="companydocslist" name="companydocslist">
+                    <div id="documentsdiv">
+                        @*@if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
+                    {
+                        foreach (Document companyFile in Model.CompanyFile.Where(s => s.Status == (Int32)Status.Active))
+                        {
+                            @Html.HiddenFor(model => companyFile.Id)
+
+                            <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
+
+                                <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = companyFile.Id })">
+                                    <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
+
+                                    companyFile.Name (companyFile.Extension)
+                                </a>
+
+                            </div>
+
+                        }
+                    }*@
+                    </div>
+                    <input id="companyfile" name="companyfile" type="file" value="" data-val-file="1" class="input" />
+                    <span id="uploaded_file"></span>
+                    @*<input id="NewCompanyFile.File" name="NewCompanyFile.File" type="file" value="" data-val-file="1" class="input" />
+                <input id="NewCompanyFile.Name" name="NewCompanyFile.Name" type="hidden" value="Company File" />
+                <input id="NewCompanyFile.Description" name="NewCompanyFile.Description" class="input" type="hidden" value="Company File" />*@
+                    @*@Html.ValidationMessageFor(model => companyFile.RegistrationFile)*@
+
+                </div>
+            </div>
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+        @*<button id="managekpis" name="managekpis">Manage KPIs</button>
+            <div id="ex1" class="modal">
+                <p>
+                    <strong class="">KPI</strong>
+                </p>
+                <div class="left" style="width: 40%; margin-right: 4%;">
+                    <div class="editor-label ">
+                        Outstanding
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.KPIOutstanding, new { @class = "input", @placeholder = "Enter KPI Outstanding" })
+                        @Html.ValidationMessageFor(model => model.KPIOutstanding)
+                    </div>
 
                     <div class="editor-label ">
-                        Contact Person Name
+                        Disputes
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" })
-                        @Html.ValidationMessageFor(model => model.ContactPerson)
-                    </div>
-                    <div class="editor-label ">
-                        Contact Person Number
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" })
-                        @Html.ValidationMessageFor(model => model.ContactNumber)
-                    </div>
-                    <div class="editor-label ">
-                        Contact Person Email
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Email, new { @class = "input", @placeholder = "Enter Email Address", type = "email" })
-                        @Html.ValidationMessageFor(model => model.Email)
+                        @Html.TextBoxFor(model => model.KPIDisputes, new { @class = "input", @placeholder = "Enter KPI Outstanding" })
+                        @Html.ValidationMessageFor(model => model.KPIDisputes)
                     </div>
 
+                </div>
 
+                <div class="left" style="width: 40%; margin-right: 4%;">
+                    <div class="editor-label ">
+                        Days Outstanding
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.KPIDaysOutstanding, new { @class = "input", @placeholder = "Enter KPI Outstanding" })
+                        @Html.ValidationMessageFor(model => model.KPIDaysOutstanding)
+                    </div>
 
                     <div class="editor-label ">
-                        Administrator Name
+                        Days to Resolve
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.AdminPerson, new { @class = "input", @placeholder = "Enter Name" })
-                        @Html.ValidationMessageFor(model => model.AdminPerson)
+                        @Html.TextBoxFor(model => model.KPIDaysToResolve, new { @class = "input", @placeholder = "Enter KPI Outstanding" })
+                        @Html.ValidationMessageFor(model => model.KPIDaysToResolve)
                     </div>
 
-                    <div class="editor-label">
-                        Administrator Email
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.AdminEmail, new { @class = "input", @placeholder = "Enter Email Address", type = "email" })
-                        @Html.ValidationMessageFor(model => model.AdminEmail)
-                    </div>
-
-
-
-                    <div class="editor-label ">
-                        Financial Person Name
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.FinancialPerson, new { @class = "input", @placeholder = "Enter Name" })
-                        @Html.ValidationMessageFor(model => model.FinancialPerson)
-                    </div>
-                    <div class="editor-label">
-                        Financial Person Email
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.FinPersonEmail, new { @class = "input", @placeholder = "Enter Email Address", type = "email" })
-                        @Html.ValidationMessageFor(model => model.FinPersonEmail)
-                    </div>
                 </div>
 
                 <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-                <div class="left" style="width: 90%; margin-right: 4%;">
-                    <div id="locationField">
-                        Type your address below:
-                        <input id="autocomplete"
-                               placeholder="Enter your address"
-                               onFocus="geolocate()"
-                               type="text" />
-                    </div>
-                </div>
-                <div class="clear" style="height: 10px;">&nbsp;</div>
-                <div class="left" style="width: 48%; margin-right: 4%;">
-                    <input id="Address.AddressType" name="Address.AddressType" type="hidden" value="@( (int)AddressType.Postal )" />
+            </div>*@
 
-                    <div class="editor-label">
-                        Street Address
-                    </div>
-                    <div class="editor-field">
-                        @*<input type="text" id="street_number" style="width:15%;" name="street_number" readonly="readonly" value="" />*@
-                        @Html.TextBoxFor(model => model.Address.AddressLine1, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
-                        @Html.ValidationMessageFor(model => model.Address.AddressLine1)
-                    </div>
+        <p>
+            <input id="save-btn" type="submit" value="Save" />
 
-                    <div class="editor-label">
-                        Town/City
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Address.Town, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Town/City" })
-                        @Html.ValidationMessageFor(model => model.Address.Town)
-                    </div>
+            <span style="padding: 0 5px;">/</span>
 
-                    <div class="editor-label">
-                        Postal Code
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Address.PostCode, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Postal Code" })
-                        @Html.ValidationMessageFor(model => model.Address.PostCode)
-                    </div>
+            <a data-refresh="1" data-target="#clientlist">Cancel</a>
+        </p>
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+    </div>
 
-                </div>
-
-                <div class="left" style="width: 48%;">
-
-
-                    <div class="editor-label">
-                        Suburb/Area
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Address.AddressLine2, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Suburb/Area " })
-                        @Html.ValidationMessageFor(model => model.Address.AddressLine2)
-                    </div>
-
-                    <div class="editor-label">
-                        Province
-                    </div>
-                    <div class="editor-field">
-
-                        <select id="Address_Province" name="Address_Province" required="required" style="width: 100%;">
-                            <!--class="chzn"-->
-                            <option value="">-- select</option>
-                            @*@foreach (int p in Enum.GetValues(typeof(Province)))
-        {
-            string text = ((Province)p).GetDisplayText();
-
-            if (text.ToLower() == "all")
-            {
-                continue;
-            }
-
-            <option value="@p">@text</option>
-        }*@
-                        </select>
-                        @*@Html.TextBoxFor(model => model.Address.Province, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Province" })*@
-                        @*@Html.ValidationMessageFor(model => model.Address.Province)*@
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="left" style="width: 33%; margin-right: 4%;">
-
-                <div class="editor-label ">
-                    Logo
-                </div>
-                <div class="editor-field">
-                    <input id="Logo.File" name="Logo.File" type="file" value="" data-val-file="1" class="input" />
-                    <input id="Logo.Name" name="Logo.Name" type="hidden" value="Company Logo" />
-                    <input id="Logo.Description" name="Logo.Description" class="input" type="hidden" value="Company Logo" />
-                </div>
-
-            </div>
-
-
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-            @*<button id="managekpis" name="managekpis">Manage KPIs</button>
-                <div id="ex1" class="modal">
-                    <p>
-                        <strong class="">KPI</strong>
-                    </p>
-                    <div class="left" style="width: 40%; margin-right: 4%;">
-                        <div class="editor-label ">
-                            Outstanding
-                        </div>
-                        <div class="editor-field">
-                            @Html.TextBoxFor(model => model.KPIOutstanding, new { @class = "input", @placeholder = "Enter KPI Outstanding" })
-                            @Html.ValidationMessageFor(model => model.KPIOutstanding)
-                        </div>
-
-                        <div class="editor-label ">
-                            Disputes
-                        </div>
-                        <div class="editor-field">
-                            @Html.TextBoxFor(model => model.KPIDisputes, new { @class = "input", @placeholder = "Enter KPI Outstanding" })
-                            @Html.ValidationMessageFor(model => model.KPIDisputes)
-                        </div>
-
-                    </div>
-
-                    <div class="left" style="width: 40%; margin-right: 4%;">
-                        <div class="editor-label ">
-                            Days Outstanding
-                        </div>
-                        <div class="editor-field">
-                            @Html.TextBoxFor(model => model.KPIDaysOutstanding, new { @class = "input", @placeholder = "Enter KPI Outstanding" })
-                            @Html.ValidationMessageFor(model => model.KPIDaysOutstanding)
-                        </div>
-
-                        <div class="editor-label ">
-                            Days to Resolve
-                        </div>
-                        <div class="editor-field">
-                            @Html.TextBoxFor(model => model.KPIDaysToResolve, new { @class = "input", @placeholder = "Enter KPI Outstanding" })
-                            @Html.ValidationMessageFor(model => model.KPIDaysToResolve)
-                        </div>
-
-                    </div>
-
-                    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-                </div>*@
-
-            <p>
-                <input id="save-btn" type="submit" value="Save" />
-
-                <span style="padding: 0 5px;">/</span>
-
-                <a data-refresh="1" data-target="#clientlist">Cancel</a>
-            </p>
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+    @*<div id="ex1" class="modal">
+            <!-- Modal HTML embedded directly into document -->
+            <form action="" class="login_form modal" id="ex2" style="display:none;">
+                <h3>Please login to continue</h3>
+                <p><label>Username:</label><input type="text" /></p>
+                <p><label>Password:</label><input type="password" /></p>
+                <p><input type="submit" value="Login" /></p>
+            </form>
         </div>
 
-        @*<div id="ex1" class="modal">
-                <!-- Modal HTML embedded directly into document -->
-                <form action="" class="login_form modal" id="ex2" style="display:none;">
-                    <h3>Please login to continue</h3>
-                    <p><label>Username:</label><input type="text" /></p>
-                    <p><label>Password:</label><input type="password" /></p>
-                    <p><input type="submit" value="Login" /></p>
-                </form>
-            </div>
+        <!-- Link to open the modal -->
+        <p><a href="#ex1" rel="modal:open">Open Modal</a></p>*@
 
-            <!-- Link to open the modal -->
-            <p><a href="#ex1" rel="modal:open">Open Modal</a></p>*@
-
-    </div>
+</div>
 
 
     <script>
@@ -311,7 +345,62 @@
         //    $("#ex1").modal();
         //    return false;
         //});
+
+        $(document).on('change', '#companyfile', function () {
+            var cId = $("#Id").val();
+            var docsList = $('#DocsList').val();
+            var name = document.getElementById("companyfile").files[0].name;
+            var form_data = new FormData();
+            var ext = name.split('.').pop().toLowerCase();
+            if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx']) == -1) {
+                alert("Invalid File");
+            }
+            var oFReader = new FileReader();
+            oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
+            var f = document.getElementById("companyfile").files[0];
+            var fsize = f.size || f.fileSize;
+            if (fsize > 2000000) {
+                alert("File Size is too large");
+            }
+            else {
+                form_data.append("file", document.getElementById('companyfile').files[0]);
+                form_data.append("clientId", $("#Id").val());
+                $.ajax({
+                    url: "Upload?clientId=" + cId,
+                    method: "POST",
+                    data: form_data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
+                    },
+                    success: function (data) {
+                        debugger;
+                        docsList = docsList + data.Id + ",";
+                        $('#DocsList').val(docsList);
+                        //$('#uploaded_file').html(data);
+                        populateDocs(cId, "client");
+                        $('#uploaded_file').html("<label class='text-success'></label>");
+                    }
+                });
+            }
+        });
     });
+
+    function populateDocs(id, doctype) {
+
+        $.ajax({
+
+            url: '@Url.Action("CompanyFiles", "Client")',
+            type: "GET",
+            dataType: "html",
+            data: { objId: id, objType:doctype },//this is as per your requirement
+            success: function (data) {
+                $('#documentsdiv').html(data);
+            },
+        });
+    }
 
     //function SaveBudget(id) {
     //    debugger;

@@ -225,19 +225,20 @@
                 {
                     <img alt="logo" src="@(String.Format("{0}/{1}", Url.Content("~/Uploads/Documents"), l.Location))" style="width:80px;margin-bottom: 2px;" />
                     @*<a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )">
-                            <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+                        <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
 
-                            @d.Name (@d.Type)
-                        </a>*@
+                        @d.Name (@d.Type)
+                    </a>*@
                 }
             }
         </div>
+        <br /><br /><br />
         <div class="display-label">
-            Upload Documents
+            Uploaded Documents
         </div>
         <div class="display-field">
             <div id="documentsdiv"></div>
-                @*@if (@ViewBag.Documents != null)
+            @*@if (@ViewBag.Documents != null)
             {
                 foreach (Document d in @ViewBag.Documents)
                 {
@@ -248,8 +249,8 @@
                     </a>
                 }
             }*@
-            </div>
         </div>
+    </div>
 
     @*<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
     <p>

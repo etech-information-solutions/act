@@ -261,6 +261,30 @@ namespace ACT.UI.Controllers
 
                     #region Any File Uploads
                     //moved to seperate ajax function
+                    if (!string.IsNullOrEmpty(model.DocsList))
+                    {
+                        String[] dList = model.DocsList.Split(',');
+                        string lastId = "0";
+                        foreach (string itm in dList)
+                        {                           
+                            if (!string.IsNullOrEmpty(itm))
+                            {
+                                int itmId = 0;
+                                if (int.TryParse(itm, out itmId))
+                                {
+                                    Document doc = dservice.GetById(itmId);
+                                    if (doc != null)
+                                    {
+                                        doc.ObjectId = itmId;//should be null for client adds, so we can update it later
+                                        doc.Status = (int)Status.Active;
+                                        
+                                        dservice.Update(doc);
+                                    }
+                                }
+                                }
+                            lastId = itm;
+                        }
+                    }
                     #endregion
 
                     #region Any Logo Uploads
@@ -3844,7 +3868,7 @@ namespace ACT.UI.Controllers
         }
 
 
-        public JsonResult Upload(int clientId=0)
+        public JsonResult Upload(int? clientId=null)
         {
             FileViewModel nfv = new FileViewModel();
             for (int i = 0; i < Request.Files.Count; i++)
@@ -3875,7 +3899,7 @@ namespace ACT.UI.Controllers
                     {
                         Document doc = new Document()
                         {
-                            ObjectId = clientId,
+                            ObjectId = clientId,//should be null for client adds, so we can update it later
                             ObjectType = "Client",
                             Status = (int)Status.Active,
                             Name = fileName,

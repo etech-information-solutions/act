@@ -162,11 +162,8 @@
         $(document).ready(function () {
             $('#Copy').on('click', function () {
                 var gId = $('#selectedgroup').val();
-                //debugger;
                 $(".excllist").each(function () {
                     if ($(this).is(':checked')) {
-                        //$(this).fadeOut();
-                       // debugger;
                         var id = $(this).attr("id");
                         SetIncludedGroup(gId, id);
                     }
@@ -194,8 +191,6 @@
                 var gId = $('#selectedgroup').val();
                 $(".incllist").each(function () {
                     if ($(this).is(':checked')) {
-                       // $(this).fadeOut();
-                       // debugger;
                         var id = $(this).attr("id");
                         SetExcludedGroup(gId, id);
                     }
@@ -205,15 +200,6 @@
                 });
                 UpdateGroups(gId);
                 alert('Group Updated.');
-                //var checkedItem = $('#includedtabledata input[type=radio]:checked').val();
-                //if (checkedItem != undefined) {
-                //    //save it first
-                //    SetExcludedGroup(gId, checkedItem);
-                //    //then update
-                //    UpdateGroups(gId);
-                //} else {
-                //    alert('Nothing to Remove is selected');
-                //}
             });
         });
 
@@ -235,7 +221,6 @@
                 contentType: "application/json;charset=utf-8",
                 dataType: "json",
                 success: function (data) {
-                    // debugger;
                     rowDiv.html('');
                     var result = "";
                     $.each(data, function (id, client) {

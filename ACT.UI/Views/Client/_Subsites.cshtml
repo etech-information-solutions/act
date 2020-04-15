@@ -35,7 +35,7 @@ else
 }
 @using (Html.BeginForm("ImportSubSites", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @style = "width: auto;" }))
 {
-    @if (ViewBag.ContextualModeSite)
+    if (ViewBag.ContextualModeSite)
     {
         <input type="hidden" id="SiteId" name="SiteId" value="0" />
     }
@@ -59,16 +59,6 @@ else
                 {
                     @Html.DropDownList("ClientList", "All Clients")
                 }
-                @*@Html.DropDownList("ClientList", "Please Select")<br /><br />*@
-                @*@Html.DropDownList("SiteList")*@
-                @*@if (ViewBag.ContextualModeSite)
-                    {
-                        @Html.DropDownList("ClientSiteList")
-                    }
-                    else
-                    {
-                        @Html.DropDownList("ClientSiteList", "All Sites")
-                    }*@
                 <br />
                 <br />
                 <br />
