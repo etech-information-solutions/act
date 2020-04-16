@@ -79,7 +79,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmProductId", csm.ProductId ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmStatus", ( int ) csm.Status ) },
+                { new SqlParameter( "csmStatus", ( int ) csm.ClientStatus ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
@@ -148,10 +148,15 @@ namespace ACT.Core.Services
 
             if (!string.IsNullOrEmpty(csm.ReferenceNumber))
             {
-                query = string.Format(@"{0} AND (p.[ChepReference] LIKE '%{1}%' OR p.[VATNumber] LIKE '%{1}%' OR p.[CompanyRegistrationNumber] LIKE '%{1}%')", query, csm.ReferenceNumber);
+                query = string.Format(@"{0} AND (p.[VATNumber] LIKE '%{1}%' OR p.[CompanyRegistrationNumber] LIKE '%{1}%')", query, csm.ReferenceNumber);
             }
 
-            if (csm.Status != Status.All)
+            if (!string.IsNullOrEmpty(csm.ReferenceNumberOther))
+            {
+                query = string.Format(@"{0} AND (p.[ChepReference] LIKE '%{1}%')", query, csm.ReferenceNumberOther);
+            }
+
+            if (csm.ClientStatus != Status.All)
             {
                 query = $"{query} AND (p.Status=@csmStatus) ";
             }

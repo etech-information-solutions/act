@@ -183,6 +183,15 @@ namespace ACT.Core.Models
         /// <summary>
         /// A custom Generic Description Search
         /// </summary>
+        [Display(Name = "Generic Other Reference Number Search")]
+        public string ReferenceNumberOther
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// A custom Generic Description Search
+        /// </summary>
         [Display(Name = "Generic Contact Name Search")]
         public string ContactName
         {
@@ -229,6 +238,14 @@ namespace ACT.Core.Models
             get;
             set;
         }
+
+        [Display(Name = "Status")]
+        public Status ClientStatus
+        {
+            get;
+            set;
+        }
+
 
         public decimal? Amount { get; set; }
 
@@ -380,7 +397,8 @@ namespace ACT.Core.Models
             this.DocumentType = DocumentType.All;
             this.ActivityType = ActivityTypes.All;
             this.InvoiceStatus = InvoiceStatus.All;
-            this.PSPClientStatus = PSPClientStatus.All;            
+            this.PSPClientStatus = PSPClientStatus.All;
+            this.ClientStatus = Status.Active;
         }
     }
 }
