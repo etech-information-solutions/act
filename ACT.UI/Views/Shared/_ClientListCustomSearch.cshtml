@@ -1,11 +1,5 @@
 ﻿@model ACT.Core.Models.CustomSearchModel
 
-<!--
-    This is a sample custom search view. You'll need to create your own view depending on the page where the custom search is needed.
-    E.g _PRCustomSearch for the Payment Requisition page or _UserCustomSearch for the Manage User page and build the view with the necessary fields which
-    must already exist in the ACT.Core.Models.CustomSearchModel, the model that's passed. If a field is missing from this model, please add it and likewise
-    add a comment on that property, as already done on ther properties. MAKE SURE you're not adding a property already added (that could be named differently).
-    -->
 
 @{
     String vn = ((String)ViewBag.ViewName ?? "");
@@ -18,8 +12,6 @@
 
         @using (Ajax.BeginForm(action, new { }, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = action.ToLower(), OnBegin = "ACT.UI.BeginCustomSearch($('#sticky-one form'), true);", OnComplete = "ACT.UI.CompleteCustomSearch();" }, new { @style = "width: auto; padding: 0;" }))
         {
-            <div class="clear"></div>
-
             <div class="left" style="width: 49%; margin-right: 1%;">
                 <div class="editor-label">
                     Client Name
@@ -67,73 +59,19 @@
                     Chep Reference number
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.ReferenceNumber, new { @placeholder = "Search Client Chep reference", @style = "width: 86%;" })
+                    @Html.TextBoxFor(model => model.ReferenceNumberOther, new { @placeholder = "Search Client Chep reference", @style = "width: 86%;" })
                 </div>
 
             </div>
 
             <div class="left" style="width: 49%;">
-
-
-            </div>
-
-            <div class="clear"></div>
-
-
-            <div class="left" style="width: 49%; margin-right: 1%;">
                 <div class="editor-label">
-                    @Html.LabelFor(model => model.Query)
+                    @Html.LabelFor(model => model.ClientStatus)
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.Query, new { @placeholder = "Search Text", @style = "width: 86%;" })
-                    <a rel="tipsyE" title="..search by any other field">
-                        <img alt="" src="@Url.Content( "~/Images/info.png" )" style="vertical-align: middle;" />
-                    </a>
+                    @Html.EnumDropDownFor(model => model.ClientStatus, false, true, new { @class = "chzn", @style = "width: 100%;" })
                 </div>
             </div>
-            <div class="left" style="width: 49%;">
-                <div class="editor-label">
-                    @Html.LabelFor(model => model.Query)
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.Query, new { @placeholder = "Search Text", @style = "width: 86%;" })
-                    <a rel="tipsyE" title="..search by any other field">
-                        <img alt="" src="@Url.Content( "~/Images/info.png" )" style="vertical-align: middle;" />
-                    </a>
-                </div>
-
-            </div>
-            <div class="clear"></div>
-
-            @*<div class="left" style="width: 49%; margin-right: 1%;">
-                <div class="editor-label">
-                    @Html.LabelFor(model => model.UserId)
-                </div>
-                <div class="editor-field">
-                    @Html.DropDownListFor(model => model.UserId, model => model.UserOptions, u => u.Id, u => u.Name + " " + u.Surname, true, new { @class = "chzn", @style = "width: 98%;" })
-                </div>
-            </div>
-
-            <div class="left" style="width: 49%;">
-
-                <div class="editor-label">
-                    @Html.LabelFor(model => model.ActivityType)
-                </div>
-                <div class="editor-field">
-                    @Html.EnumDropDownFor(model => model.ActivityType, false, true, new { @class = "chzn", @style = "width: 98%;" })
-                </div>
-
-            </div>*@
-
-            <div class="left" style="width: 48%;">
-                <div class="editor-label">
-                    @Html.LabelFor(model => model.Status)
-                </div>
-                <div class="editor-field">
-                    @Html.EnumDropDownFor(model => model.Status, false, true, new { @class = "chzn", @style = "width: 100%;" })
-                </div>
-            </div>
-
             <div class="clear"></div>
 
             <div class="editor-label">
