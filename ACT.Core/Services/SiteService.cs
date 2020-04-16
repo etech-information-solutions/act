@@ -135,7 +135,7 @@ namespace ACT.Core.Services
 
             if (!string.IsNullOrEmpty(csm.SitePlanningPoint))
             {
-                query = string.Format(@"{0} AND (p.[SitePlanningPoint] LIKE '%{1}%' OR p.[XCord] LIKE '%{1}% OR p.[YCord] LIKE '%{1}%)", query, csm.SitePlanningPoint);
+                query = string.Format(@"{0} AND (p.PlanningPoint LIKE '%{1}%' OR p.[XCord] LIKE '%{1}%' OR p.[YCord] LIKE '%{1}%')", query, csm.SitePlanningPoint);
             }
 
             if (!string.IsNullOrEmpty(csm.ContactName))
