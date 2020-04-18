@@ -31,71 +31,104 @@
 
 
 @*@if (Model == null || !items.Any())
-{
-    <div class="notification message-warn" style="margin-bottom: 20px;">
-        There are no PADs available matching your search criteria.
-    </div>
-}*@
+    {
+        <div class="notification message-warn" style="margin-bottom: 20px;">
+            There are no PADs available matching your search criteria.
+        </div>
+    }*@
 
-@if (user.IsAdmin || user.IsPSPAdmin)
+@using (Html.BeginForm("ImportChepLoad", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#poolingagentdata", @class = "custom-validate", @style = "width: auto;", id = "importpoolingagent" }))
 {
     <p>
-        @Html.ActionLink("Add", "AddPAD", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new PAD?", @data_edit = "1", @data_id = 0, @data_target = "#PADlist" })
+        <table style="width:100%" border="0">
+            <tr>
+                <td style="width:3%">
+                    <label for="file">Client:</label>
+                </td>
+                <td style="width:15%">
+                    @if (ViewBag.ContextualMode)
+                    {
+                        @Html.DropDownList("ClientList")
+                    }
+                    else
+                    {
+                        @Html.DropDownList("ClientList", "All Clients")
+                    }
+                </td>
+                <td style="width:2%">
+                    @Html.ActionLink("Add", "AddClientLoad", new { sourceview = "ClientData" }, new { @class = "add", @rel = "tipsyS", @title = "Import Client Data?", @data_edit = "1", @data_id = 0, @data_target = "#clientdata" })
+                </td>
+                <td style="width:5%">
+                    &nbsp;
+                </td>
+                <td style="width:3%">
+                    <label for="file" class="importlabel">Browse:</label>
+                </td>
+                <td style="width:55%">
+                    <input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" />
+                </td>
+                <td style="width:10%">
+                    <input type="submit" value="Import" class="importbutton" />
+                </td>
+                <td style="width:7%">
+                    <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "clientdatatemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
+                </td>
+            </tr>
+        </table>
         <span class="loader"></span>
     </p>
 }
 
-
-    <table id="PADlist-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#PADlist-table_wrapper" data-starting-point=".ap-tabs ul">
-        <thead>
-            <tr>
-                <th>
-                    Status
-                </th>
-                <th>
-                    Pooling Agent
-                </th>
-                <th>
-                    Load Data
-                </th>
-                <th>
-                    Eff Date
-                </th>
-                <th>
-                    Del Note
-                </th>
-                <th>
-                    Cust #
-                </th>
-                <th>
-                    Product
-                </th>
-                <th>
-                   Shipment No
-                </th>
-                <th>
-                    Issue note
-                </th>
-                <th>
-                    PCN
-                </th>
-                <th>
-                    THAN
-                </th>
-                <th>
-                    Qty
-                </th>
-                @*<th>
+<table id="PADlist-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#PADlist-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th>
+                Status
+            </th>
+            <th>
+                Pooling Agent
+            </th>
+            <th>
+                Load Data
+            </th>
+            <th>
+                Eff Date
+            </th>
+            <th>
+                Del Note
+            </th>
+            <th>
+                Cust #
+            </th>
+            <th>
+                Product
+            </th>
+            <th>
+                Shipment No
+            </th>
+            <th>
+                Issue note
+            </th>
+            <th>
+                PCN
+            </th>
+            <th>
+                THAN
+            </th>
+            <th>
+                Qty
+            </th>
+            @*<th>
                     Del Note
                 </th>*@
-                <th data-name="Actions">
-                    Actions
-                </th>
-            </tr>
-        </thead>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
 
-        <tbody>
-            @*@if (Model != null && items != null && items.Count() > 0)
+    <tbody>
+        @*@if (Model != null && items != null && items.Count() > 0)
             {
                 foreach (var item in items)
                 {
@@ -103,55 +136,55 @@
 
                     String active = status.Equals(Status.Active) ? "active" : "inactive";
                     String enable = status.Equals(Status.Active) ? "Disable" : "Enable";*@
- 
 
-            @*<tr id="tr-@item.Id-item" class="tr-@item.Id-item">
 
-                <td width="1%">
-                    @item.Id
-                </td>
-                <td style="width: 15%;">
-                    @item.CompanyName
-                </td>
+        @*<tr id="tr-@item.Id-item" class="tr-@item.Id-item">
 
-          
+            <td width="1%">
+                @item.Id
+            </td>
+            <td style="width: 15%;">
+                @item.CompanyName
+            </td>
 
-                <td width="15%">*@
-                    @*@Html.ActionLink("Details", "PADDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                    @Html.ActionLink("Edit", "EditPAD", new { id = item.Id, returnView = "PADList" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                    @Html.ActionLink(enable, "DeletePAD", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#PADlist", @rel = "tipsyE", @title = enable + " this item?" })*@
-                    @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+            <td width="15%">*@
+        @*@Html.ActionLink("Details", "PADDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        @if (item.CompanyFile != null && item.CompanyFile.Any(s => s.Status == (Int32)Status.Active))
+            @Html.ActionLink("Edit", "EditPAD", new { id = item.Id, returnView = "PADList" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+            @Html.ActionLink(enable, "DeletePAD", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#PADlist", @rel = "tipsyE", @title = enable + " this item?" })*@
+        @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+            @if (item.CompanyFile != null && item.CompanyFile.Any(s => s.Status == (Int32)Status.Active))
+            {
+                <a class="docs" data-sticky-one="1" data-target="#supporting-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Supporting Documents">
+                    Docs
+                </a>
+                <div id="supporting-@item.Id-docs" class="none">
+                    <ul class="list">
+                        @foreach (var d in item.CompanyFile.Where(s => s.Status == (Int32)Status.Active))
                         {
-                            <a class="docs" data-sticky-one="1" data-target="#supporting-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Supporting Documents">
-                                Docs
-                            </a>
-                            <div id="supporting-@item.Id-docs" class="none">
-                                <ul class="list">
-                                    @foreach (var d in item.CompanyFile.Where(s => s.Status == (Int32)Status.Active))
-                                    {
-                                        <li style="line-height: 20px;">
-                                            <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "PAD", new { @id = d.Id } )" target="_blank">
-                                                @d.Name (@d.Type)
-                                            </a>
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
+                            <li style="line-height: 20px;">
+                                <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "PAD", new { @id = d.Id } )" target="_blank">
+                                    @d.Name (@d.Type)
+                                </a>
+                            </li>
                         }
-                        </div>*@
-                @*</td>
+                    </ul>
+                </div>
+            }
+            </div>*@
+        @*</td>
 
 
             </tr>*@
 
-                    @*count++;
+        @*count++;
                 }
             }*@
-        </tbody>
+    </tbody>
 
-    </table>
+</table>
 @Html.Partial("_Paging")
