@@ -1,15 +1,13 @@
-
-namespace ACT.Core.Models.Custom
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+namespace ACT.UI.Models
 {
-    using System;
-    using System.Collections.Generic;
-    using ACT.Data.Models;
-
-    public partial class ClientLoadCustomModel
+    public class ClientLoadViewModel
     {
+        #region Properties
+
         public int Id { get; set; }
-        public int ClientId { get; set; }
-        public int VehicleId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -31,7 +29,21 @@ namespace ACT.Core.Models.Custom
         public string PCNNumber { get; set; }
         public string PRNNumber { get; set; }
         public int Status { get; set; }
+        [Display(Name = "Load Files")]
+        public ICollection<FileViewModel> Documents { get; set; }
         public int? DocumentCount { get; set; }
-        public List<Document> Documents { get; set; }
+        //public List<Document> Documents { get; set; }
+
+        public bool EditMode { get; set; }
+        public bool ContextualMode { get; set; }
+        public string DocsList { get; set; }
+
+        #endregion
+
+
+        #region Model Options
+
+
+        #endregion
     }
 }

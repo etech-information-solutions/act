@@ -1,13 +1,142 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using ACT.Core.Enums;
+using ACT.Core.Models;
+using ACT.Core.Models.Custom;
 using ACT.Data.Models;
 
 namespace ACT.Core.Services
 {
-    public class ClientLoadService : BaseService<ClientLoad>, IDisposable
+    public class ClientLoadService : BaseService<ClientLoadCustomModel>, IDisposable
     {
         public ClientLoadService()
         {
 
         }
+
+
+        /// <summary>
+        /// Gets a list of Items matching the specified search params
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public override List<ClientLoadCustomModel> ListCSM(PagingModel pm, CustomSearchModel csm)
+        {
+            if (csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date)
+            {
+                csm.ToDate = csm.ToDate?.AddDays(1);
+            }
+
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                //{ new SqlParameter( "clientid", clientId > 0 ? clientId : 0 ) },
+            };
+
+            #endregion
+
+            string query = @"SELECT
+                                p.*,
+                                (SELECT COUNT(1) FROM [dbo].[Document] d WHERE p.Id=d.ObjectId AND d.ObjectType='ClientLoad') AS [DocumentCount]
+                             FROM
+                                [dbo].[ClientLoad] p";
+
+            // WHERE
+
+            #region WHERE
+
+            query = $"{query} WHERE (1=1)";
+
+            #endregion
+
+            #region WHERE IF CLIENT
+            if (csm.ClientId > 0)
+            {
+                //TODO: Give this attention for Client COntext
+                //query = $"{query} AND EXISTS (SELECT Id FROM [dbo].[ClientProduct] cp WHERE cp.ProductId = p.Id AND cp.ClientId = @clientid)";
+            }
+
+            #endregion
+
+
+            // Custom Search
+
+            #region Custom Search
+
+            if (csm.FromDate.HasValue && csm.ToDate.HasValue)
+            {
+                query = $"{query} AND (p.CreatedOn >= @csmFromDate AND p.CreatedOn <= @csmToDate) ";
+            }
+            else if (csm.FromDate.HasValue || csm.ToDate.HasValue)
+            {
+                if (csm.FromDate.HasValue)
+                {
+                    query = $"{query} AND (p.CreatedOn>=@csmFromDate) ";
+                }
+                if (csm.ToDate.HasValue)
+                {
+                    query = $"{query} AND (p.CreatedOn<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            // Normal Search
+
+            #region Normal Search
+
+            if (!string.IsNullOrEmpty(csm.Query))
+            {
+                query = string.Format(@"{0} AND (p.[DocketNumber] LIKE '%{1}%' OR
+                                                  p.[ReferenceNumber] LIKE '%{1}%'
+                                                                               OR
+                                                  p.[DeliveryNote] LIKE '%{1}%'
+                                                                                OR
+                                                  p.[ClientDescription] LIKE '%{1}%'
+                                                                                OR
+                                                  p.[Equipment] LIKE '%{1}%'
+                                                                                OR
+                                                  p.[ReceiverNumber] LIKE '%{1}%'
+                                                 ) ", query, csm.Query.Trim());
+            }
+
+            #endregion
+
+            // ORDER
+
+            query = $"{query} ORDER BY {pm.SortBy} {pm.Sort}";
+
+            // SKIP, TAKE
+
+            query = string.Format("{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query);
+
+            List<ClientLoadCustomModel> model = context.Database.SqlQuery<ClientLoadCustomModel>(query, parameters.ToArray()).ToList();
+
+            if (model.NullableAny(p => p.DocumentCount > 0))
+            {
+                using (DocumentService dservice = new DocumentService())
+                {
+                    foreach (ClientLoadCustomModel item in model.Where(p => p.DocumentCount > 0))
+                    {
+                        item.Documents = dservice.List(item.Id, "ClientLoad");
+                    }
+                }
+            }
+
+            return model;
+        }
+
     }
 }

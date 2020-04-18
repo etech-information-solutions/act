@@ -1,0 +1,162 @@
+﻿@model ACT.Data.Models.ChepLoad
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Details</title>
+</head>
+<body>
+    <div>
+        <h4>ChepLoad</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.CreatedOn)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.CreatedOn)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.ModfiedOn)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.ModfiedOn)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.ModifiedBy)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.ModifiedBy)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.LoadDate)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.LoadDate)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.NotifyDate)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.NotifyDate)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.EffectiveDate)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.EffectiveDate)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.PostingType)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.PostingType)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.AccountNumber)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.AccountNumber)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.ClientDescription)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.ClientDescription)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.DeliveryNote)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.DeliveryNote)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.ReferenceNumber)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.ReferenceNumber)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.ReceiverNumber)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.ReceiverNumber)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.Equipment)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.Equipment)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.OriginalQuantity)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.OriginalQuantity)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.NewQuantity)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.NewQuantity)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.DocketNumber)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.DocketNumber)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.Status)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.Status)
+            </dd>
+    
+        </dl>
+    </div>
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+</body>
+</html>

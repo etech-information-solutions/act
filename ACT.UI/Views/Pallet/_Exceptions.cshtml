@@ -37,14 +37,15 @@
     </div>
 }*@
 
-@if (user.IsAdmin || user.IsPSPAdmin)
+@*@if (user.IsAdmin || user.IsPSPAdmin)
 {
     <p>
         @Html.ActionLink("Add", "AddPAD", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new PAD?", @data_edit = "1", @data_id = 0, @data_target = "#PADlist" })
         <span class="loader"></span>
     </p>
-}
+}*@
 
+<button id="custexc" name="custexc">Customer Exceptions</button> <button id="poolexc" name="poolexc">Pooling Agent Exceptions</button>
 
     <table id="PADlist-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#PADlist-table_wrapper" data-starting-point=".ap-tabs ul">
         <thead>
@@ -53,10 +54,10 @@
                     Status
                 </th>
                 <th>
-                    Pooling Agent
+                    Agent Client Name
                 </th>
                 <th>
-                    Load Data
+                    Load Date
                 </th>
                 <th>
                     Eff Date

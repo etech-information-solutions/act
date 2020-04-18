@@ -1,14 +1,15 @@
-
-namespace ACT.Core.Models.Custom
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+namespace ACT.UI.Models
 {
-    using System;
-    using System.Collections.Generic;
-    using ACT.Data.Models;
-    public partial class ChepLoadCustomModel
+    public class ChepLoadViewModel
     {
+        #region Properties
+
         public int Id { get; set; }
         public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModfiedOn { get; set; }
+        public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public Nullable<System.DateTime> LoadDate { get; set; }
         public Nullable<System.DateTime> NotifyDate { get; set; }
@@ -24,7 +25,21 @@ namespace ACT.Core.Models.Custom
         public Nullable<decimal> NewQuantity { get; set; }
         public string DocketNumber { get; set; }
         public int Status { get; set; }
+        [Display(Name = "Load Files")]
+        public ICollection<FileViewModel> Documents { get; set; }
         public int? DocumentCount { get; set; }
-        public List<Document> Documents { get; set; }
+        //public List<Document> Documents { get; set; }
+
+        public bool EditMode { get; set; }
+        public bool ContextualMode { get; set; }
+        public string DocsList { get; set; }
+
+        #endregion
+
+
+        #region Model Options
+
+
+        #endregion
     }
 }

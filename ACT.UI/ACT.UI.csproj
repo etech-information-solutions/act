@@ -141,7 +141,9 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="ClientLoadsController.cs" />
+    <Compile Include="Models\ClientLoadViewModel.cs" />
+    <Compile Include="Models\ChepLoadViewModel.cs" />
+    <Compile Include="Views\Scaffolded\ClientLoadsController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdministrationController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
@@ -195,6 +197,7 @@
     <Compile Include="Mvc\RequiresAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\RoleProvider.cs" />
+    <Compile Include="Views\Scaffolded\ChepLoadsController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\ap-tabs.css" />
@@ -548,11 +551,16 @@
     <Content Include="Views\Generic\_ReconcileInvoice.cshtml" />
     <Content Include="Views\Generic\_ReconcileLoads.cshtml" />
     <Content Include="Views\Generic\Index.cshtml" />
-    <Content Include="Views\ClientLoads\Create.cshtml" />
-    <Content Include="Views\ClientLoads\Delete.cshtml" />
-    <Content Include="Views\ClientLoads\Details.cshtml" />
-    <Content Include="Views\ClientLoads\Edit.cshtml" />
-    <Content Include="Views\ClientLoads\Index.cshtml" />
+    <Content Include="Views\Scaffolded\ClientLoads\Create.cshtml" />
+    <Content Include="Views\Scaffolded\ClientLoads\Delete.cshtml" />
+    <Content Include="Views\Scaffolded\ClientLoads\Details.cshtml" />
+    <Content Include="Views\Scaffolded\ClientLoads\Edit.cshtml" />
+    <Content Include="Views\Scaffolded\ClientLoads\Index.cshtml" />
+    <Content Include="Views\Scaffolded\ChepLoads\Create.cshtml" />
+    <Content Include="Views\Scaffolded\ChepLoads\Delete.cshtml" />
+    <Content Include="Views\Scaffolded\ChepLoads\Details.cshtml" />
+    <Content Include="Views\Scaffolded\ChepLoads\Edit.cshtml" />
+    <Content Include="Views\Scaffolded\ChepLoads\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
