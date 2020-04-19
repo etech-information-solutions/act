@@ -22,7 +22,7 @@
     UserModel user = User.Get();
 
     Int32 count = Model.Start;
-    //List<PADViewModel> items = (List<PADViewModel>)Model.Items;
+    List<ClientLoadCustomModel> items = (List<ClientLoadCustomModel>)Model.Items;
 
     //PADService cservice = new PADService();
 
@@ -30,12 +30,12 @@
 }
 
 
-@*@if (Model == null || !items.Any())
-    {
-        <div class="notification message-warn" style="margin-bottom: 20px;">
-            There are no PADs available matching your search criteria.
-        </div>
-    }*@
+@if (Model == null || !items.Any())
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Pooling Agent Load Entries available matching your search criteria.
+    </div>
+}
 
 @using (Html.BeginForm("ImportChepLoad", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#poolingagentdata", @class = "custom-validate", @style = "width: auto;", id = "importpoolingagent" }))
 {
@@ -56,7 +56,7 @@
                     }
                 </td>
                 <td style="width:2%">
-                    @Html.ActionLink("Add", "AddClientLoad", new { sourceview = "ClientData" }, new { @class = "add", @rel = "tipsyS", @title = "Import Client Data?", @data_edit = "1", @data_id = 0, @data_target = "#clientdata" })
+                    @Html.ActionLink("Add", "AddChepLoad", new { sourceview = "PoolingAgentData" }, new { @class = "add", @rel = "tipsyS", @title = "Import Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" })
                 </td>
                 <td style="width:5%">
                     &nbsp;
@@ -71,13 +71,14 @@
                     <input type="submit" value="Import" class="importbutton" />
                 </td>
                 <td style="width:7%">
-                    <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "clientdatatemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
+                    <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "poolingagentdatatemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
                 </td>
             </tr>
         </table>
         <span class="loader"></span>
     </p>
 }
+
 
 <table id="PADlist-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#PADlist-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
@@ -119,8 +120,8 @@
                 Qty
             </th>
             @*<th>
-                    Del Note
-                </th>*@
+            Del Note
+        </th>*@
             <th data-name="Actions">
                 Actions
             </th>
@@ -128,62 +129,111 @@
     </thead>
 
     <tbody>
-        @*@if (Model != null && items != null && items.Count() > 0)
+        @if (Model != null && items != null && items.Count() > 0)
+        {
+            foreach (var item in items)
             {
-                foreach (var item in items)
-                {
-                    Status status = (Status)item.Status;
+                Status status = (Status)item.Status;
 
-                    String active = status.Equals(Status.Active) ? "active" : "inactive";
-                    String enable = status.Equals(Status.Active) ? "Disable" : "Enable";*@
+                String active = status.Equals(Status.Active) ? "active" : "inactive";
+                String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
 
 
-        @*<tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
 
-            <td width="1%">
-                @item.Id
-            </td>
-            <td style="width: 15%;">
-                @item.CompanyName
-            </td>
+                    <td width="8%">
+                        @status
+                    </td>
+                    <td style="width: 8%;">
+                        Chep
+                        @*@item.ClientDescription*@
+                    </td>
+                    <td style="width: 8%;">
+                        @item.LoadDate
+                    </td>
+                    <td style="width: 8%;">
+                        @item.EffectiveDate
+                    </td>
+                    <td style="width: 8%;">
+                        @item.DeliveryNote
+                    </td>
+                    <td style="width: 8%;">
+                        @item.AccountNumber
+                    </td>
+                    @*<td style="width: 15%;">
+                            @item.Product
+                        </td>*@
+                    <td style="width: 8%;">
+                        @*@item.DocketNumber*@
+                    </td>
+                    <td style="width: 8%;"></td>
+                    <td style="width: 8%;"></td>
+                    <td style="width:8%;"></td>
+                    <td style="width: 8%;"></td>
+                    <td style="width: 8%;">@*@item.OriginalQuantity*@</td>
+                    <td width="8%">
+                        <a href="#doc" rel="modal:open"><i class="fa fa-file"></i></a>
+                        @Html.ActionLink("Edit", "EditPAD", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+                        @Html.ActionLink(enable, "DeletePAD", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?" })
+                        @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                                @if (item.Documents != null && item.Documents.Any(s => s.Status == (Int32)Status.Active))
+                                {
+                                    <a class="docs" data-sticky-one="1" data-target="#supporting-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Documents">
+                                        Docs
+                                    </a>
+                                    <div id="supporting-@item.Id-docs" class="none">
+                                        <ul class="list">
+                                            @foreach (var d in item.Documents.Where(s => s.Status == (Int32)Status.Active))
+                                            {
+                                                <li style="line-height: 20px;">
+                                                    <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Pallet", new { @id = d.Id } )" target="_blank">
+                                                        @d.Name (@d.Type)
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                            </div>*@
+                        @*<button id="managedocs" name="managedocs">Docs</button>*@
+                        <div id="doc" class="modal">
+                            <p>
+                                <strong class="">Documents</strong>
+                            </p>
+                            <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i></a>
+                            <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
+                                <thead>
+                                    <tr>
+
+                                        <th data-name="Name" data-column="Name">
+                                            Documnet Title
+                                        </th>
+                                        <th data-name="XCord" data-column="XCord">
+                                            Type
+                                        </th>
+                                        <th data-name="YCord" data-column="YCord">
+                                            Date
+                                        </th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="doctabledata"></tbody>
+
+                            </table>
+
+                            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+                        </div>
+                    </td>
 
 
+                </tr>
 
-            <td width="15%">*@
-        @*@Html.ActionLink("Details", "PADDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-
-            @Html.ActionLink("Edit", "EditPAD", new { id = item.Id, returnView = "PADList" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-
-            @Html.ActionLink(enable, "DeletePAD", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#PADlist", @rel = "tipsyE", @title = enable + " this item?" })*@
-        @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
-
-            @if (item.CompanyFile != null && item.CompanyFile.Any(s => s.Status == (Int32)Status.Active))
-            {
-                <a class="docs" data-sticky-one="1" data-target="#supporting-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Supporting Documents">
-                    Docs
-                </a>
-                <div id="supporting-@item.Id-docs" class="none">
-                    <ul class="list">
-                        @foreach (var d in item.CompanyFile.Where(s => s.Status == (Int32)Status.Active))
-                        {
-                            <li style="line-height: 20px;">
-                                <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "PAD", new { @id = d.Id } )" target="_blank">
-                                    @d.Name (@d.Type)
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </div>
+                count++;
             }
-            </div>*@
-        @*</td>
-
-
-            </tr>*@
-
-        @*count++;
-                }
-            }*@
+        }
     </tbody>
 
 </table>

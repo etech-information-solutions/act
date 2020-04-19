@@ -33,7 +33,7 @@
 @if (Model == null || !items.Any())
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
-        There are no PADs available matching your search criteria.
+        There are no Pooling Agent Load Entries available matching your search criteria.
     </div>
 }
 
@@ -101,9 +101,9 @@
             <th>
                 Cust #
             </th>
-            @*<th>
+            <th>
                 Product
-            </th>*@
+            </th>
             <th>
                 Shipment No
             </th>
@@ -160,17 +160,18 @@
             <td style="width: 15%;">
                 @item.AccountNumber
             </td>
-            @*<td style="width: 15%;">
-            @item.Product
-        </td>*@
+            <td style="width: 15%;">
+                @*@item.Product*@
+            </td>
             <td style="width: 15%;">
                 @item.DocketNumber
             </td>
             <td style="width: 15%;"></td>
             <td style="width: 15%;"></td>
             <td style="width: 15%;"></td>
-            <td style="width: 15%;"></td>
+
             <td style="width: 15%;">@item.OriginalQuantity</td>
+            @*<td style="width: 15%;"></td>*@
             <td width="15%">
                 <a href="#doc" rel="modal:open"><i class="fa fa-file"></i></a>
                 @Html.ActionLink("Edit", "EditPAD", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
@@ -178,25 +179,25 @@
                 @Html.ActionLink(enable, "DeletePAD", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?" })
                 @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
-            @if (item.Documents != null && item.Documents.Any(s => s.Status == (Int32)Status.Active))
-            {
-                <a class="docs" data-sticky-one="1" data-target="#supporting-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Documents">
-                    Docs
-                </a>
-                <div id="supporting-@item.Id-docs" class="none">
-                    <ul class="list">
-                        @foreach (var d in item.Documents.Where(s => s.Status == (Int32)Status.Active))
-                        {
-                            <li style="line-height: 20px;">
-                                <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Pallet", new { @id = d.Id } )" target="_blank">
-                                    @d.Name (@d.Type)
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            }
-        </div>*@
+                @if (item.Documents != null && item.Documents.Any(s => s.Status == (Int32)Status.Active))
+                {
+                    <a class="docs" data-sticky-one="1" data-target="#supporting-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Documents">
+                        Docs
+                    </a>
+                    <div id="supporting-@item.Id-docs" class="none">
+                        <ul class="list">
+                            @foreach (var d in item.Documents.Where(s => s.Status == (Int32)Status.Active))
+                            {
+                                <li style="line-height: 20px;">
+                                    <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Pallet", new { @id = d.Id } )" target="_blank">
+                                        @d.Name (@d.Type)
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>*@
                 @*<button id="managedocs" name="managedocs">Docs</button>*@
                 <div id="doc" class="modal">
                     <p>

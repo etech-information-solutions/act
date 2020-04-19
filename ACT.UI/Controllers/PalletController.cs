@@ -574,9 +574,6 @@ namespace ACT.UI.Controllers
                 {
                     string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
                     int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-                    //for subsites to load tehse sites under a main site
-                    string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
-                    int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
 
                     using (var sreader = new StreamReader(postedFile.InputStream))
                     using (SiteService siteService = new SiteService())
@@ -628,7 +625,7 @@ namespace ACT.UI.Controllers
                                 //rather than pass back to view, we will create the new site as a subsite of the existing site. 
                                 //Get the existing site first
                                 existingSite = siteService.GetByColumnsWhere("XCord", strLngX, "YCord", strLatY);
-                                SiteID = existingSite.Id;//This is the existing site retrieved by mapping same X and Y coord, read that into the model.SiteId which makes the new site a child site
+                   //             SiteID = existingSite.Id;//This is the existing site retrieved by mapping same X and Y coord, read that into the model.SiteId which makes the new site a child site
                                 siteType = 2;//Mark teh site as a subsite by default
                             }
 
@@ -678,11 +675,11 @@ namespace ACT.UI.Controllers
                                 ReceivingContactNo = rows[20].ToString(),
                             };
                             //For Subsites
-                            if (SiteID > 0)
-                            {
-                                site.SiteId = SiteID;
-                            }
-                            site = siteService.Create(site);
+                   //         if (SiteID > 0)
+                    //        {
+                       //         site.SiteId = SiteID;
+                    //        }
+                   //         site = siteService.Create(site);
                             #endregion
 
                             #region Create Address (s)
