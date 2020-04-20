@@ -660,6 +660,112 @@ namespace ACT.UI.Controllers
             }
         }
 
+        public JsonResult GetClientDetail(string clientId)
+        {
+            if (clientId != null && clientId != "")
+            {
+                Client client = null;
+
+                using (ClientService bservice = new ClientService())
+                {
+                    client = bservice.GetById(int.Parse(clientId));
+                    return Json(client, JsonRequestBehavior.AllowGet);
+                }
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetClient(string ClientId)
+        {
+            if (ClientId != null)
+            {
+                Session["ClientId"] = ClientId;
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        /*
+            Returns a general list of all active clients allowed in the current context to be selected from
+        */
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetClientList()
+        {
+
+            List<Client> model = new List<Client>();
+            PagingModel pm = new PagingModel();
+            CustomSearchModel csm = new CustomSearchModel();
+
+            using (ClientService service = new ClientService())
+            {
+                pm.Sort = pm.Sort ?? "ASC";
+                pm.SortBy = pm.SortBy ?? "Name";
+                csm.Status = Status.Active;
+                model = service.ListCSM(pm, csm);
+            }
+            if (model.Any())
+            {
+                IEnumerable<SelectListItem> clientDDL = model.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.CompanyName
+                });
+
+
+                return Json(clientDDL, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetSite(string SiteId)
+        {
+            if (SiteId != null)
+            {
+                Session["SiteId"] = SiteId;
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetClientSite(string SiteId)
+        {
+            if (SiteId != null)
+            {
+                int clientId = 0;
+                if (int.Parse(SiteId) > 0)
+                {
+                    using (SiteService service = new SiteService())
+                    {
+                        clientId = service.GetClientBySite(int.Parse(SiteId));
+                    }
+                    Session["ClientId"] = clientId;
+                }
+                Session["SiteId"] = SiteId;
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
         #endregion
 
 
