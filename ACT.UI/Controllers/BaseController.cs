@@ -660,42 +660,9 @@ namespace ACT.UI.Controllers
             }
         }
 
-        public JsonResult GetClientDetail(string clientId)
-        {
-            if (clientId != null && clientId != "")
-            {
-                Client client = null;
-
-                using (ClientService bservice = new ClientService())
-                {
-                    client = bservice.GetById(int.Parse(clientId));
-                    return Json(client, JsonRequestBehavior.AllowGet);
-                }
-            }
-            else
-            {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult SetClient(string ClientId)
-        {
-            if (ClientId != null)
-            {
-                Session["ClientId"] = ClientId;
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        /*
-            Returns a general list of all active clients allowed in the current context to be selected from
-        */
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        //
+        // Returns a general list of all active clients allowed in the current context to be selected from
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
         public JsonResult GetClientList()
         {
 
@@ -703,68 +670,58 @@ namespace ACT.UI.Controllers
             PagingModel pm = new PagingModel();
             CustomSearchModel csm = new CustomSearchModel();
 
-            using (ClientService service = new ClientService())
+            using ( ClientService service = new ClientService() )
             {
                 pm.Sort = pm.Sort ?? "ASC";
                 pm.SortBy = pm.SortBy ?? "Name";
                 csm.Status = Status.Active;
-                model = service.ListCSM(pm, csm);
+                csm.Status = Status.Active;
+                //Dont filter list if session is set so users caan choose a new client to edit
+                //string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                //int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                //if (clientId > 0)
+                //{
+                //    csm.ClientId = clientId;
+                //}
+
+                model = service.ListCSM( pm, csm );
+                //if (model.Any()) {//redo to get full list                
+                //    csm.ClientId = 0;
+                //    model = service.ListCSM(pm, csm);
+                //}
             }
-            if (model.Any())
+            if ( model.Any() )
             {
-                IEnumerable<SelectListItem> clientDDL = model.Select(c => new SelectListItem
+                IEnumerable<SelectListItem> clientDDL = model.Select( c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
                     Text = c.CompanyName
-                });
+
+                } );
 
 
-                return Json(clientDDL, JsonRequestBehavior.AllowGet);
+                return Json( clientDDL, JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
 
-
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult SetSite(string SiteId)
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult SetClient( string ClientId )
         {
-            if (SiteId != null)
+            if ( ClientId != null )
             {
-                Session["SiteId"] = SiteId;
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+                Session[ "ClientId" ] = ClientId;
+
+                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
-
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult SetClientSite(string SiteId)
-        {
-            if (SiteId != null)
-            {
-                int clientId = 0;
-                if (int.Parse(SiteId) > 0)
-                {
-                    using (SiteService service = new SiteService())
-                    {
-                        clientId = service.GetClientBySite(int.Parse(SiteId));
-                    }
-                    Session["ClientId"] = clientId;
-                }
-                Session["SiteId"] = SiteId;
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
-            }
-        }
-
 
         #endregion
 

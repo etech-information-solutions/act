@@ -6,7 +6,7 @@
 
         MovedObjSource: [],
 
-        Container: '.modal',
+        Container: '.modal_act',
 
         Open: function ( msg, title, show_btns, callback )
         {
@@ -40,6 +40,7 @@
         Close: function ()
         {
             $( ".announcement" ).slideUp( 1200 );
+
             $( ACT.Modal.Container ).fadeOut( 500, function ()
             {
                 if ( ACT.Modal.MovedObj.length )

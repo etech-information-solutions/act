@@ -26,5 +26,10 @@ namespace ACT.Core.Models.Custom
         public Nullable<int> ActionedBy { get; set; }
         public Nullable<System.DateTime> ResolvedOn { get; set; }
         public Nullable<int> ResolvedBy { get; set; }
+
+        public string ActionUser { get; set; }
+        public string ResolvedUser { get; set; }
+
+        public string ChepLoadAccountNumber { get; set; }
     }
 }

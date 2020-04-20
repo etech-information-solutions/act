@@ -49,7 +49,16 @@ namespace ACT.Core.Models
         }
 
         /// <summary>
-        /// Can be used as a selected Client 
+        /// Can be used as selected Clients
+        /// </summary>
+        [Display( Name = "Client Ids" )]
+        public List<int> ClientIds
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// Can be used as a selected Site 
         /// </summary>
         [Display(Name = "Site")]
         public int SiteId
@@ -67,7 +76,7 @@ namespace ACT.Core.Models
         }
 
         /// <summary>
-        /// Can be used as a selected Product 
+        /// Can be used as a selected Region 
         /// </summary>
         [Display(Name = "Region")]
         public int RegionId
@@ -314,6 +323,8 @@ namespace ACT.Core.Models
             }
         }
 
+        public Dictionary<int, string> SiteOptions { get; set; }
+
         public Dictionary<int, string> ClientOptions { get; set; }
 
         public Dictionary<int, string> ProductOptions { get; set; }
@@ -381,6 +392,17 @@ namespace ACT.Core.Models
                     using (RegionService cservice = new RegionService())
                     {
                         RegionOptions = cservice.List(true);
+                    }
+
+                    break;
+
+                case "Disputes":
+                    
+                    using ( SiteService sservice = new SiteService() )
+                    using ( ClientService cservice = new ClientService() )
+                    {
+                        SiteOptions = sservice.List( true );
+                        ClientOptions = cservice.List( true );
                     }
 
                     break;

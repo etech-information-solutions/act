@@ -339,7 +339,61 @@ namespace ACT.UI.Controllers
 
         #region APIs
 
-     
+        public JsonResult GetClientDetail(string clientId)
+        {
+            if (clientId != null && clientId != "")
+            {
+                Client client = null;
+
+                using (ClientService bservice = new ClientService())
+                {
+                    client = bservice.GetById(int.Parse(clientId));
+                    return Json(client, JsonRequestBehavior.AllowGet);
+                }
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetSite(string SiteId)
+        {
+            if (SiteId != null)
+            {
+                Session["SiteId"] = SiteId;
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetClientSite(string SiteId)
+        {
+            if (SiteId != null)
+            {
+                int clientId = 0;
+                if (int.Parse(SiteId) > 0)
+                {
+                    using (SiteService service = new SiteService())
+                    {
+                        clientId = service.GetClientBySite(int.Parse(SiteId));
+                    }
+                    Session["ClientId"] = clientId;
+                }
+                Session["SiteId"] = SiteId;
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
 
         #endregion
 

@@ -76,23 +76,13 @@
     <Compile Include="Enums\ActivityTypes.cs" />
     <Compile Include="Enums\SiteType.cs" />
     <Compile Include="Enums\ServiceType.cs" />
-    <Compile Include="Enums\CancellationReason.cs" />
-    <Compile Include="Enums\DinnerClaimRejectionReasons.cs" />
-    <Compile Include="Enums\JournalType.cs" />
+    <Compile Include="Enums\DisputeStatus.cs" />
     <Compile Include="Enums\PSPClientStatus.cs" />
     <Compile Include="Enums\ProductPriceType.cs" />
     <Compile Include="Enums\TargetPeriod.cs" />
-    <Compile Include="Enums\TransferStatus.cs" />
-    <Compile Include="Enums\RewardStatus.cs" />
-    <Compile Include="Enums\Income.cs" />
-    <Compile Include="Enums\PaymentStatus.cs" />
-    <Compile Include="Enums\POPStatus.cs" />
-    <Compile Include="Enums\QAStatus.cs" />
     <Compile Include="Enums\InvoiceStatus.cs" />
-    <Compile Include="Enums\PaymentMethod.cs" />
     <Compile Include="Enums\AddressType.cs" />
     <Compile Include="Enums\BroadcastType.cs" />
-    <Compile Include="Enums\CampaignPaymentStatus.cs" />
     <Compile Include="Enums\Timers.cs" />
     <Compile Include="Enums\BankAccountType.cs" />
     <Compile Include="Enums\Province.cs" />
@@ -202,9 +192,6 @@
     <Compile Include="Models\Simple\SimpleUserModel.cs" />
     <Compile Include="Models\StringDropDownModel.cs" />
     <Compile Include="Models\UserModel.cs" />
-    <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
-    <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
-    <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\DeclineReasonService.cs" />
     <Compile Include="Services\UserTaskService.cs" />
@@ -278,11 +265,9 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="obj\Debug\TempPE\" />
     <Folder Include="Utilities\" />
   </ItemGroup>
   <ItemGroup>
