@@ -1503,6 +1503,7 @@
                 UserId: ACT.UI[t].PageUserId || ACT.UI.PageUserId || 0,
                 Status: ACT.UI[t].PageStatus || ACT.UI.PageStatus || 0,
                 PSPClientStatus: ACT.UI[t].PagePSPClientStatus || ACT.UI.PagePSPClientStatus || 0,
+                SiteId: ACT.UI[t].PageSiteId || ACT.UI.PageSiteId || 0,
                 ClientId: ACT.UI[t].PageClientId || ACT.UI.PageClientId || 0,
                 ProductId: ACT.UI[t].PageProductId || ACT.UI.PageProductId || 0,
                 CampaignId: ACT.UI[t].PageCampaignId || ACT.UI.PageCampaignId || 0,
@@ -1543,6 +1544,7 @@
             ACT.UI[t].PageSort = ACT.UI.PageSort = "ASC";
             ACT.UI[t].PageSortBy = ACT.UI.PageSortBy = "Id";
             ACT.UI[t].PageUserId = ACT.UI.PageUserId = 0;
+            ACT.UI[t].PageSiteId = ACT.UI.PageSiteId = 0;
             ACT.UI[t].PageClientId = ACT.UI.PageClientId = 0;
             ACT.UI[t].PageProductId = ACT.UI.PageProductId = 0;
             ACT.UI[t].PageCampaignId = ACT.UI.PageCampaignId = 0;
@@ -2659,6 +2661,13 @@
                     q += " <b class='italic'>[ User: <a style='color: #69f95a;'>" + sender.find( 'select#UserId:first option[value="' + ACT.UI[t].PageUserId + '"]' ).text() + "</a> ]</b> ";
 
                     sender.find( 'select#UserId' ).val( ACT.UI[t].PageUserId );
+                }
+                if ( ACT.UI[t].PageSiteId && ACT.UI[t].PageSiteId !== 0 )
+                {
+                    h += "Client: <b>" + sender.find( 'select#SiteId:first option[value="' + ACT.UI[t].PageSiteId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Site: <a style='color: #69f95a;'>" + sender.find( 'select#SiteId:first option[value="' + ACT.UI[t].PageSiteId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#SiteId' ).val( ACT.UI[t].PageSiteId );
                 }
                 if ( ACT.UI[t].PageClientId && ACT.UI[t].PageClientId !== 0 )
                 {

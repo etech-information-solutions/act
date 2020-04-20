@@ -141,6 +141,8 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\ClientReportingController.cs" />
+    <Compile Include="Controllers\DashBoardController.cs" />
     <Compile Include="Models\ClientLoadViewModel.cs" />
     <Compile Include="Models\ChepLoadViewModel.cs" />
     <Compile Include="Views\Scaffolded\ClientLoadsController.cs" />
@@ -563,9 +565,13 @@
     <Content Include="Views\Scaffolded\ChepLoads\Details.cshtml" />
     <Content Include="Views\Scaffolded\ChepLoads\Edit.cshtml" />
     <Content Include="Views\Scaffolded\ChepLoads\Index.cshtml" />
+    <Content Include="Views\ClientReporting\Index.cshtml" />
+    <Content Include="Views\ClientReporting\_Disputes.cshtml" />
+    <Content Include="Views\Shared\_DisputesCustomSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\DashBoard\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

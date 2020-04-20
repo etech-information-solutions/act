@@ -660,6 +660,69 @@ namespace ACT.UI.Controllers
             }
         }
 
+        //
+        // Returns a general list of all active clients allowed in the current context to be selected from
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult GetClientList()
+        {
+
+            List<Client> model = new List<Client>();
+            PagingModel pm = new PagingModel();
+            CustomSearchModel csm = new CustomSearchModel();
+
+            using ( ClientService service = new ClientService() )
+            {
+                pm.Sort = pm.Sort ?? "ASC";
+                pm.SortBy = pm.SortBy ?? "Name";
+                csm.Status = Status.Active;
+                csm.Status = Status.Active;
+                //Dont filter list if session is set so users caan choose a new client to edit
+                //string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                //int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                //if (clientId > 0)
+                //{
+                //    csm.ClientId = clientId;
+                //}
+
+                model = service.ListCSM( pm, csm );
+                //if (model.Any()) {//redo to get full list                
+                //    csm.ClientId = 0;
+                //    model = service.ListCSM(pm, csm);
+                //}
+            }
+            if ( model.Any() )
+            {
+                IEnumerable<SelectListItem> clientDDL = model.Select( c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.CompanyName
+
+                } );
+
+
+                return Json( clientDDL, JsonRequestBehavior.AllowGet );
+            }
+            else
+            {
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
+            }
+        }
+
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult SetClient( string ClientId )
+        {
+            if ( ClientId != null )
+            {
+                Session[ "ClientId" ] = ClientId;
+
+                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
+            }
+            else
+            {
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
+            }
+        }
+
         #endregion
 
 
