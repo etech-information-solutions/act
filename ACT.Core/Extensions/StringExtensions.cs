@@ -413,5 +413,40 @@ namespace System
 
             return resp;
         }
+
+        public static string formatImportDate(string inDate)
+        {
+            string parseFormat = "dd.MM.yyyy";
+            char parseSplit = '.';
+            if (inDate.Contains("."))
+            {
+                //do nothing everything is already set
+            }
+            else if (inDate.Contains("-"))
+            {
+                parseFormat = "dd-MM-yyyy";
+                parseSplit = '-';
+            }
+            else if (inDate.Contains("/"))
+            {
+                parseFormat = "dd/MM/yyyy";
+                parseSplit = '/';
+            }
+            string[] strArr = inDate.Split(parseSplit);
+            string splitDate = "";
+            if (strArr[2].Length == 4) //discard times for now, doesnt matter
+            {
+                splitDate = strArr[2] + parseSplit + strArr[1] + parseSplit + strArr[0];
+            }
+            else if (strArr[0].Length == 4)
+            {
+                splitDate = strArr[0] + parseSplit + strArr[1] + parseSplit + strArr[2];
+            }
+
+
+            DateTime oDate = DateTime.ParseExact(inDate + " 00:00:00", parseFormat + " HH:mm:ss", null);
+
+            return oDate.ToString("yyyy/MM/dd HH:mm:ss");
+        }
     }
 }

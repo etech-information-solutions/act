@@ -354,7 +354,7 @@
             var cId = $("#Id").val();
             LoadBudgets(cId);
             //$(".budgets").hide();
-            populateDocs(cId, "client");
+            populateDocs(cId, "Client");
         });
 
     function ViewBudget() {
@@ -365,7 +365,7 @@
 
         $.ajax({
 
-            url: '@Url.Action("CompanyFiles", "Client")',
+            url: '@Url.Action("ListFiles", "Client")',
             type: "GET",
             dataType: "html",
             data: { objId: id, objType:doctype },//this is as per your requirement

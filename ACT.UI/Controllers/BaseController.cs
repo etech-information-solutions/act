@@ -15,6 +15,7 @@ using System.Net;
 using ACT.Mailer;
 using ACT.UI.Models;
 using ACT.Core.Models.Custom;
+using System.Web;
 
 namespace ACT.UI.Controllers
 {
@@ -676,19 +677,8 @@ namespace ACT.UI.Controllers
                 pm.SortBy = pm.SortBy ?? "Name";
                 csm.Status = Status.Active;
                 csm.Status = Status.Active;
-                //Dont filter list if session is set so users caan choose a new client to edit
-                //string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-                //int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-                //if (clientId > 0)
-                //{
-                //    csm.ClientId = clientId;
-                //}
 
                 model = service.ListCSM( pm, csm );
-                //if (model.Any()) {//redo to get full list                
-                //    csm.ClientId = 0;
-                //    model = service.ListCSM(pm, csm);
-                //}
             }
             if ( model.Any() )
             {
@@ -721,6 +711,126 @@ namespace ACT.UI.Controllers
             {
                 return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetSite(string SiteId)
+        {
+            if (SiteId != null)
+            {
+                Session["SiteId"] = SiteId;
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult SetClientSite(string SiteId)
+        {
+            if (SiteId != null)
+            {
+                int clientId = 0;
+                if (int.Parse(SiteId) > 0)
+                {
+                    using (SiteService service = new SiteService())
+                    {
+                        clientId = service.GetClientBySite(int.Parse(SiteId));
+                    }
+                    Session["ClientId"] = clientId;
+                }
+                Session["SiteId"] = SiteId;
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        public JsonResult Upload(int? id = null, string utype = null, string uname = null)
+        {
+            FileViewModel nfv = new FileViewModel();
+            for (int i = 0; i < Request.Files.Count; i++)
+            {
+                HttpPostedFileBase file = Request.Files[i]; //Uploaded file
+                                                            //Use the following properties to get file's name, size and MIMEType
+                int fileSize = file.ContentLength;
+                string fileName = file.FileName;
+                string mimeType = file.ContentType;
+                System.IO.Stream fileContent = file.InputStream;
+                //To save file, use SaveAs method
+                //file.SaveAs(Server.MapPath("~/") + fileName); //File will be saved in application root
+
+                // int clientid = 0;//clientId
+
+                if (fileName != null)
+                {
+                    // Create folder
+                    string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/{utype}/{id}/");
+
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+
+                    string now = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    using (DocumentService dservice = new DocumentService())
+                    {
+                        Document doc = new Document()
+                        {
+                            ObjectId = id,//should be null for client adds, so we can update it later
+                            ObjectType =utype,
+                            Status = (int)Status.Active,
+                            Name = fileName,
+                            Category = utype + " Document",
+                            Title = utype + " Document",
+                            Size = fileSize,
+                            Description = utype + " Document",
+                            Type = mimeType,
+                            Location = $"{utype}/{id}/{now}-{id}-{fileName}"
+                        };
+
+                        dservice.Create(doc);
+
+                        string fullpath = Path.Combine(path, $"{now}-{id}-{fileName}");
+                        file.SaveAs(fullpath);
+
+                        nfv.Description = doc.Description;
+                        nfv.Extension = mimeType;
+                        nfv.Location = doc.Location;
+                        nfv.Name = fileName;
+                        nfv.Id = doc.Id;
+
+                    }
+                }
+            }
+
+            //return Json("Uploaded " + Request.Files.Count + " files");
+            return Json(nfv, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ListFiles(string objId, string objType)
+        {
+            ObjectDocumentsViewModel model = new ObjectDocumentsViewModel();
+            if (!string.IsNullOrEmpty(objType) && !string.IsNullOrEmpty(objId))
+            {
+
+                using (DocumentService docservice = new DocumentService())
+                {
+                    List<Document> docList = new List<Document>();
+                    int oId = int.Parse(objId);         
+                    docList = docservice.List(oId, objType);
+
+                    model.objDocuments = docList;
+                    model.objId = oId;
+                    model.objType = objType;
+                }
+            }
+            return PartialView("_ListDocuments", model);
         }
 
         #endregion

@@ -13,6 +13,7 @@ using System.Transactions;
 using System.Web.Mvc;
 using System.Web;
 using Newtonsoft.Json;
+using OpenPop;
 namespace ACT.UI.Controllers
 {
     public class PalletController : BaseController
@@ -35,6 +36,11 @@ namespace ACT.UI.Controllers
                 return PartialView("_PoolingAgentDataCustomSearch", new CustomSearchModel("PoolingAgentData"));
             }
             ViewBag.ViewName = "PoolingAgentData";
+            //check if there are any viewbag messages from imports
+            string msg = (Session["ImportMessage"] != null ? Session["ImportMessage"].ToString() : null);
+            if (!string.IsNullOrEmpty(msg)) {
+                ViewBag.Message = msg;
+            }
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
             ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
@@ -71,6 +77,18 @@ namespace ACT.UI.Controllers
 
             return PartialView("_PoolingAgentData", paging);
         }
+
+        // GET: Pallet/AddChepLoad
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddChepLoad()
+        {
+            ChepLoadCustomModel model = new ChepLoadCustomModel();
+            //Posting type is the type or method it is entered into 1 Email, 2 Imported,  3 Added
+            model.PostingType = 3;
+
+             return View(model);
+        }
+
         #endregion
 
         //-------------------------------------------------------------------------------------
@@ -87,6 +105,12 @@ namespace ACT.UI.Controllers
                 return PartialView("_ClientDataCustomSearch", new CustomSearchModel("ClientData"));
             }
             ViewBag.ViewName = "ClientData";
+            //check if there are any viewbag messages from imports
+            string msg = (Session["ImportMessage"] != null ? Session["ImportMessage"].ToString() : null);
+            if (!string.IsNullOrEmpty(msg))
+            {
+                ViewBag.Message = msg;
+            }
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
             ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
@@ -120,6 +144,195 @@ namespace ACT.UI.Controllers
             PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
 
             return PartialView("_ClientData", paging);
+        }
+
+        // GET: Pallet/AddClientLoad
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddClientLoad()
+        {
+            ClientLoadCustomModel model = new ClientLoadCustomModel();
+            return View(model);
+        }
+
+        //// POST: Client/AddGroup
+        //[HttpPost]
+        //[Requires(PermissionTo.Create)]
+        //public ActionResult AddGroup(GroupViewModel model)
+        //{
+        //    try
+        //    {
+
+        //        if (!ModelState.IsValid)
+        //        {
+        //            Notify("Sorry, the Group was not created. Please correct all errors and try again.", NotificationType.Error);
+
+        //            return View(model);
+        //        }
+
+        //        using (GroupService gService = new GroupService())
+        //        using (ClientGroupService cgservice = new ClientGroupService())
+        //        using (TransactionScope scope = new TransactionScope())
+        //        {
+        //            #region Create Group
+        //            Group group = new Group()
+        //            {
+        //                Name = model.Name,
+        //                Description = model.Description,
+        //                Status = (int)Status.Active
+        //            };
+        //            group = gService.Create(group);
+        //            #endregion
+
+        //            #region Create Group Client Links
+        //            if (!string.IsNullOrEmpty(model.GroupClientList))
+        //            {
+        //                String[] clientList = model.GroupClientList.Split(',');
+        //                string lastId = "0";
+        //                foreach (string itm in clientList)
+        //                {
+        //                    //test to see if its not been added before
+        //                    ClientGroup checkCG = cgservice.GetByColumnsWhere("ClientId", int.Parse(itm), "GroupId", group.Id);
+
+        //                    if (!string.IsNullOrEmpty(itm) && itm != lastId && checkCG == null)
+        //                    {
+        //                        ClientGroup client = new ClientGroup()
+        //                        {
+        //                            ClientId = int.Parse(itm),
+        //                            GroupId = group.Id,
+        //                            Status = (int)Status.Active
+        //                        };
+        //                        cgservice.Create(client);
+        //                    }
+        //                    lastId = itm;
+        //                }
+        //            }
+        //            #endregion
+
+        //            scope.Complete();
+        //        }
+
+        //        Notify("The Group was successfully created.", NotificationType.Success);
+        //        return RedirectToAction("ClientGroups");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ViewBag.Message = ex.Message;
+        //        return View();
+        //    }
+        //}
+
+
+        //// GET: Client/EditGroupGet/5
+        //[Requires(PermissionTo.Edit)]
+        //public ActionResult EditGroupGet(int id)
+        //{
+        //    Group group;
+
+        //    using (GroupService service = new GroupService())
+        //    {
+        //        group = service.GetById(id);
+
+
+        //        if (group == null)
+        //        {
+        //            Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+        //            return PartialView("_AccessDenied");
+        //        }
+
+        //        GroupViewModel model = new GroupViewModel()
+        //        {
+        //            Id = group.Id,
+        //            Name = group.Name,
+        //            Description = group.Description,
+        //            Status = (int)group.Status,
+        //            EditMode = true
+        //        };
+        //        return View("EditGroup", model);
+        //    }
+        //}
+
+        //// POST: Client/EditGroup/5
+        //[Requires(PermissionTo.Edit)]
+        //public ActionResult EditGroup(GroupViewModel model, PagingModel pm, bool isstructure = false)
+        //{
+        //    try
+        //    {
+        //        if (!ModelState.IsValid)
+        //        {
+        //            Notify("Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error);
+
+        //            return View(model);
+        //        }
+
+        //        Group group;
+
+        //        using (GroupService service = new GroupService())
+        //        using (TransactionScope scope = new TransactionScope())
+        //        {
+        //            group = service.GetById(model.Id);
+
+        //            #region Update Group
+
+        //            // Update Group
+        //            //group.Id = model.Id;
+        //            group.Name = model.Name;
+        //            group.Description = model.Description;
+        //            group.Status = (int)model.Status;
+
+        //            service.Update(group);
+
+        //            #endregion
+
+
+        //            scope.Complete();
+        //        }
+
+        //        Notify("The selected Group details were successfully updated.", NotificationType.Success);
+
+        //        return RedirectToAction("ClientGroups");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ViewBag.Message = ex.Message;
+        //        return View();
+        //    }
+        //}
+
+        // POST: Pallet/DeleteClientLoad/5
+        [HttpPost]
+        [Requires(PermissionTo.Delete)]
+        public ActionResult DeleteClientLoad(ClientLoadCustomModel model)
+        {
+            ClientLoadCustomModel activeLoad;
+            try
+            {
+
+                using (ClientLoadService service = new ClientLoadService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    activeLoad = service.GetById(model.Id);
+
+                    if (activeLoad == null)
+                    {
+                        Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                        return PartialView("_AccessDenied");
+                    }
+
+                    activeLoad.Status = (((Status)activeLoad.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;
+                    service.Update(activeLoad);
+                    scope.Complete();
+
+                }
+                Notify("The selected item was successfully updated.", NotificationType.Success);
+                return RedirectToAction("ClientData");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
         }
         #endregion
 
@@ -400,102 +613,12 @@ namespace ACT.UI.Controllers
         #region Uploads and Imports
 
 
-        public ActionResult CompanyFiles(string objId, string objType)
-        {
-            ObjectDocumentsViewModel model = new ObjectDocumentsViewModel();
-            if (!string.IsNullOrEmpty(objType) && !string.IsNullOrEmpty(objId))
-            {
-
-                using (DocumentService docservice = new DocumentService())
-                {
-                    List<Document> docList = new List<Document>();
-                    int oId = int.Parse(objId);
-                    switch (objType.ToLower())
-                    {
-                        case "client":
-                            docList = docservice.List(oId, "Client");
-
-
-                            break;
-                        default:
-                            break;
-                    }
-                    model.objDocuments = docList;
-                    model.objId = oId;
-                    model.objType = objType;
-                }
-            }
-            return PartialView("_ListDocuments", model);
-        }
-
-
-        public JsonResult Upload(int? clientId = null)
-        {
-            FileViewModel nfv = new FileViewModel();
-            for (int i = 0; i < Request.Files.Count; i++)
-            {
-                HttpPostedFileBase file = Request.Files[i]; //Uploaded file
-                                                            //Use the following properties to get file's name, size and MIMEType
-                int fileSize = file.ContentLength;
-                string fileName = file.FileName;
-                string mimeType = file.ContentType;
-                System.IO.Stream fileContent = file.InputStream;
-                //To save file, use SaveAs method
-                //file.SaveAs(Server.MapPath("~/") + fileName); //File will be saved in application root
-
-                // int clientid = 0;//clientId
-
-                if (fileName != null)
-                {
-                    // Create folder
-                    string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/{clientId}/");
-
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-
-                    string now = DateTime.Now.ToString("yyyyMMddHHmmss");
-                    using (DocumentService dservice = new DocumentService())
-                    {
-                        Document doc = new Document()
-                        {
-                            ObjectId = clientId,//should be null for client adds, so we can update it later
-                            ObjectType = "Client",
-                            Status = (int)Status.Active,
-                            Name = fileName,
-                            Category = "Company Document",
-                            Title = "Company Document",
-                            Size = fileSize,
-                            Description = "Company Document",
-                            Type = mimeType,
-                            Location = $"Client/{clientId}/{now}-{clientId}-{fileName}"
-                        };
-
-                        dservice.Create(doc);
-
-                        string fullpath = Path.Combine(path, $"{now}-{clientId}-{fileName}");
-                        file.SaveAs(fullpath);
-
-                        nfv.Description = doc.Description;
-                        nfv.Extension = mimeType;
-                        nfv.Location = doc.Location;
-                        nfv.Name = fileName;
-                        nfv.Id = doc.Id;
-
-                    }
-                }
-            }
-
-            //return Json("Uploaded " + Request.Files.Count + " files");
-            return Json(nfv, JsonRequestBehavior.AllowGet);
-        }
-
 
         [HttpPost]
-        // GET: /Client/ImportChepLoad
+        // POSt: /Client/ImportChepLoad
         public ActionResult ImportChepLoad(HttpPostedFileBase postedFile)
         {
+            string importMessage = "Pooling Agent Import Started\r\n";
             if (postedFile != null)
             {
                 string fileExtension = Path.GetExtension(postedFile.FileName);
@@ -511,9 +634,10 @@ namespace ACT.UI.Controllers
                 {
                     string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
                     int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-
+                    int cnt = 0;
+                    int cntCreated = 0;
+                   
                     using (var sreader = new StreamReader(postedFile.InputStream))
-                    using (SiteService siteService = new SiteService())
                     using (ChepLoadService service = new ChepLoadService())
                     using (TransactionScope scope = new TransactionScope())
                     {
@@ -524,136 +648,31 @@ namespace ACT.UI.Controllers
                         {
                             string[] rows = sreader.ReadLine().Split(',');
 
-                            int siteType = 1;
-
-                            string strLatY = rows[3].ToString();
-                            decimal latitudeY = 0;
-                            try
+                            ChepLoadCustomModel model = new ChepLoadCustomModel();
+                            
+                            if (string.IsNullOrEmpty(rows[0]))
                             {
-                                decimal.TryParse(rows[3].ToString(), out latitudeY);
-                                latitudeY = decimal.Round(latitudeY, 4);
-                                strLatY = (latitudeY != 0 ? latitudeY.ToString() : strLatY);
+                                model.LoadDate = DateTimeExtensions.formatImportDate(rows[0]);
+                                model.EffectiveDate = DateTimeExtensions.formatImportDate(rows[1]);
+                                model.NotifyDate = DateTimeExtensions.formatImportDate(rows[2]);
+                                model.DocketNumber = rows[3];
+                                model.PostingType = 2;//import - Transfer Customer to Customer - Out
+                                model.ClientDescription = rows[5];
+                                model.ReferenceNumber = rows[6];
+                                model.ReceiverNumber = rows[7];
+                                model.Equipment = rows[9];
+                                model.OriginalQuantity = decimal.Parse(rows[10]);
+
+                                service.Create(model);
+                                importMessage += " Trading Partner: " + model.ClientDescription + " created at Id " + model.Id + "\r\n";
+                                cntCreated++;
                             }
-                            catch (Exception ex)
-                            {
-                                ViewBag.Message = string.Concat(rows[3].ToString(), " ", ex.Message);
-                            }
-                            string strLngX = rows[2].ToString();
-                            decimal longitudeX = 0;
-                            try
-                            {
-                                decimal.TryParse(rows[2].ToString(), out longitudeX);
-                                longitudeX = decimal.Round(longitudeX, 4);
-                                strLngX = (longitudeX != 0 ? longitudeX.ToString() : strLngX);
-                            }
-                            catch (Exception ex)
-                            {
-                                ViewBag.Message = string.Concat(rows[3].ToString(), " ", ex.Message);
-                            }
-
-                            Site existingSite = null;
-                            #region Validation
-                            if (!string.IsNullOrEmpty(strLngX) && siteService.ExistByXYCoords(strLngX, strLatY))
-                            {
-                                //Notify($"Sorry, a Site with the same X Y Coordinates already exists \"{model.XCord}\" already exists!", NotificationType.Error);
-                                //return View(model);
-
-                                //rather than pass back to view, we will create the new site as a subsite of the existing site. 
-                                //Get the existing site first
-                                existingSite = siteService.GetByColumnsWhere("XCord", strLngX, "YCord", strLatY);
-                   //             SiteID = existingSite.Id;//This is the existing site retrieved by mapping same X and Y coord, read that into the model.SiteId which makes the new site a child site
-                                siteType = 2;//Mark teh site as a subsite by default
-                            }
-
-                            int regionId = 0;
-                            if (!string.IsNullOrEmpty(rows[16].ToString()))
-                            {
-                                regionId = int.Parse(rows[16].ToString());
-                            }
-                            int provinceId = 0;
-                            string provinceName = "";
-                            if (!string.IsNullOrEmpty(rows[8].ToString()))
-                            {
-                                int.TryParse(rows[8].ToString(), out provinceId);
-                                try
-                                {
-                                    if (provinceId > 0)
-                                    {
-                                        provinceName = ((Province)provinceId).GetDisplayText();
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    ViewBag.Message = string.Concat(rows[8].ToString(), " ", ex.Message);
-                                }
-                            }
-                            #region Create Site
-                            Site site = new Site()
-                            {
-                                Name = rows[0].ToString(),
-                                Description = rows[1].ToString(),
-                                XCord = strLngX,
-                                YCord = strLatY,
-                                Address = rows[4].ToString() + " " + rows[5].ToString() + " " + rows[6].ToString() + " " + rows[7].ToString() + " " + provinceName,
-                                PostalCode = rows[7].ToString(),
-                                ContactName = rows[10].ToString(),
-                                ContactNo = rows[9].ToString(),
-                                PlanningPoint = rows[11].ToString(),
-                                SiteType = siteType,
-                                AccountCode = rows[13].ToString(),
-                                Depot = rows[14].ToString(),
-                                SiteCodeChep = rows[15].ToString(),
-                                Status = (int)Status.Pending,
-                                RegionId = regionId,
-                                FinanceContact = rows[17].ToString(),
-                                FinanceContactNo = rows[18].ToString(),
-                                ReceivingContact = rows[19].ToString(),
-                                ReceivingContactNo = rows[20].ToString(),
-                            };
-                            //For Subsites
-                   //         if (SiteID > 0)
-                    //        {
-                       //         site.SiteId = SiteID;
-                    //        }
-                   //         site = siteService.Create(site);
-                            #endregion
-
-                            #region Create Address (s)
-
-                            if (!string.IsNullOrEmpty(rows[3].ToString()))
-                            {
-                                Address address = new Address()
-                                {
-                                    ObjectId = site.Id,
-                                    ObjectType = "Site",
-                                    Town = rows[6].ToString(),
-                                    Status = (int)Status.Active,
-                                    PostalCode = rows[7].ToString(),
-                                    Type = (int)AddressType.Postal,
-                                    Addressline1 = rows[4].ToString(),
-                                    Addressline2 = rows[5].ToString(),
-                                    Province = provinceId,
-                                };
-                                aservice.Create(address);
-                            }
-
-                            #endregion
-
-                            //tie Client in Session to New Site
-                            #region Add ClientSite
-                            ClientSite csSite = new ClientSite()
-                            {
-                                ClientId = clientID,
-                                SiteId = site.Id,
-                                AccountingCode = site.AccountCode,
-                                Status = (int)Status.Active
-                            };
-                            csService.Create(csSite);
-                            #endregion
-
+                            cnt++;
                         }
-                        #endregion
+                        importMessage += " Records To Process: " + cnt + "\r\n";
+                        importMessage += " Records Processed: " + cntCreated + "\r\n";
                         scope.Complete();
+                        Session["ImportMessage"] = importMessage;
                     }
 
                 }
@@ -670,7 +689,7 @@ namespace ACT.UI.Controllers
             {
 
             }
-            return RedirectToAction("ManageSites", "Client");
+            return RedirectToAction("PoolingAgentData", "Pallet");
         }
 
 
@@ -678,6 +697,7 @@ namespace ACT.UI.Controllers
         // GET: /Client/ImportClientLoad
         public ActionResult ImportClientLoad(HttpPostedFileBase postedFile)
         {
+            string importMessage = "Pooling Agent Import Started\r\n";
             if (postedFile != null)
             {
                 string fileExtension = Path.GetExtension(postedFile.FileName);
@@ -693,15 +713,12 @@ namespace ACT.UI.Controllers
                 {
                     string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
                     int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-                    //for subsites to load tehse sites under a main site
-                    string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
-                    int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
+                    int cnt = 0;
+                    int cntCreated = 0;
 
                     using (var sreader = new StreamReader(postedFile.InputStream))
-                    using (SiteService siteService = new SiteService())
-                    using (ClientSiteService csService = new ClientSiteService())
+                    using (ChepLoadService service = new ChepLoadService())
                     using (TransactionScope scope = new TransactionScope())
-                    using (AddressService aservice = new AddressService())
                     {
                         //First line is header. If header is not passed in csv then we can neglect the below line.
                         string[] headers = sreader.ReadLine().Split(',');
@@ -710,136 +727,31 @@ namespace ACT.UI.Controllers
                         {
                             string[] rows = sreader.ReadLine().Split(',');
 
-                            int siteType = 1;
+                            ChepLoadCustomModel model = new ChepLoadCustomModel();
 
-                            string strLatY = rows[3].ToString();
-                            decimal latitudeY = 0;
-                            try
+                            if (string.IsNullOrEmpty(rows[0]))
                             {
-                                decimal.TryParse(rows[3].ToString(), out latitudeY);
-                                latitudeY = decimal.Round(latitudeY, 4);
-                                strLatY = (latitudeY != 0 ? latitudeY.ToString() : strLatY);
-                            }
-                            catch (Exception ex)
-                            {
-                                ViewBag.Message = string.Concat(rows[3].ToString(), " ", ex.Message);
-                            }
-                            string strLngX = rows[2].ToString();
-                            decimal longitudeX = 0;
-                            try
-                            {
-                                decimal.TryParse(rows[2].ToString(), out longitudeX);
-                                longitudeX = decimal.Round(longitudeX, 4);
-                                strLngX = (longitudeX != 0 ? longitudeX.ToString() : strLngX);
-                            }
-                            catch (Exception ex)
-                            {
-                                ViewBag.Message = string.Concat(rows[3].ToString(), " ", ex.Message);
-                            }
+                                model.LoadDate = DateTimeExtensions.formatImportDate(rows[0]);
+                                model.EffectiveDate = DateTimeExtensions.formatImportDate(rows[1]);
+                                model.NotifyDate = DateTimeExtensions.formatImportDate(rows[2]);
+                                model.DocketNumber = rows[3];
+                                model.PostingType = 2;//import - Transfer Customer to Customer - Out
+                                model.ClientDescription = rows[5];
+                                model.ReferenceNumber = rows[6];
+                                model.ReceiverNumber = rows[7];
+                                model.Equipment = rows[9];
+                                model.OriginalQuantity = decimal.Parse(rows[10]);
 
-                            Site existingSite = null;
-                            #region Validation
-                            if (!string.IsNullOrEmpty(strLngX) && siteService.ExistByXYCoords(strLngX, strLatY))
-                            {
-                                //Notify($"Sorry, a Site with the same X Y Coordinates already exists \"{model.XCord}\" already exists!", NotificationType.Error);
-                                //return View(model);
-
-                                //rather than pass back to view, we will create the new site as a subsite of the existing site. 
-                                //Get the existing site first
-                                existingSite = siteService.GetByColumnsWhere("XCord", strLngX, "YCord", strLatY);
-                                SiteID = existingSite.Id;//This is the existing site retrieved by mapping same X and Y coord, read that into the model.SiteId which makes the new site a child site
-                                siteType = 2;//Mark teh site as a subsite by default
+                                service.Create(model);
+                                importMessage += " Trading Partner: " + model.ClientDescription + " created at Id " + model.Id + "\r\n";
+                                cntCreated++;
                             }
-
-                            int regionId = 0;
-                            if (!string.IsNullOrEmpty(rows[16].ToString()))
-                            {
-                                regionId = int.Parse(rows[16].ToString());
-                            }
-                            int provinceId = 0;
-                            string provinceName = "";
-                            if (!string.IsNullOrEmpty(rows[8].ToString()))
-                            {
-                                int.TryParse(rows[8].ToString(), out provinceId);
-                                try
-                                {
-                                    if (provinceId > 0)
-                                    {
-                                        provinceName = ((Province)provinceId).GetDisplayText();
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    ViewBag.Message = string.Concat(rows[8].ToString(), " ", ex.Message);
-                                }
-                            }
-                            #region Create Site
-                            Site site = new Site()
-                            {
-                                Name = rows[0].ToString(),
-                                Description = rows[1].ToString(),
-                                XCord = strLngX,
-                                YCord = strLatY,
-                                Address = rows[4].ToString() + " " + rows[5].ToString() + " " + rows[6].ToString() + " " + rows[7].ToString() + " " + provinceName,
-                                PostalCode = rows[7].ToString(),
-                                ContactName = rows[10].ToString(),
-                                ContactNo = rows[9].ToString(),
-                                PlanningPoint = rows[11].ToString(),
-                                SiteType = siteType,
-                                AccountCode = rows[13].ToString(),
-                                Depot = rows[14].ToString(),
-                                SiteCodeChep = rows[15].ToString(),
-                                Status = (int)Status.Pending,
-                                RegionId = regionId,
-                                FinanceContact = rows[17].ToString(),
-                                FinanceContactNo = rows[18].ToString(),
-                                ReceivingContact = rows[19].ToString(),
-                                ReceivingContactNo = rows[20].ToString(),
-                            };
-                            //For Subsites
-                            if (SiteID > 0)
-                            {
-                                site.SiteId = SiteID;
-                            }
-                            site = siteService.Create(site);
-                            #endregion
-
-                            #region Create Address (s)
-
-                            if (!string.IsNullOrEmpty(rows[3].ToString()))
-                            {
-                                Address address = new Address()
-                                {
-                                    ObjectId = site.Id,
-                                    ObjectType = "Site",
-                                    Town = rows[6].ToString(),
-                                    Status = (int)Status.Active,
-                                    PostalCode = rows[7].ToString(),
-                                    Type = (int)AddressType.Postal,
-                                    Addressline1 = rows[4].ToString(),
-                                    Addressline2 = rows[5].ToString(),
-                                    Province = provinceId,
-                                };
-                                aservice.Create(address);
-                            }
-
-                            #endregion
-
-                            //tie Client in Session to New Site
-                            #region Add ClientSite
-                            ClientSite csSite = new ClientSite()
-                            {
-                                ClientId = clientID,
-                                SiteId = site.Id,
-                                AccountingCode = site.AccountCode,
-                                Status = (int)Status.Active
-                            };
-                            csService.Create(csSite);
-                            #endregion
-
+                            cnt++;
                         }
-                        #endregion
+                        importMessage += " Records To Process: " + cnt + "\r\n";
+                        importMessage += " Records Processed: " + cntCreated + "\r\n";
                         scope.Complete();
+                        Session["ImportMessage"] = importMessage;
                     }
 
                 }
@@ -856,9 +768,102 @@ namespace ACT.UI.Controllers
             {
 
             }
-            return RedirectToAction("ManageSites", "Client");
+            return RedirectToAction("PoolingAgentData", "Pallet");
         }
 
+
+        //
+        // Returns a general list of all active clients allowed in the current context to be selected from
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult ImportEmails(string pspId = null)
+        {
+            if (pspId != null)
+            {
+                using (PSPConfigService confservice = new PSPConfigService())
+                {
+                    PSPConfig conf = confservice.GetById(int.Parse(pspId));
+                    if (conf.ImportEmailHost != null && conf.ImportEmailPort != null)
+                    {
+                        OpenPop.Pop3.Pop3Client pop3Client = new OpenPop.Pop3.Pop3Client();
+                        pop3Client.Connect(conf.ImportEmailHost, int.Parse(conf.ImportEmailPort), true);
+                        pop3Client.Authenticate(conf.ImportEmailUsername, conf.ImportEmailPassword, OpenPop.Pop3.AuthenticationMethod.UsernameAndPassword);
+
+                        int count = pop3Client.GetMessageCount();
+                        List<EmailCustomModel> Emails = new List<EmailCustomModel>();
+                        int counter = 0;
+                        for (int i = count; i >= 1; i--)
+                        {
+                            OpenPop.Mime.Message message = pop3Client.GetMessage(i);
+                            EmailCustomModel email = new EmailCustomModel()
+                            {
+                                MessageNumber = i,
+                                Subject = message.Headers.Subject,
+                                DateSent = message.Headers.DateSent,
+                                From = string.Format("<a href = 'mailto:{1}'>{0}</a>", message.Headers.From.DisplayName, message.Headers.From.Address),
+                            };
+                            OpenPop.Mime.MessagePart body = message.FindFirstHtmlVersion();
+                            if (body != null)
+                            {
+                                email.Body = body.GetBodyAsText();
+                            }
+                            else
+                            {
+                                body = message.FindFirstPlainTextVersion();
+                                if (body != null)
+                                {
+                                    email.Body = body.GetBodyAsText();
+                                }
+                            }
+                            List<OpenPop.Mime.MessagePart> attachments = message.FindAllAttachments();
+
+                            foreach (OpenPop.Mime.MessagePart attachment in attachments)
+                            {
+                                email.Attachments.Add(new AttachmentCustomModel
+                                {
+                                    FileName = attachment.FileName,
+                                    ContentType = attachment.ContentType.MediaType,
+                                    Content = attachment.Body
+                                });
+                            }
+                            Emails.Add(email);
+                            counter++;
+                            if (counter > 2)
+                            {
+                                break;
+                            }
+                        }
+                        // Session["Pop3Client"] = pop3Client;
+                        //List<Client> model = new List<Client>();
+                        //PagingModel pm = new PagingModel();
+                        //CustomSearchModel csm = new CustomSearchModel();
+
+                        //using (ClientService service = new ClientService())
+                        //{
+                        //    pm.Sort = pm.Sort ?? "ASC";
+                        //    pm.SortBy = pm.SortBy ?? "Name";
+                        //    csm.Status = Status.Active;
+                        //    csm.Status = Status.Active;
+
+                        //    model = service.ListCSM(pm, csm);
+                        //}
+                        //if (model.Any())
+                        //{
+                        //    IEnumerable<SelectListItem> clientDDL = model.Select(c => new SelectListItem
+                        //    {
+                        //        Value = c.Id.ToString(),
+                        //        Text = c.CompanyName
+
+                        //    });
+                    }
+                }
+
+                return Json("OK", JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
 
 
         #endregion

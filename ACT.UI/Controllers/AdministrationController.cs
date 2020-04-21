@@ -1717,6 +1717,10 @@ namespace ACT.UI.Controllers
                         SystemContactEmail = psp.PSPConfigs.FirstOrDefault().ReceivingManagerEmail,
                         ReceivingManagerEmail = psp.PSPConfigs.FirstOrDefault().ReceivingManagerEmail,
                         ClientCorrespondenceName = psp.PSPConfigs.FirstOrDefault().ClientCorrespondenceName,
+                        ImportEmailHost = psp.PSPConfigs.FirstOrDefault().ImportEmailHost,
+                        ImportEmailPassword = psp.PSPConfigs.FirstOrDefault().ImportEmailPassword,
+                        ImportEmailPort = psp.PSPConfigs.FirstOrDefault().ImportEmailPort,
+                        ImportEmailUsername = psp.PSPConfigs.FirstOrDefault().ImportEmailUsername,
                     };
                 }
 
@@ -1758,6 +1762,10 @@ namespace ACT.UI.Controllers
                         BillingFileLocation = model.BillingFileLocation,
                         ReceivingManagerEmail = model.ReceivingManagerEmail,
                         ClientCorrespondenceName = model.ClientCorrespondenceName,
+                        ImportEmailHost = model.ImportEmailHost,
+                        ImportEmailUsername = model.ImportEmailUsername,
+                        ImportEmailPassword = model.ImportEmailPassword,
+                        ImportEmailPort = model.ImportEmailPort,
 
                     };
 

@@ -3411,43 +3411,6 @@ namespace ACT.UI.Controllers
         //    return RedirectToAction("ImportSites", "Client");
         //}
 
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetSite( string SiteId )
-        {
-            if ( SiteId != null )
-            {
-                Session[ "SiteId" ] = SiteId;
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetClientSite( string SiteId )
-        {
-            if ( SiteId != null )
-            {
-                int clientId = 0;
-                if ( int.Parse( SiteId ) > 0 )
-                {
-                    using ( SiteService service = new SiteService() )
-                    {
-                        clientId = service.GetClientBySite( int.Parse( SiteId ) );
-                    }
-                    Session[ "ClientId" ] = clientId;
-                }
-                Session[ "SiteId" ] = SiteId;
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
 
         [HttpPost]
         // GET: /Client/ImportSites
@@ -3820,95 +3783,7 @@ namespace ACT.UI.Controllers
         }
 
 
-        public JsonResult Upload( int? clientId = null )
-        {
-            FileViewModel nfv = new FileViewModel();
-            for ( int i = 0; i < Request.Files.Count; i++ )
-            {
-                HttpPostedFileBase file = Request.Files[ i ]; //Uploaded file
-                                                              //Use the following properties to get file's name, size and MIMEType
-                int fileSize = file.ContentLength;
-                string fileName = file.FileName;
-                string mimeType = file.ContentType;
-                System.IO.Stream fileContent = file.InputStream;
-                //To save file, use SaveAs method
-                //file.SaveAs(Server.MapPath("~/") + fileName); //File will be saved in application root
-
-                // int clientid = 0;//clientId
-
-                if ( fileName != null )
-                {
-                    // Create folder
-                    string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/{clientId}/" );
-
-                    if ( !Directory.Exists( path ) )
-                    {
-                        Directory.CreateDirectory( path );
-                    }
-
-                    string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
-                    using ( DocumentService dservice = new DocumentService() )
-                    {
-                        Document doc = new Document()
-                        {
-                            ObjectId = clientId,//should be null for client adds, so we can update it later
-                            ObjectType = "Client",
-                            Status = ( int ) Status.Active,
-                            Name = fileName,
-                            Category = "Company Document",
-                            Title = "Company Document",
-                            Size = fileSize,
-                            Description = "Company Document",
-                            Type = mimeType,
-                            Location = $"Client/{clientId}/{now}-{clientId}-{fileName}"
-                        };
-
-                        dservice.Create( doc );
-
-                        string fullpath = Path.Combine( path, $"{now}-{clientId}-{fileName}" );
-                        file.SaveAs( fullpath );
-
-                        nfv.Description = doc.Description;
-                        nfv.Extension = mimeType;
-                        nfv.Location = doc.Location;
-                        nfv.Name = fileName;
-                        nfv.Id = doc.Id;
-
-                    }
-                }
-            }
-
-            //return Json("Uploaded " + Request.Files.Count + " files");
-            return Json( nfv, JsonRequestBehavior.AllowGet );
-        }
-
-        public ActionResult CompanyFiles( string objId, string objType )
-        {
-            ObjectDocumentsViewModel model = new ObjectDocumentsViewModel();
-            if ( !string.IsNullOrEmpty( objType ) && !string.IsNullOrEmpty( objId ) )
-            {
-
-                using ( DocumentService docservice = new DocumentService() )
-                {
-                    List<Document> docList = new List<Document>();
-                    int oId = int.Parse( objId );
-                    switch ( objType.ToLower() )
-                    {
-                        case "client":
-                            docList = docservice.List( oId, "Client" );
-
-
-                            break;
-                        default:
-                            break;
-                    }
-                    model.objDocuments = docList;
-                    model.objId = oId;
-                    model.objType = objType;
-                }
-            }
-            return PartialView( "_ListDocuments", model );
-        }
+       
 
         #endregion
 
@@ -3933,7 +3808,10 @@ namespace ACT.UI.Controllers
         }
 
         [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetClientBudget( string Id, string ClientId, string BudgetYear, string January, string February, string March, string April, string May, string June, string July, string August, string September, string October, string November, string December )
+        public JsonResult SetClientBudget( string Id, string ClientId, string BudgetYear, 
+            string January, string February, string March, string April, string May, 
+            string June, string July, string August, string September, string October, 
+            string November, string December )
         {
             if ( Id != null )
             {
@@ -4015,7 +3893,10 @@ namespace ACT.UI.Controllers
         }
 
         [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetSiteBudget( string Id, string SiteId, string BudgetYear, string January, string February, string March, string April, string May, string June, string July, string August, string September, string October, string November, string December )
+        public JsonResult SetSiteBudget( string Id, string SiteId, string BudgetYear, 
+            string January, string February, string March, string April, string May, 
+            string June, string July, string August, string September, string October, 
+            string November, string December )
         {
             if ( Id != null )
             {
