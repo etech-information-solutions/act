@@ -56,7 +56,7 @@
                     }
                 </td>
                 <td style="width:2%">
-                    @Html.ActionLink("Add", "AddChepLoad", new { sourceview = "PoolingAgentData" }, new { @class = "add", @rel = "tipsyS", @title = "Add Manual Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" })
+                    @Html.ActionLink("Add", "AddChepLoad", new { @class = "add", @rel = "tipsyS", @title = "Add Manual Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" })
                 </td>
                 <td style="width:5%">
                     &nbsp;
@@ -174,9 +174,9 @@
                     @*<td style="width: 15%;"></td>*@
                     <td width="15%">
                         <a href="#doc" rel="modal:open"><i class="fa fa-file"></i></a>
-                        @Html.ActionLink("Edit", "EditPAD", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        @Html.ActionLink("Edit", "EditChepLoad", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        @Html.ActionLink(enable, "DeletePAD", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?" })
+                        @Html.ActionLink(enable, "DeleteChepLoad", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?" })
                         @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
                                 @if (item.Documents != null && item.Documents.Any(s => s.Status == (Int32)Status.Active))

@@ -28,7 +28,7 @@ namespace ACT.UI.Controllers
         //
         // GET: /Pallet/PoolingAgentData
         public ActionResult PoolingAgentData(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
-        {
+            {
             if (givecsm)
             {
                 ViewBag.ViewName = "PoolingAgentData";
@@ -82,25 +82,15 @@ namespace ACT.UI.Controllers
         [Requires(PermissionTo.Create)]
         public ActionResult AddChepLoad()
         {
-            ChepLoadCustomModel model = new ChepLoadCustomModel();
-            //Posting type is the type or method it is entered into 1 Email, 2 Imported,  3 Added
+            ChepLoadViewModel model = new ChepLoadViewModel();
             model.PostingType = 3;
-
-             return View(model);
+            return View("AddAgentPoolingData", model);
         }
 
-        // GET: Pallet/AddAgentPoolingData
-        [Requires(PermissionTo.Create)]
-        public ActionResult AddAgentPoolingData()
-        {
-            ChepLoadCustomModel model = new ChepLoadCustomModel();
-            return View(model);
-        }
-
-        // POST: Pallet/AddAgentPoolingData
+        // POST: Pallet/AddChepLoad
         [HttpPost]
         [Requires(PermissionTo.Create)]
-        public ActionResult AddAgentPoolingData(ChepLoadCustomModel model)
+        public ActionResult AddChepLoad(ChepLoadViewModel model)
         {
             try
             {
