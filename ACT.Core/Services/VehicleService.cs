@@ -168,17 +168,7 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                //query = string.Format( @"{0} AND (cp.DRReference LIKE '%{1}%' OR
-                //                                  cp.Description LIKE '%{1}%' OR
-                //                                  cp.PaymentReference LIKE '%{1}%' OR
-                //                                  m.Name LIKE '%{1}%' OR
-                //                                  m.Surname LIKE '%{1}%' OR
-                //                                  m.MembershipNo LIKE '%{1}%' OR
-                //                                  m.EmailAddress LIKE '%{1}%' OR
-                //                                  r.Name LIKE '%{1}%' OR
-                //                                  r.Region LIKE '%{1}%' OR
-                //                                  m.Identification LIKE '%{1}%'
-                //                             ) ", query, csm.Query.Trim() );
+                query = string.Format(@"{0} AND (LOWER(REPLACE(v.Registration, ' ', '')) LIKE '%{1}%') ", query, csm.Query.Trim().ToLower() );
             }
 
             #endregion

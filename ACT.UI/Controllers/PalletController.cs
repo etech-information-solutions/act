@@ -89,6 +89,155 @@ namespace ACT.UI.Controllers
              return View(model);
         }
 
+        // GET: Pallet/AddAgentPoolingData
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddAgentPoolingData()
+        {
+            ChepLoadCustomModel model = new ChepLoadCustomModel();
+            return View(model);
+        }
+
+        // POST: Pallet/AddAgentPoolingData
+        [HttpPost]
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddAgentPoolingData(ChepLoadCustomModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    Notify("Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                using (ChepLoadService gService = new ChepLoadService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    #region Create ClientLoadCustomModel
+                    ChepLoadCustomModel clientload = new ChepLoadCustomModel()
+                    {
+                        LoadDate = model.LoadDate,
+                        EffectiveDate = model.EffectiveDate,
+                        NotifyDate = model.NotifyDate,
+                        AccountNumber = model.AccountNumber,
+                        ClientDescription = model.ClientDescription,
+                        DeliveryNote = model.DeliveryNote,
+                        ReferenceNumber = model.ReferenceNumber,
+                        ReceiverNumber = model.ReceiverNumber,
+                        Equipment = model.Equipment,
+                        OriginalQuantity = model.OriginalQuantity,
+                        NewQuantity = model.NewQuantity,
+                        Status = (int)Status.Active
+                    };
+                    gService.Create(clientload);
+                    #endregion
+
+                    scope.Complete();
+                }
+
+                Notify("The item was successfully created.", NotificationType.Success);
+                return RedirectToAction("ClientData");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+
+        // GET: Pallet/EditChepLoad/5
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditChepLoad(int id)
+        {
+            ChepLoadCustomModel load;
+
+            using (ChepLoadService service = new ChepLoadService())
+            {
+                load = service.GetById(id);
+
+
+                if (load == null)
+                {
+                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                    return PartialView("_AccessDenied");
+                }
+
+                ChepLoadViewModel model = new ChepLoadViewModel()
+                {
+                    LoadDate = load.LoadDate,
+                    EffectiveDate = load.EffectiveDate,
+                    NotifyDate = load.NotifyDate,
+                    AccountNumber = load.AccountNumber,
+                    ClientDescription = load.ClientDescription,
+                    DeliveryNote = load.DeliveryNote,
+                    ReferenceNumber = load.ReferenceNumber,
+                    ReceiverNumber = load.ReceiverNumber,
+                    Equipment = load.Equipment,
+                    OriginalQuantity = load.OriginalQuantity,
+                    NewQuantity = load.NewQuantity,
+                    Status = (int)load.Status,
+                    DocumentCount = (int)load.DocumentCount,
+                    DocsList = ""
+                };
+                return View("EditAgentPoolingData", model);
+            }
+        }
+
+        // POST: Pallet/EditClientData/5
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditChepLoad(ChepLoadViewModel model, PagingModel pm, bool isstructure = false)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    Notify("Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                ChepLoadCustomModel load;
+
+                using (ChepLoadService service = new ChepLoadService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    load = service.GetById(model.Id);
+
+                    #region Update Chep Load
+                    load.LoadDate = model.LoadDate;
+                    load.EffectiveDate = model.EffectiveDate;
+                    load.NotifyDate = model.NotifyDate;
+                    load.AccountNumber = model.AccountNumber;
+                    load.ClientDescription = model.ClientDescription;
+                    load.DeliveryNote = model.DeliveryNote;
+                    load.ReferenceNumber = model.ReferenceNumber;
+                    load.ReceiverNumber = model.ReceiverNumber;
+                    load.Equipment = model.Equipment;
+                    load.OriginalQuantity = model.OriginalQuantity;
+                    load.NewQuantity = model.NewQuantity;
+                    load.Status = (int)model.Status;
+
+                    service.Update(load);
+
+                    #endregion
+
+
+                    scope.Complete();
+                }
+
+                Notify("The selected Item details were successfully updated.", NotificationType.Success);
+
+                return RedirectToAction("ClientData");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
         #endregion
 
         //-------------------------------------------------------------------------------------
@@ -111,24 +260,12 @@ namespace ACT.UI.Controllers
             {
                 ViewBag.Message = msg;
             }
+            
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
             ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-       //     model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            List<Client> clientList = new List<Client>();
-            //TODO
-            using (ClientService clientService = new ClientService())
-            {
-                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
-            }
+                                                                    //     model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
 
-            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            });
-            ViewBag.ClientList = clientDDL;
             int total = 0;
             List<ClientLoadCustomModel> model = new List<ClientLoadCustomModel>();
             using (ClientLoadService service = new ClientLoadService())
@@ -151,158 +288,235 @@ namespace ACT.UI.Controllers
         public ActionResult AddClientLoad()
         {
             ClientLoadCustomModel model = new ClientLoadCustomModel();
+            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            List<Transporter>transporterOptions = new List<Transporter>();
+            using (TransporterService rservice = new TransporterService())
+            {
+                transporterOptions = rservice.List();
+            }
+            IEnumerable<SelectListItem> transporterOptionsDDL = transporterOptions.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.TradingName
+
+            });
+            ViewBag.TransporterOptions = transporterOptionsDDL;
             return View(model);
         }
 
-        //// POST: Client/AddGroup
-        //[HttpPost]
-        //[Requires(PermissionTo.Create)]
-        //public ActionResult AddGroup(GroupViewModel model)
-        //{
-        //    try
-        //    {
+        // POST: Pallet/AddClientData
+        [HttpPost]
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddClientData(ClientLoadCustomModel model)
+        {
+            try
+            {               
+                if (!ModelState.IsValid)
+                {
+                    Notify("Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error);
 
-        //        if (!ModelState.IsValid)
-        //        {
-        //            Notify("Sorry, the Group was not created. Please correct all errors and try again.", NotificationType.Error);
+                    return View(model);
+                }
 
-        //            return View(model);
-        //        }
+                using (ClientLoadService gService = new ClientLoadService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    #region Create ClientLoadCustomModel
+                    ClientLoadCustomModel clientload = new ClientLoadCustomModel()
+                    {
+                        ClientId = model.ClientId,
+                        VehicleId = model.VehicleId,
+                        TransporterId = model.TransporterId,
+                        LoadDate = model.LoadDate,
+                        LoadNumber = model.LoadNumber,
+                        EffectiveDate = model.EffectiveDate,
+                        NotifyeDate = model.NotifyeDate,
+                        AccountNumber = model.AccountNumber,
+                        ClientDescription = model.ClientDescription,
+                        DeliveryNote = model.DeliveryNote,
+                        ReferenceNumber = model.ReferenceNumber,
+                        ReceiverNumber = model.ReceiverNumber,
+                        Equipment = model.Equipment,
+                        OriginalQuantity = model.OriginalQuantity,
+                        NewQuantity = model.NewQuantity,
+                        RetQuantity = model.RetQuantity,
+                        //ReconcileDate = model.ReconcileDate,
+                        //ReconcileInvoice = model.ReconcileInvoice,
+                        PODNumber = model.PODNumber,
+                        PCNNumber = model.PCNNumber,
+                        PRNNumber = model.PRNNumber,
+                        ARPMComments = model.ARPMComments,
+                        ProvCode = model.ProvCode,                        
+                        Status = (int)Status.Active
+                    };
+                    gService.Create(clientload);
+                    #endregion
 
-        //        using (GroupService gService = new GroupService())
-        //        using (ClientGroupService cgservice = new ClientGroupService())
-        //        using (TransactionScope scope = new TransactionScope())
-        //        {
-        //            #region Create Group
-        //            Group group = new Group()
-        //            {
-        //                Name = model.Name,
-        //                Description = model.Description,
-        //                Status = (int)Status.Active
-        //            };
-        //            group = gService.Create(group);
-        //            #endregion
+                    scope.Complete();
+                }
 
-        //            #region Create Group Client Links
-        //            if (!string.IsNullOrEmpty(model.GroupClientList))
-        //            {
-        //                String[] clientList = model.GroupClientList.Split(',');
-        //                string lastId = "0";
-        //                foreach (string itm in clientList)
-        //                {
-        //                    //test to see if its not been added before
-        //                    ClientGroup checkCG = cgservice.GetByColumnsWhere("ClientId", int.Parse(itm), "GroupId", group.Id);
-
-        //                    if (!string.IsNullOrEmpty(itm) && itm != lastId && checkCG == null)
-        //                    {
-        //                        ClientGroup client = new ClientGroup()
-        //                        {
-        //                            ClientId = int.Parse(itm),
-        //                            GroupId = group.Id,
-        //                            Status = (int)Status.Active
-        //                        };
-        //                        cgservice.Create(client);
-        //                    }
-        //                    lastId = itm;
-        //                }
-        //            }
-        //            #endregion
-
-        //            scope.Complete();
-        //        }
-
-        //        Notify("The Group was successfully created.", NotificationType.Success);
-        //        return RedirectToAction("ClientGroups");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ViewBag.Message = ex.Message;
-        //        return View();
-        //    }
-        //}
+                Notify("The item was successfully created.", NotificationType.Success);
+                return RedirectToAction("ClientData");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
 
 
-        //// GET: Client/EditGroupGet/5
-        //[Requires(PermissionTo.Edit)]
-        //public ActionResult EditGroupGet(int id)
-        //{
-        //    Group group;
+        // GET: Pallet/EditClientData/5
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditClientData(int id)
+        {
+            ClientLoadCustomModel load;
 
-        //    using (GroupService service = new GroupService())
-        //    {
-        //        group = service.GetById(id);
-
-
-        //        if (group == null)
-        //        {
-        //            Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
-
-        //            return PartialView("_AccessDenied");
-        //        }
-
-        //        GroupViewModel model = new GroupViewModel()
-        //        {
-        //            Id = group.Id,
-        //            Name = group.Name,
-        //            Description = group.Description,
-        //            Status = (int)group.Status,
-        //            EditMode = true
-        //        };
-        //        return View("EditGroup", model);
-        //    }
-        //}
-
-        //// POST: Client/EditGroup/5
-        //[Requires(PermissionTo.Edit)]
-        //public ActionResult EditGroup(GroupViewModel model, PagingModel pm, bool isstructure = false)
-        //{
-        //    try
-        //    {
-        //        if (!ModelState.IsValid)
-        //        {
-        //            Notify("Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error);
-
-        //            return View(model);
-        //        }
-
-        //        Group group;
-
-        //        using (GroupService service = new GroupService())
-        //        using (TransactionScope scope = new TransactionScope())
-        //        {
-        //            group = service.GetById(model.Id);
-
-        //            #region Update Group
-
-        //            // Update Group
-        //            //group.Id = model.Id;
-        //            group.Name = model.Name;
-        //            group.Description = model.Description;
-        //            group.Status = (int)model.Status;
-
-        //            service.Update(group);
-
-        //            #endregion
+            using (ClientLoadService service = new ClientLoadService())
+            {
+                load = service.GetById(id);
 
 
-        //            scope.Complete();
-        //        }
+                if (load == null)
+                {
+                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
 
-        //        Notify("The selected Group details were successfully updated.", NotificationType.Success);
+                    return PartialView("_AccessDenied");
+                }
 
-        //        return RedirectToAction("ClientGroups");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ViewBag.Message = ex.Message;
-        //        return View();
-        //    }
-        //}
+                ClientLoadViewModel model = new ClientLoadViewModel()
+                {
+                    ClientId = load.ClientId,
+                    VehicleId = load.VehicleId,
+                    TransporterId = load.TransporterId,
+                    LoadDate = load.LoadDate,
+                    LoadNumber = load.LoadNumber,
+                    EffectiveDate = load.EffectiveDate,
+                    NotifyeDate = load.NotifyeDate,
+                    AccountNumber = load.AccountNumber,
+                    ClientDescription = load.ClientDescription,
+                    DeliveryNote = load.DeliveryNote,
+                    ReferenceNumber = load.ReferenceNumber,
+                    ReceiverNumber = load.ReceiverNumber,
+                    Equipment = load.Equipment,
+                    OriginalQuantity = load.OriginalQuantity,
+                    NewQuantity = load.NewQuantity,
+                    RetQuantity = load.RetQuantity,
+                    ReconcileDate = load.ReconcileDate,
+                    ReconcileInvoice = load.ReconcileInvoice,
+                    PODNumber = load.PODNumber,
+                    PCNNumber = load.PCNNumber,
+                    PRNNumber = load.PRNNumber,
+                    ARPMComments = load.ARPMComments,
+                    ProvCode = load.ProvCode,
+                    Status = (int)load.Status,
+                    DocumentCount = (int)load.DocumentCount,
+                    DocsList = ""
+                };
+                List<Transporter> transporterOptions = new List<Transporter>();
+                using (TransporterService rservice = new TransporterService())
+                {
+                    transporterOptions = rservice.List();
+                }
+                IEnumerable<SelectListItem> transporterOptionsDDL = transporterOptions.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.TradingName
 
-        // POST: Pallet/DeleteClientLoad/5
+                });
+                ViewBag.TransporterOptions = transporterOptionsDDL;
+                List<Vehicle> vehicleOptions = new List<Vehicle>();
+                using (VehicleService vservice = new VehicleService())
+                {
+                    vehicleOptions = vservice.ListByColumnsWhere("ObjectId", model.TransporterId, "Object", "Transporter");
+                }
+                IEnumerable<SelectListItem> vehicleOptionsDDL = vehicleOptions.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Registration
+
+                });
+                ViewBag.VehicleOptions = vehicleOptionsDDL;
+                return View("EditClientData", model);
+            }
+        }
+
+        // POST: Pallet/EditClientData/5
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditClientData(ClientLoadViewModel model, PagingModel pm, bool isstructure = false)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    Notify("Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                ClientLoadCustomModel load;
+
+                using (ClientLoadService service = new ClientLoadService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    load = service.GetById(model.Id);
+
+                    #region Update Client Load
+
+                    // Update Group
+                    //group.Id = model.Id;
+                        load.ClientId = model.ClientId;
+                        load.VehicleId = model.VehicleId;
+                        load.TransporterId = model.TransporterId;
+                        load.LoadDate = model.LoadDate;
+                        load.LoadNumber = model.LoadNumber;
+                        load.EffectiveDate = model.EffectiveDate;
+                        load.NotifyeDate = model.NotifyeDate;
+                        load.AccountNumber = model.AccountNumber;
+                        load.ClientDescription = model.ClientDescription;
+                        load.DeliveryNote = model.DeliveryNote;
+                        load.ReferenceNumber = model.ReferenceNumber;
+                        load.ReceiverNumber = model.ReceiverNumber;
+                        load.Equipment = model.Equipment;
+                        load.OriginalQuantity = model.OriginalQuantity;
+                        load.NewQuantity = model.NewQuantity;
+                        load.RetQuantity = model.RetQuantity;
+                        load.ReconcileDate = model.ReconcileDate;
+                        load.ReconcileInvoice = model.ReconcileInvoice;
+                        load.PODNumber = model.PODNumber;
+                        load.PCNNumber = model.PCNNumber;
+                        load.PRNNumber = model.PRNNumber;
+                        load.ARPMComments = model.ARPMComments;
+                        load.ProvCode = model.ProvCode;
+                        load.Status = (int)model.Status;
+
+                    service.Update(load);
+
+                    #endregion
+
+
+                    scope.Complete();
+                }
+
+                Notify("The selected Item details were successfully updated.", NotificationType.Success);
+
+                return RedirectToAction("ClientData");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+        // POST: Pallet/DeleteClientData/5
         [HttpPost]
         [Requires(PermissionTo.Delete)]
-        public ActionResult DeleteClientLoad(ClientLoadCustomModel model)
+        public ActionResult DeleteClientData(ClientLoadCustomModel model)
         {
             ClientLoadCustomModel activeLoad;
             try
@@ -650,7 +864,7 @@ namespace ACT.UI.Controllers
 
                             ChepLoadCustomModel model = new ChepLoadCustomModel();
                             
-                            if (string.IsNullOrEmpty(rows[0]))
+                            if (!string.IsNullOrEmpty(rows[0]))
                             {
                                 model.LoadDate = DateTimeExtensions.formatImportDate(rows[0]);
                                 model.EffectiveDate = DateTimeExtensions.formatImportDate(rows[1]);
@@ -697,7 +911,7 @@ namespace ACT.UI.Controllers
         // GET: /Client/ImportClientLoad
         public ActionResult ImportClientLoad(HttpPostedFileBase postedFile)
         {
-            string importMessage = "Pooling Agent Import Started\r\n";
+            string importMessage = "Client Load Import Started\r\n";
             if (postedFile != null)
             {
                 string fileExtension = Path.GetExtension(postedFile.FileName);
@@ -717,7 +931,7 @@ namespace ACT.UI.Controllers
                     int cntCreated = 0;
 
                     using (var sreader = new StreamReader(postedFile.InputStream))
-                    using (ChepLoadService service = new ChepLoadService())
+                    using (ClientLoadService service = new ClientLoadService())
                     using (TransactionScope scope = new TransactionScope())
                     {
                         //First line is header. If header is not passed in csv then we can neglect the below line.
@@ -727,23 +941,52 @@ namespace ACT.UI.Controllers
                         {
                             string[] rows = sreader.ReadLine().Split(',');
 
-                            ChepLoadCustomModel model = new ChepLoadCustomModel();
-
-                            if (string.IsNullOrEmpty(rows[0]))
+                            ClientLoadCustomModel model = new ClientLoadCustomModel();
+                            int vehicleId = 0;
+                            int transporterId = 0;
+                            if (!string.IsNullOrEmpty(rows[12]))
                             {
-                                model.LoadDate = DateTimeExtensions.formatImportDate(rows[0]);
-                                model.EffectiveDate = DateTimeExtensions.formatImportDate(rows[1]);
-                                model.NotifyDate = DateTimeExtensions.formatImportDate(rows[2]);
-                                model.DocketNumber = rows[3];
-                                model.PostingType = 2;//import - Transfer Customer to Customer - Out
-                                model.ClientDescription = rows[5];
-                                model.ReferenceNumber = rows[6];
-                                model.ReceiverNumber = rows[7];
-                                model.Equipment = rows[9];
-                                model.OriginalQuantity = decimal.Parse(rows[10]);
+                                using (VehicleService vehservice = new VehicleService())
+                                {
+                                    VehicleCustomModel vehicle = vehservice.ListCSM(new PagingModel(), new CustomSearchModel() { Query = rows[12], Status = Status.Active }).FirstOrDefault();
+                                    if (vehicle != null)
+                                    {
+                                        vehicleId = vehicle.Id; //else remains 0
+                                    }
+                                }
 
+                            }
+                            if (!string.IsNullOrEmpty(rows[11]))
+                            {
+                                using (TransporterService transservice = new TransporterService())
+                                {
+                                    TransporterCustomModel trans = transservice.ListCSM(new PagingModel(), new CustomSearchModel() { Query = rows[11], Status = Status.Active }).FirstOrDefault();
+                                    if (trans != null)
+                                    {
+                                        transporterId = trans.Id; //else remains 0
+                                    }
+                                }
+                            }
+                            if (!string.IsNullOrEmpty(rows[0]))
+                            {
+                                model.ClientId = clientID;
+                                model.LoadDate = DateTimeExtensions.formatImportDate(rows[0]);
+                                model.LoadNumber = rows[1];
+                                model.AccountNumber = rows[2];                                
+                                model.ClientDescription = rows[3];
+                                model.ProvCode = rows[4];
+                                model.PCNNumber = rows[5];
+                                model.DeliveryNote = rows[6];
+                                //model.PRNNumber = rows[7];
+                                model.OriginalQuantity = decimal.Parse(rows[7]);
+                                model.RetQuantity = decimal.Parse(rows[8]);
+                                //model.RetQuantity = decimal.Parse(rows[9]);
+                                model.ARPMComments = rows[10];
+                                //some of the columns are malaligned but leaving it as is, I added 3 new columns
+                                model.VehicleId = vehicleId;
+                                model.TransporterId = transporterId;
                                 service.Create(model);
-                                importMessage += " Trading Partner: " + model.ClientDescription + " created at Id " + model.Id + "\r\n";
+                                importMessage += " Customer: " + model.ClientDescription + " created at Id " + model.Id + "\r\n";
                                 cntCreated++;
                             }
                             cnt++;
@@ -768,7 +1011,7 @@ namespace ACT.UI.Controllers
             {
 
             }
-            return RedirectToAction("PoolingAgentData", "Pallet");
+            return RedirectToAction("ClientData", "Pallet");
         }
 
 
