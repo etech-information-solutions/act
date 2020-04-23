@@ -39,9 +39,12 @@ namespace ACT.UI.Controllers
             ViewBag.ViewName = "PoolingAgentData";
             //check if there are any viewbag messages from imports
             string msg = (Session["ImportMessage"] != null ? Session["ImportMessage"].ToString() : null);
-            if (!string.IsNullOrEmpty(msg)) {
+            if (!string.IsNullOrEmpty(msg))
+            {
                 ViewBag.Message = msg;
+                Notify(msg, NotificationType.Success);
             }
+           
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
             ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
@@ -120,8 +123,11 @@ namespace ACT.UI.Controllers
                         Equipment = model.Equipment,
                         OriginalQuantity = model.OriginalQuantity,
                         NewQuantity = model.NewQuantity,
-                        Status = (int)Status.Active
-                    };
+                        Status = (int)Status.Active,
+                        CreatedOn = DateTime.Now,
+                        ModfiedOn = DateTime.Now,
+                        ModifiedBy = CurrentUser.Email
+                };
                     gService.Create(clientload);
                     #endregion
 
@@ -212,7 +218,8 @@ namespace ACT.UI.Controllers
                     load.OriginalQuantity = model.OriginalQuantity;
                     load.NewQuantity = model.NewQuantity;
                     load.Status = (int)model.Status;
-
+                    load.ModfiedOn = DateTime.Now;
+                    load.ModifiedBy =  CurrentUser.Email;
                     service.Update(load);
 
                     #endregion
@@ -284,10 +291,11 @@ namespace ACT.UI.Controllers
             }
             ViewBag.ViewName = "ClientData";
             //check if there are any viewbag messages from imports
-            string msg = (Session["ImportMessage"] != null ? Session["ImportMessage"].ToString() : null);
+            string msg = (Session["ImportMessage"] != null ? Session["ImportMessage"].ToString() : null);           
             if (!string.IsNullOrEmpty(msg))
             {
                 ViewBag.Message = msg;
+                Notify(msg, NotificationType.Success);
             }
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
@@ -393,7 +401,10 @@ namespace ACT.UI.Controllers
                         PRNNumber = model.PRNNumber,
                         ARPMComments = model.ARPMComments,
                         ProvCode = model.ProvCode,                        
-                        Status = (int)Status.Active
+                        Status = (int)Status.Active,
+                        CreatedOn = DateTime.Now,
+                        ModifiedOn = DateTime.Now,
+                        ModifiedBy = CurrentUser.Email
                     };
                     gService.Create(clientload);
                     #endregion
@@ -455,7 +466,7 @@ namespace ACT.UI.Controllers
                     PRNNumber = load.PRNNumber,
                     ARPMComments = load.ARPMComments,
                     ProvCode = load.ProvCode,
-                    Status = (int)load.Status,
+                    Status = (int)load.Status
                    // DocumentCount = (int)load.DocumentCount,
                    // DocsList = ""
                 };
@@ -536,6 +547,8 @@ namespace ACT.UI.Controllers
                         load.ARPMComments = model.ARPMComments;
                         load.ProvCode = model.ProvCode;
                         load.Status = (int)model.Status;
+                        load.ModifiedBy = CurrentUser.Email;
+                        load.ModifiedOn = DateTime.Now;
 
                     service.Update(load);
 
@@ -748,12 +761,8 @@ namespace ACT.UI.Controllers
 
             });
             ViewBag.ClientList = clientDDL;
-            int total = 0;
 
-            List<Site> model = new List<Site>();
-            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
-
-            return PartialView("_GenerateDeliveryNote", paging);
+            return PartialView("_GenerateDeliveryNote");
         }
         #endregion
 
@@ -903,31 +912,40 @@ namespace ACT.UI.Controllers
                         //Loop through the records
                         while (!sreader.EndOfStream)
                         {
-                            string[] rows = sreader.ReadLine().Split(',');
+                            try { 
+                                string[] rows = sreader.ReadLine().Split(',');
 
-                            ChepLoad model = new ChepLoad();
-                            
-                            if (!string.IsNullOrEmpty(rows[0]))
+                                ChepLoad model = new ChepLoad();
+
+                                if (!string.IsNullOrEmpty(rows[0]))
+                                {
+                                    model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[0]) : DateTime.Now);
+                                    model.EffectiveDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[1]) : DateTime.Now);
+                                    model.NotifyDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[2]) : DateTime.Now);
+                                    model.DocketNumber = rows[3];
+                                    model.PostingType = 2;//import - Transfer Customer to Customer - Out
+                                    model.ClientDescription = rows[5];
+                                    model.ReferenceNumber = rows[6];
+                                    model.ReceiverNumber = rows[7];
+                                    model.Equipment = rows[10];
+                                    model.CreatedOn = DateTime.Now;
+                                    model.ModfiedOn = DateTime.Now;
+                                    model.OriginalQuantity = (Decimal.TryParse(rows[11], out decimal oQty)? oQty : 0);
+
+                                    service.Create(model);
+                                    importMessage += " Trading Partner: " + model.ClientDescription + " created at Id " + model.Id + "<br>";
+                                    Notify("The PSP Configuration details were successfully updated.", NotificationType.Success);
+                                    cntCreated++;
+                                }
+                            }              
+                            catch (Exception ex)
                             {
-                                model.LoadDate = DateTimeExtensions.formatImportDate(rows[0]);
-                                model.EffectiveDate = DateTimeExtensions.formatImportDate(rows[1]);
-                                model.NotifyDate = DateTimeExtensions.formatImportDate(rows[2]);
-                                model.DocketNumber = rows[3];
-                                model.PostingType = 2;//import - Transfer Customer to Customer - Out
-                                model.ClientDescription = rows[5];
-                                model.ReferenceNumber = rows[6];
-                                model.ReceiverNumber = rows[7];
-                                model.Equipment = rows[9];
-                                model.OriginalQuantity = decimal.Parse(rows[10]);
-
-                                service.Create(model);
-                                importMessage += " Trading Partner: " + model.ClientDescription + " created at Id " + model.Id + "\r\n";
-                                cntCreated++;
+                                ViewBag.Message = ex.Message;
                             }
                             cnt++;
                         }
-                        importMessage += " Records To Process: " + cnt + "\r\n";
-                        importMessage += " Records Processed: " + cntCreated + "\r\n";
+                        importMessage += " Records To Process: " + cnt + "<br>";
+                        importMessage += " Records Processed: " + cntCreated + "<br>";
                         scope.Complete();
                         Session["ImportMessage"] = importMessage;
                     }
@@ -1013,7 +1031,7 @@ namespace ACT.UI.Controllers
                             if (!string.IsNullOrEmpty(rows[0]))
                             {
                                 model.ClientId = clientID;
-                                model.LoadDate = DateTimeExtensions.formatImportDate(rows[0]);
+                                model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[0]) : DateTime.Now);
                                 model.LoadNumber = rows[1];
                                 model.AccountNumber = rows[2];                                
                                 model.ClientDescription = rows[3];
@@ -1021,21 +1039,23 @@ namespace ACT.UI.Controllers
                                 model.PCNNumber = rows[5];
                                 model.DeliveryNote = rows[6];
                                 //model.PRNNumber = rows[7];
-                                model.OriginalQuantity = decimal.Parse(rows[7]);
-                                model.RetQuantity = decimal.Parse(rows[8]);
+                                model.OriginalQuantity = (Decimal.TryParse(rows[7], out decimal oQty) ? oQty : 0);
+                                model.RetQuantity = (Decimal.TryParse(rows[8], out decimal rQty) ? rQty : 0);
                                 //model.RetQuantity = decimal.Parse(rows[9]);
                                 model.ARPMComments = rows[10];
                                 //some of the columns are malaligned but leaving it as is, I added 3 new columns
                                 model.VehicleId = vehicleId;
                                 model.TransporterId = transporterId;
+                                model.CreatedOn = DateTime.Now;
+                                model.ModifiedOn = DateTime.Now;
                                 service.Create(model);
-                                importMessage += " Customer: " + model.ClientDescription + " created at Id " + model.Id + "\r\n";
+                                importMessage += " Customer: " + model.ClientDescription + " created at Id " + model.Id + "<br>";
                                 cntCreated++;
                             }
                             cnt++;
                         }
-                        importMessage += " Records To Process: " + cnt + "\r\n";
-                        importMessage += " Records Processed: " + cntCreated + "\r\n";
+                        importMessage += " Records To Process: " + cnt + "<br>";
+                        importMessage += " Records Processed: " + cntCreated + "<br>";
                         scope.Complete();
                         Session["ImportMessage"] = importMessage;
                     }

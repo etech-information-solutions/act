@@ -174,7 +174,7 @@
                 var name = document.getElementById("companyfile").files[0].name;
                 var form_data = new FormData();
                 var ext = name.split('.').pop().toLowerCase();
-                if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx']) == -1) {
+                if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx', 'csv']) == -1) {
                     alert("Invalid File");
                 }
                 var oFReader = new FileReader();
@@ -188,7 +188,7 @@
                     form_data.append("file", document.getElementById('companyfile').files[0]);
                     form_data.append("clientId", $("#Id").val());
                     $.ajax({
-                        url: "Upload?clientId="+cId,
+                        url: "Upload?id=" + cId + "&utype=ChepLoad&uname=Load",
                         method: "POST",
                         data: form_data,
                         contentType: false,
@@ -199,7 +199,7 @@
                         },
                         success: function (data) {
                             //$('#uploaded_file').html(data);
-                            populateDocs(cId, "Client");
+                            populateDocs(cId, "ClientLoad");
                             $('#uploaded_file').html("<label class='text-success'></label>");
                         }
                     });
@@ -211,7 +211,7 @@
 
             $.ajax({
 
-                url: '@Url.Action("ListFiles", "Client")',
+                url: '@Url.Action("ListFiles", "Pallet")',
                 type: "GET",
                 dataType: "html",
                 data: { objId: id, objType:doctype },//this is as per your requirement

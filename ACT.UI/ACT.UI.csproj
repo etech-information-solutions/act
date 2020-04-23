@@ -170,6 +170,7 @@
     <Compile Include="Models\ObjectDocumentsViewModel.cs" />
     <Compile Include="Models\ImportFileModel.cs" />
     <Compile Include="Models\GroupViewModel.cs" />
+    <Compile Include="Models\DeliveryNoteViewModel.cs" />
     <Compile Include="Models\SiteViewImportModel.cs" />
     <Compile Include="Models\TransporterViewModel.cs" />
     <Compile Include="Models\SiteViewModel.cs" />
@@ -565,6 +566,12 @@
     <Content Include="Views\Pallet\EditClientData.cshtml" />
     <Content Include="Views\Shared\_PoolingAgentDataCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ClientDataCustomSearch.cshtml" />
+    <Content Include="Views\Pallet\_AddDeliveryNote.cshtml" />
+    <Content Include="Views\Pallet\DetailsDeliveryNote.cshtml" />
+    <Content Include="Views\Pallet\_EditDeliveryNote.cshtml" />
+    <Content Include="Views\Pallet\IndexDeliveryNote.cshtml" />
+    <Content Include="Views\Pallet\AddDeliveryNote.cshtml" />
+    <Content Include="Views\Pallet\EditDeliveryNote.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

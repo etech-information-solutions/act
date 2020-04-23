@@ -2,7 +2,8 @@
 namespace ACT.Core.Models.Custom
 {
     using System;
-    
+    using System.Collections.Generic;
+
     public partial class DeliveryNoteCustomModel
     {
         public int Id { get; set; }
@@ -27,5 +28,8 @@ namespace ACT.Core.Models.Custom
         public string ContactNumber { get; set; }
         public string Reference306 { get; set; }
         public int Status { get; set; }
+
+        public List<DeliveryNoteLineCustomModel> DeliveryNoteLines { get; set; }
+        public int CountNoteLines { get; set; }
     }
 }

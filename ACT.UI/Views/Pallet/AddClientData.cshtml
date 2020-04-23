@@ -157,7 +157,8 @@
                     @Html.LabelFor(model => model.LoadDate)
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.LoadDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
+                    @Html.TextBoxFor(model => model.LoadDate.ToString(), new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
+                    @Html.ValidationMessageFor(model => model.LoadDate)
                 </div>
                 <div class="editor-label">
                     @Html.LabelFor(model => model.NotifyeDate)
@@ -208,7 +209,7 @@
             </div>
         </div>
 
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+        |<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
      
 
         <p>
@@ -234,7 +235,7 @@
             var name = document.getElementById("companyfile").files[0].name;
             var form_data = new FormData();
             var ext = name.split('.').pop().toLowerCase();
-            if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx']) == -1) {
+            if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx', 'csv']) == -1) {
                 alert("Invalid File");
             }
             var oFReader = new FileReader();
@@ -274,7 +275,7 @@
 
         $.ajax({
 
-            url: '@Url.Action("ListFiles", "ClientLoad")',
+            url: '@Url.Action("ListFiles", "Pallet")',
             type: "GET",
             dataType: "html",
             data: { objId: id, objType:doctype },//this is as per your requirement

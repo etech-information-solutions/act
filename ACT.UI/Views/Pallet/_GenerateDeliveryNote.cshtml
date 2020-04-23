@@ -1,35 +1,356 @@
-﻿@model PagingExtension
+﻿@model DeliveryNoteViewModel
 
-@using ACT.Data.Models;
-@using ACT.Core.Enums;
-@using ACT.Core.Models;
-@using ACT.Core.Models.Custom;
-@using ACT.Core.Services;
 @using ACT.UI.Models;
+@using ACT.Core.Enums;
 
 @{
-    ViewBag.ShowExport = true;
-    ViewBag.ShowCustom = true;
+    if (ViewBag.IncludeLayout == null)
+    {
+        Layout = null;
+    }
 
-    ViewBag.ViewName = "Generate Delivery Note";
+    ViewBag.Title = "Generate Delivery Note";
 }
 
 
 @Html.Partial("_Notification")
 
-
-@{
-    UserModel user = User.Get();
-
-    Int32 count = Model.Start;
-    //List<PADViewModel> items = (List<PADViewModel>)Model.Items;
-
-    //PADService cservice = new PADService();
-
-
-}
-
-@if (user.IsAdmin || user.IsPSPAdmin)
+@using (Html.BeginForm("GenerateDeliveryNote", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#generatedeliverynote", @class = "custom-validate", @style = "width: auto;" }))
 {
+    <div id="edit-item">
+
+
+        @Html.ValidationSummary(true)
+
+        <div id="item-details" class="item-details" style="width: auto;">
+            <div class="left" style="width: 50%; margin-right: 2%;">
+                <div class="editor-label">
+                    Order Date
+                </div>
+                <div class="editor-field">
+                    @*@Html.TextBoxFor(model => model.OrderDate.ToString(), new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
+                    @Html.ValidationMessageFor(model => model.OrderDate)*@
+                </div>
+
+                <div class="editor-label ">
+                    Order Number
+                </div>
+
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.OrderNumber, new { @class = "input", @placeholder = "Please Complete" })
+                    @Html.ValidationMessageFor(model => model.OrderNumber)
+                </div>
+
+                <div class="editor-label ">
+                    Delivery Note Number
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.InvoiceNumber, new { @class = "input", @placeholder = "Please Complete" })
+                    @Html.ValidationMessageFor(model => model.InvoiceNumber)
+                </div>
+            </div>
+
+            <div class="left" style="width: 45%;">
+
+                <div class="editor-label">
+                    Cutomer Name
+                </div>
+                <div class="editor-field">
+                    @if (ViewBag.ContextualMode)
+                    {
+                        @Html.DropDownList("ClientList")
+                    }
+                    else
+                    {
+                        @Html.DropDownList("ClientList", "All Clients")
+                    }
+                </div>
+
+                <div class="editor-label">
+                    Customer Address
+                </div>
+                <div class="editor-field">
+
+                </div>
+
+                <div class="editor-label">
+                    Town/City
+                </div>
+                <div class="editor-field">
+
+                </div>
+
+                <div class="editor-label">
+                    Postal Code
+                </div>
+                <div class="editor-field">
+
+                </div>
+                <div class="editor-label">
+                    Province
+                </div>
+                <div class="editor-field">
+
+                </div>
+
+            </div>
+
+            <div class="clear" style="height: 10px;">&nbsp;</div>
+
+
+            <div class="left" style="width: 48%; margin-right: 4%;">
+                <h3>Shipping Address</h3>
+
+                <div class="editor-label">
+                    Company
+                </div>
+                <div class="editor-field">
+
+                </div>
+
+                <div class="editor-label">
+                    Town/City
+                </div>
+                <div class="editor-field">
+
+                </div>
+
+                <div class="editor-label">
+                    Postal Code
+                </div>
+                <div class="editor-field">
+
+                </div>
+                <div class="editor-label">
+                    Province
+                </div>
+                <div class="editor-field">
+
+                </div>
+            </div>
+
+            <div class="left" style="width: 48%;">
+                <h3>Invoice Address&nbsp;</h3><input type="checkbox" id="sameasshipping" name="sameasshipping" value="1" /> Same as Shipping Address
+
+                <div class="editor-label">
+                    Company
+                </div>
+                <div class="editor-field">
+
+                </div>
+
+                <div class="editor-label">
+                    Town/City
+                </div>
+                <div class="editor-field">
+
+                </div>
+
+                <div class="editor-label">
+                    Postal Code
+                </div>
+                <div class="editor-field">
+
+                </div>
+                <div class="editor-label">
+                    Province
+                </div>
+                <div class="editor-field">
+
+                </div>
+
+
+
+            </div>
+
+            <div class="clear" style="height: 10px;">&nbsp;</div>
+
+            <table id="deliverynotelines-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsexcluded-table_wrapper" data-starting-point=".ap-tabs ul">
+                <thead>
+                    <tr>
+                        <th style="width:15%;">
+                            Product
+                        </th>
+                        <th style="width:25%;">
+                            Description
+                        </th>
+                        <th style="width:15%;">
+                            Ordered
+                        </th>
+                        <th style="width:15%;">
+                            Delivered
+                        </th>
+                        <th style="width:15%;">
+                            Outstanding
+                        </th>
+                        <th data-name="Actions" style="width:5%;">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody id="deliverynotelinesdata"></tbody>
+
+            </table>
+
+
+            <div class="clear" style="height: 10px;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Generate Delivery Note" />
+                <input id="save-btn" type="submit" value="Reprint Delivery Note" />
+                <input id="save-btn" type="submit" value="Email Delivery Note" /><input type="email" id="DeliveryEmail" id="DeliveryEmail" value="" />
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-refresh="1" data-target="#clientdata">Cancel</a>
+            </p>
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+        </div>
+
+    </div>
+
+
+    <script>
+    $(document).ready(function () {
+        @*var cId = '@Model.Id';*@
+    });
+
+    </script>
+
+    <script>
+        //The Google Stuff
+        var placeSearch, autocomplete;
+
+        var componentForm = {
+            street_number: 'short_name',
+            route: 'long_name',
+            sublocality_level_1: 'long_name',
+            sublocality_level_2: 'long_name',
+            locality: 'long_name',
+            administrative_area_level_2: 'long_name',
+            administrative_area_level_1: 'long_name',
+            //country: 'long_name',
+            postal_code: 'short_name'
+        };
+        var componentFormFields = {
+            street_number: 'Address_AddressLine1',
+            route: 'Address_AddressLine1',
+            locality: 'Address_Town',
+            sublocality_level_1: 'Address_AddressLine2',
+            sublocality_level_2: 'Address_AddressLine2',
+            administrative_area_level_2: 'Address_Province',
+            administrative_area_level_1: 'Address_Province',
+            //country: 'long_name',
+            postal_code: 'Address_PostCode'
+        };
+
+
+        function initAutocomplete() {
+            autocomplete = new google.maps.places.Autocomplete(
+                document.getElementById('autocomplete'), { types: ['geocode'] });
+            autocomplete.setFields(['address_component']);
+            autocomplete.addListener('place_changed', fillInAddress);
+        }
+
+        function fillInAddress() {
+            var place = autocomplete.getPlace();
+            console.log(place);
+            var fullAddress = "";
+
+            for (var component in componentForm) {
+                document.getElementById(componentFormFields[component]).value = '';
+                document.getElementById(componentFormFields[component]).disabled = false;
+            }
+            for (var i = 0; i < place.address_components.length; i++) {
+                var addressType = place.address_components[i].types[0];
+                if (componentForm[addressType]) {
+                    var val = place.address_components[i][componentForm[addressType]];
+                    if (addressType == "route") {
+                        var streetaddress = document.getElementById("Address_AddressLine1");
+                        document.getElementById("Address_AddressLine1").value = streetaddress.value + " " + val;
+                    } else {
+                        // debugger;
+                        if (addressType == "administrative_area_level_1") {
+                            var idx = -1;
+                            switch (val) {
+                                case "Eastern Cape":
+                                    idx = 0;
+                                    break;
+                                case "Free State":
+                                    idx = 1;
+                                    break;
+                                case "Gauteng":
+                                    idx = 2;
+                                    break;
+                                case "KwaZulu-Natal":
+                                    idx = 3;
+                                    break;
+                                case "Limpopo":
+                                    idx = 4;
+                                    break;
+                                case "Mpumalanga":
+                                    idx = 5;
+                                    break;
+                                case "Northern Cape":
+                                    idx = 67;
+                                    break;
+                                case "North West":
+                                    idx = 7;
+                                    break;
+                                case "Western Cape":
+                                    idx = 8;
+                                    break;
+                                case "Western Cape":
+                                    idx = 8;
+                                    break;
+                                default:
+                                // code block
+                            }
+                            //setSelectedIndex(document.getElementById("Address.Province"), idx);
+                            document.getElementById("Address_Province").options.length = 0;
+                            var opt = document.createElement("option");
+                            opt.text = val;
+                            opt.value = idx;
+                            document.getElementById("Address_Province").options.add(opt);
+                        } else {
+                            document.getElementById(componentFormFields[addressType]).value = val;
+                        }
+                    }
+                }
+                //change for 1st element
+                if (i == 0) {
+                    fullAddress = place.address_components[i].long_name;
+                } else {
+                    fullAddress = fullAddress + "," + place.address_components[i].long_name;
+                }
+                //for elements with Coords, call 2nd API here to locate coords with fulladdress
+
+            }
+            //alert(fullAddress);
+        }
+
+        function geolocate() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var geolocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    var circle = new google.maps.Circle(
+                        { center: geolocation, radius: position.coords.accuracy });
+                    autocomplete.setBounds(circle.getBounds());
+                });
+            }
+        }
+        function setSelectedIndex(s, i) {
+            s.options[i - 1].selected = true;
+
+            return;
+
+        }
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeQFyrVUFUjsQOK_RdtfAC57jMJkc_3Co&libraries=places&callback=initAutocomplete"
+            async defer></script>
 
 }

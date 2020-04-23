@@ -247,7 +247,7 @@
             //    var name = document.getElementById("companyfile").files[0].name;
             //    var form_data = new FormData();
             //    var ext = name.split('.').pop().toLowerCase();
-            //    if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx']) == -1) {
+            //    if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx', 'csv']) == -1) {
             //        alert("Invalid File");
             //    }
             //    var oFReader = new FileReader();
@@ -272,7 +272,7 @@
             //            },
             //            success: function (data) {
             //                //$('#uploaded_file').html(data);
-            //                populateDocs(cId, "Client");
+            //                populateDocs(cId, "ClientLoad");
             //                $('#uploaded_file').html("<label class='text-success'></label>");
             //            }
             //        });
@@ -284,7 +284,7 @@
 
             $.ajax({
 
-                url: '@Url.Action("ListFiles", "ChepLoad")',
+                url: '@Url.Action("ListFiles", "Pallet")',
                 type: "GET",
                 dataType: "html",
                 data: { objId: id, objType:doctype },//this is as per your requirement
