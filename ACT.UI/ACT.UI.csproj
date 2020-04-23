@@ -559,10 +559,12 @@
     <Content Include="Views\ClientReporting\Index.cshtml" />
     <Content Include="Views\ClientReporting\_Disputes.cshtml" />
     <Content Include="Views\Shared\_DisputesCustomSearch.cshtml" />
-    <Content Include="Views\Pallet\AddAgentPoolingData.cshtml" />
-    <Content Include="Views\Pallet\EditAgentPoolingData.cshtml" />
+    <Content Include="Views\Pallet\AddPoolingAgentData.cshtml" />
+    <Content Include="Views\Pallet\EditPoolingAgentData.cshtml" />
     <Content Include="Views\Pallet\AddClientData.cshtml" />
     <Content Include="Views\Pallet\EditClientData.cshtml" />
+    <Content Include="Views\Shared\_PoolingAgentDataCustomSearch.cshtml" />
+    <Content Include="Views\Shared\_ClientDataCustomSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -35,6 +35,7 @@ namespace ACT.UI.Controllers
 
                 return PartialView("_PoolingAgentDataCustomSearch", new CustomSearchModel("PoolingAgentData"));
             }
+
             ViewBag.ViewName = "PoolingAgentData";
             //check if there are any viewbag messages from imports
             string msg = (Session["ImportMessage"] != null ? Session["ImportMessage"].ToString() : null);
@@ -78,19 +79,20 @@ namespace ACT.UI.Controllers
             return PartialView("_PoolingAgentData", paging);
         }
 
-        // GET: Pallet/AddChepLoad
+        // GET: Pallet/AddPoolingAgentData
         [Requires(PermissionTo.Create)]
-        public ActionResult AddChepLoad()
+        public ActionResult AddPoolingAgentData()
         {
+            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
             ChepLoadViewModel model = new ChepLoadViewModel();
             model.PostingType = 3;
-            return View("AddAgentPoolingData", model);
+            return View(model);
         }
 
-        // POST: Pallet/AddChepLoad
+        // POST: Pallet/AddPoolingAgentData
         [HttpPost]
         [Requires(PermissionTo.Create)]
-        public ActionResult AddChepLoad(ChepLoadViewModel model)
+        public ActionResult AddPoolingAgentData(ChepLoadViewModel model)
         {
             try
             {
@@ -105,7 +107,7 @@ namespace ACT.UI.Controllers
                 using (TransactionScope scope = new TransactionScope())
                 {
                     #region Create ClientLoadCustomModel
-                    ChepLoadCustomModel clientload = new ChepLoadCustomModel()
+                    ChepLoad clientload = new ChepLoad()
                     {
                         LoadDate = model.LoadDate,
                         EffectiveDate = model.EffectiveDate,
@@ -137,11 +139,11 @@ namespace ACT.UI.Controllers
         }
 
 
-        // GET: Pallet/EditChepLoad/5
+        // GET: Pallet/EditPoolingAgentData/5
         [Requires(PermissionTo.Edit)]
-        public ActionResult EditChepLoad(int id)
+        public ActionResult EditPoolingAgentData(int id)
         {
-            ChepLoadCustomModel load;
+            ChepLoad load;
 
             using (ChepLoadService service = new ChepLoadService())
             {
@@ -169,16 +171,17 @@ namespace ACT.UI.Controllers
                     OriginalQuantity = load.OriginalQuantity,
                     NewQuantity = load.NewQuantity,
                     Status = (int)load.Status,
-                    DocumentCount = (int)load.DocumentCount,
-                    DocsList = ""
+                    //DocumentCount = (int)load.DocumentCount,
+                   // DocsList = ""
                 };
-                return View("EditAgentPoolingData", model);
+                return View(model);
             }
         }
 
-        // POST: Pallet/EditClientData/5
+        // POST: Pallet/EditPoolingAgentData/5
+        [HttpPost]
         [Requires(PermissionTo.Edit)]
-        public ActionResult EditChepLoad(ChepLoadViewModel model, PagingModel pm, bool isstructure = false)
+        public ActionResult EditPoolingAgentData(ChepLoadViewModel model, PagingModel pm, bool isstructure = false)
         {
             try
             {
@@ -189,7 +192,7 @@ namespace ACT.UI.Controllers
                     return View(model);
                 }
 
-                ChepLoadCustomModel load;
+                ChepLoad load;
 
                 using (ChepLoadService service = new ChepLoadService())
                 using (TransactionScope scope = new TransactionScope())
@@ -228,10 +231,46 @@ namespace ACT.UI.Controllers
                 return View();
             }
         }
+
+        // POST: Pallet/DeletePoolingAgentData/5
+        [HttpPost]
+        [Requires(PermissionTo.Delete)]
+        public ActionResult DeletePoolingAgentData(ChepLoadViewModel model)
+        {
+            ChepLoad activeLoad;
+            try
+            {
+
+                using (ChepLoadService service = new ChepLoadService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    activeLoad = service.GetById(model.Id);
+
+                    if (activeLoad == null)
+                    {
+                        Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                        return PartialView("_AccessDenied");
+                    }
+
+                    activeLoad.Status = (((Status)activeLoad.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;
+                    service.Update(activeLoad);
+                    scope.Complete();
+
+                }
+                Notify("The selected item was successfully updated.", NotificationType.Success);
+                return RedirectToAction("PoolingAgentData");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
         #endregion
 
         //-------------------------------------------------------------------------------------
-
+        
         #region Pallet ClientData
         //
         // GET: /Pallet/ClientData
@@ -250,11 +289,24 @@ namespace ACT.UI.Controllers
             {
                 ViewBag.Message = msg;
             }
-            
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
             ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-                                                                    //     model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            List<Client> clientList = new List<Client>();
+            //TODO
+            using (ClientService clientService = new ClientService())
+            {
+                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+            }
+
+            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.CompanyName
+
+            });
+            ViewBag.ClientList = clientDDL;
 
             int total = 0;
             List<ClientLoadCustomModel> model = new List<ClientLoadCustomModel>();
@@ -275,9 +327,9 @@ namespace ACT.UI.Controllers
 
         // GET: Pallet/AddClientLoad
         [Requires(PermissionTo.Create)]
-        public ActionResult AddClientLoad()
+        public ActionResult AddClientData()
         {
-            ClientLoadCustomModel model = new ClientLoadCustomModel();
+            ClientLoadViewModel model = new ClientLoadViewModel();
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
             ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
@@ -301,7 +353,7 @@ namespace ACT.UI.Controllers
         // POST: Pallet/AddClientData
         [HttpPost]
         [Requires(PermissionTo.Create)]
-        public ActionResult AddClientData(ClientLoadCustomModel model)
+        public ActionResult AddClientData(ClientLoadViewModel model)
         {
             try
             {               
@@ -316,7 +368,7 @@ namespace ACT.UI.Controllers
                 using (TransactionScope scope = new TransactionScope())
                 {
                     #region Create ClientLoadCustomModel
-                    ClientLoadCustomModel clientload = new ClientLoadCustomModel()
+                    ClientLoad clientload = new ClientLoad()
                     {
                         ClientId = model.ClientId,
                         VehicleId = model.VehicleId,
@@ -364,7 +416,7 @@ namespace ACT.UI.Controllers
         [Requires(PermissionTo.Edit)]
         public ActionResult EditClientData(int id)
         {
-            ClientLoadCustomModel load;
+            ClientLoad load;
 
             using (ClientLoadService service = new ClientLoadService())
             {
@@ -404,8 +456,8 @@ namespace ACT.UI.Controllers
                     ARPMComments = load.ARPMComments,
                     ProvCode = load.ProvCode,
                     Status = (int)load.Status,
-                    DocumentCount = (int)load.DocumentCount,
-                    DocsList = ""
+                   // DocumentCount = (int)load.DocumentCount,
+                   // DocsList = ""
                 };
                 List<Transporter> transporterOptions = new List<Transporter>();
                 using (TransporterService rservice = new TransporterService())
@@ -436,6 +488,7 @@ namespace ACT.UI.Controllers
         }
 
         // POST: Pallet/EditClientData/5
+        [HttpPost]
         [Requires(PermissionTo.Edit)]
         public ActionResult EditClientData(ClientLoadViewModel model, PagingModel pm, bool isstructure = false)
         {
@@ -448,7 +501,7 @@ namespace ACT.UI.Controllers
                     return View(model);
                 }
 
-                ClientLoadCustomModel load;
+                ClientLoad load;
 
                 using (ClientLoadService service = new ClientLoadService())
                 using (TransactionScope scope = new TransactionScope())
@@ -508,7 +561,7 @@ namespace ACT.UI.Controllers
         [Requires(PermissionTo.Delete)]
         public ActionResult DeleteClientData(ClientLoadCustomModel model)
         {
-            ClientLoadCustomModel activeLoad;
+            ClientLoad activeLoad;
             try
             {
 
@@ -852,7 +905,7 @@ namespace ACT.UI.Controllers
                         {
                             string[] rows = sreader.ReadLine().Split(',');
 
-                            ChepLoadCustomModel model = new ChepLoadCustomModel();
+                            ChepLoad model = new ChepLoad();
                             
                             if (!string.IsNullOrEmpty(rows[0]))
                             {
@@ -931,7 +984,7 @@ namespace ACT.UI.Controllers
                         {
                             string[] rows = sreader.ReadLine().Split(',');
 
-                            ClientLoadCustomModel model = new ClientLoadCustomModel();
+                            ClientLoad model = new ClientLoad();
                             int vehicleId = 0;
                             int transporterId = 0;
                             if (!string.IsNullOrEmpty(rows[12]))

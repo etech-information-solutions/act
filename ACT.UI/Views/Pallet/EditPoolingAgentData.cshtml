@@ -1,0 +1,234 @@
+﻿@model ChepLoadViewModel
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.UI.Models;
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
+
+@{
+    if (ViewBag.IncludeLayout == null)
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Edit Client";
+}
+
+
+@Html.Partial("_Notification")
+
+@using (Html.BeginForm("EditPoolingAgentData", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#poolingagentdata", @class = "custom-validate", @style = "width: auto;", id = "editpoolingagentdata" }))
+{
+<div id="edit-item">
+
+    <h2 class="uppercase" style="width: auto;">
+        <img alt="" src="@Url.Content("~/images/edit.png")" />
+        <span>Edit Pooling Agent Data</span>
+    </h2>
+
+    @Html.ValidationSummary(true)
+
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.Status)
+    @Html.HiddenFor(model => model.PostingType) <!-- is the type or method it is entered into 1Email, 2 Imported,  3 Added -->
+    @Html.HiddenFor(model => model.DocsList)
+
+    <div class="left" style="width: 60%; margin-right: 2%;">
+        <div class="left" style="width: 50%; margin-right: 2%;">
+            <h3>Load Details</h3>
+            <div class="editor-label ">
+                @Html.LabelFor(model => model.AccountNumber)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.AccountNumber, new { @class = "input", @placeholder = "Please Complete" })
+                @Html.ValidationMessageFor(model => model.AccountNumber)
+            </div>
+
+            <div class="editor-label ">
+                @Html.LabelFor(model => model.ClientDescription)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.ClientDescription, new { @class = "input", @placeholder = "Please Complete" })
+                @Html.ValidationMessageFor(model => model.ClientDescription)
+            </div>
+
+            <div class="editor-label ">
+                @Html.LabelFor(model => model.DeliveryNote)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.DeliveryNote, new { @class = "input", @placeholder = "Please Complete" })
+                @Html.ValidationMessageFor(model => model.DeliveryNote)
+            </div>
+
+
+            <div class="editor-label ">
+                @Html.LabelFor(model => model.ReferenceNumber)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.ReferenceNumber, new { @class = "input", @placeholder = "Please Complete" })
+                @Html.ValidationMessageFor(model => model.ReferenceNumber)
+            </div>
+
+
+            <div class="editor-label ">
+                @Html.LabelFor(model => model.ReceiverNumber)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.ReceiverNumber, new { @class = "input", @placeholder = "Please Complete" })
+                @Html.ValidationMessageFor(model => model.ReceiverNumber)
+            </div>
+
+
+            <div class="editor-label ">
+                @Html.LabelFor(model => model.Equipment)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.Equipment, new { @class = "input", @placeholder = "Please Complete" })
+                @Html.ValidationMessageFor(model => model.Equipment)
+            </div>
+
+
+            <div class="editor-label ">
+                @Html.LabelFor(model => model.OriginalQuantity)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.OriginalQuantity, new { @class = "input", @placeholder = "Please Complete" })
+                @Html.ValidationMessageFor(model => model.OriginalQuantity)
+            </div>
+
+
+            <div class="editor-label ">
+                @Html.LabelFor(model => model.NewQuantity)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.NewQuantity, new { @class = "input", @placeholder = "Please Complete" })
+                @Html.ValidationMessageFor(model => model.NewQuantity)
+            </div>
+
+
+            <div class="editor-label ">
+                @Html.LabelFor(model => model.DocketNumber)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.DocketNumber, new { @class = "input", @placeholder = "Please Complete" })
+                @Html.ValidationMessageFor(model => model.DocketNumber)
+            </div>
+        </div>
+
+        <div class="left" style="width: 45%;">
+
+            <h3>Dates</h3>
+            <div class="editor-label">
+                @Html.LabelFor(model => model.LoadDate)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.LoadDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
+            </div>
+            <div class="editor-label">
+                @Html.LabelFor(model => model.NotifyDate)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.NotifyDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
+                @Html.ValidationMessageFor(model => model.NotifyDate)
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.EffectiveDate)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.EffectiveDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
+                @Html.ValidationMessageFor(model => model.EffectiveDate)
+            </div>
+        </div>
+    </div>
+
+    <div class="left" style="width: 33%; margin-right: 4%;">
+        <div class="editor-label">
+            Uploaded Documents
+            <div class="editor-field" style="margin-bottom: 10px;" id="companydocslist" name="companydocslist">
+                <div id="documentsdiv">
+ 
+                </div>
+                <input id="companyfile" name="companyfile" type="file" value="" data-val-file="1" class="input" />
+                <span id="uploaded_file"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+    <p>
+        <input id="save-btn" type="submit" value="Update" />
+        <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+    </p>
+</div>
+
+    <script>
+        $(document).ready(function () {
+            var cId = $("#Id").val();
+            populateDocs(cId, "ChepLoad");
+
+            $(document).on('change', '#companyfile', function () {
+                var name = document.getElementById("companyfile").files[0].name;
+                var form_data = new FormData();
+                var ext = name.split('.').pop().toLowerCase();
+                if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx']) == -1) {
+                    alert("Invalid File");
+                }
+                var oFReader = new FileReader();
+                oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
+                var f = document.getElementById("companyfile").files[0];
+                var fsize = f.size || f.fileSize;
+                if (fsize > 2000000) {
+                    alert("File Size is too large");
+                }
+                else {
+                    form_data.append("file", document.getElementById('companyfile').files[0]);
+                    form_data.append("clientId", $("#Id").val());
+                    $.ajax({
+                        url: "Upload?clientId="+cId,
+                        method: "POST",
+                        data: form_data,
+                        contentType: false,
+                        cache: false,
+                        processData: false,
+                        beforeSend: function () {
+                            $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
+                        },
+                        success: function (data) {
+                            //$('#uploaded_file').html(data);
+                            populateDocs(cId, "Client");
+                            $('#uploaded_file').html("<label class='text-success'></label>");
+                        }
+                    });
+                }
+            });
+
+        });
+        function populateDocs(id, doctype) {
+
+            $.ajax({
+
+                url: '@Url.Action("ListFiles", "Client")',
+                type: "GET",
+                dataType: "html",
+                data: { objId: id, objType:doctype },//this is as per your requirement
+                success: function (data) {
+                    $('#documentsdiv').html(data);
+                },
+            });
+        }
+
+
+
+
+      
+
+    </script>
+
+
+}
+
+

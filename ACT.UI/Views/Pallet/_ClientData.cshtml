@@ -11,7 +11,7 @@
     ViewBag.ShowExport = true;
     ViewBag.ShowCustom = true;
 
-    ViewBag.ViewName = "_PADList";
+    ViewBag.ViewName = "_CDList";
 }
 
 
@@ -24,7 +24,7 @@
     Int32 count = Model.Start;
     List<ClientLoadCustomModel> items = (List<ClientLoadCustomModel>)Model.Items;
 
-    //PADService cservice = new PADService();
+    //CDService cservice = new CDService();
 
 
 }
@@ -33,11 +33,11 @@
 @if (Model == null || !items.Any())
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
-        There are no Pooling Agent Load Entries available matching your search criteria.
+        There are no Client Load Entries available matching your search criteria.
     </div>
 }
 
-@using (Html.BeginForm("ImportChepLoad", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#poolingagentdata", @class = "custom-validate", @style = "width: auto;", id = "importpoolingagent" }))
+@using (Html.BeginForm("ImportClientLoad", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "clientdata", @class = "custom-validate", @style = "width: auto;", id = "importclientdata" }))
 {
     <p>
         <table style="width:100%" border="0">
@@ -56,7 +56,7 @@
                     }
                 </td>
                 <td style="width:2%">
-                    @Html.ActionLink("Add", "AddClientLoad", new { sourceview = "PoolingAgentData" }, new { @class = "add", @rel = "tipsyS", @title = "Import Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" })
+                    @Html.ActionLink("Add", "AddClientData", new { sourceview = "ClientData" }, new { @class = "add", @rel = "tipsyS", @title = "Import Client Data?", @data_edit = "1", @data_id = 0, @data_target = "#clientdata" })
                 </td>
                 <td style="width:5%">
                     &nbsp;
@@ -71,7 +71,7 @@
                     <input type="submit" value="Import" class="importbutton" />
                 </td>
                 <td style="width:7%">
-                    <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "poolingagentdatatemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
+                    <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "clientdatatemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
                 </td>
             </tr>
         </table>
@@ -80,7 +80,7 @@
 }
 
 
-<table id="PADlist-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#PADlist-table_wrapper" data-starting-point=".ap-tabs ul">
+<table id="CDlist-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#CDlist-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
             <th>
@@ -173,10 +173,10 @@
                     <td style="width: 8%;">@*@item.OriginalQuantity*@</td>
                     <td width="8%">
                         <a href="#doc" rel="modal:open"><i class="fa fa-file"></i></a>
-                        @Html.ActionLink("Edit", "EditPAD", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        @Html.ActionLink("Edit", "EditClientData", new { id = item.Id, returnView = "ClientData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        @Html.ActionLink(enable, "DeletePAD", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?" })
-                        @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                        @Html.ActionLink(enable, "DeleteClientData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = enable + " this item?" })
+                        @*<div style="border-bottom: 1px dashed #7368e3; CDding-bottom: 4px; margin-bottom: 10px;">
 
                                 @if (item.Documents != null && item.Documents.Any(s => s.Status == (Int32)Status.Active))
                                 {
@@ -238,3 +238,61 @@
 
 </table>
 @Html.Partial("_Paging")
+<script>
+        $(document).ready(function () {
+
+            //populateDocs(cId, "Client");
+
+            //$(document).on('change', '#companyfile', function () {
+            //    var name = document.getElementById("companyfile").files[0].name;
+            //    var form_data = new FormData();
+            //    var ext = name.split('.').pop().toLowerCase();
+            //    if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx']) == -1) {
+            //        alert("Invalid File");
+            //    }
+            //    var oFReader = new FileReader();
+            //    oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
+            //    var f = document.getElementById("companyfile").files[0];
+            //    var fsize = f.size || f.fileSize;
+            //    if (fsize > 2000000) {
+            //        alert("File Size is too large");
+            //    }
+            //    else {
+            //        form_data.append("file", document.getElementById('companyfile').files[0]);
+            //        form_data.append("clientId", $("#Id").val());
+            //        $.ajax({
+            //            url: "Upload?id="+cId,
+            //            method: "POST",
+            //            data: form_data,
+            //            contentType: false,
+            //            cache: false,
+            //            processData: false,
+            //            beforeSend: function () {
+            //                $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
+            //            },
+            //            success: function (data) {
+            //                //$('#uploaded_file').html(data);
+            //                populateDocs(cId, "Client");
+            //                $('#uploaded_file').html("<label class='text-success'></label>");
+            //            }
+            //        });
+            //    }
+            //});
+
+        });
+        function populateDocs(id, doctype) {
+
+            $.ajax({
+
+                url: '@Url.Action("ListFiles", "ChepLoad")',
+                type: "GET",
+                dataType: "html",
+                data: { objId: id, objType:doctype },//this is as per your requirement
+                success: function (data) {
+                    $('#documentsdiv_'+id).html(data);
+                },
+            });
+    }
+
+
+</script>
