@@ -1,0 +1,137 @@
+﻿
+@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+    ViewBag.ViewName = "_MovementReport";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@{
+    Int32 count = Model.Start;
+    List<ClientLoadCustomModel> items = ( List<ClientLoadCustomModel> ) Model.Items;
+}
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Movement Reports available matching your search criteria.
+    </div>
+}
+
+<table id="movementreport-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#movementreport-table_wrapper" data-starting-point=".ap-tabs ul">
+
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="LoadDate" data-column="cl.LoadDate">
+                Movement Date
+            </th>
+            <th data-name="EffectiveDate" data-column="cl.EffectiveDate">
+                Effective Date
+            </th>
+            <th data-name="NotifyeDate" data-column="cl.NotifyeDate">
+                Date of Notification
+            </th>
+            <th data-name="DocketNumber" data-column="cl1.DocketNumber">
+                Docket #
+            </th>
+            <th data-name="PostingType" data-column="cl1.PostingType">
+                Posting Type
+            </th>
+            <th data-name="ClientDescription" data-column="cl.ClientDescription">
+                Trading Partner
+            </th>
+            <th data-name="ReferenceNumber" data-column="cl.ReferenceNumber">
+                Ref #
+            </th>
+            <th data-name="ReceiverNumber" data-column="cl.ReceiverNumber">
+                Receiver #
+            </th>
+            <th data-name="Equipment" data-column="cl.Equipment">
+                Equipment
+            </th>
+            <th data-name="PODNumber" data-column="cl.PODNumber">
+                POD #
+            </th>
+            <th data-name="PCNNumber" data-column="cl.PCNNumber">
+                PCN #
+            </th>
+            <th data-name="PRNNumber" data-column="cl.PRNNumber">
+                PRN #
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @(( item.LoadDate ?? item.CreatedOn ).ToString( "yyyy-MM-dd" ))
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="MovementReport">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @(item.EffectiveDate.HasValue ? item.EffectiveDate.Value.ToString( "yyyy-MM-dd" ) : "")
+                    </td>
+                    <td>
+                        @(item.NotifyeDate.HasValue ? item.NotifyeDate.Value.ToString( "yyyy-MM-dd" ) : "")
+                    </td>
+                    <td>
+                        @item.DocketNumber
+                    </td>
+                    <td>
+                        @item.PostingType
+                    </td>
+                    <td>
+                        @item.ClientDescription
+                    </td>
+                    <td>
+                        @item.ReferenceNumber
+                    </td>
+                    <td>
+                        @item.ReceiverNumber
+                    </td>
+                    <td>
+                        @item.Equipment
+                    </td>
+                    <td>
+                        @item.PODNumber
+                    </td>
+                    <td>
+                        @item.PCNNumber
+                    </td>
+                    <td>
+                        @item.PRNNumber
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_MovementReportCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
+
+@Html.Partial( "_Paging" )

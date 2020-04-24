@@ -24,5 +24,9 @@ namespace ACT.Core.Models.Custom
         public byte[] PalletAuditorSign { get; set; }
         public string DocumentLocation { get; set; }
         public int Status { get; set; }
+
+        public string SiteName { get; set; }
+
+        public int? ReportDocumentId { get; set; }
     }
 }

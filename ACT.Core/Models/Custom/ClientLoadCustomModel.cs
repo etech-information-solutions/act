@@ -33,5 +33,9 @@ namespace ACT.Core.Models.Custom
         public int Status { get; set; }
         public int? DocumentCount { get; set; }
         public List<Document> Documents { get; set; }
+
+        public int? PostingType { get; set; }
+
+        public string DocketNumber { get; set; }
     }
 }

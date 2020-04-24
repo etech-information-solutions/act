@@ -21,5 +21,9 @@ namespace ACT.Core.Models.Custom
         public Nullable<decimal> SuspendMCC { get; set; }
         public Nullable<decimal> AdjustedInvBalance { get; set; }
         public Nullable<decimal> MccBalance { get; set; }
+
+        public string SiteName { get; set; }
+
+        public int? ReportDocumentId { get; set; }
     }
 }

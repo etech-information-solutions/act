@@ -145,6 +145,7 @@
     <Compile Include="Controllers\DashBoardController.cs" />
     <Compile Include="Models\ClientLoadViewModel.cs" />
     <Compile Include="Models\ChepLoadViewModel.cs" />
+    <Compile Include="Models\ChepAuditViewModel.cs" />
     <Compile Include="Views\Scaffolded\ClientLoadsController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdministrationController.cs" />
@@ -568,6 +569,17 @@
     <Content Include="Views\ClientReporting\Index.cshtml" />
     <Content Include="Views\ClientReporting\_Disputes.cshtml" />
     <Content Include="Views\Shared\_DisputesCustomSearch.cshtml" />
+    <Content Include="Views\ClientReporting\DisputeDetails.cshtml" />
+    <Content Include="Views\ClientReporting\_ChepAudit.cshtml" />
+    <Content Include="Views\Shared\_ClientAuditCustomSearch.cshtml" />
+    <Content Include="Views\ClientReporting\AddChepAudit.cshtml" />
+    <Content Include="Views\ClientReporting\ChepAuditDetails.cshtml" />
+    <Content Include="Views\ClientReporting\EditChepAudit.cshtml" />
+    <Content Include="Views\ClientReporting\_ClientAudit.cshtml" />
+    <Content Include="Views\ClientReporting\ClientAuditDetails.cshtml" />
+    <Content Include="Views\Shared\_ChepAuditCustomSearch.cshtml" />
+    <Content Include="Views\ClientReporting\_MovementReport.cshtml" />
+    <Content Include="Views\Shared\_MovementReportCustomSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

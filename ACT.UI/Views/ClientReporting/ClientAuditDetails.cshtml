@@ -1,0 +1,176 @@
+﻿@model SiteAudit
+
+@using ACT.Core.Enums
+@using ACT.Data.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Details";
+
+    Document auditReport = ViewBag.Document;
+}
+
+@if ( ViewBag.IncludeLayout != null )
+{
+    <h2>
+        <img alt="" src="@Url.Content( "~/images/info.png" )" />
+        <span>Client Audit Report Details</span>
+    </h2>
+}
+
+<div id="item-details" class="item-details" style="width: auto;">
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <h2>
+            <img alt="" src="@Url.Content( "~/images/info.png" )" />
+            <span>Client Audit Report Details</span>
+        </h2>
+    }
+
+    <div class="left" style="width: 48%; margin-right: 2%;">
+
+        <div class="display-label">
+            Date Created
+        </div>
+        <div class="display-field">
+            @Model.CreatedOn.ToString( "yyyy-MM-dd" )
+        </div>
+
+        <div class="display-label">
+            Audit Date
+        </div>
+        <div class="display-field">
+            @(Model.AuditDate.HasValue ? Model.AuditDate.Value.ToString( "yyyy-MM-dd" ) : "")
+        </div>
+
+        <div class="display-label">
+            Site
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Site.Name )
+        </div>
+
+        <div class="display-label">
+            Equipment
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Equipment )
+        </div>
+
+        @if ( auditReport != null )
+        {
+            <div class="display-label">
+                Audit Report File
+            </div>
+            <div class="display-field">
+                <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "ClientReporting", new { @id = auditReport.Id } )">
+                    <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+
+                    @auditReport.Name (@auditReport.Type)
+                </a>
+            </div>
+        }
+
+    </div>
+
+    <div class="left" style="width: 48%;">
+
+        <div class="display-label">
+            Outstanding Pallets
+        </div>
+        <div class="display-field">
+            @(Math.Round( Model.PalletsOutstanding ?? 0, 2 ))
+        </div>
+
+        <div class="display-label">
+            Pallets Counted
+        </div>
+        <div class="display-field">
+            @(Math.Round( Model.PalletsCounted ?? 0, 2 ))
+        </div>
+
+        <div class="display-label">
+            Writeoff Pallets
+        </div>
+        <div class="display-field">
+            @(Math.Round( Model.WriteoffPallets ?? 0, 2 ))
+        </div>
+
+        <div class="display-label">
+            Customer Name
+        </div>
+        <div class="display-field">
+            @Model.CustomerName
+        </div>
+
+        @if ( Model.CustomerSignature != null && Model.CustomerSignature.Length > 0 )
+        {
+            <div class="display-label">
+                Customer Signature
+            </div>
+            <div class="display-field">
+                <img alt="" src="data:image/png;base64,@Convert.ToBase64String( Model.CustomerSignature )" style="max-height: 100px;" />
+            </div>
+        }
+
+        <div class="display-label">
+            Rep Name
+        </div>
+        <div class="display-field">
+            @Model.RepName
+        </div>
+
+        @if ( Model.RepSignature != null && Model.RepSignature.Length > 0 )
+        {
+            <div class="display-label">
+                Rep Signature
+            </div>
+            <div class="display-field">
+                <img alt="" src="data:image/png;base64,@Convert.ToBase64String( Model.RepSignature )" style="max-height: 100px;" />
+            </div>
+        }
+
+        <div class="display-label">
+            Pallet Auditor
+        </div>
+        <div class="display-field">
+            @Model.PalletAuditor
+        </div>
+
+        @if ( Model.PalletAuditorSign != null && Model.PalletAuditorSign.Length > 0 )
+        {
+            <div class="display-label">
+                Pallet Auditor Signature
+            </div>
+            <div class="display-field">
+                <img alt="" src="data:image/png;base64,@Convert.ToBase64String( Model.PalletAuditorSign )" style="max-height: 100px;" />
+            </div>
+        }
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <p>
+            @if ( ViewBag.IncludeLayout == null )
+            {
+                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Close</a>
+            }
+        </p>
+    }
+
+    @if ( ViewBag.IncludeLayout != null )
+    {
+        <div class="back-to-list">
+            @Html.ActionLink( "Back to List", "Index" )
+        </div>
+    }
+
+</div>

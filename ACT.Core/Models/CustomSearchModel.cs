@@ -60,7 +60,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// Can be used as a selected Site 
         /// </summary>
-        [Display(Name = "Site")]
+        [Display( Name = "Site" )]
         public int SiteId
         {
             get; set;
@@ -78,7 +78,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// Can be used as a selected Region 
         /// </summary>
-        [Display(Name = "Region")]
+        [Display( Name = "Region" )]
         public int RegionId
         {
             get; set;
@@ -102,7 +102,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// Can be used for a Start date range
         /// </summary>
-        [ Display( Name = "From Date" )]
+        [Display( Name = "From Date" )]
         public DateTime? FromDate
         {
             get; set;
@@ -165,7 +165,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// A custom Generic Name Search
         /// </summary>
-        [Display(Name = "Generic Name Search")]
+        [Display( Name = "Generic Name Search" )]
         public string Name
         {
             get; set;
@@ -174,7 +174,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// A custom Generic Description Search
         /// </summary>
-        [Display(Name = "Generic Description Search")]
+        [Display( Name = "Generic Description Search" )]
         public string Description
         {
             get; set;
@@ -183,7 +183,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// A custom Generic Description Search
         /// </summary>
-        [Display(Name = "Generic Reference Number Search")]
+        [Display( Name = "Generic Reference Number Search" )]
         public string ReferenceNumber
         {
             get; set;
@@ -192,7 +192,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// A custom Generic Description Search
         /// </summary>
-        [Display(Name = "Generic Other Reference Number Search")]
+        [Display( Name = "Generic Other Reference Number Search" )]
         public string ReferenceNumberOther
         {
             get; set;
@@ -201,7 +201,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// A custom Generic Description Search
         /// </summary>
-        [Display(Name = "Generic Contact Name Search")]
+        [Display( Name = "Generic Contact Name Search" )]
         public string ContactName
         {
             get; set;
@@ -210,7 +210,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// A custom Generic Description Search
         /// </summary>
-        [Display(Name = "Generic Contact Number  Search")]
+        [Display( Name = "Generic Contact Number  Search" )]
         public string ContactNumber
         {
             get; set;
@@ -219,7 +219,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// A custom Generic Description Search
         /// </summary>
-        [Display(Name = "SitePlanningPoint Search")]
+        [Display( Name = "SitePlanningPoint Search" )]
         public string SitePlanningPoint
         {
             get; set;
@@ -248,7 +248,7 @@ namespace ACT.Core.Models
             set;
         }
 
-        [Display(Name = "Status")]
+        [Display( Name = "Status" )]
         public Status ClientStatus
         {
             get;
@@ -372,7 +372,7 @@ namespace ACT.Core.Models
             {
                 case "Users":
 
-                    
+
 
                     break;
 
@@ -389,19 +389,39 @@ namespace ACT.Core.Models
 
                 case "Regions":
 
-                    using (RegionService cservice = new RegionService())
+                    using ( RegionService cservice = new RegionService() )
                     {
-                        RegionOptions = cservice.List(true);
+                        RegionOptions = cservice.List( true );
                     }
 
                     break;
 
                 case "Disputes":
-                    
+
                     using ( SiteService sservice = new SiteService() )
                     using ( ClientService cservice = new ClientService() )
                     {
                         SiteOptions = sservice.List( true );
+                        ClientOptions = cservice.List( true );
+                    }
+
+                    break;
+
+                case "ChepAudit":
+                case "ClientAudit":
+
+                    using ( SiteService sservice = new SiteService() )
+                    {
+                        SiteOptions = sservice.List( true );
+                    }
+
+                    break;
+
+
+                case "MovementReport":
+
+                    using ( ClientService cservice = new ClientService() )
+                    {
                         ClientOptions = cservice.List( true );
                     }
 

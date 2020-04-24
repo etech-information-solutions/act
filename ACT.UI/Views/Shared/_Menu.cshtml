@@ -28,12 +28,6 @@
                 <br />
                 <br />
             </li>
-
-            <li data-hot-spot="1" data-c="Client" data-t="" class="@(controller.ToLower().Equals( "client" ) ? "current" : "")">
-                <a rel="tipsyW" title="Clients" href="@Url.Action( "Index", "Client" )">
-                    <span>Client Management</span>
-                </a>
-            </li>
         }
 
         @if ( User.Has( PermissionTo.View, PermissionContext.DashBoard ) )
@@ -41,6 +35,15 @@
             <li class="@(controller.ToLower().Equals( "dashboard" ) ? "current" : "")" data-hot-spot="1" data-c="DashBoard" data-t="">
                 <a rel="tipsyW" title="DashBoard" href="@Url.Action( "Index", "DashBoard" )">
                     <span>Dashboard</span>
+                </a>
+            </li>
+        }
+
+        @if ( User.Has( PermissionTo.View, PermissionContext.Client ) )
+        {
+            <li data-hot-spot="1" data-c="Client" data-t="" class="@(controller.ToLower().Equals( "client" ) ? "current" : "")">
+                <a rel="tipsyW" title="Clients" href="@Url.Action( "Index", "Client" )">
+                    <span>Client Management</span>
                 </a>
             </li>
         }
