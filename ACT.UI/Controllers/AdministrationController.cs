@@ -43,7 +43,7 @@ namespace ACT.UI.Controllers
 
                     #region Roles
 
-                    csv = String.Format( "Name, Dashboard, Campaign, Dinner, Trading Partner, Member, Client, Reward, Administration, Reports {0}", Environment.NewLine );
+                    csv = String.Format( "Name, Type, Dashboard, Administration, Finance, Clients, Customers, Products, Pallets {0}", Environment.NewLine );
 
                     List<Role> roles = new List<Role>();
 
@@ -56,19 +56,17 @@ namespace ACT.UI.Controllers
                     {
                         foreach ( Role item in roles )
                         {
-                            //csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
-                            //                    csv,
-                            //                    item.Name,
-                            //                    item.DashBoard,
-                            //                    item.Campaign,
-                            //                    item.Dinner,
-                            //                    item.TradingPartner,
-                            //                    item.Member,
-                            //                    item.Client,
-                            //                    item.Reward,
-                            //                    item.Administration,
-                            //                    item.Report,
-                            //                    Environment.NewLine );
+                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8} {9}",
+                                                csv,
+                                                item.Name,
+                                                item.DashBoard,
+                                                item.Administration,
+                                                item.Finance,
+                                                item.Client,
+                                                item.Customer,
+                                                item.Product,
+                                                item.Pallet,
+                                                Environment.NewLine );
                         }
                     }
 
@@ -80,7 +78,7 @@ namespace ACT.UI.Controllers
 
                     #region System Config
 
-                    csv = String.Format( "System Contact Email, Finance Contact Email, Password Change, Images Location, Documents Location {0}", Environment.NewLine );
+                    csv = String.Format( "System Contact Email,Finance Contact Email,Activation Email,Correspondence Email,System Contact Number,System Contact Address,Invoice Run Day,Auto Logoff,Auto Logoff Seconds,Password Change, Images Location, Documents Location,App Download Url,Website Url {0}", Environment.NewLine );
 
                     List<SystemConfig> items = new List<SystemConfig>();
 
@@ -93,14 +91,23 @@ namespace ACT.UI.Controllers
                     {
                         foreach ( SystemConfig item in items )
                         {
-                            //csv = String.Format( "{0} {1},{2},{3},{4},{5} {6}",
-                            //                    csv,
-                            //                    item.ContactEmail,
-                            //                    item.FinancialEmail,
-                            //                    item.PasswordChange,
-                            //                    item.ImagesLocation,
-                            //                    item.DocumentsLocation,
-                            //                    Environment.NewLine );
+                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
+                                                csv,
+                                                item.SystemContactEmail,
+                                                item.FinancialContactEmail,
+                                                item.ActivationEmail,
+                                                item.CorrespondenceEmail,
+                                                item.ContactNumber,
+                                                item.Address,
+                                                item.InvoiceRunDay,
+                                                item.AutoLogoff,
+                                                item.LogoffSeconds,
+                                                item.PasswordChange,
+                                                item.ImagesLocation,
+                                                item.DocumentsLocation,
+                                                item.AppDownloadUrl,
+                                                item.WebsiteUrl,
+                                                Environment.NewLine );
                         }
                     }
 

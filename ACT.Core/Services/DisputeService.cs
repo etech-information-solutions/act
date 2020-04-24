@@ -16,6 +16,19 @@ namespace ACT.Core.Services
 
         }
 
+        /// <summary>
+        /// Gets a dispute using the specified Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public override Dispute GetById( int id )
+        {
+            context.Configuration.LazyLoadingEnabled = true;
+            context.Configuration.ProxyCreationEnabled = true;
+
+            return base.GetById( id );
+        }
+
         public int Total1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
@@ -43,7 +56,7 @@ namespace ACT.Core.Services
 
             string query = @"SELECT
 	                            COUNT(d.[Id]) AS [Total]
-                            FROM
+                             FROM
 	                            [dbo].[Dispute] d
                                 INNER JOIN [dbo].[ChepLoad] cl ON cl.[Id]=d.[ChepLoadId]
                                 LEFT OUTER JOIN [dbo].[User] u1 ON u1.[Id]=d.[ActionedBy]";
@@ -62,7 +75,6 @@ namespace ACT.Core.Services
                                               FROM
                                                 [dbo].[PSPUser] pu
                                               WHERE
-                                                (p.Id=pu.PSPId) AND
                                                 (pu.UserId=@userid) AND
                                                 (EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc
                                                         INNER JOIN [dbo].[ClientLoad] cl1 ON cl1.[ClientId]=pc.[ClientId]
@@ -80,7 +92,6 @@ namespace ACT.Core.Services
                                               FROM
                                                 [dbo].[ClientUser] cu 
                                               WHERE
-                                                (u.Id=cu.UserId) AND
                                                 (cu.UserId=@userid) AND
                                                 (EXISTS(SELECT 1 FROM [dbo].[ClientLoad] cl1
                                                         INNER JOIN [dbo].[ChepClient] cc ON (cc.[ClientLoadsId]=cl1.[Id] AND cc.[ChepLoadsId]=cl.[Id])
@@ -219,7 +230,6 @@ namespace ACT.Core.Services
                                               FROM
                                                 [dbo].[PSPUser] pu
                                               WHERE
-                                                (p.Id=pu.PSPId) AND
                                                 (pu.UserId=@userid) AND
                                                 (EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc
                                                         INNER JOIN [dbo].[ClientLoad] cl1 ON cl1.[ClientId]=pc.[ClientId]
@@ -237,7 +247,6 @@ namespace ACT.Core.Services
                                               FROM
                                                 [dbo].[ClientUser] cu 
                                               WHERE
-                                                (u.Id=cu.UserId) AND
                                                 (cu.UserId=@userid) AND
                                                 (EXISTS(SELECT 1 FROM [dbo].[ClientLoad] cl1
                                                         INNER JOIN [dbo].[ChepClient] cc ON (cc.[ClientLoadsId]=cl1.[Id] AND cc.[ChepLoadsId]=cl.[Id])

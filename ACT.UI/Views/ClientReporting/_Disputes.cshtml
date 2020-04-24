@@ -75,21 +75,24 @@
             {
                 DisputeStatus status = ( DisputeStatus ) item.DisputeStatus;
 
-
-
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
 
                     <td width="1%">
                         @count
                     </td>
                     <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Dispute">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
                         @item.ChepLoadAccountNumber
                     </td>
                     <td>
                         @item.TDNNumber
-                    </td>
-                    <td>
-                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
                     </td>
                     <td>
                         @item.DocketNumber
@@ -109,6 +112,11 @@
                         @if ( ( status == DisputeStatus.Resolved || status == DisputeStatus.Cancelled ) && !string.IsNullOrWhiteSpace( item.ResolvedUser ) )
                         {
                             <strong class="block">By @item.ResolvedUser</strong>
+
+                            if ( item.ResolvedOn.HasValue )
+                            {
+                                <small class="block">on @item.ResolvedOn.Value.ToString( "yyyy-MM-dd HH:mm" )</small>
+                            }
                         }
                     </td>
                     <td>

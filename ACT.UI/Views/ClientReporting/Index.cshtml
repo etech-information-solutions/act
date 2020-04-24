@@ -17,21 +17,25 @@
             <a data-ap-tab="1" data-target="#disputes" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Disputes">Disputes</a>
         </li>
 
-        <li data-hot-spot="1" data-c="ClientReporting" data-t="AuditInformation">
-            <a data-ap-tab="1" data-target="#auditinformation" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="AuditInformation">Audit Information</a>
+        <li data-hot-spot="1" data-c="ClientReporting" data-t="ChepAudit">
+            <a data-ap-tab="1" data-target="#chepaudit" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ChepAudit">Chep Audit</a>
         </li>
 
-        <li data-hot-spot="1" data-c="ClientReporting" data-t="OutstandingPallets">
-            <a data-ap-tab="1" data-target="#outstandingpallets" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="OutstandingPallets">Monthly Outstanding Pallets</a>
+        <li data-hot-spot="1" data-c="ClientReporting" data-t="ClientAudit">
+            <a data-ap-tab="1" data-target="#clientaudit" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientAudit">Client Audit</a>
         </li>
+
+        @*<li data-hot-spot="1" data-c="ClientReporting" data-t="OutstandingPallets">
+            <a data-ap-tab="1" data-target="#outstandingpallets" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="OutstandingPallets">Monthly Outstanding Pallets</a>
+        </li>*@
 
         <li data-hot-spot="1" data-c="ClientReporting" data-t="MovementReport">
             <a data-ap-tab="1" data-target="#movementreport" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="MovementReport">Movement Report</a>
         </li>
 
-        <li data-hot-spot="1" data-c="ClientReporting" data-t="Exceptions">
+        @*<li data-hot-spot="1" data-c="ClientReporting" data-t="Exceptions">
             <a data-ap-tab="1" data-target="#exceptions" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Exceptions">Exceptions per Subsite</a>
-        </li>
+        </li>*@
 
         <li class="last"></li>
     </ul>
@@ -42,7 +46,9 @@
 
         <div id="disputes" class="da-tab none" data-load-url="Disputes"> </div>
 
-        <div id="auditinformation" class="da-tab none" data-load-url="AuditInformation"> </div>
+        <div id="chepaudit" class="da-tab none" data-load-url="ChepAudit"> </div>
+
+        <div id="clientaudit" class="da-tab none" data-load-url="ClientAudit"> </div>
 
         <div id="outstandingpallets" class="da-tab none" data-load-url="OutstandingPallets"> </div>
 

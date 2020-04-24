@@ -876,6 +876,49 @@ namespace ACT.UI.Controllers
 
         //-------------------------------------------------------------------------------------
 
+        //-------------------------------------------------------------------------------------
+
+        #region Pallet Disputes
+        //
+        // GET: /Pallet/AuthorisationCode
+        public ActionResult AuthorisationCode(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        {
+            if (givecsm)
+            {
+                ViewBag.ViewName = "AuthorisationCode";
+
+                return PartialView("_AuthorisationCodeCustomSearch", new CustomSearchModel("AuthorisationCode"));
+            }
+            ViewBag.ViewName = "AuthorisationCode";
+            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+                                                                    //    model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            List<Client> clientList = new List<Client>();
+            //TODO
+            using (ClientService clientService = new ClientService())
+            {
+                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+            }
+
+            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.CompanyName
+
+            });
+            ViewBag.ClientList = clientDDL;
+            int total = 0;
+
+            List<Site> model = new List<Site>();
+            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+
+            return PartialView("_AuthorisationCode", paging);
+        }
+        #endregion
+
+        //-------------------------------------------------------------------------------------
+
         #region General
 
 
