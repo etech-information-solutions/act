@@ -566,7 +566,7 @@
     <Content Include="Views\Pallet\EditClientData.cshtml" />
     <Content Include="Views\Shared\_PoolingAgentDataCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ClientDataCustomSearch.cshtml" />
-    <Content Include="Views\Pallet\_AddDeliveryNote.cshtml" />
+    <Content Include="Views\Pallet\__AddDeliveryNote.cshtml" />
     <Content Include="Views\Pallet\DetailsDeliveryNote.cshtml" />
     <Content Include="Views\Pallet\_EditDeliveryNote.cshtml" />
     <Content Include="Views\Pallet\IndexDeliveryNote.cshtml" />

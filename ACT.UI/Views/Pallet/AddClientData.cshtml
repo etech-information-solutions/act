@@ -157,7 +157,7 @@
                     @Html.LabelFor(model => model.LoadDate)
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.LoadDate.ToString(), new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
+                    @Html.TextBoxFor(model => model.LoadDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
                     @Html.ValidationMessageFor(model => model.LoadDate)
                 </div>
                 <div class="editor-label">
@@ -209,7 +209,7 @@
             </div>
         </div>
 
-        |<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
      
 
         <p>
@@ -228,6 +228,33 @@
     <script>
     $(document).ready(function () {
         var cId = '@Model.Id';
+
+
+        $("#TransporterId").change(function () {
+            //debugger;
+            var cId = $('option:selected', this).val();
+            var options = $("#VehicleId");
+            options.empty();
+            $.ajax({
+                type: "GET",
+                url: "GetVehiclesForTransporter",
+                data: { transId: cId },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    //console.log(data);
+                    var obj = JSON.parse(data.data);
+                    options.append($("<option />").val('0').text('Please Select'));
+                    $.each(obj, function (id, veh) {
+                        options.append($("<option />").val(veh.Id).text(veh.Registration));
+                    });
+                },
+                error: function (response) {
+                    alert('Error retrieving vehicle details');
+                }
+            });
+            //UpdateSites($('option:selected', this).val(), sId);
+        });
 
         $(document).on('change', '#companyfile', function () {
             var cId = $("#Id").val();

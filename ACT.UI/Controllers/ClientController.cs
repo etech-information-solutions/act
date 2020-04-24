@@ -3957,24 +3957,6 @@ namespace ACT.UI.Controllers
                 return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetClientDetail( string clientId )
-        {
-            if ( clientId != null && clientId != "" )
-            {
-                Client client = null;
-
-                using ( ClientService bservice = new ClientService() )
-                {
-                    client = bservice.GetById( int.Parse( clientId ) );
-                    return Json( client, JsonRequestBehavior.AllowGet );
-                }
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
 
 
 

@@ -19,15 +19,15 @@ namespace ACT.UI.Models
         public string LoadNumber { get; set; }
         [Required]
         [Display(Name = "Load Date")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
         public Nullable<System.DateTime> LoadDate { get; set; }
         [Required]
         [Display(Name = "Effective Date")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
         public Nullable<System.DateTime> EffectiveDate { get; set; }
         [Required]
         [Display(Name = "Notify Date")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
         public Nullable<System.DateTime> NotifyeDate { get; set; }
         [Required]
         [Display(Name = "Account Number")]
@@ -58,12 +58,13 @@ namespace ACT.UI.Models
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
         public string Equipment { get; set; }
 
+        [Required]
         [Display(Name = "Original Quantity")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
         public Nullable<decimal> OriginalQuantity { get; set; }
 
         [Display(Name = "New Quantity")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
         public Nullable<decimal> NewQuantity { get; set; }
         public Nullable<int> ReconcileInvoice { get; set; }
         public Nullable<System.DateTime> ReconcileDate { get; set; }
@@ -82,7 +83,7 @@ namespace ACT.UI.Models
 
         public int Status { get; set; }
         [Display(Name = "Return Quantity")]
-        [StringLength(18, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        //[StringLength(18, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
         public Nullable<decimal> RetQuantity { get; set; }
         [Display(Name = "ARPM Comments")]
         [StringLength(150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]

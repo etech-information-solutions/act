@@ -14,11 +14,18 @@
 
 
 @Html.Partial("_Notification")
-
+@if (ViewBag.ContextualMode)
+{
+    <input type="hidden" id="context" name="context" value="1" />
+}
+else
+{
+    <input type="hidden" id="context" name="context" value="0" />
+}
 @using (Html.BeginForm("GenerateDeliveryNote", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#generatedeliverynote", @class = "custom-validate", @style = "width: auto;" }))
 {
     <div id="edit-item">
-
+        @Html.HiddenFor(model => model.ClientId)
 
         @Html.ValidationSummary(true)
 
@@ -28,8 +35,8 @@
                     Order Date
                 </div>
                 <div class="editor-field">
-                    @*@Html.TextBoxFor(model => model.OrderDate.ToString(), new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
-                    @Html.ValidationMessageFor(model => model.OrderDate)*@
+                    @Html.TextBoxFor(model => model.OrderDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
+                    @Html.ValidationMessageFor(model => model.OrderDate)
                 </div>
 
                 <div class="editor-label ">
@@ -56,20 +63,28 @@
                     Cutomer Name
                 </div>
                 <div class="editor-field">
-                    @if (ViewBag.ContextualMode)
-                    {
-                        @Html.DropDownList("ClientList")
-                    }
-                    else
-                    {
-                        @Html.DropDownList("ClientList", "All Clients")
-                    }
+                    @*@if (ViewBag.ContextualMode)
+                {
+                    @Html.DropDownList("ClientList")
+                }
+                else
+                {
+                    @Html.DropDownList("ClientList", "All Clients")
+                }*@
+                    @Html.DropDownListFor(model => model.ClientId,
+                               new SelectList(ViewBag.ClientList, "Value", "Text"),
+                               "Please Select",
+                               new { @class = "form-control", @onchange= "ClientListChanged()" })
                 </div>
 
                 <div class="editor-label">
                     Customer Address
                 </div>
                 <div class="editor-field">
+                    @Html.TextBoxFor(model => model.CustomerAddress, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
+                    @Html.ValidationMessageFor(model => model.CustomerAddress)
+                    @Html.TextBoxFor(model => model.CustomerAddress2, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Suburb/Area " })
+                    @Html.ValidationMessageFor(model => model.CustomerAddress2)
 
                 </div>
 
@@ -77,20 +92,24 @@
                     Town/City
                 </div>
                 <div class="editor-field">
-
+                    @Html.TextBoxFor(model => model.CustomerAddressTown, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
+                    @Html.ValidationMessageFor(model => model.CustomerAddressTown)
                 </div>
 
                 <div class="editor-label">
                     Postal Code
                 </div>
                 <div class="editor-field">
-
+                    @Html.TextBoxFor(model => model.CustomerPostalCode, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Postal Code" })
+                    @Html.ValidationMessageFor(model => model.CustomerPostalCode)
                 </div>
                 <div class="editor-label">
                     Province
                 </div>
                 <div class="editor-field">
-
+                    <select id="CustomerProvince" name="CustomerProvince" required="required" style="width: 100%;">
+                        <option value="">-- select</option>
+                    </select>
                 </div>
 
             </div>
@@ -101,10 +120,22 @@
             <div class="left" style="width: 48%; margin-right: 4%;">
                 <h3>Shipping Address</h3>
 
+                <div id="locationFieldShipping">
+                    Type your address below:
+                    <input id="autocomplete"
+                           placeholder="Enter your address"
+                           onFocus="geolocate()"
+                           type="text" />
+                </div>
+
                 <div class="editor-label">
-                    Company
+                    Customer Address
                 </div>
                 <div class="editor-field">
+                    @Html.TextBoxFor(model => model.DeliveryAddress, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
+                    @Html.ValidationMessageFor(model => model.DeliveryAddress)
+                    @Html.TextBoxFor(model => model.DeliveryAddress2, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Suburb/Area " })
+                    @Html.ValidationMessageFor(model => model.DeliveryAddress2)
 
                 </div>
 
@@ -112,30 +143,46 @@
                     Town/City
                 </div>
                 <div class="editor-field">
-
+                    @Html.TextBoxFor(model => model.DeliveryAddressTown, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
+                    @Html.ValidationMessageFor(model => model.DeliveryAddressTown)
                 </div>
 
                 <div class="editor-label">
                     Postal Code
                 </div>
                 <div class="editor-field">
-
+                    @Html.TextBoxFor(model => model.DeliveryPostalCode, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Postal Code" })
+                    @Html.ValidationMessageFor(model => model.DeliveryPostalCode)
                 </div>
                 <div class="editor-label">
                     Province
                 </div>
                 <div class="editor-field">
-
+                    <select id="DeliveryProvince" name="DeliveryProvince" required="required" style="width: 100%;">
+                        <option value="">-- select</option>
+                    </select>
                 </div>
             </div>
 
             <div class="left" style="width: 48%;">
                 <h3>Invoice Address&nbsp;</h3><input type="checkbox" id="sameasshipping" name="sameasshipping" value="1" /> Same as Shipping Address
 
+                <div id="locationFieldInvoice">
+                    Type your address below:
+                    <input id="autocompleteInvoice"
+                           placeholder="Enter your address"
+                           onFocus="geolocate()"
+                           type="text" />
+                </div>
+
                 <div class="editor-label">
-                    Company
+                    Customer Address
                 </div>
                 <div class="editor-field">
+                    @Html.TextBoxFor(model => model.BillingAddress, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
+                    @Html.ValidationMessageFor(model => model.BillingAddress)
+                    @Html.TextBoxFor(model => model.BillingAddress2, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Suburb/Area " })
+                    @Html.ValidationMessageFor(model => model.BillingAddress2)
 
                 </div>
 
@@ -143,23 +190,25 @@
                     Town/City
                 </div>
                 <div class="editor-field">
-
+                    @Html.TextBoxFor(model => model.BillingAddressTown, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
+                    @Html.ValidationMessageFor(model => model.BillingAddressTown)
                 </div>
 
                 <div class="editor-label">
                     Postal Code
                 </div>
                 <div class="editor-field">
-
+                    @Html.TextBoxFor(model => model.BillingPostalCode, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Postal Code" })
+                    @Html.ValidationMessageFor(model => model.BillingPostalCode)
                 </div>
                 <div class="editor-label">
                     Province
                 </div>
                 <div class="editor-field">
-
+                    <select id="BillingProvince" name="BillingProvince" required="required" style="width: 100%;">
+                        <option value="">-- select</option>
+                    </select>
                 </div>
-
-
 
             </div>
 
@@ -196,30 +245,89 @@
 
             <div class="clear" style="height: 10px;">&nbsp;</div>
 
-            <p>
-                <input id="save-btn" type="submit" value="Generate Delivery Note" />
-                <input id="save-btn" type="submit" value="Reprint Delivery Note" />
-                <input id="save-btn" type="submit" value="Email Delivery Note" /><input type="email" id="DeliveryEmail" id="DeliveryEmail" value="" />
-                <span style="padding: 0 5px;">/</span>
+            <div class="left" style="width: 48%; margin-right: 4%;">
+                <p>
+                    <input id="save-btn" type="submit" value="Generate Delivery Note" />
+                    <input id="save-btn" type="submit" value="Reprint Delivery Note" />
 
-                <a data-refresh="1" data-target="#clientdata">Cancel</a>
-            </p>
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+                    @*<span style="padding: 0 5px;">/</span>
+
+                    <a data-refresh="1" data-target="#clientdata">Cancel</a>*@
+                </p>
+            </div>
+
+            <div class="left" style="width: 48%;">
+                <input type="email" id="DeliveryEmail" name="DeliveryEmail" placeholder="Enter Email" value="" />
+                <input id="save-btn" type="submit" value="Email Delivery Note" />
+            </div>
+
+
+                <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+            </div>
+
         </div>
-
-    </div>
 
 
     <script>
-    $(document).ready(function () {
-        @*var cId = '@Model.Id';*@
-    });
+        $(document).ready(function () {
+            var client = $('#ClientId').val();  
+            var context = $("#context").val();
+            if (contextsite == "1") {
+                GetClientAddress(client);
+            }
 
+        });
+
+        function ClientListChanged() {
+            //debugger;
+            var client = $('#ClientId').val();
+            //GetClientDetail(client);
+            GetClientAddress(client);
+
+        }
+
+        function GetClientAddress(cId) {
+
+            $.ajax({
+                type: "GET",
+                url: "GetObjectAddress",
+                data: { objectId: cId, objectType: "Client" },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    debugger;
+                    //$('#TradingAs').val(data.TradingAs);
+                },
+                error: function (response) {
+                    alert('Error Retrieving Address Detail');
+                }
+            });
+
+        }
+
+        //function GetClientDetail(cId) {
+
+        //    var TradingAs = document.getElementById("TradingAs");
+        //    $.ajax({
+        //        type: "GET",
+        //        url: "GetClientDetail",
+        //        data: { clientId: cId },
+        //        contentType: "application/json;charset=utf-8",
+        //        dataType: "json",
+        //        success: function (data) {
+        //            $('#TradingAs').val(data.TradingAs);
+        //        },
+        //        error: function (response) {
+        //            alert('Error Retrieving Client Detail');
+        //        }
+        //    });
+
+        //}
     </script>
 
     <script>
         //The Google Stuff
-        var placeSearch, autocomplete;
+        var placeSearch, autocomplete, autocompleteInvoice;
 
         var componentForm = {
             street_number: 'short_name',
@@ -250,6 +358,11 @@
                 document.getElementById('autocomplete'), { types: ['geocode'] });
             autocomplete.setFields(['address_component']);
             autocomplete.addListener('place_changed', fillInAddress);
+
+            autocompleteInvoice = new google.maps.places.Autocomplete(
+                document.getElementById('autocompleteInvoice'), { types: ['geocode'] });
+            autocompleteInvoice.setFields(['address_componentInvoice']);
+            autocompleteInvoice.addListener('place_changed', fillInAddress);
         }
 
         function fillInAddress() {

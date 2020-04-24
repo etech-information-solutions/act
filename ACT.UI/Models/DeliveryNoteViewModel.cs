@@ -26,6 +26,9 @@ namespace ACT.UI.Models
         [Display(Name = "Customer Address")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string CustomerAddress { get; set; }
+
+        public string CustomerAddress2 { get; set; }
+        public string CustomerAddressTown { get; set; }
         [Required]
         [Display(Name = "CustomerPostalCode ")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
@@ -38,13 +41,15 @@ namespace ACT.UI.Models
         [Display(Name = "Delivery Address")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string DeliveryAddress { get; set; }
+        public string DeliveryAddress2 { get; set; }
+        public string DeliveryAddressTown { get; set; }
         [Required]
         [Display(Name = "DeliveryPostalCode ")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string DeliveryPostalCode { get; set; }
         [Required]
         [Display(Name = "Delivery Province")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
+        //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public Nullable<int> DeliveryProvince { get; set; }
         [Required]
         [Display(Name = "Invoice Number")]
@@ -55,19 +60,21 @@ namespace ACT.UI.Models
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string OrderNumber { get; set; }
         [Display(Name = "Order Date")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
+        //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public Nullable<System.DateTime> OrderDate { get; set; }
         [Required]
         [Display(Name = "Billing Address")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string BillingAddress { get; set; }
+        public string BillingAddress2 { get; set; }
+        public string BillingAddressTown { get; set; }
         [Required]
-        [Display(Name = "Bililng PostalCode")]
+        [Display(Name = "Billing PostalCode")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
-        public string BililngPostalCode { get; set; }
+        public string BillingPostalCode { get; set; }
         [Required]
         [Display(Name = "Billing Province")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
+        //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public Nullable<int> BillingProvince { get; set; }
         [Required]
         [Display(Name = "Reference")]
@@ -78,7 +85,7 @@ namespace ACT.UI.Models
 
         [Display(Name = "Delivery Note Lines")]
         public List<DeliveryNoteLineCustomModel> DeliveryNoteLines { get; set; }
-        [Display(Name = "Line |Count")]
+        [Display(Name = "Line Count")]
         public int CountNoteLines { get; set; }
 
         public string DeliveryEmail { get; set; }

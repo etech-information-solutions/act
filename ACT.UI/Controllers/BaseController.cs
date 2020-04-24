@@ -698,6 +698,45 @@ namespace ACT.UI.Controllers
             }
         }
 
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetClientDetail(string clientId)
+        {
+            if (clientId != null && clientId != "")
+            {
+                Client client = null;
+
+                using (ClientService bservice = new ClientService())
+                {
+                    client = bservice.GetById(int.Parse(clientId));
+                    return Json(client, JsonRequestBehavior.AllowGet);
+                }
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetObjectAddress(string objectId, string objectType)
+        {
+            if (objectId != null && objectId != "" && !string.IsNullOrEmpty(objectType))
+            {
+                Address address = null;
+
+                using (AddressService bservice = new AddressService())
+                {
+                    address = bservice.GetByColumnsWhere("ObjectId", int.Parse(objectId), "ObjectType", objectType);
+                    return Json(address, JsonRequestBehavior.AllowGet);
+                }
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
         [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
         public JsonResult SetClient( string ClientId )
         {

@@ -371,49 +371,59 @@ namespace ACT.UI.Controllers
 
                     return View(model);
                 }
+                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
 
-                using (ClientLoadService gService = new ClientLoadService())
-                using (TransactionScope scope = new TransactionScope())
+                if (clientId > 0 || model.ClientId > 0)
                 {
-                    #region Create ClientLoadCustomModel
-                    ClientLoad clientload = new ClientLoad()
+                    using (ClientLoadService gService = new ClientLoadService())
+                    using (TransactionScope scope = new TransactionScope())
                     {
-                        ClientId = model.ClientId,
-                        VehicleId = model.VehicleId,
-                        TransporterId = model.TransporterId,
-                        LoadDate = model.LoadDate,
-                        LoadNumber = model.LoadNumber,
-                        EffectiveDate = model.EffectiveDate,
-                        NotifyeDate = model.NotifyeDate,
-                        AccountNumber = model.AccountNumber,
-                        ClientDescription = model.ClientDescription,
-                        DeliveryNote = model.DeliveryNote,
-                        ReferenceNumber = model.ReferenceNumber,
-                        ReceiverNumber = model.ReceiverNumber,
-                        Equipment = model.Equipment,
-                        OriginalQuantity = model.OriginalQuantity,
-                        NewQuantity = model.NewQuantity,
-                        RetQuantity = model.RetQuantity,
-                        //ReconcileDate = model.ReconcileDate,
-                        //ReconcileInvoice = model.ReconcileInvoice,
-                        PODNumber = model.PODNumber,
-                        PCNNumber = model.PCNNumber,
-                        PRNNumber = model.PRNNumber,
-                        ARPMComments = model.ARPMComments,
-                        ProvCode = model.ProvCode,                        
-                        Status = (int)Status.Active,
-                        CreatedOn = DateTime.Now,
-                        ModifiedOn = DateTime.Now,
-                        ModifiedBy = CurrentUser.Email
-                    };
-                    gService.Create(clientload);
-                    #endregion
+                        #region Create ClientLoadCustomModel
+                        ClientLoad clientload = new ClientLoad()
+                        {
+                            ClientId = (model.ClientId>0?model.ClientId:clientId),
+                            VehicleId = model.VehicleId,
+                            TransporterId = model.TransporterId,
+                            LoadDate = model.LoadDate,//DateTimeExtensions.formatImportDate(model.LoadDate),
+                            LoadNumber = model.LoadNumber,
+                            EffectiveDate = model.EffectiveDate,//DateTimeExtensions.formatImportDate(model.EffectiveDate),
+                            NotifyeDate = model.NotifyeDate,//DateTimeExtensions.formatImportDate(model.NotifyeDate),
+                            AccountNumber = model.AccountNumber,
+                            ClientDescription = model.ClientDescription,
+                            DeliveryNote = model.DeliveryNote,
+                            ReferenceNumber = model.ReferenceNumber,
+                            ReceiverNumber = model.ReceiverNumber,
+                            Equipment = model.Equipment,
+                            OriginalQuantity = model.OriginalQuantity,
+                            NewQuantity = model.NewQuantity,
+                            RetQuantity = model.RetQuantity,
+                            //ReconcileDate = model.ReconcileDate,
+                            //ReconcileInvoice = model.ReconcileInvoice,
+                            PODNumber = model.PODNumber,
+                            PCNNumber = model.PCNNumber,
+                            PRNNumber = model.PRNNumber,
+                            ARPMComments = model.ARPMComments,
+                            ProvCode = model.ProvCode,
+                            Status = (int)Status.Active,
+                            CreatedOn = DateTime.Now,
+                            ModifiedOn = DateTime.Now,
+                            ModifiedBy = CurrentUser.Email
+                        };
+                        gService.Create(clientload);
+                        #endregion
 
-                    scope.Complete();
+                        scope.Complete();
+                    }
+
+                    Notify("The item was successfully created.", NotificationType.Success);
+                    return RedirectToAction("ClientData");
+                } else
+                {
+                    ViewBag.Message = "No Client Accounted for";
+                    return View();
                 }
-
-                Notify("The item was successfully created.", NotificationType.Success);
-                return RedirectToAction("ClientData");
             }
             catch (Exception ex)
             {
@@ -526,10 +536,10 @@ namespace ACT.UI.Controllers
                         load.ClientId = model.ClientId;
                         load.VehicleId = model.VehicleId;
                         load.TransporterId = model.TransporterId;
-                        load.LoadDate = model.LoadDate;
+                    load.LoadDate = model.LoadDate;// DateTimeExtensions.formatImportDate(model.LoadDate);
                         load.LoadNumber = model.LoadNumber;
-                        load.EffectiveDate = model.EffectiveDate;
-                        load.NotifyeDate = model.NotifyeDate;
+                    load.EffectiveDate = model.EffectiveDate;// DateTimeExtensions.formatImportDate(model.EffectiveDate);
+                    load.NotifyeDate = model.NotifyeDate;// DateTimeExtensions.formatImportDate(model.NotifyeDate);
                         load.AccountNumber = model.AccountNumber;
                         load.ClientDescription = model.ClientDescription;
                         load.DeliveryNote = model.DeliveryNote;
@@ -731,20 +741,16 @@ namespace ACT.UI.Controllers
 
         //-------------------------------------------------------------------------------------
 
+    
         #region Pallet GenerateDeliveryNote
         //
         // GET: /Pallet/GenerateDeliveryNote
-        public ActionResult GenerateDeliveryNote(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        public ActionResult GenerateDeliveryNote()
         {
-            if (givecsm)
-            {
-                ViewBag.ViewName = "GenerateDeliveryNote";
-
-                return PartialView("_GenerateDeliveryNoteCustomSearch", new CustomSearchModel("GenerateDeliveryNote"));
-            }
-            ViewBag.ViewName = "GenerateDeliveryNote";
+            DeliveryNoteViewModel model = new DeliveryNoteViewModel();
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            model.ClientId = clientId;
             ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
            // model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
             List<Client> clientList = new List<Client>();
@@ -762,9 +768,64 @@ namespace ACT.UI.Controllers
             });
             ViewBag.ClientList = clientDDL;
 
-            return PartialView("_GenerateDeliveryNote");
+            return PartialView("_GenerateDeliveryNote", model);
         }
+
+        // POST: Pallet/GenerateDeliveryNote
+        //[HttpPost]
+        //[Requires(PermissionTo.Create)]
+        //public ActionResult GenerateDeliveryNote(DeliveryNoteViewModel model)
+        //{
+        //    try
+        //    {
+        //        if (!ModelState.IsValid)
+        //        {
+        //            Notify("Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error);
+
+        //            return View(model);
+        //        }
+
+        //        //using (ChepLoadService gService = new ChepLoadService())
+        //        //using (TransactionScope scope = new TransactionScope())
+        //        //{
+        //        //    #region Create ClientLoadCustomModel
+        //        //    ChepLoad clientload = new ChepLoad()
+        //        //    {
+        //        //        LoadDate = model.LoadDate,
+        //        //        EffectiveDate = model.EffectiveDate,
+        //        //        NotifyDate = model.NotifyDate,
+        //        //        AccountNumber = model.AccountNumber,
+        //        //        ClientDescription = model.ClientDescription,
+        //        //        DeliveryNote = model.DeliveryNote,
+        //        //        ReferenceNumber = model.ReferenceNumber,
+        //        //        ReceiverNumber = model.ReceiverNumber,
+        //        //        Equipment = model.Equipment,
+        //        //        OriginalQuantity = model.OriginalQuantity,
+        //        //        NewQuantity = model.NewQuantity,
+        //        //        Status = (int)Status.Active,
+        //        //        CreatedOn = DateTime.Now,
+        //        //        ModfiedOn = DateTime.Now,
+        //        //        ModifiedBy = CurrentUser.Email
+        //        //    };
+        //        //    gService.Create(clientload);
+        //        //    #endregion
+
+        //        //    scope.Complete();
+        //        //}
+
+        //        Notify("The item was successfully created.", NotificationType.Success);
+        //        return RedirectToAction("ClientData");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ViewBag.Message = ex.Message;
+        //        return View();
+        //    }
+        //}
+
+
         #endregion
+
 
         //-------------------------------------------------------------------------------------
 
@@ -836,43 +897,30 @@ namespace ACT.UI.Controllers
             }
         }
 
-
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult SetSite(string SiteId)
+        public JsonResult GetVehiclesForTransporter(string transId)
         {
-            if (SiteId != null)
+            if (transId != null && transId != "")
             {
-                Session["SiteId"] = SiteId;
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult SetClientSite(string SiteId)
-        {
-            if (SiteId != null)
-            {
-                int clientId = 0;
-                if (int.Parse(SiteId) > 0)
+                List<Vehicle> sites = null;
+                using (VehicleService service = new VehicleService())
                 {
-                    using (SiteService service = new SiteService())
-                    {
-                        clientId = service.GetClientBySite(int.Parse(SiteId));
-                    }
-                    Session["ClientId"] = clientId;
+
+                    sites = service.ListByColumnsWhere("ObjectId", int.Parse(transId), "ObjectType", "Transporter");
+
                 }
-                Session["SiteId"] = SiteId;
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+                //var jsonList = JsonConvert.SerializeObject(sites);
+                //return Json(sites, JsonRequestBehavior.AllowGet);
+                var data = JsonConvert.SerializeObject(sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+                return Json(new { data = data }, JsonRequestBehavior.AllowGet);
             }
             else
             {
                 return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
             }
         }
+
+
 
         #endregion
 
@@ -940,6 +988,7 @@ namespace ACT.UI.Controllers
                             }              
                             catch (Exception ex)
                             {
+                                importMessage += ex.Message + "<br>";
                                 ViewBag.Message = ex.Message;
                             }
                             cnt++;
@@ -953,6 +1002,7 @@ namespace ACT.UI.Controllers
                 }
                 catch (Exception ex)
                 {
+                    importMessage += ex.Message + "<br>";
                     ViewBag.Message = ex.Message;
                 }
                 finally
@@ -964,6 +1014,7 @@ namespace ACT.UI.Controllers
             {
 
             }
+            Session["ImportMessage"] = importMessage;
             return RedirectToAction("PoolingAgentData", "Pallet");
         }
 
@@ -1000,7 +1051,9 @@ namespace ACT.UI.Controllers
                         //Loop through the records
                         while (!sreader.EndOfStream)
                         {
-                            string[] rows = sreader.ReadLine().Split(',');
+                            try
+                            {
+                                string[] rows = sreader.ReadLine().Split(',');
 
                             ClientLoad model = new ClientLoad();
                             int vehicleId = 0;
@@ -1028,7 +1081,7 @@ namespace ACT.UI.Controllers
                                     }
                                 }
                             }
-                            if (!string.IsNullOrEmpty(rows[0]))
+                            if (!string.IsNullOrEmpty(rows[0]) && vehicleId > 0 && transporterId > 0)
                             {
                                 model.ClientId = clientID;
                                 model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[0]) : DateTime.Now);
@@ -1044,25 +1097,37 @@ namespace ACT.UI.Controllers
                                 //model.RetQuantity = decimal.Parse(rows[9]);
                                 model.ARPMComments = rows[10];
                                 //some of the columns are malaligned but leaving it as is, I added 3 new columns
-                                model.VehicleId = vehicleId;
-                                model.TransporterId = transporterId;
+                                if (vehicleId>0)
+                                    model.VehicleId = vehicleId;
+                                if (transporterId > 0)
+                                    model.TransporterId = transporterId;
                                 model.CreatedOn = DateTime.Now;
                                 model.ModifiedOn = DateTime.Now;
                                 service.Create(model);
                                 importMessage += " Customer: " + model.ClientDescription + " created at Id " + model.Id + "<br>";
                                 cntCreated++;
+                            } else
+                                {
+
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                importMessage += ex.Message + "<br>";
+                                ViewBag.Message = ex.Message;
                             }
                             cnt++;
                         }
                         importMessage += " Records To Process: " + cnt + "<br>";
                         importMessage += " Records Processed: " + cntCreated + "<br>";
                         scope.Complete();
-                        Session["ImportMessage"] = importMessage;
+                        
                     }
 
                 }
                 catch (Exception ex)
                 {
+                    importMessage += ex.Message + "<br>";
                     ViewBag.Message = ex.Message;
                 }
                 finally
@@ -1074,6 +1139,7 @@ namespace ACT.UI.Controllers
             {
 
             }
+            Session["ImportMessage"] = importMessage;
             return RedirectToAction("ClientData", "Pallet");
         }
 
