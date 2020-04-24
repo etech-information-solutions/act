@@ -30,14 +30,14 @@
             </li>
         }
 
-        @if ( User.Has( PermissionTo.View, PermissionContext.DashBoard ) )
+        @*@if ( User.Has( PermissionTo.View, PermissionContext.DashBoard ) )
         {
             <li class="@(controller.ToLower().Equals( "dashboard" ) ? "current" : "")" data-hot-spot="1" data-c="DashBoard" data-t="">
                 <a rel="tipsyW" title="DashBoard" href="@Url.Action( "Index", "DashBoard" )">
                     <span>Dashboard</span>
                 </a>
             </li>
-        }
+        }*@
 
         @if ( User.Has( PermissionTo.View, PermissionContext.Client ) )
         {
@@ -66,27 +66,6 @@
                 </a>
             </li>
         }
-
-        @*@if ( User.Has( PermissionTo.View, PermissionContext.Customer ) )
-        {
-            <li data-hot-spot="1" data-c="Customer" data-t="" class="@(controller.ToLower().Equals( "customer" ) ? "current" : "")">
-                <a rel="tipsyW" title="Customers" href="@Url.Action( "Index", "Customer" )">
-                    <span>Customers</span>
-                </a>
-            </li>
-        }
-
-        @if ( User.Has( PermissionTo.View, PermissionContext.Product ) )
-        {
-            <li data-hot-spot="1" data-c="Product" data-t="" class="@(controller.ToLower().Equals( "product" ) ? "current" : "")">
-                <a rel="tipsyW" title="Products" href="@Url.Action( "Index", "Product" )">
-                    <span>Products</span>
-                </a>
-            </li>
-        }
-
-
-        *@
 
         @if ( User.Has( PermissionTo.View, PermissionContext.Administration ) )
         {
