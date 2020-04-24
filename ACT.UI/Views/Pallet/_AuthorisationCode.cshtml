@@ -1,0 +1,104 @@
+﻿@model PagingExtension
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
+@using ACT.UI.Models;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_AuthorisationCode";
+}
+
+
+@Html.Partial("_Notification")
+
+
+@{
+    UserModel user = User.Get();
+
+    Int32 count = Model.Start;
+    //List<PADViewModel> items = (List<PADViewModel>)Model.Items;
+
+    //PADService cservice = new PADService();
+
+
+}
+
+
+@*@if (Model == null || !items.Any())
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no PADs available matching your search criteria.
+    </div>
+}*@
+
+@*@if (user.IsAdmin || user.IsPSPAdmin)
+{
+    <p>
+        @Html.ActionLink("Add", "AddPAD", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new PAD?", @data_edit = "1", @data_id = 0, @data_target = "#PADlist" })
+        <span class="loader"></span>
+    </p>
+}*@
+
+<button id="custexc" name="custexc">Generate Authorisation Code</button>
+
+    <table id="PADlist-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#PADlist-table_wrapper" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th>
+                    Load Number
+                </th>
+                <th>
+                    Authorisation Code Date
+                </th>
+                <th>
+                    Docket #
+                </th>
+                <th>
+                    Transporter
+                </th>
+                <th>
+                    Authorisation Code
+                </th>               
+                <th data-name="Actions">
+                    Actions
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @*@if (Model != null && items != null && items.Count() > 0)
+            {
+                foreach (var item in items)
+                {
+                    Status status = (Status)item.Status;
+
+                    String active = status.Equals(Status.Active) ? "active" : "inactive";
+                    String enable = status.Equals(Status.Active) ? "Disable" : "Enable";*@
+ 
+
+            @*<tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
+                <td width="1%">
+                    @item.Id
+                </td>
+                <td style="width: 15%;">
+                    @item.CompanyName
+                </td>
+
+        
+
+            </tr>*@
+
+                    @*count++;
+                }
+            }*@
+        </tbody>
+
+    </table>
+@Html.Partial("_Paging")

@@ -25,7 +25,7 @@ else
 @using (Html.BeginForm("GenerateDeliveryNote", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#generatedeliverynote", @class = "custom-validate", @style = "width: auto;" }))
 {
     <div id="edit-item">
-        @Html.HiddenFor(model => model.ClientId)
+        @*@Html.HiddenFor(model => model.ClientId)*@
 
         @Html.ValidationSummary(true)
 
@@ -272,14 +272,14 @@ else
         $(document).ready(function () {
             var client = $('#ClientId').val();  
             var context = $("#context").val();
-            if (contextsite == "1") {
+            if (context == "1") {
                 GetClientAddress(client);
             }
 
         });
 
         function ClientListChanged() {
-            //debugger;
+           // debugger;
             var client = $('#ClientId').val();
             //GetClientDetail(client);
             GetClientAddress(client);
@@ -295,8 +295,63 @@ else
                 contentType: "application/json;charset=utf-8",
                 dataType: "json",
                 success: function (data) {
-                    debugger;
-                    //$('#TradingAs').val(data.TradingAs);
+                    //debugger;
+                    $('#CustomerAddress').val(data.Addressline1);
+                    $('#CustomerAddress2').val(data.Addressline2);
+                    $('#CustomerAddressTown').val(data.Town);
+                    //$('#CustomerAddressProvince').val(data.CustomerAddress);
+                    $('#CustomerPostalCode').val(data.PostalCode);
+
+                    document.getElementById("CustomerProvince").options.length = 0;
+                    var opt = document.createElement("option");
+                    var val = "";
+                    var idx = 0;
+                    switch (data.Province) {
+                        case 0:
+                            idx = 0;
+                            val = "Eastern Cape";
+                            break;
+                        case 1:
+                            idx = 1;
+                            val = "Free State";
+                            break;
+                        case 2:
+                            val = "Gauteng";
+                            idx = 2;
+                            break;
+                        case 3:
+                            idx = 3;
+                            val = "KwaZulu-Natal";
+                            break;
+                        case 4:
+                            idx = 4;
+                            val = "Limpopo";
+                            break;
+                        case 5:
+                            idx = 5;
+                            val = "Mpumalanga";
+                            break;
+                        case 6:
+                            idx = 6;
+                            val = "Northern Cape";
+                            break;
+                        case 7:
+                            idx = 7;
+                            val = "North West";
+                            break;
+                        case 8:
+                            idx = 8;
+                            val = "Western Cape";
+                            break;
+                        default:
+                        // code block
+                    }
+
+                  // debugger;
+                    opt.text = val;
+                    opt.value = idx;
+                    document.getElementById("CustomerProvince").options.add(opt);
+
                 },
                 error: function (response) {
                     alert('Error Retrieving Address Detail');
@@ -341,6 +396,29 @@ else
             postal_code: 'short_name'
         };
         var componentFormFields = {
+            street_number: 'Address_AddressLine1',
+            route: 'Address_AddressLine1',
+            locality: 'Address_Town',
+            sublocality_level_1: 'Address_AddressLine2',
+            sublocality_level_2: 'Address_AddressLine2',
+            administrative_area_level_2: 'Address_Province',
+            administrative_area_level_1: 'Address_Province',
+            //country: 'long_name',
+            postal_code: 'Address_PostCode'
+        };
+
+        var componentFormInvoice = {
+            street_number: 'short_name',
+            route: 'long_name',
+            sublocality_level_1: 'long_name',
+            sublocality_level_2: 'long_name',
+            locality: 'long_name',
+            administrative_area_level_2: 'long_name',
+            administrative_area_level_1: 'long_name',
+            //country: 'long_name',
+            postal_code: 'short_name'
+        };
+        var componentFormFieldsInvoice = {
             street_number: 'Address_AddressLine1',
             route: 'Address_AddressLine1',
             locality: 'Address_Town',

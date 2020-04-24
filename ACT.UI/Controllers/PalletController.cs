@@ -43,6 +43,9 @@ namespace ACT.UI.Controllers
             {
                 ViewBag.Message = msg;
                 Notify(msg, NotificationType.Success);
+
+                //clear the message for next time
+                Session["ImportMessage"] = null;
             }
            
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
@@ -296,6 +299,9 @@ namespace ACT.UI.Controllers
             {
                 ViewBag.Message = msg;
                 Notify(msg, NotificationType.Success);
+
+                //clear the message for next time
+                Session["ImportMessage"] = null;
             }
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
@@ -1081,34 +1087,39 @@ namespace ACT.UI.Controllers
                                     }
                                 }
                             }
-                            if (!string.IsNullOrEmpty(rows[0]) && vehicleId > 0 && transporterId > 0)
+                            if (!string.IsNullOrEmpty(rows[0]))
                             {
-                                model.ClientId = clientID;
-                                model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[0]) : DateTime.Now);
-                                model.LoadNumber = rows[1];
-                                model.AccountNumber = rows[2];                                
-                                model.ClientDescription = rows[3];
-                                model.ProvCode = rows[4];
-                                model.PCNNumber = rows[5];
-                                model.DeliveryNote = rows[6];
-                                //model.PRNNumber = rows[7];
-                                model.OriginalQuantity = (Decimal.TryParse(rows[7], out decimal oQty) ? oQty : 0);
-                                model.RetQuantity = (Decimal.TryParse(rows[8], out decimal rQty) ? rQty : 0);
-                                //model.RetQuantity = decimal.Parse(rows[9]);
-                                model.ARPMComments = rows[10];
-                                //some of the columns are malaligned but leaving it as is, I added 3 new columns
-                                if (vehicleId>0)
-                                    model.VehicleId = vehicleId;
-                                if (transporterId > 0)
-                                    model.TransporterId = transporterId;
-                                model.CreatedOn = DateTime.Now;
-                                model.ModifiedOn = DateTime.Now;
-                                service.Create(model);
-                                importMessage += " Customer: " + model.ClientDescription + " created at Id " + model.Id + "<br>";
-                                cntCreated++;
-                            } else
+                                    if (vehicleId > 0 && transporterId > 0) { 
+                                        model.ClientId = clientID;
+                                        model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[0]) : DateTime.Now);
+                                        model.LoadNumber = rows[1];
+                                        model.AccountNumber = rows[2];                                
+                                        model.ClientDescription = rows[3];
+                                        model.ProvCode = rows[4];
+                                        model.PCNNumber = rows[5];
+                                        model.DeliveryNote = rows[6];
+                                        //model.PRNNumber = rows[7];
+                                        model.OriginalQuantity = (Decimal.TryParse(rows[7], out decimal oQty) ? oQty : 0);
+                                        model.RetQuantity = (Decimal.TryParse(rows[8], out decimal rQty) ? rQty : 0);
+                                        //model.RetQuantity = decimal.Parse(rows[9]);
+                                        model.ARPMComments = rows[10];
+                                        //some of the columns are malaligned but leaving it as is, I added 3 new columns
+                                        if (vehicleId>0)
+                                            model.VehicleId = vehicleId;
+                                        if (transporterId > 0)
+                                            model.TransporterId = transporterId;
+                                        model.CreatedOn = DateTime.Now;
+                                        model.ModifiedOn = DateTime.Now;
+                                        service.Create(model);
+                                        importMessage += " Customer: " + model.ClientDescription + " created at Id " + model.Id + "<br>";
+                                        cntCreated++;
+                                    } else {
+                                        importMessage += " File Row : " + cnt + " could not be inserted, no Vehicle or Transporter that matches. Skipped<br>";
+                                    }
+                                }
+                                else
                                 {
-
+                                    importMessage += " File Row : " + cnt + " could not be inserted. Check Data<br>";
                                 }
                             }
                             catch (Exception ex)
@@ -1121,7 +1132,7 @@ namespace ACT.UI.Controllers
                         importMessage += " Records To Process: " + cnt + "<br>";
                         importMessage += " Records Processed: " + cntCreated + "<br>";
                         scope.Complete();
-                        
+                        Session["ImportMessage"] = importMessage;
                     }
 
                 }
