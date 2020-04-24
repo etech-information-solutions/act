@@ -394,7 +394,7 @@
             var cId = $("#Id").val();
             LoadBudgets(cId);
             $(".budgets").hide();
-            populateDocs(cId, "client");
+            populateDocs(cId, "Client");
 
             $(document).on('change', '#companyfile', function () {
                 var name = document.getElementById("companyfile").files[0].name;
@@ -425,7 +425,7 @@
                         },
                         success: function (data) {
                             //$('#uploaded_file').html(data);
-                            populateDocs(cId, "client");
+                            populateDocs(cId, "Client");
                             $('#uploaded_file').html("<label class='text-success'></label>");
                         }
                     });
@@ -437,7 +437,7 @@
 
             $.ajax({
 
-                url: '@Url.Action("CompanyFiles", "Client")',
+                url: '@Url.Action("ListFiles", "Client")',
                 type: "GET",
                 dataType: "html",
                 data: { objId: id, objType:doctype },//this is as per your requirement

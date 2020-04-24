@@ -282,6 +282,10 @@
           <Property Name="PCNNumber" Type="varchar" MaxLength="50" />
           <Property Name="PRNNumber" Type="varchar" MaxLength="50" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="TransporterId" Type="int" Nullable="true" />
+          <Property Name="RetQuantity" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="ARPMComments" Type="varchar" MaxLength="150" />
+          <Property Name="ProvCode" Type="varchar" MaxLength="30" />       
         </EntityType>
         <EntityType Name="ClientProduct">
           <Key>
@@ -708,6 +712,10 @@
           <Property Name="ReceivingManagerEmail" Type="varchar" MaxLength="50" />
           <Property Name="OpsManagerEmail" Type="varchar" MaxLength="50" />
           <Property Name="AdminManagerEmail" Type="varchar" MaxLength="50" />
+          <Property Name="ImportEmailHost" Type="varchar" MaxLength="100" />
+          <Property Name="ImportEmailUsername" Type="varchar" MaxLength="100" />
+          <Property Name="ImportEmailPassword" Type="varchar" MaxLength="50" />
+          <Property Name="ImportEmailPort" Type="varchar" MaxLength="10" />
         </EntityType>
         <EntityType Name="PSPProduct">
           <Key>
@@ -2652,6 +2660,10 @@
           <Property Name="PCNNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="PRNNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="TransporterId" Type="Int32" Nullable="true" />
+          <Property Name="RetQuantity" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="ARPMComments" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="ProvCode" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="ChepClients" Relationship="ACTModel.FK_ChepClients_ClientLoads" FromRole="ClientLoad" ToRole="ChepClient" />
           <NavigationProperty Name="ChepClient" Relationship="ACTModel.FK_ClientLoads_ChepClients" FromRole="ClientLoad" ToRole="ChepClient" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientLoads_Clients" FromRole="ClientLoad" ToRole="Client" />
@@ -3101,6 +3113,10 @@
           <Property Name="ReceivingManagerEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="OpsManagerEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="AdminManagerEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ImportEmailHost" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ImportEmailUsername" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ImportEmailPassword" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ImportEmailPort" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPConfigs_PSP" FromRole="PSPConfig" ToRole="PSP" />
         </EntityType>
         <EntityType Name="PSPProduct">
@@ -4481,6 +4497,10 @@
           <EntitySetMapping Name="ClientLoads">
             <EntityTypeMapping TypeName="ACTModel.ClientLoad">
               <MappingFragment StoreEntitySet="ClientLoad">
+                <ScalarProperty Name="ProvCode" ColumnName="ProvCode" />
+                <ScalarProperty Name="ARPMComments" ColumnName="ARPMComments" />
+                <ScalarProperty Name="RetQuantity" ColumnName="RetQuantity" />
+                <ScalarProperty Name="TransporterId" ColumnName="TransporterId" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="PRNNumber" ColumnName="PRNNumber" />
                 <ScalarProperty Name="PCNNumber" ColumnName="PCNNumber" />
@@ -4914,6 +4934,10 @@
           <EntitySetMapping Name="PSPConfigs">
             <EntityTypeMapping TypeName="ACTModel.PSPConfig">
               <MappingFragment StoreEntitySet="PSPConfig">
+                <ScalarProperty Name="ImportEmailPort" ColumnName="ImportEmailPort" />
+                <ScalarProperty Name="ImportEmailPassword" ColumnName="ImportEmailPassword" />
+                <ScalarProperty Name="ImportEmailUsername" ColumnName="ImportEmailUsername" />
+                <ScalarProperty Name="ImportEmailHost" ColumnName="ImportEmailHost" />
                 <ScalarProperty Name="AdminManagerEmail" ColumnName="AdminManagerEmail" />
                 <ScalarProperty Name="OpsManagerEmail" ColumnName="OpsManagerEmail" />
                 <ScalarProperty Name="ReceivingManagerEmail" ColumnName="ReceivingManagerEmail" />

@@ -1,157 +1,469 @@
-﻿@model PagingExtension
+﻿@model DeliveryNoteViewModel
 
-@using ACT.Data.Models;
-@using ACT.Core.Enums;
-@using ACT.Core.Models;
-@using ACT.Core.Models.Custom;
-@using ACT.Core.Services;
 @using ACT.UI.Models;
+@using ACT.Core.Enums;
 
 @{
-    ViewBag.ShowExport = true;
-    ViewBag.ShowCustom = true;
+    if (ViewBag.IncludeLayout == null)
+    {
+        Layout = null;
+    }
 
-    ViewBag.ViewName = "_PADList";
+    ViewBag.Title = "Generate Delivery Note";
 }
 
 
 @Html.Partial("_Notification")
-
-
-@{
-    UserModel user = User.Get();
-
-    Int32 count = Model.Start;
-    //List<PADViewModel> items = (List<PADViewModel>)Model.Items;
-
-    //PADService cservice = new PADService();
-
-
-}
-
-
-@*@if (Model == null || !items.Any())
+@if (ViewBag.ContextualMode)
 {
-    <div class="notification message-warn" style="margin-bottom: 20px;">
-        There are no PADs available matching your search criteria.
-    </div>
-}*@
-
-@if (user.IsAdmin || user.IsPSPAdmin)
-{
-    <p>
-        @Html.ActionLink("Add", "AddPAD", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new PAD?", @data_edit = "1", @data_id = 0, @data_target = "#PADlist" })
-        <span class="loader"></span>
-    </p>
+    <input type="hidden" id="context" name="context" value="1" />
 }
+else
+{
+    <input type="hidden" id="context" name="context" value="0" />
+}
+@using (Html.BeginForm("GenerateDeliveryNote", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#generatedeliverynote", @class = "custom-validate", @style = "width: auto;" }))
+{
+    <div id="edit-item">
+        @Html.HiddenFor(model => model.ClientId)
 
+        @Html.ValidationSummary(true)
 
-    <table id="PADlist-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#PADlist-table_wrapper" data-starting-point=".ap-tabs ul">
-        <thead>
-            <tr>
-                <th>
-                    Status
-                </th>
-                <th>
-                    Pooling Agent
-                </th>
-                <th>
-                    Load Data
-                </th>
-                <th>
-                    Eff Date
-                </th>
-                <th>
-                    Del Note
-                </th>
-                <th>
-                    Cust #
-                </th>
-                <th>
-                    Product
-                </th>
-                <th>
-                   Shipment No
-                </th>
-                <th>
-                    Issue note
-                </th>
-                <th>
-                    PCN
-                </th>
-                <th>
-                    THAN
-                </th>
-                <th>
-                    Qty
-                </th>
-                @*<th>
-                    Del Note
-                </th>*@
-                <th data-name="Actions">
-                    Actions
-                </th>
-            </tr>
-        </thead>
+        <div id="item-details" class="item-details" style="width: auto;">
+            <div class="left" style="width: 50%; margin-right: 2%;">
+                <div class="editor-label">
+                    Order Date
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.OrderDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
+                    @Html.ValidationMessageFor(model => model.OrderDate)
+                </div>
 
-        <tbody>
-            @*@if (Model != null && items != null && items.Count() > 0)
-            {
-                foreach (var item in items)
+                <div class="editor-label ">
+                    Order Number
+                </div>
+
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.OrderNumber, new { @class = "input", @placeholder = "Please Complete" })
+                    @Html.ValidationMessageFor(model => model.OrderNumber)
+                </div>
+
+                <div class="editor-label ">
+                    Delivery Note Number
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.InvoiceNumber, new { @class = "input", @placeholder = "Please Complete" })
+                    @Html.ValidationMessageFor(model => model.InvoiceNumber)
+                </div>
+            </div>
+
+            <div class="left" style="width: 45%;">
+
+                <div class="editor-label">
+                    Cutomer Name
+                </div>
+                <div class="editor-field">
+                    @*@if (ViewBag.ContextualMode)
                 {
-                    Status status = (Status)item.Status;
-
-                    String active = status.Equals(Status.Active) ? "active" : "inactive";
-                    String enable = status.Equals(Status.Active) ? "Disable" : "Enable";*@
- 
-
-            @*<tr id="tr-@item.Id-item" class="tr-@item.Id-item">
-
-                <td width="1%">
-                    @item.Id
-                </td>
-                <td style="width: 15%;">
-                    @item.CompanyName
-                </td>
-
-          
-
-                <td width="15%">*@
-                    @*@Html.ActionLink("Details", "PADDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-
-                    @Html.ActionLink("Edit", "EditPAD", new { id = item.Id, returnView = "PADList" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-
-                    @Html.ActionLink(enable, "DeletePAD", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#PADlist", @rel = "tipsyE", @title = enable + " this item?" })*@
-                    @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
-
-                        @if (item.CompanyFile != null && item.CompanyFile.Any(s => s.Status == (Int32)Status.Active))
-                        {
-                            <a class="docs" data-sticky-one="1" data-target="#supporting-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Supporting Documents">
-                                Docs
-                            </a>
-                            <div id="supporting-@item.Id-docs" class="none">
-                                <ul class="list">
-                                    @foreach (var d in item.CompanyFile.Where(s => s.Status == (Int32)Status.Active))
-                                    {
-                                        <li style="line-height: 20px;">
-                                            <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "PAD", new { @id = d.Id } )" target="_blank">
-                                                @d.Name (@d.Type)
-                                            </a>
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
-                        }
-                        </div>*@
-                @*</td>
-
-
-            </tr>*@
-
-                    @*count++;
+                    @Html.DropDownList("ClientList")
                 }
-            }*@
-        </tbody>
+                else
+                {
+                    @Html.DropDownList("ClientList", "All Clients")
+                }*@
+                    @Html.DropDownListFor(model => model.ClientId,
+                               new SelectList(ViewBag.ClientList, "Value", "Text"),
+                               "Please Select",
+                               new { @class = "form-control", @onchange= "ClientListChanged()" })
+                </div>
 
-    </table>
-@Html.Partial("_Paging")
+                <div class="editor-label">
+                    Customer Address
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.CustomerAddress, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
+                    @Html.ValidationMessageFor(model => model.CustomerAddress)
+                    @Html.TextBoxFor(model => model.CustomerAddress2, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Suburb/Area " })
+                    @Html.ValidationMessageFor(model => model.CustomerAddress2)
+
+                </div>
+
+                <div class="editor-label">
+                    Town/City
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.CustomerAddressTown, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
+                    @Html.ValidationMessageFor(model => model.CustomerAddressTown)
+                </div>
+
+                <div class="editor-label">
+                    Postal Code
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.CustomerPostalCode, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Postal Code" })
+                    @Html.ValidationMessageFor(model => model.CustomerPostalCode)
+                </div>
+                <div class="editor-label">
+                    Province
+                </div>
+                <div class="editor-field">
+                    <select id="CustomerProvince" name="CustomerProvince" required="required" style="width: 100%;">
+                        <option value="">-- select</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="clear" style="height: 10px;">&nbsp;</div>
+
+
+            <div class="left" style="width: 48%; margin-right: 4%;">
+                <h3>Shipping Address</h3>
+
+                <div id="locationFieldShipping">
+                    Type your address below:
+                    <input id="autocomplete"
+                           placeholder="Enter your address"
+                           onFocus="geolocate()"
+                           type="text" />
+                </div>
+
+                <div class="editor-label">
+                    Customer Address
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.DeliveryAddress, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
+                    @Html.ValidationMessageFor(model => model.DeliveryAddress)
+                    @Html.TextBoxFor(model => model.DeliveryAddress2, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Suburb/Area " })
+                    @Html.ValidationMessageFor(model => model.DeliveryAddress2)
+
+                </div>
+
+                <div class="editor-label">
+                    Town/City
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.DeliveryAddressTown, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
+                    @Html.ValidationMessageFor(model => model.DeliveryAddressTown)
+                </div>
+
+                <div class="editor-label">
+                    Postal Code
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.DeliveryPostalCode, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Postal Code" })
+                    @Html.ValidationMessageFor(model => model.DeliveryPostalCode)
+                </div>
+                <div class="editor-label">
+                    Province
+                </div>
+                <div class="editor-field">
+                    <select id="DeliveryProvince" name="DeliveryProvince" required="required" style="width: 100%;">
+                        <option value="">-- select</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="left" style="width: 48%;">
+                <h3>Invoice Address&nbsp;</h3><input type="checkbox" id="sameasshipping" name="sameasshipping" value="1" /> Same as Shipping Address
+
+                <div id="locationFieldInvoice">
+                    Type your address below:
+                    <input id="autocompleteInvoice"
+                           placeholder="Enter your address"
+                           onFocus="geolocate()"
+                           type="text" />
+                </div>
+
+                <div class="editor-label">
+                    Customer Address
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.BillingAddress, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
+                    @Html.ValidationMessageFor(model => model.BillingAddress)
+                    @Html.TextBoxFor(model => model.BillingAddress2, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Suburb/Area " })
+                    @Html.ValidationMessageFor(model => model.BillingAddress2)
+
+                </div>
+
+                <div class="editor-label">
+                    Town/City
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.BillingAddressTown, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
+                    @Html.ValidationMessageFor(model => model.BillingAddressTown)
+                </div>
+
+                <div class="editor-label">
+                    Postal Code
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.BillingPostalCode, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Postal Code" })
+                    @Html.ValidationMessageFor(model => model.BillingPostalCode)
+                </div>
+                <div class="editor-label">
+                    Province
+                </div>
+                <div class="editor-field">
+                    <select id="BillingProvince" name="BillingProvince" required="required" style="width: 100%;">
+                        <option value="">-- select</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="clear" style="height: 10px;">&nbsp;</div>
+
+            <table id="deliverynotelines-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsexcluded-table_wrapper" data-starting-point=".ap-tabs ul">
+                <thead>
+                    <tr>
+                        <th style="width:15%;">
+                            Product
+                        </th>
+                        <th style="width:25%;">
+                            Description
+                        </th>
+                        <th style="width:15%;">
+                            Ordered
+                        </th>
+                        <th style="width:15%;">
+                            Delivered
+                        </th>
+                        <th style="width:15%;">
+                            Outstanding
+                        </th>
+                        <th data-name="Actions" style="width:5%;">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody id="deliverynotelinesdata"></tbody>
+
+            </table>
+
+
+            <div class="clear" style="height: 10px;">&nbsp;</div>
+
+            <div class="left" style="width: 48%; margin-right: 4%;">
+                <p>
+                    <input id="save-btn" type="submit" value="Generate Delivery Note" />
+                    <input id="save-btn" type="submit" value="Reprint Delivery Note" />
+
+                    @*<span style="padding: 0 5px;">/</span>
+
+                    <a data-refresh="1" data-target="#clientdata">Cancel</a>*@
+                </p>
+            </div>
+
+            <div class="left" style="width: 48%;">
+                <input type="email" id="DeliveryEmail" name="DeliveryEmail" placeholder="Enter Email" value="" />
+                <input id="save-btn" type="submit" value="Email Delivery Note" />
+            </div>
+
+
+                <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+            </div>
+
+        </div>
+
+
+    <script>
+        $(document).ready(function () {
+            var client = $('#ClientId').val();  
+            var context = $("#context").val();
+            if (contextsite == "1") {
+                GetClientAddress(client);
+            }
+
+        });
+
+        function ClientListChanged() {
+            //debugger;
+            var client = $('#ClientId').val();
+            //GetClientDetail(client);
+            GetClientAddress(client);
+
+        }
+
+        function GetClientAddress(cId) {
+
+            $.ajax({
+                type: "GET",
+                url: "GetObjectAddress",
+                data: { objectId: cId, objectType: "Client" },
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    debugger;
+                    //$('#TradingAs').val(data.TradingAs);
+                },
+                error: function (response) {
+                    alert('Error Retrieving Address Detail');
+                }
+            });
+
+        }
+
+        //function GetClientDetail(cId) {
+
+        //    var TradingAs = document.getElementById("TradingAs");
+        //    $.ajax({
+        //        type: "GET",
+        //        url: "GetClientDetail",
+        //        data: { clientId: cId },
+        //        contentType: "application/json;charset=utf-8",
+        //        dataType: "json",
+        //        success: function (data) {
+        //            $('#TradingAs').val(data.TradingAs);
+        //        },
+        //        error: function (response) {
+        //            alert('Error Retrieving Client Detail');
+        //        }
+        //    });
+
+        //}
+    </script>
+
+    <script>
+        //The Google Stuff
+        var placeSearch, autocomplete, autocompleteInvoice;
+
+        var componentForm = {
+            street_number: 'short_name',
+            route: 'long_name',
+            sublocality_level_1: 'long_name',
+            sublocality_level_2: 'long_name',
+            locality: 'long_name',
+            administrative_area_level_2: 'long_name',
+            administrative_area_level_1: 'long_name',
+            //country: 'long_name',
+            postal_code: 'short_name'
+        };
+        var componentFormFields = {
+            street_number: 'Address_AddressLine1',
+            route: 'Address_AddressLine1',
+            locality: 'Address_Town',
+            sublocality_level_1: 'Address_AddressLine2',
+            sublocality_level_2: 'Address_AddressLine2',
+            administrative_area_level_2: 'Address_Province',
+            administrative_area_level_1: 'Address_Province',
+            //country: 'long_name',
+            postal_code: 'Address_PostCode'
+        };
+
+
+        function initAutocomplete() {
+            autocomplete = new google.maps.places.Autocomplete(
+                document.getElementById('autocomplete'), { types: ['geocode'] });
+            autocomplete.setFields(['address_component']);
+            autocomplete.addListener('place_changed', fillInAddress);
+
+            autocompleteInvoice = new google.maps.places.Autocomplete(
+                document.getElementById('autocompleteInvoice'), { types: ['geocode'] });
+            autocompleteInvoice.setFields(['address_componentInvoice']);
+            autocompleteInvoice.addListener('place_changed', fillInAddress);
+        }
+
+        function fillInAddress() {
+            var place = autocomplete.getPlace();
+            console.log(place);
+            var fullAddress = "";
+
+            for (var component in componentForm) {
+                document.getElementById(componentFormFields[component]).value = '';
+                document.getElementById(componentFormFields[component]).disabled = false;
+            }
+            for (var i = 0; i < place.address_components.length; i++) {
+                var addressType = place.address_components[i].types[0];
+                if (componentForm[addressType]) {
+                    var val = place.address_components[i][componentForm[addressType]];
+                    if (addressType == "route") {
+                        var streetaddress = document.getElementById("Address_AddressLine1");
+                        document.getElementById("Address_AddressLine1").value = streetaddress.value + " " + val;
+                    } else {
+                        // debugger;
+                        if (addressType == "administrative_area_level_1") {
+                            var idx = -1;
+                            switch (val) {
+                                case "Eastern Cape":
+                                    idx = 0;
+                                    break;
+                                case "Free State":
+                                    idx = 1;
+                                    break;
+                                case "Gauteng":
+                                    idx = 2;
+                                    break;
+                                case "KwaZulu-Natal":
+                                    idx = 3;
+                                    break;
+                                case "Limpopo":
+                                    idx = 4;
+                                    break;
+                                case "Mpumalanga":
+                                    idx = 5;
+                                    break;
+                                case "Northern Cape":
+                                    idx = 67;
+                                    break;
+                                case "North West":
+                                    idx = 7;
+                                    break;
+                                case "Western Cape":
+                                    idx = 8;
+                                    break;
+                                case "Western Cape":
+                                    idx = 8;
+                                    break;
+                                default:
+                                // code block
+                            }
+                            //setSelectedIndex(document.getElementById("Address.Province"), idx);
+                            document.getElementById("Address_Province").options.length = 0;
+                            var opt = document.createElement("option");
+                            opt.text = val;
+                            opt.value = idx;
+                            document.getElementById("Address_Province").options.add(opt);
+                        } else {
+                            document.getElementById(componentFormFields[addressType]).value = val;
+                        }
+                    }
+                }
+                //change for 1st element
+                if (i == 0) {
+                    fullAddress = place.address_components[i].long_name;
+                } else {
+                    fullAddress = fullAddress + "," + place.address_components[i].long_name;
+                }
+                //for elements with Coords, call 2nd API here to locate coords with fulladdress
+
+            }
+            //alert(fullAddress);
+        }
+
+        function geolocate() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var geolocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    var circle = new google.maps.Circle(
+                        { center: geolocation, radius: position.coords.accuracy });
+                    autocomplete.setBounds(circle.getBounds());
+                });
+            }
+        }
+        function setSelectedIndex(s, i) {
+            s.options[i - 1].selected = true;
+
+            return;
+
+        }
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeQFyrVUFUjsQOK_RdtfAC57jMJkc_3Co&libraries=places&callback=initAutocomplete"
+            async defer></script>
+
+}

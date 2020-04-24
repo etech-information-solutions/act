@@ -10,6 +10,7 @@ namespace ACT.Core.Models.Custom
         public int Id { get; set; }
         public int ClientId { get; set; }
         public int VehicleId { get; set; }
+        public int TransporterId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -31,6 +32,11 @@ namespace ACT.Core.Models.Custom
         public string PCNNumber { get; set; }
         public string PRNNumber { get; set; }
         public int Status { get; set; }
+
+        public Nullable<decimal> RetQuantity { get; set; }
+        public string ARPMComments { get; set; }
+        public string ProvCode { get; set; }
+
         public int? DocumentCount { get; set; }
         public List<Document> Documents { get; set; }
 

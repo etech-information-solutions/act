@@ -56,6 +56,9 @@
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="OpenPop, Version=2.0.6.1120, Culture=neutral, PublicKeyToken=6bdb97f144b7efc8, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenPop.NET.2.0.6.1120\lib\net40\OpenPop.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -145,8 +148,6 @@
     <Compile Include="Controllers\DashBoardController.cs" />
     <Compile Include="Models\ClientLoadViewModel.cs" />
     <Compile Include="Models\ChepLoadViewModel.cs" />
-    <Compile Include="Models\ChepAuditViewModel.cs" />
-    <Compile Include="Views\Scaffolded\ClientLoadsController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdministrationController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
@@ -169,6 +170,7 @@
     <Compile Include="Models\ObjectDocumentsViewModel.cs" />
     <Compile Include="Models\ImportFileModel.cs" />
     <Compile Include="Models\GroupViewModel.cs" />
+    <Compile Include="Models\DeliveryNoteViewModel.cs" />
     <Compile Include="Models\SiteViewImportModel.cs" />
     <Compile Include="Models\TransporterViewModel.cs" />
     <Compile Include="Models\SiteViewModel.cs" />
@@ -200,7 +202,6 @@
     <Compile Include="Mvc\RequiresAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\RoleProvider.cs" />
-    <Compile Include="Views\Scaffolded\ChepLoadsController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\ap-tabs.css" />
@@ -556,30 +557,21 @@
     <Content Include="Views\Generic\_ReconcileInvoice.cshtml" />
     <Content Include="Views\Generic\_ReconcileLoads.cshtml" />
     <Content Include="Views\Generic\Index.cshtml" />
-    <Content Include="Views\Scaffolded\ClientLoads\Create.cshtml" />
-    <Content Include="Views\Scaffolded\ClientLoads\Delete.cshtml" />
-    <Content Include="Views\Scaffolded\ClientLoads\Details.cshtml" />
-    <Content Include="Views\Scaffolded\ClientLoads\Edit.cshtml" />
-    <Content Include="Views\Scaffolded\ClientLoads\Index.cshtml" />
-    <Content Include="Views\Scaffolded\ChepLoads\Create.cshtml" />
-    <Content Include="Views\Scaffolded\ChepLoads\Delete.cshtml" />
-    <Content Include="Views\Scaffolded\ChepLoads\Details.cshtml" />
-    <Content Include="Views\Scaffolded\ChepLoads\Edit.cshtml" />
-    <Content Include="Views\Scaffolded\ChepLoads\Index.cshtml" />
     <Content Include="Views\ClientReporting\Index.cshtml" />
     <Content Include="Views\ClientReporting\_Disputes.cshtml" />
     <Content Include="Views\Shared\_DisputesCustomSearch.cshtml" />
-    <Content Include="Views\ClientReporting\DisputeDetails.cshtml" />
-    <Content Include="Views\ClientReporting\_ChepAudit.cshtml" />
-    <Content Include="Views\Shared\_ClientAuditCustomSearch.cshtml" />
-    <Content Include="Views\ClientReporting\AddChepAudit.cshtml" />
-    <Content Include="Views\ClientReporting\ChepAuditDetails.cshtml" />
-    <Content Include="Views\ClientReporting\EditChepAudit.cshtml" />
-    <Content Include="Views\ClientReporting\_ClientAudit.cshtml" />
-    <Content Include="Views\ClientReporting\ClientAuditDetails.cshtml" />
-    <Content Include="Views\Shared\_ChepAuditCustomSearch.cshtml" />
-    <Content Include="Views\ClientReporting\_MovementReport.cshtml" />
-    <Content Include="Views\Shared\_MovementReportCustomSearch.cshtml" />
+    <Content Include="Views\Pallet\AddPoolingAgentData.cshtml" />
+    <Content Include="Views\Pallet\EditPoolingAgentData.cshtml" />
+    <Content Include="Views\Pallet\AddClientData.cshtml" />
+    <Content Include="Views\Pallet\EditClientData.cshtml" />
+    <Content Include="Views\Shared\_PoolingAgentDataCustomSearch.cshtml" />
+    <Content Include="Views\Shared\_ClientDataCustomSearch.cshtml" />
+    <Content Include="Views\Pallet\__AddDeliveryNote.cshtml" />
+    <Content Include="Views\Pallet\DetailsDeliveryNote.cshtml" />
+    <Content Include="Views\Pallet\_EditDeliveryNote.cshtml" />
+    <Content Include="Views\Pallet\IndexDeliveryNote.cshtml" />
+    <Content Include="Views\Pallet\AddDeliveryNote.cshtml" />
+    <Content Include="Views\Pallet\EditDeliveryNote.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
