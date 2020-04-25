@@ -63,19 +63,19 @@ else
                     }
                 </td>
                 <td style="width:2%">
-                    @Html.ActionLink("Add", "AddClientData", new { sourceview = "ClientData" }, new { @class = "add", @rel = "tipsyS", @title = "Import Client Data?", @data_edit = "1", @data_id = 0, @data_target = "#clientdata" })
+                    @Html.ActionLink("Add", "AddClientData", new { sourceview = "ClientData" }, new { @class = "add postedFilecdata", @rel = "tipsyS", @title = "Import Client Data?", @id= "addrowdata", @data_edit = "1", @data_id = 0, @data_target = "#clientdata" })
                 </td>
                 <td style="width:5%">
                     &nbsp;
                 </td>
                 <td style="width:3%">
-                    <label for="file" class="importlabel">Browse:</label>
+                    <label for="file" class="importlabel postedFilecdata">Browse:</label>
                 </td>
                 <td style="width:55%">
-                    <input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" />
+                    <input type="file" class="postedFilecdata" id="postedFile" name="postedFile" class="form-control" accept=".csv" />
                 </td>
                 <td style="width:10%">
-                    <input type="submit" value="Import" class="importbutton" />
+                    <input type="submit" value="Import" class="importbutton postedFilecdata" />
                 </td>
                 <td style="width:7%">
                     <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "clientdatatemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
@@ -250,7 +250,7 @@ else
         //var cId = parseInt($("#ClientListSiteManage").val());
         var context = $("#context").val();
         if (context == "0") {
-            $('.add').hide();
+            $('#addrowdata').hide();
             $('.importlabel').hide();
             $('.importbutton').hide();
             $('#postedFile').hide();
@@ -263,12 +263,12 @@ else
                 if (cId > 0) {
 
 
-                    $('.add').show();
+                    $('#addrowdata').show();
                     $('.importlabel').show();
                     $('.importbutton').show();
                     $('#postedFile').show();
                 } else {
-                    $('.add').hide();
+                    $('#addrowdata').hide();
                     $('.importlabel').hide();
                     $('.importbutton').hide();
                     $('#postedFile').hide();

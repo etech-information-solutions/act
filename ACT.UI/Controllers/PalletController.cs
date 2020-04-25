@@ -380,6 +380,18 @@ namespace ACT.UI.Controllers
                 string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
                 int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
                 ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+                List<Transporter> transporterOptions = new List<Transporter>();
+                using (TransporterService rservice = new TransporterService())
+                {
+                    transporterOptions = rservice.List();
+                }
+                IEnumerable<SelectListItem> transporterOptionsDDL = transporterOptions.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.TradingName
+
+                });
+                ViewBag.TransporterOptions = transporterOptionsDDL;
 
                 if (clientId > 0 || model.ClientId > 0)
                 {
