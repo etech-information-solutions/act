@@ -188,7 +188,7 @@
                     form_data.append("file", document.getElementById('companyfile').files[0]);
                     form_data.append("clientId", $("#Id").val());
                     $.ajax({
-                        url: "Upload?id=" + cId + "&utype=ChepLoad&uname=Load",
+                        url: "Upload?id=" + cId + "&utype=ChepLoad&uname=Agent",
                         method: "POST",
                         data: form_data,
                         contentType: false,
@@ -199,7 +199,7 @@
                         },
                         success: function (data) {
                             //$('#uploaded_file').html(data);
-                            populateDocs(cId, "ClientLoad");
+                            populateDocs(cId, "ChepLoad");
                             $('#uploaded_file').html("<label class='text-success'></label>");
                         }
                     });

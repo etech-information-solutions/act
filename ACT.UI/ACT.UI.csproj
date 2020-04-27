@@ -585,6 +585,7 @@
     <Content Include="Views\Shared\_ClientAuditCustomSearch.cshtml" />
     <Content Include="Views\Shared\_MovementReportCustomSearch.cshtml" />
     <Content Include="Views\Pallet\_AuthorisationCode.cshtml" />
+    <Content Include="Views\Shared\_ListDocumentsTable.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

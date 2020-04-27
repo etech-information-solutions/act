@@ -14,6 +14,7 @@ using System.Web.Mvc;
 using System.Web;
 using Newtonsoft.Json;
 using OpenPop;
+using ACT.Core.Helpers;
 namespace ACT.UI.Controllers
 {
     public class PalletController : BaseController
@@ -78,7 +79,7 @@ namespace ACT.UI.Controllers
                 }
 
                 model = service.ListCSM(pm, csm);
-                        
+                total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total();
             }
             PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
 
@@ -138,7 +139,7 @@ namespace ACT.UI.Controllers
                 }
 
                 Notify("The item was successfully created.", NotificationType.Success);
-                return RedirectToAction("ClientData");
+                return RedirectToAction("AgentPoolingData");
             }
             catch (Exception ex)
             {
@@ -332,7 +333,7 @@ namespace ACT.UI.Controllers
                 }
 
                 model = service.ListCSM(pm, csm);
-
+                total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total();
             }
             PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
 
@@ -890,7 +891,7 @@ namespace ACT.UI.Controllers
 
         //-------------------------------------------------------------------------------------
 
-        #region Pallet Disputes
+        #region Pallet AuthorisationCode
         //
         // GET: /Pallet/AuthorisationCode
         public ActionResult AuthorisationCode(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
@@ -939,24 +940,6 @@ namespace ACT.UI.Controllers
         //-------------------------------------------------------------------------------------
 
         #region APIs
-
-        public JsonResult GetClientDetail(string clientId)
-        {
-            if (clientId != null && clientId != "")
-            {
-                Client client = null;
-
-                using (ClientService bservice = new ClientService())
-                {
-                    client = bservice.GetById(int.Parse(clientId));
-                    return Json(client, JsonRequestBehavior.AllowGet);
-                }
-            }
-            else
-            {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
-            }
-        }
 
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
         public JsonResult GetVehiclesForTransporter(string transId)
@@ -1028,9 +1011,9 @@ namespace ACT.UI.Controllers
 
                                 if (!string.IsNullOrEmpty(rows[0]))
                                 {
-                                    model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[0]) : DateTime.Now);
-                                    model.EffectiveDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[1]) : DateTime.Now);
-                                    model.NotifyDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[2]) : DateTime.Now);
+                                    model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeHelper.formatImportDate(rows[0]) : DateTime.Now);
+                                    model.EffectiveDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeHelper.formatImportDate(rows[1]) : DateTime.Now);
+                                    model.NotifyDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeHelper.formatImportDate(rows[2]) : DateTime.Now);
                                     model.DocketNumber = rows[3];
                                     model.PostingType = 2;//import - Transfer Customer to Customer - Out
                                     model.ClientDescription = rows[5];
@@ -1119,18 +1102,6 @@ namespace ACT.UI.Controllers
                             ClientLoad model = new ClientLoad();
                             int vehicleId = 0;
                             int transporterId = 0;
-                            if (!string.IsNullOrEmpty(rows[12]))
-                            {
-                                using (VehicleService vehservice = new VehicleService())
-                                {
-                                    VehicleCustomModel vehicle = vehservice.ListCSM(new PagingModel(), new CustomSearchModel() { Query = rows[12], Status = Status.Active }).FirstOrDefault();
-                                    if (vehicle != null)
-                                    {
-                                        vehicleId = vehicle.Id; //else remains 0
-                                    }
-                                }
-
-                            }
                             if (!string.IsNullOrEmpty(rows[11]))
                             {
                                 using (TransporterService transservice = new TransporterService())
@@ -1139,14 +1110,76 @@ namespace ACT.UI.Controllers
                                     if (trans != null)
                                     {
                                         transporterId = trans.Id; //else remains 0
-                                    }
+                                    } else
+                                        {
+                                            try { 
+                                                Transporter tra = new Transporter()
+                                                {
+                                                    Name = rows[11],
+                                                    ContactNumber = "TBC",
+                                                    Email = "TBC",
+                                                    TradingName = rows[11],
+                                                    RegistrationNumber = rows[12],
+                                                    Status = (int)Status.Active
+
+                                                };
+                                                transservice.Create(tra);
+                                                transporterId = tra.Id;
+                                                importMessage += " Transporter: " + tra.Name + " created at Id " + tra.Id + "<br>";
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                importMessage += "Reg : " + rows[12] + "Error " + ex.Message + "<br>";
+                                                ViewBag.Message = ex.Message;
+                                            }
+                                        }
                                 }
-                            }
+                            } //no else, if  there are no column data we cant add or facilitate a row addition
+                            if (!string.IsNullOrEmpty(rows[12]) && transporterId > 0)
+                            {
+                                using (VehicleService vehservice = new VehicleService())
+                                {
+                                    VehicleCustomModel vehicle = vehservice.ListCSM(new PagingModel(), new CustomSearchModel() { Query = rows[12], Status = Status.Active }).FirstOrDefault();
+                                    if (vehicle != null)
+                                    {
+                                        vehicleId = vehicle.Id; //else remains 0
+                                    } else
+                                        {
+                                            try
+                                            {
+                                                Vehicle veh = new Vehicle()
+                                                {
+                                                    ObjectId = transporterId,
+                                                    ObjectType = "Transporter",
+                                                    Make = "TBC",
+                                                    Model = "TBC",
+                                                    Year = 1,
+                                                    EngineNumber = rows[12],
+                                                    VINNumber = rows[12],
+                                                    Registration = rows[12],
+                                                    Descriptoin = rows[12],
+                                                    Type = (int)VehicleType.Other,
+                                                    Status = (int)Status.Active
+                                                };
+                                                vehservice.Create(veh);
+                                                vehicleId = veh.Id;
+                                                importMessage += " Vehicle: " + veh.Registration + " created at Id " + veh.Id + " For Transporter " + rows[11] + "<br>";
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                importMessage += "Reg : " + rows[12] + "Error " +ex.Message + "<br>";
+                                                ViewBag.Message = ex.Message;
+                                            }
+                                        }
+                                }
+
+                            } //no else, if  there are no column data we cant add or facilitate a row addition
+
                             if (!string.IsNullOrEmpty(rows[0]))
                             {
                                     if (vehicleId > 0 && transporterId > 0) { 
                                         model.ClientId = clientID;
-                                        model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[0]) : DateTime.Now);
+                                        model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeHelper.formatImportDate(rows[0]) : DateTime.Now);
                                         model.LoadNumber = rows[1];
                                         model.AccountNumber = rows[2];                                
                                         model.ClientDescription = rows[3];

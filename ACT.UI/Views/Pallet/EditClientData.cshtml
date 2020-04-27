@@ -248,7 +248,7 @@
     <script>
         $(document).ready(function () {
             var cId = $("#Id").val();
-            populateDocs(cId, "ChepLoad");
+            populateDocs(cId, "ClientLoad");
 
             $(document).on('change', '#companyfile', function () {
                 var name = document.getElementById("companyfile").files[0].name;
@@ -268,7 +268,7 @@
                     form_data.append("file", document.getElementById('companyfile').files[0]);
                     form_data.append("clientId", $("#Id").val());
                     $.ajax({
-                        url: "Upload?id=" + cId + "&utype=ClientLoad&uname=Load",
+                        url: "Upload?id=" + cId + "&utype=ClientLoad&uname=Client",
                         method: "POST",
                         data: form_data,
                         contentType: false,

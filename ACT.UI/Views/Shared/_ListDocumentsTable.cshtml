@@ -1,0 +1,31 @@
+﻿@model ObjectDocumentsViewModel
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.UI.Models;
+
+
+
+        @if (Model.objDocuments != null && Model.objDocuments.Count() > 0)
+        {            
+            foreach (Document companyFile in Model.objDocuments.Where(s => s.Status == (Int32)Status.Active))
+            {
+                @Html.HiddenFor(model => companyFile.Id)
+
+                <tr>
+                    <td>
+                        <a target="_blank" href="@Url.Action("ViewDocument", Model.objType, new { @id = companyFile.Id })">@companyFile.Name </a>
+                    </td>
+                    <td>
+                        @companyFile.Type
+                    </td>
+                    <td>
+                        @companyFile.CreatedOn
+                    </td>
+                    <td>
+                        <a target="_blank" href="@Url.Action("ViewDocument", Model.objType, new { @id = companyFile.Id })"><i class="fa fa-eye"></i></a>
+                        <a onclick="removeFile(@companyFile.Id)" href=""><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            }
+        }

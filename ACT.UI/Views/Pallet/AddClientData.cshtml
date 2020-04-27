@@ -38,6 +38,8 @@
                     Transporter
                 </div>
                 <div class="editor-field">
+               
+                    
                     @Html.DropDownList("TransporterId", new SelectList(ViewBag.TransporterOptions as System.Collections.IEnumerable, "Value", "Text", "Select a Transporter"), new { @class = "chzn", @style = "width: 98%;", required = "required" })
                     @Html.ValidationMessageFor(model => model.TransporterId)
                 </div>
