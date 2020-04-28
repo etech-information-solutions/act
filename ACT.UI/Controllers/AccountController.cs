@@ -90,7 +90,9 @@ namespace ACT.UI.Controllers
                 Redirect( returnUrl );
             }
 
-            return DoLogin( user.RoleType );
+            return RedirectToAction( "Index", "DashBoard" );
+
+           // return DoLogin( user.RoleType );
         }
 
         public ActionResult DoLogin( RoleType roleType )

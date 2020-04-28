@@ -38,7 +38,7 @@
 
         Start: function ()
         {
-            //this.DataSideBar($('*[data-side-bar="1"]'));
+            this.DataGraphs( $( '*[data-graph="1"]' ) );
 
             var dt = ( $( '#tab-data>div:visible' ).length ) ? $( '#tab-data>div:visible' ) : ( $( '#collapse>div:visible' ).length ) ? $( '#collapse>div:visible' ) : ( $( "#list" ).length ) ? $( "#list" ) : $( ".graphs" ).length ? $( ".graphs" ) : $( '#item-list' );
 
@@ -182,16 +182,16 @@
                         target.animate( {
                             "width": width
                         }, 1000, function ()
-                            {
+                        {
 
-                            } );
+                        } );
 
                         content.animate( {
                             "marginLeft": width
                         }, 1000, function ()
-                            {
+                        {
 
-                            } );
+                        } );
                     } );
 
                 if ( clicked === "0" )
@@ -866,61 +866,61 @@
                     "padding": "20px 0",
                     "filter": "alpha(opacity=100)"
                 }, 1200, function ()
+                {
+                    i.parent().prepend( spinner );
+
+                    group.addClass( "not-allowed" );
+                    target.find( ".partial-results" ).stop().load( url, { skip: ACT.UI.PageSkip, PRId: ACT.UI.PageViewId, BudgetYear: by }, function ( r, s, xhr )
                     {
-                        i.parent().prepend( spinner );
-
-                        group.addClass( "not-allowed" );
-                        target.find( ".partial-results" ).stop().load( url, { skip: ACT.UI.PageSkip, PRId: ACT.UI.PageViewId, BudgetYear: by }, function ( r, s, xhr )
+                        if ( s === "error" )
                         {
-                            if ( s === "error" )
-                            {
-                                ACT.Modal.Open( xhr.responseText, xhr.statusText, false, ACT.Init.Start() );
+                            ACT.Modal.Open( xhr.responseText, xhr.statusText, false, ACT.Init.Start() );
 
-                                return;
-                            }
+                            return;
+                        }
 
-                            var table = $( this ).find( "table.datatable-numberpaging" );
+                        var table = $( this ).find( "table.datatable-numberpaging" );
 
-                            // Tables Excused...
-                            if ( table.find( "tbody tr td" ).length > 1 )
-                            {
-                                var sort = table.hasClass( "sort" );
+                        // Tables Excused...
+                        if ( table.find( "tbody tr td" ).length > 1 )
+                        {
+                            var sort = table.hasClass( "sort" );
 
-                                table.dataTable( {
-                                    bPaginate: false,
-                                    bSort: false,
-                                    iDisplayLength: 50,
-                                    //"fixedHeader": {
-                                    //    header: table.hasClass( "fixed-table" )
-                                    //},
-                                    "fnDrawCallback": function ()
-                                    {
-                                        ACT.UI.Start();
-                                    }
-                                } );
-                            }
-
-                            $( this ).stop().animate( {
-                                "opacity": "1",
-                                "width": "100%",
-                                "filter": "alpha(opacity=100)"
-                            }, 1200, function ()
+                            table.dataTable( {
+                                bPaginate: false,
+                                bSort: false,
+                                iDisplayLength: 50,
+                                //"fixedHeader": {
+                                //    header: table.hasClass( "fixed-table" )
+                                //},
+                                "fnDrawCallback": function ()
                                 {
+                                    ACT.UI.Start();
+                                }
+                            } );
+                        }
 
-                                } );
+                        $( this ).stop().animate( {
+                            "opacity": "1",
+                            "width": "100%",
+                            "filter": "alpha(opacity=100)"
+                        }, 1200, function ()
+                        {
 
-                            target.find( ".partial-loading" ).remove();
-
-                            i.attr( "data-rendered", 1 );
-                            i.parent().find( ".spinner" ).stop().fadeOut( 1000, function () { $( this ).remove(); } );
-
-                            ACT.Init.Start( true );
-                            ACT.UI.DataTablesOverride( target );
-                            ACT.UI.DataPRSum( $( '*[data-pr-sum="1"]' ) );
-
-                            group.removeClass( "not-allowed" );
                         } );
+
+                        target.find( ".partial-loading" ).remove();
+
+                        i.attr( "data-rendered", 1 );
+                        i.parent().find( ".spinner" ).stop().fadeOut( 1000, function () { $( this ).remove(); } );
+
+                        ACT.Init.Start( true );
+                        ACT.UI.DataTablesOverride( target );
+                        ACT.UI.DataPRSum( $( '*[data-pr-sum="1"]' ) );
+
+                        group.removeClass( "not-allowed" );
                     } );
+                } );
 
                 count++;
             } );
@@ -1619,13 +1619,13 @@
                     "opacity": "0.1",
                     "filter": "alpha(opacity=10)"
                 }, 1000, function ()
-                    {
-                        $( this ).css( "background", "#ffffff" ).animate(
-                            {
-                                "opacity": "1",
-                                "filter": "alpha(opacity=100)"
-                            }, 1000 );
-                    } );
+                {
+                    $( this ).css( "background", "#ffffff" ).animate(
+                        {
+                            "opacity": "1",
+                            "filter": "alpha(opacity=100)"
+                        }, 1000 );
+                } );
         },
 
         DataPartialImages: function ( sender )
@@ -1880,9 +1880,9 @@
                                 "opacity": "0",
                                 "filter": "alpha(opacity=0)"
                             }, 700, function ()
-                            {
-                                remove.remove();
-                            } );
+                        {
+                            remove.remove();
+                        } );
 
                         return false;
                     } );
@@ -2953,7 +2953,7 @@
                         valid = false;
 
                         direction = "center-right";
-                        cntr = $(this);
+                        cntr = $( this );
 
                         err += "Please enter/select a value for this field to proceed!";
 
@@ -3715,6 +3715,27 @@
                         }
                     } );
             } );
+        },
+
+        DataGraphs: function ( sender )
+        {
+            var i = sender.parent().find( 'div[data-loaded="0"]:first' );
+
+            if ( !i.length )
+            {
+                return;
+            }
+
+            i.append( "<div id='loader' />" );
+
+            function LoadNext()
+            {
+                i.attr( "data-loaded", 1 );
+
+                ACT.UI.DataGraphs( sender.find( 'div[data-loaded="0"]:first' ) );
+            }
+
+            ACT.UI.Get( i.find( "#loader" ), i, siteurl + "/" + i.attr( "data-type" ), {}, LoadNext(), true );
         }
     };
 } )();

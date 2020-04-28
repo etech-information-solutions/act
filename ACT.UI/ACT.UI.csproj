@@ -585,10 +585,10 @@
     <Content Include="Views\Shared\_ClientAuditCustomSearch.cshtml" />
     <Content Include="Views\Shared\_MovementReportCustomSearch.cshtml" />
     <Content Include="Views\Pallet\_AuthorisationCode.cshtml" />
+    <Content Include="Views\DashBoard\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\DashBoard\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
