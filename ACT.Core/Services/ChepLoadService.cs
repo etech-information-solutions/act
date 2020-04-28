@@ -108,10 +108,10 @@ namespace ACT.Core.Services
             }
 
 
-            if (csm.Status != Status.All)
-            {
-                query = $"{query} AND (p.Status=@csmReconciliation)";
-            }
+            //if (csm.Status != Status.All)
+            //{
+            //    query = $"{query} AND (p.Status=@csmReconciliation)";
+            //}
 
             if (!string.IsNullOrEmpty(csm.Name))
             {

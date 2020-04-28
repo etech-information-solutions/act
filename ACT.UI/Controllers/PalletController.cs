@@ -673,49 +673,51 @@ namespace ACT.UI.Controllers
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
         public JsonResult GetUnreconciledClientLoads(int? clientId)
         {
-            if (clientId != null && groupId != "")
-            {
-                List<Client> clients;
+            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+            clientId = (int)(clientId!=null? (int)clientId:!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+
+                List<ClientLoadCustomModel> load;
                 //int pspId = Session[ "UserPSP" ];
                 int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-                int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+              
 
-                using (ClientService clientService = new ClientService())
+                using (ClientLoadService clientService = new ClientLoadService())
                 {
 
-                    clients = clientService.GetClientsByPSPExcludedGroup(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                    load = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)Reconciliation.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
 
                 }
-                return Json(clients, JsonRequestBehavior.AllowGet);
+                if (load != null)
+                {
+                    return Json(load, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                }
             }
-            else
-            {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
-            }
-        }
 
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult GetUnreconciledAgentLoads()
+        public JsonResult GetUnreconciledAgentLoads(int? clientId)
         {
-            if (groupId != null && groupId != "")
-            {
-                List<Client> clients;
+            
+                List<ChepLoadCustomModel> load;
                 //int pspId = Session[ "UserPSP" ];
                 int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
                 string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-                int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                clientId = (int)(clientId != null ? (int)clientId : !string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
 
-                using (ClientService clientService = new ClientService())
+                using (ChepLoadService chepService = new ChepLoadService())
                 {
 
-                    clients = clientService.GetClientsByPSPExcludedGroup(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                    load = chepService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)Reconciliation.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
 
                 }
-                return Json(clients, JsonRequestBehavior.AllowGet);
-            }
-            else
+           
+            if (load != null)
             {
+                return Json(load, JsonRequestBehavior.AllowGet);
+            } else { 
                 return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
             }
         }
@@ -1015,31 +1017,31 @@ namespace ACT.UI.Controllers
             if (!string.IsNullOrEmpty(agentLoadId) && !string.IsNullOrEmpty(clientLoadId))
             {
                 //using (GroupService service = new GroupService())
-                using (ClientGroupService clientgroupservice = new ClientGroupService())
-                using (GroupService groupservice = new GroupService())
-                using (ClientService clientService = new ClientService())
-                usingcccccccccccccccc (TransactionScope scope = new TransactionScope())
+                using (ChepClientService cgservivce = new ChepClientService())
+                using (ClientLoadService clientservice = new ClientLoadService())
+                using (ChepLoadService chepService = new ChepLoadService())
+                using (TransactionScope scope = new TransactionScope())
                 {
-                    ClientGroup checkCG = clientgroupservice.GetByColumnsWhere(groupId, clientId);//check this link doesnt already exist, ignore if it does
-                    //Group groupObj = groupservice.GetById(int.Parse(groupId));
-                    if (checkCG == null)
-                    {
-                        ClientGroup cgroup = new ClientGroup()
-                        {
-                            GroupId = int.Parse(groupId),
-                            ClientId = int.Parse(clientId),
-                            Status = (int)Status.Active,
-                        };
-                        clientgroupservice.Create(cgroup);
+                    //ClientGroup checkCG = clientgroupservice.GetByColumnsWhere(groupId, clientId);//check this link doesnt already exist, ignore if it does
+                    ////Group groupObj = groupservice.GetById(int.Parse(groupId));
+                    //if (checkCG == null)
+                    //{
+                    //    ClientGroup cgroup = new ClientGroup()
+                    //    {
+                    //        GroupId = int.Parse(groupId),
+                    //        ClientId = int.Parse(clientId),
+                    //        Status = (int)Status.Active,
+                    //    };
+                    //    clientgroupservice.Create(cgroup);
 
-                        scope.Complete();
-                    } //nothing to do here if the group is already linekd  to the same client
-                    else
-                    {
-                        //just update status to make sure its visible and active, maybe it was disabled
-                        checkCG.Status = (int)Status.Active;
-                        clientgroupservice.Update(checkCG);
-                    }
+                    //    scope.Complete();
+                    //} //nothing to do here if the group is already linekd  to the same client
+                    //else
+                    //{
+                    //    //just update status to make sure its visible and active, maybe it was disabled
+                    //    checkCG.Status = (int)Status.Active;
+                    //    clientgroupservice.Update(checkCG);
+                    //}
                 }
 
 
@@ -1105,6 +1107,7 @@ namespace ACT.UI.Controllers
                                     model.CreatedOn = DateTime.Now;
                                     model.ModfiedOn = DateTime.Now;
                                     model.OriginalQuantity = (Decimal.TryParse(rows[11], out decimal oQty)? oQty : 0);
+                                    model.NewQuantity = model.OriginalQuantity;
 
                                     service.Create(model);
                                     importMessage += " Trading Partner: " + model.ClientDescription + " created at Id " + model.Id + "<br>";
@@ -1270,6 +1273,7 @@ namespace ACT.UI.Controllers
                                         model.DeliveryNote = rows[6];
                                         //model.PRNNumber = rows[7];
                                         model.OriginalQuantity = (Decimal.TryParse(rows[7], out decimal oQty) ? oQty : 0);
+                                        model.NewQuantity = model.OriginalQuantity;
                                         model.RetQuantity = (Decimal.TryParse(rows[8], out decimal rQty) ? rQty : 0);
                                         //model.RetQuantity = decimal.Parse(rows[9]);
                                         model.ARPMComments = rows[10];
