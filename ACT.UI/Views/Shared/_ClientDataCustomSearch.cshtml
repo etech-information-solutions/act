@@ -14,7 +14,7 @@
         {
             <div class="left" style="width: 49%; margin-right: 1%;">
                 <div class="editor-label">
-                    Client Name
+                    Customer
                 </div>
                 <div class="editor-field">
                     @Html.TextBoxFor(model => model.Name, new { @placeholder = "Search Client Name", @style = "width: 86%;" })
@@ -22,56 +22,81 @@
             </div>
 
             <div class="left" style="width: 49%;">
+
                 <div class="editor-label">
-                    Registration Number
+                    Load Date
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.ReferenceNumber, new { @placeholder = "Search Client Registration Number", @style = "width: 86%;" })
-                </div>
-            </div>
-
-            <div class="clear"></div>
-
-            <div class="left" style="width: 49%; margin-right: 1%;">
-                <div class="editor-label">
-                    Contact Number
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.ContactNumber, new { @placeholder = "Search Client Contact Number", @style = "width: 86%;" })
-                </div>
-
-            </div>
-
-            <div class="left" style="width: 49%;">
-                <div class="editor-label">
-                    Contact Name
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.ContactName, new { @placeholder = "Search Client Contact Name", @style = "width: 86%;" })
+                    @Html.TextBoxFor(model => model.FilterDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
                 </div>
 
             </div>
 
             <div class="clear"></div>
 
-            <div class="left" style="width: 49%; margin-right: 1%;">
+            <div class="left" style="width: 49%;">
                 <div class="editor-label">
-                    Chep Reference number
+                    Delivery Note Number
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.ReferenceNumberOther, new { @placeholder = "Search Client Chep reference", @style = "width: 86%;" })
+                    @Html.TextBoxFor(model => model.ReferenceNumberOther, new { @placeholder = "Search Client Registration Number", @style = "width: 86%;" })
+                </div>
+            </div>
+
+            <div class="left" style="width: 49%;">
+                <div class="editor-label">
+                    Order Number
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.ReferenceNumber, new { @placeholder = "Search Client Contact Name", @style = "width: 86%;" })
+                </div>
+
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="left" style="width: 49%; margin-right: 1%;">
+                <div class="editor-label">
+                    Product
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.Description, new { @placeholder = "Search Product/Equipment", @style = "width: 86%;" })
                 </div>
 
             </div>
 
             <div class="left" style="width: 49%;">
                 <div class="editor-label">
-                    @Html.LabelFor(model => model.ClientStatus)
+                  Reconciliation Status
                 </div>
                 <div class="editor-field">
-                    @Html.EnumDropDownFor(model => model.ClientStatus, false, true, new { @class = "chzn", @style = "width: 100%;" })
+                    @Html.EnumDropDownFor(model => model.ReconciliationStatus, false, true, new { @class = "chzn", @style = "width: 87%;" })
                 </div>
             </div>
+            <div class="clear"></div>
+
+            <div class="left" style="width: 49%; margin-right: 1%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.FromDate)
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.FromDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 49%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.ToDate)
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.ToDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " })
+                </div>
+
+            </div>
+
             <div class="clear"></div>
 
             <div class="editor-label">

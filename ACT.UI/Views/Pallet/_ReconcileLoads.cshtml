@@ -36,62 +36,12 @@
             There are no PADs available matching your search criteria.
         </div>
     }*@
-
+<input type="hidden" id="ClientId" name="ClientId" value="@ViewBag.ClientId" />
 <div id="BottomLists" style="display:block;">
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
     <div class="left" style="width: 42%; margin-right: 2%;">
         <h3>Pooling Agent Loads</h3>
         <table id="pool-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsexcluded-table_wrapper" data-starting-point=".ap-tabs ul">
-            <thead>
-                <tr>
-                    <th style="width:7%;">
-                        Status
-                    </th>
-                    <th style="width:7%;">
-                        Agent
-                    </th>
-                    <th style="width:7%;">
-                        Load Date
-                    </th>
-                    <th style="width:7%;">
-                        Eff Date
-                    </th>
-                    <th style="width:7%;">
-                        Del Note
-                    </th>
-                    <th style="width:7%;">
-                        Product
-                    </th>
-                    <th style="width:7%;">
-                        Shipment #
-                    </th>
-                    <th style="width:7%;">
-                        Issue Note
-                    </th>
-                    <th style="width:7%;">
-                       Qty
-                    </th>
-                    <th data-name="Actions" style="width:5%;">
-                        Actions
-                    </th>
-                </tr>
-            </thead>
-
-            <tbody id="pooltabledata"></tbody>
-
-        </table>
-
-    </div>
-    @*<div class="left" style="width: 5%; margin-left: 1%;">
-        <br /><br /><br />
-        <button id="Copy">>></button>
-        <br />
-        <br />
-        <button id="Remove"><<</button>
-    </div>*@
-    <div class="left" style="width: 45%; margin-right: 2%;">
-        <h3>Client Loads</h3>
-        <table id="client-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsincluded-table_wrapper" data-starting-point=".ap-tabs ul">
             <thead>
                 <tr>
                     <th style="width:7%;">
@@ -127,6 +77,49 @@
                 </tr>
             </thead>
 
+            <tbody id="pooltabledata"></tbody>
+
+        </table>
+
+    </div>
+    <div class="left" style="width: 45%; margin-right: 2%;">
+        <h3>Client Loads</h3>
+        <table id="client-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsincluded-table_wrapper" data-starting-point=".ap-tabs ul">
+            <thead>
+                <tr>
+                    <th style="width:7%;">
+                        Status
+                    </th>
+                    <th style="width:7%;">
+                        Agent
+                    </th>xX
+                    <th style="width:7%;">
+                        Load Date
+                    </th>
+                    <th style="width:7%;">
+                        Eff Date
+                    </th>
+                    <th style="width:7%;">
+                        Del Note
+                    </th>
+                    <th style="width:7%;">
+                        Product
+                    </th>
+                    <th style="width:7%;">
+                        Shipment #
+                    </th>
+                    <th style="width:7%;">
+                        Issue Note
+                    </th>
+                    <th style="width:7%;">
+                        Qty
+                    </th>
+                    <th data-name="Actions" style="width:5%;">
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+
             <tbody id="clienttabledata"></tbody>
 
         </table>
@@ -134,4 +127,130 @@
     </div>
 </div>
 <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-@Html.Partial("_Paging")
+<div class="left" style="width: 99%; text-align:center">
+    <button id="Reconcile">Link For Reconciliation</button>
+    <br /><br /><br />
+    <button id="ItemTask">Task for Selected Item</button>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#Reconcile').on('click', function () {
+            var gId = $('#selectedgroup').val();
+            $(".excllist").each(function () {
+                if ($(this).is(':checked')) {
+                    var id = $(this).attr("id");
+                    SetIncludedGroup(gId, id);
+                }
+                else {
+                    // Checkbox isn't checked
+                }
+            });
+            UpdateLists(gId);
+
+        });
+
+        $('#Unreconcile').on('click', function () {
+            var gId = $('#selectedgroup').val();
+            $(".incllist").each(function () {
+                if ($(this).is(':checked')) {
+                    var id = $(this).attr("id");
+                    SetExcludedGroup(gId, id);
+                }
+                else {
+                    // Checkbox isn't checked
+                }
+            });
+        });
+    });
+
+    function UpdateLists() {
+        $('#BottomLists').show();
+        GetUnreconciledAgentLoads();
+        GetUnreconciledClientLoads();
+    }
+
+    function GetUnreconciledClientLoads() {
+        var cId = $('#ClientId').val()
+        var rowDiv = $("#client-table tbody");
+        $.ajax({
+            type: "GET",
+            url: "GetUnreconciledClientLoads",
+            data: { clientId: cId },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                rowDiv.html('');
+                var result = "";
+                $.each(data, function (id, client) {
+
+                    result += '<tr id="tr-' + client.Id + '" class="tr-' + client.Id + '-item">' +
+                        '<td style = "width: 35%;">' +
+                        client.CompanyName +
+                        '</td><td  style = "width: 35%;">' +
+                        client.TradingAs +
+                        '</td><td  style = "width: 20%;"> ' +
+                        client.CompanyRegistrationNumber +
+                        '</td><td><input type="checkbox" id="' + client.Id + '" name="excl_item-' + client.Id + '" class="excllist" value="' + client.Id + '" /></td></tr>';
+                });
+                rowDiv.html(result);
+
+            },
+            error: function (response) {
+                alert('Error retrieving clients');
+            }
+        });
+
+    }
+
+    function GetUnreconciledAgentLoads() {
+        var cId = $('#ClientId').val()
+        var rowDiv = $("#pool-table tbody");
+        $.ajax({
+            type: "GET",
+            url: "GetUnreconciledAgentLoads",
+            data: { clientId: cId },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                rowDiv.html('');
+                var result = "";
+                $.each(data, function (id, client) {
+
+                    result += '<tr id="tr-' + client.Id + '" class="tr-' + client.Id + '-item">' +
+                        '<td style = "width: 35%;">' +
+                        client.CompanyName +
+                        '</td><td  style = "width: 35%;">' +
+                        client.TradingAs +
+                        '</td><td  style = "width: 20%;"> ' +
+                        client.CompanyRegistrationNumber +
+                        '</td><td><input type="checkbox" id="' + client.Id + '" name="excl_item-' + client.Id + '" class="excllist" value="' + client.Id + '" /></td></tr>';
+                });
+                rowDiv.html(result);
+
+            },
+            error: function (response) {
+                alert('Error retrieving clients');
+            }
+        });
+
+    }
+
+    function SetReconciliation(alId, clId) {
+        var data = {
+            "agentLoadId": alId, "clientLoadId": clId
+        };
+        $.ajax({
+            type: 'POST',
+            url: "ReconcileLoadsByIds",
+            data: data,
+            success: function (response) {
+                if (response == "True") {
+                    alert('Load Reconciliation Complete.');
+                    var x = 1; //do nothing
+                } else {
+                    alert('Load Reconciliation Failed. Try again.');
+                }
+            }
+        });
+    }
+</script></script>

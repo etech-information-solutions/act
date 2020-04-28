@@ -97,7 +97,7 @@ else
                 Pooling Agent
             </th>
             <th>
-                Load Data
+                Load Date
             </th>
             <th>
                 Eff Date
@@ -145,9 +145,7 @@ else
                 String active = status.Equals(Status.Active) ? "active" : "inactive";
                 String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
 
-
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
-
                     <td width="8%">
                         @status
                     </td>
@@ -165,29 +163,23 @@ else
                         @item.DeliveryNote
                     </td>
                     <td style="width: 8%;">
-                        @item.AccountNumber
+                        @item.ReceiverNumber
                     </td>
-                    @*<td style="width: 15%;">
-                            @item.Product
-                        </td>*@
                     <td style="width: 8%;">
-                        @*@item.DocketNumber*@
+                        @item.Equipment
                     </td>
-                    <td style="width: 8%;"></td>
-                    <td style="width: 8%;"></td>
-                    <td style="width:8%;"></td>
-                    <td style="width: 8%;"></td>
-                    <td style="width: 8%;">@*@item.OriginalQuantity*@</td>
+                    <td style="width: 8%;">@item.LoadNumber</td>
+                    <td style="width: 8%;">@*Issue Note**@</td>
+                    <td style="width: 8%;">@item.PCNNumber</td>
+                    <td style="width: 8%;">@*THAN**@</td>a>
+                    <td style="width: 8%;">@item.OriginalQuantity</td>
                     <td width="8%">
                         <a href="#doc" rel="modal:open" onclick="loadDocs(@item.Id)"><i class="fa fa-file-text-o"></i></a>
                         @Html.ActionLink("Edit", "EditClientData", new { id = item.Id, returnView = "ClientData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
                         @Html.ActionLink(enable, "DeleteClientData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = enable + " this item?" })
                     </td>
-
-
                 </tr>
-
                 count++;
             }
         }

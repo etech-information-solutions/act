@@ -152,6 +152,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmReconciliation", ( int ) csm.ReconciliationStatus ) },
             };
 
             #endregion
@@ -208,6 +209,37 @@ namespace ACT.Core.Services
                 }
             }
 
+            if (csm.ReconciliationStatus != Reconciliation.Unreconcilable)
+            {
+                query = $"{query} AND (cl.Status=@csmReconciliation)";
+            }
+
+
+            if (!string.IsNullOrEmpty(csm.ReferenceNumber))
+            {
+                query = string.Format(@"{0} AND (cl.LoadNumber LIKE '%{1}%' OR cl.ReceiverNumber LIKE '%{1}%' OR cl.AccountNumber LIKE '%{1}%' )", query, csm.ReferenceNumber);
+            }
+            if (!string.IsNullOrEmpty(csm.ReferenceNumberOther))
+            {
+                query = string.Format(@"{0} AND (cl.LoadNumber LIKE '%{1}%' OR cl.ReceiverNumber LIKE '%{1}%' OR cl.AccountNumber LIKE '%{1}%' OR cl.ReferenceNumber LIKE '%{1}%' OR cl.DeliveryNote LIKE '%{1}%' OR cl.PODNumber LIKE '%{1}%' OR cl.PCNNumber LIKE '%{1}%' OR cl.PRNNumber LIKE '%{1}%')", query, csm.ReferenceNumberOther);
+            }
+
+            if (!string.IsNullOrEmpty(csm.Description))
+            {
+                query = string.Format(@"{0} AND (cl.Equipment LIKE '%{1}%' OR cl.ClientDescription LIKE '%{1}%' )", query, csm.Description);
+            }
+
+            if (!string.IsNullOrEmpty(csm.Name))
+            {
+                query = string.Format(@"{0} AND (cl.ClientDescription LIKE '%{1}%' )", query, csm.Description);
+            }
+
+            if (csm.FilterDate.HasValue)
+            {
+                query = string.Format(@"{0} AND (cl.LoadDate >= @{1}) ", query, csm.FilterDate);
+            }
+
+
             #endregion
 
             // Normal Search
@@ -216,7 +248,7 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (cl.[DocketNumber] LIKE '%{1}%' OR
+                query = string.Format(@"{0} AND (cl.[ARPMComments] LIKE '%{1}%' OR
                                                   cl.[ReferenceNumber] LIKE '%{1}%' OR
                                                   cl.[DeliveryNote] LIKE '%{1}%' OR
                                                   cl.[ClientDescription] LIKE '%{1}%' OR
@@ -255,5 +287,35 @@ namespace ACT.Core.Services
 
             return model;
         }
+
+        public bool ReconcileClientAgentLoad(List<ClientLoad> clientLoad, List<ChepLoad> agentLoad)
+        {
+            if (clientLoad!=null && agentLoad != null)
+            {
+                //iterate through clientload items and attempt to  match the agent loads on teh following: 
+                /*
+* Agent:
+6.	If data is uploaded that already exists on the unreconciled  then update the records
+7.	If changes come through for reconciled items then unreconciled all records on both Chep and Client
+8.	Allow user to import pallet providers data and immediately run the batch reconciliation – on DeliveryNote Number, order number and sum of qty’s must be 0 for reconciled - 
+
+13.	Add the vehicle registration number to the load schedule
+14.	Import from Chep all deliveries for customers and depots, Use Delivery note and order number as the main keys  keep exceptions when loads that are not reconciled because the keys are incorrect.
+
+Client:
+4.	Check if the PCN number exists, if it does not exist import anyway
+5.	If a PCN number exists, then check if the PCN number exists on the chep table if it does and the qty’s are the same then input the data on the clientLoad table and mark both tables and set status as  reconciled.
+6.	If a PCN number exists, then check if the PCN number exists on the chep table if it does and if the quantities are not the same input the data on the clientLoad table and mark both tables set status as  PCN Found
+7.	A PCN number can only be loaded once for the client (indicate if it already exists and allow the user to indicate that this is a split load) and once for chep
+
+                 */
+                foreach (var cLoad in clientLoad)
+                {
+
+                }
+            }
+            return true;
+        }
+
     }
 }
