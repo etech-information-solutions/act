@@ -63,19 +63,19 @@ else
                     }
                 </td>
                 <td style="width:2%">
-                    @Html.ActionLink("Add", "AddClientData", new { sourceview = "ClientData" }, new { @class = "add", @rel = "tipsyS", @title = "Import Client Data?", @data_edit = "1", @data_id = 0, @data_target = "#clientdata" })
+                    @Html.ActionLink("Add", "AddClientData", new { sourceview = "ClientData" }, new { @class = "add postedFilecdata", @rel = "tipsyS", @title = "Import Client Data?", @id= "addrowdata", @data_edit = "1", @data_id = 0, @data_target = "#clientdata" })
                 </td>
                 <td style="width:5%">
                     &nbsp;
                 </td>
                 <td style="width:3%">
-                    <label for="file" class="importlabel">Browse:</label>
+                    <label for="file" class="importlabel postedFilecdata">Browse:</label>
                 </td>
                 <td style="width:55%">
-                    <input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" />
+                    <input type="file" class="postedFilecdata" id="postedFile" name="postedFile" class="form-control" accept=".csv" />
                 </td>
                 <td style="width:10%">
-                    <input type="submit" value="Import" class="importbutton" />
+                    <input type="submit" value="Import" class="importbutton postedFilecdata" />
                 </td>
                 <td style="width:7%">
                     <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "clientdatatemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
@@ -97,7 +97,7 @@ else
                 Pooling Agent
             </th>
             <th>
-                Load Data
+                Load Date
             </th>
             <th>
                 Eff Date
@@ -145,9 +145,7 @@ else
                 String active = status.Equals(Status.Active) ? "active" : "inactive";
                 String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
 
-
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
-
                     <td width="8%">
                         @status
                     </td>
@@ -165,92 +163,66 @@ else
                         @item.DeliveryNote
                     </td>
                     <td style="width: 8%;">
-                        @item.AccountNumber
+                        @item.ReceiverNumber
                     </td>
-                    @*<td style="width: 15%;">
-                            @item.Product
-                        </td>*@
                     <td style="width: 8%;">
-                        @*@item.DocketNumber*@
+                        @item.Equipment
                     </td>
-                    <td style="width: 8%;"></td>
-                    <td style="width: 8%;"></td>
-                    <td style="width:8%;"></td>
-                    <td style="width: 8%;"></td>
-                    <td style="width: 8%;">@*@item.OriginalQuantity*@</td>
+                    <td style="width: 8%;">@item.LoadNumber</td>
+                    <td style="width: 8%;">@*Issue Note**@</td>
+                    <td style="width: 8%;">@item.PCNNumber</td>
+                    <td style="width: 8%;">@*THAN**@</td>a>
+                    <td style="width: 8%;">@item.OriginalQuantity</td>
                     <td width="8%">
-                        <a href="#doc" rel="modal:open"><i class="fa fa-file"></i></a>
+                        <a href="#doc" rel="modal:open" onclick="loadDocs(@item.Id)"><i class="fa fa-file-text-o"></i></a>
                         @Html.ActionLink("Edit", "EditClientData", new { id = item.Id, returnView = "ClientData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
                         @Html.ActionLink(enable, "DeleteClientData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = enable + " this item?" })
-                        @*<div style="border-bottom: 1px dashed #7368e3; CDding-bottom: 4px; margin-bottom: 10px;">
-
-                                @if (item.Documents != null && item.Documents.Any(s => s.Status == (Int32)Status.Active))
-                                {
-                                    <a class="docs" data-sticky-one="1" data-target="#supporting-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Documents">
-                                        Docs
-                                    </a>
-                                    <div id="supporting-@item.Id-docs" class="none">
-                                        <ul class="list">
-                                            @foreach (var d in item.Documents.Where(s => s.Status == (Int32)Status.Active))
-                                            {
-                                                <li style="line-height: 20px;">
-                                                    <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Pallet", new { @id = d.Id } )" target="_blank">
-                                                        @d.Name (@d.Type)
-                                                    </a>
-                                                </li>
-                                            }
-                                        </ul>
-                                    </div>
-                                }
-                            </div>*@
-                        @*<button id="managedocs" name="managedocs">Docs</button>*@
-                        <div id="doc" class="modal">
-                            <p>
-                                <strong class="">Documents</strong>
-                            </p>
-                            <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i></a>
-                            <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
-                                <thead>
-                                    <tr>
-
-                                        <th data-name="Name" data-column="Name">
-                                            Documnet Title
-                                        </th>
-                                        <th data-name="XCord" data-column="XCord">
-                                            Type
-                                        </th>
-                                        <th data-name="YCord" data-column="YCord">
-                                            Date
-                                        </th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody id="doctabledata"></tbody>
-
-                            </table>
-
-                            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-                        </div>
                     </td>
-
-
                 </tr>
-
                 count++;
             }
         }
     </tbody>
 
 </table>
+<div id="doc" class="modal">
+    <p>
+        <strong class="">Documents</strong>
+    </p>
+    <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i> Add</a>
+    <input type="hidden" id="docitem" name="docitem" value="0" />
+    <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th>
+                    Document Title
+                </th>
+                <th>
+                    Type
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody></tbody>
+    </table>
+    <div id="documentsdiv">
+    </div>
+    <span id="uploaded_file"></span>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+</div>
 @Html.Partial("_Paging")
 <script>
     $(document).ready(function () {
         //var cId = parseInt($("#ClientListSiteManage").val());
         var context = $("#context").val();
         if (context == "0") {
-            $('.add').hide();
+            $('#addrowdata').hide();
             $('.importlabel').hide();
             $('.importbutton').hide();
             $('#postedFile').hide();
@@ -263,12 +235,12 @@ else
                 if (cId > 0) {
 
 
-                    $('.add').show();
+                    $('#addrowdata').show();
                     $('.importlabel').show();
                     $('.importbutton').show();
                     $('#postedFile').show();
                 } else {
-                    $('.add').hide();
+                    $('#addrowdata').hide();
                     $('.importlabel').hide();
                     $('.importbutton').hide();
                     $('#postedFile').hide();
@@ -288,69 +260,95 @@ else
 
             //populateDocs(cId, "Client");
 
-            //$(document).on('change', '#companyfile', function () {
-            //    var name = document.getElementById("companyfile").files[0].name;
-            //    var form_data = new FormData();
-            //    var ext = name.split('.').pop().toLowerCase();
-            //    if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx', 'csv']) == -1) {
-            //        alert("Invalid File");
-            //    }
-            //    var oFReader = new FileReader();
-            //    oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
-            //    var f = document.getElementById("companyfile").files[0];
-            //    var fsize = f.size || f.fileSize;
-            //    if (fsize > 2000000) {
-            //        alert("File Size is too large");
-            //    }
-            //    else {
-            //        form_data.append("file", document.getElementById('companyfile').files[0]);
-            //        form_data.append("clientId", $("#Id").val());
-            //        $.ajax({
-            //            url: "Upload?id="+cId,
-            //            method: "POST",
-            //            data: form_data,
-            //            contentType: false,
-            //            cache: false,
-            //            processData: false,
-            //            beforeSend: function () {
-            //                $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
-            //            },
-            //            success: function (data) {
-            //                //$('#uploaded_file').html(data);
-            //                populateDocs(cId, "ClientLoad");
-            //                $('#uploaded_file').html("<label class='text-success'></label>");
-            //            }
-            //        });
-            //    }
-            //});
+       $(document).on('change', '#companyfile', function () {
+                        var cId = $('#docitem').val();
+                        var name = document.getElementById("companyfile").files[0].name;
+                        var form_data = new FormData();
+                        var ext = name.split('.').pop().toLowerCase();
+                        if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx', 'csv']) == -1) {
+                            alert("Invalid File");
+                        }
+                        var oFReader = new FileReader();
+                        oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
+                        var f = document.getElementById("companyfile").files[0];
+                        var fsize = f.size || f.fileSize;
+                        if (fsize > 2000000) {
+                            alert("File Size is too large");
+                        }
+                        else {
+                            form_data.append("file", document.getElementById('companyfile').files[0]);
+                            form_data.append("clientId", $("#Id").val());
+                            $.ajax({
+                                url: "Upload?id=" + cId + "&utype=ClientLoad&uname=Agent",
+                                method: "POST",
+                                data: form_data,
+                                contentType: false,
+                                cache: false,
+                                processData: false,
+                                beforeSend: function () {
+                                    $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
+                                },
+                                success: function (data) {
+                                    //$('#uploaded_file').html(data);
+                                    populateDocs(cId, "ClientLoad");
+                                    $('#uploaded_file').html("<label class='text-success'></label>");
+                                }
+                            });
+                        }
+                    });
 
-    });
-    function SetClient(cId) {
-        $("#ClientId").val(cId);
-        $.ajax({
-            type: 'POST',
-            url: "SetClient",
-            data: { "ClientId": cId },
-            success: function (response) {
-                //window.location.href = 'Index#managesites';
-                location.reload();
-               // GetIncludedSites(cId);
+                });
+
+            function AddDocRow() {
+                var rowDiv = $("#doctable-table tbody");
+                var tabledata = '<tr><td colspan="4"><input id="companyfile" name="companyfile" type="file" value="" data-val-file="1" class="input" /></td></tr>';
+                rowDiv.append(tabledata);
+
             }
-        });
-    }
-        function populateDocs(id, doctype) {
 
-            $.ajax({
+            function loadDocs(itemId) {
+                populateDocs(itemId, "ClientLoad")
+            }
 
-                url: '@Url.Action("ListFiles", "Pallet")',
-                type: "GET",
-                dataType: "html",
-                data: { objId: id, objType:doctype },//this is as per your requirement
-                success: function (data) {
-                    $('#documentsdiv_'+id).html(data);
-                },
-            });
-    }
+            function removeFile(fileId,itemId) {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("RemoveFile", "Pallet")',
+                    data: { "FileId": fileId },
+                    success: function (response) {
+                        debugger;
+                        populateDocs(itemId, "ClientLoad");
+                    }
+                });
+            }
+
+            function SetClient(cId) {
+                $("#ClientId").val(cId);
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("SetClient", "Pallet")',
+                    data: { "ClientId": cId },
+                    success: function (response) {
+                        location.reload();
+
+                    }
+                });
+            }
+            function populateDocs(id, doctype) {
+                $("#docitem").val(id); //docslisttable
+                $("#doctable-table tbody").html('');//clear the div
+                $.ajax({
+
+                    url: '@Url.Action("ListFilesTable", "Pallet")',
+                    type: "GET",
+                    dataType: "html",
+                    data: { objId: id, objType:doctype },
+                    success: function (data) {
+                      //  debugger;
+                        $('#doctable-table tbody').html(data); //reload the div
+                    },
+                });
+            }
 
 
 </script>

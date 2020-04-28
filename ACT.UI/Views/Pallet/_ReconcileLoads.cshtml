@@ -1,6 +1,4 @@
-﻿@model PagingExtension
-
-@using ACT.Data.Models;
+﻿@using ACT.Data.Models;
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
 @using ACT.Core.Models.Custom;
@@ -21,10 +19,6 @@
 @{
     UserModel user = User.Get();
 
-    Int32 count = Model.Start;
-    //List<PADViewModel> items = (List<PADViewModel>)Model.Items;
-
-    //PADService cservice = new PADService();
 
 
 }
@@ -36,7 +30,7 @@
             There are no PADs available matching your search criteria.
         </div>
     }*@
-
+<input type="hidden" id="ClientId" name="ClientId" value="@ViewBag.ClientId" />
 <div id="BottomLists" style="display:block;">
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
     <div class="left" style="width: 42%; margin-right: 2%;">
@@ -45,7 +39,7 @@
             <thead>
                 <tr>
                     <th style="width:7%;">
-                        Status
+                        Select
                     </th>
                     <th style="width:7%;">
                         Agent
@@ -69,7 +63,7 @@
                         Issue Note
                     </th>
                     <th style="width:7%;">
-                       Qty
+                        Qty
                     </th>
                     <th data-name="Actions" style="width:5%;">
                         Actions
@@ -82,20 +76,13 @@
         </table>
 
     </div>
-    @*<div class="left" style="width: 5%; margin-left: 1%;">
-        <br /><br /><br />
-        <button id="Copy">>></button>
-        <br />
-        <br />
-        <button id="Remove"><<</button>
-    </div>*@
     <div class="left" style="width: 45%; margin-right: 2%;">
         <h3>Client Loads</h3>
         <table id="client-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsincluded-table_wrapper" data-starting-point=".ap-tabs ul">
             <thead>
                 <tr>
                     <th style="width:7%;">
-                        Status
+                        Select
                     </th>
                     <th style="width:7%;">
                         Agent
@@ -134,4 +121,232 @@
     </div>
 </div>
 <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-@Html.Partial("_Paging")
+<div class="left" style="width: 99%; text-align:center">
+    <button id="Reconcile">Link For Reconciliation</button>
+    <br /><br /><br />
+    <button id="ItemTask">Task for Selected Item</button>
+</div>
+<script>
+    $(document).ready(function () {
+        UpdateLists();
+        $('#Reconcile').on('click', function () {
+            var gId = $('#selectedgroup').val();
+            $(".agentloadlist").each(function () {
+                if ($(this).is(':checked')) {
+                    var id = $(this).attr("id");
+                    SetIncludedGroup(gId, id);
+                }
+                else {
+                    // Checkbox isn't checked
+                }
+            });
+
+
+        });
+
+        //$('#Unreconcile').on('click', function () {
+        //    var gId = $('#selectedgroup').val();
+        //    $(".incllist").each(function () {
+        //        if ($(this).is(':checked')) {
+        //            var id = $(this).attr("id");
+        //            SetExcludedGroup(gId, id);
+        //        }
+        //        else {
+        //            // Checkbox isn't checked
+        //        }
+        //    });
+        //Docs Change
+        $(document).on('change', '#companyfile', function () {
+            var cId = $('#docitem').val();
+            var name = document.getElementById("companyfile").files[0].name;
+            var form_data = new FormData();
+            var ext = name.split('.').pop().toLowerCase();
+            if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx', 'csv']) == -1) {
+                alert("Invalid File");
+            }
+            var oFReader = new FileReader();
+            oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
+            var f = document.getElementById("companyfile").files[0];
+            var fsize = f.size || f.fileSize;
+            if (fsize > 2000000) {
+                alert("File Size is too large");
+            }
+            else {
+                form_data.append("file", document.getElementById('companyfile').files[0]);
+                form_data.append("clientId", $("#Id").val());
+                $.ajax({
+                    url: "Upload?id=" + cId + "&utype=ChepLoad&uname=Agent",
+                    method: "POST",
+                    data: form_data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
+                    },
+                    success: function (data) {
+                        //$('#uploaded_file').html(data);
+                        populateDocs(cId, "ChepLoad");
+                        $('#uploaded_file').html("<label class='text-success'></label>");
+                    }
+                });
+            }
+        });
+        //Docs Change End
+
+        });
+
+    function UpdateLists() {
+        $('#BottomLists').show();
+        GetUnreconciledAgentLoads();
+        GetUnreconciledClientLoads();
+    }
+
+    function GetUnreconciledClientLoads() {
+        var cId = $('#ClientId').val()
+        var rowDiv = $("#client-table tbody");
+        debugger;
+        $.ajax({
+            type: "GET",
+            url: "GetUnreconciledClientLoads",
+            data: { clientId: cId },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                rowDiv.html('');
+                var result = "";
+                $.each(data, function (id, load) {
+                    debugger;
+                    result += '<tr id="tr-' + load.Id + '" class="tr-' + load.Id + '-item">' +
+                        '<td style = "width: 5%;"><input type="checkbox" id="' + load.Id + '" name="agent_item-' + load.Id + '" class="agentloadlist" value="' + load.Id + '" />' +
+                        '</td > <td style="width: 35%;">Chep</td> <td style="width: 20%;"> ' +
+                        load.LoadDate +
+                        '</td><td  style = "width: 20%;"> ' +
+                        load.EffectiveDate +
+                        '</td><td  style = "width: 20%;"> ' +
+                        load.DeliveryNote +
+                        '</td><td  style = "width: 20%;"> ' +
+                        load.Equipment +
+                        '</td><td  style = "width: 20%;"> ' +
+                        load.DocketNumber +
+                        '</td><td  style = "width: 20%;"> </td><td  style = "width: 20%;"> ' +
+                        load.OriginalQuantity +
+                        '</td><td><a href="#doc" rel="modal:open" onclick="loadDocs(' + load.Id + ', 0)"><i class="fa fa-file-text-o"></i></a></td></tr>';
+                });
+                rowDiv.html(result);
+
+            },
+            error: function (response) {
+                alert('Error retrieving clients');
+            }
+        });
+
+    }
+
+    function GetUnreconciledAgentLoads() {
+        var cId = $('#ClientId').val()
+        var rowDiv = $("#pool-table tbody");
+        debugger;
+        $.ajax({
+            type: "GET",
+            url: "GetUnreconciledAgentLoads",
+            data: { clientId: cId },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                rowDiv.html('');
+                var result = "";
+                $.each(data, function (id, load) {
+                    debugger;
+
+                    result += '<tr id="tr-' + load.Id + '" class="tr-' + load.Id + '-item">' +
+                        '<td style = "width: 5%;"><input type="checkbox" id="' + load.Id + '" name="agent_item-' + load.Id + '" class="agentloadlist" value="' + load.Id + '" />' +
+                        '</td > <td style="width: 35%;">Chep</td> <td style="width: 20%;"> ' +
+                        load.LoadDate +
+                        '</td><td  style = "width: 20%;"> ' +
+                        load.EffectiveDate +
+                        '</td><td  style = "width: 20%;"> ' +
+                        load.DeliveryNote +
+                        '</td><td  style = "width: 20%;"> ' +
+                        load.Equipment +
+                        '</td><td  style = "width: 20%;"> ' +
+                        load.DocketNumber +
+                        '</td><td  style = "width: 20%;"> </td><td  style = "width: 20%;"> ' +
+                        load.OriginalQuantity +
+                        '</td><td><a href="#doc" rel="modal:open" onclick="loadDocs(' + load.Id + ', 0)"><i class="fa fa-file-text-o"></i></a></td></tr>';
+                });
+                rowDiv.html(result);
+
+            },
+            error: function (response) {
+                alert('Error retrieving clients');
+            }
+        });
+
+    }
+
+    function SetReconciliation(alId, clId) {
+        var data = {
+            "agentLoadId": alId, "clientLoadId": clId
+        };
+        $.ajax({
+            type: 'POST',
+            url: "ReconcileLoadsByIds",
+            data: data,
+            success: function (response) {
+                if (response == "True") {
+                    alert('Load Reconciliation Complete.');
+                    var x = 1; //do nothing
+                } else {
+                    alert('Load Reconciliation Failed. Try again.');
+                }
+            }
+        });
+    }
+
+    //Docs From here
+    function populateDocs(id, doctype) {
+    $("#docitem").val(id); //docslisttable
+    $("#doctable-table tbody").html('');//clear the div
+    $.ajax({
+
+        url: '@Url.Action("ListFilesTable", "Pallet")',
+        type: "GET",
+        dataType: "html",
+        data: { objId: id, objType:doctype },
+        success: function (data) {
+            $('#doctable-table tbody').html(data); //reload the div
+        },
+    });
+    }
+    function AddDocRow() {
+    var rowDiv = $("#doctable-table tbody");
+    var tabledata = '<tr><td colspan="4"><input id="companyfile" name="companyfile" type="file" value="" data-val-file="1" class="input" /></td></tr>';
+    rowDiv.append(tabledata);
+
+    }
+
+    function loadDocs(itemId, typeid) {
+        var stype = "ChepLoad";
+        if (typeid == 1) {
+            stype = "ClientLoad";
+        }
+        populateDocs(itemId, stype);
+    }
+
+    function removeFile(fileId, itemId, typeid) {
+        var stype = "ChepLoad";
+        if (typeid == 1) {
+            stype = "ClientLoad";
+        }
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("RemoveFile", "Pallet")',
+                data: { "FileId": fileId },
+                success: function (response) {            
+                    populateDocs(itemId, stype);
+                }
+            });
+    }
+    //Docs From here End
+</script>

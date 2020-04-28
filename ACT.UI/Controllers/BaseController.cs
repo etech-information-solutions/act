@@ -789,7 +789,25 @@ namespace ACT.UI.Controllers
             }
         }
 
+        public JsonResult RemoveFile(int? id = null, string utype = null, string uname = null)
+        {
+            int docId = (id != null ? (int)id : 0);
+            if (docId>0)
+            {
+                using (DocumentService docservice = new DocumentService())
+                {
 
+                    Document rDoc = docservice.GetById(docId);
+                    rDoc.Status = (int)Status.Inactive;
+                    docservice.Update(rDoc);
+                }
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            } else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+
+        }
         public JsonResult Upload(int? id = null, string utype = null, string uname = null)
         {
             FileViewModel nfv = new FileViewModel();
@@ -857,7 +875,18 @@ namespace ACT.UI.Controllers
             ObjectDocumentsViewModel model = new ObjectDocumentsViewModel();
             if (!string.IsNullOrEmpty(objType) && !string.IsNullOrEmpty(objId))
             {
-
+                string controllerObjectType = objType;
+                switch (objType)
+                {
+                    case "ChepLoad":
+                        controllerObjectType = "Pallet";
+                        break;
+                    case "ClientLoad":
+                        controllerObjectType = "Pallet";
+                        break;
+                    default:
+                        break;
+                }
                 using (DocumentService docservice = new DocumentService())
                 {
                     List<Document> docList = new List<Document>();
@@ -866,11 +895,44 @@ namespace ACT.UI.Controllers
 
                     model.objDocuments = docList;
                     model.objId = oId;
-                    model.objType = objType;
+                    model.objType = controllerObjectType;
                 }
             }
             return PartialView("_ListDocuments", model);
         }
+
+        public ActionResult ListFilesTable(string objId, string objType)
+        {
+            ObjectDocumentsViewModel model = new ObjectDocumentsViewModel();
+            if (!string.IsNullOrEmpty(objType) && !string.IsNullOrEmpty(objId))
+            {
+                string controllerObjectType = objType;
+                switch (objType)
+                {
+                    case "ChepLoad":
+                        controllerObjectType = "Pallet";
+                        break;
+                    case "ClientLoad":
+                        controllerObjectType = "Pallet";
+                        break;
+                    default:
+                        break;
+                }
+                using (DocumentService docservice = new DocumentService())
+                {
+                    List<Document> docList = new List<Document>();
+                    int oId = int.Parse(objId);
+                    docList = docservice.List(oId, objType);
+
+                    model.objDocuments = docList;
+                    model.objId = oId;
+                    model.objType = controllerObjectType;                    
+                }
+            }
+            return PartialView("_ListDocumentsTable", model);
+        }
+
+        
 
         #endregion
 

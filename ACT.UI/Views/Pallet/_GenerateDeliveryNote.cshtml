@@ -165,7 +165,7 @@ else
             </div>
 
             <div class="left" style="width: 48%;">
-                <h3>Invoice Address&nbsp;</h3><input type="checkbox" id="sameasshipping" name="sameasshipping" value="1" /> Same as Shipping Address
+                <h3>Invoice Address&nbsp;</h3><input type="checkbox" id="sameasshipping" name="sameasshipping" value="1" disabled="disabled" onclick="copyAddress()" /> Same as Shipping Address
 
                 <div id="locationFieldInvoice">
                     Type your address below:
@@ -360,29 +360,34 @@ else
 
         }
 
-        //function GetClientDetail(cId) {
 
-        //    var TradingAs = document.getElementById("TradingAs");
-        //    $.ajax({
-        //        type: "GET",
-        //        url: "GetClientDetail",
-        //        data: { clientId: cId },
-        //        contentType: "application/json;charset=utf-8",
-        //        dataType: "json",
-        //        success: function (data) {
-        //            $('#TradingAs').val(data.TradingAs);
-        //        },
-        //        error: function (response) {
-        //            alert('Error Retrieving Client Detail');
-        //        }
-        //    });
+        function copyAddress() {
+            if ($("#DeliveryAddress").val() != "") {
 
-        //}
+                $("#BillingAddress").val($("#DeliveryAddress").val());
+                $("#BillingAddress2").val($("#DeliveryAddress2").val());
+                $("#BillingAddressTown").val($("#DeliveryAddressTown").val());
+                var provId = $("#DeliveryProvince").val();
+                var provText = $("#DeliveryProvince").text();
+                document.getElementById("BillingProvince").options.length = 0;
+                var opt = document.createElement("option");
+                opt.text = provText;
+                opt.value = provId;
+                document.getElementById("BillingProvince").options.add(opt);
+                $("#BillingPostalCode").val($("#DeliveryPostalCode").val());
+
+            } else {
+                alert("Please complete Shipping Address first");
+                document.getElementById("sameasshipping").checked = false; 
+            }
+        }
     </script>
 
     <script>
         //The Google Stuff
         var placeSearch, autocomplete, autocompleteInvoice;
+
+     
 
         var componentForm = {
             street_number: 'short_name',
@@ -396,15 +401,15 @@ else
             postal_code: 'short_name'
         };
         var componentFormFields = {
-            street_number: 'Address_AddressLine1',
-            route: 'Address_AddressLine1',
-            locality: 'Address_Town',
-            sublocality_level_1: 'Address_AddressLine2',
-            sublocality_level_2: 'Address_AddressLine2',
-            administrative_area_level_2: 'Address_Province',
-            administrative_area_level_1: 'Address_Province',
+            street_number: 'DeliveryAddress',
+            route: 'DeliveryAddress',
+            locality: 'DeliveryAddressTown',
+            sublocality_level_1: 'DeliveryAddress2',
+            sublocality_level_2: 'DeliveryAddress2',
+            administrative_area_level_2: 'DeliveryProvince',
+            administrative_area_level_1: 'DeliveryProvince',
             //country: 'long_name',
-            postal_code: 'Address_PostCode'
+            postal_code: 'DeliveryPostalCode'
         };
 
         var componentFormInvoice = {
@@ -419,17 +424,16 @@ else
             postal_code: 'short_name'
         };
         var componentFormFieldsInvoice = {
-            street_number: 'Address_AddressLine1',
-            route: 'Address_AddressLine1',
-            locality: 'Address_Town',
-            sublocality_level_1: 'Address_AddressLine2',
-            sublocality_level_2: 'Address_AddressLine2',
-            administrative_area_level_2: 'Address_Province',
-            administrative_area_level_1: 'Address_Province',
+            street_number: 'BillingAddress',
+            route: 'BillingAddress',
+            locality: 'BillingAddressTown',
+            sublocality_level_1: 'BillingAddress2',
+            sublocality_level_2: 'BillingAddress2',
+            administrative_area_level_2: 'BillingProvince',
+            administrative_area_level_1: 'BillingProvince',
             //country: 'long_name',
-            postal_code: 'Address_PostCode'
+            postal_code: 'BillingPostalCode'
         };
-
 
         function initAutocomplete() {
             autocomplete = new google.maps.places.Autocomplete(
@@ -439,8 +443,8 @@ else
 
             autocompleteInvoice = new google.maps.places.Autocomplete(
                 document.getElementById('autocompleteInvoice'), { types: ['geocode'] });
-            autocompleteInvoice.setFields(['address_componentInvoice']);
-            autocompleteInvoice.addListener('place_changed', fillInAddress);
+            autocompleteInvoice.setFields(['address_component']);
+            autocompleteInvoice.addListener('place_changed', fillInAddressInvoice);
         }
 
         function fillInAddress() {
@@ -457,8 +461,8 @@ else
                 if (componentForm[addressType]) {
                     var val = place.address_components[i][componentForm[addressType]];
                     if (addressType == "route") {
-                        var streetaddress = document.getElementById("Address_AddressLine1");
-                        document.getElementById("Address_AddressLine1").value = streetaddress.value + " " + val;
+                        var streetaddress = document.getElementById("DeliveryAddress");
+                        document.getElementById("DeliveryAddress").value = streetaddress.value + " " + val;
                     } else {
                         // debugger;
                         if (addressType == "administrative_area_level_1") {
@@ -498,13 +502,91 @@ else
                                 // code block
                             }
                             //setSelectedIndex(document.getElementById("Address.Province"), idx);
-                            document.getElementById("Address_Province").options.length = 0;
+                            document.getElementById("DeliveryProvince").options.length = 0;
                             var opt = document.createElement("option");
                             opt.text = val;
                             opt.value = idx;
-                            document.getElementById("Address_Province").options.add(opt);
+                            document.getElementById("DeliveryProvince").options.add(opt);
                         } else {
                             document.getElementById(componentFormFields[addressType]).value = val;
+                        }
+                        document.getElementById("sameasshipping").disabled = false;
+                    }
+                }
+                //change for 1st element
+                if (i == 0) {
+                    fullAddress = place.address_components[i].long_name;
+                } else {
+                    fullAddress = fullAddress + "," + place.address_components[i].long_name;
+                }
+                //for elements with Coords, call 2nd API here to locate coords with fulladdress
+
+            }
+            //alert(fullAddress);
+        }
+
+        function fillInAddressInvoice() {
+            var place = autocomplete.getPlace();
+            console.log(place);
+            var fullAddress = "";
+
+            for (var component in componentFormInvoice) {
+                document.getElementById(componentFormFieldsInvoice[component]).value = '';
+                document.getElementById(componentFormFieldsInvoice[component]).disabled = false;
+            }
+            for (var i = 0; i < place.address_components.length; i++) {
+                var addressType = place.address_components[i].types[0];
+                if (componentFormInvoice[addressType]) {
+                    var val = place.address_components[i][componentFormInvoice[addressType]];
+                    if (addressType == "route") {
+                        var streetaddress = document.getElementById("BillingAddress");
+                        document.getElementById("BillingAddress").value = streetaddress.value + " " + val;
+                    } else {
+                        // debugger;
+                        if (addressType == "administrative_area_level_1") {
+                            var idx = -1;
+                            switch (val) {
+                                case "Eastern Cape":
+                                    idx = 0;
+                                    break;
+                                case "Free State":
+                                    idx = 1;
+                                    break;
+                                case "Gauteng":
+                                    idx = 2;
+                                    break;
+                                case "KwaZulu-Natal":
+                                    idx = 3;
+                                    break;
+                                case "Limpopo":
+                                    idx = 4;
+                                    break;
+                                case "Mpumalanga":
+                                    idx = 5;
+                                    break;
+                                case "Northern Cape":
+                                    idx = 67;
+                                    break;
+                                case "North West":
+                                    idx = 7;
+                                    break;
+                                case "Western Cape":
+                                    idx = 8;
+                                    break;
+                                case "Western Cape":
+                                    idx = 8;
+                                    break;
+                                default:
+                                // code block
+                            }
+                            //setSelectedIndex(document.getElementById("Address.Province"), idx);
+                            document.getElementById("BillingProvince").options.length = 0;
+                            var opt = document.createElement("option");
+                            opt.text = val;
+                            opt.value = idx;
+                            document.getElementById("BillingProvince").options.add(opt);
+                        } else {
+                            document.getElementById(componentFormFieldsInvoice[addressType]).value = val;
                         }
                     }
                 }

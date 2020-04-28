@@ -255,6 +255,31 @@ namespace ACT.Core.Models
             set;
         }
 
+        [Display(Name = "ReconciliationStatus")]
+        public Reconciliation ReconciliationStatus
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Can be used for a Filter date range
+        /// </summary>
+        [Display(Name = "Filter Date")]
+        public DateTime? FilterDate
+        {
+            get; set;
+        }
+
+
+        /// <summary>
+        /// Can be used for a Filter date range
+        /// </summary>
+        [Display(Name = "Filter Additional Date")]
+        public DateTime? Filter2Date
+        {
+            get; set;
+        }
 
         public decimal? Amount { get; set; }
 
@@ -396,6 +421,15 @@ namespace ACT.Core.Models
 
                     break;
 
+                case "Clients":
+
+                    using (ClientService cservice = new ClientService())
+                    {
+                        ClientOptions = cservice.List( true );
+                    }
+
+                    break;
+
                 case "Disputes":
 
                     using ( SiteService sservice = new SiteService() )
@@ -441,6 +475,7 @@ namespace ACT.Core.Models
             this.InvoiceStatus = InvoiceStatus.All;
             this.PSPClientStatus = PSPClientStatus.All;
             this.ClientStatus = Status.Active;
+            this.ReconciliationStatus = Reconciliation.Unreconcilable;
         }
     }
 }

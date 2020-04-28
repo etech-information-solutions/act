@@ -14,6 +14,7 @@ using System.Web.Mvc;
 using System.Web;
 using Newtonsoft.Json;
 using OpenPop;
+using ACT.Core.Helpers;
 namespace ACT.UI.Controllers
 {
     public class PalletController : BaseController
@@ -78,7 +79,7 @@ namespace ACT.UI.Controllers
                 }
 
                 model = service.ListCSM(pm, csm);
-                        
+                total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total();
             }
             PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
 
@@ -138,7 +139,7 @@ namespace ACT.UI.Controllers
                 }
 
                 Notify("The item was successfully created.", NotificationType.Success);
-                return RedirectToAction("ClientData");
+                return RedirectToAction("AgentPoolingData");
             }
             catch (Exception ex)
             {
@@ -332,7 +333,7 @@ namespace ACT.UI.Controllers
                 }
 
                 model = service.ListCSM(pm, csm);
-
+                total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total();
             }
             PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
 
@@ -380,6 +381,18 @@ namespace ACT.UI.Controllers
                 string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
                 int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
                 ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+                List<Transporter> transporterOptions = new List<Transporter>();
+                using (TransporterService rservice = new TransporterService())
+                {
+                    transporterOptions = rservice.List();
+                }
+                IEnumerable<SelectListItem> transporterOptionsDDL = transporterOptions.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.TradingName
+
+                });
+                ViewBag.TransporterOptions = transporterOptionsDDL;
 
                 if (clientId > 0 || model.ClientId > 0)
                 {
@@ -639,9 +652,8 @@ namespace ACT.UI.Controllers
             string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
             int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
             ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-   //         model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            ViewBag.ClientId = clientId;
             List<Client> clientList = new List<Client>();
-            //TODO
             using (ClientService clientService = new ClientService())
             {
                 clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
@@ -654,12 +666,60 @@ namespace ACT.UI.Controllers
 
             });
             ViewBag.ClientList = clientDDL;
-            int total = 0;
 
-            List<Site> model = new List<Site>();
-            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+            return PartialView("_ReconcileLoads");
+        }
 
-            return PartialView("_ReconcileLoads", paging);
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetUnreconciledClientLoads(int? clientId)
+        {
+            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+            clientId = (int)(clientId!=null? (int)clientId:!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+
+                List<ClientLoadCustomModel> load;
+                //int pspId = Session[ "UserPSP" ];
+                int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+              
+
+                using (ClientLoadService clientService = new ClientLoadService())
+                {
+
+                    load = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)Reconciliation.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+
+                }
+                if (load != null)
+                {
+                    return Json(load, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                }
+            }
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetUnreconciledAgentLoads(int? clientId)
+        {
+            
+                List<ChepLoadCustomModel> load;
+                //int pspId = Session[ "UserPSP" ];
+                int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                clientId = (int)(clientId != null ? (int)clientId : !string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+
+                using (ChepLoadService chepService = new ChepLoadService())
+                {
+
+                    load = chepService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)Reconciliation.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+
+                }
+           
+            if (load != null)
+            {
+                return Json(load, JsonRequestBehavior.AllowGet);
+            } else { 
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
         }
         #endregion
 
@@ -878,7 +938,7 @@ namespace ACT.UI.Controllers
 
         //-------------------------------------------------------------------------------------
 
-        #region Pallet Disputes
+        #region Pallet AuthorisationCode
         //
         // GET: /Pallet/AuthorisationCode
         public ActionResult AuthorisationCode(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
@@ -928,24 +988,6 @@ namespace ACT.UI.Controllers
 
         #region APIs
 
-        public JsonResult GetClientDetail(string clientId)
-        {
-            if (clientId != null && clientId != "")
-            {
-                Client client = null;
-
-                using (ClientService bservice = new ClientService())
-                {
-                    client = bservice.GetById(int.Parse(clientId));
-                    return Json(client, JsonRequestBehavior.AllowGet);
-                }
-            }
-            else
-            {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
-            }
-        }
-
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
         public JsonResult GetVehiclesForTransporter(string transId)
         {
@@ -969,6 +1011,43 @@ namespace ACT.UI.Controllers
             }
         }
 
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult ReconcileLoadsByIds(string agentLoadId, string clientLoadId)
+        {
+            if (!string.IsNullOrEmpty(agentLoadId) && !string.IsNullOrEmpty(clientLoadId))
+            {
+                //using (GroupService service = new GroupService())
+                using (ChepClientService cgservivce = new ChepClientService())
+                using (ClientLoadService clientservice = new ClientLoadService())
+                using (ChepLoadService chepService = new ChepLoadService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    //ClientGroup checkCG = clientgroupservice.GetByColumnsWhere(groupId, clientId);//check this link doesnt already exist, ignore if it does
+                    ////Group groupObj = groupservice.GetById(int.Parse(groupId));
+                    //if (checkCG == null)
+                    //{
+                    //    ClientGroup cgroup = new ClientGroup()
+                    //    {
+                    //        GroupId = int.Parse(groupId),
+                    //        ClientId = int.Parse(clientId),
+                    //        Status = (int)Status.Active,
+                    //    };
+                    //    clientgroupservice.Create(cgroup);
+
+                    //    scope.Complete();
+                    //} //nothing to do here if the group is already linekd  to the same client
+                    //else
+                    //{
+                    //    //just update status to make sure its visible and active, maybe it was disabled
+                    //    checkCG.Status = (int)Status.Active;
+                    //    clientgroupservice.Update(checkCG);
+                    //}
+                }
+
+
+            }
+            return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+        }
 
 
         #endregion
@@ -1016,9 +1095,9 @@ namespace ACT.UI.Controllers
 
                                 if (!string.IsNullOrEmpty(rows[0]))
                                 {
-                                    model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[0]) : DateTime.Now);
-                                    model.EffectiveDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[1]) : DateTime.Now);
-                                    model.NotifyDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[2]) : DateTime.Now);
+                                    model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeHelper.formatImportDate(rows[0]) : DateTime.Now);
+                                    model.EffectiveDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeHelper.formatImportDate(rows[1]) : DateTime.Now);
+                                    model.NotifyDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeHelper.formatImportDate(rows[2]) : DateTime.Now);
                                     model.DocketNumber = rows[3];
                                     model.PostingType = 2;//import - Transfer Customer to Customer - Out
                                     model.ClientDescription = rows[5];
@@ -1028,6 +1107,7 @@ namespace ACT.UI.Controllers
                                     model.CreatedOn = DateTime.Now;
                                     model.ModfiedOn = DateTime.Now;
                                     model.OriginalQuantity = (Decimal.TryParse(rows[11], out decimal oQty)? oQty : 0);
+                                    model.NewQuantity = model.OriginalQuantity;
 
                                     service.Create(model);
                                     importMessage += " Trading Partner: " + model.ClientDescription + " created at Id " + model.Id + "<br>";
@@ -1107,18 +1187,6 @@ namespace ACT.UI.Controllers
                             ClientLoad model = new ClientLoad();
                             int vehicleId = 0;
                             int transporterId = 0;
-                            if (!string.IsNullOrEmpty(rows[12]))
-                            {
-                                using (VehicleService vehservice = new VehicleService())
-                                {
-                                    VehicleCustomModel vehicle = vehservice.ListCSM(new PagingModel(), new CustomSearchModel() { Query = rows[12], Status = Status.Active }).FirstOrDefault();
-                                    if (vehicle != null)
-                                    {
-                                        vehicleId = vehicle.Id; //else remains 0
-                                    }
-                                }
-
-                            }
                             if (!string.IsNullOrEmpty(rows[11]))
                             {
                                 using (TransporterService transservice = new TransporterService())
@@ -1127,14 +1195,76 @@ namespace ACT.UI.Controllers
                                     if (trans != null)
                                     {
                                         transporterId = trans.Id; //else remains 0
-                                    }
+                                    } else
+                                        {
+                                            try { 
+                                                Transporter tra = new Transporter()
+                                                {
+                                                    Name = rows[11],
+                                                    ContactNumber = "TBC",
+                                                    Email = "TBC",
+                                                    TradingName = rows[11],
+                                                    RegistrationNumber = rows[12],
+                                                    Status = (int)Status.Active
+
+                                                };
+                                                transservice.Create(tra);
+                                                transporterId = tra.Id;
+                                                importMessage += " Transporter: " + tra.Name + " created at Id " + tra.Id + "<br>";
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                importMessage += "Reg : " + rows[12] + "Error " + ex.Message + "<br>";
+                                                ViewBag.Message = ex.Message;
+                                            }
+                                        }
                                 }
-                            }
+                            } //no else, if  there are no column data we cant add or facilitate a row addition
+                            if (!string.IsNullOrEmpty(rows[12]) && transporterId > 0)
+                            {
+                                using (VehicleService vehservice = new VehicleService())
+                                {
+                                    VehicleCustomModel vehicle = vehservice.ListCSM(new PagingModel(), new CustomSearchModel() { Query = rows[12], Status = Status.Active }).FirstOrDefault();
+                                    if (vehicle != null)
+                                    {
+                                        vehicleId = vehicle.Id; //else remains 0
+                                    } else
+                                        {
+                                            try
+                                            {
+                                                Vehicle veh = new Vehicle()
+                                                {
+                                                    ObjectId = transporterId,
+                                                    ObjectType = "Transporter",
+                                                    Make = "TBC",
+                                                    Model = "TBC",
+                                                    Year = 1,
+                                                    EngineNumber = rows[12],
+                                                    VINNumber = rows[12],
+                                                    Registration = rows[12],
+                                                    Descriptoin = rows[12],
+                                                    Type = (int)VehicleType.Other,
+                                                    Status = (int)Status.Active
+                                                };
+                                                vehservice.Create(veh);
+                                                vehicleId = veh.Id;
+                                                importMessage += " Vehicle: " + veh.Registration + " created at Id " + veh.Id + " For Transporter " + rows[11] + "<br>";
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                importMessage += "Reg : " + rows[12] + "Error " +ex.Message + "<br>";
+                                                ViewBag.Message = ex.Message;
+                                            }
+                                        }
+                                }
+
+                            } //no else, if  there are no column data we cant add or facilitate a row addition
+
                             if (!string.IsNullOrEmpty(rows[0]))
                             {
                                     if (vehicleId > 0 && transporterId > 0) { 
                                         model.ClientId = clientID;
-                                        model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeExtensions.formatImportDate(rows[0]) : DateTime.Now);
+                                        model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeHelper.formatImportDate(rows[0]) : DateTime.Now);
                                         model.LoadNumber = rows[1];
                                         model.AccountNumber = rows[2];                                
                                         model.ClientDescription = rows[3];
@@ -1143,6 +1273,7 @@ namespace ACT.UI.Controllers
                                         model.DeliveryNote = rows[6];
                                         //model.PRNNumber = rows[7];
                                         model.OriginalQuantity = (Decimal.TryParse(rows[7], out decimal oQty) ? oQty : 0);
+                                        model.NewQuantity = model.OriginalQuantity;
                                         model.RetQuantity = (Decimal.TryParse(rows[8], out decimal rQty) ? rQty : 0);
                                         //model.RetQuantity = decimal.Parse(rows[9]);
                                         model.ARPMComments = rows[10];
@@ -1291,6 +1422,246 @@ namespace ACT.UI.Controllers
             }
         }
 
+
+        #endregion
+
+        #region Exports
+
+        //
+        // GET: /Administration/Export
+        public FileContentResult Export(PagingModel pm, CustomSearchModel csm, string type = "configurations")
+        {
+            string csv = "";
+            string filename = string.Format("{0}-{1}.csv", type.ToUpperInvariant(), DateTime.Now.ToString("yyyy_MM_dd_HH_mm"));
+
+            pm.Skip = 0;
+            pm.Take = int.MaxValue;
+
+            switch (type)
+            {
+                case "clientlist":
+                    #region ClientList
+                    csv = String.Format("Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine);
+
+                    List<Client> clients = new List<Client>();
+
+                    using (ClientService service = new ClientService())
+                    {
+                        clients = service.ListCSM(pm, csm);
+                    }
+
+                    if (clients != null && clients.Any())
+                    {
+                        foreach (Client item in clients)
+                        {
+                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
+                                                csv,
+                                                item.Id,
+                                                item.CompanyName,
+                                                item.CompanyRegistrationNumber,
+                                                item.TradingAs,
+                                                item.VATNumber,
+                                                item.ChepReference,
+                                                item.ContactPerson,
+                                                item.ContactNumber,
+                                                item.Email,
+                                                item.AdminPerson,
+                                                item.AdminEmail,
+                                                item.FinancialPerson,
+                                                item.FinPersonEmail,
+                                                (Status)(int)item.Status,
+                                                Environment.NewLine);
+                        }
+                    }
+
+
+                    #endregion
+
+                    break;
+                case "awaitingactivation":
+                    #region AwaitingActivation
+                    csv = String.Format("Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine);
+
+                    List<Client> inactiveclients = new List<Client>();
+                    csm.Status = Status.Pending;
+                    using (ClientService service = new ClientService())
+                    {
+                        inactiveclients = service.ListCSM(pm, csm);
+                    }
+
+                    if (inactiveclients != null && inactiveclients.Any())
+                    {
+                        foreach (Client item in inactiveclients)
+                        {
+                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
+                                                csv,
+                                                item.Id,
+                                                item.CompanyName,
+                                                item.CompanyRegistrationNumber,
+                                                item.TradingAs,
+                                                item.VATNumber,
+                                                item.ChepReference,
+                                                item.ContactPerson,
+                                                item.ContactNumber,
+                                                item.Email,
+                                                item.AdminPerson,
+                                                item.AdminEmail,
+                                                item.FinancialPerson,
+                                                item.FinPersonEmail,
+                                                (Status)(int)item.Status,
+                                                Environment.NewLine);
+                        }
+                    }
+
+
+                    #endregion
+
+                    break;
+                case "managesites":
+                    #region AwaitingActivation
+                    csv = String.Format("Id, Name, Description, X Coord, Y Coord, Address, Postal Code, Contact Name,Contact No,Planning Point, Depot, Chep Sitecode, Site Type, Status {0}", Environment.NewLine);
+
+                    List<Site> siteList = new List<Site>();
+
+                    using (SiteService service = new SiteService())
+                    {
+                        siteList = service.ListCSM(pm, csm);
+                    }
+
+                    if (siteList != null && siteList.Any())
+                    {
+                        foreach (Site item in siteList)
+                        {
+                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10}, {11}, {12}, {13}, {14} {15}",
+                                                csv,
+                                                item.Id,
+                                                item.Name,
+                                                item.Description,
+                                                item.XCord,
+                                                item.YCord,
+                                                item.Address,
+                                                item.PostalCode,
+                                                item.ContactName,
+                                                item.ContactNo,
+                                                item.PlanningPoint,
+                                                item.Depot,
+                                                item.SiteCodeChep,
+                                                (SiteType)(int)item.SiteType,
+                                                (Status)(int)item.Status,
+                                                Environment.NewLine);
+                        }
+                    }
+                    #endregion
+                    break;
+
+                case "linkproducts":
+                    #region linkproducts
+                    csv = String.Format("Id, ClientId, Company Name, ProductId, Product Name, Product Description, Active Date, HireRate, LostRate, IssueRate, PassonRate, PassonDays, Status {0}", Environment.NewLine);
+
+                    List<ClientProductCustomModel> product = new List<ClientProductCustomModel>();
+
+                    using (ClientProductService service = new ClientProductService())
+                    {
+                        product = service.ListCSM(pm, csm);
+                    }
+
+                    if (product != null && product.Any())
+                    {
+                        foreach (ClientProductCustomModel item in product)
+                        {
+                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} {14}",
+                                                csv,
+                                                item.Id,
+                                                item.ClientId,
+                                                item.CompanyName,
+                                                item.ProductId,
+                                                item.Name,
+                                                item.ProductDescription,
+                                                item.ActiveDate,
+                                                item.HireRate,
+                                                item.LostRate,
+                                                item.IssueRate,
+                                                item.PassonRate,
+                                                item.PassonDays,
+                                                (Status)(int)item.Status,
+                                                Environment.NewLine);
+                        }
+                    }
+
+
+                    #endregion
+
+                    break;
+
+                case "clientgroups":
+                    #region ClientGroup
+                    csv = String.Format("Id, Group Name, Description, Status {0}", Environment.NewLine);
+
+                    List<ClientGroupCustomModel> clientGroups = new List<ClientGroupCustomModel>();
+
+                    using (ClientGroupService service = new ClientGroupService())
+                    {
+                        clientGroups = service.ListCSM(pm, csm);
+                    }
+
+                    if (clientGroups != null && clientGroups.Any())
+                    {
+                        foreach (ClientGroupCustomModel item in clientGroups)
+                        {
+                            csv = String.Format("{0} {1},{2},{3},{4} {5}",
+                                                csv,
+                                                item.Id,
+                                                item.Name,
+                                                item.Description,
+                                                 (Status)(int)item.Status,
+                                                Environment.NewLine);
+                        }
+                    }
+
+
+                    #endregion
+
+                    break;
+                case "clientkpis":
+                    #region ClientKPI
+                    csv = String.Format("Id, Client Id,Description, Weight %, TargetAmount, Target Period, Status {0}", Environment.NewLine);
+
+                    List<ClientKPI> kpis = new List<ClientKPI>();
+
+                    using (ClientKPIService service = new ClientKPIService())
+                    {
+                        kpis = service.ListCSM(pm, csm);
+                    }
+
+                    if (kpis != null && kpis.Any())
+                    {
+                        foreach (ClientKPI item in kpis)
+                        {
+                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
+                                                csv,
+                                                item.Id,
+                                                item.ClientId,
+                                                item.KPIDescription,
+                                                //item.Disputes,
+                                                //item.OutstandingPallets,
+                                                //item.OutstandingDays,
+                                                //item.Passons,
+                                                item.Weight,
+                                                item.TargetAmount,
+                                                item.TargetPeriod,
+                                                (Status)(int)item.Status,
+                                                Environment.NewLine);
+                        }
+                    }
+
+
+                    #endregion
+
+                    break;
+            }
+
+            return File(new System.Text.UTF8Encoding().GetBytes(csv), "text/csv", filename);
+        }
 
         #endregion
     }

@@ -36,7 +36,14 @@
         There are no Pooling Agent Load Entries available matching your search criteria.
     </div>
 }
-
+@if (ViewBag.ContextualMode)
+{
+    <input type="hidden" id="context" name="context" value="1" />
+}
+else
+{
+    <input type="hidden" id="context" name="context" value="0" />
+}
 @using (Html.BeginForm("ImportChepLoad", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#poolingagentdata", @class = "custom-validate", @style = "width: auto;", id = "importpoolingagent" }))
 {
     <p>
@@ -56,7 +63,7 @@
                     }
                 </td>
                 <td style="width:2%">
-                    @Html.ActionLink("Add", "AddPoolingAgentData", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add Manual Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" })                    
+                    @Html.ActionLink("Add", "AddPoolingAgentData", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add Manual Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" })
                 </td>
                 <td style="width:5%">
                     &nbsp;
@@ -133,7 +140,7 @@
         {
             foreach (var item in items)
             {
-                Status status = (Status)item.Status;
+                Reconciliation status = (Reconciliation)item.Status;
 
                 String active = status.Equals(Status.Active) ? "active" : "inactive";
                 String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
@@ -173,112 +180,55 @@
                     <td style="width: 15%;">@item.OriginalQuantity</td>
                     @*<td style="width: 15%;"></td>*@
                     <td width="15%">
-                        <a href="#doc" rel="modal:open"><i class="fa fa-file-o"></i></a>
-                        @Html.ActionLink("Edit", "EditPoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        <a href="#doc" rel="modal:open" onclick="loadDocs(@item.Id)"><i class="fa fa-file-text-o"></i></a>
+                        @Html.ActionLink(" ", "EditPoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        @Html.ActionLink(enable, "DeletePoolingAgentData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?" })
-                        @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
-
-            @if (item.Documents != null && item.Documents.Any(s => s.Status == (Int32)Status.Active))
-            {
-                <a class="docs" data-sticky-one="1" data-target="#supporting-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Documents">
-                    Docs
-                </a>
-                <div id="supporting-@item.Id-docs" class="none">
-                    <ul class="list">
-                        @foreach (var d in item.Documents.Where(s => s.Status == (Int32)Status.Active))
-                        {
-                            <li style="line-height: 20px;">
-                                <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Pallet", new { @id = d.Id } )" target="_blank">
-                                    @d.Name (@d.Type)
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            }
-        </div>*@
-                        @*<button id="managedocs" name="managedocs">Docs</button>*@
-                        <div id="doc" class="modal">
-                            <p>
-                                <strong class="">Documents</strong>
-                            </p>
-                            <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i> Add</a>
-                            <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
-                                <thead>
-                                    <tr>
-
-                                        <th data-name="Name" data-column="Name">
-                                            Documnet Title
-                                        </th>
-                                        <th data-name="XCord" data-column="XCord">
-                                            Type
-                                        </th>
-                                        <th data-name="YCord" data-column="YCord">
-                                            Date
-                                        </th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody id="doctabledata"></tbody>
-
-                            </table>
-
-                            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-                        </div>
-                        @*<div id="doc" class="modal_act ">
-
-            <div class="modalContainer">
-                <div class="modalTitle">
-                    <p>
-                        <strong class="">Documents</strong>
-                    </p>
-                </div>
-                <div class="modalContent">
-                    <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i></a>
-
-                    <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
-                        <thead>
-                            <tr>
-
-                                <th data-name="Name" data-column="Name">
-                                    Documnet Title
-                                </th>
-                                <th data-name="XCord" data-column="XCord">
-                                    Type
-                                </th>
-                                <th data-name="YCord" data-column="YCord">
-                                    Date
-                                </th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="doctabledata"></tbody>
-
-                    </table>
-                    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-                </div>
-
-
-            </div>
-        </div>
-                        *@
+                        @Html.ActionLink(" ", "DeletePoolingAgentData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?" })
                     </td>
 
 
-                        </tr>
+                </tr>
 
-                        count++;
-                    }
-                }
-            </tbody>
+                count++;
+            }
+        }
+    </tbody>
 
-        </table>
-        @Html.Partial("_Paging")
+</table>
+<div id="doc" class="modal">
+    <p>
+        <strong class="">Documents</strong>
+    </p>
+    <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i> Add</a>
+    <input type="hidden" id="docitem" name="docitem" value="0" />
+    @*<div id="docslisttable" />*@
+    <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th>
+                    Document Title
+                </th>
+                <th>
+                    Type
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
 
-        <script>
+        <tbody></tbody>
+    </table>
+    <div id="documentsdiv">
+    </div>
+    <span id="uploaded_file"></span>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+</div>
+@Html.Partial("_Paging")
+
+<script>
                 $(document).ready(function () {
                     var context = $("#context").val();
                     if (context == "0") {
@@ -318,69 +268,93 @@
 
                     //populateDocs(cId, "Client");
 
-                    //$(document).on('change', '#companyfile', function () {
-                    //    var name = document.getElementById("companyfile").files[0].name;
-                    //    var form_data = new FormData();
-                    //    var ext = name.split('.').pop().toLowerCase();
-                    //    if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx', 'csv']) == -1) {
-                    //        alert("Invalid File");
-                    //    }
-                    //    var oFReader = new FileReader();
-                    //    oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
-                    //    var f = document.getElementById("companyfile").files[0];
-                    //    var fsize = f.size || f.fileSize;
-                    //    if (fsize > 2000000) {
-                    //        alert("File Size is too large");
-                    //    }
-                    //    else {
-                    //        form_data.append("file", document.getElementById('companyfile').files[0]);
-                    //        form_data.append("clientId", $("#Id").val());
-                    //        $.ajax({
-                    //            url: "Upload?id="+cId,
-                    //            method: "POST",
-                    //            data: form_data,
-                    //            contentType: false,
-                    //            cache: false,
-                    //            processData: false,
-                    //            beforeSend: function () {
-                    //                $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
-                    //            },
-                    //            success: function (data) {
-                    //                //$('#uploaded_file').html(data);
-                    //                populateDocs(cId, "ChepLoad");
-                    //                $('#uploaded_file').html("<label class='text-success'></label>");
-                    //            }
-                    //        });
-                    //    }
-                    //});
+                    $(document).on('change', '#companyfile', function () {
+                        var cId = $('#docitem').val();
+                        var name = document.getElementById("companyfile").files[0].name;
+                        var form_data = new FormData();
+                        var ext = name.split('.').pop().toLowerCase();
+                        if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx', 'csv']) == -1) {
+                            alert("Invalid File");
+                        }
+                        var oFReader = new FileReader();
+                        oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
+                        var f = document.getElementById("companyfile").files[0];
+                        var fsize = f.size || f.fileSize;
+                        if (fsize > 2000000) {
+                            alert("File Size is too large");
+                        }
+                        else {
+                            form_data.append("file", document.getElementById('companyfile').files[0]);
+                            form_data.append("clientId", $("#Id").val());
+                            $.ajax({
+                                url: "Upload?id=" + cId + "&utype=ChepLoad&uname=Agent",
+                                method: "POST",
+                                data: form_data,
+                                contentType: false,
+                                cache: false,
+                                processData: false,
+                                beforeSend: function () {
+                                    $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
+                                },
+                                success: function (data) {
+                                    //$('#uploaded_file').html(data);
+                                    populateDocs(cId, "ChepLoad");
+                                    $('#uploaded_file').html("<label class='text-success'></label>");
+                                }
+                            });
+                        }
+                    });
 
                 });
+
+            function AddDocRow() {
+                var rowDiv = $("#doctable-table tbody");
+                var tabledata = '<tr><td colspan="4"><input id="companyfile" name="companyfile" type="file" value="" data-val-file="1" class="input" /></td></tr>';
+                rowDiv.append(tabledata);
+
+            }
+
+            function loadDocs(itemId) {
+                populateDocs(itemId, "ChepLoad")
+            }
+
+            function removeFile(fileId,itemId) {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("RemoveFile", "Pallet")',
+                    data: { "FileId": fileId },
+                    success: function (response) {
+                        debugger;
+                        populateDocs(itemId, "ChepLoad");
+                    }
+                });
+            }
+
             function SetClient(cId) {
                 $("#ClientId").val(cId);
                 $.ajax({
                     type: 'POST',
-                    url: "SetClient",
+                    url: '@Url.Action("SetClient", "Pallet")',
                     data: { "ClientId": cId },
                     success: function (response) {
-                        //window.location.href = 'Index#managesites';
-                        //location.reload();
-                        // GetIncludedSites(cId);
+                        location.reload();
                     }
                 });
             }
-                function populateDocs(id, doctype) {
+            function populateDocs(id, doctype) {
+                $("#docitem").val(id); //docslisttable
+                $("#doctable-table tbody").html('');//clear the div
+                $.ajax({
 
-                    $.ajax({
-
-                        url: '@Url.Action("ListFiles", "Pallet")',
-                        type: "GET",
-                        dataType: "html",
-                        data: { objId: id, objType:doctype },//this is as per your requirement
-                        success: function (data) {
-                            $('#documentsdiv_'+id).html(data);
-                        },
-                    });
+                    url: '@Url.Action("ListFilesTable", "Pallet")',
+                    type: "GET",
+                    dataType: "html",
+                    data: { objId: id, objType:doctype },
+                    success: function (data) {
+                        $('#doctable-table tbody').html(data); //reload the div
+                    },
+                });
             }
 
 
-            </script>
+</script>

@@ -41,6 +41,8 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmReconciliation", ( int ) csm.ReconciliationStatus ) },
+                { new SqlParameter( "csmStatus", ( int ) csm.Status ) },
                 //{ new SqlParameter( "clientid", clientId > 0 ? clientId : 0 ) },
             };
 
@@ -57,6 +59,15 @@ namespace ACT.Core.Services
             #region WHERE
 
             query = $"{query} WHERE (1=1)";
+
+            //if (CurrentUser.RoleType == RoleType.PSP)
+            //{
+            //    query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+            //}
+            //else if (CurrentUser.RoleType == RoleType.Client)
+            //{
+            //    query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            //}
 
             #endregion
 
@@ -88,6 +99,38 @@ namespace ACT.Core.Services
                 {
                     query = $"{query} AND (p.CreatedOn<=@csmToDate) ";
                 }
+            }
+
+
+            if (csm.ReconciliationStatus != Reconciliation.Unreconcilable)
+            {
+                query = $"{query} AND (p.Status=@csmReconciliation)";
+            }
+
+
+            //if (csm.Status != Status.All)
+            //{
+            //    query = $"{query} AND (p.Status=@csmReconciliation)";
+            //}
+
+            if (!string.IsNullOrEmpty(csm.Name))
+            {
+                query = string.Format(@"{0} AND (p.ClientDescription LIKE '%{1}%' )", query, csm.Description);
+            }
+
+            if (!string.IsNullOrEmpty(csm.ReferenceNumber))
+            {
+                query = string.Format(@"{0} AND (p.DocketNumber LIKE '%{1}%' OR p.ReferenceNumber LIKE '%{1}%' OR p.ReceiverNumber LIKE '%{1}%' OR p.AccountNumber LIKE '%{1}%' )", query, csm.ReferenceNumber);
+            }
+
+            if (!string.IsNullOrEmpty(csm.ReferenceNumberOther))
+            {
+                query = string.Format(@"{0} AND (p.DocketNumber LIKE '%{1}%' OR p.ReferenceNumber LIKE '%{1}%' OR p.ReceiverNumber LIKE '%{1}%' OR p.AccountNumber LIKE '%{1}%' )", query, csm.ReferenceNumberOther);
+            }
+
+            if (!string.IsNullOrEmpty(csm.Description))
+            {
+                query = string.Format(@"{0} AND (p.Equipment LIKE '%{1}%' OR p.ClientDescription LIKE '%{1}%' )", query, csm.Description);
             }
 
             #endregion
@@ -136,6 +179,8 @@ namespace ACT.Core.Services
 
             return model;
         }
+
+
 
     }
 }
