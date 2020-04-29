@@ -85,7 +85,7 @@ namespace ACT.Core.Services
 
             if (!string.IsNullOrEmpty(csm.Query))
             {
-                query = string.Format(@"{0} AND (LOWER(REPLACE(v.TradingName, ' ', '')) LIKE '%{1}%' OR LOWER(REPLACE(v.Name, ' ', '')) LIKE '%{1}%' OR LOWER(REPLACE(v.RegistrationNumber, ' ', '')) LIKE '%{1}%') ", query, csm.Query.Trim().ToLower());
+                query = string.Format(@"{0} AND (LOWER(REPLACE(v.TradingName, ' ', '')) LIKE '%{1}%' OR LOWER(REPLACE(v.Name, ' ', '')) LIKE '%{1}%' OR LOWER(REPLACE(v.RegistrationNumber, ' ', '')) LIKE '%{1}%') ", query, csm.Query.Trim().ToLower().Replace(" ", ""));
             }
 
             #endregion

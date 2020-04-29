@@ -31,6 +31,7 @@ namespace ACT.UI
                         "~/Scripts/Plugins/jquery.dataTables.min.js",
                         "~/Scripts/Plugins/dataTables.select.min.js",
                         "~/Scripts/Plugins/toastr.min.js",
+                        "~/Scripts/Plugins/moment.js",
                         "~/Scripts/Plugins/jquery.modal.min.js"
                         /*,
                         "~/Scripts/Plugins/dataTables.fixedHeader.min.js"*/ ) );

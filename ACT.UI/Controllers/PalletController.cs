@@ -17,6 +17,7 @@ using OpenPop;
 using ACT.Core.Helpers;
 namespace ACT.UI.Controllers
 {
+    [Requires(PermissionTo.View, PermissionContext.Pallet)]
     public class PalletController : BaseController
     {
         // GET: Pallet
@@ -474,7 +475,7 @@ namespace ACT.UI.Controllers
                 {
                     ClientId = load.ClientId,
                     VehicleId = load.VehicleId,
-                    TransporterId = load.TransporterId,
+                    TransporterId = (int)load.TransporterId,
                     LoadDate = load.LoadDate,
                     LoadNumber = load.LoadNumber,
                     EffectiveDate = load.EffectiveDate,

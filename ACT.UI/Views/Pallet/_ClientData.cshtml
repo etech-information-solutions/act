@@ -72,7 +72,7 @@ else
                     <label for="file" class="importlabel postedFilecdata">Browse:</label>
                 </td>
                 <td style="width:55%">
-                    <input type="file" class="postedFilecdata" id="postedFile" name="postedFile" class="form-control" accept=".csv" />
+                    <input type="file" class="postedFilecdata form-control" id="postedFile" name="postedFile" accept=".csv" />
                 </td>
                 <td style="width:10%">
                     <input type="submit" value="Import" class="importbutton postedFilecdata" />
@@ -171,7 +171,7 @@ else
                     <td style="width: 8%;">@item.LoadNumber</td>
                     <td style="width: 8%;">@*Issue Note**@</td>
                     <td style="width: 8%;">@item.PCNNumber</td>
-                    <td style="width: 8%;">@*THAN**@</td>a>
+                    <td style="width: 8%;">@*THAN**@</td>
                     <td style="width: 8%;">@item.OriginalQuantity</td>
                     <td width="8%">
                         <a href="#doc" rel="modal:open" onclick="loadDocs(@item.Id)"><i class="fa fa-file-text-o"></i></a>
@@ -222,10 +222,11 @@ else
         //var cId = parseInt($("#ClientListSiteManage").val());
         var context = $("#context").val();
         if (context == "0") {
-            $('#addrowdata').hide();
-            $('.importlabel').hide();
-            $('.importbutton').hide();
-            $('#postedFile').hide();
+            $('.postedFilecdata').hide();
+            //$('.add').hide();
+            //$('.importlabel').hide();
+            //$('.importbutton').hide();
+            //$('#postedFile').hide();
         }
 
             $("#ClientList").change(function () {
@@ -233,17 +234,17 @@ else
                 var cId = parseInt($('option:selected', this).val());
                 SetClient(cId);
                 if (cId > 0) {
-
-
-                    $('#addrowdata').show();
-                    $('.importlabel').show();
-                    $('.importbutton').show();
-                    $('#postedFile').show();
+                    $('.postedFilecdata').show();
+                    //$('.add').show();
+                    //$('.importlabel').show();
+                    //$('.importbutton').show();
+                    //$('#postedFile').show();
                 } else {
-                    $('#addrowdata').hide();
-                    $('.importlabel').hide();
-                    $('.importbutton').hide();
-                    $('#postedFile').hide();
+                    $('.postedFilecdata').hide();
+                    //$('.add').hide();
+                    //$('.importlabel').hide();
+                    //$('.importbutton').hide();
+                    //$('#postedFile').hide();
                 }
 
                 //$.ajax({

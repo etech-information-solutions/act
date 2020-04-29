@@ -76,6 +76,21 @@
           <Property Name="AccountType" Type="int" Nullable="false" />
           <Property Name="Status" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="Batch">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="BatchNo" Type="varchar" MaxLength="30" />
+          <Property Name="BatchTable" Type="varchar" MaxLength="50" />
+          <Property Name="BatchInNotes" Type="text" />
+          <Property Name="BatchOutNotes" Type="text" />
+          <Property Name="RunDate" Type="datetime" Nullable="false" />
+          <Property Name="FinishDate" Type="datetime" Nullable="false" />
+          <Property Name="BatchSource" Type="varchar" MaxLength="100" />
+          <Property Name="BatchRows" Type="int" />
+          <Property Name="BatchComm" Type="varchar" MaxLength="300" Nullable="false" />
+        </EntityType>
         <EntityType Name="Broadcast">
           <Key>
             <PropertyRef Name="Id" />
@@ -168,9 +183,9 @@
           <Property Name="DeclinedReason" Type="varchar" MaxLength="500" />
           <Property Name="ServiceRequired" Type="int" Nullable="false" />
           <Property Name="Status" Type="int" Nullable="false" />
-          <Property Name="ChepReference" Type="varchar" MaxLength="50" />
           <Property Name="AdminPerson" Type="varchar" MaxLength="50" />
           <Property Name="FinPersonEmail" Type="varchar" MaxLength="50" />
+          <Property Name="ChepReference" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ClientAuthorisation">
           <Key>
@@ -195,18 +210,18 @@
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="BudgetYear" Type="int" />
-          <Property Name="January"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="February"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="March"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="April"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="May"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="June"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="July"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="August"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="September"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="October"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="November"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="December"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="January" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="February" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="March" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="April" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="May" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="June" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="July" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="August" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="September" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="October" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="November" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="December" Type="numeric" Precision="18" Scale="2" />
           <Property Name="Status" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="ClientGroup">
@@ -242,6 +257,7 @@
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
+          <Property Name="KPIDescription" Type="varchar" MaxLength="250" />
           <Property Name="Disputes" Type="numeric" Precision="18" Scale="0" />
           <Property Name="OutstandingPallets" Type="numeric" Precision="18" Scale="0" />
           <Property Name="Passons" Type="numeric" Precision="18" Scale="0" />
@@ -249,10 +265,9 @@
           <Property Name="Status" Type="int" Nullable="false" />
           <Property Name="OutstandingDays" Type="int" />
           <Property Name="ResolveDays" Type="int" />
-          <Property Name="Weight" Type="numeric" Precision="18" Scale="0" />
-          <Property Name="TargetAmount" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="Weight" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="TargetAmount" Type="numeric" Precision="18" Scale="2" />
           <Property Name="TargetPeriod" Type="int" />
-          <Property Name="KPIDescription" Type="varchar" MaxLength="250" />
         </EntityType>
         <EntityType Name="ClientLoad">
           <Key>
@@ -273,7 +288,7 @@
           <Property Name="DeliveryNote" Type="varchar" MaxLength="50" />
           <Property Name="ReferenceNumber" Type="varchar" MaxLength="50" />
           <Property Name="ReceiverNumber" Type="varchar" MaxLength="50" />
-          <Property Name="Equipment" Type="char" MaxLength="10" />
+          <Property Name="Equipment" Type="varchar" MaxLength="50" />
           <Property Name="OriginalQuantity" Type="numeric" Precision="18" Scale="0" />
           <Property Name="NewQuantity" Type="numeric" Precision="18" Scale="0" />
           <Property Name="ReconcileInvoice" Type="int" />
@@ -282,10 +297,10 @@
           <Property Name="PCNNumber" Type="varchar" MaxLength="50" />
           <Property Name="PRNNumber" Type="varchar" MaxLength="50" />
           <Property Name="Status" Type="int" Nullable="false" />
-          <Property Name="TransporterId" Type="int" Nullable="true" />
+          <Property Name="TransporterId" Type="int" />
           <Property Name="RetQuantity" Type="numeric" Precision="18" Scale="0" />
           <Property Name="ARPMComments" Type="varchar" MaxLength="150" />
-          <Property Name="ProvCode" Type="varchar" MaxLength="30" />       
+          <Property Name="ProvCode" Type="varchar" MaxLength="30" />
         </EntityType>
         <EntityType Name="ClientProduct">
           <Key>
@@ -494,18 +509,18 @@
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="ObjectId" Type="int" />
           <Property Name="ObjectType" Type="varchar" MaxLength="50" />
-          <Property Name="January"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="February"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="March"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="April"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="May"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="June"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="July"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="August"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="September"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="October"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="November"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="December"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="January" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="February" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="March" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="April" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="May" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="June" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="July" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="August" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="September" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="October" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="November" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="December" Type="numeric" Precision="18" Scale="2" />
         </EntityType>
         <EntityType Name="Group">
           <Key>
@@ -663,18 +678,18 @@
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="BudgetYear" Type="int" Nullable="false" />
-          <Property Name="January"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="February"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="March"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="April"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="May"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="June"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="July"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="August"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="September"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="October"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="November"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="December"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="January" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="February" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="March" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="April" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="May" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="June" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="July" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="August" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="September" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="October" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="November" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="December" Type="numeric" Precision="18" Scale="2" />
           <Property Name="Status" Type="int" />
         </EntityType>
         <EntityType Name="PSPClient">
@@ -797,16 +812,16 @@
           <Property Name="PostalCode" Type="char" MaxLength="10" />
           <Property Name="ContactNo" Type="varchar" MaxLength="50" />
           <Property Name="ContactName" Type="varchar" MaxLength="50" />
-          <Property Name="FinanceContactNo" Type="varchar" MaxLength="50" />
-          <Property Name="FinanceContact" Type="varchar" MaxLength="50" />
-          <Property Name="ReceivingContactNo" Type="varchar" MaxLength="50" />
-          <Property Name="ReceivingContact" Type="varchar" MaxLength="50" />          
           <Property Name="PlanningPoint" Type="varchar" MaxLength="50" />
           <Property Name="SiteType" Type="int" />
           <Property Name="AccountCode" Type="varchar" MaxLength="50" />
           <Property Name="Depot" Type="varchar" MaxLength="50" />
           <Property Name="SiteCodeChep" Type="varchar" MaxLength="50" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="FinanceContact" Type="varchar" MaxLength="50" />
+          <Property Name="FinanceContactNo" Type="varchar" MaxLength="50" />
+          <Property Name="ReceivingContact" Type="varchar" MaxLength="50" />
+          <Property Name="ReceivingContactNo" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="SiteAudit">
           <Key>
@@ -858,18 +873,18 @@
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="BudgetYear" Type="int" Nullable="false" />
-          <Property Name="January"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="February"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="March"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="April"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="May"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="June"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="July"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="August"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="September"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="October"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="November"  Type="numeric" Precision="18" Scale="0" />
-          <Property Name="December"  Type="numeric" Precision="18" Scale="0" />
+          <Property Name="January" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="February" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="March" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="April" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="May" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="June" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="July" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="August" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="September" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="October" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="November" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="December" Type="numeric" Precision="18" Scale="2" />
           <Property Name="Status" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="SystemConfig">
@@ -897,6 +912,12 @@
           <Property Name="WebsiteUrl" Type="varchar" MaxLength="250" />
           <Property Name="PlatformTnCDocumentUrl" Type="varchar" MaxLength="250" />
           <Property Name="ClientTnCDocumentUrl" Type="varchar" MaxLength="250" />
+          <Property Name="EmailBatchMonitorStart" Type="time" Precision="7" />
+          <Property Name="EmailBatchMonitorEnd" Type="time" Precision="7" />
+          <Property Name="EmailBatchMonitorPoll" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="EmailBatchMonitorPath" Type="varchar" MaxLength="250" />
+          <Property Name="LastEmailBatchMonitorRun" Type="datetime" />
+          <Property Name="LastEmailBatchMonitorCount" Type="int" />
         </EntityType>
         <EntityType Name="Task">
           <Key>
@@ -1114,18 +1135,6 @@
             </Principal>
             <Dependent Role="ClientGroup">
               <PropertyRef Name="GroupId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ClientGroups_PSPClients">
-          <End Role="PSPClient" Type="Self.PSPClient" Multiplicity="1" />
-          <End Role="ClientGroup" Type="Self.ClientGroup" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSPClient">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ClientGroup">
-              <PropertyRef Name="ClientId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1758,6 +1767,7 @@
           <EntitySet Name="AuditLog" EntityType="Self.AuditLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Bank" EntityType="Self.Bank" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="BankDetail" EntityType="Self.BankDetail" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Batch" EntityType="Self.Batch" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Broadcast" EntityType="Self.Broadcast" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ChepAudit" EntityType="Self.ChepAudit" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ChepClient" EntityType="Self.ChepClient" Schema="dbo" store:Type="Tables" />
@@ -1838,10 +1848,6 @@
           </AssociationSet>
           <AssociationSet Name="FK_ClientGroups_Groups" Association="Self.FK_ClientGroups_Groups">
             <End Role="Group" EntitySet="Group" />
-            <End Role="ClientGroup" EntitySet="ClientGroup" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ClientGroups_PSPClients" Association="Self.FK_ClientGroups_PSPClients">
-            <End Role="PSPClient" EntitySet="PSPClient" />
             <End Role="ClientGroup" EntitySet="ClientGroup" />
           </AssociationSet>
           <AssociationSet Name="FK_ClientInvoices_ClientLoads" Association="Self.FK_ClientInvoices_ClientLoads">
@@ -2356,6 +2362,7 @@
             <End Role="PSPProduct" EntitySet="PSPProducts" />
             <End Role="PSPBilling" EntitySet="PSPBillings" />
           </AssociationSet>
+          <EntitySet Name="Batches" EntityType="ACTModel.Batch" />
         </EntityContainer>
         <EntityType Name="Address">
           <Key>
@@ -2567,18 +2574,18 @@
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="BudgetYear" Type="Int32" />
-          <Property Name="January"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="February" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="March"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="April"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="May"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="June"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="July"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="August"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="September"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="October"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="November"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="December"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="January"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="February" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="March"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="April"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="May"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="June"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="July"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="August"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="September"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="October"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="November"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="December"  Type="Decimal" Precision="18" Scale="2" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientBudget_Clients" FromRole="ClientBudget" ToRole="Client" />
         </EntityType>
@@ -2626,8 +2633,8 @@
           <Property Name="Status" Type="Int32" Nullable="false" />
           <Property Name="OutstandingDays" Type="Int32" />
           <Property Name="ResolveDays" Type="Int32" />
-          <Property Name="Weight" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="TargetAmount" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="Weight" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="TargetAmount" Type="Decimal" Precision="18" Scale="2" />
           <Property Name="TargetPeriod" Type="Int32" />     
           <Property Name="KPIDescription" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientKPIs_Clients" FromRole="ClientKPI" ToRole="Client" />
@@ -2651,7 +2658,7 @@
           <Property Name="DeliveryNote" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="ReferenceNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="ReceiverNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Equipment" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
+          <Property Name="Equipment" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="OriginalQuantity" Type="Decimal" Precision="18" Scale="0" />
           <Property Name="NewQuantity" Type="Decimal" Precision="18" Scale="0" />
           <Property Name="ReconcileInvoice" Type="Int32" />
@@ -2894,18 +2901,18 @@
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="ObjectId" Type="Int32" />
           <Property Name="ObjectType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="January"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="February" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="March"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="April"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="May"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="June"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="July"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="August"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="September"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="October"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="November"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="December"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="January" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="February" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="March" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="April" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="May" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="June" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="July" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="August" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="September" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="October" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="November" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="December" Type="Decimal" Precision="18" Scale="2" />
         </EntityType>
         <EntityType Name="Group">
           <Key>
@@ -3060,18 +3067,18 @@
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="BudgetYear" Type="Int32" Nullable="false" />
-          <Property Name="January"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="February" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="March"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="April"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="May"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="June"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="July"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="August"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="September"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="October"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="November"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="December"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="January"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="February" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="March"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="April"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="May"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="June"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="July"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="August"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="September"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="October"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="November"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="December"  Type="Decimal" Precision="18" Scale="2" />
           <Property Name="Status" Type="Int32" />
           <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPBudget_PSP" FromRole="PSPBudget" ToRole="PSP" />
         </EntityType>
@@ -3281,18 +3288,18 @@
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="BudgetYear" Type="Int32" Nullable="false" />
-          <Property Name="January"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="February" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="March"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="April"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="May"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="June"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="July"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="August"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="September"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="October"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="November"  Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="December"  Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="January"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="February" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="March"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="April"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="May"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="June"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="July"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="August"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="September"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="October"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="November"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="December"  Type="Decimal" Precision="18" Scale="2" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Site" Relationship="ACTModel.FK_SiteBudgets_Sites" FromRole="SiteBudget" ToRole="Site" />
         </EntityType>
@@ -3321,6 +3328,12 @@
           <Property Name="WebsiteUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="PlatformTnCDocumentUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="ClientTnCDocumentUrl" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="EmailBatchMonitorStart" Type="Time" Precision="7" />
+          <Property Name="EmailBatchMonitorEnd" Type="Time" Precision="7" />
+          <Property Name="EmailBatchMonitorPoll" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="EmailBatchMonitorPath" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="LastEmailBatchMonitorRun" Type="DateTime" Precision="3" />
+          <Property Name="LastEmailBatchMonitorCount" Type="Int32" />
         </EntityType>
         <EntityType Name="Task">
           <Key>
@@ -4225,6 +4238,21 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Batch">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="BatchNo" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="BatchTable" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="BatchInNotes" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="BatchOutNotes" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="RunDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="FinishDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="BatchSource" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="BatchRows" Type="Int32" />
+          <Property Name="BatchComm" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -5126,6 +5154,12 @@
           <EntitySetMapping Name="SystemConfigs">
             <EntityTypeMapping TypeName="ACTModel.SystemConfig">
               <MappingFragment StoreEntitySet="SystemConfig">
+                <ScalarProperty Name="LastEmailBatchMonitorCount" ColumnName="LastEmailBatchMonitorCount" />
+                <ScalarProperty Name="LastEmailBatchMonitorRun" ColumnName="LastEmailBatchMonitorRun" />
+                <ScalarProperty Name="EmailBatchMonitorPath" ColumnName="EmailBatchMonitorPath" />
+                <ScalarProperty Name="EmailBatchMonitorPoll" ColumnName="EmailBatchMonitorPoll" />
+                <ScalarProperty Name="EmailBatchMonitorEnd" ColumnName="EmailBatchMonitorEnd" />
+                <ScalarProperty Name="EmailBatchMonitorStart" ColumnName="EmailBatchMonitorStart" />
                 <ScalarProperty Name="ClientTnCDocumentUrl" ColumnName="ClientTnCDocumentUrl" />
                 <ScalarProperty Name="PlatformTnCDocumentUrl" ColumnName="PlatformTnCDocumentUrl" />
                 <ScalarProperty Name="WebsiteUrl" ColumnName="WebsiteUrl" />
@@ -5313,6 +5347,22 @@
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="PSPProductId" ColumnName="PSPProductId" />
                 <ScalarProperty Name="PSPId" ColumnName="PSPId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Batches">
+            <EntityTypeMapping TypeName="ACTModel.Batch">
+              <MappingFragment StoreEntitySet="Batch">
+                <ScalarProperty Name="BatchComm" ColumnName="BatchComm" />
+                <ScalarProperty Name="BatchRows" ColumnName="BatchRows" />
+                <ScalarProperty Name="BatchSource" ColumnName="BatchSource" />
+                <ScalarProperty Name="FinishDate" ColumnName="FinishDate" />
+                <ScalarProperty Name="RunDate" ColumnName="RunDate" />
+                <ScalarProperty Name="BatchOutNotes" ColumnName="BatchOutNotes" />
+                <ScalarProperty Name="BatchInNotes" ColumnName="BatchInNotes" />
+                <ScalarProperty Name="BatchTable" ColumnName="BatchTable" />
+                <ScalarProperty Name="BatchNo" ColumnName="BatchNo" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
