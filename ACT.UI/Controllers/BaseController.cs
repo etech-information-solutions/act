@@ -742,7 +742,8 @@ namespace ACT.UI.Controllers
         {
             if ( ClientId != null )
             {
-                Session[ "ClientId" ] = ClientId;
+                int.TryParse(ClientId, out int intClientId); //to ensure we have a parseable value to use, whether 0 or greater, and not a NaN
+                Session["ClientId"] = intClientId;
 
                 return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
             }
