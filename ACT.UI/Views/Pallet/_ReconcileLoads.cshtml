@@ -9,7 +9,7 @@
     ViewBag.ShowExport = true;
     ViewBag.ShowCustom = true;
 
-    ViewBag.ViewName = "_PADList";
+    ViewBag.ViewName = "_ReconcileLoad";
 }
 
 
@@ -19,17 +19,8 @@
 @{
     UserModel user = User.Get();
 
-
-
 }
 
-
-@*@if (Model == null || !items.Any())
-    {
-        <div class="notification message-warn" style="margin-bottom: 20px;">
-            There are no PADs available matching your search criteria.
-        </div>
-    }*@
 @if (ViewBag.ContextualMode)
 {
     <input type="hidden" id="context" name="context" value="1" />
@@ -152,12 +143,14 @@ else
 
     </div>
 </div>
+
 <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
 <div class="left" style="width: 99%; text-align:center">
     <button id="Reconcile">Link For Reconciliation</button>
     <br /><br /><br />
     <button id="ItemTask">Task for Selected Item</button>
 </div>
+<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
 <div id="doc" class="modal">
     <p>
         <strong class="">Documents</strong>
@@ -188,20 +181,18 @@ else
 
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 </div>
+
 <div id="comment" class="modal">
     <p>
         <strong class="">Comments</strong>
     </p>
-    <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i> Add</a>
-    <input type="hidden" id="docitem" name="docitem" value="0" />
-    <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
+    <a id="addcommentrow" href="#" onclick="AddCommentRow();"><i class="fa fa-plus"></i> Add</a>
+    <input type="hidden" id="commentitem" name="commentitem" value="0" />
+    <table id="commenttable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
         <thead>
             <tr>
                 <th>
-                    Document Title
-                </th>
-                <th>
-                    Type
+                    Details
                 </th>
                 <th>
                     Date
@@ -212,69 +203,80 @@ else
 
         <tbody></tbody>
     </table>
-    <div id="documentsdiv">
+    <div id="commentdiv">
     </div>
-    <span id="uploaded_file"></span>
+    <span id="savecommentdiv"></span>
 
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 </div>
+
 <div id="task" class="modal">
     <p>
         <strong class="">Tasks</strong>
     </p>
-    <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i> Add</a>
-    <input type="hidden" id="docitem" name="docitem" value="0" />
-    <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
+    <a id="addtaskrow" href="#" onclick="AddTaskRow();"><i class="fa fa-plus"></i> Add</a>
+    <input type="hidden" id="taskitem" name="taskitem" value="0" />
+    <table id="tasktable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
         <thead>
             <tr>
                 <th>
-                    Document Title
+                    Task
                 </th>
                 <th>
-                    Type
+                    Message
+                </th>
+                <th>
+                    Contact Person
                 </th>
                 <th>
                     Date
                 </th>
                 <th>Actions</th>
+                <th>
+                    Complete
+                </th>
             </tr>
         </thead>
 
         <tbody></tbody>
     </table>
-    <div id="documentsdiv">
+    <div id=taskstsdiv">
     </div>
-    <span id="uploaded_file"></span>
+    <span id="savetaskdiv"></span>
 
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 </div>
+
 <div id="journal" class="modal">
     <p>
         <strong class="">Journals</strong>
     </p>
-    <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i> Add</a>
-    <input type="hidden" id="docitem" name="docitem" value="0" />
-    <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
+    <a id="addjournalrow" href="#" onclick="AddJournalRow();"><i class="fa fa-plus"></i> Add</a>
+    <input type="hidden" id="journalitem" name="journalitem" value="0" />
+    <table id="journaltable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
         <thead>
             <tr>
                 <th>
-                    Document Title
+                    Journal Description
                 </th>
                 <th>
-                    Type
+                    In/Out
                 </th>
                 <th>
                     Date
                 </th>
-                <th>Actions</th>
+                <th>
+                    Qty
+                </th>
+                <th>link Doc</th>
             </tr>
         </thead>
 
         <tbody></tbody>
     </table>
-    <div id="documentsdiv">
+    <div id="journaldiv">
     </div>
-    <span id="uploaded_file"></span>
+    <span id="savejournaldiv"></span>
 
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 </div>
