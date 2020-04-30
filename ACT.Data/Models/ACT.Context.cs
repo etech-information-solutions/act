@@ -83,7 +83,6 @@ namespace ACT.Data.Models
         public virtual DbSet<UserTask> UserTasks { get; set; }
         public virtual DbSet<Vehicle> Vehicles { get; set; }
         public virtual DbSet<PSPBilling> PSPBillings { get; set; }
-
-        //public System.Data.Entity.DbSet<ACT.Core.Models.Custom.DeliveryNoteCustomModel> DeliveryNoteCustomModels { get; set; }
+        public virtual DbSet<Batch> Batches { get; set; }
     }
 }

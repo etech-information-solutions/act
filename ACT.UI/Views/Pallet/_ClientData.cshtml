@@ -59,7 +59,11 @@ else
                     }
                     else
                     {
-                        @Html.DropDownList("ClientList", "All Clients")
+                        @*@Html.DropDownList("ClientList", "All Clients")*@
+                        @Html.DropDownList("ClientList",
+                             new SelectList(ViewBag.ClientList, "Value", "Text"),
+                             "All Clients",
+                             new { @class = "form-control", @onchange= "ClientListChanged()" })
                     }
                 </td>
                 <td style="width:2%">
@@ -72,7 +76,7 @@ else
                     <label for="file" class="importlabel postedFilecdata">Browse:</label>
                 </td>
                 <td style="width:55%">
-                    <input type="file" class="postedFilecdata" id="postedFile" name="postedFile" class="form-control" accept=".csv" />
+                    <input type="file" class="postedFilecdata form-control" id="postedFile" name="postedFile" accept=".csv" />
                 </td>
                 <td style="width:10%">
                     <input type="submit" value="Import" class="importbutton postedFilecdata" />
@@ -171,7 +175,7 @@ else
                     <td style="width: 8%;">@item.LoadNumber</td>
                     <td style="width: 8%;">@*Issue Note**@</td>
                     <td style="width: 8%;">@item.PCNNumber</td>
-                    <td style="width: 8%;">@*THAN**@</td>a>
+                    <td style="width: 8%;">@*THAN**@</td>
                     <td style="width: 8%;">@item.OriginalQuantity</td>
                     <td width="8%">
                         <a href="#doc" rel="modal:open" onclick="loadDocs(@item.Id)"><i class="fa fa-file-text-o"></i></a>
@@ -222,82 +226,91 @@ else
         //var cId = parseInt($("#ClientListSiteManage").val());
         var context = $("#context").val();
         if (context == "0") {
-            $('#addrowdata').hide();
-            $('.importlabel').hide();
-            $('.importbutton').hide();
-            $('#postedFile').hide();
+            $('.postedFilecdata').hide();
         }
 
-            $("#ClientList").change(function () {
-                //debugger;
-                var cId = parseInt($('option:selected', this).val());
-                SetClient(cId);
-                if (cId > 0) {
+            //$("#ClientList").change(function () {
+            //    //debugger;
+            //    var cId = parseInt($('option:selected', this).val());
+            //    SetClient(cId);
+            //    if (cId > 0) {
+            //        $('.postedFilecdata').show();
+            //        //$('.add').show();
+            //        //$('.importlabel').show();
+            //        //$('.importbutton').show();
+            //        //$('#postedFile').show();
+            //    } else {
+            //        $('.postedFilecdata').hide();
+            //        //$('.add').hide();
+            //        //$('.importlabel').hide();
+            //        //$('.importbutton').hide();
+            //        //$('#postedFile').hide();
+            //    }
 
+            //    //$.ajax({
+            //    //    type: 'POST',
+            //    //    url: "SetClient",
+            //    //    data: { "ClientId": id },
+            //    //    success: function (response) {
+            //    //        window.location.href = 'Index#managesites';
+            //    //        location.reload();
+            //    //    }
+            //    //});
 
-                    $('#addrowdata').show();
-                    $('.importlabel').show();
-                    $('.importbutton').show();
-                    $('#postedFile').show();
-                } else {
-                    $('#addrowdata').hide();
-                    $('.importlabel').hide();
-                    $('.importbutton').hide();
-                    $('#postedFile').hide();
-                }
-
-                //$.ajax({
-                //    type: 'POST',
-                //    url: "SetClient",
-                //    data: { "ClientId": id },
-                //    success: function (response) {
-                //        window.location.href = 'Index#managesites';
-                //        location.reload();
-                //    }
-                //});
-
-            });
+            //});
 
             //populateDocs(cId, "Client");
 
-       $(document).on('change', '#companyfile', function () {
-                        var cId = $('#docitem').val();
-                        var name = document.getElementById("companyfile").files[0].name;
-                        var form_data = new FormData();
-                        var ext = name.split('.').pop().toLowerCase();
-                        if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx', 'csv']) == -1) {
-                            alert("Invalid File");
-                        }
-                        var oFReader = new FileReader();
-                        oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
-                        var f = document.getElementById("companyfile").files[0];
-                        var fsize = f.size || f.fileSize;
-                        if (fsize > 2000000) {
-                            alert("File Size is too large");
-                        }
-                        else {
-                            form_data.append("file", document.getElementById('companyfile').files[0]);
-                            form_data.append("clientId", $("#Id").val());
-                            $.ajax({
-                                url: "Upload?id=" + cId + "&utype=ClientLoad&uname=Agent",
-                                method: "POST",
-                                data: form_data,
-                                contentType: false,
-                                cache: false,
-                                processData: false,
-                                beforeSend: function () {
-                                    $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
-                                },
-                                success: function (data) {
-                                    //$('#uploaded_file').html(data);
-                                    populateDocs(cId, "ClientLoad");
-                                    $('#uploaded_file').html("<label class='text-success'></label>");
-                                }
-                            });
+            $(document).on('change', '#companyfile', function () {
+                var cId = $('#docitem').val();
+                var name = document.getElementById("companyfile").files[0].name;
+                var form_data = new FormData();
+                var ext = name.split('.').pop().toLowerCase();
+                if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx', 'csv']) == -1) {
+                    alert("Invalid File");
+                }
+                var oFReader = new FileReader();
+                oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
+                var f = document.getElementById("companyfile").files[0];
+                var fsize = f.size || f.fileSize;
+                if (fsize > 2000000) {
+                    alert("File Size is too large");
+                }
+                else {
+                    form_data.append("file", document.getElementById('companyfile').files[0]);
+                    form_data.append("clientId", $("#Id").val());
+                    $.ajax({
+                        url: "Upload?id=" + cId + "&utype=ClientLoad&uname=Agent",
+                        method: "POST",
+                        data: form_data,
+                        contentType: false,
+                        cache: false,
+                        processData: false,
+                        beforeSend: function () {
+                            $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
+                        },
+                        success: function (data) {
+                            //$('#uploaded_file').html(data);
+                            populateDocs(cId, "ClientLoad");
+                            $('#uploaded_file').html("<label class='text-success'></label>");
                         }
                     });
+                }
+            });
 
-                });
+        });
+
+    function ClientListChanged() {
+        var cId = $('#ClientList').val();
+        //var cId = parseInt($('option:selected', this).val());
+        SetClient(cId);
+        if (cId > 0) {
+            $('.postedFilecdata').show();
+        } else {
+            $('.postedFilecdata').hide();
+        }
+
+    }
 
             function AddDocRow() {
                 var rowDiv = $("#doctable-table tbody");

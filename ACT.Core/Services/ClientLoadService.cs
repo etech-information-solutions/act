@@ -157,7 +157,12 @@ namespace ACT.Core.Services
 
             #endregion
 
-            string query = @"SELECT
+            string query = @"";
+
+             if (csm.ReconciliationStatus == Reconciliation.Reconciled)
+            {
+
+                query = @"SELECT
                                 cl.*,
                                 cl1.PostingType,
                                 cl1.DocketNumber,
@@ -166,6 +171,15 @@ namespace ACT.Core.Services
                                 [dbo].[ClientLoad] cl
                                 INNER JOIN [dbo].[ChepClient] cc ON cl.[Id]=cc.[ClientLoadsId]
                                 INNER JOIN [dbo].[ChepLoad] cl1 ON cl1.[Id]=cc.[ChepLoadsId]";
+
+            } else
+            {
+                query = @"SELECT
+                                cl.*,                                
+                                (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ClientLoad') AS [DocumentCount]
+                             FROM
+                                [dbo].[ClientLoad] cl";
+            }
 
             // WHERE
 

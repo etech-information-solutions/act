@@ -123,6 +123,7 @@
         <EntityTypeShape EntityType="ACTModel.PSPBilling" Width="1.5" PointX="13.75" PointY="21.375" />
         <AssociationConnector Association="ACTModel.FK_PSPBilling_PSP" />
         <AssociationConnector Association="ACTModel.FK_PSPBilling_PSPProducts" />
+        <EntityTypeShape EntityType="ACTModel.Batch" Width="1.5" PointX="16.375" PointY="4.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

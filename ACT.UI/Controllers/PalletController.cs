@@ -17,6 +17,7 @@ using OpenPop;
 using ACT.Core.Helpers;
 namespace ACT.UI.Controllers
 {
+    [Requires(PermissionTo.View, PermissionContext.Pallet)]
     public class PalletController : BaseController
     {
         // GET: Pallet
@@ -474,7 +475,7 @@ namespace ACT.UI.Controllers
                 {
                     ClientId = load.ClientId,
                     VehicleId = load.VehicleId,
-                    TransporterId = load.TransporterId,
+                    TransporterId = (int)load.TransporterId,
                     LoadDate = load.LoadDate,
                     LoadNumber = load.LoadNumber,
                     EffectiveDate = load.EffectiveDate,
@@ -1022,31 +1023,32 @@ namespace ACT.UI.Controllers
                 using (ChepLoadService chepService = new ChepLoadService())
                 using (TransactionScope scope = new TransactionScope())
                 {
-                    //ClientGroup checkCG = clientgroupservice.GetByColumnsWhere(groupId, clientId);//check this link doesnt already exist, ignore if it does
-                    ////Group groupObj = groupservice.GetById(int.Parse(groupId));
-                    //if (checkCG == null)
-                    //{
-                    //    ClientGroup cgroup = new ClientGroup()
-                    //    {
-                    //        GroupId = int.Parse(groupId),
-                    //        ClientId = int.Parse(clientId),
-                    //        Status = (int)Status.Active,
-                    //    };
-                    //    clientgroupservice.Create(cgroup);
+                    //get objects to reconcile
+                    ClientLoad client = clientservice.GetById(int.Parse(clientLoadId));
+                    ChepLoad agent = chepService.GetById(int.Parse(agentLoadId));
+                    // create new chep client object
+                    ChepClient agentclient = new ChepClient();
 
-                    //    scope.Complete();
-                    //} //nothing to do here if the group is already linekd  to the same client
-                    //else
-                    //{
-                    //    //just update status to make sure its visible and active, maybe it was disabled
-                    //    checkCG.Status = (int)Status.Active;
-                    //    clientgroupservice.Update(checkCG);
-                    //}
+                    //Run Validation first to ensure everything checks out to allow reconcilliation
+
+                    //set up all agent items and update
+                    agent.Status = (int)Reconciliation.Reconciled;
+                    client.Status = (int)Reconciliation.Reconciled;
+                    agentclient.Status = (int)Reconciliation.Reconciled;
+                    agentclient.ChepLoadsId = agent.Id;
+                    agentclient.ClientLoadsId = client.Id;
+
+                    chepService.Update(agent);
+                    clientservice.Update(client);
+                    cgservivce.Create(agentclient);
                 }
 
 
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            } else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
             }
-            return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
         }
 
 

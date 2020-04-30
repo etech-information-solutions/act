@@ -63,19 +63,19 @@ else
                     }
                 </td>
                 <td style="width:2%">
-                    @Html.ActionLink("Add", "AddPoolingAgentData", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add Manual Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" })
+                    @Html.ActionLink("Add", "AddPoolingAgentData", new { }, new { @class = "add postedFileadata", @rel = "tipsyS", @title = "Add Manual Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" })
                 </td>
                 <td style="width:5%">
                     &nbsp;
                 </td>
                 <td style="width:3%">
-                    <label for="file" class="importlabel">Browse:</label>
+                    <label for="file" class="importlabel postedFileadata">Browse:</label>
                 </td>
                 <td style="width:55%">
-                    <input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" />
+                    <input type="file" id="postedFile" name="postedFile" class="form-control postedFileadata" accept=".csv" />
                 </td>
                 <td style="width:10%">
-                    <input type="submit" value="Import" class="importbutton" />
+                    <input type="submit" value="Import" class="importbutton postedFileadata" />
                 </td>
                 <td style="width:7%">
                     <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "poolingagentdatatemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
@@ -168,7 +168,7 @@ else
                         @item.AccountNumber
                     </td>
                     <td style="width: 15%;">
-                        @*@item.Product*@
+                        @item.Equipment
                     </td>
                     <td style="width: 15%;">
                         @item.DocketNumber
@@ -232,10 +232,11 @@ else
                 $(document).ready(function () {
                     var context = $("#context").val();
                     if (context == "0") {
-                        $('.add').hide();
-                        $('.importlabel').hide();
-                        $('.importbutton').hide();
-                        $('#postedFile').hide();
+                        $('.postedFileadata').hide();
+                        //$('.add').hide();
+                        //$('.importlabel').hide();
+                        //$('.importbutton').hide();
+                        //$('#postedFile').hide();
                     }
 
                     $("#ClientList").change(function () {
@@ -243,15 +244,17 @@ else
                         var cId = parseInt($('option:selected', this).val());
                         SetClient(cId);
                         if (cId > 0) {
-                            $('.add').show();
-                            $('.importlabel').show();
-                            $('.importbutton').show();
-                            $('#postedFile').show();
+                            $('.postedFileadata').show();
+                            //$('.add').show();
+                            //$('.importlabel').show();
+                            //$('.importbutton').show();
+                            //$('#postedFile').show();
                         } else {
-                            $('.add').hide();
-                            $('.importlabel').hide();
-                            $('.importbutton').hide();
-                            $('#postedFile').hide();
+                            $('.postedFileadata').hide();
+                            //$('.add').hide();
+                            //$('.importlabel').hide();
+                            //$('.importbutton').hide();
+                            //$('#postedFile').hide();
                         }
 
                         //$.ajax({
