@@ -685,7 +685,7 @@ namespace ACT.UI.Controllers
                 using (ClientLoadService clientService = new ClientLoadService())
                 {
 
-                    load = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)ReconciliationStatus.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                    load = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)ReconciliationStatus.Unreconciled, ReconciliationStatus = (int)ReconciliationStatus.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
 
                 }
                 if (load != null)
@@ -695,7 +695,7 @@ namespace ACT.UI.Controllers
                 else
                 {
                     return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
-                }
+                }                                                                                                                                                                                                                                                                                                   
             }
 
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
@@ -711,7 +711,7 @@ namespace ACT.UI.Controllers
                 using (ChepLoadService chepService = new ChepLoadService())
                 {
 
-                    load = chepService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)ReconciliationStatus.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                    load = chepService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)ReconciliationStatus.Unreconciled, ReconciliationStatus = (int)ReconciliationStatus.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
 
                 }
            
@@ -1041,6 +1041,8 @@ namespace ACT.UI.Controllers
                     chepService.Update(agent);
                     clientservice.Update(client);
                     cgservivce.Create(agentclient);
+
+                    scope.Complete();
                 }
 
 
@@ -1049,6 +1051,180 @@ namespace ACT.UI.Controllers
             {
                 return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
             }
+        }
+
+
+        #endregion
+
+        #region Journals Tasks and Comments
+
+        public JsonResult RemoveComment(int? id = null, string ctype = null)
+        {
+            int commId = (id != null ? (int)id : 0);
+            if (commId > 0)
+            {
+                using (TransactionScope scope = new TransactionScope())
+                using (CommentService service = new CommentService())
+                {
+
+                    Comment comm = service.GetById(commId);
+                    comm.Status = (int)Status.Inactive;
+                    service.Update(comm);
+
+                    scope.Complete();
+                }
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+
+        }
+        public JsonResult AddComment(int? id = null, string utype = null, string details = null)
+        {
+
+            if (id != null && !string.IsNullOrEmpty(utype)) {
+                Comment comm = new Comment()
+                {
+                    Details = details,
+                    ObjectId = (int)id,
+                    ObjectType = utype,
+                    Status = (int)Status.Active
+                };
+
+                using (TransactionScope scope = new TransactionScope())
+                using (CommentService service = new CommentService())
+                {
+                    service.Create(comm);
+                }
+            }
+
+            //return Json("Uploaded " + Request.Files.Count + " files");
+            return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ListComments(string objId, string objType)
+        {
+            List<Comment> commlist = new List<Comment>();
+            if (!string.IsNullOrEmpty(objType) && !string.IsNullOrEmpty(objId))
+            {
+                string controllerObjectType = objType;
+                using (CommentService service = new CommentService())
+                {
+                    commlist = service.ListByColumnsWhere("ObjectId", objId, "ObjectType", objType);
+                }
+            }
+            if (commlist != null)
+            {
+                return Json(commlist, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult RemoveTask(int? id = null, string ctype = null)
+        {
+            int tskId = (id != null ? (int)id : 0);
+            if (tskId > 0)
+            {
+                using (TransactionScope scope = new TransactionScope())
+                using (TaskService service = new TaskService())
+                {
+
+                    Task tsk = service.GetById(tskId);
+                    tsk.Status = (int)Status.Inactive;
+                    service.Update(tsk);
+
+                    scope.Complete();
+                }
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+
+        }
+        public JsonResult AddTask(int clientId, int agentLoadId, int clientLoadId, string name, string description)
+        {
+
+            if (clientId > 0 && agentLoadId > 0 && clientLoadId > 0)
+            {
+                Task tsk = new Task()
+                {
+                    ClientId = clientId,
+                    ChepLoadId = agentLoadId,
+                    ClientLoadId = clientLoadId,
+                    Name = name,
+                    Description = description,
+                    Status = (int)Status.Active,
+                    Action = 1
+                };
+
+                using (TransactionScope scope = new TransactionScope())
+                using (TaskService service = new TaskService())
+                {
+                    service.Create(tsk);
+                }
+            }
+
+            //return Json("Uploaded " + Request.Files.Count + " files");
+            return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ListTasks(string objId, string objType)
+        {
+            List<Comment> commlist = new List<Comment>();
+            if (!string.IsNullOrEmpty(objType) && !string.IsNullOrEmpty(objId))
+            {
+                string controllerObjectType = objType;
+                using (CommentService service = new CommentService())
+                {
+                    commlist = service.ListByColumnsWhere("ObjectId", objId, "ObjectType", objType);
+                }
+            }
+            if (commlist != null)
+            {
+                return Json(commlist, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult ListFilesTable(string objId, string objType)
+        {
+            ObjectDocumentsViewModel model = new ObjectDocumentsViewModel();
+            if (!string.IsNullOrEmpty(objType) && !string.IsNullOrEmpty(objId))
+            {
+                string controllerObjectType = objType;
+                switch (objType)
+                {
+                    case "ChepLoad":
+                        controllerObjectType = "Pallet";
+                        break;
+                    case "ClientLoad":
+                        controllerObjectType = "Pallet";
+                        break;
+                    default:
+                        break;
+                }
+                using (DocumentService docservice = new DocumentService())
+                {
+                    List<Document> docList = new List<Document>();
+                    int oId = int.Parse(objId);
+                    docList = docservice.List(oId, objType);
+
+                    model.objDocuments = docList;
+                    model.objId = oId;
+                    model.objType = controllerObjectType;
+                }
+            }
+            return PartialView("_ListDocumentsTable", model);
         }
 
 

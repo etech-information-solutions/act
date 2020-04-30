@@ -26,7 +26,8 @@
 
     @Html.ValidationSummary(true)
 
-    @Html.HiddenFor(model => model.Id)   
+    @*@Html.HiddenFor(model => model.Id)*@   
+
     @Html.HiddenFor(model => model.DocsList)
 
     <div id="item-details" class="item-details" style="width: auto;">
@@ -229,7 +230,7 @@
 
     <script>
     $(document).ready(function () {
-        var cId = '@Model.Id';
+        var cId = $("#Id").val();
 
 
         $("#TransporterId").change(function () {

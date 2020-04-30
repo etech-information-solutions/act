@@ -140,7 +140,7 @@ else
         {
             foreach (var item in items)
             {
-                Reconciliation status = (Reconciliation)item.Status;
+                ReconciliationStatus status = (ReconciliationStatus)item.Status;
 
                 String active = status.Equals(Status.Active) ? "active" : "inactive";
                 String enable = status.Equals(Status.Active) ? "Disable" : "Enable";

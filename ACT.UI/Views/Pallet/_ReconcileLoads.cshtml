@@ -30,6 +30,41 @@
             There are no PADs available matching your search criteria.
         </div>
     }*@
+@if (ViewBag.ContextualMode)
+{
+    <input type="hidden" id="context" name="context" value="1" />
+}
+else
+{
+    <input type="hidden" id="context" name="context" value="0" />
+}
+    <p>
+        <table style="width:100%" border="0">
+            <tr>
+                <td style="width:3%">
+                    <label for="file">Client:</label>
+                </td>
+                <td style="width:15%">
+                    @if (ViewBag.ContextualMode)
+                    {
+                        @Html.DropDownList("ClientList")
+                    }
+                    else
+                    {
+                        @*@Html.DropDownList("ClientList", "All Clients")*@
+                        @Html.DropDownList("ClientList",
+                             new SelectList(ViewBag.ClientList, "Value", "Text"),
+                             "All Clients",
+                             new { @class = "form-control", @onchange= "ClientListChanged()" })
+                    }
+                </td>
+                <td colspan="6">
+                   &nbsp;
+                </td>
+            </tr>
+        </table>
+        <span class="loader"></span>
+    </p>
 <input type="hidden" id="ClientId" name="ClientId" value="@ViewBag.ClientId" />
 <div id="BottomLists" style="display:block;">
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
@@ -123,11 +158,131 @@
     <br /><br /><br />
     <button id="ItemTask">Task for Selected Item</button>
 </div>
+<div id="doc" class="modal">
+    <p>
+        <strong class="">Documents</strong>
+    </p>
+    <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i> Add</a>
+    <input type="hidden" id="docitem" name="docitem" value="0" />
+    <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th>
+                    Document Title
+                </th>
+                <th>
+                    Type
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody></tbody>
+    </table>
+    <div id="documentsdiv">
+    </div>
+    <span id="uploaded_file"></span>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+</div>
+<div id="comment" class="modal">
+    <p>
+        <strong class="">Comments</strong>
+    </p>
+    <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i> Add</a>
+    <input type="hidden" id="docitem" name="docitem" value="0" />
+    <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th>
+                    Document Title
+                </th>
+                <th>
+                    Type
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody></tbody>
+    </table>
+    <div id="documentsdiv">
+    </div>
+    <span id="uploaded_file"></span>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+</div>
+<div id="task" class="modal">
+    <p>
+        <strong class="">Tasks</strong>
+    </p>
+    <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i> Add</a>
+    <input type="hidden" id="docitem" name="docitem" value="0" />
+    <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th>
+                    Document Title
+                </th>
+                <th>
+                    Type
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody></tbody>
+    </table>
+    <div id="documentsdiv">
+    </div>
+    <span id="uploaded_file"></span>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+</div>
+<div id="journal" class="modal">
+    <p>
+        <strong class="">Journals</strong>
+    </p>
+    <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i> Add</a>
+    <input type="hidden" id="docitem" name="docitem" value="0" />
+    <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th>
+                    Document Title
+                </th>
+                <th>
+                    Type
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody></tbody>
+    </table>
+    <div id="documentsdiv">
+    </div>
+    <span id="uploaded_file"></span>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+</div>
 <script>
     $(document).ready(function () {
         UpdateLists();
         $('#Reconcile').on('click', function () {
-            debugger;
+            //debugger;
             var selectedAgentLoads = [];
             var selectedClientLoads = [];
             //var gId = $('#selectedgroup').val();
@@ -141,7 +296,7 @@
                     selectedClientLoads.push($(this).val());
                 }
             });
-            //$(".agentloadlist :checked").each(function () {               
+            //$(".agentloadlist :checked").each(function () {
             //    selectedAgentLoads.push($(this).val());
             //});
             //$(".clientloadlist :checked").each(function () {
@@ -157,6 +312,8 @@
                     }
 
                     alert('Load Reconciliation Complete.');
+                    //UpdateLists();
+                    location.reload();
                 } else {
                     alert("Please select from the right grid to reconcile.")
                 }
@@ -217,7 +374,25 @@
         });
         //Docs Change End
 
-        });
+    });
+
+    function ClientListChanged() {
+        var cId = $('#ClientList').val();
+        SetClient(cId);
+    }
+
+    function SetClient(cId) {
+                $("#ClientId").val(cId);
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("SetClient", "Pallet")',
+                    data: { "ClientId": cId },
+                    success: function (response) {
+                        location.reload();
+
+                    }
+                });
+            }
 
     function UpdateLists() {
         $('#BottomLists').show();
@@ -254,7 +429,12 @@
                         load.DocketNumber +
                         '</td><td  style = "width: 15%;"> </td><td  style = "width: 15%;"> ' +
                         load.OriginalQuantity +
-                        '</td><td><a href="#doc" rel="modal:open" onclick="loadDocs(' + load.Id + ', 0)"><i class="fa fa-file-text-o"></i></a></td></tr>';
+                        '</td><td>' +
+                        '<a href="#doc" rel="modal:open" alt="Documents" tooltip="Documents" onclick="loadDocs(' + load.Id + ', 0)"><i class="fa fa-file-text-o"></i></a> ' + 
+                        '<a href="#comment" rel="modal:open" alt="Comments" tooltip="Comments" onclick="loadComments(' + load.Id + ', 0)"><i class="fa fa-comment"></i></a> ' + 
+                        '<a href="#task" rel="modal:open" alt="Tasks" tooltip="Tasks" onclick="loadTasks(' + load.Id + ', 0)"><i class="fa fa-tasks"></i></a> ' + 
+                        '<a href="#journal" rel="modal:open" alt="Journals" tooltip="Journals" onclick="loadJournals(' + load.Id + ', 0)"><i class="fa fa-book"></i></a> ' + 
+                        '</td ></tr > ';
                 });
                 rowDiv.html(result);
 
@@ -295,7 +475,12 @@
                         load.DocketNumber +
                         '</td><td  style = "width: 15%;"> </td><td  style = "width: 15%;"> ' +
                         load.OriginalQuantity +
-                        '</td><td><a href="#doc" rel="modal:open" onclick="loadDocs(' + load.Id + ', 0)"><i class="fa fa-file-text-o"></i></a></td></tr>';
+                        '</td><td>' +
+                        '<a href="#doc" rel="modal:open" alt="Documents" tooltip="Documents" onclick="loadDocs(' + load.Id + ', 0)"><i class="fa fa-file-text-o"></i></a>' +
+                        '<a href="#comment" rel="modal:open"  alt="Comments" tooltip="Comments" onclick="loadComments(' + load.Id + ', 0)"><i class="fa fa-comment"></i></a> ' +
+                        '<a href="#task" rel="modal:open" alt="Tasks" tooltip="Tasks" onclick="loadTasks(' + load.Id + ', 0)"><i class="fa fa-tasks"></i></a> ' +
+                        '<a href="#journal" rel="modal:open" alt="Journals" tooltip="Journals" onclick="loadJournals(' + load.Id + ', 0)"><i class="fa fa-book"></i></a> ' + 
+                        '</td ></tr > ';
                 });
                 rowDiv.html(result);
 
@@ -308,7 +493,7 @@
     }
 
     function SetReconciliation(alId, clId) {
-        debugger;
+        //debugger;
         var data = {
             "agentLoadId": alId, "clientLoadId": clId
         };
@@ -365,7 +550,7 @@
                 type: 'POST',
                 url: '@Url.Action("RemoveFile", "Pallet")',
                 data: { "FileId": fileId },
-                success: function (response) {            
+                success: function (response) {
                     populateDocs(itemId, stype);
                 }
             });

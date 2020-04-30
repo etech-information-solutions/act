@@ -401,6 +401,7 @@
     <Content Include="Scripts\Plugins\jquery.modal.min.js" />
     <Content Include="Scripts\Plugins\jquery.mousewheel.js" />
     <Content Include="Scripts\Plugins\jquery.placeholder.js" />
+    <Content Include="Scripts\Plugins\moment.js" />
     <Content Include="Scripts\Plugins\select2.js" />
     <Content Include="Scripts\Plugins\timer.jquery.js" />
     <Content Include="Scripts\Plugins\tipsy.js" />
