@@ -1032,9 +1032,9 @@ namespace ACT.UI.Controllers
                     //Run Validation first to ensure everything checks out to allow reconcilliation
 
                     //set up all agent items and update
-                    agent.Status = (int)Reconciliation.Reconciled;
-                    client.Status = (int)Reconciliation.Reconciled;
-                    agentclient.Status = (int)Reconciliation.Reconciled;
+                    agent.Status = (int)ReconciliationStatus.Reconciled;
+                    client.Status = (int)ReconciliationStatus.Reconciled;
+                    agentclient.Status = (int)ReconciliationStatus.Reconciled;
                     agentclient.ChepLoadsId = agent.Id;
                     agentclient.ClientLoadsId = client.Id;
 

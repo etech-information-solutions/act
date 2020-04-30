@@ -159,7 +159,7 @@ namespace ACT.Core.Services
 
             string query = @"";
 
-             if (csm.ReconciliationStatus == Reconciliation.Reconciled)
+             if (csm.ReconciliationStatus == ReconciliationStatus.Reconciled)
             {
 
                 query = @"SELECT
