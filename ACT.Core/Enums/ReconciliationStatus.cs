@@ -4,7 +4,7 @@ namespace ACT.Core.Enums
     using Attributes;
 
     [StringEnum]
-    public enum Reconciliation
+    public enum ReconciliationStatus
     {
         [UiIgnoreEnumValue]
         [StringEnumDisplayText( "Unreconcilable" )]

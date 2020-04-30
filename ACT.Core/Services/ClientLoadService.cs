@@ -209,34 +209,34 @@ namespace ACT.Core.Services
                 }
             }
 
-            if (csm.ReconciliationStatus != Reconciliation.Unreconcilable)
+            if ( csm.ReconciliationStatus != ReconciliationStatus.Unreconcilable )
             {
                 query = $"{query} AND (cl.Status=@csmReconciliation)";
             }
 
 
-            if (!string.IsNullOrEmpty(csm.ReferenceNumber))
+            if ( !string.IsNullOrEmpty( csm.ReferenceNumber ) )
             {
-                query = string.Format(@"{0} AND (cl.LoadNumber LIKE '%{1}%' OR cl.ReceiverNumber LIKE '%{1}%' OR cl.AccountNumber LIKE '%{1}%' )", query, csm.ReferenceNumber);
+                query = string.Format( @"{0} AND (cl.LoadNumber LIKE '%{1}%' OR cl.ReceiverNumber LIKE '%{1}%' OR cl.AccountNumber LIKE '%{1}%' )", query, csm.ReferenceNumber );
             }
-            if (!string.IsNullOrEmpty(csm.ReferenceNumberOther))
+            if ( !string.IsNullOrEmpty( csm.ReferenceNumberOther ) )
             {
-                query = string.Format(@"{0} AND (cl.LoadNumber LIKE '%{1}%' OR cl.ReceiverNumber LIKE '%{1}%' OR cl.AccountNumber LIKE '%{1}%' OR cl.ReferenceNumber LIKE '%{1}%' OR cl.DeliveryNote LIKE '%{1}%' OR cl.PODNumber LIKE '%{1}%' OR cl.PCNNumber LIKE '%{1}%' OR cl.PRNNumber LIKE '%{1}%')", query, csm.ReferenceNumberOther);
-            }
-
-            if (!string.IsNullOrEmpty(csm.Description))
-            {
-                query = string.Format(@"{0} AND (cl.Equipment LIKE '%{1}%' OR cl.ClientDescription LIKE '%{1}%' )", query, csm.Description);
+                query = string.Format( @"{0} AND (cl.LoadNumber LIKE '%{1}%' OR cl.ReceiverNumber LIKE '%{1}%' OR cl.AccountNumber LIKE '%{1}%' OR cl.ReferenceNumber LIKE '%{1}%' OR cl.DeliveryNote LIKE '%{1}%' OR cl.PODNumber LIKE '%{1}%' OR cl.PCNNumber LIKE '%{1}%' OR cl.PRNNumber LIKE '%{1}%')", query, csm.ReferenceNumberOther );
             }
 
-            if (!string.IsNullOrEmpty(csm.Name))
+            if ( !string.IsNullOrEmpty( csm.Description ) )
             {
-                query = string.Format(@"{0} AND (cl.ClientDescription LIKE '%{1}%' )", query, csm.Description);
+                query = string.Format( @"{0} AND (cl.Equipment LIKE '%{1}%' OR cl.ClientDescription LIKE '%{1}%' )", query, csm.Description );
             }
 
-            if (csm.FilterDate.HasValue)
+            if ( !string.IsNullOrEmpty( csm.Name ) )
             {
-                query = string.Format(@"{0} AND (cl.LoadDate >= @{1}) ", query, csm.FilterDate);
+                query = string.Format( @"{0} AND (cl.ClientDescription LIKE '%{1}%' )", query, csm.Description );
+            }
+
+            if ( csm.FilterDate.HasValue )
+            {
+                query = string.Format( @"{0} AND (cl.LoadDate >= @{1}) ", query, csm.FilterDate );
             }
 
 
@@ -248,7 +248,7 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format(@"{0} AND (cl.[ARPMComments] LIKE '%{1}%' OR
+                query = string.Format( @"{0} AND (cl.[ARPMComments] LIKE '%{1}%' OR
                                                   cl.[ReferenceNumber] LIKE '%{1}%' OR
                                                   cl.[DeliveryNote] LIKE '%{1}%' OR
                                                   cl.[ClientDescription] LIKE '%{1}%' OR
@@ -288,33 +288,472 @@ namespace ACT.Core.Services
             return model;
         }
 
-        public bool ReconcileClientAgentLoad(List<ClientLoad> clientLoad, List<ChepLoad> agentLoad)
+        public bool ReconcileClientAgentLoad( List<ClientLoad> clientLoad, List<ChepLoad> agentLoad )
         {
-            if (clientLoad!=null && agentLoad != null)
+            if ( clientLoad != null && agentLoad != null )
             {
                 //iterate through clientload items and attempt to  match the agent loads on teh following: 
                 /*
-* Agent:
-6.	If data is uploaded that already exists on the unreconciled  then update the records
-7.	If changes come through for reconciled items then unreconciled all records on both Chep and Client
-8.	Allow user to import pallet providers data and immediately run the batch reconciliation – on DeliveryNote Number, order number and sum of qty’s must be 0 for reconciled - 
+                * Agent:
+                6.	If data is uploaded that already exists on the unreconciled  then update the records
+                7.	If changes come through for reconciled items then unreconciled all records on both Chep and Client
+                8.	Allow user to import pallet providers data and immediately run the batch reconciliation – on DeliveryNote Number, order number and sum of qty’s must be 0 for reconciled - 
 
-13.	Add the vehicle registration number to the load schedule
-14.	Import from Chep all deliveries for customers and depots, Use Delivery note and order number as the main keys  keep exceptions when loads that are not reconciled because the keys are incorrect.
+                13.	Add the vehicle registration number to the load schedule
+                14.	Import from Chep all deliveries for customers and depots, Use Delivery note and order number as the main keys  keep exceptions when loads that are not reconciled because the keys are incorrect.
 
-Client:
-4.	Check if the PCN number exists, if it does not exist import anyway
-5.	If a PCN number exists, then check if the PCN number exists on the chep table if it does and the qty’s are the same then input the data on the clientLoad table and mark both tables and set status as  reconciled.
-6.	If a PCN number exists, then check if the PCN number exists on the chep table if it does and if the quantities are not the same input the data on the clientLoad table and mark both tables set status as  PCN Found
-7.	A PCN number can only be loaded once for the client (indicate if it already exists and allow the user to indicate that this is a split load) and once for chep
+                Client:
+                4.	Check if the PCN number exists, if it does not exist import anyway
+                5.	If a PCN number exists, then check if the PCN number exists on the chep table if it does and the qty’s are the same then input the data on the clientLoad table and mark both tables and set status as  reconciled.
+                6.	If a PCN number exists, then check if the PCN number exists on the chep table if it does and if the quantities are not the same input the data on the clientLoad table and mark both tables set status as  PCN Found
+                7.	A PCN number can only be loaded once for the client (indicate if it already exists and allow the user to indicate that this is a split load) and once for chep
 
                  */
-                foreach (var cLoad in clientLoad)
+                foreach ( var cLoad in clientLoad )
                 {
 
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Gets the age of outstanding pallets for the specified From-To date as well as other applicable search params
+        /// </summary>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public AgeOfOutstandingPallets AgeOfOutstandingPallets( CustomSearchModel csm )
+        {
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmGroupId", ( int ) csm.GroupId ) },
+                { new SqlParameter( "csmRegionId", ( int ) csm.RegionId ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
+            };
+
+            #endregion
+
+
+            #region Query
+
+            string query = @"SELECT
+	                            SUM(ch.[NewQuantity] - cl.[NewQuantity]) AS [Sum]
+                             FROM 
+	                            [dbo].[ClientLoad] cl,
+	                            [dbo].[ChepClient] cc,
+	                            [dbo].[ChepLoad] ch
+                             WHERE
+	                            (cl.[Id]=cc.[ClientLoadsId]) AND
+	                            (ch.[Id]=cc.[ChepLoadsId])";
+
+            #endregion
+
+            // WHERE
+
+            #region WHERE
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
+            // CUSTOM SEARCH
+
+            #region Custom Search
+
+            if ( csm.ReconciliationStatus != ReconciliationStatus.Unreconcilable )
+            {
+                query = $"{query} AND (cl.[Status]=@csmReconciliationStatus) ";
+            }
+
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND (cl.ClientId=@csmClientId) ";
+            }
+
+            if ( csm.SiteId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=cl.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
+            }
+
+            if ( csm.GroupId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientGroup] cg WHERE cg.[ClientId]=cl.[ClientId] AND cg.[GroupId]=@csmGroupId) ";
+            }
+
+            if ( csm.RegionId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=cl.[ClientId] AND s.[RegionId]=@csmRegionId) ";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (cl.LoadDate>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (cl.LoadDate<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            CountModel model = context.Database.SqlQuery<CountModel>( query, parameters.ToArray() ).FirstOrDefault();
+
+            return new AgeOfOutstandingPallets()
+            {
+                Oustanding = model?.Sum ?? 0,
+            };
+        }
+
+        /// <summary>
+        /// Gets loads per month for the specified From-To date as well as other applicable search params
+        /// </summary>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public LoadsPerMonth LoadsPerMonth( CustomSearchModel csm )
+        {
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmGroupId", ( int ) csm.GroupId ) },
+                { new SqlParameter( "csmRegionId", ( int ) csm.RegionId ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+            };
+
+            #endregion
+
+
+            #region Query
+
+            string query = @"SELECT
+	                            COUNT(cl.[Id]) AS [Loads],
+	                            SUM(cl.[NewQuantity]) AS [Quantity],
+	                            COUNT(CASE WHEN cl.[PODNumber] IS NULL THEN 1 ELSE 0 END) AS [POD]
+                             FROM 
+	                            [dbo].[ClientLoad] cl
+                             WHERE (1=1)";
+
+            #endregion
+
+            // WHERE
+
+            #region WHERE
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
+            // CUSTOM SEARCH
+
+            #region Custom Search
+
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND (cl.ClientId=@csmClientId) ";
+            }
+
+            if ( csm.SiteId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=cl.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
+            }
+
+            if ( csm.GroupId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientGroup] cg WHERE cg.[ClientId]=cl.[ClientId] AND cg.[GroupId]=@csmGroupId) ";
+            }
+
+            if ( csm.RegionId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=cl.[ClientId] AND s.[RegionId]=@csmRegionId) ";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (cl.LoadDate>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (cl.LoadDate<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            return context.Database.SqlQuery<LoadsPerMonth>( query, parameters.ToArray() ).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Gets a comparison of loads vs authorisation codes issued for the specified From-To date as well as other applicable search params
+        /// </summary>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public AuthorisationCodes AuthorisationCodesPerMonth( CustomSearchModel csm )
+        {
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmGroupId", ( int ) csm.GroupId ) },
+                { new SqlParameter( "csmRegionId", ( int ) csm.RegionId ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+            };
+
+            #endregion
+
+
+            #region Query
+
+            string clQuery = @"SELECT
+	                              COUNT(cl.[Id]) AS [Loads]
+                               FROM
+	                              [dbo].[ClientLoad] cl
+                               WHERE
+	                              (1=1)";
+
+            string caQuery = @"SELECT
+	                              COUNT(ca.[Id]) AS [Codes]
+                               FROM
+	                              [dbo].[ClientAuthorisation] ca,
+	                              [dbo].[ClientLoad] cl
+                               WHERE
+	                              (ca.[LoadNumber]=cl.[LoadNumber])";
+
+            #endregion
+
+            // WHERE
+
+            #region WHERE
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                clQuery = $"{clQuery} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+                caQuery = $"{caQuery} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                clQuery = $"{clQuery} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+                caQuery = $"{caQuery} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
+            // CUSTOM SEARCH
+
+            #region Custom Search
+
+            if ( csm.ClientId > 0 )
+            {
+                clQuery = $"{clQuery} AND (cl.ClientId=@csmClientId) ";
+                caQuery = $"{caQuery} AND (cl.ClientId=@csmClientId) ";
+            }
+
+            if ( csm.SiteId > 0 )
+            {
+                clQuery = $"{clQuery} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=cl.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
+                caQuery = $"{caQuery} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=cl.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
+            }
+
+            if ( csm.GroupId > 0 )
+            {
+                clQuery = $"{clQuery} AND EXISTS(SELECT 1 FROM [dbo].[ClientGroup] cg WHERE cg.[ClientId]=cl.[ClientId] AND cg.[GroupId]=@csmGroupId) ";
+                caQuery = $"{caQuery} AND EXISTS(SELECT 1 FROM [dbo].[ClientGroup] cg WHERE cg.[ClientId]=cl.[ClientId] AND cg.[GroupId]=@csmGroupId) ";
+            }
+
+            if ( csm.RegionId > 0 )
+            {
+                clQuery = $"{clQuery} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=cl.[ClientId] AND s.[RegionId]=@csmRegionId) ";
+                caQuery = $"{caQuery} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=cl.[ClientId] AND s.[RegionId]=@csmRegionId) ";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                clQuery = $"{clQuery} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
+                caQuery = $"{caQuery} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    clQuery = $"{clQuery} AND (cl.LoadDate>=@csmFromDate) ";
+                    caQuery = $"{caQuery} AND (cl.LoadDate>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    clQuery = $"{clQuery} AND (cl.LoadDate<=@csmToDate) ";
+                    caQuery = $"{caQuery} AND (cl.LoadDate<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            AuthorisationCodes clAuth = context.Database.SqlQuery<AuthorisationCodes>( clQuery, parameters.ToArray() ).FirstOrDefault();
+
+            parameters = new List<object>()
+            {
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmGroupId", ( int ) csm.GroupId ) },
+                { new SqlParameter( "csmRegionId", ( int ) csm.RegionId ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+            };
+
+            AuthorisationCodes caAuth = context.Database.SqlQuery<AuthorisationCodes>( caQuery, parameters.ToArray() ).FirstOrDefault();
+
+            return new AuthorisationCodes()
+            {
+                Codes = caAuth.Codes,
+                Loads = clAuth.Loads
+            };
+        }
+
+        /// <summary>
+        /// Gets the number of pallets managed for the specified From-To date as well as other applicable search params
+        /// </summary>
+        /// <param name="csm"></param>
+        /// <param name="isYear"></param>
+        /// <returns></returns>
+        public NumberOfPalletsManaged NumberOfPalletsManaged( CustomSearchModel csm )
+        {
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmGroupId", ( int ) csm.GroupId ) },
+                { new SqlParameter( "csmRegionId", ( int ) csm.RegionId ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "rsReconciled", ReconciliationStatus.Reconciled ) },
+                { new SqlParameter( "rsUnreconciled", ReconciliationStatus.Unreconciled ) },
+            };
+
+            #endregion
+
+
+            #region Query
+
+            string query = @"SELECT
+	                            SUM(cl.[NewQuantity]) AS [Total],
+	                            SUM(CASE WHEN cl.[Status]=@rsReconciled THEN cl.[NewQuantity] ELSE 0 END) AS [Reconciled],
+	                            SUM(CASE WHEN cl.[Status]=@rsUnreconciled THEN cl.[NewQuantity] ELSE 0 END) AS [Unreconciled]
+                             FROM 
+	                            [dbo].[ClientLoad] cl
+                             WHERE (1=1)";
+
+            #endregion
+
+            // WHERE
+
+            #region WHERE
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
+            // CUSTOM SEARCH
+
+            #region Custom Search
+
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND (cl.ClientId=@csmClientId) ";
+            }
+
+            if ( csm.SiteId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=cl.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
+            }
+
+            if ( csm.GroupId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientGroup] cg WHERE cg.[ClientId]=cl.[ClientId] AND cg.[GroupId]=@csmGroupId) ";
+            }
+
+            if ( csm.RegionId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=cl.[ClientId] AND s.[RegionId]=@csmRegionId) ";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (cl.LoadDate>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (cl.LoadDate<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            return context.Database.SqlQuery<NumberOfPalletsManaged>( query, parameters.ToArray() ).FirstOrDefault();
         }
 
     }

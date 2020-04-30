@@ -76,7 +76,7 @@
     <Compile Include="Enums\ActivityTypes.cs" />
     <Compile Include="Enums\PostingType.cs" />
     <Compile Include="Enums\VehicleType.cs" />
-    <Compile Include="Enums\Reconciliation.cs" />
+    <Compile Include="Enums\ReconciliationStatus.cs" />
     <Compile Include="Enums\SiteType.cs" />
     <Compile Include="Enums\ServiceType.cs" />
     <Compile Include="Enums\DisputeStatus.cs" />
@@ -183,6 +183,7 @@
     <Compile Include="Models\Custom\TransporterCustomModel.cs" />
     <Compile Include="Models\Custom\UserCustomModel.cs" />
     <Compile Include="Models\Custom\VehicleCustomModel.cs" />
+    <Compile Include="Models\DashBoardModel.cs" />
     <Compile Include="Models\JsonCommonModel.cs" />
     <Compile Include="Models\CountModel.cs" />
     <Compile Include="Models\KeyValueModel.cs" />

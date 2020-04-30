@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 
 namespace ACT.UI.Controllers
 {
+    [Requires( PermissionTo.View, PermissionContext.Client )]
     public class ClientController : BaseController
     {
         // GET: Client

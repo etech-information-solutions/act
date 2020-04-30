@@ -1,0 +1,56 @@
+﻿@model List<LoadsPerMonth>
+
+@using ACT.Core.Models
+
+@{
+    string monthNames = "[";
+
+    foreach ( LoadsPerMonth item in Model )
+    {
+        monthNames += $"\"{item.MonthName}\",";
+    }
+
+    monthNames = monthNames.Remove( monthNames.Trim().Length - 1 );
+    monthNames += "]";
+
+    string loads = "{\"type\": \"column\", \"name\": \"Loads\", \"data\": [",
+           pod = "{\"type\": \"column\", \"name\": \"POD Number\", \"data\": [";
+
+    for ( int i = 0; i < Model.Count; i++ )
+    {
+        loads += Model[ i ].Loads + ",";
+        pod += Model[ i ].POD + ",";
+    }
+
+    loads = loads.Remove( loads.Trim().Length - 1 );
+    loads += "]}";
+
+    pod = pod.Remove( pod.Trim().Length - 1 );
+    pod += "]}";
+
+    
+    string quantity = "{\"type\": \"pie\", \"name\": \"Quantity Per Month\", \"data\": [";
+
+    foreach ( LoadsPerMonth item in Model )
+    {
+        quantity += "{\"name\": \"" + item.MonthName + ": " + item.Quantity + "\", \"y\": " + item.Quantity + "},";
+    }
+
+    quantity = quantity.Remove( quantity.Trim().Length - 1 );
+
+    quantity += "], \"center\": [180, 60], \"size\": 150}";
+
+    string series = $"[{loads},{pod},{quantity}]";
+}
+
+<script type="text/javascript">
+
+    var series = JSON.parse( '@series'.replace( /&quot;/g, '"' ) );
+    var monthNames = JSON.parse( '@monthNames'.replace( /&quot;/g, '"' ) );
+
+    setTimeout(function ()
+    {
+        ACT.UI.LoadsPerMonth( "lpm-graph", monthNames, series );
+    }, '500');
+</script>
+

@@ -3719,7 +3719,7 @@
 
         DataGraphs: function ( sender )
         {
-            var i = sender.parent().find( 'div[data-loaded="0"]:first' );
+            var i = sender.parent().find( 'div[data-loaded="0"]' ).first();
 
             if ( !i.length )
             {
@@ -3732,10 +3732,195 @@
             {
                 i.attr( "data-loaded", 1 );
 
-                ACT.UI.DataGraphs( sender.find( 'div[data-loaded="0"]:first' ) );
+                ACT.UI.DataGraphs( sender );
             }
 
-            ACT.UI.Get( i.find( "#loader" ), i, siteurl + "/" + i.attr( "data-type" ), {}, LoadNext(), true );
+            ACT.UI.Get( i.find( "#loader" ), i, siteurl + "/" + i.attr( "data-type" ), {}, LoadNext(), true, true );
+        },
+
+        AgeOfOutstandingPallets: function ( sender, months )
+        {
+            Highcharts.chart( sender, {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Age Of Outstanding Pallets'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.y:.0f}</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b style="color:{point.color};">{point.name}</b>: <span style="color:{point.color};">{point.y:.0f}</span>'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'NO. OF OUTSTANDING PALLETS',
+                    colorByPoint: true,
+                    data: months
+                }]
+            } );
+        },
+
+        LoadsPerMonth: function ( sender, months, series )
+        {
+            Highcharts.chart( sender, {
+                title: {
+                    text: 'Loads Per Month'
+                },
+                xAxis: {
+                    categories: months
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Total'
+                    },
+                    stackLabels: {
+                        enabled: true
+                    }
+                },
+                legend: {
+                    x: 0,
+                    y: 5,
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        dataLabels: {
+                            enabled: true
+                        }
+                    }
+                },
+                series: series
+            } );
+        },
+
+        AuthorisationCodesPerMonth: function ( sender, months, series )
+        {
+            Highcharts.chart( sender, {
+                chart: {
+                    marginBottom: 70
+                },
+                title: {
+                    text: 'Authorisations Per Month'
+                },
+                xAxis: {
+                    categories: months
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Total'
+                    },
+                    stackLabels: {
+                        enabled: true
+                    }
+                },
+                legend: {
+                    x: 0,
+                    y: 5,
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                },
+                tooltip: {
+                    headerFormat: '<b>{point.x}</b><br/>',
+                    pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        dataLabels: {
+                            enabled: true
+                        }
+                    }
+                },
+                series: series
+            } );
+        },
+
+        NumberOfPalletsManaged: function ( sender, months, series )
+        {
+            Highcharts.chart( sender, {
+                chart: {
+                    type: 'line'
+                },
+                title: {
+                    text: 'Number Of Pallets Managed'
+                },
+                xAxis: {
+                    categories: months
+                },
+                yAxis: {
+                    title: {
+                        text: 'Pallets'
+                    }
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        }
+                    },
+                    series: {
+                        label: {
+                            connectorAllowed: false
+                        }
+                    }
+                },
+                series: series,
+
+                responsive: {
+                    rules: [{
+                        chartOptions: {
+                            legend: {
+                                layout: 'horizontal',
+                                align: 'center',
+                                verticalAlign: 'bottom'
+                            }
+                        }
+                    }]
+                }
+            } );
+        },
+
+        NumberOfDisputes: function ( sender, months, series )
+        {
+            Highcharts.chart( sender, {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Number Of Disputes'
+                },
+                xAxis: {
+                    categories: months
+                },
+                yAxis: {
+                    title: {
+                        text: 'Disputes'
+                    }
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        }
+                    }
+                },
+                series: series
+            } );
         }
     };
 } )();

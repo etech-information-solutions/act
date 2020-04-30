@@ -102,7 +102,7 @@ namespace ACT.Core.Services
             }
 
 
-            if (csm.ReconciliationStatus != Reconciliation.Unreconcilable)
+            if (csm.ReconciliationStatus != ReconciliationStatus.Unreconcilable)
             {
                 query = $"{query} AND (p.Status=@csmReconciliation)";
             }

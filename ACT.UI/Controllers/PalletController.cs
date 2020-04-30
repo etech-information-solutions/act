@@ -684,7 +684,7 @@ namespace ACT.UI.Controllers
                 using (ClientLoadService clientService = new ClientLoadService())
                 {
 
-                    load = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)Reconciliation.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                    load = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)ReconciliationStatus.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
 
                 }
                 if (load != null)
@@ -710,7 +710,7 @@ namespace ACT.UI.Controllers
                 using (ChepLoadService chepService = new ChepLoadService())
                 {
 
-                    load = chepService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)Reconciliation.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                    load = chepService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)ReconciliationStatus.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
 
                 }
            

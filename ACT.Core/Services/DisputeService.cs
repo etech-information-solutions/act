@@ -334,5 +334,103 @@ namespace ACT.Core.Services
 
             return context.Database.SqlQuery<DisputeCustomModel>( query, parameters.ToArray() ).ToList();
         }
+
+        /// <summary>
+        /// Gets the age of outstanding pallets for the specified From-To date as well as other applicable search params
+        /// </summary>
+        /// <param name="csm"></param>
+        /// <param name="isYear"></param>
+        /// <returns></returns>
+        public NumberOfDisputes NumberOfDisputes( CustomSearchModel csm )
+        {
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmGroupId", ( int ) csm.GroupId ) },
+                { new SqlParameter( "csmRegionId", ( int ) csm.RegionId ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+            };
+
+            #endregion
+
+
+            #region Query
+
+            string query = @"SELECT
+	                            COUNT(j.[Id]) AS [Total]
+                             FROM
+	                            [dbo].[Journal] j,
+	                            [dbo].[ClientLoad] cl
+                             WHERE
+                                (j.[ClientLoadId]=cl.[Id])";
+
+            #endregion
+
+            // WHERE
+
+            #region WHERE
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
+            // CUSTOM SEARCH
+
+            #region Custom Search
+
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND (cl.ClientId=@csmClientId) ";
+            }
+
+            if ( csm.SiteId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=cl.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
+            }
+
+            if ( csm.GroupId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientGroup] cg WHERE cg.[ClientId]=cl.[ClientId] AND cg.[GroupId]=@csmGroupId) ";
+            }
+
+            if ( csm.RegionId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=cl.[ClientId] AND s.[RegionId]=@csmRegionId) ";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (j.CreatedOn >= @csmFromDate AND j.CreatedOn <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (j.CreatedOn>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (j.CreatedOn<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            return context.Database.SqlQuery<NumberOfDisputes>( query, parameters.ToArray() ).FirstOrDefault();
+        }
     }
 }

@@ -49,9 +49,18 @@ namespace ACT.Core.Models
         }
 
         /// <summary>
+        /// Can be used as a selected Client Group 
+        /// </summary>
+        [Display( Name = "Client Group" )]
+        public int GroupId
+        {
+            get; set;
+        }
+
+        /// <summary>
         /// Can be used as selected Clients
         /// </summary>
-        [Display( Name = "Client Ids" )]
+        [ Display( Name = "Client Ids" )]
         public List<int> ClientIds
         {
             get; set;
@@ -255,8 +264,8 @@ namespace ACT.Core.Models
             set;
         }
 
-        [Display(Name = "ReconciliationStatus")]
-        public Reconciliation ReconciliationStatus
+        [Display(Name = "Reconciliation Status")]
+        public ReconciliationStatus ReconciliationStatus
         {
             get;
             set;
@@ -470,12 +479,12 @@ namespace ACT.Core.Models
             this.Status = Status.All;
             this.Province = Province.All;
             this.RoleType = RoleType.All;
+            this.ClientStatus = Status.Active;
             this.DocumentType = DocumentType.All;
             this.ActivityType = ActivityTypes.All;
             this.InvoiceStatus = InvoiceStatus.All;
             this.PSPClientStatus = PSPClientStatus.All;
-            this.ClientStatus = Status.Active;
-            this.ReconciliationStatus = Reconciliation.Unreconcilable;
+            this.ReconciliationStatus = ReconciliationStatus.Unreconcilable;
         }
     }
 }
