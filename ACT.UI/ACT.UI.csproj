@@ -168,6 +168,7 @@
     <Compile Include="Models\AddressViewModel.cs" />
     <Compile Include="Models\BudgetViewModel.cs" />
     <Compile Include="Models\ClientKPIViewModel.cs" />
+    <Compile Include="Models\DeliveryNoteLineViewModel.cs" />
     <Compile Include="Models\ObjectDocumentsViewModel.cs" />
     <Compile Include="Models\ImportFileModel.cs" />
     <Compile Include="Models\GroupViewModel.cs" />
@@ -594,6 +595,7 @@
     <Content Include="Views\DashBoard\_NumberOfPalletsManaged.cshtml" />
     <Content Include="Views\DashBoard\_NumberOfDisputes.cshtml" />
     <Content Include="Views\DashBoard\_KPIMeasurement.cshtml" />
+    <Content Include="Views\Pallet\_ListDeliveryNoteLines.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
