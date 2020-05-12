@@ -845,13 +845,16 @@ namespace ACT.UI.Controllers
         {
             try
             {
+               
                 string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
                 int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-                model.ClientId = clientId;
-                ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-                                                                        // model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+                
+                ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it                                                                        
+                if (model.ClientId > 0 && clientId > 0 )
+                {
+                    model.ClientId = clientId;
+                }
                 List<Client> clientList = new List<Client>();
-                //TODO
                 using (ClientService clientService = new ClientService())
                 {
                     clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
@@ -874,8 +877,12 @@ namespace ACT.UI.Controllers
 
                 using (DeliveryNoteService service = new DeliveryNoteService())
                 using (DeliveryNoteLineService lineservice = new DeliveryNoteLineService())
+                using (ClientLoadService clientloadservice = new ClientLoadService())
                 using (TransactionScope scope = new TransactionScope())
                 {
+                    try
+                    { 
+                        bool newNote = false;
                     #region Save DeliveryNote
                     DeliveryNote delnote = new DeliveryNote();
 
@@ -908,8 +915,10 @@ namespace ACT.UI.Controllers
                         delnote.BililngPostalCode = model.BillingPostalCode;
                         delnote.BillingProvince = model.BillingProvince;
 
-                        service.Update(delnote);
-                    } else
+                        service.Update(delnote);                        
+
+                    }
+                    else
                     {
                         delnote.ClientId = model.ClientId;
                         //Create
@@ -935,66 +944,152 @@ namespace ACT.UI.Controllers
                         delnote.BillingProvince = model.BillingProvince;
 
                         service.Create(delnote);
+
+                        newNote = true;
                     }
                     #endregion
                     #region Save DeliveryNoteLine
-
+                    decimal? originalQuantity = 0;
+                    decimal? newQuantity = 0;
+                    decimal? retQuantity = 0;
                     if (!string.IsNullOrEmpty(model.DeliveryNoteLinesString))
                     {
-                        int.TryParse(model.CountNoteLines.ToString(), out int lineCount);
-                        String[] dList = model.DeliveryNoteLinesString.Split(',');
-                      //  string lastId = "0";
-                        foreach (string itm in dList)
-                        {
-                            if (!string.IsNullOrEmpty(itm))
-                            {
-                                String[] note = itm.Split('|');
-
-                                //var newstr = id + '|' +delnoteid +'|'+product + '|' + productdesc + '|' + qty + '|' + delqty + '|' + outqty + '|';
-                                int.TryParse(note[0], out int noteId);
-                                int.TryParse(note[1], out int deliveryNoteId);
-                                string product = note[2];
-                                string productdesc = note[3];
-                                decimal.TryParse(note[4], out decimal qty);
-                                decimal.TryParse(note[5], out decimal delqty);
-                                decimal.TryParse(note[6], out decimal outqty);
-
-                                DeliveryNoteLine noteline = new DeliveryNoteLine();
-                                if (noteId>0)
+                            try { 
+                                int.TryParse(model.CountNoteLines.ToString(), out int lineCount);
+                                String[] dList = model.DeliveryNoteLinesString.Split(',');
+                                //  string lastId = "0";
+                                for (int i = 0; i < lineCount; i++)
                                 {
-                                    noteline = lineservice.GetById(noteId);
 
-                                    noteline.DeliveryNoteId = delnote.Id;// deliveryNoteId;
-                                    noteline.Delivered = delqty;
-                                    noteline.Product = product;
-                                    noteline.ProductDescription = productdesc;
-                                    noteline.OrderQuantity = qty;
-                                    noteline.ModifiedOn = DateTime.Now;
-                                    noteline.Status = (int)Status.Active;
 
-                                    lineservice.Update(noteline);
-                                } else {
-                                    noteline.DeliveryNoteId = delnote.Id;//deliveryNoteId;
-                                    noteline.Delivered = delqty;
-                                    noteline.Product = product;
-                                    noteline.ProductDescription = productdesc;
-                                    noteline.OrderQuantity = qty;
-                                    noteline.ModifiedOn = DateTime.Now;
-                                    noteline.Status = (int)Status.Active;
+                                    foreach (string itm in dList)
+                                    {
+                                        if (!string.IsNullOrEmpty(itm))
+                                        {
+                                            String[] note = itm.Split('|');
 
-                                    lineservice.Create(noteline);
+                                            //var newstr = id + '|' +delnoteid +'|'+product + '|' + productdesc + '|' + qty + '|' + delqty + '|' + outqty + '|';
+                                            int.TryParse(note[0], out int noteId);
+                                            int.TryParse(note[1], out int deliveryNoteId);
+                                            string product = note[2];
+                                            string productdesc = note[3];
+                                            decimal.TryParse(note[4], out decimal qty);
+                                            decimal.TryParse(note[5], out decimal delqty);
+                                            decimal.TryParse(note[6], out decimal outqty);
+
+                                            DeliveryNoteLine noteline = new DeliveryNoteLine();
+                                            //if (noteId > 0)
+                                            //{
+                                            //    noteline = lineservice.GetById(noteId);
+
+                                            //    noteline.DeliveryNoteId = delnote.Id;// deliveryNoteId;
+                                            //    noteline.Delivered = delqty;
+                                            //    noteline.Product = product;
+                                            //    noteline.ProductDescription = productdesc;
+                                            //    noteline.OrderQuantity = qty;
+                                            //    noteline.ModifiedOn = DateTime.Now;
+                                            //    noteline.CreatedOn = DateTime.Now;
+                                            //    noteline.Status = (int)Status.Active;
+
+                                            //    lineservice.Update(noteline);
+                                            //}
+                                            //else
+                                            //{
+                                            noteline.DeliveryNoteId = delnote.Id;//deliveryNoteId;
+                                            noteline.Delivered = delqty;
+                                            noteline.Product = product;
+                                            noteline.ProductDescription = productdesc;
+                                            noteline.OrderQuantity = qty;
+                                            noteline.ModifiedOn = DateTime.Now;
+                                            noteline.CreatedOn = DateTime.Now;
+                                            noteline.Status = (int)Status.Active;
+
+                                            lineservice.Create(noteline);
+                                            //}
+                                            originalQuantity = noteline.OrderQuantity;
+                                            newQuantity = noteline.OrderQuantity;
+                                            retQuantity = noteline.Delivered;
+
+                                        }
+                                    }
                                 }
                             }
+                            catch (Exception ex)
+                            {
+                                ViewBag.Message = ex.Message;
+                                //  return View();
+                                return PartialView("_GenerateDeliveryNote", model);
+                            }
                         }
-                    }
 
                     #endregion
 
-                    scope.Complete();
+                    #region ClientLoad
+                    try { 
+                    ClientLoad loadModel = new ClientLoad();
+                    int vehicleId = 0;
+                    int transporterId = 0;
+
+                    if (newNote)
+                    {
+                        loadModel.ClientId = model.ClientId;
+                        loadModel.LoadDate = model.OrderDate;
+                        loadModel.LoadNumber = model.InvoiceNumber;
+                        loadModel.AccountNumber = model.OrderNumber;
+                        loadModel.ClientDescription = model.CustomerName;
+                        loadModel.ProvCode = model.CustomerProvince.ToString();
+                        loadModel.PCNNumber = model.OrderNumber;
+                        loadModel.DeliveryNote = model.InvoiceNumber;
+                        //model.PRNNumber = rows[7];
+                        loadModel.OriginalQuantity = originalQuantity;
+                        loadModel.NewQuantity = originalQuantity;
+                        loadModel.RetQuantity = retQuantity;
+                        //model.RetQuantity = decimal.Parse(rows[9]);
+                        //loadModel.ARPMComments = rows[10];
+                        //some of the columns are malaligned but leaving it as is, I added 3 new columns
+                        //grab the first of bothe vehicle and transporter to complete this load create, its mandatory
+                        using (VehicleService vservice = new VehicleService())
+                        using (TransporterService tservice = new TransporterService())
+                        {
+                            vehicleId = vservice.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active }).FirstOrDefault().Id;
+                            transporterId = tservice.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active }).FirstOrDefault().Id;
+                        }
+                        if (vehicleId > 0)
+                            loadModel.VehicleId = vehicleId;
+                        if (transporterId > 0)
+                            loadModel.TransporterId = transporterId;
+                        model.CreatedOn = DateTime.Now;
+                        model.ModifiedOn = DateTime.Now;
+                        clientloadservice.Create(loadModel);
+                    
+                    }
+                        }
+                        catch (Exception ex)
+                        {
+                            ViewBag.Message = ex.Message;
+                            //  return View();
+                            return PartialView("_GenerateDeliveryNote", model);
+                        }
+                        //else {
+                        //    loadModel = 
+                        //    loadModel = 
+                        //}
+
+                        #endregion
+
+                        scope.Complete(); //only commit if all is passed
+                    }
+                    catch (Exception ex)
+                    {
+                        ViewBag.Message = ex.Message;
+                        //  return View();
+                        return PartialView("_GenerateDeliveryNote", model);
+                    }
                 }
 
                 Notify("The item was successfully saved.", NotificationType.Success);
-                return RedirectToAction("GenerateDeliveryNote");
+                //Session["ImportMessage"] = importMessage;
+                return RedirectToAction("ClientData", "Pallet");
             }
             catch (Exception ex)
             {

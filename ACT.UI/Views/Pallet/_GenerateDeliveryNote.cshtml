@@ -59,10 +59,10 @@ else
                 <div class="editor-label ">
                     Delivery Note Number
                 </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.InvoiceNumber, new { @class = "input", @placeholder = "Please Complete", @readonly = "readonly" })
+                <div class="editor-field" style="display: inline-flex;width:100%;">
+                    @Html.TextBoxFor(model => model.InvoiceNumber, new { @class = "input", @placeholder = "Please Complete", @readonly = "readonly", @style = "width: 60%; " })
                     @Html.ValidationMessageFor(model => model.InvoiceNumber)
-                    <a id="generatednnumber" href="#" onclick="GetDeliveryNoteNumber();"><i class="fa fa-refresh"></i> Generate Number</a>
+                    <a id="generatednnumber" href="#" onclick="GetDeliveryNoteNumber();" style="width:40%; "><i class="fa fa-refresh"></i> Generate Number</a>
                 </div>
             </div>
 
@@ -326,6 +326,7 @@ else
         $('#savedn-btn').attr("disabled", true);
         $('#reprintdn-btn').attr("disabled", true);
         $('#emaildn-btn').attr("disabled", true);
+        $('#DeliveryEmail').attr("disabled", true);
         if (context == "1") {
             GetClientAddress(client);
         }
@@ -410,7 +411,7 @@ else
             contentType: "application/json;charset=utf-8",
             dataType: "json",
             success: function (result) {
-                $('#InvoiceNumber').val('DN'+result);
+                $('#InvoiceNumber').val(result);//'DN'+
             },
             error: function (response) {
                 $('#InvoiceNumber').val('Error');
@@ -569,6 +570,7 @@ else
             $('#savedn-btn').removeAttr("disabled");
             //$('#reprint-btn').removeAttr("disabled");
             $('#emaildn-btn').removeAttr("disabled");
+            $('#DeliveryEmail').removeAttr("disabled", true);
 
         } else {
             alert("Please complete all information to save a delivery note line");
