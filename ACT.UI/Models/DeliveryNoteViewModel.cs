@@ -79,7 +79,7 @@ namespace ACT.UI.Models
         [Display(Name = "Billing Province")]
         //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public Nullable<int> BillingProvince { get; set; }
-        [Required]
+
         [Display(Name = "Reference")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string Reference306 { get; set; }
@@ -93,6 +93,9 @@ namespace ACT.UI.Models
 
         public string DeliveryEmail { get; set; }
         public bool Reprint { get; set; }
+
+        [Required]
+        [Display(Name = "Delivery Note Lines")]
         public string DeliveryNoteLinesString { get; set; }
 
         #endregion

@@ -33,6 +33,7 @@ else
         @Html.HiddenFor(model => model.CountNoteLines)
         @Html.HiddenFor(model => model.Reprint)
         @Html.HiddenFor(model => model.DeliveryEmail)
+        @Html.HiddenFor(model => model.CustomerName)
 
         @Html.ValidationSummary(true)
 
@@ -59,8 +60,9 @@ else
                     Delivery Note Number
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.InvoiceNumber, new { @class = "input", @placeholder = "Please Complete" })
+                    @Html.TextBoxFor(model => model.InvoiceNumber, new { @class = "input", @placeholder = "Please Complete", @readonly = "readonly" })
                     @Html.ValidationMessageFor(model => model.InvoiceNumber)
+                    <a id="generatednnumber" href="#" onclick="GetDeliveryNoteNumber();"><i class="fa fa-refresh"></i> Generate Number</a>
                 </div>
             </div>
 
@@ -295,18 +297,18 @@ else
 
             <div class="left" style="width: 48%; margin-right: 4%;">
                 <p>
-                    <input id="save-btn" type="submit" value="Generate Delivery Note" /><!--onclick="SubmitDeliveryNote()"-->
-                    <input id="reprint-btn" type="button" onclick="ReprintDeliveryNote()" value="Reprint Delivery Note" />
+                    <input id="savedn-btn"  type="submit" value="Generate Delivery Note" disabled="disabled"/><!--onclick="SubmitDeliveryNote()"-->
+                    <input id="reprintdn-btn"  type="button" onclick="ReprintDeliveryNote()" disabled="disabled" value="Reprint Delivery Note" />
 
                     @*<span style="padding: 0 5px;">/</span>
 
-                    <a data-refresh="1" data-target="#clientdata">Cancel</a>*@
+        <a data-refresh="1" data-target="#clientdata">Cancel</a>*@
                 </p>
             </div>
 
             <div class="left" style="width: 48%;">
                 <input type="email" id="DeliveryEmail" name="DeliveryEmail" placeholder="Enter Email" value="" />
-                <input id="email-btn" type="button" onclick="EmailDeliveryNote()" value="Email Delivery Note" />
+                <input id="emaildn-btn" type="button" onclick="EmailDeliveryNote()" disabled="disabled" value="Email Delivery Note" />
             </div>
 
 
@@ -321,21 +323,35 @@ else
     $(document).ready(function () {
         var client = $('#ClientId').val();
         var context = $("#context").val();
+        $('#savedn-btn').attr("disabled", true);
+        $('#reprintdn-btn').attr("disabled", true);
+        $('#emaildn-btn').attr("disabled", true);
         if (context == "1") {
             GetClientAddress(client);
         }
+
+        $('#save-btn').click(function (e) {
+            var allok = CheckForm();
+
+            if (!allok) {
+                e.preventDefault();
+            }
+        });
         //$("#generatedeliverynote").submit(function (event) {
         //    alert("Handler for .submit() called.");
         //    event.preventDefault();
         //});
-        $('#save-btn').click(function () {
-            //alert("clicked");
-            var qtylines = $('#CountNoteLines').val();
-            if (parseFloat(qtylines) > 0) {
-                $("#generatedeliverynote").submit();
-            } else {
-                alert("Please Add Lines to the Delivery Note before attempting to save.");
-            }
+
+
+        //$('#save-btn').click(function () {
+        //    //alert("clicked");
+        //    debugger;
+        //    var qtylines = $('#CountNoteLines').val();
+        //    if (parseFloat(qtylines) > 0) {
+        //        $("#generatedeliverynote").submit();
+        //    } else {
+        //        alert("Please Add Lines to the Delivery Note before attempting to save.");
+        //    }
 
             //var form = $("#generatedeliverynote");
             //var dataString = form.serializeArray();
@@ -372,7 +388,7 @@ else
             //   $.post("CreateDeliveryNote", formData, function (data) {
             //       $("#msg").html(data);
             //   });
-        });
+       // });
 
         //$("form").submit(function (event) {
         //    if ($("input").first().val() === "correct") {
@@ -386,10 +402,45 @@ else
 
     });
 
-    function SubmitDeliveryNote() {
-        alert("Creating Delivery Note");
-        var form = $("#generatedeliverynote");
+    function GetDeliveryNoteNumber() {
 
+        $.ajax({
+            type: "GET",
+            url: "GetDeliveryNoteNumber",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                $('#InvoiceNumber').val('DN'+result);
+            },
+            error: function (response) {
+                $('#InvoiceNumber').val('Error');
+            }
+        });
+
+
+    }
+
+    function CheckForm() {
+        var bReturn = false;
+        var qtylines = $('#CountNoteLines').val();
+        var invNumber = $('#InvoiceNumber').val();
+        var orderNumber = $('#OrderNumber').val();
+        if (parseFloat(qtylines) > 0 && invNumber != '' && orderNumber !='') {
+            bReturn = true;
+        }
+        return bReturn;
+    }
+
+    function SubmitDeliveryNote() {
+        //alert("Creating Delivery Note");
+       // var form = $("#generatedeliverynote");
+        var qtylines = $('#CountNoteLines').val();
+        if (parseFloat(qtylines) > 0) {
+           // debugger;
+            $("#generatedeliverynote").submit();
+        } else {
+            alert("Please Add Lines to the Delivery Note before attempting to save.");
+        }
        // CreateDeliveryNote();
 
     }
@@ -429,7 +480,11 @@ else
 
     function AddLineRow() {
         var rowDiv = $("#deliverynotelines-table tbody");
-
+        var id = $('#CountNoteLines').val();
+        if (id == '' || id == undefined) {
+            id = 0;
+        }
+        id = parseInt(id) + 1;
         //var tabledata = '<tr><td><input id="DeliveryNoteLines.Product" name="DeliveryNoteLines.Product" placeholder="Enter Product" required="required" type="text" value="" class="input" /></td>' +
         //    '<td><input id="DeliveryNoteLines.ProductDescription" name="DeliveryNoteLines.ProductDescription" placeholder="Enter Product Description" type="text" value="" required="required"  class="input" /></td>' +            
         //    '<td><input id="DeliveryNoteLines.OrderQuantity" name="DeliveryNoteLines.OrderQuantity" type="number" required="required" value="0" class="input" /></td>' +
@@ -438,17 +493,18 @@ else
         //    '<td><a id="saveline_0" name="saveline_0"><i class="fa fa-save"></i></a></td></tr> ';
 
 
-        //var tabledata = '<tr><td><input id="lineproduct_0" name="lineproduct_0" placeholder="Enter Product"\ required="required" type="text" value="" class="input" /></td>' +
-        //    '<td><input id="lineproductdescr_0" name="lineproductdescr_0" placeholder="Enter Product Description" type="text" value="" required="required"  class="input" /></td>' +
-        //    '<td><input id="lineordered_0" name="lineordered_0" type="number" value="0" required="required"  class="input" /></td>' +
-        //    '<td><input id="linedelivered_0" name="linedelivered_0" type="number" required="required" value="0" class="input" /></td>' +
-        //    '<td><input id="lineoutstanding_0" name="lineoutstanding_0" type="number" required="required" value="0" class="input" /></td>' +
-        //    '<td><a id="saveline_0" onclick="SaveLine(0)" name="saveline_0"><i class="fa fa-save"></i></a></td></tr> ';
+        var tabledata = '<tr><td><input id="lineproduct_' + id +'" name="lineproduct_' + id +'" placeholder="Enter Product" required="required" type="text" value="" class="input" /></td>' +
+            '<td><input id="lineproductdescr_'+id+'" name="lineproductdescr_'+id+'" placeholder="Enter Product Description" type="text" value="" required="required"  class="input" /></td>' +
+            '<td><input id="lineordered_' + id + '" name="lineordered_' + id + '" type="number" value="0" required="required"  class="input" onchange="calcRemaining(' + id +')" /></td>' +
+            '<td><input id="linedelivered_' + id + '" name="linedelivered_' + id + '" type="number" required="required" value="0" class="input" onchange="calcRemaining(' + id +')" /></td>' +
+            '<td><input id="lineoutstanding_' + id + '" name="lineoutstanding_' + id + '" type="number" required="required" value="0" disabled="disabled"  class="input" /></td>' +
+            '<td><a id="saveline_' + id + '" onclick="SaveLine(' + id + ')" name="saveline_' + id +'"><i class="fa fa-save"></i></a></td></tr> ';
         rowDiv.append(tabledata);
+        
+
     }
 
     function SaveLineAJAX(id) {
-        alert("Save"); 
         var deliverynoteid = $('#Id').val();
         if (deliverynoteid == 0) {
             alert("Delivery Note not created yet");
@@ -476,18 +532,24 @@ else
         }
     }
 
+    function calcRemaining(id) {
+        var qty = $('#lineordered_' + id).val();
+        var delqty = $('#linedelivered_' + id).val();
+        var outqty = qty - delqty;
+        $('#lineoutstanding_' + id).val(outqty);
+    }
+
     function SaveLine(id) {
-        debugger;
-        var delnoteid = $('#deliverynoteid' + id).val();
+        var deliverynoteid = $('#Id').val();
         var product = $('#lineproduct_' + id).val();
-        var productdesc = $('#lineproduct_' + id).val();
+        var productdesc = $('#lineproductdescr_' + id).val();
         var qty = $('#lineordered_' + id).val();
         var delqty = $('#linedelivered_' + id).val();
         var outqty = $('#lineoutstanding_' + id).val();
         var qtylines = parseFloat($('#CountNoteLines').val());
 
-        if (parseFloat(qty) > 0 && parseFloat(delqty) > 0 && parseFloat(outqty) > 0) {
-            var newstr = id + '|' +delnoteid +'|'+product + '|' + productdesc + '|' + qty + '|' + delqty + '|' + outqty + '|';
+        if (product != '' && productdesc != '' && (parseFloat(qty)>0)) {
+            var newstr = id + '|' + deliverynoteid +'|'+product + '|' + productdesc + '|' + qty + '|' + delqty + '|' + outqty + '|';
             var oldstr = $('#DeliveryNoteLinesString').val();
 
             if (oldstr == '') {
@@ -498,6 +560,15 @@ else
 
             alert("Line Saved");
             qtylines = qtylines + 1;
+            $('#lineproduct_' + id).attr("disabled", true);
+            $('#lineproductdescr_' + id).attr("disabled", true);
+            $('#lineordered_' + id).attr("disabled", true);
+            $('#linedelivered_' + id).attr("disabled", true);
+
+            //open up buttons after first save
+            $('#savedn-btn').removeAttr("disabled");
+            //$('#reprint-btn').removeAttr("disabled");
+            $('#emaildn-btn').removeAttr("disabled");
 
         } else {
             alert("Please complete all information to save a delivery note line");
@@ -527,6 +598,7 @@ else
         var client = $('#ClientId').val();
         //GetClientDetail(client);
         GetClientAddress(client);
+        $('#CustomerName').val($("#ClientId option:selected").text());
 
     }
 
@@ -545,6 +617,8 @@ else
                 $('#CustomerAddressTown').val(data.Town);
                 //$('#CustomerAddressProvince').val(data.CustomerAddress);
                 $('#CustomerPostalCode').val(data.PostalCode);
+
+                
 
                 document.getElementById("CustomerProvince").options.length = 0;
                 var opt = document.createElement("option");

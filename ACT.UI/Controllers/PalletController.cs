@@ -845,6 +845,26 @@ namespace ACT.UI.Controllers
         {
             try
             {
+                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                model.ClientId = clientId;
+                ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+                                                                        // model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+                List<Client> clientList = new List<Client>();
+                //TODO
+                using (ClientService clientService = new ClientService())
+                {
+                    clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                }
+
+                IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.CompanyName
+
+                });
+                ViewBag.ClientList = clientDDL;
+
                 if (!ModelState.IsValid)
                 {
                     Notify("Sorry, the item was not updated. Please correct all errors and try again.", NotificationType.Error);
@@ -891,6 +911,7 @@ namespace ACT.UI.Controllers
                         service.Update(delnote);
                     } else
                     {
+                        delnote.ClientId = model.ClientId;
                         //Create
                         delnote.InvoiceNumber = model.InvoiceNumber;
                         delnote.CustomerName = model.CustomerName;
@@ -984,56 +1005,39 @@ namespace ACT.UI.Controllers
         }
 
         // POST: Pallet/GenerateDeliveryNote
-        [HttpPost]
-        [Requires(PermissionTo.Create)]
-        public ActionResult CreateDeliveryNote(DeliveryNoteViewModel model)
+        //[HttpPost]
+        //[Requires(PermissionTo.Create)]
+        //public ActionResult CreateDeliveryNote(DeliveryNoteViewModel model)
+        //{
+        //    try
+        //    {
+               
+        //        return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ViewBag.Message = ex.Message;
+        //        //return View();
+        //        return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+        //    }
+        //}
+
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetDeliveryNoteNumber()
         {
-            try
-            {
-                //string text = HttpContext.Request.Form["InvoiceNumber"];
-                //if (!ModelState.IsValid)
-                //{
-                //    Notify("Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error);
+                string noteNumber = null;
 
-                //    return View(model);
-                //}
-
-                //using (ChepLoadService gService = new ChepLoadService())
-                //using (TransactionScope scope = new TransactionScope())
-                //{
-                //    #region Create ClientLoadCustomModel
-                //    ChepLoad clientload = new ChepLoad()
-                //    {
-                //        LoadDate = model.LoadDate,
-                //        EffectiveDate = model.EffectiveDate,
-                //        NotifyDate = model.NotifyDate,
-                //        AccountNumber = model.AccountNumber,
-                //        ClientDescription = model.ClientDescription,
-                //        DeliveryNote = model.DeliveryNote,
-                //        ReferenceNumber = model.ReferenceNumber,
-                //        ReceiverNumber = model.ReceiverNumber,
-                //        Equipment = model.Equipment,
-                //        OriginalQuantity = model.OriginalQuantity,
-                //        NewQuantity = model.NewQuantity,
-                //        Status = (int)Status.Active,
-                //        CreatedOn = DateTime.Now,
-                //        ModfiedOn = DateTime.Now,
-                //        ModifiedBy = CurrentUser.Email
-                //    };
-                //    gService.Create(clientload);
-                //    #endregion
-
-                //    scope.Complete();
-                //}
-
-                //Notify("The item was successfully created.", NotificationType.Success);
-                //return RedirectToAction("ClientData");
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+                using (DeliveryNoteService service = new DeliveryNoteService())
+                {
+                    noteNumber = service.GetDeliveryNoteNumber(); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+                }
+                //var jsonList = JsonConvert.SerializeObject(sites);
+               // var data = JsonConvert.SerializeObject(sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+            if (noteNumber!=null) { 
+                return Json(data: noteNumber, behavior: JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            else
             {
-                ViewBag.Message = ex.Message;
-                //return View();
                 return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
             }
         }
