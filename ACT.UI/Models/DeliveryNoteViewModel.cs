@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using ACT.Core.Enums;
 using ACT.Core.Services;
 using ACT.Data.Models;
-using System.Collections.Generic;
 using ACT.Core.Models.Custom;
 namespace ACT.UI.Models
 {
@@ -26,8 +25,9 @@ namespace ACT.UI.Models
         [Display(Name = "Customer Address")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string CustomerAddress { get; set; }
-
         public string CustomerAddress2 { get; set; }
+        [Required]
+        [Display(Name = "Customer Address")]
         public string CustomerAddressTown { get; set; }
         [Required]
         [Display(Name = "CustomerPostalCode ")]
@@ -35,13 +35,14 @@ namespace ACT.UI.Models
         public string CustomerPostalCode { get; set; }
         [Required]
         [Display(Name = "Customer Province")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public Nullable<int> CustomerProvince { get; set; }
         [Required]
         [Display(Name = "Delivery Address")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string DeliveryAddress { get; set; }
         public string DeliveryAddress2 { get; set; }
+        [Required]
+        [Display(Name = "Customer Address")]
         public string DeliveryAddressTown { get; set; }
         [Required]
         [Display(Name = "DeliveryPostalCode ")]
@@ -59,6 +60,8 @@ namespace ACT.UI.Models
         [Display(Name = "Order Number")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string OrderNumber { get; set; }
+        [Required]
+        [DataType(DataType.Date)]
         [Display(Name = "Order Date")]
         //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public Nullable<System.DateTime> OrderDate { get; set; }
@@ -76,7 +79,7 @@ namespace ACT.UI.Models
         [Display(Name = "Billing Province")]
         //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public Nullable<int> BillingProvince { get; set; }
-        [Required]
+
         [Display(Name = "Reference")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
         public string Reference306 { get; set; }
@@ -84,11 +87,16 @@ namespace ACT.UI.Models
         public int Status { get; set; }
 
         [Display(Name = "Delivery Note Lines")]
-        public List<DeliveryNoteLineCustomModel> DeliveryNoteLines { get; set; }
+        public List<DeliveryNoteLineViewModel> DeliveryNoteLines { get; set; }
         [Display(Name = "Line Count")]
         public int CountNoteLines { get; set; }
 
         public string DeliveryEmail { get; set; }
+        public bool Reprint { get; set; }
+
+        [Required]
+        [Display(Name = "Delivery Note Lines")]
+        public string DeliveryNoteLinesString { get; set; }
 
         #endregion
 

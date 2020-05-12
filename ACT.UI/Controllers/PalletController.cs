@@ -838,58 +838,386 @@ namespace ACT.UI.Controllers
             return PartialView("_GenerateDeliveryNote", model);
         }
 
+        // POST: Pallet/GenerateDeliveryNotePost
+        [HttpPost]
+        [Requires(PermissionTo.Create)]
+        public ActionResult GenerateDeliveryNotePost(DeliveryNoteViewModel model)
+        {
+            try
+            {
+               
+                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
+                int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                
+                ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it                                                                        
+                if (model.ClientId > 0 && clientId > 0 )
+                {
+                    model.ClientId = clientId;
+                }
+                List<Client> clientList = new List<Client>();
+                using (ClientService clientService = new ClientService())
+                {
+                    clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                }
+
+                IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.CompanyName
+
+                });
+                ViewBag.ClientList = clientDDL;
+
+                if (!ModelState.IsValid)
+                {
+                    Notify("Sorry, the item was not updated. Please correct all errors and try again.", NotificationType.Error);
+                    return PartialView("_GenerateDeliveryNote", model);
+                    //return View(model);
+                }
+
+                using (DeliveryNoteService service = new DeliveryNoteService())
+                using (DeliveryNoteLineService lineservice = new DeliveryNoteLineService())
+                using (ClientLoadService clientloadservice = new ClientLoadService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    try
+                    { 
+                        bool newNote = false;
+                    #region Save DeliveryNote
+                    DeliveryNote delnote = new DeliveryNote();
+
+                    string customerAddress = model.CustomerAddress + ' ' + model.CustomerAddress2 + ' ' + model.CustomerAddressTown + ' ' + model.CustomerPostalCode + ' ' + ((Province)model.CustomerProvince).GetDisplayText();
+                    string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ((Province)model.BillingProvince).GetDisplayText();
+                    string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ((Province)model.DeliveryProvince).GetDisplayText();
+
+                    if (model.Id > 0)
+                    {
+                        //Update
+                        delnote = service.GetById(model.Id);
+                        delnote.InvoiceNumber = model.InvoiceNumber;
+                        delnote.CustomerName = model.CustomerName;
+                        delnote.EmailAddress = model.DeliveryEmail;
+                        delnote.OrderNumber = model.OrderNumber;
+                        delnote.OrderDate = model.OrderDate;
+                        //delnote.ContactNumber = model.ContactNumber;
+                        delnote.Reference306 = model.Reference306;
+                        delnote.Status = (int)Status.Active;
+
+                        delnote.CustomerAddress = customerAddress;
+                        delnote.CustomerPostalCode = model.CustomerPostalCode;
+                        delnote.CustomerProvince = model.CustomerProvince;
+
+                        delnote.DeliveryAddress = deliveryAddress;
+                        delnote.DeliveryPostalCode = model.DeliveryPostalCode;
+                        delnote.DeliveryProvince = model.DeliveryProvince;
+
+                        delnote.BillingAddress = billingAddress;
+                        delnote.BililngPostalCode = model.BillingPostalCode;
+                        delnote.BillingProvince = model.BillingProvince;
+
+                        service.Update(delnote);                        
+
+                    }
+                    else
+                    {
+                        delnote.ClientId = model.ClientId;
+                        //Create
+                        delnote.InvoiceNumber = model.InvoiceNumber;
+                        delnote.CustomerName = model.CustomerName;
+                        delnote.EmailAddress = model.DeliveryEmail;
+                        delnote.OrderNumber = model.OrderNumber;
+                        delnote.OrderDate = model.OrderDate;
+                        //delnote.ContactNumber = model.ContactNumber;
+                        delnote.Reference306 = model.Reference306;
+                        delnote.Status = (int)Status.Active;
+
+                        delnote.CustomerAddress = customerAddress;
+                        delnote.CustomerPostalCode = model.CustomerPostalCode;
+                        delnote.CustomerProvince = model.CustomerProvince;
+
+                        delnote.DeliveryAddress = deliveryAddress;
+                        delnote.DeliveryPostalCode = model.DeliveryPostalCode;
+                        delnote.DeliveryProvince = model.DeliveryProvince;
+
+                        delnote.BillingAddress = billingAddress;
+                        delnote.BililngPostalCode = model.BillingPostalCode;
+                        delnote.BillingProvince = model.BillingProvince;
+
+                        service.Create(delnote);
+
+                        newNote = true;
+                    }
+                    #endregion
+                    #region Save DeliveryNoteLine
+                    decimal? originalQuantity = 0;
+                    decimal? newQuantity = 0;
+                    decimal? retQuantity = 0;
+                    if (!string.IsNullOrEmpty(model.DeliveryNoteLinesString))
+                    {
+                            try { 
+                                int.TryParse(model.CountNoteLines.ToString(), out int lineCount);
+                                String[] dList = model.DeliveryNoteLinesString.Split(',');
+                                //  string lastId = "0";
+                                for (int i = 0; i < lineCount; i++)
+                                {
+
+
+                                    foreach (string itm in dList)
+                                    {
+                                        if (!string.IsNullOrEmpty(itm))
+                                        {
+                                            String[] note = itm.Split('|');
+
+                                            //var newstr = id + '|' +delnoteid +'|'+product + '|' + productdesc + '|' + qty + '|' + delqty + '|' + outqty + '|';
+                                            int.TryParse(note[0], out int noteId);
+                                            int.TryParse(note[1], out int deliveryNoteId);
+                                            string product = note[2];
+                                            string productdesc = note[3];
+                                            decimal.TryParse(note[4], out decimal qty);
+                                            decimal.TryParse(note[5], out decimal delqty);
+                                            decimal.TryParse(note[6], out decimal outqty);
+
+                                            DeliveryNoteLine noteline = new DeliveryNoteLine();
+                                            //if (noteId > 0)
+                                            //{
+                                            //    noteline = lineservice.GetById(noteId);
+
+                                            //    noteline.DeliveryNoteId = delnote.Id;// deliveryNoteId;
+                                            //    noteline.Delivered = delqty;
+                                            //    noteline.Product = product;
+                                            //    noteline.ProductDescription = productdesc;
+                                            //    noteline.OrderQuantity = qty;
+                                            //    noteline.ModifiedOn = DateTime.Now;
+                                            //    noteline.CreatedOn = DateTime.Now;
+                                            //    noteline.Status = (int)Status.Active;
+
+                                            //    lineservice.Update(noteline);
+                                            //}
+                                            //else
+                                            //{
+                                            noteline.DeliveryNoteId = delnote.Id;//deliveryNoteId;
+                                            noteline.Delivered = delqty;
+                                            noteline.Product = product;
+                                            noteline.ProductDescription = productdesc;
+                                            noteline.OrderQuantity = qty;
+                                            noteline.ModifiedOn = DateTime.Now;
+                                            noteline.CreatedOn = DateTime.Now;
+                                            noteline.Status = (int)Status.Active;
+
+                                            lineservice.Create(noteline);
+                                            //}
+                                            originalQuantity = noteline.OrderQuantity;
+                                            newQuantity = noteline.OrderQuantity;
+                                            retQuantity = noteline.Delivered;
+
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                ViewBag.Message = ex.Message;
+                                //  return View();
+                                return PartialView("_GenerateDeliveryNote", model);
+                            }
+                        }
+
+                    #endregion
+
+                    #region ClientLoad
+                    try { 
+                    ClientLoad loadModel = new ClientLoad();
+                    int vehicleId = 0;
+                    int transporterId = 0;
+
+                    if (newNote)
+                    {
+                        loadModel.ClientId = model.ClientId;
+                        loadModel.LoadDate = model.OrderDate;
+                        loadModel.LoadNumber = model.InvoiceNumber;
+                        loadModel.AccountNumber = model.OrderNumber;
+                        loadModel.ClientDescription = model.CustomerName;
+                        loadModel.ProvCode = model.CustomerProvince.ToString();
+                        loadModel.PCNNumber = model.OrderNumber;
+                        loadModel.DeliveryNote = model.InvoiceNumber;
+                        //model.PRNNumber = rows[7];
+                        loadModel.OriginalQuantity = originalQuantity;
+                        loadModel.NewQuantity = originalQuantity;
+                        loadModel.RetQuantity = retQuantity;
+                        //model.RetQuantity = decimal.Parse(rows[9]);
+                        //loadModel.ARPMComments = rows[10];
+                        //some of the columns are malaligned but leaving it as is, I added 3 new columns
+                        //grab the first of bothe vehicle and transporter to complete this load create, its mandatory
+                        using (VehicleService vservice = new VehicleService())
+                        using (TransporterService tservice = new TransporterService())
+                        {
+                            vehicleId = vservice.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active }).FirstOrDefault().Id;
+                            transporterId = tservice.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active }).FirstOrDefault().Id;
+                        }
+                        if (vehicleId > 0)
+                            loadModel.VehicleId = vehicleId;
+                        if (transporterId > 0)
+                            loadModel.TransporterId = transporterId;
+                        model.CreatedOn = DateTime.Now;
+                        model.ModifiedOn = DateTime.Now;
+                        clientloadservice.Create(loadModel);
+                    
+                    }
+                        }
+                        catch (Exception ex)
+                        {
+                            ViewBag.Message = ex.Message;
+                            //  return View();
+                            return PartialView("_GenerateDeliveryNote", model);
+                        }
+                        //else {
+                        //    loadModel = 
+                        //    loadModel = 
+                        //}
+
+                        #endregion
+
+                        scope.Complete(); //only commit if all is passed
+                    }
+                    catch (Exception ex)
+                    {
+                        ViewBag.Message = ex.Message;
+                        //  return View();
+                        return PartialView("_GenerateDeliveryNote", model);
+                    }
+                }
+
+                Notify("The item was successfully saved.", NotificationType.Success);
+                //Session["ImportMessage"] = importMessage;
+                return RedirectToAction("ClientData", "Pallet");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+              //  return View();
+                return PartialView("_GenerateDeliveryNote", model);
+            }
+        }
+
         // POST: Pallet/GenerateDeliveryNote
         //[HttpPost]
         //[Requires(PermissionTo.Create)]
-        //public ActionResult GenerateDeliveryNote(DeliveryNoteViewModel model)
+        //public ActionResult CreateDeliveryNote(DeliveryNoteViewModel model)
         //{
         //    try
         //    {
-        //        if (!ModelState.IsValid)
-        //        {
-        //            Notify("Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error);
-
-        //            return View(model);
-        //        }
-
-        //        //using (ChepLoadService gService = new ChepLoadService())
-        //        //using (TransactionScope scope = new TransactionScope())
-        //        //{
-        //        //    #region Create ClientLoadCustomModel
-        //        //    ChepLoad clientload = new ChepLoad()
-        //        //    {
-        //        //        LoadDate = model.LoadDate,
-        //        //        EffectiveDate = model.EffectiveDate,
-        //        //        NotifyDate = model.NotifyDate,
-        //        //        AccountNumber = model.AccountNumber,
-        //        //        ClientDescription = model.ClientDescription,
-        //        //        DeliveryNote = model.DeliveryNote,
-        //        //        ReferenceNumber = model.ReferenceNumber,
-        //        //        ReceiverNumber = model.ReceiverNumber,
-        //        //        Equipment = model.Equipment,
-        //        //        OriginalQuantity = model.OriginalQuantity,
-        //        //        NewQuantity = model.NewQuantity,
-        //        //        Status = (int)Status.Active,
-        //        //        CreatedOn = DateTime.Now,
-        //        //        ModfiedOn = DateTime.Now,
-        //        //        ModifiedBy = CurrentUser.Email
-        //        //    };
-        //        //    gService.Create(clientload);
-        //        //    #endregion
-
-        //        //    scope.Complete();
-        //        //}
-
-        //        Notify("The item was successfully created.", NotificationType.Success);
-        //        return RedirectToAction("ClientData");
+               
+        //        return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
         //    }
         //    catch (Exception ex)
         //    {
         //        ViewBag.Message = ex.Message;
-        //        return View();
+        //        //return View();
+        //        return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
         //    }
         //}
 
+        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        public JsonResult GetDeliveryNoteNumber()
+        {
+                string noteNumber = null;
+
+                using (DeliveryNoteService service = new DeliveryNoteService())
+                {
+                    noteNumber = service.GetDeliveryNoteNumber(); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+                }
+                //var jsonList = JsonConvert.SerializeObject(sites);
+               // var data = JsonConvert.SerializeObject(sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+            if (noteNumber!=null) { 
+                return Json(data: noteNumber, behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        #region DeliveryNote AJAX
+        public JsonResult RemoveDeliveryNoteLine(int? id = null, int? delnoteid = null)
+        {
+            int lineId = (id != null ? (int)id : 0);
+            if (lineId > 0)
+            {
+                using (TransactionScope scope = new TransactionScope())
+                using (DeliveryNoteLineService service = new DeliveryNoteLineService())
+                {
+
+                    DeliveryNoteLine line = service.GetById(lineId);
+                    line.Status = (int)Status.Inactive;
+                    service.Update(line);
+
+                    scope.Complete();
+                }
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+
+        }
+        public JsonResult SaveDeliveryNoteLine(int? id = null, int? delnoteid = null, string product = null, string productdesc = null, string qty = null, string delqty = null, string outqty = null)
+        {
+            int noteId = (delnoteid != null ? (int)delnoteid : 0);
+            int noteLineId = (id != null ? (int)id : 0);
+            if (noteId > 0 && noteLineId == 0)
+            {
+                DeliveryNoteLine line = new DeliveryNoteLine() { };
+                line.Product = product;
+                line.ProductDescription = productdesc;
+                line.DeliveryNoteId = noteId;
+                if (qty != null) {
+                    decimal quant = 0;
+                    decimal.TryParse(qty, out quant);
+                    line.OrderQuantity = quant;
+                }
+                if (delqty != null)
+                {
+                    decimal quant = 0;
+                    decimal.TryParse(delqty, out quant);
+                    line.Delivered = quant;
+                }
+                line.Status = (int)Status.Active;
+
+                using (TransactionScope scope = new TransactionScope())
+                using (DeliveryNoteLineService service = new DeliveryNoteLineService())
+                {
+                    service.Create(line);
+                    scope.Complete();
+                }
+            } else if (noteId > 0 && noteLineId > 0) //updates
+            {
+
+            }
+            return Json(data: noteLineId, behavior: JsonRequestBehavior.AllowGet); //returnms ID of line to view
+        }
+
+        public ActionResult ListDeliveryNoteLines(int? delnoteid = null)
+        {
+            List<DeliveryNoteLine> linelist = new List<DeliveryNoteLine>();
+            int noteLlineId = (delnoteid != null ? (int)delnoteid : 0);          
+            if (noteLlineId>0)
+            {
+                using (DeliveryNoteLineService service = new DeliveryNoteLineService())
+                {
+                    linelist = service.ListByColumnsWhere("DeliveryNoteId", noteLlineId, "Status", (int)Status.Active);
+                }
+            }
+            if (linelist != null)
+            {
+                return Json(linelist, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+        #endregion
 
         #endregion
 
@@ -1058,6 +1386,7 @@ namespace ACT.UI.Controllers
 
         #region Journals Tasks and Comments
 
+        #region Comments
         public JsonResult RemoveComment(int? id = null, string ctype = null)
         {
             int commId = (id != null ? (int)id : 0);
@@ -1124,7 +1453,9 @@ namespace ACT.UI.Controllers
                 return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
             }
         }
+        #endregion
 
+        #region Tasks
         public JsonResult RemoveTask(int? id = null, string ctype = null)
         {
             int tskId = (id != null ? (int)id : 0);
@@ -1161,13 +1492,59 @@ namespace ACT.UI.Controllers
                     Name = name,
                     Description = description,
                     Status = (int)Status.Active,
-                    Action = 1
+                    Action = (int)ActionType.None
                 };
 
                 using (TransactionScope scope = new TransactionScope())
                 using (TaskService service = new TaskService())
                 {
                     service.Create(tsk);
+                    scope.Complete();
+                }
+            }
+
+            //return Json("Uploaded " + Request.Files.Count + " files");
+            return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult MarkTask(int taskId, int agentLoadId, int clientLoadId)
+        {
+
+            if (taskId > 0 && agentLoadId > 0 && clientLoadId > 0)
+            {
+
+                using (TransactionScope scope = new TransactionScope())
+                using (TaskService service = new TaskService())
+                {
+                    Task tsk = service.GetById(taskId);
+                    tsk.Status = (int)Status.Inactive;
+                    service.Update(tsk);
+
+                    scope.Complete();
+
+                }
+            }
+
+            //return Json("Uploaded " + Request.Files.Count + " files");
+            return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult EmailTask(int taskId, int agentLoadId, int clientLoadId, string instruction, string to)
+        {
+
+            if (taskId > 0 && agentLoadId > 0 && clientLoadId > 0)
+            {
+                //UPDATE EMAILS HERE TO EMAIL
+
+                using (TransactionScope scope = new TransactionScope())                  
+                using (TaskService service = new TaskService())
+                {
+                    Task tsk = service.GetById(taskId);
+                    tsk.Status = (int)Status.Active;
+                    tsk.Action = (int)ActionType.Email;
+                    service.Update(tsk);
+
+                    scope.Complete();
                 }
             }
 
@@ -1195,37 +1572,88 @@ namespace ACT.UI.Controllers
                 return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
             }
         }
+        #endregion
 
-        public ActionResult ListFilesTable(string objId, string objType)
+        #region Tasks
+        public JsonResult RemoveJournal(int? id = null, string ctype = null)
         {
-            ObjectDocumentsViewModel model = new ObjectDocumentsViewModel();
-            if (!string.IsNullOrEmpty(objType) && !string.IsNullOrEmpty(objId))
+            int tskId = (id != null ? (int)id : 0);
+            if (tskId > 0)
             {
-                string controllerObjectType = objType;
-                switch (objType)
+                using (TransactionScope scope = new TransactionScope())
+                using (JournalService service = new JournalService())
                 {
-                    case "ChepLoad":
-                        controllerObjectType = "Pallet";
-                        break;
-                    case "ClientLoad":
-                        controllerObjectType = "Pallet";
-                        break;
-                    default:
-                        break;
-                }
-                using (DocumentService docservice = new DocumentService())
-                {
-                    List<Document> docList = new List<Document>();
-                    int oId = int.Parse(objId);
-                    docList = docservice.List(oId, objType);
 
-                    model.objDocuments = docList;
-                    model.objId = oId;
-                    model.objType = controllerObjectType;
+                    Journal tsk = service.GetById(tskId);
+                    tsk.Status = (int)Status.Inactive;
+                    service.Update(tsk);
+
+                    scope.Complete();
+                }
+                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+
+        }
+        public JsonResult AddJournal(int clientLoadId, int siteAuditId, int documentId,  string description, string qty, int isIn, string refnumber)
+        {
+
+            if (clientLoadId > 0)
+            {
+                Journal journal = new Journal(){ };
+                journal.ClientLoadId = (int)clientLoadId;
+                if (siteAuditId>0)
+                    journal.SiteAuditId = (int)siteAuditId;
+                if (documentId > 0)
+                    journal.DocumetId = (int)documentId;
+
+                journal.PostintDescription = description;
+                journal.IsIn = ((int)isIn==0?false:true);
+
+                if (qty != null)
+                {
+                    decimal inQty = 0;
+                    decimal.TryParse(qty, out inQty);
+                    journal.PostingQuantity = inQty;
+
+                } 
+                journal.THANNumber = refnumber;
+                journal.Status = (int)Status.Active;
+
+                using (TransactionScope scope = new TransactionScope())
+                using (JournalService service = new JournalService())
+                {
+                    service.Create(journal);
                 }
             }
-            return PartialView("_ListDocumentsTable", model);
+
+            //return Json("Uploaded " + Request.Files.Count + " files");
+            return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
         }
+
+        public ActionResult ListJournals(string clientLoadId)
+        {
+            List<Journal> commlist = new List<Journal>();
+            if (!string.IsNullOrEmpty(clientLoadId))
+            {
+                using (JournalService service = new JournalService())
+                {
+                    commlist = service.ListByColumnWhere("ClientLoadId", int.Parse(clientLoadId));
+                }
+            }
+            if (commlist != null)
+            {
+                return Json(commlist, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+            }
+        }
+        #endregion
 
 
         #endregion
