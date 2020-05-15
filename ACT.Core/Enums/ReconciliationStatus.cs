@@ -15,5 +15,8 @@ namespace ACT.Core.Enums
 
         [StringEnumDisplayText( "Reconciled" )]
         Reconciled = 1,
+
+        [StringEnumDisplayText("PCNFound")]
+        PCNFound = 3,
     }
 }
