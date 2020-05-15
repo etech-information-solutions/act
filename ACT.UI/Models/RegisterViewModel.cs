@@ -66,7 +66,7 @@ namespace ACT.UI.Models
 
         public AddressViewModel Address { get; set; }
 
-        [Display( Name = "Company Registration File" )]
+        [Display( Name = "Company Registration Document" )]
         public FileViewModel RegistrationFile { get; set; }
 
         [Display( Name = "I accept the Terms and Conditions" )]
