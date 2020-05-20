@@ -1,0 +1,59 @@
+﻿@model CustomSearchModel
+
+@using ACT.Core.Models
+
+<div class="dashboard-search" style="margin-top: 10px;">
+
+    <span>
+        @Html.LabelFor( model => model.RegionId )
+    </span>
+
+    <span>
+        @Html.LabelFor( model => model.SiteId )
+    </span>
+
+    <span>
+        @Html.LabelFor( model => model.ClientId )
+    </span>
+
+    @*<span>
+        @Html.LabelFor( model => model.ProductId )
+    </span>*@
+
+    <span>
+        @Html.LabelFor( model => model.FromDate )
+    </span>
+
+    <span>
+        @Html.LabelFor( model => model.ToDate )
+    </span>
+
+</div>
+
+<div id="gs-search-fields" class="dashboard-search">
+
+    <span>
+        @Html.Partial( "_Regions", Model )
+    </span>
+
+    <span>
+        @Html.Partial( "_Sites", Model )
+    </span>
+
+    <span>
+        @Html.Partial( "_Clients", Model )
+    </span>
+
+    @*<span>
+        @Html.Partial( "_Products", Model )
+    </span>*@
+
+    <span>
+        @Html.TextBoxFor( model => model.ToDate, new { @class = "date-picker", @style = "width: 92%; height: 25px; position: relative; bottom: -6px;", @placeholder = "              /              /" } )
+    </span>
+
+    <span>
+        @Html.TextBoxFor( model => model.FromDate, new { @class = "date-picker", @style = "width: 92%; height: 25px; position: relative; bottom: -6px;", @placeholder = "              /              /" } )
+    </span>
+
+</div>

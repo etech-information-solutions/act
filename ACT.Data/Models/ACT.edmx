@@ -76,21 +76,6 @@
           <Property Name="AccountType" Type="int" Nullable="false" />
           <Property Name="Status" Type="int" Nullable="false" />
         </EntityType>
-        <EntityType Name="Batch">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="BatchNo" Type="varchar" MaxLength="30" />
-          <Property Name="BatchTable" Type="varchar" MaxLength="50" />
-          <Property Name="BatchInNotes" Type="text" />
-          <Property Name="BatchOutNotes" Type="text" />
-          <Property Name="RunDate" Type="datetime" Nullable="false" />
-          <Property Name="FinishDate" Type="datetime" Nullable="false" />
-          <Property Name="BatchSource" Type="varchar" MaxLength="100" />
-          <Property Name="BatchRows" Type="int" />
-          <Property Name="BatchComm" Type="varchar" MaxLength="300" Nullable="false" />
-        </EntityType>
         <EntityType Name="Broadcast">
           <Key>
             <PropertyRef Name="Id" />
@@ -161,6 +146,12 @@
           <Property Name="NewQuantity" Type="numeric" Precision="18" Scale="0" />
           <Property Name="DocketNumber" Type="varchar" MaxLength="50" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="InputInd" Type="int" />
+          <Property Name="OrderNo" Type="varchar" MaxLength="50" />
+          <Property Name="THAN" Type="varchar" MaxLength="50" />
+          <Property Name="ShipmentNo" Type="varchar" MaxLength="50" />
+          <Property Name="IssueNote" Type="varchar" MaxLength="50" />
+          <Property Name="SiteId" Type="int" />
         </EntityType>
         <EntityType Name="Client">
           <Key>
@@ -281,14 +272,14 @@
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="LoadNumber" Type="varchar" MaxLength="50" />
           <Property Name="LoadDate" Type="datetime" />
-          <Property Name="EffectiveDate" Type="datetime" />
-          <Property Name="NotifyeDate" Type="datetime" />
+          <Property Name="EffectiveDate" Type="datetime" Nullable="false" />
+          <Property Name="NotifyDate" Type="datetime" />
           <Property Name="AccountNumber" Type="varchar" MaxLength="50" />
           <Property Name="ClientDescription" Type="varchar" MaxLength="50" />
           <Property Name="DeliveryNote" Type="varchar" MaxLength="50" />
           <Property Name="ReferenceNumber" Type="varchar" MaxLength="50" />
           <Property Name="ReceiverNumber" Type="varchar" MaxLength="50" />
-          <Property Name="Equipment" Type="varchar" MaxLength="50" />
+          <Property Name="Equipment" Type="char" MaxLength="10" />
           <Property Name="OriginalQuantity" Type="numeric" Precision="18" Scale="0" />
           <Property Name="NewQuantity" Type="numeric" Precision="18" Scale="0" />
           <Property Name="ReconcileInvoice" Type="int" />
@@ -297,10 +288,12 @@
           <Property Name="PCNNumber" Type="varchar" MaxLength="50" />
           <Property Name="PRNNumber" Type="varchar" MaxLength="50" />
           <Property Name="Status" Type="int" Nullable="false" />
-          <Property Name="TransporterId" Type="int" />
-          <Property Name="RetQuantity" Type="numeric" Precision="18" Scale="0" />
-          <Property Name="ARPMComments" Type="varchar" MaxLength="150" />
-          <Property Name="ProvCode" Type="varchar" MaxLength="30" />
+          <Property Name="InputInd" Type="int" />
+          <Property Name="THAN" Type="varchar" MaxLength="50" />
+          <Property Name="ClientSiteId" Type="int" />
+          <Property Name="ReturnQty" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="OutstandingQty" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="OutstandingReasonid" Type="int" />
         </EntityType>
         <EntityType Name="ClientProduct">
           <Key>
@@ -320,6 +313,7 @@
           <Property Name="PassonRate" Type="money" />
           <Property Name="PassonDays" Type="int" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="Equipment" Type="char" MaxLength="10" />
         </EntityType>
         <EntityType Name="ClientProductMonthly">
           <Key>
@@ -400,6 +394,22 @@
           <Property Name="ContactEmail" Type="varchar" MaxLength="50" />
           <Property Name="Status" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="Country">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CountryCode" Type="char" MaxLength="10" />
+          <Property Name="CountryName" Type="varchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="CountryProvince">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="CountryId" Type="int" />
+          <Property Name="ProvinceId" Type="int" />
+        </EntityType>
         <EntityType Name="DeclineReason">
           <Key>
             <PropertyRef Name="Id" />
@@ -437,6 +447,7 @@
           <Property Name="ContactNumber" Type="varchar" MaxLength="50" />
           <Property Name="Reference306" Type="varchar" MaxLength="50" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="ClientSiteId" Type="int" />
         </EntityType>
         <EntityType Name="DeliveryNoteLine">
           <Key>
@@ -452,6 +463,7 @@
           <Property Name="OrderQuantity" Type="numeric" Precision="18" Scale="0" />
           <Property Name="Delivered" Type="numeric" Precision="18" Scale="0" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="Equipment" Type="char" MaxLength="10" />
         </EntityType>
         <EntityType Name="Dispute">
           <Key>
@@ -478,6 +490,7 @@
           <Property Name="ActionedBy" Type="int" />
           <Property Name="ResolvedOn" Type="datetime" />
           <Property Name="ResolvedBy" Type="int" />
+          <Property Name="ProductId" Type="int" />
         </EntityType>
         <EntityType Name="Document">
           <Key>
@@ -509,18 +522,18 @@
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="ObjectId" Type="int" />
           <Property Name="ObjectType" Type="varchar" MaxLength="50" />
-          <Property Name="January" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="February" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="March" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="April" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="May" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="June" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="July" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="August" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="September" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="October" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="November" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="December" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="January" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="February" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="March" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="April" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="May" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="June" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="July" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="August" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="September" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="October" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="November" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="December" Type="numeric" Precision="18" Scale="0" />
         </EntityType>
         <EntityType Name="Group">
           <Key>
@@ -579,11 +592,12 @@
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
-          <Property Name="PostintDescription" Type="varchar" MaxLength="50" />
+          <Property Name="PostingDescription" Type="varchar" MaxLength="50" />
           <Property Name="PostingQuantity" Type="numeric" Precision="18" Scale="0" />
-          <Property Name="IsIn" Type="bit" />
-          <Property Name="THANNumber" Type="varchar" MaxLength="50" />
+          <Property Name="InOutInd" Type="bit" />
+          <Property Name="THAN" Type="varchar" MaxLength="50" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="JournalType" Type="nchar" MaxLength="10" />
         </EntityType>
         <EntityType Name="Notification">
           <Key>
@@ -597,6 +611,14 @@
           <Property Name="NotificationDate" Type="datetime" Nullable="false" />
           <Property Name="Status" Type="bit" Nullable="false" />
           <Property Name="SentBy" Type="varchar" MaxLength="150" Nullable="false" />
+        </EntityType>
+        <EntityType Name="OutstandingReason">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="OutstandingReason" Type="varchar" MaxLength="100" />
+          <Property Name="Status" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="Product">
           <Key>
@@ -667,6 +689,7 @@
           <Property Name="ReferenceNumber" Type="varchar" MaxLength="50" />
           <Property Name="NominatedAccount" Type="varchar" MaxLength="50" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="TaxAmount" Type="money" />
         </EntityType>
         <EntityType Name="PSPBudget">
           <Key>
@@ -678,18 +701,18 @@
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="BudgetYear" Type="int" Nullable="false" />
-          <Property Name="January" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="February" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="March" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="April" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="May" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="June" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="July" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="August" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="September" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="October" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="November" Type="numeric" Precision="18" Scale="2" />
-          <Property Name="December" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="January" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="February" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="March" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="April" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="May" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="June" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="July" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="August" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="September" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="October" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="November" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="December" Type="numeric" Precision="18" Scale="0" />
           <Property Name="Status" Type="int" />
         </EntityType>
         <EntityType Name="PSPClient">
@@ -727,10 +750,7 @@
           <Property Name="ReceivingManagerEmail" Type="varchar" MaxLength="50" />
           <Property Name="OpsManagerEmail" Type="varchar" MaxLength="50" />
           <Property Name="AdminManagerEmail" Type="varchar" MaxLength="50" />
-          <Property Name="ImportEmailHost" Type="varchar" MaxLength="100" />
-          <Property Name="ImportEmailUsername" Type="varchar" MaxLength="100" />
-          <Property Name="ImportEmailPassword" Type="varchar" MaxLength="50" />
-          <Property Name="ImportEmailPort" Type="varchar" MaxLength="10" />
+          <Property Name="TaxPercentage" Type="numeric" Precision="10" Scale="2" />
         </EntityType>
         <EntityType Name="PSPProduct">
           <Key>
@@ -1078,6 +1098,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ChepClient_ClientLoad">
+          <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="1" />
+          <End Role="ChepClient" Type="Self.ChepClient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ChepClient">
+              <PropertyRef Name="ClientLoadsId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ChepClients_ChepLoads">
           <End Role="ChepLoad" Type="Self.ChepLoad" Multiplicity="1" />
           <End Role="ChepClient" Type="Self.ChepClient" Multiplicity="*" />
@@ -1087,18 +1119,6 @@
             </Principal>
             <Dependent Role="ChepClient">
               <PropertyRef Name="ChepLoadsId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ChepClients_ClientLoads">
-          <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="1" />
-          <End Role="ChepClient" Type="Self.ChepClient" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ClientLoad">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ChepClient">
-              <PropertyRef Name="ClientLoadsId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1122,6 +1142,18 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="ClientBudget">
+              <PropertyRef Name="ClientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ClientGroup_Client">
+          <End Role="Client" Type="Self.Client" Multiplicity="1" />
+          <End Role="ClientGroup" Type="Self.ClientGroup" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Client">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ClientGroup">
               <PropertyRef Name="ClientId" />
             </Dependent>
           </ReferentialConstraint>
@@ -1175,10 +1207,10 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_ClientLoads_ChepClients">
-          <End Role="ChepClient" Type="Self.ChepClient" Multiplicity="1" />
+          <End Role="Client" Type="Self.Client" Multiplicity="1" />
           <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="ChepClient">
+            <Principal Role="Client">
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="ClientLoad">
@@ -1767,7 +1799,6 @@
           <EntitySet Name="AuditLog" EntityType="Self.AuditLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Bank" EntityType="Self.Bank" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="BankDetail" EntityType="Self.BankDetail" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Batch" EntityType="Self.Batch" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Broadcast" EntityType="Self.Broadcast" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ChepAudit" EntityType="Self.ChepAudit" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ChepClient" EntityType="Self.ChepClient" Schema="dbo" store:Type="Tables" />
@@ -1785,6 +1816,8 @@
           <EntitySet Name="ClientUser" EntityType="Self.ClientUser" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Comment" EntityType="Self.Comment" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Contact" EntityType="Self.Contact" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Country" EntityType="Self.Country" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CountryProvince" EntityType="Self.CountryProvince" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DeclineReason" EntityType="Self.DeclineReason" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DeliveryNote" EntityType="Self.DeliveryNote" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DeliveryNoteLine" EntityType="Self.DeliveryNoteLine" Schema="dbo" store:Type="Tables" />
@@ -1796,6 +1829,7 @@
           <EntitySet Name="Invoice" EntityType="Self.Invoice" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Journal" EntityType="Self.Journal" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Notification" EntityType="Self.Notification" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="OutstandingReason" EntityType="Self.OutstandingReason" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProductPrice" EntityType="Self.ProductPrice" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PSP" EntityType="Self.PSP" Schema="dbo" store:Type="Tables" />
@@ -1830,12 +1864,12 @@
             <End Role="Site" EntitySet="Site" />
             <End Role="ChepAudit" EntitySet="ChepAudit" />
           </AssociationSet>
-          <AssociationSet Name="FK_ChepClients_ChepLoads" Association="Self.FK_ChepClients_ChepLoads">
-            <End Role="ChepLoad" EntitySet="ChepLoad" />
+          <AssociationSet Name="FK_ChepClient_ClientLoad" Association="Self.FK_ChepClient_ClientLoad">
+            <End Role="ClientLoad" EntitySet="ClientLoad" />
             <End Role="ChepClient" EntitySet="ChepClient" />
           </AssociationSet>
-          <AssociationSet Name="FK_ChepClients_ClientLoads" Association="Self.FK_ChepClients_ClientLoads">
-            <End Role="ClientLoad" EntitySet="ClientLoad" />
+          <AssociationSet Name="FK_ChepClients_ChepLoads" Association="Self.FK_ChepClients_ChepLoads">
+            <End Role="ChepLoad" EntitySet="ChepLoad" />
             <End Role="ChepClient" EntitySet="ChepClient" />
           </AssociationSet>
           <AssociationSet Name="FK_ClientAuthorisations_ClientSites" Association="Self.FK_ClientAuthorisations_ClientSites">
@@ -1845,6 +1879,10 @@
           <AssociationSet Name="FK_ClientBudget_Clients" Association="Self.FK_ClientBudget_Clients">
             <End Role="Client" EntitySet="Client" />
             <End Role="ClientBudget" EntitySet="ClientBudget" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ClientGroup_Client" Association="Self.FK_ClientGroup_Client">
+            <End Role="Client" EntitySet="Client" />
+            <End Role="ClientGroup" EntitySet="ClientGroup" />
           </AssociationSet>
           <AssociationSet Name="FK_ClientGroups_Groups" Association="Self.FK_ClientGroups_Groups">
             <End Role="Group" EntitySet="Group" />
@@ -1863,7 +1901,7 @@
             <End Role="ClientKPI" EntitySet="ClientKPI" />
           </AssociationSet>
           <AssociationSet Name="FK_ClientLoads_ChepClients" Association="Self.FK_ClientLoads_ChepClients">
-            <End Role="ChepClient" EntitySet="ChepClient" />
+            <End Role="Client" EntitySet="Client" />
             <End Role="ClientLoad" EntitySet="ClientLoad" />
           </AssociationSet>
           <AssociationSet Name="FK_ClientLoads_Clients" Association="Self.FK_ClientLoads_Clients">
@@ -2074,7 +2112,6 @@
           <EntitySet Name="ChepLoads" EntityType="ACTModel.ChepLoad" />
           <EntitySet Name="Clients" EntityType="ACTModel.Client" />
           <EntitySet Name="ClientAuthorisations" EntityType="ACTModel.ClientAuthorisation" />
-          <EntitySet Name="ClientBudgets" EntityType="ACTModel.ClientBudget" />
           <EntitySet Name="ClientGroups" EntityType="ACTModel.ClientGroup" />
           <EntitySet Name="ClientInvoices" EntityType="ACTModel.ClientInvoice" />
           <EntitySet Name="ClientKPIs" EntityType="ACTModel.ClientKPI" />
@@ -2085,21 +2122,22 @@
           <EntitySet Name="ClientUsers" EntityType="ACTModel.ClientUser" />
           <EntitySet Name="Comments" EntityType="ACTModel.Comment" />
           <EntitySet Name="Contacts" EntityType="ACTModel.Contact" />
+          <EntitySet Name="Countries" EntityType="ACTModel.Country" />
+          <EntitySet Name="CountryProvinces" EntityType="ACTModel.CountryProvince" />
           <EntitySet Name="DeclineReasons" EntityType="ACTModel.DeclineReason" />
           <EntitySet Name="DeliveryNotes" EntityType="ACTModel.DeliveryNote" />
           <EntitySet Name="DeliveryNoteLines" EntityType="ACTModel.DeliveryNoteLine" />
           <EntitySet Name="Disputes" EntityType="ACTModel.Dispute" />
           <EntitySet Name="Documents" EntityType="ACTModel.Document" />
-          <EntitySet Name="EstimatedLoads" EntityType="ACTModel.EstimatedLoad" />
           <EntitySet Name="Groups" EntityType="ACTModel.Group" />
           <EntitySet Name="Images" EntityType="ACTModel.Image" />
           <EntitySet Name="Invoices" EntityType="ACTModel.Invoice" />
           <EntitySet Name="Journals" EntityType="ACTModel.Journal" />
           <EntitySet Name="Notifications" EntityType="ACTModel.Notification" />
+          <EntitySet Name="OutstandingReasons" EntityType="ACTModel.OutstandingReason" />
           <EntitySet Name="Products" EntityType="ACTModel.Product" />
           <EntitySet Name="ProductPrices" EntityType="ACTModel.ProductPrice" />
           <EntitySet Name="PSPs" EntityType="ACTModel.PSP" />
-          <EntitySet Name="PSPBudgets" EntityType="ACTModel.PSPBudget" />
           <EntitySet Name="PSPClients" EntityType="ACTModel.PSPClient" />
           <EntitySet Name="PSPConfigs" EntityType="ACTModel.PSPConfig" />
           <EntitySet Name="PSPProducts" EntityType="ACTModel.PSPProduct" />
@@ -2133,17 +2171,13 @@
             <End Role="Site" EntitySet="Sites" />
             <End Role="ChepAudit" EntitySet="ChepAudits" />
           </AssociationSet>
+          <AssociationSet Name="FK_ChepClient_ClientLoad" Association="ACTModel.FK_ChepClient_ClientLoad">
+            <End Role="ClientLoad" EntitySet="ClientLoads" />
+            <End Role="ChepClient" EntitySet="ChepClients" />
+          </AssociationSet>
           <AssociationSet Name="FK_ChepClients_ChepLoads" Association="ACTModel.FK_ChepClients_ChepLoads">
             <End Role="ChepLoad" EntitySet="ChepLoads" />
             <End Role="ChepClient" EntitySet="ChepClients" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ChepClients_ClientLoads" Association="ACTModel.FK_ChepClients_ClientLoads">
-            <End Role="ClientLoad" EntitySet="ClientLoads" />
-            <End Role="ChepClient" EntitySet="ChepClients" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ClientLoads_ChepClients" Association="ACTModel.FK_ClientLoads_ChepClients">
-            <End Role="ChepClient" EntitySet="ChepClients" />
-            <End Role="ClientLoad" EntitySet="ClientLoads" />
           </AssociationSet>
           <AssociationSet Name="FK_Disputes_ChepLoads" Association="ACTModel.FK_Disputes_ChepLoads">
             <End Role="ChepLoad" EntitySet="ChepLoads" />
@@ -2153,13 +2187,17 @@
             <End Role="ChepLoad" EntitySet="ChepLoads" />
             <End Role="Task" EntitySet="Tasks" />
           </AssociationSet>
-          <AssociationSet Name="FK_ClientBudget_Clients" Association="ACTModel.FK_ClientBudget_Clients">
+          <AssociationSet Name="FK_ClientGroup_Client" Association="ACTModel.FK_ClientGroup_Client">
             <End Role="Client" EntitySet="Clients" />
-            <End Role="ClientBudget" EntitySet="ClientBudgets" />
+            <End Role="ClientGroup" EntitySet="ClientGroups" />
           </AssociationSet>
           <AssociationSet Name="FK_ClientKPIs_Clients" Association="ACTModel.FK_ClientKPIs_Clients">
             <End Role="Client" EntitySet="Clients" />
             <End Role="ClientKPI" EntitySet="ClientKPIs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ClientLoads_ChepClients" Association="ACTModel.FK_ClientLoads_ChepClients">
+            <End Role="Client" EntitySet="Clients" />
+            <End Role="ClientLoad" EntitySet="ClientLoads" />
           </AssociationSet>
           <AssociationSet Name="FK_ClientLoads_Clients" Association="ACTModel.FK_ClientLoads_Clients">
             <End Role="Client" EntitySet="Clients" />
@@ -2195,10 +2233,6 @@
           </AssociationSet>
           <AssociationSet Name="FK_ClientGroups_Groups" Association="ACTModel.FK_ClientGroups_Groups">
             <End Role="Group" EntitySet="Groups" />
-            <End Role="ClientGroup" EntitySet="ClientGroups" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ClientGroups_PSPClients" Association="ACTModel.FK_ClientGroups_PSPClients">
-            <End Role="PSPClient" EntitySet="PSPClients" />
             <End Role="ClientGroup" EntitySet="ClientGroups" />
           </AssociationSet>
           <AssociationSet Name="FK_ClientInvoices_ClientLoads" Association="ACTModel.FK_ClientInvoices_ClientLoads">
@@ -2268,10 +2302,6 @@
           <AssociationSet Name="FK_SiteBilling_Products" Association="ACTModel.FK_SiteBilling_Products">
             <End Role="Product" EntitySet="Products" />
             <End Role="SiteBilling" EntitySet="SiteBillings" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PSPBudget_PSP" Association="ACTModel.FK_PSPBudget_PSP">
-            <End Role="PSP" EntitySet="PSPs" />
-            <End Role="PSPBudget" EntitySet="PSPBudgets" />
           </AssociationSet>
           <AssociationSet Name="FK_PSPClients_PSP" Association="ACTModel.FK_PSPClients_PSP">
             <End Role="PSP" EntitySet="PSPs" />
@@ -2353,16 +2383,26 @@
             <End Role="User" EntitySet="Users" />
             <End Role="UserTask" EntitySet="UserTasks" />
           </AssociationSet>
+          <EntitySet Name="ClientBudgets" EntityType="ACTModel.ClientBudget" />
+          <EntitySet Name="EstimatedLoads" EntityType="ACTModel.EstimatedLoad" />
           <EntitySet Name="PSPBillings" EntityType="ACTModel.PSPBilling" />
+          <EntitySet Name="PSPBudgets" EntityType="ACTModel.PSPBudget" />
+          <AssociationSet Name="FK_ClientBudget_Clients" Association="ACTModel.FK_ClientBudget_Clients">
+            <End Role="Client" EntitySet="Clients" />
+            <End Role="ClientBudget" EntitySet="ClientBudgets" />
+          </AssociationSet>
           <AssociationSet Name="FK_PSPBilling_PSP" Association="ACTModel.FK_PSPBilling_PSP">
             <End Role="PSP" EntitySet="PSPs" />
             <End Role="PSPBilling" EntitySet="PSPBillings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PSPBudget_PSP" Association="ACTModel.FK_PSPBudget_PSP">
+            <End Role="PSP" EntitySet="PSPs" />
+            <End Role="PSPBudget" EntitySet="PSPBudgets" />
           </AssociationSet>
           <AssociationSet Name="FK_PSPBilling_PSPProducts" Association="ACTModel.FK_PSPBilling_PSPProducts">
             <End Role="PSPProduct" EntitySet="PSPProducts" />
             <End Role="PSPBilling" EntitySet="PSPBillings" />
           </AssociationSet>
-          <EntitySet Name="Batches" EntityType="ACTModel.Batch" />
         </EntityContainer>
         <EntityType Name="Address">
           <Key>
@@ -2486,9 +2526,8 @@
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ClientLoad" Relationship="ACTModel.FK_ChepClient_ClientLoad" FromRole="ChepClient" ToRole="ClientLoad" />
           <NavigationProperty Name="ChepLoad" Relationship="ACTModel.FK_ChepClients_ChepLoads" FromRole="ChepClient" ToRole="ChepLoad" />
-          <NavigationProperty Name="ClientLoad" Relationship="ACTModel.FK_ChepClients_ClientLoads" FromRole="ChepClient" ToRole="ClientLoad" />
-          <NavigationProperty Name="ClientLoads" Relationship="ACTModel.FK_ClientLoads_ChepClients" FromRole="ChepClient" ToRole="ClientLoad" />
         </EntityType>
         <EntityType Name="ChepLoad">
           <Key>
@@ -2512,6 +2551,12 @@
           <Property Name="NewQuantity" Type="Decimal" Precision="18" Scale="0" />
           <Property Name="DocketNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="InputInd" Type="Int32" />
+          <Property Name="OrderNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="THAN" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ShipmentNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="IssueNote" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="SiteId" Type="Int32" />
           <NavigationProperty Name="ChepClients" Relationship="ACTModel.FK_ChepClients_ChepLoads" FromRole="ChepLoad" ToRole="ChepClient" />
           <NavigationProperty Name="Disputes" Relationship="ACTModel.FK_Disputes_ChepLoads" FromRole="ChepLoad" ToRole="Dispute" />
           <NavigationProperty Name="Tasks" Relationship="ACTModel.FK_UserTasks_ChepLoads" FromRole="ChepLoad" ToRole="Task" />
@@ -2537,18 +2582,20 @@
           <Property Name="DeclinedReason" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="ServiceRequired" Type="Int32" Nullable="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
-          <Property Name="ChepReference" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="AdminPerson" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="FinPersonEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />          
-          <NavigationProperty Name="ClientBudgets" Relationship="ACTModel.FK_ClientBudget_Clients" FromRole="Client" ToRole="ClientBudget" />
+          <Property Name="FinPersonEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ChepReference" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ClientGroups" Relationship="ACTModel.FK_ClientGroup_Client" FromRole="Client" ToRole="ClientGroup" />
           <NavigationProperty Name="ClientKPIs" Relationship="ACTModel.FK_ClientKPIs_Clients" FromRole="Client" ToRole="ClientKPI" />
-          <NavigationProperty Name="ClientLoads" Relationship="ACTModel.FK_ClientLoads_Clients" FromRole="Client" ToRole="ClientLoad" />
+          <NavigationProperty Name="ClientLoads" Relationship="ACTModel.FK_ClientLoads_ChepClients" FromRole="Client" ToRole="ClientLoad" />
+          <NavigationProperty Name="ClientLoads1" Relationship="ACTModel.FK_ClientLoads_Clients" FromRole="Client" ToRole="ClientLoad" />
           <NavigationProperty Name="ClientProducts" Relationship="ACTModel.FK_ClientProducts_Clients" FromRole="Client" ToRole="ClientProduct" />
           <NavigationProperty Name="ClientSites" Relationship="ACTModel.FK_ClientSites_Clients" FromRole="Client" ToRole="ClientSite" />
           <NavigationProperty Name="ClientUsers" Relationship="ACTModel.FK_ClientUsers_Clients" FromRole="Client" ToRole="ClientUser" />
           <NavigationProperty Name="DeliveryNotes" Relationship="ACTModel.FK_DeliveryNote_Clients" FromRole="Client" ToRole="DeliveryNote" />
           <NavigationProperty Name="PSPClients" Relationship="ACTModel.FK_PSPClients_Clients" FromRole="Client" ToRole="PSPClient" />
           <NavigationProperty Name="Tasks" Relationship="ACTModel.FK_UserTasks_Clients" FromRole="Client" ToRole="Task" />
+          <NavigationProperty Name="ClientBudgets" Relationship="ACTModel.FK_ClientBudget_Clients" FromRole="Client" ToRole="ClientBudget" />
         </EntityType>
         <EntityType Name="ClientAuthorisation">
           <Key>
@@ -2564,31 +2611,6 @@
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="ClientSite" Relationship="ACTModel.FK_ClientAuthorisations_ClientSites" FromRole="ClientAuthorisation" ToRole="ClientSite" />
         </EntityType>
-        <EntityType Name="ClientBudget">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ClientId" Type="Int32" Nullable="false" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="BudgetYear" Type="Int32" />
-          <Property Name="January"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="February" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="March"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="April"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="May"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="June"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="July"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="August"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="September"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="October"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="November"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="December"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="Status" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientBudget_Clients" FromRole="ClientBudget" ToRole="Client" />
-        </EntityType>
         <EntityType Name="ClientGroup">
           <Key>
             <PropertyRef Name="Id" />
@@ -2600,8 +2622,8 @@
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientGroup_Client" FromRole="ClientGroup" ToRole="Client" />
           <NavigationProperty Name="Group" Relationship="ACTModel.FK_ClientGroups_Groups" FromRole="ClientGroup" ToRole="Group" />
-          <NavigationProperty Name="PSPClient" Relationship="ACTModel.FK_ClientGroups_PSPClients" FromRole="ClientGroup" ToRole="PSPClient" />
         </EntityType>
         <EntityType Name="ClientInvoice">
           <Key>
@@ -2626,6 +2648,7 @@
           <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="KPIDescription" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="Disputes" Type="Decimal" Precision="18" Scale="0" />
           <Property Name="OutstandingPallets" Type="Decimal" Precision="18" Scale="0" />
           <Property Name="Passons" Type="Decimal" Precision="18" Scale="0" />
@@ -2635,8 +2658,7 @@
           <Property Name="ResolveDays" Type="Int32" />
           <Property Name="Weight" Type="Decimal" Precision="18" Scale="2" />
           <Property Name="TargetAmount" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="TargetPeriod" Type="Int32" />     
-          <Property Name="KPIDescription" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="TargetPeriod" Type="Int32" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientKPIs_Clients" FromRole="ClientKPI" ToRole="Client" />
         </EntityType>
         <EntityType Name="ClientLoad">
@@ -2651,14 +2673,14 @@
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="LoadNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="LoadDate" Type="DateTime" Precision="3" />
-          <Property Name="EffectiveDate" Type="DateTime" Precision="3" />
-          <Property Name="NotifyeDate" Type="DateTime" Precision="3" />
+          <Property Name="EffectiveDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="NotifyDate" Type="DateTime" Precision="3" />
           <Property Name="AccountNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="ClientDescription" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="DeliveryNote" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="ReferenceNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="ReceiverNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Equipment" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Equipment" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="OriginalQuantity" Type="Decimal" Precision="18" Scale="0" />
           <Property Name="NewQuantity" Type="Decimal" Precision="18" Scale="0" />
           <Property Name="ReconcileInvoice" Type="Int32" />
@@ -2667,13 +2689,15 @@
           <Property Name="PCNNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="PRNNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
-          <Property Name="TransporterId" Type="Int32" Nullable="true" />
-          <Property Name="RetQuantity" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="ARPMComments" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="ProvCode" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="ChepClients" Relationship="ACTModel.FK_ChepClients_ClientLoads" FromRole="ClientLoad" ToRole="ChepClient" />
-          <NavigationProperty Name="ChepClient" Relationship="ACTModel.FK_ClientLoads_ChepClients" FromRole="ClientLoad" ToRole="ChepClient" />
-          <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientLoads_Clients" FromRole="ClientLoad" ToRole="Client" />
+          <Property Name="InputInd" Type="Int32" />
+          <Property Name="THAN" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ClientSiteId" Type="Int32" />
+          <Property Name="ReturnQty" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="OutstandingQty" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="OutstandingReasonid" Type="Int32" />
+          <NavigationProperty Name="ChepClients" Relationship="ACTModel.FK_ChepClient_ClientLoad" FromRole="ClientLoad" ToRole="ChepClient" />
+          <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientLoads_ChepClients" FromRole="ClientLoad" ToRole="Client" />
+          <NavigationProperty Name="Client1" Relationship="ACTModel.FK_ClientLoads_Clients" FromRole="ClientLoad" ToRole="Client" />
           <NavigationProperty Name="ClientInvoices" Relationship="ACTModel.FK_ClientInvoices_ClientLoads" FromRole="ClientLoad" ToRole="ClientInvoice" />
           <NavigationProperty Name="Vehicle" Relationship="ACTModel.FK_ClientLoads_Vehicle" FromRole="ClientLoad" ToRole="Vehicle" />
           <NavigationProperty Name="Journals" Relationship="ACTModel.FK_Postings_ClientLoads" FromRole="ClientLoad" ToRole="Journal" />
@@ -2697,6 +2721,7 @@
           <Property Name="PassonRate" Type="Decimal" Precision="19" Scale="4" />
           <Property Name="PassonDays" Type="Int32" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="Equipment" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientProducts_Clients" FromRole="ClientProduct" ToRole="Client" />
           <NavigationProperty Name="ClientProductMonthlies" Relationship="ACTModel.FK_ClientProductMonthlys_ClientProducts" FromRole="ClientProduct" ToRole="ClientProductMonthly" />
           <NavigationProperty Name="Product" Relationship="ACTModel.FK_ClientProducts_Products" FromRole="ClientProduct" ToRole="Product" />
@@ -2786,6 +2811,22 @@
           <Property Name="ContactEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
         </EntityType>
+        <EntityType Name="Country">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CountryCode" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
+          <Property Name="CountryName" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="CountryProvince">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="CountryId" Type="Int32" />
+          <Property Name="ProvinceId" Type="Int32" />
+        </EntityType>
         <EntityType Name="DeclineReason">
           <Key>
             <PropertyRef Name="Id" />
@@ -2823,6 +2864,7 @@
           <Property Name="ContactNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Reference306" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="ClientSiteId" Type="Int32" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_DeliveryNote_Clients" FromRole="DeliveryNote" ToRole="Client" />
           <NavigationProperty Name="DeliveryNoteLines" Relationship="ACTModel.FK_DeliveryNoteLines_DeliveryNote" FromRole="DeliveryNote" ToRole="DeliveryNoteLine" />
         </EntityType>
@@ -2840,6 +2882,7 @@
           <Property Name="OrderQuantity" Type="Decimal" Precision="18" Scale="0" />
           <Property Name="Delivered" Type="Decimal" Precision="18" Scale="0" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="Equipment" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <NavigationProperty Name="DeliveryNote" Relationship="ACTModel.FK_DeliveryNoteLines_DeliveryNote" FromRole="DeliveryNoteLine" ToRole="DeliveryNote" />
         </EntityType>
         <EntityType Name="Dispute">
@@ -2867,6 +2910,7 @@
           <Property Name="ActionedBy" Type="Int32" />
           <Property Name="ResolvedOn" Type="DateTime" Precision="3" />
           <Property Name="ResolvedBy" Type="Int32" />
+          <Property Name="ProductId" Type="Int32" />
           <NavigationProperty Name="ChepLoad" Relationship="ACTModel.FK_Disputes_ChepLoads" FromRole="Dispute" ToRole="ChepLoad" />
         </EntityType>
         <EntityType Name="Document">
@@ -2890,29 +2934,6 @@
           <Property Name="Url" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Journals" Relationship="ACTModel.FK_Journal_Document" FromRole="Document" ToRole="Journal" />
           <NavigationProperty Name="UserDocuments" Relationship="ACTModel.FK_UserDocument_Document" FromRole="Document" ToRole="UserDocument" />
-        </EntityType>
-        <EntityType Name="EstimatedLoad">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="ObjectId" Type="Int32" />
-          <Property Name="ObjectType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="January" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="February" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="March" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="April" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="May" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="June" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="July" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="August" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="September" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="October" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="November" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="December" Type="Decimal" Precision="18" Scale="2" />
         </EntityType>
         <EntityType Name="Group">
           <Key>
@@ -2973,11 +2994,12 @@
           <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="PostintDescription" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="PostingDescription" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="PostingQuantity" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="IsIn" Type="Boolean" />
-          <Property Name="THANNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="InOutInd" Type="Boolean" />
+          <Property Name="THAN" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="JournalType" Type="String" MaxLength="10" FixedLength="true" Unicode="true" />
           <NavigationProperty Name="ClientLoad" Relationship="ACTModel.FK_Postings_ClientLoads" FromRole="Journal" ToRole="ClientLoad" />
           <NavigationProperty Name="Document" Relationship="ACTModel.FK_Journal_Document" FromRole="Journal" ToRole="Document" />
           <NavigationProperty Name="SiteAudit" Relationship="ACTModel.FK_Journals_SiteAudit" FromRole="Journal" ToRole="SiteAudit" />
@@ -2995,6 +3017,14 @@
           <Property Name="Status" Type="Boolean" Nullable="false" />
           <Property Name="SentBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="UserNotifications" Relationship="ACTModel.FK_UserNotification_Notification" FromRole="Notification" ToRole="UserNotification" />
+        </EntityType>
+        <EntityType Name="OutstandingReason">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="OutstandingReason1" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="Product">
           <Key>
@@ -3025,8 +3055,8 @@
           <Property Name="RateUnit" Type="Int32" />
           <Property Name="FromDate" Type="DateTime" Precision="0" />
           <Property Name="Status" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Product" Relationship="ACTModel.FK_ProductPrices_Products" FromRole="ProductPrice" ToRole="Product" />
           <Property Name="Type" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Product" Relationship="ACTModel.FK_ProductPrices_Products" FromRole="ProductPrice" ToRole="Product" />
         </EntityType>
         <EntityType Name="PSP">
           <Key>
@@ -3049,38 +3079,13 @@
           <Property Name="DeclinedReason" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="ServiceRequired" Type="Int32" Nullable="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="PSPBudgets" Relationship="ACTModel.FK_PSPBudget_PSP" FromRole="PSP" ToRole="PSPBudget" />
           <NavigationProperty Name="PSPClients" Relationship="ACTModel.FK_PSPClients_PSP" FromRole="PSP" ToRole="PSPClient" />
           <NavigationProperty Name="PSPConfigs" Relationship="ACTModel.FK_PSPConfigs_PSP" FromRole="PSP" ToRole="PSPConfig" />
           <NavigationProperty Name="PSPProducts" Relationship="ACTModel.FK_PSPProducts_PSP" FromRole="PSP" ToRole="PSPProduct" />
           <NavigationProperty Name="PSPUsers" Relationship="ACTModel.FK_PSPUser_PSP" FromRole="PSP" ToRole="PSPUser" />
           <NavigationProperty Name="Regions" Relationship="ACTModel.FK_Regions_PSP" FromRole="PSP" ToRole="Region" />
           <NavigationProperty Name="PSPBillings" Relationship="ACTModel.FK_PSPBilling_PSP" FromRole="PSP" ToRole="PSPBilling" />
-        </EntityType>
-        <EntityType Name="PSPBudget">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="PSPId" Type="Int32" Nullable="false" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="BudgetYear" Type="Int32" Nullable="false" />
-          <Property Name="January"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="February" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="March"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="April"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="May"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="June"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="July"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="August"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="September"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="October"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="November"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="December"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="Status" Type="Int32" />
-          <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPBudget_PSP" FromRole="PSPBudget" ToRole="PSP" />
+          <NavigationProperty Name="PSPBudgets" Relationship="ACTModel.FK_PSPBudget_PSP" FromRole="PSP" ToRole="PSPBudget" />
         </EntityType>
         <EntityType Name="PSPClient">
           <Key>
@@ -3094,7 +3099,6 @@
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_PSPClients_Clients" FromRole="PSPClient" ToRole="Client" />
-          <NavigationProperty Name="ClientGroups" Relationship="ACTModel.FK_ClientGroups_PSPClients" FromRole="PSPClient" ToRole="ClientGroup" />
           <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPClients_PSP" FromRole="PSPClient" ToRole="PSP" />
         </EntityType>
         <EntityType Name="PSPConfig">
@@ -3120,10 +3124,7 @@
           <Property Name="ReceivingManagerEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="OpsManagerEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="AdminManagerEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ImportEmailHost" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="ImportEmailUsername" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="ImportEmailPassword" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ImportEmailPort" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="TaxPercentage" Type="Decimal" Precision="10" Scale="2" />
           <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPConfigs_PSP" FromRole="PSPConfig" ToRole="PSP" />
         </EntityType>
         <EntityType Name="PSPProduct">
@@ -3215,16 +3216,16 @@
           <Property Name="PostalCode" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="ContactNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="ContactName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="FinanceContactNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="FinanceContact" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ReceivingContactNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ReceivingContact" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="PlanningPoint" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="SiteType" Type="Int32" />
           <Property Name="AccountCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Depot" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="SiteCodeChep" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="FinanceContact" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FinanceContactNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ReceivingContact" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ReceivingContactNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="ChepAudits" Relationship="ACTModel.FK_ChepAudit_Sites" FromRole="Site" ToRole="ChepAudit" />
           <NavigationProperty Name="ClientSites" Relationship="ACTModel.FK_ClientSites_Sites" FromRole="Site" ToRole="ClientSite" />
           <NavigationProperty Name="Region" Relationship="ACTModel.FK_Sites_Regions" FromRole="Site" ToRole="Region" />
@@ -3288,18 +3289,18 @@
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="BudgetYear" Type="Int32" Nullable="false" />
-          <Property Name="January"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="January" Type="Decimal" Precision="18" Scale="2" />
           <Property Name="February" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="March"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="April"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="May"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="June"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="July"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="August"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="September"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="October"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="November"  Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="December"  Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="March" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="April" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="May" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="June" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="July" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="August" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="September" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="October" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="November" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="December" Type="Decimal" Precision="18" Scale="2" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Site" Relationship="ACTModel.FK_SiteBudgets_Sites" FromRole="SiteBudget" ToRole="Site" />
         </EntityType>
@@ -3531,19 +3532,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ChepClients_ChepLoads">
-          <End Type="ACTModel.ChepLoad" Role="ChepLoad" Multiplicity="1" />
-          <End Type="ACTModel.ChepClient" Role="ChepClient" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ChepLoad">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ChepClient">
-              <PropertyRef Name="ChepLoadsId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ChepClients_ClientLoads">
+        <Association Name="FK_ChepClient_ClientLoad">
           <End Type="ACTModel.ClientLoad" Role="ClientLoad" Multiplicity="1" />
           <End Type="ACTModel.ChepClient" Role="ChepClient" Multiplicity="*" />
           <ReferentialConstraint>
@@ -3555,15 +3544,15 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ClientLoads_ChepClients">
-          <End Type="ACTModel.ChepClient" Role="ChepClient" Multiplicity="1" />
-          <End Type="ACTModel.ClientLoad" Role="ClientLoad" Multiplicity="*" />
+        <Association Name="FK_ChepClients_ChepLoads">
+          <End Type="ACTModel.ChepLoad" Role="ChepLoad" Multiplicity="1" />
+          <End Type="ACTModel.ChepClient" Role="ChepClient" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="ChepClient">
+            <Principal Role="ChepLoad">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="ClientLoad">
-              <PropertyRef Name="ClientId" />
+            <Dependent Role="ChepClient">
+              <PropertyRef Name="ChepLoadsId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -3591,14 +3580,14 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ClientBudget_Clients">
+        <Association Name="FK_ClientGroup_Client">
           <End Type="ACTModel.Client" Role="Client" Multiplicity="1" />
-          <End Type="ACTModel.ClientBudget" Role="ClientBudget" Multiplicity="*" />
+          <End Type="ACTModel.ClientGroup" Role="ClientGroup" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Client">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="ClientBudget">
+            <Dependent Role="ClientGroup">
               <PropertyRef Name="ClientId" />
             </Dependent>
           </ReferentialConstraint>
@@ -3611,6 +3600,18 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="ClientKPI">
+              <PropertyRef Name="ClientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ClientLoads_ChepClients">
+          <End Type="ACTModel.Client" Role="Client" Multiplicity="1" />
+          <End Type="ACTModel.ClientLoad" Role="ClientLoad" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Client">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ClientLoad">
               <PropertyRef Name="ClientId" />
             </Dependent>
           </ReferentialConstraint>
@@ -3720,18 +3721,6 @@
             </Principal>
             <Dependent Role="ClientGroup">
               <PropertyRef Name="GroupId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ClientGroups_PSPClients">
-          <End Type="ACTModel.PSPClient" Role="PSPClient" Multiplicity="1" />
-          <End Type="ACTModel.ClientGroup" Role="ClientGroup" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSPClient">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ClientGroup">
-              <PropertyRef Name="ClientId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -3936,18 +3925,6 @@
             </Principal>
             <Dependent Role="SiteBilling">
               <PropertyRef Name="ProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PSPBudget_PSP">
-          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
-          <End Type="ACTModel.PSPBudget" Role="PSPBudget" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSP">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PSPBudget">
-              <PropertyRef Name="PSPId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4191,6 +4168,54 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="ClientBudget">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClientId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="BudgetYear" Type="Int32" />
+          <Property Name="January" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="February" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="March" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="April" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="May" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="June" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="July" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="August" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="September" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="October" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="November" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="December" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientBudget_Clients" FromRole="ClientBudget" ToRole="Client" />
+        </EntityType>
+        <EntityType Name="EstimatedLoad">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="ObjectId" Type="Int32" />
+          <Property Name="ObjectType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="January" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="February" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="March" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="April" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="May" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="June" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="July" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="August" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="September" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="October" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="November" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="December" Type="Decimal" Precision="18" Scale="0" />
+        </EntityType>
         <EntityType Name="PSPBilling">
           <Key>
             <PropertyRef Name="Id" />
@@ -4211,9 +4236,47 @@
           <Property Name="ReferenceNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="NominatedAccount" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="TaxAmount" Type="Decimal" Precision="19" Scale="4" />
           <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPBilling_PSP" FromRole="PSPBilling" ToRole="PSP" />
           <NavigationProperty Name="PSPProduct" Relationship="ACTModel.FK_PSPBilling_PSPProducts" FromRole="PSPBilling" ToRole="PSPProduct" />
         </EntityType>
+        <EntityType Name="PSPBudget">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PSPId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="BudgetYear" Type="Int32" Nullable="false" />
+          <Property Name="January" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="February" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="March" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="April" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="May" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="June" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="July" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="August" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="September" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="October" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="November" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="December" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="Status" Type="Int32" />
+          <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPBudget_PSP" FromRole="PSPBudget" ToRole="PSP" />
+        </EntityType>
+        <Association Name="FK_ClientBudget_Clients">
+          <End Type="ACTModel.Client" Role="Client" Multiplicity="1" />
+          <End Type="ACTModel.ClientBudget" Role="ClientBudget" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Client">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ClientBudget">
+              <PropertyRef Name="ClientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_PSPBilling_PSP">
           <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
           <End Type="ACTModel.PSPBilling" Role="PSPBilling" Multiplicity="*" />
@@ -4222,6 +4285,18 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="PSPBilling">
+              <PropertyRef Name="PSPId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PSPBudget_PSP">
+          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
+          <End Type="ACTModel.PSPBudget" Role="PSPBudget" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PSP">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PSPBudget">
               <PropertyRef Name="PSPId" />
             </Dependent>
           </ReferentialConstraint>
@@ -4238,21 +4313,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="Batch">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="BatchNo" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="BatchTable" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="BatchInNotes" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="BatchOutNotes" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="RunDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="FinishDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="BatchSource" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="BatchRows" Type="Int32" />
-          <Property Name="BatchComm" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
-        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -4388,6 +4448,12 @@
           <EntitySetMapping Name="ChepLoads">
             <EntityTypeMapping TypeName="ACTModel.ChepLoad">
               <MappingFragment StoreEntitySet="ChepLoad">
+                <ScalarProperty Name="SiteId" ColumnName="SiteId" />
+                <ScalarProperty Name="IssueNote" ColumnName="IssueNote" />
+                <ScalarProperty Name="ShipmentNo" ColumnName="ShipmentNo" />
+                <ScalarProperty Name="THAN" ColumnName="THAN" />
+                <ScalarProperty Name="OrderNo" ColumnName="OrderNo" />
+                <ScalarProperty Name="InputInd" ColumnName="InputInd" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="DocketNumber" ColumnName="DocketNumber" />
                 <ScalarProperty Name="NewQuantity" ColumnName="NewQuantity" />
@@ -4413,8 +4479,8 @@
             <EntityTypeMapping TypeName="ACTModel.Client">
               <MappingFragment StoreEntitySet="Client">
                 <ScalarProperty Name="ChepReference" ColumnName="ChepReference" />
-                <ScalarProperty Name="AdminPerson" ColumnName="AdminPerson" />
                 <ScalarProperty Name="FinPersonEmail" ColumnName="FinPersonEmail" />
+                <ScalarProperty Name="AdminPerson" ColumnName="AdminPerson" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="ServiceRequired" ColumnName="ServiceRequired" />
                 <ScalarProperty Name="DeclinedReason" ColumnName="DeclinedReason" />
@@ -4449,31 +4515,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="ClientBudgets">
-            <EntityTypeMapping TypeName="ACTModel.ClientBudget">
-              <MappingFragment StoreEntitySet="ClientBudget">
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="December" ColumnName="December" />
-                <ScalarProperty Name="November" ColumnName="November" />
-                <ScalarProperty Name="October" ColumnName="October" />
-                <ScalarProperty Name="September" ColumnName="September" />
-                <ScalarProperty Name="August" ColumnName="August" />
-                <ScalarProperty Name="July" ColumnName="July" />
-                <ScalarProperty Name="June" ColumnName="June" />
-                <ScalarProperty Name="May" ColumnName="May" />
-                <ScalarProperty Name="April" ColumnName="April" />
-                <ScalarProperty Name="March" ColumnName="March" />
-                <ScalarProperty Name="February" ColumnName="February" />
-                <ScalarProperty Name="January" ColumnName="January" />
-                <ScalarProperty Name="BudgetYear" ColumnName="BudgetYear" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="ClientId" ColumnName="ClientId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="ClientGroups">
             <EntityTypeMapping TypeName="ACTModel.ClientGroup">
               <MappingFragment StoreEntitySet="ClientGroup">
@@ -4503,7 +4544,6 @@
           <EntitySetMapping Name="ClientKPIs">
             <EntityTypeMapping TypeName="ACTModel.ClientKPI">
               <MappingFragment StoreEntitySet="ClientKPI">
-                <ScalarProperty Name="KPIDescription" ColumnName="KPIDescription" />
                 <ScalarProperty Name="TargetPeriod" ColumnName="TargetPeriod" />
                 <ScalarProperty Name="TargetAmount" ColumnName="TargetAmount" />
                 <ScalarProperty Name="Weight" ColumnName="Weight" />
@@ -4514,6 +4554,7 @@
                 <ScalarProperty Name="Passons" ColumnName="Passons" />
                 <ScalarProperty Name="OutstandingPallets" ColumnName="OutstandingPallets" />
                 <ScalarProperty Name="Disputes" ColumnName="Disputes" />
+                <ScalarProperty Name="KPIDescription" ColumnName="KPIDescription" />
                 <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
                 <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
@@ -4525,10 +4566,12 @@
           <EntitySetMapping Name="ClientLoads">
             <EntityTypeMapping TypeName="ACTModel.ClientLoad">
               <MappingFragment StoreEntitySet="ClientLoad">
-                <ScalarProperty Name="ProvCode" ColumnName="ProvCode" />
-                <ScalarProperty Name="ARPMComments" ColumnName="ARPMComments" />
-                <ScalarProperty Name="RetQuantity" ColumnName="RetQuantity" />
-                <ScalarProperty Name="TransporterId" ColumnName="TransporterId" />
+                <ScalarProperty Name="OutstandingReasonid" ColumnName="OutstandingReasonid" />
+                <ScalarProperty Name="OutstandingQty" ColumnName="OutstandingQty" />
+                <ScalarProperty Name="ReturnQty" ColumnName="ReturnQty" />
+                <ScalarProperty Name="ClientSiteId" ColumnName="ClientSiteId" />
+                <ScalarProperty Name="THAN" ColumnName="THAN" />
+                <ScalarProperty Name="InputInd" ColumnName="InputInd" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="PRNNumber" ColumnName="PRNNumber" />
                 <ScalarProperty Name="PCNNumber" ColumnName="PCNNumber" />
@@ -4543,7 +4586,7 @@
                 <ScalarProperty Name="DeliveryNote" ColumnName="DeliveryNote" />
                 <ScalarProperty Name="ClientDescription" ColumnName="ClientDescription" />
                 <ScalarProperty Name="AccountNumber" ColumnName="AccountNumber" />
-                <ScalarProperty Name="NotifyeDate" ColumnName="NotifyeDate" />
+                <ScalarProperty Name="NotifyDate" ColumnName="NotifyDate" />
                 <ScalarProperty Name="EffectiveDate" ColumnName="EffectiveDate" />
                 <ScalarProperty Name="LoadDate" ColumnName="LoadDate" />
                 <ScalarProperty Name="LoadNumber" ColumnName="LoadNumber" />
@@ -4559,6 +4602,7 @@
           <EntitySetMapping Name="ClientProducts">
             <EntityTypeMapping TypeName="ACTModel.ClientProduct">
               <MappingFragment StoreEntitySet="ClientProduct">
+                <ScalarProperty Name="Equipment" ColumnName="Equipment" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="PassonDays" ColumnName="PassonDays" />
                 <ScalarProperty Name="PassonRate" ColumnName="PassonRate" />
@@ -4660,6 +4704,24 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Countries">
+            <EntityTypeMapping TypeName="ACTModel.Country">
+              <MappingFragment StoreEntitySet="Country">
+                <ScalarProperty Name="CountryName" ColumnName="CountryName" />
+                <ScalarProperty Name="CountryCode" ColumnName="CountryCode" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CountryProvinces">
+            <EntityTypeMapping TypeName="ACTModel.CountryProvince">
+              <MappingFragment StoreEntitySet="CountryProvince">
+                <ScalarProperty Name="ProvinceId" ColumnName="ProvinceId" />
+                <ScalarProperty Name="CountryId" ColumnName="CountryId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="DeclineReasons">
             <EntityTypeMapping TypeName="ACTModel.DeclineReason">
               <MappingFragment StoreEntitySet="DeclineReason">
@@ -4675,6 +4737,7 @@
           <EntitySetMapping Name="DeliveryNotes">
             <EntityTypeMapping TypeName="ACTModel.DeliveryNote">
               <MappingFragment StoreEntitySet="DeliveryNote">
+                <ScalarProperty Name="ClientSiteId" ColumnName="ClientSiteId" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="Reference306" ColumnName="Reference306" />
                 <ScalarProperty Name="ContactNumber" ColumnName="ContactNumber" />
@@ -4703,6 +4766,7 @@
           <EntitySetMapping Name="DeliveryNoteLines">
             <EntityTypeMapping TypeName="ACTModel.DeliveryNoteLine">
               <MappingFragment StoreEntitySet="DeliveryNoteLine">
+                <ScalarProperty Name="Equipment" ColumnName="Equipment" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="Delivered" ColumnName="Delivered" />
                 <ScalarProperty Name="OrderQuantity" ColumnName="OrderQuantity" />
@@ -4719,6 +4783,7 @@
           <EntitySetMapping Name="Disputes">
             <EntityTypeMapping TypeName="ACTModel.Dispute">
               <MappingFragment StoreEntitySet="Dispute">
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
                 <ScalarProperty Name="ResolvedBy" ColumnName="ResolvedBy" />
                 <ScalarProperty Name="ResolvedOn" ColumnName="ResolvedOn" />
                 <ScalarProperty Name="ActionedBy" ColumnName="ActionedBy" />
@@ -4760,30 +4825,6 @@
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="ObjectType" ColumnName="ObjectType" />
                 <ScalarProperty Name="ObjectId" ColumnName="ObjectId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="EstimatedLoads">
-            <EntityTypeMapping TypeName="ACTModel.EstimatedLoad">
-              <MappingFragment StoreEntitySet="EstimatedLoad">
-                <ScalarProperty Name="December" ColumnName="December" />
-                <ScalarProperty Name="November" ColumnName="November" />
-                <ScalarProperty Name="October" ColumnName="October" />
-                <ScalarProperty Name="September" ColumnName="September" />
-                <ScalarProperty Name="August" ColumnName="August" />
-                <ScalarProperty Name="July" ColumnName="July" />
-                <ScalarProperty Name="June" ColumnName="June" />
-                <ScalarProperty Name="May" ColumnName="May" />
-                <ScalarProperty Name="April" ColumnName="April" />
-                <ScalarProperty Name="March" ColumnName="March" />
-                <ScalarProperty Name="February" ColumnName="February" />
-                <ScalarProperty Name="January" ColumnName="January" />
-                <ScalarProperty Name="ObjectType" ColumnName="ObjectType" />
-                <ScalarProperty Name="ObjectId" ColumnName="ObjectId" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -4840,11 +4881,12 @@
           <EntitySetMapping Name="Journals">
             <EntityTypeMapping TypeName="ACTModel.Journal">
               <MappingFragment StoreEntitySet="Journal">
+                <ScalarProperty Name="JournalType" ColumnName="JournalType" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="THANNumber" ColumnName="THANNumber" />
-                <ScalarProperty Name="IsIn" ColumnName="IsIn" />
+                <ScalarProperty Name="THAN" ColumnName="THAN" />
+                <ScalarProperty Name="InOutInd" ColumnName="InOutInd" />
                 <ScalarProperty Name="PostingQuantity" ColumnName="PostingQuantity" />
-                <ScalarProperty Name="PostintDescription" ColumnName="PostintDescription" />
+                <ScalarProperty Name="PostingDescription" ColumnName="PostingDescription" />
                 <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
                 <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
@@ -4865,6 +4907,15 @@
                 <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
                 <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OutstandingReasons">
+            <EntityTypeMapping TypeName="ACTModel.OutstandingReason">
+              <MappingFragment StoreEntitySet="OutstandingReason">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="OutstandingReason1" ColumnName="OutstandingReason" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -4921,31 +4972,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="PSPBudgets">
-            <EntityTypeMapping TypeName="ACTModel.PSPBudget">
-              <MappingFragment StoreEntitySet="PSPBudget">
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="December" ColumnName="December" />
-                <ScalarProperty Name="November" ColumnName="November" />
-                <ScalarProperty Name="October" ColumnName="October" />
-                <ScalarProperty Name="September" ColumnName="September" />
-                <ScalarProperty Name="August" ColumnName="August" />
-                <ScalarProperty Name="July" ColumnName="July" />
-                <ScalarProperty Name="June" ColumnName="June" />
-                <ScalarProperty Name="May" ColumnName="May" />
-                <ScalarProperty Name="April" ColumnName="April" />
-                <ScalarProperty Name="March" ColumnName="March" />
-                <ScalarProperty Name="February" ColumnName="February" />
-                <ScalarProperty Name="January" ColumnName="January" />
-                <ScalarProperty Name="BudgetYear" ColumnName="BudgetYear" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="PSPId" ColumnName="PSPId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="PSPClients">
             <EntityTypeMapping TypeName="ACTModel.PSPClient">
               <MappingFragment StoreEntitySet="PSPClient">
@@ -4962,10 +4988,7 @@
           <EntitySetMapping Name="PSPConfigs">
             <EntityTypeMapping TypeName="ACTModel.PSPConfig">
               <MappingFragment StoreEntitySet="PSPConfig">
-                <ScalarProperty Name="ImportEmailPort" ColumnName="ImportEmailPort" />
-                <ScalarProperty Name="ImportEmailPassword" ColumnName="ImportEmailPassword" />
-                <ScalarProperty Name="ImportEmailUsername" ColumnName="ImportEmailUsername" />
-                <ScalarProperty Name="ImportEmailHost" ColumnName="ImportEmailHost" />
+                <ScalarProperty Name="TaxPercentage" ColumnName="TaxPercentage" />
                 <ScalarProperty Name="AdminManagerEmail" ColumnName="AdminManagerEmail" />
                 <ScalarProperty Name="OpsManagerEmail" ColumnName="OpsManagerEmail" />
                 <ScalarProperty Name="ReceivingManagerEmail" ColumnName="ReceivingManagerEmail" />
@@ -5057,10 +5080,10 @@
           <EntitySetMapping Name="Sites">
             <EntityTypeMapping TypeName="ACTModel.Site">
               <MappingFragment StoreEntitySet="Site">
-                <ScalarProperty Name="ReceivingContact" ColumnName="ReceivingContact" />
                 <ScalarProperty Name="ReceivingContactNo" ColumnName="ReceivingContactNo" />
+                <ScalarProperty Name="ReceivingContact" ColumnName="ReceivingContact" />
+                <ScalarProperty Name="FinanceContactNo" ColumnName="FinanceContactNo" />
                 <ScalarProperty Name="FinanceContact" ColumnName="FinanceContact" />
-                <ScalarProperty Name="FinanceContactNo" ColumnName="FinanceContactNo" />                
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="SiteCodeChep" ColumnName="SiteCodeChep" />
                 <ScalarProperty Name="Depot" ColumnName="Depot" />
@@ -5329,9 +5352,59 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="ClientBudgets">
+            <EntityTypeMapping TypeName="ACTModel.ClientBudget">
+              <MappingFragment StoreEntitySet="ClientBudget">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="December" ColumnName="December" />
+                <ScalarProperty Name="November" ColumnName="November" />
+                <ScalarProperty Name="October" ColumnName="October" />
+                <ScalarProperty Name="September" ColumnName="September" />
+                <ScalarProperty Name="August" ColumnName="August" />
+                <ScalarProperty Name="July" ColumnName="July" />
+                <ScalarProperty Name="June" ColumnName="June" />
+                <ScalarProperty Name="May" ColumnName="May" />
+                <ScalarProperty Name="April" ColumnName="April" />
+                <ScalarProperty Name="March" ColumnName="March" />
+                <ScalarProperty Name="February" ColumnName="February" />
+                <ScalarProperty Name="January" ColumnName="January" />
+                <ScalarProperty Name="BudgetYear" ColumnName="BudgetYear" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ClientId" ColumnName="ClientId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EstimatedLoads">
+            <EntityTypeMapping TypeName="ACTModel.EstimatedLoad">
+              <MappingFragment StoreEntitySet="EstimatedLoad">
+                <ScalarProperty Name="December" ColumnName="December" />
+                <ScalarProperty Name="November" ColumnName="November" />
+                <ScalarProperty Name="October" ColumnName="October" />
+                <ScalarProperty Name="September" ColumnName="September" />
+                <ScalarProperty Name="August" ColumnName="August" />
+                <ScalarProperty Name="July" ColumnName="July" />
+                <ScalarProperty Name="June" ColumnName="June" />
+                <ScalarProperty Name="May" ColumnName="May" />
+                <ScalarProperty Name="April" ColumnName="April" />
+                <ScalarProperty Name="March" ColumnName="March" />
+                <ScalarProperty Name="February" ColumnName="February" />
+                <ScalarProperty Name="January" ColumnName="January" />
+                <ScalarProperty Name="ObjectType" ColumnName="ObjectType" />
+                <ScalarProperty Name="ObjectId" ColumnName="ObjectId" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="PSPBillings">
             <EntityTypeMapping TypeName="ACTModel.PSPBilling">
               <MappingFragment StoreEntitySet="PSPBilling">
+                <ScalarProperty Name="TaxAmount" ColumnName="TaxAmount" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="NominatedAccount" ColumnName="NominatedAccount" />
                 <ScalarProperty Name="ReferenceNumber" ColumnName="ReferenceNumber" />
@@ -5351,18 +5424,27 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Batches">
-            <EntityTypeMapping TypeName="ACTModel.Batch">
-              <MappingFragment StoreEntitySet="Batch">
-                <ScalarProperty Name="BatchComm" ColumnName="BatchComm" />
-                <ScalarProperty Name="BatchRows" ColumnName="BatchRows" />
-                <ScalarProperty Name="BatchSource" ColumnName="BatchSource" />
-                <ScalarProperty Name="FinishDate" ColumnName="FinishDate" />
-                <ScalarProperty Name="RunDate" ColumnName="RunDate" />
-                <ScalarProperty Name="BatchOutNotes" ColumnName="BatchOutNotes" />
-                <ScalarProperty Name="BatchInNotes" ColumnName="BatchInNotes" />
-                <ScalarProperty Name="BatchTable" ColumnName="BatchTable" />
-                <ScalarProperty Name="BatchNo" ColumnName="BatchNo" />
+          <EntitySetMapping Name="PSPBudgets">
+            <EntityTypeMapping TypeName="ACTModel.PSPBudget">
+              <MappingFragment StoreEntitySet="PSPBudget">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="December" ColumnName="December" />
+                <ScalarProperty Name="November" ColumnName="November" />
+                <ScalarProperty Name="October" ColumnName="October" />
+                <ScalarProperty Name="September" ColumnName="September" />
+                <ScalarProperty Name="August" ColumnName="August" />
+                <ScalarProperty Name="July" ColumnName="July" />
+                <ScalarProperty Name="June" ColumnName="June" />
+                <ScalarProperty Name="May" ColumnName="May" />
+                <ScalarProperty Name="April" ColumnName="April" />
+                <ScalarProperty Name="March" ColumnName="March" />
+                <ScalarProperty Name="February" ColumnName="February" />
+                <ScalarProperty Name="January" ColumnName="January" />
+                <ScalarProperty Name="BudgetYear" ColumnName="BudgetYear" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="PSPId" ColumnName="PSPId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

@@ -17,15 +17,17 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Client()
         {
-            this.ClientBudgets = new HashSet<ClientBudget>();
+            this.ClientGroups = new HashSet<ClientGroup>();
             this.ClientKPIs = new HashSet<ClientKPI>();
             this.ClientLoads = new HashSet<ClientLoad>();
+            this.ClientLoads1 = new HashSet<ClientLoad>();
             this.ClientProducts = new HashSet<ClientProduct>();
             this.ClientSites = new HashSet<ClientSite>();
             this.ClientUsers = new HashSet<ClientUser>();
             this.DeliveryNotes = new HashSet<DeliveryNote>();
             this.PSPClients = new HashSet<PSPClient>();
             this.Tasks = new HashSet<Task>();
+            this.ClientBudgets = new HashSet<ClientBudget>();
         }
     
         public int Id { get; set; }
@@ -45,16 +47,18 @@ namespace ACT.Data.Models
         public string DeclinedReason { get; set; }
         public int ServiceRequired { get; set; }
         public int Status { get; set; }
-        public string ChepReference { get; set; }
         public string AdminPerson { get; set; }
         public string FinPersonEmail { get; set; }
+        public string ChepReference { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientBudget> ClientBudgets { get; set; }
+        public virtual ICollection<ClientGroup> ClientGroups { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientKPI> ClientKPIs { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoad> ClientLoads1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientProduct> ClientProducts { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
@@ -67,5 +71,7 @@ namespace ACT.Data.Models
         public virtual ICollection<PSPClient> PSPClients { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Tasks { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientBudget> ClientBudgets { get; set; }
     }
 }

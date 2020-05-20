@@ -21,11 +21,12 @@ namespace ACT.Data.Models
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
-        public string PostintDescription { get; set; }
+        public string PostingDescription { get; set; }
         public Nullable<decimal> PostingQuantity { get; set; }
-        public Nullable<bool> IsIn { get; set; }
-        public string THANNumber { get; set; }
+        public Nullable<bool> InOutInd { get; set; }
+        public string THAN { get; set; }
         public int Status { get; set; }
+        public string JournalType { get; set; }
     
         public virtual ClientLoad ClientLoad { get; set; }
         public virtual Document Document { get; set; }

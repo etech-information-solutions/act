@@ -239,7 +239,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
             };
 
-            string query = $"SELECT r.Id AS [TKey], r.Name AS [TValue] FROM [dbo].[Region] r";
+            string query = $"SELECT r.Id AS [TKey], r.Description AS [TValue] FROM [dbo].[Region] r";
 
             if ( CurrentUser.RoleType == RoleType.PSP )
             {

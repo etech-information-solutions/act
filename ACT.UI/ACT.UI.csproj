@@ -596,6 +596,11 @@
     <Content Include="Views\DashBoard\_NumberOfDisputes.cshtml" />
     <Content Include="Views\DashBoard\_KPIMeasurement.cshtml" />
     <Content Include="Views\Pallet\_ListDeliveryNoteLines.cshtml" />
+    <Content Include="Views\Shared\_DashBoardCustomSearch.cshtml" />
+    <Content Include="Views\DashBoard\_Sites.cshtml" />
+    <Content Include="Views\DashBoard\_Regions.cshtml" />
+    <Content Include="Views\DashBoard\_Clients.cshtml" />
+    <Content Include="Views\DashBoard\_Products.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

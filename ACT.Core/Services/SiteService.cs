@@ -20,19 +20,25 @@ namespace ACT.Core.Services
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        public Dictionary<int, string> List( bool v )
+        public Dictionary<int, string> List( bool v, int regionId = 0 )
         {
             Dictionary<int, string> siteOptions = new Dictionary<int, string>();
             List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
 
             List<object> parameters = new List<object>()
             {
+                { new SqlParameter( "regionId", regionId ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
             };
 
             string query = string.Empty;
 
-            query = $"SELECT s.Id AS [TKey], s.Name AS [TValue] FROM [dbo].[Site] s";
+            query = $"SELECT s.Id AS [TKey], s.Name AS [TValue] FROM [dbo].[Site] s WHERE (1=1)";
+
+            if ( regionId > 0 )
+            {
+                query = $"{query} AND (s.[RegionId]=@regionId)";
+            }
 
             if ( CurrentUser.RoleType == RoleType.PSP )
             {

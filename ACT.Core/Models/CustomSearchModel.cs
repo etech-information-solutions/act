@@ -469,6 +469,22 @@ namespace ACT.Core.Models
                     }
 
                     break;
+
+
+                case "DashBoard":
+
+                    using ( SiteService sservice = new SiteService() )
+                    using ( RegionService rservice = new RegionService() )
+                    using ( ClientService cservice = new ClientService() )
+                    using ( ProductService pservice = new ProductService() )
+                    {
+                        SiteOptions = sservice.List( true );
+                        RegionOptions = rservice.List( true );
+                        ClientOptions = cservice.List( true );
+                        ProductOptions = pservice.List( true );
+                    }
+
+                    break;
             }
         }
 

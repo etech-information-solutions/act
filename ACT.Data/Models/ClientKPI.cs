@@ -19,6 +19,7 @@ namespace ACT.Data.Models
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
+        public string KPIDescription { get; set; }
         public Nullable<decimal> Disputes { get; set; }
         public Nullable<decimal> OutstandingPallets { get; set; }
         public Nullable<decimal> Passons { get; set; }
@@ -29,7 +30,6 @@ namespace ACT.Data.Models
         public Nullable<decimal> Weight { get; set; }
         public Nullable<decimal> TargetAmount { get; set; }
         public Nullable<int> TargetPeriod { get; set; }
-        public string KPIDescription { get; set; }
     
         public virtual Client Client { get; set; }
     }

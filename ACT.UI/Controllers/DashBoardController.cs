@@ -25,7 +25,7 @@ namespace ACT.UI.Controllers
 
         //
         // POST || GET: /DashBoard/AgeOfOutstandingPallets
-        public ActionResult AgeOfOutstandingPallets( PagingModel pm, CustomSearchModel csm )
+        public ActionResult AgeOfOutstandingPallets( CustomSearchModel csm )
         {
             using ( ClientLoadService service = new ClientLoadService() )
             {
@@ -85,7 +85,7 @@ namespace ACT.UI.Controllers
 
         //
         // POST || GET: /DashBoard/LoadsPerMonth
-        public ActionResult LoadsPerMonth( PagingModel pm, CustomSearchModel csm )
+        public ActionResult LoadsPerMonth( CustomSearchModel csm )
         {
             using ( ClientLoadService service = new ClientLoadService() )
             {
@@ -133,7 +133,7 @@ namespace ACT.UI.Controllers
 
         //
         // POST || GET: /DashBoard/AuthorisationCodes
-        public ActionResult AuthorisationCodes( PagingModel pm, CustomSearchModel csm )
+        public ActionResult AuthorisationCodes( CustomSearchModel csm )
         {
             using ( ClientLoadService service = new ClientLoadService() )
             {
@@ -181,7 +181,7 @@ namespace ACT.UI.Controllers
 
         //
         // POST || GET: /DashBoard/NumberOfPalletsManaged
-        public ActionResult NumberOfPalletsManaged( PagingModel pm, CustomSearchModel csm )
+        public ActionResult NumberOfPalletsManaged( CustomSearchModel csm )
         {
             using ( ClientLoadService service = new ClientLoadService() )
             {
@@ -217,7 +217,7 @@ namespace ACT.UI.Controllers
 
         //
         // POST || GET: /DashBoard/KPIMeasurement
-        public ActionResult KPIMeasurement( PagingModel pm, CustomSearchModel csm )
+        public ActionResult KPIMeasurement( CustomSearchModel csm )
         {
 
             return PartialView( "_KPIMeasurement" );
@@ -225,7 +225,7 @@ namespace ACT.UI.Controllers
 
         //
         // POST || GET: /DashBoard/NumberOfDisputes
-        public ActionResult NumberOfDisputes( PagingModel pm, CustomSearchModel csm )
+        public ActionResult NumberOfDisputes( CustomSearchModel csm )
         {
             using ( DisputeService service = new DisputeService() )
             {

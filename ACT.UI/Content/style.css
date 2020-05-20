@@ -1318,6 +1318,67 @@ tr.duplicate-highlight td {
 
 
 
+.graphs {
+}
+
+    .graphs .gs-data {
+        top: 0;
+        right: 0;
+        display: none;
+        color: #012d71;
+        font-size: 25px;
+        padding: 2px 4px;
+        position: absolute;
+    }
+
+
+.graph-search {
+    position: relative;
+}
+
+    .graph-search .title {
+        display: block;
+        text-transform: uppercase;
+        border-bottom: 1px solid #eee;
+    }
+
+    .graph-search .do-search {
+        top: 25px;
+        right: 0;
+        bottom: 0;
+        color: #ffffff;
+        font-size: 14px;
+        padding: 2% 20px;
+        font-weight: bold;
+        margin-bottom: 0px;
+        position: absolute;
+        background: #012d71;
+        text-transform: uppercase;
+        border-bottom-left-radius: 7px;
+    }
+
+.dashboard-search {
+}
+
+    .dashboard-search > span {
+        width: 17%;
+        margin-right: 1%;
+        position: relative;
+        display: inline-block;
+    }
+
+        .dashboard-search > span.little {
+            width: 5%;
+            padding-right: 5px;
+            border-right: 1px solid #eee;
+        }
+
+        .dashboard-search > span:last-child {
+            margin-right: 0;
+        }
+
+
+
 footer {
     left: 0;
     bottom: 0;

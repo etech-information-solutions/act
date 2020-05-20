@@ -30,6 +30,7 @@ namespace ACT.Data.Models
         public string ReferenceNumber { get; set; }
         public string NominatedAccount { get; set; }
         public int Status { get; set; }
+        public Nullable<decimal> TaxAmount { get; set; }
     
         public virtual PSP PSP { get; set; }
         public virtual PSPProduct PSPProduct { get; set; }

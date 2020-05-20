@@ -12,20 +12,10 @@ namespace ACT.Data.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class DeliveryNoteLine
+    public partial class OutstandingReason
     {
         public int Id { get; set; }
-        public int DeliveryNoteId { get; set; }
-        public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModifiedOn { get; set; }
-        public string ModifiedBy { get; set; }
-        public string Product { get; set; }
-        public string ProductDescription { get; set; }
-        public Nullable<decimal> OrderQuantity { get; set; }
-        public Nullable<decimal> Delivered { get; set; }
+        public string OutstandingReason1 { get; set; }
         public int Status { get; set; }
-        public string Equipment { get; set; }
-    
-        public virtual DeliveryNote DeliveryNote { get; set; }
     }
 }
