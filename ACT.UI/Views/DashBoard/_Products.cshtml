@@ -1,0 +1,5 @@
+﻿@model CustomSearchModel
+
+@using ACT.Core.Models
+
+@Html.DropDownListFor( model => model.ProductId, model => model.ProductOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 100%;" } )

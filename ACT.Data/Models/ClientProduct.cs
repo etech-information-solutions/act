@@ -34,6 +34,7 @@ namespace ACT.Data.Models
         public Nullable<decimal> PassonRate { get; set; }
         public Nullable<int> PassonDays { get; set; }
         public int Status { get; set; }
+        public string Equipment { get; set; }
     
         public virtual Client Client { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

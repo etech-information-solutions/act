@@ -12,17 +12,10 @@ namespace ACT.Data.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Batch
+    public partial class CountryProvince
     {
         public int Id { get; set; }
-        public string BatchNo { get; set; }
-        public string BatchTable { get; set; }
-        public string BatchInNotes { get; set; }
-        public string BatchOutNotes { get; set; }
-        public System.DateTime RunDate { get; set; }
-        public System.DateTime FinishDate { get; set; }
-        public string BatchSource { get; set; }
-        public Nullable<int> BatchRows { get; set; }
-        public string BatchComm { get; set; }
+        public Nullable<int> CountryId { get; set; }
+        public Nullable<int> ProvinceId { get; set; }
     }
 }

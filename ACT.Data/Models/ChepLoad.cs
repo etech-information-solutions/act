@@ -40,6 +40,12 @@ namespace ACT.Data.Models
         public Nullable<decimal> NewQuantity { get; set; }
         public string DocketNumber { get; set; }
         public int Status { get; set; }
+        public Nullable<int> InputInd { get; set; }
+        public string OrderNo { get; set; }
+        public string THAN { get; set; }
+        public string ShipmentNo { get; set; }
+        public string IssueNote { get; set; }
+        public Nullable<int> SiteId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }

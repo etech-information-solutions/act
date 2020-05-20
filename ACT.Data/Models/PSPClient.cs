@@ -14,12 +14,6 @@ namespace ACT.Data.Models
     
     public partial class PSPClient
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public PSPClient()
-        {
-            this.ClientGroups = new HashSet<ClientGroup>();
-        }
-    
         public int Id { get; set; }
         public int PSPId { get; set; }
         public int ClientId { get; set; }
@@ -29,8 +23,6 @@ namespace ACT.Data.Models
         public int Status { get; set; }
     
         public virtual Client Client { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientGroup> ClientGroups { get; set; }
         public virtual PSP PSP { get; set; }
     }
 }

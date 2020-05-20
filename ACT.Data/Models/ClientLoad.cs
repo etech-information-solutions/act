@@ -31,8 +31,8 @@ namespace ACT.Data.Models
         public string ModifiedBy { get; set; }
         public string LoadNumber { get; set; }
         public Nullable<System.DateTime> LoadDate { get; set; }
-        public Nullable<System.DateTime> EffectiveDate { get; set; }
-        public Nullable<System.DateTime> NotifyeDate { get; set; }
+        public System.DateTime EffectiveDate { get; set; }
+        public Nullable<System.DateTime> NotifyDate { get; set; }
         public string AccountNumber { get; set; }
         public string ClientDescription { get; set; }
         public string DeliveryNote { get; set; }
@@ -47,15 +47,17 @@ namespace ACT.Data.Models
         public string PCNNumber { get; set; }
         public string PRNNumber { get; set; }
         public int Status { get; set; }
-        public Nullable<int> TransporterId { get; set; }
-        public Nullable<decimal> RetQuantity { get; set; }
-        public string ARPMComments { get; set; }
-        public string ProvCode { get; set; }
+        public Nullable<int> InputInd { get; set; }
+        public string THAN { get; set; }
+        public Nullable<int> ClientSiteId { get; set; }
+        public Nullable<decimal> ReturnQty { get; set; }
+        public Nullable<decimal> OutstandingQty { get; set; }
+        public Nullable<int> OutstandingReasonid { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }
-        public virtual ChepClient ChepClient { get; set; }
         public virtual Client Client { get; set; }
+        public virtual Client Client1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientInvoice> ClientInvoices { get; set; }
         public virtual Vehicle Vehicle { get; set; }

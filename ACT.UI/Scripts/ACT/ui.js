@@ -106,6 +106,12 @@
             this.DataDOB( $( '*[data-dob="1"]' ) );
             this.DataServiceType( $( '*[data-service-type="1"]' ) );
 
+            // Dashboard / Graphs
+            this.DataGSSite( $( '*[data-gs-site="1"]' ) );
+            this.DataGSRegion( $( '*[data-gs-region="1"]' ) );
+
+            this.DataGSearch( $( '*[data-g-search="1"]' ) ); // Search button on Dashboard
+
             if ( window.location.search !== "" && !$( "tr.edit" ).length && $( ".dataTable" ).length && !ACT.UI.PageViewIdProcessed )
             {
                 var viewid = false,
@@ -3717,25 +3723,36 @@
             } );
         },
 
-        DataGraphs: function ( sender )
+        DataGraphs: function ( sender, params )
         {
             var i = sender.parent().find( 'div[data-loaded="0"]' ).first();
 
             if ( !i.length )
             {
+                setTimeout( function ()
+                {
+                    $( ".gs-data" ).show( 1000 );
+                }, 4000 );
+
                 return;
             }
 
+            i.html( "" );
             i.append( "<div id='loader' />" );
 
             function LoadNext()
             {
                 i.attr( "data-loaded", 1 );
 
-                ACT.UI.DataGraphs( sender );
+                ACT.UI.DataGraphs( sender, params );
             }
 
-            ACT.UI.Get( i.find( "#loader" ), i, siteurl + "/" + i.attr( "data-type" ), {}, LoadNext(), true, true );
+            if ( typeof ( params ) === 'undefined' )
+            {
+                params = {};
+            }
+
+            ACT.UI.Get( i.find( "#loader" ), i, siteurl + "/" + i.attr( "data-type" ), params, LoadNext(), true, true );
         },
 
         AgeOfOutstandingPallets: function ( sender, months )
@@ -3920,6 +3937,103 @@
                     }
                 },
                 series: series
+            } );
+        },
+
+        DataGSRegion: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        ACT.Loader.Show( $( 'label[for="SiteId"]' ), true );
+
+                        $( "select#SiteId" ).parent().load( siteurl + "GetHtmlSiteList", { regionId: $( this ).val() }, function ()
+                        {
+                            ACT.UI.DataHighlightFields( $( "select#SiteId" ).parent() );
+
+                            ACT.UI.DataGSSite( $( '*[data-gs-site="1"]' ) );
+
+                            $( "select#SiteId" ).change();
+
+                            ACT.Init.PluginInit( $( "select#SiteId" ).parent() );
+                        } );
+                    } );
+            } );
+        },
+
+        DataGSSite: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        var siteIds = "";
+
+                        // Only set siteIds if no site is selected..
+
+                        if ( $( this ).val() === "" )
+                        {
+                            $( this ).find( "option" ).each( function ( x )
+                            {
+                                if ( $( this ).attr( "value" ) === "" ) return;
+
+                                if ( x > 0 )
+                                {
+                                    siteIds += "&";
+                                }
+
+                                siteIds += "siteIds=" + $( this ).attr( "value" );
+                            } );
+                        }
+
+                        $( "select#ClientId" ).parent().load( siteurl + "GetHtmlClientList?" + siteIds, { siteId: $( this ).val() }, function ()
+                        {
+                            ACT.Loader.Hide();
+
+                            ACT.UI.DataHighlightFields( $( "select#ClientId" ).parent() );
+
+                            ACT.Init.PluginInit( $( "select#ClientId" ).parent() );
+                        } );
+                    } );
+            } );
+        },
+
+        DataGSearch: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var filters = $( i.attr( "data-filters" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        // These params should match the ACT.Core/Models/CustomSearchModel.cs
+
+                        var params = {
+                            SiteId: filters.find( "#SiteId" ).val(),
+                            ClientId: filters.find( "#ClientId" ).val(),
+                            RegionId: filters.find( "#RegionId" ).val(),
+                            ToDate: filters.find( '[name="ToDate"]' ).val(),
+                            FromDate: filters.find( '[name="FromDate"]' ).val()
+                        };
+
+                        $( ".gs-data" ).css( "display", "none" );
+                        $( '*[data-graph="1"]' ).attr( "data-loaded", 0 );
+
+                        ACT.UI.DataGraphs( $( '*[data-graph="1"]' ), params );
+                    } );
             } );
         }
     };

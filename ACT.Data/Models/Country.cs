@@ -12,17 +12,10 @@ namespace ACT.Data.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class ChepClient
+    public partial class Country
     {
         public int Id { get; set; }
-        public int ChepLoadsId { get; set; }
-        public int ClientLoadsId { get; set; }
-        public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModifiedOn { get; set; }
-        public string ModifiedBy { get; set; }
-        public int Status { get; set; }
-    
-        public virtual ClientLoad ClientLoad { get; set; }
-        public virtual ChepLoad ChepLoad { get; set; }
+        public string CountryCode { get; set; }
+        public string CountryName { get; set; }
     }
 }

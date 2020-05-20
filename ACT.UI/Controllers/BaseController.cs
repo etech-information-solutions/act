@@ -698,41 +698,41 @@ namespace ACT.UI.Controllers
             }
         }
 
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult GetClientDetail(string clientId)
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult GetClientDetail( string clientId )
         {
-            if (clientId != null && clientId != "")
+            if ( clientId != null && clientId != "" )
             {
                 Client client = null;
 
-                using (ClientService bservice = new ClientService())
+                using ( ClientService bservice = new ClientService() )
                 {
-                    client = bservice.GetById(int.Parse(clientId));
-                    return Json(client, JsonRequestBehavior.AllowGet);
+                    client = bservice.GetById( int.Parse( clientId ) );
+                    return Json( client, JsonRequestBehavior.AllowGet );
                 }
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
 
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult GetObjectAddress(string objectId, string objectType)
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult GetObjectAddress( string objectId, string objectType )
         {
-            if (objectId != null && objectId != "" && !string.IsNullOrEmpty(objectType))
+            if ( objectId != null && objectId != "" && !string.IsNullOrEmpty( objectType ) )
             {
                 Address address = null;
 
-                using (AddressService bservice = new AddressService())
+                using ( AddressService bservice = new AddressService() )
                 {
-                    address = bservice.GetByColumnsWhere("ObjectId", int.Parse(objectId), "ObjectType", objectType);
-                    return Json(address, JsonRequestBehavior.AllowGet);
+                    address = bservice.GetByColumnsWhere( "ObjectId", int.Parse( objectId ), "ObjectType", objectType );
+                    return Json( address, JsonRequestBehavior.AllowGet );
                 }
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
 
@@ -742,8 +742,8 @@ namespace ACT.UI.Controllers
         {
             if ( ClientId != null )
             {
-                int.TryParse(ClientId, out int intClientId); //to ensure we have a parseable value to use, whether 0 or greater, and not a NaN
-                Session["ClientId"] = intClientId;
+                int.TryParse( ClientId, out int intClientId ); //to ensure we have a parseable value to use, whether 0 or greater, and not a NaN
+                Session[ "ClientId" ] = intClientId;
 
                 return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
             }
@@ -753,69 +753,71 @@ namespace ACT.UI.Controllers
             }
         }
 
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult SetSite(string SiteId)
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult SetSite( string SiteId )
         {
-            if (SiteId != null)
+            if ( SiteId != null )
             {
-                Session["SiteId"] = SiteId;
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+                Session[ "SiteId" ] = SiteId;
+                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
 
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult SetClientSite(string SiteId)
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult SetClientSite( string SiteId )
         {
-            if (SiteId != null)
+            if ( SiteId != null )
             {
                 int clientId = 0;
-                if (int.Parse(SiteId) > 0)
+                if ( int.Parse( SiteId ) > 0 )
                 {
-                    using (SiteService service = new SiteService())
+                    using ( SiteService service = new SiteService() )
                     {
-                        clientId = service.GetClientBySite(int.Parse(SiteId));
+                        clientId = service.GetClientBySite( int.Parse( SiteId ) );
                     }
-                    Session["ClientId"] = clientId;
+                    Session[ "ClientId" ] = clientId;
                 }
-                Session["SiteId"] = SiteId;
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+                Session[ "SiteId" ] = SiteId;
+                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
 
-        public JsonResult RemoveFile(int? id = null, string utype = null, string uname = null)
+        public JsonResult RemoveFile( int? id = null, string utype = null, string uname = null )
         {
-            int docId = (id != null ? (int)id : 0);
-            if (docId>0)
+            int docId = ( id != null ? ( int ) id : 0 );
+            if ( docId > 0 )
             {
-                using (DocumentService docservice = new DocumentService())
+                using ( DocumentService docservice = new DocumentService() )
                 {
 
-                    Document rDoc = docservice.GetById(docId);
-                    rDoc.Status = (int)Status.Inactive;
-                    docservice.Update(rDoc);
+                    Document rDoc = docservice.GetById( docId );
+                    rDoc.Status = ( int ) Status.Inactive;
+                    docservice.Update( rDoc );
                 }
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
-            } else
+                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
+            }
+            else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
 
         }
-        public JsonResult Upload(int? id = null, string utype = null, string uname = null)
+
+        public JsonResult Upload( int? id = null, string utype = null, string uname = null )
         {
             FileViewModel nfv = new FileViewModel();
-            for (int i = 0; i < Request.Files.Count; i++)
+            for ( int i = 0; i < Request.Files.Count; i++ )
             {
-                HttpPostedFileBase file = Request.Files[i]; //Uploaded file
-                                                            //Use the following properties to get file's name, size and MIMEType
+                HttpPostedFileBase file = Request.Files[ i ]; //Uploaded file
+                                                              //Use the following properties to get file's name, size and MIMEType
                 int fileSize = file.ContentLength;
                 string fileName = file.FileName;
                 string mimeType = file.ContentType;
@@ -825,24 +827,24 @@ namespace ACT.UI.Controllers
 
                 // int clientid = 0;//clientId
 
-                if (fileName != null)
+                if ( fileName != null )
                 {
                     // Create folder
-                    string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/{utype}/{id}/");
+                    string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/{utype}/{id}/" );
 
-                    if (!Directory.Exists(path))
+                    if ( !Directory.Exists( path ) )
                     {
-                        Directory.CreateDirectory(path);
+                        Directory.CreateDirectory( path );
                     }
 
-                    string now = DateTime.Now.ToString("yyyyMMddHHmmss");
-                    using (DocumentService dservice = new DocumentService())
+                    string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+                    using ( DocumentService dservice = new DocumentService() )
                     {
                         Document doc = new Document()
                         {
                             ObjectId = id,//should be null for client adds, so we can update it later
-                            ObjectType =utype,
-                            Status = (int)Status.Active,
+                            ObjectType = utype,
+                            Status = ( int ) Status.Active,
                             Name = fileName,
                             Category = utype + " Document",
                             Title = utype + " Document",
@@ -852,10 +854,10 @@ namespace ACT.UI.Controllers
                             Location = $"{utype}/{id}/{now}-{id}-{fileName}"
                         };
 
-                        dservice.Create(doc);
+                        dservice.Create( doc );
 
-                        string fullpath = Path.Combine(path, $"{now}-{id}-{fileName}");
-                        file.SaveAs(fullpath);
+                        string fullpath = Path.Combine( path, $"{now}-{id}-{fileName}" );
+                        file.SaveAs( fullpath );
 
                         nfv.Description = doc.Description;
                         nfv.Extension = mimeType;
@@ -868,16 +870,16 @@ namespace ACT.UI.Controllers
             }
 
             //return Json("Uploaded " + Request.Files.Count + " files");
-            return Json(nfv, JsonRequestBehavior.AllowGet);
+            return Json( nfv, JsonRequestBehavior.AllowGet );
         }
 
-        public ActionResult ListFiles(string objId, string objType)
+        public ActionResult ListFiles( string objId, string objType )
         {
             ObjectDocumentsViewModel model = new ObjectDocumentsViewModel();
-            if (!string.IsNullOrEmpty(objType) && !string.IsNullOrEmpty(objId))
+            if ( !string.IsNullOrEmpty( objType ) && !string.IsNullOrEmpty( objId ) )
             {
                 string controllerObjectType = objType;
-                switch (objType)
+                switch ( objType )
                 {
                     case "ChepLoad":
                         controllerObjectType = "Pallet";
@@ -888,27 +890,27 @@ namespace ACT.UI.Controllers
                     default:
                         break;
                 }
-                using (DocumentService docservice = new DocumentService())
+                using ( DocumentService docservice = new DocumentService() )
                 {
                     List<Document> docList = new List<Document>();
-                    int oId = int.Parse(objId);         
-                    docList = docservice.List(oId, objType);
+                    int oId = int.Parse( objId );
+                    docList = docservice.List( oId, objType );
 
                     model.objDocuments = docList;
                     model.objId = oId;
                     model.objType = controllerObjectType;
                 }
             }
-            return PartialView("_ListDocuments", model);
+            return PartialView( "_ListDocuments", model );
         }
 
-        public ActionResult ListFilesTable(string objId, string objType)
+        public ActionResult ListFilesTable( string objId, string objType )
         {
             ObjectDocumentsViewModel model = new ObjectDocumentsViewModel();
-            if (!string.IsNullOrEmpty(objType) && !string.IsNullOrEmpty(objId))
+            if ( !string.IsNullOrEmpty( objType ) && !string.IsNullOrEmpty( objId ) )
             {
                 string controllerObjectType = objType;
-                switch (objType)
+                switch ( objType )
                 {
                     case "ChepLoad":
                         controllerObjectType = "Pallet";
@@ -919,21 +921,39 @@ namespace ACT.UI.Controllers
                     default:
                         break;
                 }
-                using (DocumentService docservice = new DocumentService())
+                using ( DocumentService docservice = new DocumentService() )
                 {
                     List<Document> docList = new List<Document>();
-                    int oId = int.Parse(objId);
-                    docList = docservice.List(oId, objType);
+                    int oId = int.Parse( objId );
+                    docList = docservice.List( oId, objType );
 
                     model.objDocuments = docList;
                     model.objId = oId;
-                    model.objType = controllerObjectType;                    
+                    model.objType = controllerObjectType;
                 }
             }
-            return PartialView("_ListDocumentsTable", model);
+            return PartialView( "_ListDocumentsTable", model );
         }
 
-        
+        public ActionResult GetHtmlSiteList( int regionId = 0 )
+        {
+            using ( SiteService sservice = new SiteService() )
+            {
+                Dictionary<int, string> siteOptions = sservice.List( true, regionId );
+
+                return PartialView( "_Sites", new CustomSearchModel() { SiteOptions = siteOptions } ); // Views/Dashboard/_Sites
+            }
+        }
+
+        public ActionResult GetHtmlClientList( List<int> siteIds = null, int siteId = 0 )
+        {
+            using ( ClientService sservice = new ClientService() )
+            {
+                Dictionary<int, string> clientOptions = sservice.List( true, siteId, siteIds );
+
+                return PartialView( "_Clients", new CustomSearchModel() { ClientOptions = clientOptions } ); // Views/Dashboard/_Sites
+            }
+        }
 
         #endregion
 

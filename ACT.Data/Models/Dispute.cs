@@ -35,6 +35,7 @@ namespace ACT.Data.Models
         public Nullable<int> ActionedBy { get; set; }
         public Nullable<System.DateTime> ResolvedOn { get; set; }
         public Nullable<int> ResolvedBy { get; set; }
+        public Nullable<int> ProductId { get; set; }
     
         public virtual ChepLoad ChepLoad { get; set; }
     }

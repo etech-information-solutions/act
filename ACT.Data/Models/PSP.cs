@@ -17,13 +17,13 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public PSP()
         {
-            this.PSPBudgets = new HashSet<PSPBudget>();
             this.PSPClients = new HashSet<PSPClient>();
             this.PSPConfigs = new HashSet<PSPConfig>();
             this.PSPProducts = new HashSet<PSPProduct>();
             this.PSPUsers = new HashSet<PSPUser>();
             this.Regions = new HashSet<Region>();
             this.PSPBillings = new HashSet<PSPBilling>();
+            this.PSPBudgets = new HashSet<PSPBudget>();
         }
     
         public int Id { get; set; }
@@ -45,8 +45,6 @@ namespace ACT.Data.Models
         public int Status { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<PSPBudget> PSPBudgets { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PSPClient> PSPClients { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PSPConfig> PSPConfigs { get; set; }
@@ -58,5 +56,7 @@ namespace ACT.Data.Models
         public virtual ICollection<Region> Regions { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PSPBilling> PSPBillings { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<PSPBudget> PSPBudgets { get; set; }
     }
 }
