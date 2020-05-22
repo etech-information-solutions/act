@@ -34,7 +34,12 @@ namespace ACT.Data.Models
         public string OpsManagerEmail { get; set; }
         public string AdminManagerEmail { get; set; }
         public Nullable<decimal> TaxPercentage { get; set; }
-    
+        public string ImportEmailHost { get; set; }
+        public string ImportEmailPort { get; set; }
+        public string ImportEmailUsername { get; set; }
+        public string ImportEmailPassword { get; set; }
+
+
         public virtual PSP PSP { get; set; }
     }
 }

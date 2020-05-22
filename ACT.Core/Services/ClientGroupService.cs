@@ -116,12 +116,24 @@ namespace ACT.Core.Services
             return context.Database.SqlQuery<ClientGroupCustomModel>(query, parameters.ToArray()).ToList();
         }
 
-        public List<ClientGroup> GetClientGroupsByPSP(int pspId)
+        //public List<ClientGroup> GetClientGroupsByPSP(int pspId)
+        //{
+        //    List<ClientGroup> grouptList;
+        //    //context.Roles.FirstOrDefault(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
+        //    grouptList = (from g in context.ClientGroups
+        //                  where g.PSPClient.PSPId == pspId
+        //                  where g.Status == (int)Status.Active
+        //                  select g).ToList();
+
+        //    return grouptList;
+        //}
+
+        public List<ClientGroup> GetClientGroupsByClient(int clientId)
         {
             List<ClientGroup> grouptList;
             //context.Roles.FirstOrDefault(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
             grouptList = (from g in context.ClientGroups
-                          where g.PSPClient.PSPId == pspId
+                          where g.ClientId == clientId
                           where g.Status == (int)Status.Active
                           select g).ToList();
 

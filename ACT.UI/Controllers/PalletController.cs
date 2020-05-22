@@ -409,11 +409,11 @@ namespace ACT.UI.Controllers
                         {
                             ClientId = (model.ClientId > 0 ? model.ClientId : clientId),
                             VehicleId = model.VehicleId,
-                            TransporterId = model.TransporterId,
+                           // TransporterId = model.TransporterId,
                             LoadDate = model.LoadDate,//DateTimeExtensions.formatImportDate(model.LoadDate),
                             LoadNumber = model.LoadNumber,
                             EffectiveDate = model.EffectiveDate,//DateTimeExtensions.formatImportDate(model.EffectiveDate),
-                            NotifyeDate = model.NotifyeDate,//DateTimeExtensions.formatImportDate(model.NotifyeDate),
+                            NotifyDate = model.NotifyDate,//DateTimeExtensions.formatImportDate(model.NotifyeDate),
                             AccountNumber = model.AccountNumber,
                             ClientDescription = model.ClientDescription,
                             DeliveryNote = model.DeliveryNote,
@@ -422,14 +422,15 @@ namespace ACT.UI.Controllers
                             Equipment = model.Equipment,
                             OriginalQuantity = model.OriginalQuantity,
                             NewQuantity = model.NewQuantity,
-                            RetQuantity = model.RetQuantity,
+                            ReturnQty = model.ReturnQty,
+                            OutstandingQty = (model.OriginalQuantity - model.ReturnQty), //double check this
                             //ReconcileDate = model.ReconcileDate,
                             //ReconcileInvoice = model.ReconcileInvoice,
                             PODNumber = model.PODNumber,
                             PCNNumber = model.PCNNumber,
                             PRNNumber = model.PRNNumber,
-                            ARPMComments = model.ARPMComments,
-                            ProvCode = model.ProvCode,
+                            //ARPMComments = model.ARPMComments,
+                            //ProvCode = model.ProvCode,
                             Status = (int)Status.Active,
                             CreatedOn = DateTime.Now,
                             ModifiedOn = DateTime.Now,
@@ -577,11 +578,11 @@ namespace ACT.UI.Controllers
                 {
                     ClientId = load.ClientId,
                     VehicleId = load.VehicleId,
-                    TransporterId = (int)load.TransporterId,
+                    //TransporterId = (int)load.TransporterId,
                     LoadDate = load.LoadDate,
                     LoadNumber = load.LoadNumber,
                     EffectiveDate = load.EffectiveDate,
-                    NotifyeDate = load.NotifyeDate,
+                    NotifyDate = load.NotifyDate,
                     AccountNumber = load.AccountNumber,
                     ClientDescription = load.ClientDescription,
                     DeliveryNote = load.DeliveryNote,
@@ -590,14 +591,12 @@ namespace ACT.UI.Controllers
                     Equipment = load.Equipment,
                     OriginalQuantity = load.OriginalQuantity,
                     NewQuantity = load.NewQuantity,
-                    RetQuantity = load.RetQuantity,
+                    ReturnQty = load.ReturnQty,
                     ReconcileDate = load.ReconcileDate,
                     ReconcileInvoice = load.ReconcileInvoice,
                     PODNumber = load.PODNumber,
                     PCNNumber = load.PCNNumber,
                     PRNNumber = load.PRNNumber,
-                    ARPMComments = load.ARPMComments,
-                    ProvCode = load.ProvCode,
                     Status = (int)load.Status
                    // DocumentCount = (int)load.DocumentCount,
                    // DocsList = ""
@@ -617,7 +616,7 @@ namespace ACT.UI.Controllers
                 List<Vehicle> vehicleOptions = new List<Vehicle>();
                 using (VehicleService vservice = new VehicleService())
                 {
-                    vehicleOptions = vservice.ListByColumnsWhere("ObjectId", model.TransporterId, "Object", "Transporter");
+                    vehicleOptions = vservice.ListByColumnsWhere("ObjectId", model.ClientId, "Object", "Client");
                 }
                 IEnumerable<SelectListItem> vehicleOptionsDDL = vehicleOptions.Select(c => new SelectListItem
                 {
@@ -657,11 +656,11 @@ namespace ACT.UI.Controllers
                     //group.Id = model.Id;
                         load.ClientId = model.ClientId;
                         load.VehicleId = model.VehicleId;
-                        load.TransporterId = model.TransporterId;
+                     //   load.TransporterId = model.TransporterId;
                     load.LoadDate = model.LoadDate;// DateTimeExtensions.formatImportDate(model.LoadDate);
                         load.LoadNumber = model.LoadNumber;
                     load.EffectiveDate = model.EffectiveDate;// DateTimeExtensions.formatImportDate(model.EffectiveDate);
-                    load.NotifyeDate = model.NotifyeDate;// DateTimeExtensions.formatImportDate(model.NotifyeDate);
+                    load.NotifyDate = model.NotifyDate;// DateTimeExtensions.formatImportDate(model.NotifyeDate);
                         load.AccountNumber = model.AccountNumber;
                         load.ClientDescription = model.ClientDescription;
                         load.DeliveryNote = model.DeliveryNote;
@@ -670,14 +669,14 @@ namespace ACT.UI.Controllers
                         load.Equipment = model.Equipment;
                         load.OriginalQuantity = model.OriginalQuantity;
                         load.NewQuantity = model.NewQuantity;
-                        load.RetQuantity = model.RetQuantity;
+                        load.ReturnQty = model.ReturnQty;
                         load.ReconcileDate = model.ReconcileDate;
                         load.ReconcileInvoice = model.ReconcileInvoice;
                         load.PODNumber = model.PODNumber;
                         load.PCNNumber = model.PCNNumber;
                         load.PRNNumber = model.PRNNumber;
-                        load.ARPMComments = model.ARPMComments;
-                        load.ProvCode = model.ProvCode;
+                        //load.ARPMComments = model.ARPMComments;
+                        //load.ProvCode = model.ProvCode;
                         load.Status = (int)model.Status;
                         load.ModifiedBy = CurrentUser.Email;
                         load.ModifiedOn = DateTime.Now;
@@ -985,86 +984,86 @@ namespace ACT.UI.Controllers
                     try
                     { 
                         bool newNote = false;
-                    #region Save DeliveryNote
-                    DeliveryNote delnote = new DeliveryNote();
+                        #region Save DeliveryNote
+                        DeliveryNote delnote = new DeliveryNote();
 
-                    string customerAddress = model.CustomerAddress + ' ' + model.CustomerAddress2 + ' ' + model.CustomerAddressTown + ' ' + model.CustomerPostalCode + ' ' + ((Province)model.CustomerProvince).GetDisplayText();
-                    string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ((Province)model.BillingProvince).GetDisplayText();
-                    string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ((Province)model.DeliveryProvince).GetDisplayText();
+                        string customerAddress = model.CustomerAddress + ' ' + model.CustomerAddress2 + ' ' + model.CustomerAddressTown + ' ' + model.CustomerPostalCode + ' ' + ((Province)model.CustomerProvince).GetDisplayText();
+                        string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ((Province)model.BillingProvince).GetDisplayText();
+                        string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ((Province)model.DeliveryProvince).GetDisplayText();
 
-                    if (model.Id > 0)
-                    {
-                        //Update
-                        delnote = service.GetById(model.Id);
-                        delnote.InvoiceNumber = model.InvoiceNumber;
-                        delnote.CustomerName = model.CustomerName;
-                        delnote.EmailAddress = model.DeliveryEmail;
-                        delnote.OrderNumber = model.OrderNumber;
-                        delnote.OrderDate = model.OrderDate;
-                        //delnote.ContactNumber = model.ContactNumber;
-                        delnote.Reference306 = model.Reference306;
-                        delnote.Status = (int)Status.Active;
-
-                        delnote.CustomerAddress = customerAddress;
-                        delnote.CustomerPostalCode = model.CustomerPostalCode;
-                        delnote.CustomerProvince = model.CustomerProvince;
-
-                        delnote.DeliveryAddress = deliveryAddress;
-                        delnote.DeliveryPostalCode = model.DeliveryPostalCode;
-                        delnote.DeliveryProvince = model.DeliveryProvince;
-
-                        delnote.BillingAddress = billingAddress;
-                        delnote.BililngPostalCode = model.BillingPostalCode;
-                        delnote.BillingProvince = model.BillingProvince;
-
-                        service.Update(delnote);                        
-
-                    }
-                    else
-                    {
-                        delnote.ClientId = model.ClientId;
-                        //Create
-                        delnote.InvoiceNumber = model.InvoiceNumber;
-                        delnote.CustomerName = model.CustomerName;
-                        delnote.EmailAddress = model.DeliveryEmail;
-                        delnote.OrderNumber = model.OrderNumber;
-                        delnote.OrderDate = model.OrderDate;
-                        //delnote.ContactNumber = model.ContactNumber;
-                        delnote.Reference306 = model.Reference306;
-                        delnote.Status = (int)Status.Active;
-
-                        delnote.CustomerAddress = customerAddress;
-                        delnote.CustomerPostalCode = model.CustomerPostalCode;
-                        delnote.CustomerProvince = model.CustomerProvince;
-
-                        delnote.DeliveryAddress = deliveryAddress;
-                        delnote.DeliveryPostalCode = model.DeliveryPostalCode;
-                        delnote.DeliveryProvince = model.DeliveryProvince;
-
-                        delnote.BillingAddress = billingAddress;
-                        delnote.BililngPostalCode = model.BillingPostalCode;
-                        delnote.BillingProvince = model.BillingProvince;
-
-                        service.Create(delnote);
-
-                        newNote = true;
-
-                        Address invoiceCustomerAddress = new Address()
+                        if (model.Id > 0)
                         {
-                            ObjectId = delnote.Id,
-                            ObjectType = "InvoiceCustomer",
-                            Town = clientAddress.Town,
-                            Status = (int)Status.Active,
-                            PostalCode = clientAddress.PostalCode,
-                            Type = 1,
-                            Addressline1 = clientAddress.Addressline1,
-                            Addressline2 = clientAddress.Addressline2,
-                            Province = (int)clientAddress.Province,
-                            //Province = (int)mappedProvinceVal,
-                        };
-                        addservice.Create(invoiceCustomerAddress);
+                             //Update
+                            delnote = service.GetById(model.Id);
+                            delnote.InvoiceNumber = model.InvoiceNumber;
+                            delnote.CustomerName = model.CustomerName;
+                            delnote.EmailAddress = model.DeliveryEmail;
+                            delnote.OrderNumber = model.OrderNumber;
+                            delnote.OrderDate = model.OrderDate;
+                            //delnote.ContactNumber = model.ContactNumber;
+                            delnote.Reference306 = model.Reference306;
+                            delnote.Status = (int)Status.Active;
+
+                            delnote.CustomerAddress = customerAddress;
+                            delnote.CustomerPostalCode = model.CustomerPostalCode;
+                            delnote.CustomerProvince = model.CustomerProvince;
+
+                            delnote.DeliveryAddress = deliveryAddress;
+                            delnote.DeliveryPostalCode = model.DeliveryPostalCode;
+                            delnote.DeliveryProvince = model.DeliveryProvince;
+
+                            delnote.BillingAddress = billingAddress;
+                            delnote.BililngPostalCode = model.BillingPostalCode;
+                            delnote.BillingProvince = model.BillingProvince;
+
+                            service.Update(delnote);                        
+
                         }
-                    #endregion
+                        else
+                        {
+                            delnote.ClientId = model.ClientId;
+                            //Create
+                            delnote.InvoiceNumber = model.InvoiceNumber;
+                            delnote.CustomerName = model.CustomerName;
+                            delnote.EmailAddress = model.DeliveryEmail;
+                            delnote.OrderNumber = model.OrderNumber;
+                            delnote.OrderDate = model.OrderDate;
+                            //delnote.ContactNumber = model.ContactNumber;
+                            delnote.Reference306 = model.Reference306;
+                            delnote.Status = (int)Status.Active;
+
+                            delnote.CustomerAddress = customerAddress;
+                            delnote.CustomerPostalCode = model.CustomerPostalCode;
+                            delnote.CustomerProvince = model.CustomerProvince;
+
+                            delnote.DeliveryAddress = deliveryAddress;
+                            delnote.DeliveryPostalCode = model.DeliveryPostalCode;
+                            delnote.DeliveryProvince = model.DeliveryProvince;
+
+                            delnote.BillingAddress = billingAddress;
+                            delnote.BililngPostalCode = model.BillingPostalCode;
+                            delnote.BillingProvince = model.BillingProvince;
+
+                            service.Create(delnote);
+
+                            newNote = true;
+
+                            //Address invoiceCustomerAddress = new Address()
+                            //{
+                            //    ObjectId = delnote.Id,
+                            //    ObjectType = "InvoiceCustomer",
+                            //    Town = clientAddress.Town,
+                            //    Status = (int)Status.Active,
+                            //    PostalCode = clientAddress.PostalCode,
+                            //    Type = 1,
+                            //    Addressline1 = clientAddress.Addressline1,
+                            //    Addressline2 = clientAddress.Addressline2,
+                            //    Province = (int)clientAddress.Province,
+                            //    //Province = (int)mappedProvinceVal,
+                            //};
+                            //addservice.Create(invoiceCustomerAddress);
+                           }
+                        #endregion
                     #region Save DeliveryNoteLine
                     decimal? originalQuantity = 0;
                     decimal? newQuantity = 0;
@@ -1143,59 +1142,59 @@ namespace ACT.UI.Controllers
 
                     #region ClientLoad
                     try { 
-                    ClientLoad loadModel = new ClientLoad();
-                    int vehicleId = 0;
-                    int transporterId = 0;
+                        ClientLoad loadModel = new ClientLoad();
+                        int vehicleId = 0;
+                        int transporterId = 0;
 
-                    if (newNote)
-                    {
-                        loadModel.ClientId = model.ClientId;
-                        loadModel.LoadDate = model.OrderDate;
-                        loadModel.LoadNumber = model.InvoiceNumber;
-                        loadModel.AccountNumber = model.OrderNumber;
-                        loadModel.ClientDescription = model.CustomerName;
-                        loadModel.ProvCode = model.CustomerProvince.ToString();
-                        loadModel.PCNNumber = model.OrderNumber;
-                        loadModel.DeliveryNote = model.InvoiceNumber;
-                        //model.PRNNumber = rows[7];
-                        loadModel.OriginalQuantity = originalQuantity;
-                        loadModel.NewQuantity = originalQuantity;
-                        loadModel.RetQuantity = retQuantity;
-                        //model.RetQuantity = decimal.Parse(rows[9]);
-                        //loadModel.ARPMComments = rows[10];
-                        //some of the columns are malaligned but leaving it as is, I added 3 new columns
-                        //grab the first of bothe vehicle and transporter to complete this load create, its mandatory
-                        using (VehicleService vservice = new VehicleService())
-                        using (TransporterService tservice = new TransporterService())
+                        if (newNote)
                         {
-                            vehicleId = vservice.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active }).FirstOrDefault().Id;
-                            transporterId = tservice.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active }).FirstOrDefault().Id;
-                        }
-                        if (vehicleId > 0)
-                            loadModel.VehicleId = vehicleId;
-                        if (transporterId > 0)
-                            loadModel.TransporterId = transporterId;
-                        model.CreatedOn = DateTime.Now;
-                        model.ModifiedOn = DateTime.Now;
-                        clientloadservice.Create(loadModel);
-
-                                Address invoiceCustomerAddress = new Address()
-                                {
-                                    ObjectId = delnote.Id,
-                                    ObjectType = "InvoiceCustomer",
-                                    Town = clientAddress.Town,
-                                    Status = (int)Status.Active,
-                                    PostalCode = clientAddress.PostalCode,
-                                    Type = 1,
-                                    Addressline1 = clientAddress.Addressline1,
-                                    Addressline2 = clientAddress.Addressline2,
-                                    Province = (int)clientAddress.Province,
-                                    //Province = (int)mappedProvinceVal,
-                                };
-                                addservice.Create(invoiceCustomerAddress);
+                            loadModel.ClientId = model.ClientId;
+                            loadModel.LoadDate = model.OrderDate;
+                            loadModel.LoadNumber = model.InvoiceNumber;
+                            loadModel.AccountNumber = model.OrderNumber;
+                            loadModel.ClientDescription = model.CustomerName;
+                            //loadModel.ProvCode = model.CustomerProvince.ToString();
+                            loadModel.PCNNumber = model.OrderNumber;
+                            loadModel.DeliveryNote = model.InvoiceNumber;
+                            //model.PRNNumber = rows[7];
+                            loadModel.OriginalQuantity = originalQuantity;
+                            loadModel.NewQuantity = originalQuantity;
+                            loadModel.ReturnQty = retQuantity;
+                            //model.RetQuantity = decimal.Parse(rows[9]);
+                            //loadModel.ARPMComments = rows[10];
+                            //some of the columns are malaligned but leaving it as is, I added 3 new columns
+                            //grab the first of bothe vehicle and transporter to complete this load create, its mandatory
+                            using (VehicleService vservice = new VehicleService())
+                            using (TransporterService tservice = new TransporterService())
+                            {
+                                vehicleId = vservice.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active }).FirstOrDefault().Id;
+                                transporterId = tservice.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active }).FirstOrDefault().Id;
                             }
+                            if (vehicleId > 0)
+                                loadModel.VehicleId = vehicleId;
+                            //if (transporterId > 0)
+                              //  loadModel.TransporterId = transporterId;
+                            model.CreatedOn = DateTime.Now;
+                            model.ModifiedOn = DateTime.Now;
+                            clientloadservice.Create(loadModel);
 
-                        }
+                                    //Address invoiceCustomerAddress = new Address()
+                                    //{
+                                    //    ObjectId = delnote.Id,
+                                    //    ObjectType = "InvoiceCustomer",
+                                    //    Town = clientAddress.Town,
+                                    //    Status = (int)Status.Active,
+                                    //    PostalCode = clientAddress.PostalCode,
+                                    //    Type = 1,
+                                    //    Addressline1 = clientAddress.Addressline1,
+                                    //    Addressline2 = clientAddress.Addressline2,
+                                    //    Province = (int)clientAddress.Province,
+                                    //    //Province = (int)mappedProvinceVal,
+                                    //};
+                                    //addservice.Create(invoiceCustomerAddress);
+                                }
+
+                            //}
                         }
                         catch (Exception ex)
                         {
@@ -1743,8 +1742,8 @@ namespace ACT.UI.Controllers
                 if (documentId > 0)
                     journal.DocumetId = (int)documentId;
 
-                journal.PostintDescription = description;
-                journal.IsIn = ((int)isIn==0?false:true);
+                journal.PostingDescription = description;
+                journal.InOutInd = ((int)isIn==0?false:true);
 
                 if (qty != null)
                 {
@@ -1753,8 +1752,9 @@ namespace ACT.UI.Controllers
                     journal.PostingQuantity = inQty;
 
                 } 
-                journal.THANNumber = refnumber;
+                journal.THAN = refnumber;
                 journal.Status = (int)Status.Active;
+                journal.JournalType = "ClientLoad";
 
                 using (TransactionScope scope = new TransactionScope())
                 using (JournalService service = new JournalService())
@@ -1929,43 +1929,44 @@ namespace ACT.UI.Controllers
 
                                 ClientLoad model = new ClientLoad();
                                 int vehicleId = 0;
-                                int transporterId = 0;
-                                if (!string.IsNullOrEmpty(rows[11]))
-                                {
-                                    using (TransporterService transservice = new TransporterService())
-                                    {
-                                        TransporterCustomModel trans = transservice.ListCSM(new PagingModel(), new CustomSearchModel() { Query = rows[11], Status = Status.Active }).FirstOrDefault();
-                                        if (trans != null)
-                                        {
-                                            transporterId = trans.Id; //else remains 0
-                                        }
-                                        else
-                                        {
-                                            try
-                                            {
-                                                Transporter tra = new Transporter()
-                                                {
-                                                    Name = rows[11],
-                                                    ContactNumber = "TBC",
-                                                    Email = "TBC",
-                                                    TradingName = rows[11],
-                                                    RegistrationNumber = rows[12],
-                                                    Status = (int)Status.Active
+                                //no transporter data
+                                //int transporterId = 0;
+                                //if (!string.IsNullOrEmpty(rows[11]))
+                                //{
+                                //    using (TransporterService transservice = new TransporterService())
+                                //    {
+                                //        TransporterCustomModel trans = transservice.ListCSM(new PagingModel(), new CustomSearchModel() { Query = rows[11], Status = Status.Active }).FirstOrDefault();
+                                //        if (trans != null)
+                                //        {
+                                //            transporterId = trans.Id; //else remains 0
+                                //        }
+                                //        else
+                                //        {
+                                //            try
+                                //            {
+                                //                Transporter tra = new Transporter()
+                                //                {
+                                //                    Name = rows[11],
+                                //                    ContactNumber = "TBC",
+                                //                    Email = "TBC",
+                                //                    TradingName = rows[11],
+                                //                    RegistrationNumber = rows[12],
+                                //                    Status = (int)Status.Active
 
-                                                };
-                                                transservice.Create(tra);
-                                                transporterId = tra.Id;
-                                                importMessage += " Transporter: " + tra.Name + " created at Id " + tra.Id + "<br>";
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                importMessage += "Reg : " + rows[12] + "Error " + ex.Message + "<br>";
-                                                ViewBag.Message = ex.Message;
-                                            }
-                                        }
-                                    }
-                                } //no else, if  there are no column data we cant add or facilitate a row addition
-                                if (!string.IsNullOrEmpty(rows[12]) && transporterId > 0)
+                                //                };
+                                //                transservice.Create(tra);
+                                //                transporterId = tra.Id;
+                                //                importMessage += " Transporter: " + tra.Name + " created at Id " + tra.Id + "<br>";
+                                //            }
+                                //            catch (Exception ex)
+                                //            {
+                                //                importMessage += "Reg : " + rows[12] + "Error " + ex.Message + "<br>";
+                                //                ViewBag.Message = ex.Message;
+                                //            }
+                                //        }
+                                //    }
+                                //} //no else, if  there are no column data we cant add or facilitate a row addition
+                                if (!string.IsNullOrEmpty(rows[12]))// && transporterId > 0
                                 {
                                     using (VehicleService vehservice = new VehicleService())
                                     {
@@ -1980,8 +1981,8 @@ namespace ACT.UI.Controllers
                                             {
                                                 Vehicle veh = new Vehicle()
                                                 {
-                                                    ObjectId = transporterId,
-                                                    ObjectType = "Transporter",
+                                                    ObjectId = clientID,
+                                                    ObjectType = "Client",
                                                     Make = "TBC",
                                                     Model = "TBC",
                                                     Year = 1,
@@ -2008,27 +2009,27 @@ namespace ACT.UI.Controllers
 
                                 if (!string.IsNullOrEmpty(rows[0]))
                                 {
-                                    if (vehicleId > 0 && transporterId > 0)
+                                    if (vehicleId > 0)//&& transporterId > 0
                                     {
                                         model.ClientId = clientID;
                                         model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeHelper.formatImportDate(rows[0]) : DateTime.Now);
                                         model.LoadNumber = rows[1];
                                         model.AccountNumber = rows[2];
                                         model.ClientDescription = rows[3];
-                                        model.ProvCode = rows[4];
+                                        //model.ProvCode = rows[4];
                                         model.PCNNumber = rows[5];
                                         model.DeliveryNote = rows[6];
                                         //model.PRNNumber = rows[7];
                                         model.OriginalQuantity = (Decimal.TryParse(rows[7], out decimal oQty) ? oQty : 0);
                                         model.NewQuantity = model.OriginalQuantity;
-                                        model.RetQuantity = (Decimal.TryParse(rows[8], out decimal rQty) ? rQty : 0);
+                                        model.ReturnQty = (Decimal.TryParse(rows[8], out decimal rQty) ? rQty : 0);
                                         //model.RetQuantity = decimal.Parse(rows[9]);
-                                        model.ARPMComments = rows[10];
+                                 //       model.ARPMComments = rows[10];
                                         //some of the columns are malaligned but leaving it as is, I added 3 new columns
                                         if (vehicleId > 0)
                                             model.VehicleId = vehicleId;
-                                        if (transporterId > 0)
-                                            model.TransporterId = transporterId;
+                                        //if (transporterId > 0)
+                                        //    model.TransporterId = transporterId;
                                         model.CreatedOn = DateTime.Now;
                                         model.ModifiedOn = DateTime.Now;
                                         service.Create(model);

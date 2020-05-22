@@ -11,7 +11,7 @@ namespace ACT.UI.Models
 
         public int ClientId { get; set; }
         public int VehicleId { get; set; }
-        public int TransporterId { get; set; }
+        //public int TransporterId { get; set; }
 
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
@@ -24,11 +24,11 @@ namespace ACT.UI.Models
         [Required]
         [Display(Name = "Effective Date")]
         //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
-        public Nullable<System.DateTime> EffectiveDate { get; set; }
+        public System.DateTime EffectiveDate { get; set; }
         [Required]
         [Display(Name = "Notify Date")]
         //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
-        public Nullable<System.DateTime> NotifyeDate { get; set; }
+        public Nullable<System.DateTime> NotifyDate { get; set; }
         [Required]
         [Display(Name = "Account Number")]
         [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
@@ -84,13 +84,22 @@ namespace ACT.UI.Models
         public int Status { get; set; }
         [Display(Name = "Return Quantity")]
         [Range(-9999999, 9999999)]        
-        public Nullable<decimal> RetQuantity { get; set; }
-        [Display(Name = "ARPM Comments")]
-        [StringLength(150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
-        public string ARPMComments { get; set; }
-        [Display(Name = "Province Code")]
-        [StringLength(30, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
-        public string ProvCode { get; set; }
+        public Nullable<decimal> ReturnQty { get; set; }
+        //[Display(Name = "ARPM Comments")]
+        //[StringLength(150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        //public string ARPMComments { get; set; }
+        //[Display(Name = "Province Code")]
+        //[StringLength(30, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        //public string ProvCode { get; set; }
+
+        public Nullable<int> InputInd { get; set; }
+        public string THAN { get; set; }
+        public Nullable<int> ClientSiteId { get; set; }
+        [Display(Name = "Outstanding Quantity")]
+        [Range(-9999999, 9999999)]
+        public Nullable<decimal> OutstandingQty { get; set; }
+        public Nullable<int> OutstandingReasonid { get; set; }
+
 
         [Display(Name = "Load Files")]
         public ICollection<FileViewModel> Documents { get; set; }
