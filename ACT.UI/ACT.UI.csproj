@@ -601,6 +601,16 @@
     <Content Include="Views\DashBoard\_Regions.cshtml" />
     <Content Include="Views\DashBoard\_Clients.cshtml" />
     <Content Include="Views\DashBoard\_Products.cshtml" />
+    <Content Include="Views\DashBoard\_AgeOfOutstandingPalletsData.cshtml" />
+    <Content Include="Views\DashBoard\_LoadsPerMonthData.cshtml" />
+    <Content Include="Views\DashBoard\_NumberOfPalletsManagedData.cshtml" />
+    <Content Include="Views\DashBoard\_AuthorisationCodesData.cshtml" />
+    <Content Include="Views\DashBoard\_NumberOfDisputesData.cshtml" />
+    <Content Include="Views\ClientReporting\_Exceptions.cshtml" />
+    <Content Include="Views\Shared\_ExceptionsCustomSearch.cshtml" />
+    <Content Include="Views\ClientReporting\ExceptionDetails.cshtml" />
+    <Content Include="Views\Shared\_OutstandingPalletsCustomSearch.cshtml" />
+    <Content Include="Views\ClientReporting\_OutstandingPallets.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

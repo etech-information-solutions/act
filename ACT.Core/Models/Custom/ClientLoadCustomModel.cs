@@ -10,6 +10,8 @@ namespace ACT.Core.Models.Custom
         public int Id { get; set; }
         public int ClientId { get; set; }
         public int VehicleId { get; set; }
+        public Nullable<int> ClientSiteId { get; set; }
+        public Nullable<int> OutstandingReasonId { get; set; }
         public int TransporterId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
@@ -31,7 +33,7 @@ namespace ACT.Core.Models.Custom
         public string PODNumber { get; set; }
         public string PCNNumber { get; set; }
         public string PRNNumber { get; set; }
-        public int Status { get; set; }
+        public int Status { get; set; } 
 
         public Nullable<decimal> RetQuantity { get; set; }
         public string ARPMComments { get; set; }
@@ -43,5 +45,18 @@ namespace ACT.Core.Models.Custom
         public int? PostingType { get; set; }
 
         public string DocketNumber { get; set; }
+        public Nullable<int> InputInd { get; set; }
+        public string THAN { get; set; }
+        public Nullable<decimal> ReturnQty { get; set; }
+        public Nullable<decimal> OutstandingQty { get; set; }
+
+        public int? SiteId { get; set; }
+        public string SiteName { get; set; }
+        public string ClientName { get; set; }
+        public string SubSiteName { get; set; }
+        public string OutstandingReason { get; set; }
+
+        public int? TaskCount { get; set; }
+        public int? JournalCount { get; set; }
     }
 }

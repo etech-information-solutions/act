@@ -151,7 +151,6 @@
                             @Html.ActionLink( "Details", "ChepAuditDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
 
                             @Html.ActionLink( "Edit", "EditChepAudit", new { id = item.Id, returnView = "ChepAudit" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-
                         </div>
 
                         @Html.ActionLink( "Delete", "DeleteChepAudit", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#chepaudit", @rel = "tipsyE", @title = "Delete this item?" } )

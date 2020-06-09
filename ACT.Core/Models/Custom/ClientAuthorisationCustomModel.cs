@@ -11,5 +11,8 @@ namespace ACT.Core.Models.Custom
         public string AuthorisationCode { get; set; }
         public string LoadNumber { get; set; }
         public int Status { get; set; }
+
+        public string SiteName { get; set; }
+        public string ClientName { get; set; }
     }
 }

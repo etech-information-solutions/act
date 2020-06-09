@@ -12,17 +12,17 @@ namespace ACT.Data.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class ClientInvoice
+    public partial class Batch
     {
         public int Id { get; set; }
-        public int ClientLoadId { get; set; }
-        public int InvoiceId { get; set; }
-        public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModifiedOn { get; set; }
-        public string ModifiedBy { get; set; }
-        public int Status { get; set; }
-    
-        public virtual Invoice Invoice { get; set; }
-        public virtual ClientLoad ClientLoad { get; set; }
+        public string BatchNo { get; set; }
+        public string BatchTable { get; set; }
+        public string BatchInNotes { get; set; }
+        public string BatchOutNotes { get; set; }
+        public System.DateTime RunDate { get; set; }
+        public System.DateTime FinishDate { get; set; }
+        public string BatchSource { get; set; }
+        public Nullable<int> BatchRows { get; set; }
+        public string BatchComm { get; set; }
     }
 }

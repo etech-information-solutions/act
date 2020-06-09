@@ -16,6 +16,19 @@ namespace ACT.Core.Services
 
         }
 
+        /// <summary>
+        /// Gets a ClientLoad using the specified Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public override ClientLoad GetById( int id )
+        {
+            context.Configuration.LazyLoadingEnabled = true;
+            context.Configuration.ProxyCreationEnabled = true;
+
+            return base.GetById( id );
+        }
+
 
         /// <summary>
         /// Gets a total count of Items matching the specified search params
@@ -38,11 +51,12 @@ namespace ACT.Core.Services
             {
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmClientId", csm.ClientId ) },
             };
 
             #endregion
@@ -52,7 +66,9 @@ namespace ACT.Core.Services
                              FROM
                                 [dbo].[ClientLoad] cl
                                 INNER JOIN [dbo].[ChepClient] cc ON cl.[Id]=cc.[ClientLoadsId]
-                                INNER JOIN [dbo].[ChepLoad] cl1 ON cl1.[Id]=cc.[ChepLoadsId]";
+                                INNER JOIN [dbo].[ChepLoad] cl1 ON cl1.[Id]=cc.[ChepLoadsId]
+                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=cl.[ClientSiteId]
+                                LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]";
 
             // WHERE
 
@@ -75,6 +91,10 @@ namespace ACT.Core.Services
 
             #region Custom Search
 
+            if ( csm.SiteId > 0 )
+            {
+                query = $"{query} AND (s.Id=@csmSiteId)";
+            }
             if ( csm.ClientId > 0 )
             {
                 query = $"{query} AND (cl.ClientId=@csmClientId)";
@@ -114,7 +134,8 @@ namespace ACT.Core.Services
                                                   cl.[AccountNumber] LIKE '%{1}%' OR
                                                   cl.[PODNumber] LIKE '%{1}%' OR
                                                   cl.[PCNNumber] LIKE '%{1}%' OR
-                                                  cl.[PRNNumber] LIKE '%{1}%'
+                                                  cl.[PRNNumber] LIKE '%{1}%' OR
+                                                  s.[Description] LIKE '%{1}%'
                                                  ) ", query, csm.Query.Trim() );
             }
 
@@ -151,6 +172,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmReconciliation", ( int ) csm.ReconciliationStatus ) },
             };
@@ -159,26 +181,51 @@ namespace ACT.Core.Services
 
             string query = @"";
 
-             if (csm.ReconciliationStatus == ReconciliationStatus.Reconciled)
+            if ( csm.ReconciliationStatus == ReconciliationStatus.Reconciled )
             {
 
                 query = @"SELECT
-                                cl.*,
-                                cl1.PostingType,
-                                cl1.DocketNumber,
-                                (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ClientLoad') AS [DocumentCount]
-                             FROM
-                                [dbo].[ClientLoad] cl
-                                INNER JOIN [dbo].[ChepClient] cc ON cl.[Id]=cc.[ClientLoadsId]
-                                INNER JOIN [dbo].[ChepLoad] cl1 ON cl1.[Id]=cc.[ChepLoadsId]";
+                            cl.*,
+                            cl1.PostingType,
+                            cl1.DocketNumber,
+                            s.Id AS [SiteId],
+                            s.Description AS [SiteName],
+                            c.CompanyName AS [ClientName],
+                            s1.Description AS [SubSiteName],
+                            otr.[Description] AS [OutstandingReason],
+                            (SELECT COUNT(1) FROM [dbo].[Task] t WHERE cl.Id=t.ClientLoadId) AS [TaskCount],
+                            (SELECT COUNT(1) FROM [dbo].[Journal] j WHERE cl.Id=j.ClientLoadId) AS [JournalCount],
+                            (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ClientLoad') AS [DocumentCount]
+                          FROM
+                            [dbo].[ClientLoad] cl
+                            INNER JOIN [dbo].[Client] c ON c.[Id]=cl.[ClientId]
+                            INNER JOIN [dbo].[ChepClient] cc ON cl.[Id]=cc.[ClientLoadsId]
+                            INNER JOIN [dbo].[ChepLoad] cl1 ON cl1.[Id]=cc.[ChepLoadsId]
+                            LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=cl.[ClientSiteId]
+                            LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
+                            LEFT OUTER JOIN [dbo].[Site] s1 ON s.[Id]=s1.[SiteId]
+                            LEFT OUTER JOIN [dbo].[OutstandingReason] otr ON otr.[Id]=cl.[OutstandingReasonId]";
 
-            } else
+            }
+            else
             {
                 query = @"SELECT
-                                cl.*,                                
-                                (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ClientLoad') AS [DocumentCount]
-                             FROM
-                                [dbo].[ClientLoad] cl";
+                            cl.*,
+                            s.Id AS [SiteId],
+                            s.Description AS [SiteName],
+                            c.CompanyName AS [ClientName],
+                            s1.Description AS [SubSiteName],
+                            otr.[Description] AS [OutstandingReason],
+                            (SELECT COUNT(1) FROM [dbo].[Task] t WHERE cl.Id=t.ClientLoadId) AS [TaskCount],
+                            (SELECT COUNT(1) FROM [dbo].[Journal] j WHERE cl.Id=j.ClientLoadId) AS [JournalCount],
+                            (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ClientLoad') AS [DocumentCount]
+                          FROM
+                            [dbo].[ClientLoad] cl
+                            INNER JOIN [dbo].[Client] c ON c.[Id]=cl.[ClientId]
+                            LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=cl.[ClientSiteId]
+                            LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
+                            LEFT OUTER JOIN [dbo].[Site] s1 ON s.[Id]=s1.[SiteId]
+                            LEFT OUTER JOIN [dbo].[OutstandingReason] otr ON otr.[Id]=cl.[OutstandingReasonId]";
             }
 
             // WHERE
@@ -202,6 +249,10 @@ namespace ACT.Core.Services
 
             #region Custom Search
 
+            if ( csm.SiteId > 0 )
+            {
+                query = $"{query} AND (s.Id=@csmSiteId)";
+            }
             if ( csm.ClientId > 0 )
             {
                 query = $"{query} AND (cl.ClientId=@csmClientId)";
@@ -272,7 +323,8 @@ namespace ACT.Core.Services
                                                   cl.[AccountNumber] LIKE '%{1}%' OR
                                                   cl.[PODNumber] LIKE '%{1}%' OR
                                                   cl.[PCNNumber] LIKE '%{1}%' OR
-                                                  cl.[PRNNumber] LIKE '%{1}%'
+                                                  cl.[PRNNumber] LIKE '%{1}%' OR
+                                                  s.[Description] LIKE '%{1}%'
                                                  ) ", query, csm.Query.Trim() );
             }
 
@@ -769,6 +821,5 @@ namespace ACT.Core.Services
 
             return context.Database.SqlQuery<NumberOfPalletsManaged>( query, parameters.ToArray() ).FirstOrDefault();
         }
-
     }
 }

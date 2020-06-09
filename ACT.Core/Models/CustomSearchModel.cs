@@ -440,6 +440,8 @@ namespace ACT.Core.Models
                     break;
 
                 case "Disputes":
+                case "Exceptions":
+                case "OutstandingPallets":
 
                     using ( SiteService sservice = new SiteService() )
                     using ( ClientService cservice = new ClientService() )

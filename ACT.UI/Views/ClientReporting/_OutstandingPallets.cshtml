@@ -1,0 +1,283 @@
+﻿
+@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+    ViewBag.ViewName = "_OutstandingPallets";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@{
+    Int32 count = Model.Start;
+    List<ClientLoadCustomModel> items = ( List<ClientLoadCustomModel> ) Model.Items;
+
+
+    int? oldestYear = items.OrderBy( o => o.LoadDate.Value.Year )?.FirstOrDefault()?.LoadDate?.Year;
+
+    int yearDiff = DateTime.Now.Year - ( oldestYear ?? 0 );
+
+    int cols = 11 + yearDiff;
+}
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Outstanding Pallets available matching your search criteria.
+    </div>
+}
+
+<table id="outstandingpallets-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#outstandingpallets-table_wrapper" data-starting-point=".ap-tabs ul">
+
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="ClientName">
+                Client
+            </th>
+            <th data-name="Reason">
+                Reason
+            </th>
+            <th data-name="0-30">
+                0-30 Days
+            </th>
+            <th data-name="31-60">
+                31-60 Days
+            </th>
+            <th data-name="61-90">
+                61-90 Days
+            </th>
+            <th data-name="91-120">
+                91-120 Days
+            </th>
+            <th data-name="121-183">
+                121-183 Days
+            </th>
+            <th data-name="184-270">
+                184-270 Days
+            </th>
+            <th data-name="271-365">
+                271-365 Days
+            </th>
+            @if ( yearDiff > 0 )
+            {
+                for ( int i = 1; i <= yearDiff; i++ )
+                {
+                    int y = DateTime.Now.AddYears( -i ).Year;
+
+                    <th data-name="@y">
+                        @y
+                    </th>
+                }
+            }
+            <th data-name="GrandTotal">
+                Grand Total
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            int clientCount = 0;
+
+            List<int?> clientIds = new List<int?>();
+            List<int?> outstandingIds = new List<int?>();
+
+            foreach ( var item in items )
+            {
+                if ( !clientIds.Any( c => c == item.ClientId ) )
+                {
+                    clientCount = 0;
+                    clientIds.Add( item.ClientId );
+
+                    if ( clientCount == 0 )
+                    {
+                        <tr>
+                            <td width="1%" style="background-color: #012d71;">
+                            </td>
+                            <td width="18%" style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                                @item.ClientName
+                            </td>
+                            <td style="border-left: 0 none; background-color: #012d71;">
+                            </td>
+                            <td style="border-left: 0 none; background-color: #012d71;">
+                            </td>
+                            <td style="border-left: 0 none; background-color: #012d71;">
+                            </td>
+                            <td style="border-left: 0 none; background-color: #012d71;">
+                            </td>
+                            <td style="border-left: 0 none; background-color: #012d71;">
+                            </td>
+                            <td style="border-left: 0 none; background-color: #012d71;">
+                            </td>
+                            <td style="border-left: 0 none; background-color: #012d71;">
+                            </td>
+                            <td style="border-left: 0 none; background-color: #012d71;">
+                            </td>
+                            @if ( yearDiff > 0 )
+                            {
+                                for ( int i = 1; i <= yearDiff; i++ )
+                                {
+                                    int y = DateTime.Now.AddYears( -i ).Year;
+
+                                    <td style="border-left: 0 none; background-color: #012d71;"></td>
+                                }
+                            }
+
+                            <td style="border-left: 0 none; background-color: #012d71;">
+                            </td>
+                        </tr>
+                    }
+                }
+
+                if ( outstandingIds.Any( o => o == item.OutstandingReasonId ) )
+                {
+                    continue;
+                }
+
+                outstandingIds.Add( item.OutstandingReasonId );
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                    </td>
+                    <td width="15%" style="border-left: 0 none; background-color: #7cf0f0; color: #123cdf; font-weight: bold;">
+                        @item.OutstandingReason
+                    </td>
+                    <td>
+                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 30 )
+                    </td>
+                    <td>
+                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 60 ) )
+                    </td>
+                    <td>
+                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 90 ) )
+                    </td>
+                    <td>
+                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 120 ) )
+                    </td>
+                    <td>
+                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 183 ) )
+                    </td>
+                    <td>
+                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 270 ) )
+                    </td>
+                    <td>
+                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 365 ) )
+                    </td>
+                    @if ( yearDiff > 0 )
+                    {
+                        for ( int i = 1; i <= yearDiff; i++ )
+                        {
+                            int y = DateTime.Now.AddYears( -i ).Year;
+
+                            <td width="2%">
+                                @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( item.LoadDate ?? item.CreatedOn ).Year == y )
+                            </td>
+                        }
+                    }
+
+                    <td width="8%" style="border-left: 0 none; background-color: #7cf0f0; color: #123cdf; font-weight: bold;">
+                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId )
+                    </td>
+
+                </tr>
+
+                if ( clientCount + 1 == items.Count( c => c.ClientId == item.ClientId ) )
+                {
+                    <tr>
+                        <td width="1%" style="background-color: #012d71;">
+                        </td>
+                        <td width="18%" style="border-left: 0 none; background-color: #012d71;">
+                        </td>
+                        <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                            Grand Total
+                        </td>
+                        <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                            @items.Count( c => c.ClientId == item.ClientId && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 30 )
+                        </td>
+                        <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                            @items.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 60 ) )
+                        </td>
+                        <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                            @items.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 90 ) )
+                        </td>
+                        <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                            @items.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 120 ) )
+                        </td>
+                        <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                            @items.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 183 ) )
+                        </td>
+                        <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                            @items.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 270 ) )
+                        </td>
+                        <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                            @items.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 365 ) )
+                        </td>
+
+                        @if ( yearDiff > 0 )
+                        {
+                            for ( int i = 1; i <= yearDiff; i++ )
+                            {
+                                int y = DateTime.Now.AddYears( -i ).Year;
+
+                                <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                                    @items.Count( c => c.ClientId == item.ClientId && ( c.LoadDate ?? c.CreatedOn ).Year == y )
+                                </td>
+                            }
+                        }
+
+                        <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                            @items.Count( c => c.ClientId == item.ClientId )
+                        </td>
+                    </tr>
+
+                    if ( count != items.Count )
+                    {
+                        <tr>
+                            <td style="border-left: 0 none;">&nbsp;</td>
+                            <td style="border-left: 0 none;"></td>
+                            <td style="border-left: 0 none;"></td>
+                            <td style="border-left: 0 none;"></td>
+                            <td style="border-left: 0 none;"></td>
+                            <td style="border-left: 0 none;"></td>
+                            <td style="border-left: 0 none;"></td>
+                            <td style="border-left: 0 none;"></td>
+                            <td style="border-left: 0 none;"></td>
+                            <td style="border-left: 0 none;"></td>
+
+                            @if ( yearDiff > 0 )
+                            {
+                                for ( int i = 1; i <= yearDiff; i++ )
+                                {
+                                    <td style="border-left: 0 none;"></td>
+                                }
+                            }
+
+                            <td style="border-left: 0 none;"></td>
+                        </tr>
+                    }
+                }
+
+                count++;
+                clientCount++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_OutstandingPalletsCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
+
+@Html.Partial( "_Paging" )

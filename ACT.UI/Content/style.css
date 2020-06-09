@@ -1331,6 +1331,11 @@ tr.duplicate-highlight td {
         position: absolute;
     }
 
+    .graphs .gs-left {
+        left: 0;
+        right: auto;
+    }
+
 
 .graph-search {
     position: relative;

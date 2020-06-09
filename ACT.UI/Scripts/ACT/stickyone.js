@@ -40,12 +40,19 @@
 
             if ( arrow )
             {
+                this.StickyOne.removeClass( "top-right top-left bottom-right bottom-left center-left center-right" );
+
                 this.StickyOne.addClass( arrow );
 
-                if ( arrow.equals( "top-right" ) || arrow.equals( "top-left" ) )
+                if ( arrow.equals( "top-right" ) )
                 {
                     top = top + 10;
                     left = ( sender.offset().left - this.StickyOne.outerWidth() ) + ( sender.outerWidth() / 2 );
+                }
+                else if ( arrow.equals( "top-left" ) )
+                {
+                    top = top + 10;
+                    left = sender.offset().left + ( ( sender.outerWidth() / 2 ) - 10 );
                 }
                 else if ( arrow.equals( "bottom-right" ) || arrow.equals( "bottom-left" ) )
                 {
@@ -75,11 +82,11 @@
                     "margin-left": "0",
                     "filter": "alpha(opacity=100)"
                 }, 800, function ()
-                    {
-                        ACT.Sticky.Close = true;
+                {
+                    ACT.Sticky.Close = true;
 
-                        ACT.UI.DataCallBack( callback );
-                    } );
+                    ACT.UI.DataCallBack( callback );
+                } );
             }
             else
             {

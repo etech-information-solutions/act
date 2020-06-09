@@ -81,6 +81,9 @@
     <Compile Include="Models\BankDetail.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Batch.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Broadcast.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>

@@ -364,12 +364,14 @@ namespace ACT.Core.Services
             #region Query
 
             string query = @"SELECT
-	                            COUNT(j.[Id]) AS [Total]
+	                            COUNT(d.[Id]) AS [Total]
                              FROM
-	                            [dbo].[Journal] j,
-	                            [dbo].[ClientLoad] cl
+	                            [dbo].[Dispute] d
+                                INNER JOIN [dbo].[ChepLoad] cl ON cl.[Id]=d.[ChepLoadId]
+                                INNER JOIN [dbo].[ChepClient] cc ON cc.[ChepLoadsId]=cl.[Id]
+	                            INNER JOIN [dbo].[ClientLoad] cl1 ON cc.[ClientLoadsId]=cl1.[Id]
                              WHERE
-                                (j.[ClientLoadId]=cl.[Id])";
+                                (1=1)";
 
             #endregion
 
@@ -414,17 +416,17 @@ namespace ACT.Core.Services
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (j.CreatedOn >= @csmFromDate AND j.CreatedOn <= @csmToDate) ";
+                query = $"{query} AND (d.CreatedOn >= @csmFromDate AND d.CreatedOn <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (j.CreatedOn>=@csmFromDate) ";
+                    query = $"{query} AND (d.CreatedOn>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (j.CreatedOn<=@csmToDate) ";
+                    query = $"{query} AND (d.CreatedOn<=@csmToDate) ";
                 }
             }
 

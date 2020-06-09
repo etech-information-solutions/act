@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using ACT.Core.Enums;
 using ACT.Core.Models;
+using ACT.Core.Models.Custom;
 using ACT.Core.Services;
 using ACT.UI.Mvc;
 
@@ -25,11 +26,18 @@ namespace ACT.UI.Controllers
 
         //
         // POST || GET: /DashBoard/AgeOfOutstandingPallets
-        public ActionResult AgeOfOutstandingPallets( CustomSearchModel csm )
+        public ActionResult AgeOfOutstandingPallets( CustomSearchModel csm, bool givedata = false )
         {
             using ( ClientLoadService service = new ClientLoadService() )
             {
                 csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
+
+                if ( givedata )
+                {
+                    List<ClientLoadCustomModel> loads = service.ListCSM( new PagingModel() { Take = int.MaxValue }, csm );
+
+                    return PartialView( "_AgeOfOutstandingPalletsData", loads );
+                }
 
                 List<AgeOfOutstandingPallets> reps = new List<AgeOfOutstandingPallets>();
 
@@ -85,14 +93,24 @@ namespace ACT.UI.Controllers
 
         //
         // POST || GET: /DashBoard/LoadsPerMonth
-        public ActionResult LoadsPerMonth( CustomSearchModel csm )
+        public ActionResult LoadsPerMonth( CustomSearchModel csm, bool givedata = false )
         {
             using ( ClientLoadService service = new ClientLoadService() )
             {
-                List<LoadsPerMonth> loads = new List<LoadsPerMonth>();
-
                 DateTime fromDate = csm.FromDate ?? new DateTime( DateTime.Now.AddMonths( -3 ).Year, DateTime.Now.AddMonths( -3 ).Month, 1 );
                 DateTime toDate = csm.ToDate ?? new DateTime( DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth( DateTime.Now.Year, DateTime.Now.Month ) );
+
+                if ( givedata )
+                {
+                    csm.ToDate = toDate;
+                    csm.FromDate = fromDate;
+
+                    List<ClientLoadCustomModel> loadsPerMonth = service.ListCSM( new PagingModel() { Take = int.MaxValue }, csm );
+
+                    return PartialView( "_LoadsPerMonthData", loadsPerMonth );
+                }
+
+                List<LoadsPerMonth> loads = new List<LoadsPerMonth>();
 
                 int months = ( ( toDate.Year - fromDate.Year ) * 12 ) + toDate.Month - fromDate.Month;
 
@@ -132,59 +150,18 @@ namespace ACT.UI.Controllers
         }
 
         //
-        // POST || GET: /DashBoard/AuthorisationCodes
-        public ActionResult AuthorisationCodes( CustomSearchModel csm )
+        // POST || GET: /DashBoard/NumberOfPalletsManaged
+        public ActionResult NumberOfPalletsManaged( CustomSearchModel csm, bool givedata = false )
         {
             using ( ClientLoadService service = new ClientLoadService() )
             {
-                List<AuthorisationCodes> auths = new List<AuthorisationCodes>();
-
-                DateTime fromDate = csm.FromDate ?? new DateTime( DateTime.Now.AddMonths( -3 ).Year, DateTime.Now.AddMonths( -3 ).Month, 1 );
-                DateTime toDate = csm.ToDate ?? new DateTime( DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth( DateTime.Now.Year, DateTime.Now.Month ) );
-
-                int months = ( ( toDate.Year - fromDate.Year ) * 12 ) + toDate.Month - fromDate.Month;
-
-                months = months <= 0 ? 1 : months;
-
-                AuthorisationCodes auth;
-
-                for ( int i = 0; i < months; i++ )
+                if ( givedata )
                 {
-                    csm.FromDate = fromDate.AddMonths( months - i );
-                    csm.ToDate = new DateTime( csm.FromDate.Value.Year, csm.FromDate.Value.Month, DateTime.DaysInMonth( csm.FromDate.Value.Year, csm.FromDate.Value.Month ) );
+                    List<ClientLoadCustomModel> numberOfPalletsManaged = service.ListCSM( new PagingModel() { Take = int.MaxValue }, csm );
 
-                    auth = service.AuthorisationCodesPerMonth( csm );
-
-                    auth.MonthNumber = csm.FromDate.Value.Month;
-                    auth.MonthName = csm.FromDate.Value.ToString( "MMMM" );
-
-                    auths.Add( auth );
+                    return PartialView( "_NumberOfPalletsManagedData", numberOfPalletsManaged );
                 }
 
-                //Yearly cumulative
-
-                csm.FromDate = new DateTime( DateTime.Now.Year, 1, 1 );
-                csm.ToDate = new DateTime( DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth( DateTime.Now.Year, DateTime.Now.Month ) );
-
-                auth = service.AuthorisationCodesPerMonth( csm );
-
-                auth.MonthNumber = int.MaxValue;
-                auth.MonthName = csm.FromDate.Value.ToString( "yyyy" );
-
-                auths.Add( auth );
-
-                auths = auths.OrderBy( o => o.MonthNumber ).ToList();
-
-                return PartialView( "_AuthorisationCodes", auths );
-            }
-        }
-
-        //
-        // POST || GET: /DashBoard/NumberOfPalletsManaged
-        public ActionResult NumberOfPalletsManaged( CustomSearchModel csm )
-        {
-            using ( ClientLoadService service = new ClientLoadService() )
-            {
                 List<NumberOfPalletsManaged> loads = new List<NumberOfPalletsManaged>();
 
                 DateTime fromDate = csm.FromDate ?? new DateTime( DateTime.Now.Year, 1, 1 );
@@ -216,8 +193,67 @@ namespace ACT.UI.Controllers
         }
 
         //
+        // POST || GET: /DashBoard/AuthorisationCodes
+        public ActionResult AuthorisationCodes( CustomSearchModel csm, bool givedata = false )
+        {
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( ClientAuthorisationService aservice = new ClientAuthorisationService() )
+            {
+                DateTime fromDate = csm.FromDate ?? new DateTime( DateTime.Now.AddMonths( -3 ).Year, DateTime.Now.AddMonths( -3 ).Month, 1 );
+                DateTime toDate = csm.ToDate ?? new DateTime( DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth( DateTime.Now.Year, DateTime.Now.Month ) );
+
+                if ( givedata )
+                {
+                    csm.ToDate = toDate;
+                    csm.FromDate = fromDate;
+
+                    List<ClientAuthorisationCustomModel> authCodes = aservice.List1( new PagingModel() { Take = int.MaxValue }, csm );
+
+                    return PartialView( "_AuthorisationCodesData", authCodes );
+                }
+
+                List<AuthorisationCodes> auths = new List<AuthorisationCodes>();
+
+                int months = ( ( toDate.Year - fromDate.Year ) * 12 ) + toDate.Month - fromDate.Month;
+
+                months = months <= 0 ? 1 : months;
+
+                AuthorisationCodes auth;
+
+                for ( int i = 0; i < months; i++ )
+                {
+                    csm.FromDate = fromDate.AddMonths( months - i );
+                    csm.ToDate = new DateTime( csm.FromDate.Value.Year, csm.FromDate.Value.Month, DateTime.DaysInMonth( csm.FromDate.Value.Year, csm.FromDate.Value.Month ) );
+
+                    auth = clservice.AuthorisationCodesPerMonth( csm );
+
+                    auth.MonthNumber = csm.FromDate.Value.Month;
+                    auth.MonthName = csm.FromDate.Value.ToString( "MMMM" );
+
+                    auths.Add( auth );
+                }
+
+                //Yearly cumulative
+
+                csm.FromDate = new DateTime( DateTime.Now.Year, 1, 1 );
+                csm.ToDate = new DateTime( DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth( DateTime.Now.Year, DateTime.Now.Month ) );
+
+                auth = clservice.AuthorisationCodesPerMonth( csm );
+
+                auth.MonthNumber = int.MaxValue;
+                auth.MonthName = csm.FromDate.Value.ToString( "yyyy" );
+
+                auths.Add( auth );
+
+                auths = auths.OrderBy( o => o.MonthNumber ).ToList();
+
+                return PartialView( "_AuthorisationCodes", auths );
+            }
+        }
+
+        //
         // POST || GET: /DashBoard/KPIMeasurement
-        public ActionResult KPIMeasurement( CustomSearchModel csm )
+        public ActionResult KPIMeasurement( CustomSearchModel csm, bool givedata = false )
         {
 
             return PartialView( "_KPIMeasurement" );
@@ -225,14 +261,24 @@ namespace ACT.UI.Controllers
 
         //
         // POST || GET: /DashBoard/NumberOfDisputes
-        public ActionResult NumberOfDisputes( CustomSearchModel csm )
+        public ActionResult NumberOfDisputes( CustomSearchModel csm, bool givedata = false )
         {
+            DateTime fromDate = csm.FromDate ?? new DateTime( DateTime.Now.AddMonths( -3 ).Year, DateTime.Now.AddMonths( -3 ).Month, 1 );
+            DateTime toDate = csm.ToDate ?? new DateTime( DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth( DateTime.Now.Year, DateTime.Now.Month ) );
+
             using ( DisputeService service = new DisputeService() )
             {
-                List<NumberOfDisputes> disputes = new List<NumberOfDisputes>();
+                if ( givedata )
+                {
+                    csm.ToDate = toDate;
+                    csm.FromDate = fromDate;
 
-                DateTime fromDate = csm.FromDate ?? new DateTime( DateTime.Now.AddMonths( -3 ).Year, DateTime.Now.AddMonths( -3 ).Month, 1 );
-                DateTime toDate = csm.ToDate ?? new DateTime( DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth( DateTime.Now.Year, DateTime.Now.Month ) );
+                    List<DisputeCustomModel> authCodes = service.List1( new PagingModel() { Take = int.MaxValue }, csm );
+
+                    return PartialView( "_NumberOfDisputesData", authCodes );
+                }
+
+                List<NumberOfDisputes> disputes = new List<NumberOfDisputes>();
 
                 int months = ( ( toDate.Year - fromDate.Year ) * 12 ) + toDate.Month - fromDate.Month;
 

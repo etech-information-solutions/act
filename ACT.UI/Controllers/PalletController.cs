@@ -17,7 +17,7 @@ using OpenPop;
 using ACT.Core.Helpers;
 namespace ACT.UI.Controllers
 {
-    [Requires(PermissionTo.View, PermissionContext.Pallet)]
+    [Requires( PermissionTo.View, PermissionContext.Pallet )]
     public class PalletController : BaseController
     {
         // GET: Pallet
@@ -29,90 +29,90 @@ namespace ACT.UI.Controllers
         #region Pallet PoolingAgentData
         //
         // GET: /Pallet/PoolingAgentData
-        public ActionResult PoolingAgentData(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
-            {
-            if (givecsm)
+        public ActionResult PoolingAgentData( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            if ( givecsm )
             {
                 ViewBag.ViewName = "PoolingAgentData";
 
-                return PartialView("_PoolingAgentDataCustomSearch", new CustomSearchModel("PoolingAgentData"));
+                return PartialView( "_PoolingAgentDataCustomSearch", new CustomSearchModel( "PoolingAgentData" ) );
             }
 
             ViewBag.ViewName = "PoolingAgentData";
             //check if there are any viewbag messages from imports
-            string msg = (Session["ImportMessage"] != null ? Session["ImportMessage"].ToString() : null);
-            if (!string.IsNullOrEmpty(msg))
+            string msg = ( Session[ "ImportMessage" ] != null ? Session[ "ImportMessage" ].ToString() : null );
+            if ( !string.IsNullOrEmpty( msg ) )
             {
                 ViewBag.Message = msg;
-                Notify(msg, NotificationType.Success);
+                Notify( msg, NotificationType.Success );
 
                 //clear the message for next time
-                Session["ImportMessage"] = null;
+                Session[ "ImportMessage" ] = null;
             }
-           
-            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
             //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
             List<Client> clientList = new List<Client>();
             //TODO
-            using (ClientService clientService = new ClientService())
+            using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
-            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.CompanyName
 
-            });
+            } );
             ViewBag.ClientList = clientDDL;
 
 
             int total = 0;
             List<ChepLoadCustomModel> model = new List<ChepLoadCustomModel>();
-            using (ChepLoadService service = new ChepLoadService())
+            using ( ChepLoadService service = new ChepLoadService() )
             {
-                if (clientId > 0)
+                if ( clientId > 0 )
                 {
                     csm.ClientId = clientId;
                 }
 
-                model = service.ListCSM(pm, csm);
-                total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total();
+                model = service.ListCSM( pm, csm );
+                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total();
             }
-            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
-            return PartialView("_PoolingAgentData", paging);
+            return PartialView( "_PoolingAgentData", paging );
         }
 
         // GET: Pallet/AddPoolingAgentData
-        [Requires(PermissionTo.Create)]
+        [Requires( PermissionTo.Create )]
         public ActionResult AddPoolingAgentData()
         {
-            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
             ChepLoadViewModel model = new ChepLoadViewModel();
             model.PostingType = 3;
-            return View(model);
+            return View( model );
         }
 
         // POST: Pallet/AddPoolingAgentData
         [HttpPost]
-        [Requires(PermissionTo.Create)]
-        public ActionResult AddPoolingAgentData(ChepLoadViewModel model)
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddPoolingAgentData( ChepLoadViewModel model )
         {
             try
             {
-                if (!ModelState.IsValid)
+                if ( !ModelState.IsValid )
                 {
-                    Notify("Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error);
+                    Notify( "Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error );
 
-                    return View(model);
+                    return View( model );
                 }
 
-                using (ChepLoadService gService = new ChepLoadService())
-                using (TransactionScope scope = new TransactionScope())
+                using ( ChepLoadService gService = new ChepLoadService() )
+                using ( TransactionScope scope = new TransactionScope() )
                 {
                     #region Create ClientLoadCustomModel
                     ChepLoad clientload = new ChepLoad()
@@ -128,21 +128,21 @@ namespace ACT.UI.Controllers
                         Equipment = model.Equipment,
                         OriginalQuantity = model.OriginalQuantity,
                         NewQuantity = model.NewQuantity,
-                        Status = (int)Status.Active,
+                        Status = ( int ) Status.Active,
                         CreatedOn = DateTime.Now,
                         ModfiedOn = DateTime.Now,
                         ModifiedBy = CurrentUser.Email
-                };
-                    gService.Create(clientload);
+                    };
+                    gService.Create( clientload );
                     #endregion
 
                     scope.Complete();
                 }
 
-                Notify("The item was successfully created.", NotificationType.Success);
-                return RedirectToAction("AgentPoolingData");
+                Notify( "The item was successfully created.", NotificationType.Success );
+                return RedirectToAction( "AgentPoolingData" );
             }
-            catch (Exception ex)
+            catch ( Exception ex )
             {
                 ViewBag.Message = ex.Message;
                 return View();
@@ -151,21 +151,21 @@ namespace ACT.UI.Controllers
 
 
         // GET: Pallet/EditPoolingAgentData/5
-        [Requires(PermissionTo.Edit)]
-        public ActionResult EditPoolingAgentData(int id)
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditPoolingAgentData( int id )
         {
             ChepLoad load;
 
-            using (ChepLoadService service = new ChepLoadService())
+            using ( ChepLoadService service = new ChepLoadService() )
             {
-                load = service.GetById(id);
+                load = service.GetById( id );
 
 
-                if (load == null)
+                if ( load == null )
                 {
-                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
-                    return PartialView("_AccessDenied");
+                    return PartialView( "_AccessDenied" );
                 }
 
                 ChepLoadViewModel model = new ChepLoadViewModel()
@@ -181,34 +181,34 @@ namespace ACT.UI.Controllers
                     Equipment = load.Equipment,
                     OriginalQuantity = load.OriginalQuantity,
                     NewQuantity = load.NewQuantity,
-                    Status = (int)load.Status,
+                    Status = ( int ) load.Status,
                     //DocumentCount = (int)load.DocumentCount,
-                   // DocsList = ""
+                    // DocsList = ""
                 };
-                return View(model);
+                return View( model );
             }
         }
 
         // POST: Pallet/EditPoolingAgentData/5
         [HttpPost]
-        [Requires(PermissionTo.Edit)]
-        public ActionResult EditPoolingAgentData(ChepLoadViewModel model, PagingModel pm, bool isstructure = false)
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditPoolingAgentData( ChepLoadViewModel model, PagingModel pm, bool isstructure = false )
         {
             try
             {
-                if (!ModelState.IsValid)
+                if ( !ModelState.IsValid )
                 {
-                    Notify("Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error);
+                    Notify( "Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error );
 
-                    return View(model);
+                    return View( model );
                 }
 
                 ChepLoad load;
 
-                using (ChepLoadService service = new ChepLoadService())
-                using (TransactionScope scope = new TransactionScope())
+                using ( ChepLoadService service = new ChepLoadService() )
+                using ( TransactionScope scope = new TransactionScope() )
                 {
-                    load = service.GetById(model.Id);
+                    load = service.GetById( model.Id );
 
                     #region Update Chep Load
                     load.LoadDate = model.LoadDate;
@@ -222,10 +222,10 @@ namespace ACT.UI.Controllers
                     load.Equipment = model.Equipment;
                     load.OriginalQuantity = model.OriginalQuantity;
                     load.NewQuantity = model.NewQuantity;
-                    load.Status = (int)model.Status;
+                    load.Status = ( int ) model.Status;
                     load.ModfiedOn = DateTime.Now;
-                    load.ModifiedBy =  CurrentUser.Email;
-                    service.Update(load);
+                    load.ModifiedBy = CurrentUser.Email;
+                    service.Update( load );
 
                     #endregion
 
@@ -233,11 +233,11 @@ namespace ACT.UI.Controllers
                     scope.Complete();
                 }
 
-                Notify("The selected Item details were successfully updated.", NotificationType.Success);
+                Notify( "The selected Item details were successfully updated.", NotificationType.Success );
 
-                return RedirectToAction("ClientData");
+                return RedirectToAction( "ClientData" );
             }
-            catch (Exception ex)
+            catch ( Exception ex )
             {
                 ViewBag.Message = ex.Message;
                 return View();
@@ -246,34 +246,34 @@ namespace ACT.UI.Controllers
 
         // POST: Pallet/DeletePoolingAgentData/5
         [HttpPost]
-        [Requires(PermissionTo.Delete)]
-        public ActionResult DeletePoolingAgentData(ChepLoadViewModel model)
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeletePoolingAgentData( ChepLoadViewModel model )
         {
             ChepLoad activeLoad;
             try
             {
 
-                using (ChepLoadService service = new ChepLoadService())
-                using (TransactionScope scope = new TransactionScope())
+                using ( ChepLoadService service = new ChepLoadService() )
+                using ( TransactionScope scope = new TransactionScope() )
                 {
-                    activeLoad = service.GetById(model.Id);
+                    activeLoad = service.GetById( model.Id );
 
-                    if (activeLoad == null)
+                    if ( activeLoad == null )
                     {
-                        Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+                        Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
-                        return PartialView("_AccessDenied");
+                        return PartialView( "_AccessDenied" );
                     }
 
-                    activeLoad.Status = (((Status)activeLoad.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;
-                    service.Update(activeLoad);
+                    activeLoad.Status = ( ( ( Status ) activeLoad.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+                    service.Update( activeLoad );
                     scope.Complete();
 
                 }
-                Notify("The selected item was successfully updated.", NotificationType.Success);
-                return RedirectToAction("PoolingAgentData");
+                Notify( "The selected item was successfully updated.", NotificationType.Success );
+                return RedirectToAction( "PoolingAgentData" );
             }
-            catch (Exception ex)
+            catch ( Exception ex )
             {
                 ViewBag.Message = ex.Message;
                 return View();
@@ -282,134 +282,134 @@ namespace ACT.UI.Controllers
         #endregion
 
         //-------------------------------------------------------------------------------------
-        
+
         #region Pallet ClientData
         //
         // GET: /Pallet/ClientData
-        public ActionResult ClientData(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        public ActionResult ClientData( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-            if (givecsm)
+            if ( givecsm )
             {
                 ViewBag.ViewName = "ClientData";
 
-                return PartialView("_ClientDataCustomSearch", new CustomSearchModel("ClientData"));
+                return PartialView( "_ClientDataCustomSearch", new CustomSearchModel( "ClientData" ) );
             }
             ViewBag.ViewName = "ClientData";
             //check if there are any viewbag messages from imports
-            string msg = (Session["ImportMessage"] != null ? Session["ImportMessage"].ToString() : null);           
-            if (!string.IsNullOrEmpty(msg))
+            string msg = ( Session[ "ImportMessage" ] != null ? Session[ "ImportMessage" ].ToString() : null );
+            if ( !string.IsNullOrEmpty( msg ) )
             {
                 ViewBag.Message = msg;
-                Notify(msg, NotificationType.Success);
+                Notify( msg, NotificationType.Success );
 
                 //clear the message for next time
-                Session["ImportMessage"] = null;
+                Session[ "ImportMessage" ] = null;
             }
-            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
             //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
             List<Client> clientList = new List<Client>();
             //TODO
-            using (ClientService clientService = new ClientService())
+            using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
-            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.CompanyName
 
-            });
+            } );
             ViewBag.ClientList = clientDDL;
 
             int total = 0;
             List<ClientLoadCustomModel> model = new List<ClientLoadCustomModel>();
-            using (ClientLoadService service = new ClientLoadService())
+            using ( ClientLoadService service = new ClientLoadService() )
             {
-                if (clientId > 0)
+                if ( clientId > 0 )
                 {
                     csm.ClientId = clientId;
                 }
 
-                model = service.ListCSM(pm, csm);
-                total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total();
+                model = service.ListCSM( pm, csm );
+                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total();
             }
-            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
-            return PartialView("_ClientData", paging);
+            return PartialView( "_ClientData", paging );
         }
 
         // GET: Pallet/AddClientLoad
-        [Requires(PermissionTo.Create)]
+        [Requires( PermissionTo.Create )]
         public ActionResult AddClientData()
         {
             ClientLoadViewModel model = new ClientLoadViewModel();
-            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
 
-            int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-            List<Transporter>transporterOptions = new List<Transporter>();
-            using (TransporterService rservice = new TransporterService())
+            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
+            List<Transporter> transporterOptions = new List<Transporter>();
+            using ( TransporterService rservice = new TransporterService() )
             {
                 transporterOptions = rservice.List();
             }
-            IEnumerable<SelectListItem> transporterOptionsDDL = transporterOptions.Select(c => new SelectListItem
+            IEnumerable<SelectListItem> transporterOptionsDDL = transporterOptions.Select( c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.TradingName
 
-            });
+            } );
             ViewBag.TransporterOptions = transporterOptionsDDL;
-            return View(model);
+            return View( model );
         }
 
         // POST: Pallet/AddClientData
         [HttpPost]
-        [Requires(PermissionTo.Create)]
-        public ActionResult AddClientData(ClientLoadViewModel model)
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddClientData( ClientLoadViewModel model )
         {
             try
-            {               
-                if (!ModelState.IsValid)
+            {
+                if ( !ModelState.IsValid )
                 {
-                    Notify("Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error);
+                    Notify( "Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error );
 
-                    return View(model);
+                    return View( model );
                 }
-                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-                int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-                ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+                int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+                ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
                 List<Transporter> transporterOptions = new List<Transporter>();
-                using (TransporterService rservice = new TransporterService())
+                using ( TransporterService rservice = new TransporterService() )
                 {
                     transporterOptions = rservice.List();
                 }
-                IEnumerable<SelectListItem> transporterOptionsDDL = transporterOptions.Select(c => new SelectListItem
+                IEnumerable<SelectListItem> transporterOptionsDDL = transporterOptions.Select( c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
                     Text = c.TradingName
 
-                });
+                } );
                 ViewBag.TransporterOptions = transporterOptionsDDL;
 
-                if (clientId > 0 || model.ClientId > 0)
+                if ( clientId > 0 || model.ClientId > 0 )
                 {
-                    using (ClientLoadService gService = new ClientLoadService())
-                    using (DeliveryNoteService service = new DeliveryNoteService())
-                    using (DeliveryNoteLineService lineservice = new DeliveryNoteLineService())
-                    using (AddressService addservice = new AddressService())
-                    using (ClientService clientservice = new ClientService())
-                    using (TransactionScope scope = new TransactionScope())
+                    using ( ClientLoadService gService = new ClientLoadService() )
+                    using ( DeliveryNoteService service = new DeliveryNoteService() )
+                    using ( DeliveryNoteLineService lineservice = new DeliveryNoteLineService() )
+                    using ( AddressService addservice = new AddressService() )
+                    using ( ClientService clientservice = new ClientService() )
+                    using ( TransactionScope scope = new TransactionScope() )
                     {
                         #region Create ClientLoadCustomModel
                         ClientLoad clientload = new ClientLoad()
                         {
-                            ClientId = (model.ClientId > 0 ? model.ClientId : clientId),
+                            ClientId = ( model.ClientId > 0 ? model.ClientId : clientId ),
                             VehicleId = model.VehicleId,
-                           // TransporterId = model.TransporterId,
+                            // TransporterId = model.TransporterId,
                             LoadDate = model.LoadDate,//DateTimeExtensions.formatImportDate(model.LoadDate),
                             LoadNumber = model.LoadNumber,
                             EffectiveDate = model.EffectiveDate,//DateTimeExtensions.formatImportDate(model.EffectiveDate),
@@ -423,7 +423,7 @@ namespace ACT.UI.Controllers
                             OriginalQuantity = model.OriginalQuantity,
                             NewQuantity = model.NewQuantity,
                             ReturnQty = model.ReturnQty,
-                            OutstandingQty = (model.OriginalQuantity - model.ReturnQty), //double check this
+                            OutstandingQty = ( model.OriginalQuantity - model.ReturnQty ), //double check this
                             //ReconcileDate = model.ReconcileDate,
                             //ReconcileInvoice = model.ReconcileInvoice,
                             PODNumber = model.PODNumber,
@@ -431,27 +431,27 @@ namespace ACT.UI.Controllers
                             PRNNumber = model.PRNNumber,
                             //ARPMComments = model.ARPMComments,
                             //ProvCode = model.ProvCode,
-                            Status = (int)Status.Active,
+                            Status = ( int ) Status.Active,
                             CreatedOn = DateTime.Now,
                             ModifiedOn = DateTime.Now,
                             ModifiedBy = CurrentUser.Email
                         };
-                        gService.Create(clientload);
+                        gService.Create( clientload );
                         #endregion
 
                         #region Create DeliveryNote for new ClientLoad
-                        if (clientload.Id > 0)
+                        if ( clientload.Id > 0 )
                             try
                             {
                                 DeliveryNote delnote = new DeliveryNote();
 
-                                Client noteClient = clientservice.GetById(model.ClientId);
-                                Address clientAddress = addservice.GetByColumnsWhere("ObjectId", model.ClientId, "ObjectType", "Client");
-                                string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ((Province)clientAddress.Province).GetDisplayText();
+                                Client noteClient = clientservice.GetById( model.ClientId );
+                                Address clientAddress = addservice.GetByColumnsWhere( "ObjectId", model.ClientId, "ObjectType", "Client" );
+                                string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ( ( Province ) clientAddress.Province ).GetDisplayText();
                                 //string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ((Province)model.BillingProvince).GetDisplayText();
                                 //string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ((Province)model.DeliveryProvince).GetDisplayText();
 
-                                if (model.Id > 0)
+                                if ( model.Id > 0 )
                                 {
                                     try
                                     {
@@ -464,7 +464,7 @@ namespace ACT.UI.Controllers
                                         delnote.OrderDate = model.LoadDate;
                                         //delnote.ContactNumber = model.ContactNumber;
                                         delnote.Reference306 = model.LoadNumber;
-                                        delnote.Status = (int)Status.Active;
+                                        delnote.Status = ( int ) Status.Active;
 
                                         delnote.CustomerAddress = customerAddress;
                                         delnote.CustomerPostalCode = clientAddress.PostalCode;
@@ -480,7 +480,7 @@ namespace ACT.UI.Controllers
                                         //delnote.BillingProvince = model.BillingProvince;
 
                                         //Create Client Invoice Address
-                                        service.Create(delnote);
+                                        service.Create( delnote );
 
                                         //Create Invoice Customer Address
                                         Address invoiceCustomerAddress = new Address()
@@ -488,51 +488,51 @@ namespace ACT.UI.Controllers
                                             ObjectId = delnote.Id,
                                             ObjectType = "InvoiceCustomer",
                                             Town = clientAddress.Town,
-                                            Status = (int)Status.Active,
+                                            Status = ( int ) Status.Active,
                                             PostalCode = clientAddress.PostalCode,
                                             Type = 1,
                                             Addressline1 = clientAddress.Addressline1,
                                             Addressline2 = clientAddress.Addressline2,
-                                            Province = (int)clientAddress.Province,
+                                            Province = ( int ) clientAddress.Province,
                                             //Province = (int)mappedProvinceVal,
                                         };
-                                        addservice.Create(invoiceCustomerAddress);
+                                        addservice.Create( invoiceCustomerAddress );
 
 
                                     }
-                                    catch (Exception ex)
+                                    catch ( Exception ex )
                                     {
                                         ViewBag.Message = ex.Message;
                                         //  return View();
-                                        return PartialView("_GenerateDeliveryNote", model);
+                                        return PartialView( "_GenerateDeliveryNote", model );
                                     }
 
                                 }
                                 #endregion
                                 #region Save DeliveryNoteLine
-                                    try
-                                    {                                        
-                                        DeliveryNoteLine noteline = new DeliveryNoteLine();
+                                try
+                                {
+                                    DeliveryNoteLine noteline = new DeliveryNoteLine();
 
-                                        noteline.DeliveryNoteId = delnote.Id;//deliveryNoteId;
-                                        noteline.Delivered = model.NewQuantity;
-                                        noteline.Product = "Delivery Note";
-                                        noteline.ProductDescription = "Delivery Note";
-                                        noteline.OrderQuantity = model.OriginalQuantity;
-                                        noteline.ModifiedOn = DateTime.Now;
-                                        noteline.CreatedOn = DateTime.Now;
-                                        noteline.Status = (int)Status.Active;
+                                    noteline.DeliveryNoteId = delnote.Id;//deliveryNoteId;
+                                    noteline.Delivered = model.NewQuantity;
+                                    noteline.Product = "Delivery Note";
+                                    noteline.ProductDescription = "Delivery Note";
+                                    noteline.OrderQuantity = model.OriginalQuantity;
+                                    noteline.ModifiedOn = DateTime.Now;
+                                    noteline.CreatedOn = DateTime.Now;
+                                    noteline.Status = ( int ) Status.Active;
 
-                                        lineservice.Create(noteline);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        ViewBag.Message = ex.Message;
-                                    }
+                                    lineservice.Create( noteline );
+                                }
+                                catch ( Exception ex )
+                                {
+                                    ViewBag.Message = ex.Message;
+                                }
 
                                 #endregion
                             }
-                            catch (Exception ex)
+                            catch ( Exception ex )
                             {
                                 ViewBag.Message = ex.Message;
                             }
@@ -540,15 +540,16 @@ namespace ACT.UI.Controllers
                         scope.Complete();
                     }
 
-                        Notify("The item was successfully created.", NotificationType.Success);
-                        return RedirectToAction("ClientData");
-                    } else
+                    Notify( "The item was successfully created.", NotificationType.Success );
+                    return RedirectToAction( "ClientData" );
+                }
+                else
                 {
                     ViewBag.Message = "No Client Accounted for";
                     return View();
                 }
             }
-            catch (Exception ex)
+            catch ( Exception ex )
             {
                 ViewBag.Message = ex.Message;
                 return View();
@@ -557,21 +558,21 @@ namespace ACT.UI.Controllers
 
 
         // GET: Pallet/EditClientData/5
-        [Requires(PermissionTo.Edit)]
-        public ActionResult EditClientData(int id)
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditClientData( int id )
         {
             ClientLoad load;
 
-            using (ClientLoadService service = new ClientLoadService())
+            using ( ClientLoadService service = new ClientLoadService() )
             {
-                load = service.GetById(id);
+                load = service.GetById( id );
 
 
-                if (load == null)
+                if ( load == null )
                 {
-                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
-                    return PartialView("_AccessDenied");
+                    return PartialView( "_AccessDenied" );
                 }
 
                 ClientLoadViewModel model = new ClientLoadViewModel()
@@ -597,91 +598,91 @@ namespace ACT.UI.Controllers
                     PODNumber = load.PODNumber,
                     PCNNumber = load.PCNNumber,
                     PRNNumber = load.PRNNumber,
-                    Status = (int)load.Status
-                   // DocumentCount = (int)load.DocumentCount,
-                   // DocsList = ""
+                    Status = ( int ) load.Status
+                    // DocumentCount = (int)load.DocumentCount,
+                    // DocsList = ""
                 };
                 List<Transporter> transporterOptions = new List<Transporter>();
-                using (TransporterService rservice = new TransporterService())
+                using ( TransporterService rservice = new TransporterService() )
                 {
                     transporterOptions = rservice.List();
                 }
-                IEnumerable<SelectListItem> transporterOptionsDDL = transporterOptions.Select(c => new SelectListItem
+                IEnumerable<SelectListItem> transporterOptionsDDL = transporterOptions.Select( c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
                     Text = c.TradingName
 
-                });
+                } );
                 ViewBag.TransporterOptions = transporterOptionsDDL;
                 List<Vehicle> vehicleOptions = new List<Vehicle>();
-                using (VehicleService vservice = new VehicleService())
+                using ( VehicleService vservice = new VehicleService() )
                 {
-                    vehicleOptions = vservice.ListByColumnsWhere("ObjectId", model.ClientId, "Object", "Client");
+                    vehicleOptions = vservice.ListByColumnsWhere( "ObjectId", model.ClientId, "Object", "Client" );
                 }
-                IEnumerable<SelectListItem> vehicleOptionsDDL = vehicleOptions.Select(c => new SelectListItem
+                IEnumerable<SelectListItem> vehicleOptionsDDL = vehicleOptions.Select( c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
                     Text = c.Registration
 
-                });
+                } );
                 ViewBag.VehicleOptions = vehicleOptionsDDL;
-                return View("EditClientData", model);
+                return View( "EditClientData", model );
             }
         }
 
         // POST: Pallet/EditClientData/5
         [HttpPost]
-        [Requires(PermissionTo.Edit)]
-        public ActionResult EditClientData(ClientLoadViewModel model, PagingModel pm, bool isstructure = false)
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditClientData( ClientLoadViewModel model, PagingModel pm, bool isstructure = false )
         {
             try
             {
-                if (!ModelState.IsValid)
+                if ( !ModelState.IsValid )
                 {
-                    Notify("Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error);
+                    Notify( "Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error );
 
-                    return View(model);
+                    return View( model );
                 }
 
                 ClientLoad load;
 
-                using (ClientLoadService service = new ClientLoadService())
-                using (TransactionScope scope = new TransactionScope())
+                using ( ClientLoadService service = new ClientLoadService() )
+                using ( TransactionScope scope = new TransactionScope() )
                 {
-                    load = service.GetById(model.Id);
+                    load = service.GetById( model.Id );
 
                     #region Update Client Load
 
                     // Update Group
                     //group.Id = model.Id;
-                        load.ClientId = model.ClientId;
-                        load.VehicleId = model.VehicleId;
-                     //   load.TransporterId = model.TransporterId;
+                    load.ClientId = model.ClientId;
+                    load.VehicleId = model.VehicleId;
+                    //   load.TransporterId = model.TransporterId;
                     load.LoadDate = model.LoadDate;// DateTimeExtensions.formatImportDate(model.LoadDate);
-                        load.LoadNumber = model.LoadNumber;
+                    load.LoadNumber = model.LoadNumber;
                     load.EffectiveDate = model.EffectiveDate;// DateTimeExtensions.formatImportDate(model.EffectiveDate);
                     load.NotifyDate = model.NotifyDate;// DateTimeExtensions.formatImportDate(model.NotifyeDate);
-                        load.AccountNumber = model.AccountNumber;
-                        load.ClientDescription = model.ClientDescription;
-                        load.DeliveryNote = model.DeliveryNote;
-                        load.ReferenceNumber = model.ReferenceNumber;
-                        load.ReceiverNumber = model.ReceiverNumber;
-                        load.Equipment = model.Equipment;
-                        load.OriginalQuantity = model.OriginalQuantity;
-                        load.NewQuantity = model.NewQuantity;
-                        load.ReturnQty = model.ReturnQty;
-                        load.ReconcileDate = model.ReconcileDate;
-                        load.ReconcileInvoice = model.ReconcileInvoice;
-                        load.PODNumber = model.PODNumber;
-                        load.PCNNumber = model.PCNNumber;
-                        load.PRNNumber = model.PRNNumber;
-                        //load.ARPMComments = model.ARPMComments;
-                        //load.ProvCode = model.ProvCode;
-                        load.Status = (int)model.Status;
-                        load.ModifiedBy = CurrentUser.Email;
-                        load.ModifiedOn = DateTime.Now;
+                    load.AccountNumber = model.AccountNumber;
+                    load.ClientDescription = model.ClientDescription;
+                    load.DeliveryNote = model.DeliveryNote;
+                    load.ReferenceNumber = model.ReferenceNumber;
+                    load.ReceiverNumber = model.ReceiverNumber;
+                    load.Equipment = model.Equipment;
+                    load.OriginalQuantity = model.OriginalQuantity;
+                    load.NewQuantity = model.NewQuantity;
+                    load.ReturnQty = model.ReturnQty;
+                    load.ReconcileDate = model.ReconcileDate;
+                    load.ReconcileInvoice = model.ReconcileInvoice;
+                    load.PODNumber = model.PODNumber;
+                    load.PCNNumber = model.PCNNumber;
+                    load.PRNNumber = model.PRNNumber;
+                    //load.ARPMComments = model.ARPMComments;
+                    //load.ProvCode = model.ProvCode;
+                    load.Status = ( int ) model.Status;
+                    load.ModifiedBy = CurrentUser.Email;
+                    load.ModifiedOn = DateTime.Now;
 
-                    service.Update(load);
+                    service.Update( load );
 
                     #endregion
 
@@ -689,11 +690,11 @@ namespace ACT.UI.Controllers
                     scope.Complete();
                 }
 
-                Notify("The selected Item details were successfully updated.", NotificationType.Success);
+                Notify( "The selected Item details were successfully updated.", NotificationType.Success );
 
-                return RedirectToAction("ClientData");
+                return RedirectToAction( "ClientData" );
             }
-            catch (Exception ex)
+            catch ( Exception ex )
             {
                 ViewBag.Message = ex.Message;
                 return View();
@@ -702,34 +703,34 @@ namespace ACT.UI.Controllers
 
         // POST: Pallet/DeleteClientData/5
         [HttpPost]
-        [Requires(PermissionTo.Delete)]
-        public ActionResult DeleteClientData(ClientLoadCustomModel model)
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteClientData( ClientLoadCustomModel model )
         {
             ClientLoad activeLoad;
             try
             {
 
-                using (ClientLoadService service = new ClientLoadService())
-                using (TransactionScope scope = new TransactionScope())
+                using ( ClientLoadService service = new ClientLoadService() )
+                using ( TransactionScope scope = new TransactionScope() )
                 {
-                    activeLoad = service.GetById(model.Id);
+                    activeLoad = service.GetById( model.Id );
 
-                    if (activeLoad == null)
+                    if ( activeLoad == null )
                     {
-                        Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+                        Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
-                        return PartialView("_AccessDenied");
+                        return PartialView( "_AccessDenied" );
                     }
 
-                    activeLoad.Status = (((Status)activeLoad.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;
-                    service.Update(activeLoad);
+                    activeLoad.Status = ( ( ( Status ) activeLoad.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+                    service.Update( activeLoad );
                     scope.Complete();
 
                 }
-                Notify("The selected item was successfully updated.", NotificationType.Success);
-                return RedirectToAction("ClientData");
+                Notify( "The selected item was successfully updated.", NotificationType.Success );
+                return RedirectToAction( "ClientData" );
             }
-            catch (Exception ex)
+            catch ( Exception ex )
             {
                 ViewBag.Message = ex.Message;
                 return View();
@@ -742,85 +743,87 @@ namespace ACT.UI.Controllers
         #region Pallet ReconcileLoads
         //
         // GET: /Pallet/ReconcileLoads
-        public ActionResult ReconcileLoads(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        public ActionResult ReconcileLoads( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-            if (givecsm)
+            if ( givecsm )
             {
                 ViewBag.ViewName = "ReconcileLoads";
 
-                return PartialView("_ReconcileLoadsCustomSearch", new CustomSearchModel("ReconcileLoads"));
+                return PartialView( "_ReconcileLoadsCustomSearch", new CustomSearchModel( "ReconcileLoads" ) );
             }
             ViewBag.ViewName = "ReconcileLoads";
-            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
             ViewBag.ClientId = clientId;
             List<Client> clientList = new List<Client>();
-            using (ClientService clientService = new ClientService())
+            using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
-            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.CompanyName
 
-            });
+            } );
             ViewBag.ClientList = clientDDL;
 
-            return PartialView("_ReconcileLoads");
+            return PartialView( "_ReconcileLoads" );
         }
 
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult GetUnreconciledClientLoads(int? clientId)
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult GetUnreconciledClientLoads( int? clientId )
         {
-            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-            clientId = (int)(clientId!=null? (int)clientId:!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            clientId = ( int ) ( clientId != null ? ( int ) clientId : !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
 
-                List<ClientLoadCustomModel> load;
-                //int pspId = Session[ "UserPSP" ];
-                int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-              
+            List<ClientLoadCustomModel> load;
+            //int pspId = Session[ "UserPSP" ];
+            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
 
-                using (ClientLoadService clientService = new ClientLoadService())
-                {
 
-                    load = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)ReconciliationStatus.Unreconciled, ReconciliationStatus = (int)ReconciliationStatus.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+            using ( ClientLoadService clientService = new ClientLoadService() )
+            {
 
-                }
-                if (load != null)
-                {
-                    return Json(load, JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
-                }                                                                                                                                                                                                                                                                                                   
+                load = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = ( int ) clientId, Status = ( int ) ReconciliationStatus.Unreconciled, ReconciliationStatus = ( int ) ReconciliationStatus.Unreconciled } ); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+
+            }
+            if ( load != null )
+            {
+                return Json( load, JsonRequestBehavior.AllowGet );
+            }
+            else
+            {
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
+            }
+        }
+
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult GetUnreconciledAgentLoads( int? clientId )
+        {
+
+            List<ChepLoadCustomModel> load;
+            //int pspId = Session[ "UserPSP" ];
+            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            clientId = ( int ) ( clientId != null ? ( int ) clientId : !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+
+            using ( ChepLoadService chepService = new ChepLoadService() )
+            {
+
+                load = chepService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = ( int ) clientId, Status = ( int ) ReconciliationStatus.Unreconciled, ReconciliationStatus = ( int ) ReconciliationStatus.Unreconciled } ); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+
             }
 
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult GetUnreconciledAgentLoads(int? clientId)
-        {
-            
-                List<ChepLoadCustomModel> load;
-                //int pspId = Session[ "UserPSP" ];
-                int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-                clientId = (int)(clientId != null ? (int)clientId : !string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-
-                using (ChepLoadService chepService = new ChepLoadService())
-                {
-
-                    load = chepService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = (int)clientId, Status = (int)ReconciliationStatus.Unreconciled, ReconciliationStatus = (int)ReconciliationStatus.Unreconciled }); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
-
-                }
-           
-            if (load != null)
+            if ( load != null )
             {
-                return Json(load, JsonRequestBehavior.AllowGet);
-            } else { 
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( load, JsonRequestBehavior.AllowGet );
+            }
+            else
+            {
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
         #endregion
@@ -830,39 +833,39 @@ namespace ACT.UI.Controllers
         #region Pallet ReconcileInvoice
         //
         // GET: /Pallet/ReconcileInvoice
-        public ActionResult ReconcileInvoice(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        public ActionResult ReconcileInvoice( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-            if (givecsm)
+            if ( givecsm )
             {
                 ViewBag.ViewName = "ReconcileInvoice";
 
-                return PartialView("_ReconcileInvoiceCustomSearch", new CustomSearchModel("ReconcileInvoice"));
+                return PartialView( "_ReconcileInvoiceCustomSearch", new CustomSearchModel( "ReconcileInvoice" ) );
             }
             ViewBag.ViewName = "ReconcileInvoice";
-            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-           // model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
+                                                                      // model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
             List<Client> clientList = new List<Client>();
             //TODO
-            using (ClientService clientService = new ClientService())
+            using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
-            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.CompanyName
 
-            });
+            } );
             ViewBag.ClientList = clientDDL;
             int total = 0;
 
             List<Site> model = new List<Site>();
-            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
-            return PartialView("_ReconcileInvoice", paging);
+            return PartialView( "_ReconcileInvoice", paging );
         }
         #endregion
 
@@ -871,130 +874,131 @@ namespace ACT.UI.Controllers
         #region Pallet Exceptions
         //
         // GET: /Pallet/Exceptions
-        public ActionResult Exceptions(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        public ActionResult Exceptions( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-            if (givecsm)
+            if ( givecsm )
             {
                 ViewBag.ViewName = "Exceptions";
 
-                return PartialView("_ExceptionsCustomSearch", new CustomSearchModel("Exceptions"));
+                return PartialView( "_ExceptionsCustomSearch", new CustomSearchModel( "Exceptions" ) );
             }
             ViewBag.ViewName = "Exceptions";
-            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
             //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
             List<Client> clientList = new List<Client>();
             //TODO
-            using (ClientService clientService = new ClientService())
+            using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
-            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.CompanyName
 
-            });
+            } );
             ViewBag.ClientList = clientDDL;
             int total = 0;
 
             List<Site> model = new List<Site>();
-            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
-            return PartialView("_Exceptions", paging);
+            return PartialView( "_Exceptions", paging );
         }
         #endregion
 
         //-------------------------------------------------------------------------------------
 
-    
+
         #region Pallet GenerateDeliveryNote
         //
         // GET: /Pallet/GenerateDeliveryNote
         public ActionResult GenerateDeliveryNote()
         {
             DeliveryNoteViewModel model = new DeliveryNoteViewModel();
-            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
             model.ClientId = clientId;
-            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-           // model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
+                                                                      // model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
             List<Client> clientList = new List<Client>();
             //TODO
-            using (ClientService clientService = new ClientService())
+            using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
-            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.CompanyName
 
-            });
+            } );
+
             ViewBag.ClientList = clientDDL;
 
-            return PartialView("_GenerateDeliveryNote", model);
+            return PartialView( "_GenerateDeliveryNote", model );
         }
 
         // POST: Pallet/GenerateDeliveryNotePost
         [HttpPost]
-        [Requires(PermissionTo.Create)]
-        public ActionResult GenerateDeliveryNotePost(DeliveryNoteViewModel model)
+        [Requires( PermissionTo.Create )]
+        public ActionResult GenerateDeliveryNotePost( DeliveryNoteViewModel model )
         {
             try
             {
-               
-                string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-                int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-                
-                ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it                                                                        
-                if (model.ClientId > 0 && clientId > 0 )
+
+                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+                int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+
+                ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it                                                                        
+                if ( model.ClientId > 0 && clientId > 0 )
                 {
                     model.ClientId = clientId;
                 }
                 List<Client> clientList = new List<Client>();
-                using (ClientService clientService = new ClientService())
+                using ( ClientService clientService = new ClientService() )
                 {
-                    clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                    clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
                 }
 
-                IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+                IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
                     Text = c.CompanyName
 
-                });
+                } );
                 ViewBag.ClientList = clientDDL;
 
-                if (!ModelState.IsValid)
+                if ( !ModelState.IsValid )
                 {
-                    Notify("Sorry, the item was not updated. Please correct all errors and try again.", NotificationType.Error);
-                    return PartialView("_GenerateDeliveryNote", model);
+                    Notify( "Sorry, the item was not updated. Please correct all errors and try again.", NotificationType.Error );
+                    return PartialView( "_GenerateDeliveryNote", model );
                     //return View(model);
                 }
 
-                using (DeliveryNoteService service = new DeliveryNoteService())
-                using (DeliveryNoteLineService lineservice = new DeliveryNoteLineService())
-                using (ClientLoadService clientloadservice = new ClientLoadService())
-                using (TransactionScope scope = new TransactionScope())
+                using ( DeliveryNoteService service = new DeliveryNoteService() )
+                using ( DeliveryNoteLineService lineservice = new DeliveryNoteLineService() )
+                using ( ClientLoadService clientloadservice = new ClientLoadService() )
+                using ( TransactionScope scope = new TransactionScope() )
                 {
                     try
-                    { 
+                    {
                         bool newNote = false;
                         #region Save DeliveryNote
                         DeliveryNote delnote = new DeliveryNote();
 
-                        string customerAddress = model.CustomerAddress + ' ' + model.CustomerAddress2 + ' ' + model.CustomerAddressTown + ' ' + model.CustomerPostalCode + ' ' + ((Province)model.CustomerProvince).GetDisplayText();
-                        string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ((Province)model.BillingProvince).GetDisplayText();
-                        string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ((Province)model.DeliveryProvince).GetDisplayText();
+                        string customerAddress = model.CustomerAddress + ' ' + model.CustomerAddress2 + ' ' + model.CustomerAddressTown + ' ' + model.CustomerPostalCode + ' ' + ( ( Province ) model.CustomerProvince ).GetDisplayText();
+                        string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ( ( Province ) model.BillingProvince ).GetDisplayText();
+                        string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ( ( Province ) model.DeliveryProvince ).GetDisplayText();
 
-                        if (model.Id > 0)
+                        if ( model.Id > 0 )
                         {
-                             //Update
-                            delnote = service.GetById(model.Id);
+                            //Update
+                            delnote = service.GetById( model.Id );
                             delnote.InvoiceNumber = model.InvoiceNumber;
                             delnote.CustomerName = model.CustomerName;
                             delnote.EmailAddress = model.DeliveryEmail;
@@ -1002,7 +1006,7 @@ namespace ACT.UI.Controllers
                             delnote.OrderDate = model.OrderDate;
                             //delnote.ContactNumber = model.ContactNumber;
                             delnote.Reference306 = model.Reference306;
-                            delnote.Status = (int)Status.Active;
+                            delnote.Status = ( int ) Status.Active;
 
                             delnote.CustomerAddress = customerAddress;
                             delnote.CustomerPostalCode = model.CustomerPostalCode;
@@ -1016,7 +1020,7 @@ namespace ACT.UI.Controllers
                             delnote.BililngPostalCode = model.BillingPostalCode;
                             delnote.BillingProvince = model.BillingProvince;
 
-                            service.Update(delnote);                        
+                            service.Update( delnote );
 
                         }
                         else
@@ -1030,7 +1034,7 @@ namespace ACT.UI.Controllers
                             delnote.OrderDate = model.OrderDate;
                             //delnote.ContactNumber = model.ContactNumber;
                             delnote.Reference306 = model.Reference306;
-                            delnote.Status = (int)Status.Active;
+                            delnote.Status = ( int ) Status.Active;
 
                             delnote.CustomerAddress = customerAddress;
                             delnote.CustomerPostalCode = model.CustomerPostalCode;
@@ -1044,7 +1048,7 @@ namespace ACT.UI.Controllers
                             delnote.BililngPostalCode = model.BillingPostalCode;
                             delnote.BillingProvince = model.BillingProvince;
 
-                            service.Create(delnote);
+                            service.Create( delnote );
 
                             newNote = true;
 
@@ -1062,36 +1066,37 @@ namespace ACT.UI.Controllers
                             //    //Province = (int)mappedProvinceVal,
                             //};
                             //addservice.Create(invoiceCustomerAddress);
-                           }
+                        }
                         #endregion
-                    #region Save DeliveryNoteLine
-                    decimal? originalQuantity = 0;
-                    decimal? newQuantity = 0;
-                    decimal? retQuantity = 0;
-                    if (!string.IsNullOrEmpty(model.DeliveryNoteLinesString))
-                    {
-                            try { 
-                                int.TryParse(model.CountNoteLines.ToString(), out int lineCount);
-                                String[] dList = model.DeliveryNoteLinesString.Split(',');
+                        #region Save DeliveryNoteLine
+                        decimal? originalQuantity = 0;
+                        decimal? newQuantity = 0;
+                        decimal? retQuantity = 0;
+                        if ( !string.IsNullOrEmpty( model.DeliveryNoteLinesString ) )
+                        {
+                            try
+                            {
+                                int.TryParse( model.CountNoteLines.ToString(), out int lineCount );
+                                String[] dList = model.DeliveryNoteLinesString.Split( ',' );
                                 //  string lastId = "0";
-                                for (int i = 0; i < lineCount; i++)
+                                for ( int i = 0; i < lineCount; i++ )
                                 {
 
 
-                                    foreach (string itm in dList)
+                                    foreach ( string itm in dList )
                                     {
-                                        if (!string.IsNullOrEmpty(itm))
+                                        if ( !string.IsNullOrEmpty( itm ) )
                                         {
-                                            String[] note = itm.Split('|');
+                                            String[] note = itm.Split( '|' );
 
                                             //var newstr = id + '|' +delnoteid +'|'+product + '|' + productdesc + '|' + qty + '|' + delqty + '|' + outqty + '|';
-                                            int.TryParse(note[0], out int noteId);
-                                            int.TryParse(note[1], out int deliveryNoteId);
-                                            string product = note[2];
-                                            string productdesc = note[3];
-                                            decimal.TryParse(note[4], out decimal qty);
-                                            decimal.TryParse(note[5], out decimal delqty);
-                                            decimal.TryParse(note[6], out decimal outqty);
+                                            int.TryParse( note[ 0 ], out int noteId );
+                                            int.TryParse( note[ 1 ], out int deliveryNoteId );
+                                            string product = note[ 2 ];
+                                            string productdesc = note[ 3 ];
+                                            decimal.TryParse( note[ 4 ], out decimal qty );
+                                            decimal.TryParse( note[ 5 ], out decimal delqty );
+                                            decimal.TryParse( note[ 6 ], out decimal outqty );
 
                                             DeliveryNoteLine noteline = new DeliveryNoteLine();
                                             //if (noteId > 0)
@@ -1118,9 +1123,9 @@ namespace ACT.UI.Controllers
                                             noteline.OrderQuantity = qty;
                                             noteline.ModifiedOn = DateTime.Now;
                                             noteline.CreatedOn = DateTime.Now;
-                                            noteline.Status = (int)Status.Active;
+                                            noteline.Status = ( int ) Status.Active;
 
-                                            lineservice.Create(noteline);
+                                            lineservice.Create( noteline );
                                             //}
                                             originalQuantity = noteline.OrderQuantity;
                                             newQuantity = noteline.OrderQuantity;
@@ -1130,77 +1135,78 @@ namespace ACT.UI.Controllers
                                     }
                                 }
                             }
-                            catch (Exception ex)
+                            catch ( Exception ex )
                             {
                                 ViewBag.Message = ex.Message;
                                 //  return View();
-                                return PartialView("_GenerateDeliveryNote", model);
+                                return PartialView( "_GenerateDeliveryNote", model );
                             }
                         }
 
-                    #endregion
+                        #endregion
 
-                    #region ClientLoad
-                    try { 
-                        ClientLoad loadModel = new ClientLoad();
-                        int vehicleId = 0;
-                        int transporterId = 0;
-
-                        if (newNote)
+                        #region ClientLoad
+                        try
                         {
-                            loadModel.ClientId = model.ClientId;
-                            loadModel.LoadDate = model.OrderDate;
-                            loadModel.LoadNumber = model.InvoiceNumber;
-                            loadModel.AccountNumber = model.OrderNumber;
-                            loadModel.ClientDescription = model.CustomerName;
-                            //loadModel.ProvCode = model.CustomerProvince.ToString();
-                            loadModel.PCNNumber = model.OrderNumber;
-                            loadModel.DeliveryNote = model.InvoiceNumber;
-                            //model.PRNNumber = rows[7];
-                            loadModel.OriginalQuantity = originalQuantity;
-                            loadModel.NewQuantity = originalQuantity;
-                            loadModel.ReturnQty = retQuantity;
-                            //model.RetQuantity = decimal.Parse(rows[9]);
-                            //loadModel.ARPMComments = rows[10];
-                            //some of the columns are malaligned but leaving it as is, I added 3 new columns
-                            //grab the first of bothe vehicle and transporter to complete this load create, its mandatory
-                            using (VehicleService vservice = new VehicleService())
-                            using (TransporterService tservice = new TransporterService())
-                            {
-                                vehicleId = vservice.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active }).FirstOrDefault().Id;
-                                transporterId = tservice.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active }).FirstOrDefault().Id;
-                            }
-                            if (vehicleId > 0)
-                                loadModel.VehicleId = vehicleId;
-                            //if (transporterId > 0)
-                              //  loadModel.TransporterId = transporterId;
-                            model.CreatedOn = DateTime.Now;
-                            model.ModifiedOn = DateTime.Now;
-                            clientloadservice.Create(loadModel);
+                            ClientLoad loadModel = new ClientLoad();
+                            int vehicleId = 0;
+                            int transporterId = 0;
 
-                                    //Address invoiceCustomerAddress = new Address()
-                                    //{
-                                    //    ObjectId = delnote.Id,
-                                    //    ObjectType = "InvoiceCustomer",
-                                    //    Town = clientAddress.Town,
-                                    //    Status = (int)Status.Active,
-                                    //    PostalCode = clientAddress.PostalCode,
-                                    //    Type = 1,
-                                    //    Addressline1 = clientAddress.Addressline1,
-                                    //    Addressline2 = clientAddress.Addressline2,
-                                    //    Province = (int)clientAddress.Province,
-                                    //    //Province = (int)mappedProvinceVal,
-                                    //};
-                                    //addservice.Create(invoiceCustomerAddress);
+                            if ( newNote )
+                            {
+                                loadModel.ClientId = model.ClientId;
+                                loadModel.LoadDate = model.OrderDate;
+                                loadModel.LoadNumber = model.InvoiceNumber;
+                                loadModel.AccountNumber = model.OrderNumber;
+                                loadModel.ClientDescription = model.CustomerName;
+                                //loadModel.ProvCode = model.CustomerProvince.ToString();
+                                loadModel.PCNNumber = model.OrderNumber;
+                                loadModel.DeliveryNote = model.InvoiceNumber;
+                                //model.PRNNumber = rows[7];
+                                loadModel.OriginalQuantity = originalQuantity;
+                                loadModel.NewQuantity = originalQuantity;
+                                loadModel.ReturnQty = retQuantity;
+                                //model.RetQuantity = decimal.Parse(rows[9]);
+                                //loadModel.ARPMComments = rows[10];
+                                //some of the columns are malaligned but leaving it as is, I added 3 new columns
+                                //grab the first of bothe vehicle and transporter to complete this load create, its mandatory
+                                using ( VehicleService vservice = new VehicleService() )
+                                using ( TransporterService tservice = new TransporterService() )
+                                {
+                                    vehicleId = vservice.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active } ).FirstOrDefault().Id;
+                                    transporterId = tservice.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active } ).FirstOrDefault().Id;
                                 }
+                                if ( vehicleId > 0 )
+                                    loadModel.VehicleId = vehicleId;
+                                //if (transporterId > 0)
+                                //  loadModel.TransporterId = transporterId;
+                                model.CreatedOn = DateTime.Now;
+                                model.ModifiedOn = DateTime.Now;
+                                clientloadservice.Create( loadModel );
+
+                                //Address invoiceCustomerAddress = new Address()
+                                //{
+                                //    ObjectId = delnote.Id,
+                                //    ObjectType = "InvoiceCustomer",
+                                //    Town = clientAddress.Town,
+                                //    Status = (int)Status.Active,
+                                //    PostalCode = clientAddress.PostalCode,
+                                //    Type = 1,
+                                //    Addressline1 = clientAddress.Addressline1,
+                                //    Addressline2 = clientAddress.Addressline2,
+                                //    Province = (int)clientAddress.Province,
+                                //    //Province = (int)mappedProvinceVal,
+                                //};
+                                //addservice.Create(invoiceCustomerAddress);
+                            }
 
                             //}
                         }
-                        catch (Exception ex)
+                        catch ( Exception ex )
                         {
                             ViewBag.Message = ex.Message;
                             //  return View();
-                            return PartialView("_GenerateDeliveryNote", model);
+                            return PartialView( "_GenerateDeliveryNote", model );
                         }
                         //else {
                         //    loadModel = 
@@ -1211,23 +1217,23 @@ namespace ACT.UI.Controllers
 
                         scope.Complete(); //only commit if all is passed
                     }
-                    catch (Exception ex)
+                    catch ( Exception ex )
                     {
                         ViewBag.Message = ex.Message;
                         //  return View();
-                        return PartialView("_GenerateDeliveryNote", model);
+                        return PartialView( "_GenerateDeliveryNote", model );
                     }
                 }
 
-                Notify("The item was successfully saved.", NotificationType.Success);
+                Notify( "The item was successfully saved.", NotificationType.Success );
                 //Session["ImportMessage"] = importMessage;
-                return RedirectToAction("ClientData", "Pallet");
+                return RedirectToAction( "ClientData", "Pallet" );
             }
-            catch (Exception ex)
+            catch ( Exception ex )
             {
                 ViewBag.Message = ex.Message;
-              //  return View();
-                return PartialView("_GenerateDeliveryNote", model);
+                //  return View();
+                return PartialView( "_GenerateDeliveryNote", model );
             }
         }
 
@@ -1238,7 +1244,7 @@ namespace ACT.UI.Controllers
         //{
         //    try
         //    {
-               
+
         //        return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
         //    }
         //    catch (Exception ex)
@@ -1249,104 +1255,107 @@ namespace ACT.UI.Controllers
         //    }
         //}
 
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
         public JsonResult GetDeliveryNoteNumber()
         {
-                string noteNumber = null;
+            string noteNumber = null;
 
-                using (DeliveryNoteService service = new DeliveryNoteService())
-                {
-                    noteNumber = service.GetDeliveryNoteNumber(); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
-                }
-                //var jsonList = JsonConvert.SerializeObject(sites);
-               // var data = JsonConvert.SerializeObject(sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
-            if (noteNumber!=null) { 
-                return Json(data: noteNumber, behavior: JsonRequestBehavior.AllowGet);
+            using ( DeliveryNoteService service = new DeliveryNoteService() )
+            {
+                noteNumber = service.GetDeliveryNoteNumber(); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+            }
+            //var jsonList = JsonConvert.SerializeObject(sites);
+            // var data = JsonConvert.SerializeObject(sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+            if ( noteNumber != null )
+            {
+                return Json( data: noteNumber, behavior: JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
 
         #region DeliveryNote AJAX
-        public JsonResult RemoveDeliveryNoteLine(int? id = null, int? delnoteid = null)
+        public JsonResult RemoveDeliveryNoteLine( int? id = null, int? delnoteid = null )
         {
-            int lineId = (id != null ? (int)id : 0);
-            if (lineId > 0)
+            int lineId = ( id != null ? ( int ) id : 0 );
+            if ( lineId > 0 )
             {
-                using (TransactionScope scope = new TransactionScope())
-                using (DeliveryNoteLineService service = new DeliveryNoteLineService())
+                using ( TransactionScope scope = new TransactionScope() )
+                using ( DeliveryNoteLineService service = new DeliveryNoteLineService() )
                 {
 
-                    DeliveryNoteLine line = service.GetById(lineId);
-                    line.Status = (int)Status.Inactive;
-                    service.Update(line);
+                    DeliveryNoteLine line = service.GetById( lineId );
+                    line.Status = ( int ) Status.Inactive;
+                    service.Update( line );
 
                     scope.Complete();
                 }
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
 
         }
-        public JsonResult SaveDeliveryNoteLine(int? id = null, int? delnoteid = null, string product = null, string productdesc = null, string qty = null, string delqty = null, string outqty = null)
+        public JsonResult SaveDeliveryNoteLine( int? id = null, int? delnoteid = null, string product = null, string productdesc = null, string qty = null, string delqty = null, string outqty = null )
         {
-            int noteId = (delnoteid != null ? (int)delnoteid : 0);
-            int noteLineId = (id != null ? (int)id : 0);
-            if (noteId > 0 && noteLineId == 0)
+            int noteId = ( delnoteid != null ? ( int ) delnoteid : 0 );
+            int noteLineId = ( id != null ? ( int ) id : 0 );
+            if ( noteId > 0 && noteLineId == 0 )
             {
                 DeliveryNoteLine line = new DeliveryNoteLine() { };
                 line.Product = product;
                 line.ProductDescription = productdesc;
                 line.DeliveryNoteId = noteId;
-                if (qty != null) {
+                if ( qty != null )
+                {
                     decimal quant = 0;
-                    decimal.TryParse(qty, out quant);
+                    decimal.TryParse( qty, out quant );
                     line.OrderQuantity = quant;
                 }
-                if (delqty != null)
+                if ( delqty != null )
                 {
                     decimal quant = 0;
-                    decimal.TryParse(delqty, out quant);
+                    decimal.TryParse( delqty, out quant );
                     line.Delivered = quant;
                 }
-                line.Status = (int)Status.Active;
+                line.Status = ( int ) Status.Active;
 
-                using (TransactionScope scope = new TransactionScope())
-                using (DeliveryNoteLineService service = new DeliveryNoteLineService())
+                using ( TransactionScope scope = new TransactionScope() )
+                using ( DeliveryNoteLineService service = new DeliveryNoteLineService() )
                 {
-                    service.Create(line);
+                    service.Create( line );
                     scope.Complete();
                 }
-            } else if (noteId > 0 && noteLineId > 0) //updates
+            }
+            else if ( noteId > 0 && noteLineId > 0 ) //updates
             {
 
             }
-            return Json(data: noteLineId, behavior: JsonRequestBehavior.AllowGet); //returnms ID of line to view
+            return Json( data: noteLineId, behavior: JsonRequestBehavior.AllowGet ); //returnms ID of line to view
         }
 
-        public ActionResult ListDeliveryNoteLines(int? delnoteid = null)
+        public ActionResult ListDeliveryNoteLines( int? delnoteid = null )
         {
             List<DeliveryNoteLine> linelist = new List<DeliveryNoteLine>();
-            int noteLlineId = (delnoteid != null ? (int)delnoteid : 0);          
-            if (noteLlineId>0)
+            int noteLlineId = ( delnoteid != null ? ( int ) delnoteid : 0 );
+            if ( noteLlineId > 0 )
             {
-                using (DeliveryNoteLineService service = new DeliveryNoteLineService())
+                using ( DeliveryNoteLineService service = new DeliveryNoteLineService() )
                 {
-                    linelist = service.ListByColumnsWhere("DeliveryNoteId", noteLlineId, "Status", (int)Status.Active);
+                    linelist = service.ListByColumnsWhere( "DeliveryNoteId", noteLlineId, "Status", ( int ) Status.Active );
                 }
             }
-            if (linelist != null)
+            if ( linelist != null )
             {
-                return Json(linelist, JsonRequestBehavior.AllowGet);
+                return Json( linelist, JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
         #endregion
@@ -1359,39 +1368,39 @@ namespace ACT.UI.Controllers
         #region Pallet Disputes
         //
         // GET: /Pallet/Disputes
-        public ActionResult Disputes(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        public ActionResult Disputes( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-            if (givecsm)
+            if ( givecsm )
             {
                 ViewBag.ViewName = "Disputes";
 
-                return PartialView("_DisputesCustomSearch", new CustomSearchModel("Disputes"));
+                return PartialView( "_DisputesCustomSearch", new CustomSearchModel( "Disputes" ) );
             }
             ViewBag.ViewName = "Disputes";
-            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-        //    model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
+                                                                      //    model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
             List<Client> clientList = new List<Client>();
             //TODO
-            using (ClientService clientService = new ClientService())
+            using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
-            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.CompanyName
 
-            });
+            } );
             ViewBag.ClientList = clientDDL;
             int total = 0;
 
             List<Site> model = new List<Site>();
-            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
-            return PartialView("_Disputes", paging);
+            return PartialView( "_Disputes", paging );
         }
         #endregion
 
@@ -1402,39 +1411,39 @@ namespace ACT.UI.Controllers
         #region Pallet AuthorisationCode
         //
         // GET: /Pallet/AuthorisationCode
-        public ActionResult AuthorisationCode(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        public ActionResult AuthorisationCode( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-            if (givecsm)
+            if ( givecsm )
             {
                 ViewBag.ViewName = "AuthorisationCode";
 
-                return PartialView("_AuthorisationCodeCustomSearch", new CustomSearchModel("AuthorisationCode"));
+                return PartialView( "_AuthorisationCodeCustomSearch", new CustomSearchModel( "AuthorisationCode" ) );
             }
             ViewBag.ViewName = "AuthorisationCode";
-            string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-            int clientId = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-            ViewBag.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-                                                                    //    model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
+                                                                      //    model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
             List<Client> clientList = new List<Client>();
             //TODO
-            using (ClientService clientService = new ClientService())
+            using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM(new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
-            IEnumerable<SelectListItem> clientDDL = clientList.Select(c => new SelectListItem
+            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
             {
                 Value = c.Id.ToString(),
                 Text = c.CompanyName
 
-            });
+            } );
             ViewBag.ClientList = clientDDL;
             int total = 0;
 
             List<Site> model = new List<Site>();
-            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
-            return PartialView("_AuthorisationCode", paging);
+            return PartialView( "_AuthorisationCode", paging );
         }
         #endregion
 
@@ -1449,67 +1458,68 @@ namespace ACT.UI.Controllers
 
         #region APIs
 
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult GetVehiclesForTransporter(string transId)
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult GetVehiclesForTransporter( string transId )
         {
-            if (transId != null && transId != "")
+            if ( transId != null && transId != "" )
             {
                 List<Vehicle> sites = null;
-                using (VehicleService service = new VehicleService())
+                using ( VehicleService service = new VehicleService() )
                 {
 
-                    sites = service.ListByColumnsWhere("ObjectId", int.Parse(transId), "ObjectType", "Transporter");
+                    sites = service.ListByColumnsWhere( "ObjectId", int.Parse( transId ), "ObjectType", "Transporter" );
 
                 }
                 //var jsonList = JsonConvert.SerializeObject(sites);
                 //return Json(sites, JsonRequestBehavior.AllowGet);
-                var data = JsonConvert.SerializeObject(sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
-                return Json(new { data = data }, JsonRequestBehavior.AllowGet);
+                var data = JsonConvert.SerializeObject( sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore } );
+                return Json( new { data = data }, JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
 
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult ReconcileLoadsByIds(string agentLoadId, string clientLoadId)
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult ReconcileLoadsByIds( string agentLoadId, string clientLoadId )
         {
-            if (!string.IsNullOrEmpty(agentLoadId) && !string.IsNullOrEmpty(clientLoadId))
+            if ( !string.IsNullOrEmpty( agentLoadId ) && !string.IsNullOrEmpty( clientLoadId ) )
             {
                 //using (GroupService service = new GroupService())
-                using (ChepClientService cgservivce = new ChepClientService())
-                using (ClientLoadService clientservice = new ClientLoadService())
-                using (ChepLoadService chepService = new ChepLoadService())
-                using (TransactionScope scope = new TransactionScope())
+                using ( ChepClientService cgservivce = new ChepClientService() )
+                using ( ClientLoadService clientservice = new ClientLoadService() )
+                using ( ChepLoadService chepService = new ChepLoadService() )
+                using ( TransactionScope scope = new TransactionScope() )
                 {
                     //get objects to reconcile
-                    ClientLoad client = clientservice.GetById(int.Parse(clientLoadId));
-                    ChepLoad agent = chepService.GetById(int.Parse(agentLoadId));
+                    ClientLoad client = clientservice.GetById( int.Parse( clientLoadId ) );
+                    ChepLoad agent = chepService.GetById( int.Parse( agentLoadId ) );
                     // create new chep client object
                     ChepClient agentclient = new ChepClient();
 
                     //Run Validation first to ensure everything checks out to allow reconcilliation
 
                     //set up all agent items and update
-                    agent.Status = (int)ReconciliationStatus.Reconciled;
-                    client.Status = (int)ReconciliationStatus.Reconciled;
-                    agentclient.Status = (int)ReconciliationStatus.Reconciled;
+                    agent.Status = ( int ) ReconciliationStatus.Reconciled;
+                    client.Status = ( int ) ReconciliationStatus.Reconciled;
+                    agentclient.Status = ( int ) ReconciliationStatus.Reconciled;
                     agentclient.ChepLoadsId = agent.Id;
                     agentclient.ClientLoadsId = client.Id;
 
-                    chepService.Update(agent);
-                    clientservice.Update(client);
-                    cgservivce.Create(agentclient);
+                    chepService.Update( agent );
+                    clientservice.Update( client );
+                    cgservivce.Create( agentclient );
 
                     scope.Complete();
                 }
 
 
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
-            } else
+                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
+            }
+            else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
 
@@ -1519,102 +1529,103 @@ namespace ACT.UI.Controllers
         #region Journals Tasks and Comments
 
         #region Comments
-        public JsonResult RemoveComment(int? id = null, string ctype = null)
+        public JsonResult RemoveComment( int? id = null, string ctype = null )
         {
-            int commId = (id != null ? (int)id : 0);
-            if (commId > 0)
+            int commId = ( id != null ? ( int ) id : 0 );
+            if ( commId > 0 )
             {
-                using (TransactionScope scope = new TransactionScope())
-                using (CommentService service = new CommentService())
+                using ( TransactionScope scope = new TransactionScope() )
+                using ( CommentService service = new CommentService() )
                 {
 
-                    Comment comm = service.GetById(commId);
-                    comm.Status = (int)Status.Inactive;
-                    service.Update(comm);
+                    Comment comm = service.GetById( commId );
+                    comm.Status = ( int ) Status.Inactive;
+                    service.Update( comm );
 
                     scope.Complete();
                 }
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
 
         }
-        public JsonResult AddComment(int? id = null, string utype = null, string details = null)
+        public JsonResult AddComment( int? id = null, string utype = null, string details = null )
         {
 
-            if (id != null && !string.IsNullOrEmpty(utype)) {
+            if ( id != null && !string.IsNullOrEmpty( utype ) )
+            {
                 Comment comm = new Comment()
                 {
                     Details = details,
-                    ObjectId = (int)id,
+                    ObjectId = ( int ) id,
                     ObjectType = utype,
-                    Status = (int)Status.Active
+                    Status = ( int ) Status.Active
                 };
 
-                using (TransactionScope scope = new TransactionScope())
-                using (CommentService service = new CommentService())
+                using ( TransactionScope scope = new TransactionScope() )
+                using ( CommentService service = new CommentService() )
                 {
-                    service.Create(comm);
+                    service.Create( comm );
                 }
             }
 
             //return Json("Uploaded " + Request.Files.Count + " files");
-            return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
         }
 
-        public ActionResult ListComments(string objId, string objType)
+        public ActionResult ListComments( string objId, string objType )
         {
             List<Comment> commlist = new List<Comment>();
-            if (!string.IsNullOrEmpty(objType) && !string.IsNullOrEmpty(objId))
+            if ( !string.IsNullOrEmpty( objType ) && !string.IsNullOrEmpty( objId ) )
             {
                 string controllerObjectType = objType;
-                using (CommentService service = new CommentService())
+                using ( CommentService service = new CommentService() )
                 {
-                    commlist = service.ListByColumnsWhere("ObjectId", objId, "ObjectType", objType);
+                    commlist = service.ListByColumnsWhere( "ObjectId", objId, "ObjectType", objType );
                 }
             }
-            if (commlist != null)
+            if ( commlist != null )
             {
-                return Json(commlist, JsonRequestBehavior.AllowGet);
+                return Json( commlist, JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
         #endregion
 
         #region Tasks
-        public JsonResult RemoveTask(int? id = null, string ctype = null)
+        public JsonResult RemoveTask( int? id = null, string ctype = null )
         {
-            int tskId = (id != null ? (int)id : 0);
-            if (tskId > 0)
+            int tskId = ( id != null ? ( int ) id : 0 );
+            if ( tskId > 0 )
             {
-                using (TransactionScope scope = new TransactionScope())
-                using (TaskService service = new TaskService())
+                using ( TransactionScope scope = new TransactionScope() )
+                using ( TaskService service = new TaskService() )
                 {
 
-                    Task tsk = service.GetById(tskId);
-                    tsk.Status = (int)Status.Inactive;
-                    service.Update(tsk);
+                    Task tsk = service.GetById( tskId );
+                    tsk.Status = ( int ) Status.Inactive;
+                    service.Update( tsk );
 
                     scope.Complete();
                 }
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
 
         }
-        public JsonResult AddTask(int clientId, int agentLoadId, int clientLoadId, string name, string description)
+        public JsonResult AddTask( int clientId, int agentLoadId, int clientLoadId, string name, string description )
         {
 
-            if (clientId > 0 && agentLoadId > 0 && clientLoadId > 0)
+            if ( clientId > 0 && agentLoadId > 0 && clientLoadId > 0 )
             {
                 Task tsk = new Task()
                 {
@@ -1623,34 +1634,34 @@ namespace ACT.UI.Controllers
                     ClientLoadId = clientLoadId,
                     Name = name,
                     Description = description,
-                    Status = (int)Status.Active,
-                    Action = (int)ActionType.None
+                    Status = ( int ) Status.Active,
+                    Action = ( int ) ActionType.None
                 };
 
-                using (TransactionScope scope = new TransactionScope())
-                using (TaskService service = new TaskService())
+                using ( TransactionScope scope = new TransactionScope() )
+                using ( TaskService service = new TaskService() )
                 {
-                    service.Create(tsk);
+                    service.Create( tsk );
                     scope.Complete();
                 }
             }
 
             //return Json("Uploaded " + Request.Files.Count + " files");
-            return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
         }
 
-        public JsonResult MarkTask(int taskId, int agentLoadId, int clientLoadId)
+        public JsonResult MarkTask( int taskId, int agentLoadId, int clientLoadId )
         {
 
-            if (taskId > 0 && agentLoadId > 0 && clientLoadId > 0)
+            if ( taskId > 0 && agentLoadId > 0 && clientLoadId > 0 )
             {
 
-                using (TransactionScope scope = new TransactionScope())
-                using (TaskService service = new TaskService())
+                using ( TransactionScope scope = new TransactionScope() )
+                using ( TaskService service = new TaskService() )
                 {
-                    Task tsk = service.GetById(taskId);
-                    tsk.Status = (int)Status.Inactive;
-                    service.Update(tsk);
+                    Task tsk = service.GetById( taskId );
+                    tsk.Status = ( int ) Status.Inactive;
+                    service.Update( tsk );
 
                     scope.Complete();
 
@@ -1658,132 +1669,132 @@ namespace ACT.UI.Controllers
             }
 
             //return Json("Uploaded " + Request.Files.Count + " files");
-            return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
         }
 
-        public JsonResult EmailTask(int taskId, int agentLoadId, int clientLoadId, string instruction, string to)
+        public JsonResult EmailTask( int taskId, int agentLoadId, int clientLoadId, string instruction, string to )
         {
 
-            if (taskId > 0 && agentLoadId > 0 && clientLoadId > 0)
+            if ( taskId > 0 && agentLoadId > 0 && clientLoadId > 0 )
             {
                 //UPDATE EMAILS HERE TO EMAIL
 
-                using (TransactionScope scope = new TransactionScope())                  
-                using (TaskService service = new TaskService())
+                using ( TransactionScope scope = new TransactionScope() )
+                using ( TaskService service = new TaskService() )
                 {
-                    Task tsk = service.GetById(taskId);
-                    tsk.Status = (int)Status.Active;
-                    tsk.Action = (int)ActionType.Email;
-                    service.Update(tsk);
+                    Task tsk = service.GetById( taskId );
+                    tsk.Status = ( int ) Status.Active;
+                    tsk.Action = ( int ) ActionType.Email;
+                    service.Update( tsk );
 
                     scope.Complete();
                 }
             }
 
             //return Json("Uploaded " + Request.Files.Count + " files");
-            return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
         }
 
-        public ActionResult ListTasks(string objId, string objType)
+        public ActionResult ListTasks( string objId, string objType )
         {
             List<Comment> commlist = new List<Comment>();
-            if (!string.IsNullOrEmpty(objType) && !string.IsNullOrEmpty(objId))
+            if ( !string.IsNullOrEmpty( objType ) && !string.IsNullOrEmpty( objId ) )
             {
                 string controllerObjectType = objType;
-                using (CommentService service = new CommentService())
+                using ( CommentService service = new CommentService() )
                 {
-                    commlist = service.ListByColumnsWhere("ObjectId", objId, "ObjectType", objType);
+                    commlist = service.ListByColumnsWhere( "ObjectId", objId, "ObjectType", objType );
                 }
             }
-            if (commlist != null)
+            if ( commlist != null )
             {
-                return Json(commlist, JsonRequestBehavior.AllowGet);
+                return Json( commlist, JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
         #endregion
 
         #region Tasks
-        public JsonResult RemoveJournal(int? id = null, string ctype = null)
+        public JsonResult RemoveJournal( int? id = null, string ctype = null )
         {
-            int tskId = (id != null ? (int)id : 0);
-            if (tskId > 0)
+            int tskId = ( id != null ? ( int ) id : 0 );
+            if ( tskId > 0 )
             {
-                using (TransactionScope scope = new TransactionScope())
-                using (JournalService service = new JournalService())
+                using ( TransactionScope scope = new TransactionScope() )
+                using ( JournalService service = new JournalService() )
                 {
 
-                    Journal tsk = service.GetById(tskId);
-                    tsk.Status = (int)Status.Inactive;
-                    service.Update(tsk);
+                    Journal tsk = service.GetById( tskId );
+                    tsk.Status = ( int ) Status.Inactive;
+                    service.Update( tsk );
 
                     scope.Complete();
                 }
-                return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
 
         }
-        public JsonResult AddJournal(int clientLoadId, int siteAuditId, int documentId,  string description, string qty, int isIn, string refnumber)
+        public JsonResult AddJournal( int clientLoadId, int siteAuditId, int documentId, string description, string qty, int isIn, string refnumber )
         {
 
-            if (clientLoadId > 0)
+            if ( clientLoadId > 0 )
             {
-                Journal journal = new Journal(){ };
-                journal.ClientLoadId = (int)clientLoadId;
-                if (siteAuditId>0)
-                    journal.SiteAuditId = (int)siteAuditId;
-                if (documentId > 0)
-                    journal.DocumetId = (int)documentId;
+                Journal journal = new Journal() { };
+                journal.ClientLoadId = ( int ) clientLoadId;
+                if ( siteAuditId > 0 )
+                    journal.SiteAuditId = ( int ) siteAuditId;
+                if ( documentId > 0 )
+                    journal.DocumetId = ( int ) documentId;
 
                 journal.PostingDescription = description;
-                journal.InOutInd = ((int)isIn==0?false:true);
+                journal.InOutInd = ( ( int ) isIn == 0 ? false : true );
 
-                if (qty != null)
+                if ( qty != null )
                 {
                     decimal inQty = 0;
-                    decimal.TryParse(qty, out inQty);
+                    decimal.TryParse( qty, out inQty );
                     journal.PostingQuantity = inQty;
 
-                } 
+                }
                 journal.THAN = refnumber;
-                journal.Status = (int)Status.Active;
+                journal.Status = ( int ) Status.Active;
                 journal.JournalType = "ClientLoad";
 
-                using (TransactionScope scope = new TransactionScope())
-                using (JournalService service = new JournalService())
+                using ( TransactionScope scope = new TransactionScope() )
+                using ( JournalService service = new JournalService() )
                 {
-                    service.Create(journal);
+                    service.Create( journal );
                 }
             }
 
             //return Json("Uploaded " + Request.Files.Count + " files");
-            return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
+            return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
         }
 
-        public ActionResult ListJournals(string clientLoadId)
+        public ActionResult ListJournals( string clientLoadId )
         {
             List<Journal> commlist = new List<Journal>();
-            if (!string.IsNullOrEmpty(clientLoadId))
+            if ( !string.IsNullOrEmpty( clientLoadId ) )
             {
-                using (JournalService service = new JournalService())
+                using ( JournalService service = new JournalService() )
                 {
-                    commlist = service.ListByColumnWhere("ClientLoadId", int.Parse(clientLoadId));
+                    commlist = service.ListByColumnWhere( "ClientLoadId", int.Parse( clientLoadId ) );
                 }
             }
-            if (commlist != null)
+            if ( commlist != null )
             {
-                return Json(commlist, JsonRequestBehavior.AllowGet);
+                return Json( commlist, JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
         #endregion
@@ -1797,15 +1808,15 @@ namespace ACT.UI.Controllers
 
         [HttpPost]
         // POSt: /Client/ImportChepLoad
-        public ActionResult ImportChepLoad(HttpPostedFileBase postedFile)
+        public ActionResult ImportChepLoad( HttpPostedFileBase postedFile )
         {
             string importMessage = "Pooling Agent Import Started\r\n";
-            if (postedFile != null)
+            if ( postedFile != null )
             {
-                string fileExtension = Path.GetExtension(postedFile.FileName);
+                string fileExtension = Path.GetExtension( postedFile.FileName );
 
                 //Validate uploaded file and return error.
-                if (fileExtension != ".csv")
+                if ( fileExtension != ".csv" )
                 {
                     ViewBag.Message = "Please select the csv file with .csv extension";
                     return View();
@@ -1813,48 +1824,49 @@ namespace ACT.UI.Controllers
 
                 try
                 {
-                    string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-                    int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                    string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+                    int clientID = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
                     int cnt = 0;
                     int cntCreated = 0;
-                   
-                    using (var sreader = new StreamReader(postedFile.InputStream))
-                    using (ChepLoadService service = new ChepLoadService())
-                    using (TransactionScope scope = new TransactionScope())
+
+                    using ( var sreader = new StreamReader( postedFile.InputStream ) )
+                    using ( ChepLoadService service = new ChepLoadService() )
+                    using ( TransactionScope scope = new TransactionScope() )
                     {
                         //First line is header. If header is not passed in csv then we can neglect the below line.
-                        string[] headers = sreader.ReadLine().Split(',');
+                        string[] headers = sreader.ReadLine().Split( ',' );
                         //Loop through the records
-                        while (!sreader.EndOfStream)
+                        while ( !sreader.EndOfStream )
                         {
-                            try { 
-                                string[] rows = sreader.ReadLine().Split(',');
+                            try
+                            {
+                                string[] rows = sreader.ReadLine().Split( ',' );
 
                                 ChepLoad model = new ChepLoad();
 
-                                if (!string.IsNullOrEmpty(rows[0]))
+                                if ( !string.IsNullOrEmpty( rows[ 0 ] ) )
                                 {
-                                    model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeHelper.formatImportDate(rows[0]) : DateTime.Now);
-                                    model.EffectiveDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeHelper.formatImportDate(rows[1]) : DateTime.Now);
-                                    model.NotifyDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeHelper.formatImportDate(rows[2]) : DateTime.Now);
-                                    model.DocketNumber = rows[3];
+                                    model.LoadDate = ( !string.IsNullOrEmpty( rows[ 0 ] ) ? DateTimeHelper.formatImportDate( rows[ 0 ] ) : DateTime.Now );
+                                    model.EffectiveDate = ( !string.IsNullOrEmpty( rows[ 0 ] ) ? DateTimeHelper.formatImportDate( rows[ 1 ] ) : DateTime.Now );
+                                    model.NotifyDate = ( !string.IsNullOrEmpty( rows[ 0 ] ) ? DateTimeHelper.formatImportDate( rows[ 2 ] ) : DateTime.Now );
+                                    model.DocketNumber = rows[ 3 ];
                                     model.PostingType = 2;//import - Transfer Customer to Customer - Out
-                                    model.ClientDescription = rows[5];
-                                    model.ReferenceNumber = rows[6];
-                                    model.ReceiverNumber = rows[7];
-                                    model.Equipment = rows[10];
+                                    model.ClientDescription = rows[ 5 ];
+                                    model.ReferenceNumber = rows[ 6 ];
+                                    model.ReceiverNumber = rows[ 7 ];
+                                    model.Equipment = rows[ 10 ];
                                     model.CreatedOn = DateTime.Now;
                                     model.ModfiedOn = DateTime.Now;
-                                    model.OriginalQuantity = (Decimal.TryParse(rows[11], out decimal oQty)? oQty : 0);
+                                    model.OriginalQuantity = ( Decimal.TryParse( rows[ 11 ], out decimal oQty ) ? oQty : 0 );
                                     model.NewQuantity = model.OriginalQuantity;
 
-                                    service.Create(model);
+                                    service.Create( model );
                                     importMessage += " Trading Partner: " + model.ClientDescription + " created at Id " + model.Id + "<br>";
-                                    Notify("The PSP Configuration details were successfully updated.", NotificationType.Success);
+                                    Notify( "The PSP Configuration details were successfully updated.", NotificationType.Success );
                                     cntCreated++;
                                 }
-                            }              
-                            catch (Exception ex)
+                            }
+                            catch ( Exception ex )
                             {
                                 importMessage += ex.Message + "<br>";
                                 ViewBag.Message = ex.Message;
@@ -1864,11 +1876,11 @@ namespace ACT.UI.Controllers
                         importMessage += " Records To Process: " + cnt + "<br>";
                         importMessage += " Records Processed: " + cntCreated + "<br>";
                         scope.Complete();
-                        Session["ImportMessage"] = importMessage;
+                        Session[ "ImportMessage" ] = importMessage;
                     }
 
                 }
-                catch (Exception ex)
+                catch ( Exception ex )
                 {
                     importMessage += ex.Message + "<br>";
                     ViewBag.Message = ex.Message;
@@ -1882,22 +1894,22 @@ namespace ACT.UI.Controllers
             {
 
             }
-            Session["ImportMessage"] = importMessage;
-            return RedirectToAction("PoolingAgentData", "Pallet");
+            Session[ "ImportMessage" ] = importMessage;
+            return RedirectToAction( "PoolingAgentData", "Pallet" );
         }
 
 
         [HttpPost]
         // GET: /Client/ImportClientLoad
-        public ActionResult ImportClientLoad(HttpPostedFileBase postedFile)
+        public ActionResult ImportClientLoad( HttpPostedFileBase postedFile )
         {
             string importMessage = "Client Load Import Started\r\n";
-            if (postedFile != null)
+            if ( postedFile != null )
             {
-                string fileExtension = Path.GetExtension(postedFile.FileName);
+                string fileExtension = Path.GetExtension( postedFile.FileName );
 
                 //Validate uploaded file and return error.
-                if (fileExtension != ".csv")
+                if ( fileExtension != ".csv" )
                 {
                     ViewBag.Message = "Please select the csv file with .csv extension";
                     return View();
@@ -1905,27 +1917,27 @@ namespace ACT.UI.Controllers
 
                 try
                 {
-                    string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-                    int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
+                    string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+                    int clientID = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
                     int cnt = 0;
                     int cntCreated = 0;
 
-                    using (var sreader = new StreamReader(postedFile.InputStream))
-                    using (ClientLoadService service = new ClientLoadService())
-                    using (DeliveryNoteService noteservice = new DeliveryNoteService())
-                    using (DeliveryNoteLineService lineservice = new DeliveryNoteLineService())
-                    using (AddressService addservice = new AddressService())
-                    using (ClientService clientservice = new ClientService())
-                    using (TransactionScope scope = new TransactionScope())
+                    using ( var sreader = new StreamReader( postedFile.InputStream ) )
+                    using ( ClientLoadService service = new ClientLoadService() )
+                    using ( DeliveryNoteService noteservice = new DeliveryNoteService() )
+                    using ( DeliveryNoteLineService lineservice = new DeliveryNoteLineService() )
+                    using ( AddressService addservice = new AddressService() )
+                    using ( ClientService clientservice = new ClientService() )
+                    using ( TransactionScope scope = new TransactionScope() )
                     {
                         //First line is header. If header is not passed in csv then we can neglect the below line.
-                        string[] headers = sreader.ReadLine().Split(',');
+                        string[] headers = sreader.ReadLine().Split( ',' );
                         //Loop through the records
-                        while (!sreader.EndOfStream)
+                        while ( !sreader.EndOfStream )
                         {
                             try
                             {
-                                string[] rows = sreader.ReadLine().Split(',');
+                                string[] rows = sreader.ReadLine().Split( ',' );
 
                                 ClientLoad model = new ClientLoad();
                                 int vehicleId = 0;
@@ -1966,12 +1978,12 @@ namespace ACT.UI.Controllers
                                 //        }
                                 //    }
                                 //} //no else, if  there are no column data we cant add or facilitate a row addition
-                                if (!string.IsNullOrEmpty(rows[12]))// && transporterId > 0
+                                if ( !string.IsNullOrEmpty( rows[ 12 ] ) )// && transporterId > 0
                                 {
-                                    using (VehicleService vehservice = new VehicleService())
+                                    using ( VehicleService vehservice = new VehicleService() )
                                     {
-                                        VehicleCustomModel vehicle = vehservice.ListCSM(new PagingModel(), new CustomSearchModel() { Query = rows[12], Status = Status.Active }).FirstOrDefault();
-                                        if (vehicle != null)
+                                        VehicleCustomModel vehicle = vehservice.ListCSM( new PagingModel(), new CustomSearchModel() { Query = rows[ 12 ], Status = Status.Active } ).FirstOrDefault();
+                                        if ( vehicle != null )
                                         {
                                             vehicleId = vehicle.Id; //else remains 0
                                         }
@@ -1986,20 +1998,20 @@ namespace ACT.UI.Controllers
                                                     Make = "TBC",
                                                     Model = "TBC",
                                                     Year = 1,
-                                                    EngineNumber = rows[12],
-                                                    VINNumber = rows[12],
-                                                    Registration = rows[12],
-                                                    Descriptoin = rows[12],
-                                                    Type = (int)VehicleType.Other,
-                                                    Status = (int)Status.Active
+                                                    EngineNumber = rows[ 12 ],
+                                                    VINNumber = rows[ 12 ],
+                                                    Registration = rows[ 12 ],
+                                                    Descriptoin = rows[ 12 ],
+                                                    Type = ( int ) VehicleType.Other,
+                                                    Status = ( int ) Status.Active
                                                 };
-                                                vehservice.Create(veh);
+                                                vehservice.Create( veh );
                                                 vehicleId = veh.Id;
-                                                importMessage += " Vehicle: " + veh.Registration + " created at Id " + veh.Id + " For Transporter " + rows[11] + "<br>";
+                                                importMessage += " Vehicle: " + veh.Registration + " created at Id " + veh.Id + " For Transporter " + rows[ 11 ] + "<br>";
                                             }
-                                            catch (Exception ex)
+                                            catch ( Exception ex )
                                             {
-                                                importMessage += "Reg : " + rows[12] + "Error " + ex.Message + "<br>";
+                                                importMessage += "Reg : " + rows[ 12 ] + "Error " + ex.Message + "<br>";
                                                 ViewBag.Message = ex.Message;
                                             }
                                         }
@@ -2007,32 +2019,32 @@ namespace ACT.UI.Controllers
 
                                 } //no else, if  there are no column data we cant add or facilitate a row addition
 
-                                if (!string.IsNullOrEmpty(rows[0]))
+                                if ( !string.IsNullOrEmpty( rows[ 0 ] ) )
                                 {
-                                    if (vehicleId > 0)//&& transporterId > 0
+                                    if ( vehicleId > 0 )//&& transporterId > 0
                                     {
                                         model.ClientId = clientID;
-                                        model.LoadDate = (!string.IsNullOrEmpty(rows[0]) ? DateTimeHelper.formatImportDate(rows[0]) : DateTime.Now);
-                                        model.LoadNumber = rows[1];
-                                        model.AccountNumber = rows[2];
-                                        model.ClientDescription = rows[3];
+                                        model.LoadDate = ( !string.IsNullOrEmpty( rows[ 0 ] ) ? DateTimeHelper.formatImportDate( rows[ 0 ] ) : DateTime.Now );
+                                        model.LoadNumber = rows[ 1 ];
+                                        model.AccountNumber = rows[ 2 ];
+                                        model.ClientDescription = rows[ 3 ];
                                         //model.ProvCode = rows[4];
-                                        model.PCNNumber = rows[5];
-                                        model.DeliveryNote = rows[6];
+                                        model.PCNNumber = rows[ 5 ];
+                                        model.DeliveryNote = rows[ 6 ];
                                         //model.PRNNumber = rows[7];
-                                        model.OriginalQuantity = (Decimal.TryParse(rows[7], out decimal oQty) ? oQty : 0);
+                                        model.OriginalQuantity = ( Decimal.TryParse( rows[ 7 ], out decimal oQty ) ? oQty : 0 );
                                         model.NewQuantity = model.OriginalQuantity;
-                                        model.ReturnQty = (Decimal.TryParse(rows[8], out decimal rQty) ? rQty : 0);
+                                        model.ReturnQty = ( Decimal.TryParse( rows[ 8 ], out decimal rQty ) ? rQty : 0 );
                                         //model.RetQuantity = decimal.Parse(rows[9]);
-                                 //       model.ARPMComments = rows[10];
+                                        //       model.ARPMComments = rows[10];
                                         //some of the columns are malaligned but leaving it as is, I added 3 new columns
-                                        if (vehicleId > 0)
+                                        if ( vehicleId > 0 )
                                             model.VehicleId = vehicleId;
                                         //if (transporterId > 0)
                                         //    model.TransporterId = transporterId;
                                         model.CreatedOn = DateTime.Now;
                                         model.ModifiedOn = DateTime.Now;
-                                        service.Create(model);
+                                        service.Create( model );
                                         importMessage += " Customer: " + model.ClientDescription + " created at Id " + model.Id + "<br>";
                                         cntCreated++;
 
@@ -2042,13 +2054,13 @@ namespace ACT.UI.Controllers
                                             #region Save DeliveryNote
                                             DeliveryNote delnote = new DeliveryNote();
 
-                                            Client noteClient = clientservice.GetById(clientID);
-                                            Address clientAddress = addservice.GetByColumnsWhere("ObjectId", model.ClientId, "ObjectType", "Client");
-                                            string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ((Province)clientAddress.Province).GetDisplayText();
+                                            Client noteClient = clientservice.GetById( clientID );
+                                            Address clientAddress = addservice.GetByColumnsWhere( "ObjectId", model.ClientId, "ObjectType", "Client" );
+                                            string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ( ( Province ) clientAddress.Province ).GetDisplayText();
                                             //string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ((Province)model.BillingProvince).GetDisplayText();
                                             //string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ((Province)model.DeliveryProvince).GetDisplayText();
 
-                                            if (model.Id > 0)
+                                            if ( model.Id > 0 )
                                             {
                                                 try
                                                 {
@@ -2061,7 +2073,7 @@ namespace ACT.UI.Controllers
                                                     delnote.OrderDate = model.LoadDate;
                                                     //delnote.ContactNumber = model.ContactNumber;
                                                     delnote.Reference306 = model.LoadNumber;
-                                                    delnote.Status = (int)Status.Active;
+                                                    delnote.Status = ( int ) Status.Active;
 
                                                     delnote.CustomerAddress = customerAddress;
                                                     delnote.CustomerPostalCode = clientAddress.PostalCode;
@@ -2077,7 +2089,7 @@ namespace ACT.UI.Controllers
                                                     //delnote.BillingProvince = model.BillingProvince;
 
                                                     //Create Client Invoice Address
-                                                    noteservice.Create(delnote);
+                                                    noteservice.Create( delnote );
 
                                                     //Create Invoice Customer Address
                                                     Address invoiceCustomerAddress = new Address()
@@ -2085,23 +2097,23 @@ namespace ACT.UI.Controllers
                                                         ObjectId = delnote.Id,
                                                         ObjectType = "InvoiceCustomer",
                                                         Town = clientAddress.Town,
-                                                        Status = (int)Status.Active,
+                                                        Status = ( int ) Status.Active,
                                                         PostalCode = clientAddress.PostalCode,
                                                         Type = 1,
                                                         Addressline1 = clientAddress.Addressline1,
                                                         Addressline2 = clientAddress.Addressline2,
-                                                        Province = (int)clientAddress.Province,
+                                                        Province = ( int ) clientAddress.Province,
                                                         //Province = (int)mappedProvinceVal,
                                                     };
-                                                    addservice.Create(invoiceCustomerAddress);
+                                                    addservice.Create( invoiceCustomerAddress );
 
 
                                                 }
-                                                catch (Exception ex)
+                                                catch ( Exception ex )
                                                 {
                                                     ViewBag.Message = ex.Message;
                                                     //  return View();
-                                                    return PartialView("_GenerateDeliveryNote", model);
+                                                    return PartialView( "_GenerateDeliveryNote", model );
                                                 }
 
                                             }
@@ -2118,18 +2130,18 @@ namespace ACT.UI.Controllers
                                                 noteline.OrderQuantity = model.OriginalQuantity;
                                                 noteline.ModifiedOn = DateTime.Now;
                                                 noteline.CreatedOn = DateTime.Now;
-                                                noteline.Status = (int)Status.Active;
+                                                noteline.Status = ( int ) Status.Active;
 
-                                                lineservice.Create(noteline);
+                                                lineservice.Create( noteline );
                                             }
-                                            catch (Exception ex)
+                                            catch ( Exception ex )
                                             {
                                                 ViewBag.Message = ex.Message;
                                             }
 
                                             #endregion
                                         }
-                                        catch (Exception ex)
+                                        catch ( Exception ex )
                                         {
                                             ViewBag.Message = ex.Message;
                                         }
@@ -2144,7 +2156,7 @@ namespace ACT.UI.Controllers
                                     importMessage += " File Row : " + cnt + " could not be inserted. Check Data<br>";
                                 }
                             }
-                            catch (Exception ex)
+                            catch ( Exception ex )
                             {
                                 importMessage += ex.Message + "<br>";
                                 ViewBag.Message = ex.Message;
@@ -2154,11 +2166,11 @@ namespace ACT.UI.Controllers
                         importMessage += " Records To Process: " + cnt + "<br>";
                         importMessage += " Records Processed: " + cntCreated + "<br>";
                         scope.Complete();
-                        Session["ImportMessage"] = importMessage;
+                        Session[ "ImportMessage" ] = importMessage;
                     }
 
                 }
-                catch (Exception ex)
+                catch ( Exception ex )
                 {
                     importMessage += ex.Message + "<br>";
                     ViewBag.Message = ex.Message;
@@ -2172,67 +2184,67 @@ namespace ACT.UI.Controllers
             {
 
             }
-            Session["ImportMessage"] = importMessage;
-            return RedirectToAction("ClientData", "Pallet");
+            Session[ "ImportMessage" ] = importMessage;
+            return RedirectToAction( "ClientData", "Pallet" );
         }
 
 
         //
         // Returns a general list of all active clients allowed in the current context to be selected from
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public JsonResult ImportEmails(string pspId = null)
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult ImportEmails( string pspId = null )
         {
-            if (pspId != null)
+            if ( pspId != null )
             {
-                using (PSPConfigService confservice = new PSPConfigService())
+                using ( PSPConfigService confservice = new PSPConfigService() )
                 {
-                    PSPConfig conf = confservice.GetById(int.Parse(pspId));
-                    if (conf.ImportEmailHost != null && conf.ImportEmailPort != null)
+                    PSPConfig conf = confservice.GetById( int.Parse( pspId ) );
+                    if ( conf.ImportEmailHost != null && conf.ImportEmailPort != null )
                     {
                         OpenPop.Pop3.Pop3Client pop3Client = new OpenPop.Pop3.Pop3Client();
-                        pop3Client.Connect(conf.ImportEmailHost, int.Parse(conf.ImportEmailPort), true);
-                        pop3Client.Authenticate(conf.ImportEmailUsername, conf.ImportEmailPassword, OpenPop.Pop3.AuthenticationMethod.UsernameAndPassword);
+                        pop3Client.Connect( conf.ImportEmailHost, int.Parse( conf.ImportEmailPort ), true );
+                        pop3Client.Authenticate( conf.ImportEmailUsername, conf.ImportEmailPassword, OpenPop.Pop3.AuthenticationMethod.UsernameAndPassword );
 
                         int count = pop3Client.GetMessageCount();
                         List<EmailCustomModel> Emails = new List<EmailCustomModel>();
                         int counter = 0;
-                        for (int i = count; i >= 1; i--)
+                        for ( int i = count; i >= 1; i-- )
                         {
-                            OpenPop.Mime.Message message = pop3Client.GetMessage(i);
+                            OpenPop.Mime.Message message = pop3Client.GetMessage( i );
                             EmailCustomModel email = new EmailCustomModel()
                             {
                                 MessageNumber = i,
                                 Subject = message.Headers.Subject,
                                 DateSent = message.Headers.DateSent,
-                                From = string.Format("<a href = 'mailto:{1}'>{0}</a>", message.Headers.From.DisplayName, message.Headers.From.Address),
+                                From = string.Format( "<a href = 'mailto:{1}'>{0}</a>", message.Headers.From.DisplayName, message.Headers.From.Address ),
                             };
                             OpenPop.Mime.MessagePart body = message.FindFirstHtmlVersion();
-                            if (body != null)
+                            if ( body != null )
                             {
                                 email.Body = body.GetBodyAsText();
                             }
                             else
                             {
                                 body = message.FindFirstPlainTextVersion();
-                                if (body != null)
+                                if ( body != null )
                                 {
                                     email.Body = body.GetBodyAsText();
                                 }
                             }
                             List<OpenPop.Mime.MessagePart> attachments = message.FindAllAttachments();
 
-                            foreach (OpenPop.Mime.MessagePart attachment in attachments)
+                            foreach ( OpenPop.Mime.MessagePart attachment in attachments )
                             {
-                                email.Attachments.Add(new AttachmentCustomModel
+                                email.Attachments.Add( new AttachmentCustomModel
                                 {
                                     FileName = attachment.FileName,
                                     ContentType = attachment.ContentType.MediaType,
                                     Content = attachment.Body
-                                });
+                                } );
                             }
-                            Emails.Add(email);
+                            Emails.Add( email );
                             counter++;
-                            if (counter > 2)
+                            if ( counter > 2 )
                             {
                                 break;
                             }
@@ -2262,11 +2274,11 @@ namespace ACT.UI.Controllers
                     }
                 }
 
-                return Json("OK", JsonRequestBehavior.AllowGet);
+                return Json( "OK", JsonRequestBehavior.AllowGet );
             }
             else
             {
-                return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
 
@@ -2277,32 +2289,32 @@ namespace ACT.UI.Controllers
 
         //
         // GET: /Administration/Export
-        public FileContentResult Export(PagingModel pm, CustomSearchModel csm, string type = "configurations")
+        public FileContentResult Export( PagingModel pm, CustomSearchModel csm, string type = "configurations" )
         {
             string csv = "";
-            string filename = string.Format("{0}-{1}.csv", type.ToUpperInvariant(), DateTime.Now.ToString("yyyy_MM_dd_HH_mm"));
+            string filename = string.Format( "{0}-{1}.csv", type.ToUpperInvariant(), DateTime.Now.ToString( "yyyy_MM_dd_HH_mm" ) );
 
             pm.Skip = 0;
             pm.Take = int.MaxValue;
 
-            switch (type)
+            switch ( type )
             {
                 case "clientlist":
                     #region ClientList
-                    csv = String.Format("Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine);
+                    csv = String.Format( "Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine );
 
                     List<Client> clients = new List<Client>();
 
-                    using (ClientService service = new ClientService())
+                    using ( ClientService service = new ClientService() )
                     {
-                        clients = service.ListCSM(pm, csm);
+                        clients = service.ListCSM( pm, csm );
                     }
 
-                    if (clients != null && clients.Any())
+                    if ( clients != null && clients.Any() )
                     {
-                        foreach (Client item in clients)
+                        foreach ( Client item in clients )
                         {
-                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
+                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
                                                 csv,
                                                 item.Id,
                                                 item.CompanyName,
@@ -2317,8 +2329,8 @@ namespace ACT.UI.Controllers
                                                 item.AdminEmail,
                                                 item.FinancialPerson,
                                                 item.FinPersonEmail,
-                                                (Status)(int)item.Status,
-                                                Environment.NewLine);
+                                                ( Status ) ( int ) item.Status,
+                                                Environment.NewLine );
                         }
                     }
 
@@ -2328,20 +2340,20 @@ namespace ACT.UI.Controllers
                     break;
                 case "awaitingactivation":
                     #region AwaitingActivation
-                    csv = String.Format("Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine);
+                    csv = String.Format( "Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine );
 
                     List<Client> inactiveclients = new List<Client>();
                     csm.Status = Status.Pending;
-                    using (ClientService service = new ClientService())
+                    using ( ClientService service = new ClientService() )
                     {
-                        inactiveclients = service.ListCSM(pm, csm);
+                        inactiveclients = service.ListCSM( pm, csm );
                     }
 
-                    if (inactiveclients != null && inactiveclients.Any())
+                    if ( inactiveclients != null && inactiveclients.Any() )
                     {
-                        foreach (Client item in inactiveclients)
+                        foreach ( Client item in inactiveclients )
                         {
-                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
+                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
                                                 csv,
                                                 item.Id,
                                                 item.CompanyName,
@@ -2356,8 +2368,8 @@ namespace ACT.UI.Controllers
                                                 item.AdminEmail,
                                                 item.FinancialPerson,
                                                 item.FinPersonEmail,
-                                                (Status)(int)item.Status,
-                                                Environment.NewLine);
+                                                ( Status ) ( int ) item.Status,
+                                                Environment.NewLine );
                         }
                     }
 
@@ -2367,20 +2379,20 @@ namespace ACT.UI.Controllers
                     break;
                 case "managesites":
                     #region AwaitingActivation
-                    csv = String.Format("Id, Name, Description, X Coord, Y Coord, Address, Postal Code, Contact Name,Contact No,Planning Point, Depot, Chep Sitecode, Site Type, Status {0}", Environment.NewLine);
+                    csv = String.Format( "Id, Name, Description, X Coord, Y Coord, Address, Postal Code, Contact Name,Contact No,Planning Point, Depot, Chep Sitecode, Site Type, Status {0}", Environment.NewLine );
 
                     List<Site> siteList = new List<Site>();
 
-                    using (SiteService service = new SiteService())
+                    using ( SiteService service = new SiteService() )
                     {
-                        siteList = service.ListCSM(pm, csm);
+                        siteList = service.ListCSM( pm, csm );
                     }
 
-                    if (siteList != null && siteList.Any())
+                    if ( siteList != null && siteList.Any() )
                     {
-                        foreach (Site item in siteList)
+                        foreach ( Site item in siteList )
                         {
-                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10}, {11}, {12}, {13}, {14} {15}",
+                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10}, {11}, {12}, {13}, {14} {15}",
                                                 csv,
                                                 item.Id,
                                                 item.Name,
@@ -2394,9 +2406,9 @@ namespace ACT.UI.Controllers
                                                 item.PlanningPoint,
                                                 item.Depot,
                                                 item.SiteCodeChep,
-                                                (SiteType)(int)item.SiteType,
-                                                (Status)(int)item.Status,
-                                                Environment.NewLine);
+                                                ( SiteType ) ( int ) item.SiteType,
+                                                ( Status ) ( int ) item.Status,
+                                                Environment.NewLine );
                         }
                     }
                     #endregion
@@ -2404,20 +2416,20 @@ namespace ACT.UI.Controllers
 
                 case "linkproducts":
                     #region linkproducts
-                    csv = String.Format("Id, ClientId, Company Name, ProductId, Product Name, Product Description, Active Date, HireRate, LostRate, IssueRate, PassonRate, PassonDays, Status {0}", Environment.NewLine);
+                    csv = String.Format( "Id, ClientId, Company Name, ProductId, Product Name, Product Description, Active Date, HireRate, LostRate, IssueRate, PassonRate, PassonDays, Status {0}", Environment.NewLine );
 
                     List<ClientProductCustomModel> product = new List<ClientProductCustomModel>();
 
-                    using (ClientProductService service = new ClientProductService())
+                    using ( ClientProductService service = new ClientProductService() )
                     {
-                        product = service.ListCSM(pm, csm);
+                        product = service.ListCSM( pm, csm );
                     }
 
-                    if (product != null && product.Any())
+                    if ( product != null && product.Any() )
                     {
-                        foreach (ClientProductCustomModel item in product)
+                        foreach ( ClientProductCustomModel item in product )
                         {
-                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} {14}",
+                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} {14}",
                                                 csv,
                                                 item.Id,
                                                 item.ClientId,
@@ -2431,8 +2443,8 @@ namespace ACT.UI.Controllers
                                                 item.IssueRate,
                                                 item.PassonRate,
                                                 item.PassonDays,
-                                                (Status)(int)item.Status,
-                                                Environment.NewLine);
+                                                ( Status ) ( int ) item.Status,
+                                                Environment.NewLine );
                         }
                     }
 
@@ -2443,26 +2455,26 @@ namespace ACT.UI.Controllers
 
                 case "clientgroups":
                     #region ClientGroup
-                    csv = String.Format("Id, Group Name, Description, Status {0}", Environment.NewLine);
+                    csv = String.Format( "Id, Group Name, Description, Status {0}", Environment.NewLine );
 
                     List<ClientGroupCustomModel> clientGroups = new List<ClientGroupCustomModel>();
 
-                    using (ClientGroupService service = new ClientGroupService())
+                    using ( ClientGroupService service = new ClientGroupService() )
                     {
-                        clientGroups = service.ListCSM(pm, csm);
+                        clientGroups = service.ListCSM( pm, csm );
                     }
 
-                    if (clientGroups != null && clientGroups.Any())
+                    if ( clientGroups != null && clientGroups.Any() )
                     {
-                        foreach (ClientGroupCustomModel item in clientGroups)
+                        foreach ( ClientGroupCustomModel item in clientGroups )
                         {
-                            csv = String.Format("{0} {1},{2},{3},{4} {5}",
+                            csv = String.Format( "{0} {1},{2},{3},{4} {5}",
                                                 csv,
                                                 item.Id,
                                                 item.Name,
                                                 item.Description,
-                                                 (Status)(int)item.Status,
-                                                Environment.NewLine);
+                                                 ( Status ) ( int ) item.Status,
+                                                Environment.NewLine );
                         }
                     }
 
@@ -2472,20 +2484,20 @@ namespace ACT.UI.Controllers
                     break;
                 case "clientkpis":
                     #region ClientKPI
-                    csv = String.Format("Id, Client Id,Description, Weight %, TargetAmount, Target Period, Status {0}", Environment.NewLine);
+                    csv = String.Format( "Id, Client Id,Description, Weight %, TargetAmount, Target Period, Status {0}", Environment.NewLine );
 
                     List<ClientKPI> kpis = new List<ClientKPI>();
 
-                    using (ClientKPIService service = new ClientKPIService())
+                    using ( ClientKPIService service = new ClientKPIService() )
                     {
-                        kpis = service.ListCSM(pm, csm);
+                        kpis = service.ListCSM( pm, csm );
                     }
 
-                    if (kpis != null && kpis.Any())
+                    if ( kpis != null && kpis.Any() )
                     {
-                        foreach (ClientKPI item in kpis)
+                        foreach ( ClientKPI item in kpis )
                         {
-                            csv = String.Format("{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
+                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
                                                 csv,
                                                 item.Id,
                                                 item.ClientId,
@@ -2497,8 +2509,8 @@ namespace ACT.UI.Controllers
                                                 item.Weight,
                                                 item.TargetAmount,
                                                 item.TargetPeriod,
-                                                (Status)(int)item.Status,
-                                                Environment.NewLine);
+                                                ( Status ) ( int ) item.Status,
+                                                Environment.NewLine );
                         }
                     }
 
@@ -2508,7 +2520,7 @@ namespace ACT.UI.Controllers
                     break;
             }
 
-            return File(new System.Text.UTF8Encoding().GetBytes(csv), "text/csv", filename);
+            return File( new System.Text.UTF8Encoding().GetBytes( csv ), "text/csv", filename );
         }
 
         #endregion

@@ -192,6 +192,37 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     break;
+
+                case "exceptions":
+
+                    #region Exceptions
+
+                    csv = String.Format( "Site,Sub-site,Load Date,Exception {0}", Environment.NewLine );
+
+                    using ( ClientLoadService dservice = new ClientLoadService() )
+                    {
+                        csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
+
+                        List<ClientLoadCustomModel> clientload = dservice.ListCSM( pm, csm );
+
+                        if ( clientload != null && clientload.Any() )
+                        {
+                            foreach ( ClientLoadCustomModel item in clientload )
+                            {
+                                csv = String.Format( "{0} {1},{2},{3} {12}",
+                                                    csv,
+                                                    item.SiteName,
+                                                    item.SubSiteName,
+                                                    item.LoadDate,
+                                                    item.OutstandingReason,
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
             }
 
             return File( new System.Text.UTF8Encoding().GetBytes( csv ), "text/csv", filename );
@@ -579,103 +610,154 @@ namespace ACT.UI.Controllers
 
 
 
+        #region Exceptions
+
+        //
+        // GET: /ClientReporting/ExceptionDetails/5
+        public ActionResult ExceptionDetails( int id, bool layout = true )
+        {
+            using ( DocumentService dservice = new DocumentService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            {
+                ClientLoad model = clservice.GetById( id );
+
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return RedirectToAction( "Index" );
+                }
+
+                List<Document> documents = dservice.List( model.Id, "ClientLoad" );
+
+                if ( documents != null )
+                {
+                    ViewBag.Documents = documents;
+                }
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                return View( model );
+            }
+        }
+
+        #endregion
+
+
+
         #region Partial Views
 
         //
         // POST || GET: /ClientReporting/Disputes
         public ActionResult Disputes( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-            if ( givecsm )
-            {
-                ViewBag.ViewName = "Disputes";
-
-                return PartialView( "_DisputesCustomSearch", new CustomSearchModel( "Disputes" ) );
-            }
-
-            int total = 0;
-
-            List<DisputeCustomModel> model;
-
             using ( DisputeService service = new DisputeService() )
             {
-                model = service.List1( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "Disputes";
+
+                    return PartialView( "_DisputesCustomSearch", new CustomSearchModel( "Disputes" ) );
+                }
+
+                List<DisputeCustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_Disputes", paging );
             }
-
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
-
-            return PartialView( "_Disputes", paging );
         }
 
         //
         // POST || GET: /ClientReporting/ChepAudit
         public ActionResult ChepAudit( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-            if ( givecsm )
-            {
-                ViewBag.ViewName = "ChepAudit";
-
-                return PartialView( "_ChepAuditCustomSearch", new CustomSearchModel( "ChepAudit" ) );
-            }
-
-            int total = 0;
-
-            List<ChepAuditCustomModel> model;
-
             using ( ChepAuditService service = new ChepAuditService() )
             {
-                model = service.List1( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "ChepAudit";
+
+                    return PartialView( "_ChepAuditCustomSearch", new CustomSearchModel( "ChepAudit" ) );
+                }
+
+                List<ChepAuditCustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_ChepAudit", paging );
             }
-
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
-
-            return PartialView( "_ChepAudit", paging );
         }
 
         //
         // POST || GET: /ClientReporting/ClientAudit
         public ActionResult ClientAudit( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-            if ( givecsm )
-            {
-                ViewBag.ViewName = "ClientAudit";
-
-                return PartialView( "_ClientAuditCustomSearch", new CustomSearchModel( "ClientAudit" ) );
-            }
-
-            int total = 0;
-
-            List<SiteAuditCustomModel> model;
-
             using ( SiteAuditService service = new SiteAuditService() )
             {
-                model = service.List1( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "ClientAudit";
+
+                    return PartialView( "_ClientAuditCustomSearch", new CustomSearchModel( "ClientAudit" ) );
+                }
+
+                List<SiteAuditCustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_ClientAudit", paging );
             }
+        }
 
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+        //
+        // POST || GET: /ClientReporting/OutstandingPallets
+        public ActionResult OutstandingPallets( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            using ( ClientLoadService service = new ClientLoadService() )
+            {
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "OutstandingPallets";
 
-            return PartialView( "_ClientAudit", paging );
+                    return PartialView( "_OutstandingPalletsCustomSearch", new CustomSearchModel( "OutstandingPallets" ) );
+                }
+
+                pm.SortBy = "cl.ClientId";
+                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
+
+                List<ClientLoadCustomModel> model = service.ListCSM( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_OutstandingPallets", paging );
+            }
         }
 
         //
         // POST || GET: /ClientReporting/MovementReport
         public ActionResult MovementReport( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-            if ( givecsm )
-            {
-                ViewBag.ViewName = "MovementReport";
-
-                return PartialView( "_MovementReportCustomSearch", new CustomSearchModel( "MovementReport" ) );
-            }
-
-            int total = 0;
-
-            List<ClientLoadCustomModel> model;
-
             using ( ClientLoadService service = new ClientLoadService() )
             {
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "MovementReport";
+
+                    return PartialView( "_MovementReportCustomSearch", new CustomSearchModel( "MovementReport" ) );
+                }
+
                 if ( !csm.FromDate.HasValue )
                 {
                     csm.FromDate = DateTime.Now.AddMonths( -1 );
@@ -685,13 +767,44 @@ namespace ACT.UI.Controllers
                     csm.ToDate = DateTime.Now;
                 }
 
-                model = service.ListCSM( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+                List<ClientLoadCustomModel> model = service.ListCSM( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_MovementReport", paging );
             }
+        }
 
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+        //
+        // POST || GET: /ClientReporting/Exceptions
+        public ActionResult Exceptions( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            using ( ClientLoadService service = new ClientLoadService() )
+            {
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "Exceptions";
 
-            return PartialView( "_MovementReport", paging );
+                    return PartialView( "_ExceptionsCustomSearch", new CustomSearchModel( "Exceptions" ) );
+                }
+
+                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
+
+                List<ClientLoadCustomModel> model = service.ListCSM( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                if ( model.NullableAny() && pm.SortBy == "CreatedOn" )
+                {
+                    model = model.OrderBy( o => o.SiteId ).ThenBy( t => t.LoadDate ).ToList();
+                }
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_Exceptions", paging );
+            }
         }
 
         #endregion

@@ -26,6 +26,8 @@ namespace ACT.Data.Models
         public int Id { get; set; }
         public int ClientId { get; set; }
         public int VehicleId { get; set; }
+        public Nullable<int> ClientSiteId { get; set; }
+        public Nullable<int> OutstandingReasonId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -49,10 +51,8 @@ namespace ACT.Data.Models
         public int Status { get; set; }
         public Nullable<int> InputInd { get; set; }
         public string THAN { get; set; }
-        public Nullable<int> ClientSiteId { get; set; }
         public Nullable<decimal> ReturnQty { get; set; }
         public Nullable<decimal> OutstandingQty { get; set; }
-        public Nullable<int> OutstandingReasonid { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }
@@ -60,6 +60,8 @@ namespace ACT.Data.Models
         public virtual Client Client1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientInvoice> ClientInvoices { get; set; }
+        public virtual ClientSite ClientSite { get; set; }
+        public virtual OutstandingReason OutstandingReason { get; set; }
         public virtual Vehicle Vehicle { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Journal> Journals { get; set; }

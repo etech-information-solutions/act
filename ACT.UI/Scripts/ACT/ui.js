@@ -110,6 +110,7 @@
             this.DataGSSite( $( '*[data-gs-site="1"]' ) );
             this.DataGSRegion( $( '*[data-gs-region="1"]' ) );
 
+            this.DataGSData( $( '[data-gs-data="1"]' ) );
             this.DataGSearch( $( '*[data-g-search="1"]' ) ); // Search button on Dashboard
 
             if ( window.location.search !== "" && !$( "tr.edit" ).length && $( ".dataTable" ).length && !ACT.UI.PageViewIdProcessed )
@@ -4021,18 +4022,69 @@
                     {
                         // These params should match the ACT.Core/Models/CustomSearchModel.cs
 
-                        var params = {
-                            SiteId: filters.find( "#SiteId" ).val(),
-                            ClientId: filters.find( "#ClientId" ).val(),
-                            RegionId: filters.find( "#RegionId" ).val(),
-                            ToDate: filters.find( '[name="ToDate"]' ).val(),
-                            FromDate: filters.find( '[name="FromDate"]' ).val()
-                        };
+                        var params = ACT.UI.GetDashSearchParams( filters );
 
                         $( ".gs-data" ).css( "display", "none" );
                         $( '*[data-graph="1"]' ).attr( "data-loaded", 0 );
 
                         ACT.UI.DataGraphs( $( '*[data-graph="1"]' ), params );
+                    } );
+            } );
+        },
+
+        GetDashSearchParams: function ( filters )
+        {
+            return {
+                GiveData: false,
+                SiteId: filters.find( "#SiteId" ).val(),
+                ClientId: filters.find( "#ClientId" ).val(),
+                RegionId: filters.find( "#RegionId" ).val(),
+                ToDate: filters.find( '[name="ToDate"]' ).val(),
+                FromDate: filters.find( '[name="FromDate"]' ).val()
+            };
+        },
+
+        DataGSData: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var type = i.attr( "data-type" );
+                var arrow = i.attr( "data-arrow" );
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var loaded = i.attr( "data-loaded" );
+
+                        if ( loaded === "1" )
+                        {
+                            $( ".sticky-frame" ).css( { "width": ( $( "#item-list" ).outerWidth() - 60 ), "max-width": ( $( "#item-list" ).outerWidth() - 60 ) } );
+
+                            ACT.Sticky.Show( i, "Data", target.html(), [], arrow );
+
+                            return;
+                        }
+
+                        var params = ACT.UI.GetDashSearchParams( $( "#gs-search-fields" ) );
+
+                        params.GiveData = true;
+
+                        ACT.Loader.Show( i.find( "i" ) );
+
+                        target.load( siteurl + "/" + type, params, function ( data )
+                        {
+                            $( ".sticky-frame" ).css( { "width": ( $( "#item-list" ).outerWidth() - 60 ), "max-width": ( $( "#item-list" ).outerWidth() - 60 ) } );
+
+                            ACT.Sticky.Show( i, "Data", data, ACT.Loader.Hide(), arrow );
+
+                            i.attr( "data-loaded", "1" );
+
+                            //ACT.Loader.Hide();
+                        } );
                     } );
             } );
         }

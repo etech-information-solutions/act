@@ -1,77 +1,65 @@
 ﻿
-@model PagingExtension
+@model List<DisputeCustomModel>
 
 @using ACT.Core.Enums;
 @using ACT.Core.Models.Custom;
 
-@{
-    ViewBag.ShowExport = true;
-    ViewBag.ShowCustom = true;
-    ViewBag.ViewName = "_Disputes";
-}
-
 
 @Html.Partial( "_Notification" )
 
-@{
-    Int32 count = Model.Start;
-    List<DisputeCustomModel> items = ( List<DisputeCustomModel> ) Model.Items;
-}
-
-@if ( Model == null || !items.Any() )
+@if ( !Model.NullableAny() )
 {
-    <div class="notification message-warn" style="margin-bottom: 20px;">
+    <div class="message-warn" style="margin-bottom: 20px;">
         There are no Disputes available matching your search criteria.
     </div>
 }
 
-<table id="disputes-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#disputes-table_wrapper" data-starting-point=".ap-tabs ul">
+<table id="disputes-table" class="da-table">
 
     <thead>
         <tr>
             <th data-name="Count">
                 #
             </th>
-            <th data-name="ChepLoadAccountNumber" data-column="ChepLoadAccountNumber">
+            <th>
                 Account #
             </th>
-            <th data-name="TDNNumber" data-column="d.TDNNumber">
+            <th>
                 TDN
             </th>
-            <th data-name="CreatedOn" data-column="d.CreatedOn">
+            <th>
                 Raised Date
             </th>
-            <th data-name="DocketNumber" data-column="d.DocketNumber">
+            <th>
                 Docket #
             </th>
-            <th data-name="Reference" data-column="d.Reference">
+            <th>
                 Ref
             </th>
-            <th data-name="ActionBy" data-column="u1.Name">
+            <th>
                 Action By
             </th>
-            <th data-name="OtherParty" data-column="d.OtherParty">
+            <th>
                 Other Party
             </th>
-            <th data-name="DisputeStatus" data-column="d.DisputeStatus">
+            <th>
                 Status
             </th>
-            <th data-name="Equipment" data-column="d.Equipment">
+            <th>
                 Equipment
             </th>
-            <th data-name="Quantity" data-column="d.Quantity">
+            <th>
                 Quantity
-            </th>
-            <th data-name="Actions">
-                Actions
             </th>
         </tr>
     </thead>
 
     <tbody>
-        @if ( Model != null && items != null && items.Count() > 0 )
+        @if ( Model.NullableAny() )
         {
-            foreach ( var item in items )
+            int count = 1;
+
+            foreach ( var item in Model )
             {
                 DisputeStatus status = ( DisputeStatus ) item.DisputeStatus;
 
@@ -81,18 +69,13 @@
                         @count
                     </td>
                     <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
+                    </td>
+                    <td>
                         @item.ChepLoadAccountNumber
                     </td>
                     <td>
                         @item.TDNNumber
-                    </td>
-                    <td>
-                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
-
-                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Dispute">
-                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
-                            <span></span>
-                        </a>
                     </td>
                     <td>
                         @item.DocketNumber
@@ -125,9 +108,6 @@
                     <td>
                         @item.Quantity
                     </td>
-                    <td width="4%">
-                        @Html.ActionLink( "Details", "DisputeDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                    </td>
 
                 </tr>
 
@@ -137,7 +117,3 @@
     </tbody>
 
 </table>
-
-@*@Html.Partial( "_DisputeCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
-
-@Html.Partial( "_Paging" )

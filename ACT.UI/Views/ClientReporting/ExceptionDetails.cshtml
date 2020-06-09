@@ -1,0 +1,251 @@
+﻿@model ClientLoad
+
+@using ACT.Core.Enums
+@using ACT.Data.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Details";
+
+    int count = 1;
+}
+
+@if ( ViewBag.IncludeLayout != null )
+{
+    <h2>
+        <img alt="" src="@Url.Content( "~/images/info.png" )" />
+        <span>Exception Details</span>
+    </h2>
+}
+
+<div id="item-details" class="item-details" style="width: auto;">
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <h2>
+            <img alt="" src="@Url.Content( "~/images/info.png" )" />
+            <span>Exception Details</span>
+        </h2>
+    }
+
+    <div class="left" style="width: 22%; margin-right: 3%;">
+
+        <div class="display-label">
+            Site
+        </div>
+        <div class="display-field">
+            @(Model?.ClientSite?.Site?.Description)
+        </div>
+
+        <div class="display-label">
+            Sub-site
+        </div>
+        <div class="display-field">
+            @(Model?.ClientSite?.Site?.Site2?.Description)
+        </div>
+
+        <div class="display-label">
+            Load Date
+        </div>
+        <div class="display-field">
+            @(( Model.LoadDate ?? Model.CreatedOn ).ToString( "yyyy-MM-dd" ))
+        </div>
+
+        <div class="display-label">
+            Exception
+        </div>
+        <div class="display-field">
+            @(Model?.OutstandingReason?.Description)
+        </div>
+
+    </div>
+
+    <div class="left" style="width: 75%;">
+
+        <div class="display-label">
+            Journals (@Model.Journals.NullableCount())
+        </div>
+        <div class="display-field">
+
+            @if ( Model.Journals.NullableAny() )
+            {
+                count = 1;
+
+                <table id="journal-@Model.Id-table" class="da-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                #
+                            </th>
+                            <th>
+                                Date
+                            </th>
+                            <th>
+                                Posting Quantity
+                            </th>
+                            <th>
+                                Posting Description
+                            </th>
+                            <th>
+                                IN/OUT
+                            </th>
+                            <th>
+                                THAN
+                            </th>
+                            <th>
+                                Type
+                            </th>
+                            <th>
+                                Status
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ( var item in Model.Journals )
+                        {
+                            Status status = ( Status ) item.Status;
+
+                            String active = status == Status.Active ? "active" : "inactive";
+
+                            <tr class="@active">
+                                <td width="1%">
+                                    @count
+                                </td>
+                                <td>
+                                    @item.CreatedOn.ToString( "yyyy-MM-dd @ HH:mm tt" )
+                                </td>
+                                <td>
+                                    @item.PostingQuantity
+                                </td>
+                                <td>
+                                    @item.PostingDescription
+                                </td>
+                                <td>
+                                    @(item.InOutInd == true ? "YES" : "NO")
+                                </td>
+                                <td>
+                                    @item.THAN
+                                </td>
+                                <td>
+                                    @item.JournalType
+                                </td>
+                                <td>
+                                    @status.GetDisplayText()
+                                </td>
+                            </tr>
+
+                            count++;
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="message-warn">
+                    There are no Jounals for this Exception yet.
+                </div>
+            }
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+        <div class="display-label">
+            Tasks (@Model.Tasks.NullableCount())
+        </div>
+        <div class="display-field">
+
+            @if ( Model.Tasks.NullableAny() )
+            {
+                count = 1;
+
+                <table id="task-@Model.Id-table" class="da-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                #
+                            </th>
+                            <th>
+                                Date
+                            </th>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+                                Description
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                            <th>
+                                Status
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ( var item in Model.Tasks )
+                        {
+                            Status status = ( Status ) item.Status;
+                            ActionType action = ( ActionType ) item.Action;
+
+                            String active = status == Status.Active ? "active" : "inactive";
+
+                            <tr class="@active">
+                                <td width="1%">
+                                    @count
+                                </td>
+                                <td>
+                                    @item.CreatedOn.ToString( "yyyy-MM-dd @ HH:mm tt" )
+                                </td>
+                                <td>
+                                    @item.Name
+                                </td>
+                                <td>
+                                    @item.Description
+                                </td>
+                                <td>
+                                    @action.GetDisplayText()
+                                </td>
+                                <td>
+                                    @status.GetDisplayText()
+                                </td>
+                            </tr>
+
+                            count++;
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="message-warn">
+                    There are no Tasks done on this Exception yet.
+                </div>
+            }
+        </div>
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <p>
+            @if ( ViewBag.IncludeLayout == null )
+            {
+                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Close</a>
+            }
+        </p>
+    }
+
+    @if ( ViewBag.IncludeLayout != null )
+    {
+        <div class="back-to-list">
+            @Html.ActionLink( "Back to List", "Index" )
+        </div>
+    }
+
+</div>

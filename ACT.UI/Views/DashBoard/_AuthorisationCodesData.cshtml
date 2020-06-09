@@ -1,0 +1,80 @@
+﻿
+@model List<ClientAuthorisationCustomModel>
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+<div style="max-height: 800px; overflow-x: auto;">
+
+
+    @Html.Partial( "_Notification" )
+
+    @if ( !Model.NullableAny() )
+    {
+        <div class="message-warn" style="margin-bottom: 20px;">
+            There are no Authorisation Codes available matching your search criteria.
+        </div>
+    }
+
+    <table id="authorisationcodes-table" class="da-table">
+
+        <thead>
+            <tr>
+                <th>
+                    #
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>
+                    Client
+                </th>
+                <th>
+                    Site
+                </th>
+                <th>
+                    Code
+                </th>
+                <th>
+                    Load #
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if ( Model.NullableAny() )
+            {
+                int count = 1;
+
+                foreach ( var item in Model )
+                {
+                    <tr>
+                        <td width="1%">
+                            @count
+                        </td>
+                        <td>
+                            @item.CreatedOn.ToString( "yyyy-MM-dd @ HH:mm tt" )
+                        </td>
+                        <td>
+                            @item.ClientName
+                        </td>
+                        <td>
+                            @item.SiteName
+                        </td>
+                        <td>
+                            @item.AuthorisationCode
+                        </td>
+                        <td>
+                            @item.LoadNumber
+                        </td>
+
+                    </tr>
+
+                    count++;
+                }
+            }
+        </tbody>
+
+    </table>
+
+</div>
