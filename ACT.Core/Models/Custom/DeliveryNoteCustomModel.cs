@@ -30,6 +30,17 @@ namespace ACT.Core.Models.Custom
         public int Status { get; set; }
 
         public List<DeliveryNoteLineCustomModel> DeliveryNoteLines { get; set; }
+
         public int CountNoteLines { get; set; }
+
+        public string SiteName { get; set; }
+
+        public string ClientName { get; set; }
+
+        public decimal? OrderedCountCount { get; set; }
+
+        public decimal? ReturnedCountCount { get; set; }
+
+        public decimal? DeliveredCountCount { get; set; }
     }
 }

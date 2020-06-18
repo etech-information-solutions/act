@@ -23,8 +23,9 @@ namespace ACT.Data.Models
         public string ProductDescription { get; set; }
         public Nullable<decimal> OrderQuantity { get; set; }
         public Nullable<decimal> Delivered { get; set; }
-        public int Status { get; set; }
+        public Nullable<decimal> Returned { get; set; }
         public string Equipment { get; set; }
+        public int Status { get; set; }
     
         public virtual DeliveryNote DeliveryNote { get; set; }
     }

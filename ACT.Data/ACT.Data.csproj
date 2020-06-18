@@ -81,9 +81,6 @@
     <Compile Include="Models\BankDetail.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Batch.cs">
-      <DependentUpon>ACT.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Broadcast.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
@@ -133,12 +130,6 @@
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Contact.cs">
-      <DependentUpon>ACT.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Country.cs">
-      <DependentUpon>ACT.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\CountryProvince.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DeclineReason.cs">
@@ -196,6 +187,9 @@
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\PSPConfig.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\PSPPeriod.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\PSPProduct.cs">

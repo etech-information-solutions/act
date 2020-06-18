@@ -15,6 +15,10 @@ using System.Web;
 using Newtonsoft.Json;
 using OpenPop;
 using ACT.Core.Helpers;
+using iTextSharp.text.pdf;
+using iTextSharp.tool.xml;
+using ACT.Mailer;
+
 namespace ACT.UI.Controllers
 {
     [Requires( PermissionTo.View, PermissionContext.Pallet )]
@@ -913,452 +917,557 @@ namespace ACT.UI.Controllers
         //-------------------------------------------------------------------------------------
 
 
-        #region Pallet GenerateDeliveryNote
+        #region Generate Delivery Note
+
         //
-        // GET: /Pallet/GenerateDeliveryNote
-        public ActionResult GenerateDeliveryNote()
+        // GET: /Pallet/DeliveryNoteDetails/5
+        public ActionResult DeliveryNoteDetails( int id, bool layout = true )
         {
-            DeliveryNoteViewModel model = new DeliveryNoteViewModel();
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            model.ClientId = clientId;
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-                                                                      // model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            List<Client> clientList = new List<Client>();
-            //TODO
-            using ( ClientService clientService = new ClientService() )
+            using ( DeliveryNoteService cservice = new DeliveryNoteService() )
             {
-                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+                DeliveryNote model = cservice.GetById( id );
+
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return RedirectToAction( "Index" );
+                }
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                return View( model );
             }
-
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            } );
-
-            ViewBag.ClientList = clientDDL;
-
-            return PartialView( "_GenerateDeliveryNote", model );
         }
 
-        // POST: Pallet/GenerateDeliveryNotePost
+        //
+        // GET: /Pallet/AddDeliveryNote/5 
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddDeliveryNote()
+        {
+            DeliveryNoteViewModel model = new DeliveryNoteViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        //
+        // POST: /Pallet/AddDeliveryNote/5
         [HttpPost]
         [Requires( PermissionTo.Create )]
-        public ActionResult GenerateDeliveryNotePost( DeliveryNoteViewModel model )
+        public ActionResult AddDeliveryNote( DeliveryNoteViewModel model )
         {
-            try
+            if ( !ModelState.IsValid )
             {
+                Notify( "Sorry, the Delivery Note was not created. Please correct all errors and try again.", NotificationType.Error );
 
-                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-                int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+                return View( model );
+            }
 
-                ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it                                                                        
-                if ( model.ClientId > 0 && clientId > 0 )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( DeliveryNoteService dnservice = new DeliveryNoteService() )
+            using ( DeliveryNoteLineService dnlservice = new DeliveryNoteLineService() )
+            {
+                ClientSite cs = csservice.GetBySiteId( model.ClientId, model.SiteId );
+
+                string number = ( dnservice.Max( "InvoiceNumber" ) as string ) ?? "0";
+
+                int.TryParse( number.Trim().Replace( "ACTDN", "" ), out int n );
+
+                model.InvoiceNumber = dnservice.FormatNumber( "ACTDN", ( n + 1 ) );
+
+                #region Create Delivery Note
+
+                // Create Delivery Note
+                DeliveryNote note = new DeliveryNote()
                 {
-                    model.ClientId = clientId;
-                }
-                List<Client> clientList = new List<Client>();
-                using ( ClientService clientService = new ClientService() )
-                {
-                    clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-                }
+                    ClientSiteId = cs?.Id,
+                    ClientId = model.ClientId,
+                    OrderDate = model.OrderDate,
+                    Status = ( int ) Status.Active,
+                    OrderNumber = model.OrderNumber,
+                    CustomerName = model.CustomerName,
+                    EmailAddress = model.EmailAddress,
+                    Reference306 = model.Reference306,
+                    InvoiceNumber = model.InvoiceNumber,
+                    ContactNumber = model.ContactNumber,
+                    BililngPostalCode = model.BillingPostalCode,
+                    CustomerPostalCode = model.CustomerPostalCode,
+                    DeliveryPostalCode = model.DeliveryPostalCode,
+                    BillingProvince = ( int ) model.BillingProvince,
+                    CustomerProvince = ( int ) model.CustomerProvince,
+                    DeliveryProvince = ( int ) model.DeliveryProvince,
+                    BillingAddress = $"{model.BillingAddress1}~{model.BillingAddress2}~{model.BillingAddressTown}",
+                    DeliveryAddress = $"{model.DeliveryAddress1}~{model.DeliveryAddress2}~{model.DeliveryAddressTown}",
+                    CustomerAddress = $"{model.CustomerAddress1}~{model.CustomerAddress2}~{model.CustomerAddressTown}",
+                };
 
-                IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.CompanyName
+                note = dnservice.Create( note );
 
-                } );
-                ViewBag.ClientList = clientDDL;
+                #endregion
 
-                if ( !ModelState.IsValid )
-                {
-                    Notify( "Sorry, the item was not updated. Please correct all errors and try again.", NotificationType.Error );
-                    return PartialView( "_GenerateDeliveryNote", model );
-                    //return View(model);
-                }
+                #region Create Delivery Note Lines
 
-                using ( DeliveryNoteService service = new DeliveryNoteService() )
-                using ( DeliveryNoteLineService lineservice = new DeliveryNoteLineService() )
-                using ( ClientLoadService clientloadservice = new ClientLoadService() )
-                using ( TransactionScope scope = new TransactionScope() )
+                if ( model.DeliveryNoteLines.NullableAny() )
                 {
-                    try
+                    foreach ( DeliveryNoteLineViewModel l in model.DeliveryNoteLines )
                     {
-                        bool newNote = false;
-                        #region Save DeliveryNote
-                        DeliveryNote delnote = new DeliveryNote();
-
-                        string customerAddress = model.CustomerAddress + ' ' + model.CustomerAddress2 + ' ' + model.CustomerAddressTown + ' ' + model.CustomerPostalCode + ' ' + ( ( Province ) model.CustomerProvince ).GetDisplayText();
-                        string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ( ( Province ) model.BillingProvince ).GetDisplayText();
-                        string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ( ( Province ) model.DeliveryProvince ).GetDisplayText();
-
-                        if ( model.Id > 0 )
+                        DeliveryNoteLine line = new DeliveryNoteLine()
                         {
-                            //Update
-                            delnote = service.GetById( model.Id );
-                            delnote.InvoiceNumber = model.InvoiceNumber;
-                            delnote.CustomerName = model.CustomerName;
-                            delnote.EmailAddress = model.DeliveryEmail;
-                            delnote.OrderNumber = model.OrderNumber;
-                            delnote.OrderDate = model.OrderDate;
-                            //delnote.ContactNumber = model.ContactNumber;
-                            delnote.Reference306 = model.Reference306;
-                            delnote.Status = ( int ) Status.Active;
+                            Product = l.Product,
+                            Equipment = l.Product,
+                            Delivered = l.Delivered,
+                            DeliveryNoteId = note.Id,
+                            OrderQuantity = l.Ordered,
+                            Status = ( int ) Status.Active,
+                            ProductDescription = l.ProductDescription,
+                        };
 
-                            delnote.CustomerAddress = customerAddress;
-                            delnote.CustomerPostalCode = model.CustomerPostalCode;
-                            delnote.CustomerProvince = model.CustomerProvince;
+                        dnlservice.Create( line );
+                    }
+                }
 
-                            delnote.DeliveryAddress = deliveryAddress;
-                            delnote.DeliveryPostalCode = model.DeliveryPostalCode;
-                            delnote.DeliveryProvince = model.DeliveryProvince;
+                #endregion
 
-                            delnote.BillingAddress = billingAddress;
-                            delnote.BililngPostalCode = model.BillingPostalCode;
-                            delnote.BillingProvince = model.BillingProvince;
+                #region Create Client Load
 
-                            service.Update( delnote );
+                ClientLoad load = new ClientLoad()
+                {
+                    ClientSiteId = cs?.Id,
+                    NotifyDate = DateTime.Now,
+                    ClientId = model.ClientId,
+                    LoadDate = model.OrderDate,
+                    VehicleId = model.VehicleId,
+                    EffectiveDate = DateTime.Now,
+                    LoadNumber = model.OrderNumber,
+                    DeliveryNote = model.InvoiceNumber,
+                    AccountNumber = model.Reference306,
+                    ReceiverNumber = model.ContactNumber,
+                    ReferenceNumber = model.InvoiceNumber,
+                    ClientDescription = model.CustomerName,
+                    Status = ( int ) ReconciliationStatus.Unreconciled,
+                    ReturnQty = model.DeliveryNoteLines?.Sum( s => s.Returned ),
+                    NewQuantity = model.DeliveryNoteLines?.Sum( s => s.Ordered ),
+                    Equipment = model.DeliveryNoteLines?.FirstOrDefault()?.Product,
+                    OriginalQuantity = model.DeliveryNoteLines?.Sum( s => s.Ordered ),
+                };
 
+                clservice.Create( load );
+
+                #endregion
+
+                // We're done here..
+
+                scope.Complete();
+            }
+
+            Notify( "The Delivery Note was successfully created.", NotificationType.Success );
+
+            return DeliveryNotes( new PagingModel(), new CustomSearchModel() );
+        }
+
+        //
+        // GET: /Pallet/EditDeliveryNote/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditDeliveryNote( int id )
+        {
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( DeliveryNoteService service = new DeliveryNoteService() )
+            {
+                DeliveryNote note = service.GetById( id );
+
+                if ( note == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                ClientLoad load = clservice.GetByRefernce( note.InvoiceNumber );
+
+                string[] bAddress = note.BillingAddress?.Split( '~' );
+                string[] dAddress = note.DeliveryAddress?.Split( '~' );
+                string[] cAddress = note.CustomerAddress?.Split( '~' );
+
+                #region Delivery Note
+
+                DeliveryNoteViewModel model = new DeliveryNoteViewModel()
+                {
+                    Id = note.Id,
+                    EditMode = true,
+                    ClientId = note.ClientId,
+                    OrderDate = note.OrderDate,
+                    OrderNumber = note.OrderNumber,
+                    SiteId = note.ClientSite.SiteId,
+                    Status = ( Status ) note.Status,
+                    VehicleId = load?.VehicleId ?? 0,
+                    Reference306 = note.Reference306,
+                    CustomerName = note.CustomerName,
+                    EmailAddress = note.EmailAddress,
+                    ContactNumber = note.ContactNumber,
+                    InvoiceNumber = note.InvoiceNumber,
+                    BillingPostalCode = note.BililngPostalCode,
+                    CustomerPostalCode = note.CustomerPostalCode,
+                    DeliveryPostalCode = note.DeliveryPostalCode,
+                    BillingProvince = ( Province ) note.BillingProvince,
+                    CustomerProvince = ( Province ) note.CustomerProvince,
+                    DeliveryProvince = ( Province ) note.DeliveryProvince,
+
+                    BillingAddress1 = bAddress.Length >= 1 ? bAddress[ 0 ] : string.Empty,
+                    BillingAddress2 = bAddress.Length >= 2 ? bAddress[ 1 ] : string.Empty,
+                    BillingAddressTown = bAddress.Length >= 3 ? bAddress[ 2 ] : string.Empty,
+
+                    CustomerAddress1 = cAddress.Length >= 1 ? cAddress[ 0 ] : string.Empty,
+                    CustomerAddress2 = cAddress.Length >= 2 ? cAddress[ 1 ] : string.Empty,
+                    CustomerAddressTown = cAddress.Length >= 3 ? cAddress[ 2 ] : string.Empty,
+
+                    DeliveryAddress1 = cAddress.Length >= 1 ? cAddress[ 0 ] : string.Empty,
+                    DeliveryAddress2 = cAddress.Length >= 2 ? cAddress[ 1 ] : string.Empty,
+                    DeliveryAddressTown = cAddress.Length >= 3 ? cAddress[ 2 ] : string.Empty,
+
+                    DeliveryNoteLines = new List<DeliveryNoteLineViewModel>(),
+                };
+
+                #endregion
+
+                #region Delivery Note Lines
+
+                foreach ( DeliveryNoteLine line in note.DeliveryNoteLines )
+                {
+                    model.DeliveryNoteLines.Add( new DeliveryNoteLineViewModel()
+                    {
+                        Id = line.Id,
+                        Product = line.Product,
+                        Status = ( Status ) line.Status,
+                        Returned = ( int ) line.Returned,
+                        Delivered = ( int ) line.Delivered,
+                        Ordered = ( int ) line.OrderQuantity,
+                        DeliveryNoteId = line.DeliveryNoteId,
+                        ProductDescription = line.ProductDescription,
+                    } );
+                }
+
+                #endregion
+
+                return View( model );
+            }
+        }
+
+        //
+        // POST: /Pallet/EditDeliveryNote/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditDeliveryNote( DeliveryNoteViewModel model )
+        {
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( DeliveryNoteService dnservice = new DeliveryNoteService() )
+            using ( DeliveryNoteLineService dnlservice = new DeliveryNoteLineService() )
+            {
+                DeliveryNote note = dnservice.GetById( model.Id );
+
+                if ( note == null )
+                {
+                    Notify( "Sorry, that Delivery Note does not exist! Please specify a valid Delivery Note Id and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                ClientSite cs = csservice.GetBySiteId( model.ClientId, model.SiteId );
+
+                #region Update Delivery Note
+
+                // Update Delivery Note
+                note.ClientSiteId = cs?.Id;
+                note.ClientId = model.ClientId;
+                note.OrderDate = model.OrderDate;
+                note.Status = ( int ) model.Status;
+                note.OrderNumber = model.OrderNumber;
+                note.CustomerName = model.CustomerName;
+                note.EmailAddress = model.EmailAddress;
+                note.Reference306 = model.Reference306;
+                note.ContactNumber = model.ContactNumber;
+                note.BililngPostalCode = model.BillingPostalCode;
+                note.CustomerPostalCode = model.CustomerPostalCode;
+                note.DeliveryPostalCode = model.DeliveryPostalCode;
+                note.BillingProvince = ( int ) model.BillingProvince;
+                note.CustomerProvince = ( int ) model.CustomerProvince;
+                note.DeliveryProvince = ( int ) model.DeliveryProvince;
+                note.BillingAddress = $"{model.BillingAddress1}~{model.BillingAddress2}~{model.BillingAddressTown}";
+                note.DeliveryAddress = $"{model.DeliveryAddress1}~{model.DeliveryAddress2}~{model.DeliveryAddressTown}";
+                note.CustomerAddress = $"{model.CustomerAddress1}~{model.CustomerAddress2}~{model.CustomerAddressTown}";
+
+                note = dnservice.Update( note );
+
+                #endregion
+
+                #region Update Delivery Note Lines
+
+                if ( model.DeliveryNoteLines.NullableAny() )
+                {
+                    foreach ( DeliveryNoteLineViewModel l in model.DeliveryNoteLines )
+                    {
+                        DeliveryNoteLine line = dnlservice.GetById( l.Id );
+
+                        if ( line != null )
+                        {
+                            line.Product = l.Product;
+                            line.Equipment = l.Product;
+                            line.Returned = l.Returned;
+                            line.Delivered = l.Delivered;
+                            line.DeliveryNoteId = note.Id;
+                            line.OrderQuantity = l.Ordered;
+                            line.ProductDescription = l.ProductDescription;
+
+                            dnlservice.Update( line );
                         }
                         else
                         {
-                            delnote.ClientId = model.ClientId;
-                            //Create
-                            delnote.InvoiceNumber = model.InvoiceNumber;
-                            delnote.CustomerName = model.CustomerName;
-                            delnote.EmailAddress = model.DeliveryEmail;
-                            delnote.OrderNumber = model.OrderNumber;
-                            delnote.OrderDate = model.OrderDate;
-                            //delnote.ContactNumber = model.ContactNumber;
-                            delnote.Reference306 = model.Reference306;
-                            delnote.Status = ( int ) Status.Active;
-
-                            delnote.CustomerAddress = customerAddress;
-                            delnote.CustomerPostalCode = model.CustomerPostalCode;
-                            delnote.CustomerProvince = model.CustomerProvince;
-
-                            delnote.DeliveryAddress = deliveryAddress;
-                            delnote.DeliveryPostalCode = model.DeliveryPostalCode;
-                            delnote.DeliveryProvince = model.DeliveryProvince;
-
-                            delnote.BillingAddress = billingAddress;
-                            delnote.BililngPostalCode = model.BillingPostalCode;
-                            delnote.BillingProvince = model.BillingProvince;
-
-                            service.Create( delnote );
-
-                            newNote = true;
-
-                            //Address invoiceCustomerAddress = new Address()
-                            //{
-                            //    ObjectId = delnote.Id,
-                            //    ObjectType = "InvoiceCustomer",
-                            //    Town = clientAddress.Town,
-                            //    Status = (int)Status.Active,
-                            //    PostalCode = clientAddress.PostalCode,
-                            //    Type = 1,
-                            //    Addressline1 = clientAddress.Addressline1,
-                            //    Addressline2 = clientAddress.Addressline2,
-                            //    Province = (int)clientAddress.Province,
-                            //    //Province = (int)mappedProvinceVal,
-                            //};
-                            //addservice.Create(invoiceCustomerAddress);
-                        }
-                        #endregion
-                        #region Save DeliveryNoteLine
-                        decimal? originalQuantity = 0;
-                        decimal? newQuantity = 0;
-                        decimal? retQuantity = 0;
-                        if ( !string.IsNullOrEmpty( model.DeliveryNoteLinesString ) )
-                        {
-                            try
+                            line = new DeliveryNoteLine()
                             {
-                                int.TryParse( model.CountNoteLines.ToString(), out int lineCount );
-                                String[] dList = model.DeliveryNoteLinesString.Split( ',' );
-                                //  string lastId = "0";
-                                for ( int i = 0; i < lineCount; i++ )
-                                {
+                                Product = l.Product,
+                                Equipment = l.Product,
+                                Returned = l.Returned,
+                                Delivered = l.Delivered,
+                                DeliveryNoteId = note.Id,
+                                OrderQuantity = l.Ordered,
+                                Status = ( int ) Status.Active,
+                                ProductDescription = l.ProductDescription,
+                            };
 
-
-                                    foreach ( string itm in dList )
-                                    {
-                                        if ( !string.IsNullOrEmpty( itm ) )
-                                        {
-                                            String[] note = itm.Split( '|' );
-
-                                            //var newstr = id + '|' +delnoteid +'|'+product + '|' + productdesc + '|' + qty + '|' + delqty + '|' + outqty + '|';
-                                            int.TryParse( note[ 0 ], out int noteId );
-                                            int.TryParse( note[ 1 ], out int deliveryNoteId );
-                                            string product = note[ 2 ];
-                                            string productdesc = note[ 3 ];
-                                            decimal.TryParse( note[ 4 ], out decimal qty );
-                                            decimal.TryParse( note[ 5 ], out decimal delqty );
-                                            decimal.TryParse( note[ 6 ], out decimal outqty );
-
-                                            DeliveryNoteLine noteline = new DeliveryNoteLine();
-                                            //if (noteId > 0)
-                                            //{
-                                            //    noteline = lineservice.GetById(noteId);
-
-                                            //    noteline.DeliveryNoteId = delnote.Id;// deliveryNoteId;
-                                            //    noteline.Delivered = delqty;
-                                            //    noteline.Product = product;
-                                            //    noteline.ProductDescription = productdesc;
-                                            //    noteline.OrderQuantity = qty;
-                                            //    noteline.ModifiedOn = DateTime.Now;
-                                            //    noteline.CreatedOn = DateTime.Now;
-                                            //    noteline.Status = (int)Status.Active;
-
-                                            //    lineservice.Update(noteline);
-                                            //}
-                                            //else
-                                            //{
-                                            noteline.DeliveryNoteId = delnote.Id;//deliveryNoteId;
-                                            noteline.Delivered = delqty;
-                                            noteline.Product = product;
-                                            noteline.ProductDescription = productdesc;
-                                            noteline.OrderQuantity = qty;
-                                            noteline.ModifiedOn = DateTime.Now;
-                                            noteline.CreatedOn = DateTime.Now;
-                                            noteline.Status = ( int ) Status.Active;
-
-                                            lineservice.Create( noteline );
-                                            //}
-                                            originalQuantity = noteline.OrderQuantity;
-                                            newQuantity = noteline.OrderQuantity;
-                                            retQuantity = noteline.Delivered;
-
-                                        }
-                                    }
-                                }
-                            }
-                            catch ( Exception ex )
-                            {
-                                ViewBag.Message = ex.Message;
-                                //  return View();
-                                return PartialView( "_GenerateDeliveryNote", model );
-                            }
+                            dnlservice.Create( line );
                         }
-
-                        #endregion
-
-                        #region ClientLoad
-                        try
-                        {
-                            ClientLoad loadModel = new ClientLoad();
-                            int vehicleId = 0;
-                            int transporterId = 0;
-
-                            if ( newNote )
-                            {
-                                loadModel.ClientId = model.ClientId;
-                                loadModel.LoadDate = model.OrderDate;
-                                loadModel.LoadNumber = model.InvoiceNumber;
-                                loadModel.AccountNumber = model.OrderNumber;
-                                loadModel.ClientDescription = model.CustomerName;
-                                //loadModel.ProvCode = model.CustomerProvince.ToString();
-                                loadModel.PCNNumber = model.OrderNumber;
-                                loadModel.DeliveryNote = model.InvoiceNumber;
-                                //model.PRNNumber = rows[7];
-                                loadModel.OriginalQuantity = originalQuantity;
-                                loadModel.NewQuantity = originalQuantity;
-                                loadModel.ReturnQty = retQuantity;
-                                //model.RetQuantity = decimal.Parse(rows[9]);
-                                //loadModel.ARPMComments = rows[10];
-                                //some of the columns are malaligned but leaving it as is, I added 3 new columns
-                                //grab the first of bothe vehicle and transporter to complete this load create, its mandatory
-                                using ( VehicleService vservice = new VehicleService() )
-                                using ( TransporterService tservice = new TransporterService() )
-                                {
-                                    vehicleId = vservice.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active } ).FirstOrDefault().Id;
-                                    transporterId = tservice.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = model.ClientId, Status = Status.Active } ).FirstOrDefault().Id;
-                                }
-                                if ( vehicleId > 0 )
-                                    loadModel.VehicleId = vehicleId;
-                                //if (transporterId > 0)
-                                //  loadModel.TransporterId = transporterId;
-                                model.CreatedOn = DateTime.Now;
-                                model.ModifiedOn = DateTime.Now;
-                                clientloadservice.Create( loadModel );
-
-                                //Address invoiceCustomerAddress = new Address()
-                                //{
-                                //    ObjectId = delnote.Id,
-                                //    ObjectType = "InvoiceCustomer",
-                                //    Town = clientAddress.Town,
-                                //    Status = (int)Status.Active,
-                                //    PostalCode = clientAddress.PostalCode,
-                                //    Type = 1,
-                                //    Addressline1 = clientAddress.Addressline1,
-                                //    Addressline2 = clientAddress.Addressline2,
-                                //    Province = (int)clientAddress.Province,
-                                //    //Province = (int)mappedProvinceVal,
-                                //};
-                                //addservice.Create(invoiceCustomerAddress);
-                            }
-
-                            //}
-                        }
-                        catch ( Exception ex )
-                        {
-                            ViewBag.Message = ex.Message;
-                            //  return View();
-                            return PartialView( "_GenerateDeliveryNote", model );
-                        }
-                        //else {
-                        //    loadModel = 
-                        //    loadModel = 
-                        //}
-
-                        #endregion
-
-                        scope.Complete(); //only commit if all is passed
-                    }
-                    catch ( Exception ex )
-                    {
-                        ViewBag.Message = ex.Message;
-                        //  return View();
-                        return PartialView( "_GenerateDeliveryNote", model );
                     }
                 }
 
-                Notify( "The item was successfully saved.", NotificationType.Success );
-                //Session["ImportMessage"] = importMessage;
-                return RedirectToAction( "ClientData", "Pallet" );
+                #endregion
+
+                #region Update Client Load
+
+                ClientLoad load = clservice.GetByRefernce( note.InvoiceNumber );
+
+                if ( load != null )
+                {
+                    load.ClientSiteId = cs?.Id;
+                    load.ClientId = model.ClientId;
+                    load.LoadDate = model.OrderDate;
+                    load.VehicleId = model.VehicleId;
+                    load.LoadNumber = model.OrderNumber;
+                    load.AccountNumber = model.Reference306;
+                    load.ReceiverNumber = model.ContactNumber;
+                    load.ClientDescription = model.CustomerName;
+                    load.Status = ( int ) ReconciliationStatus.Unreconciled;
+                    load.ReturnQty = model.DeliveryNoteLines?.Sum( s => s.Returned );
+                    load.NewQuantity = model.DeliveryNoteLines?.Sum( s => s.Ordered );
+                    load.Equipment = model.DeliveryNoteLines?.FirstOrDefault()?.Product;
+                    load.OriginalQuantity = model.DeliveryNoteLines?.Sum( s => s.Ordered );
+
+                    clservice.Update( load );
+                }
+                else
+                {
+                    load = new ClientLoad()
+                    {
+                        ClientSiteId = cs?.Id,
+                        NotifyDate = DateTime.Now,
+                        ClientId = model.ClientId,
+                        LoadDate = model.OrderDate,
+                        VehicleId = model.VehicleId,
+                        EffectiveDate = DateTime.Now,
+                        LoadNumber = model.OrderNumber,
+                        DeliveryNote = model.InvoiceNumber,
+                        AccountNumber = model.Reference306,
+                        ReceiverNumber = model.ContactNumber,
+                        ReferenceNumber = model.InvoiceNumber,
+                        ClientDescription = model.CustomerName,
+                        Status = ( int ) ReconciliationStatus.Unreconciled,
+                        ReturnQty = model.DeliveryNoteLines?.Sum( s => s.Returned ),
+                        NewQuantity = model.DeliveryNoteLines?.Sum( s => s.Ordered ),
+                        Equipment = model.DeliveryNoteLines?.FirstOrDefault()?.Product,
+                        OriginalQuantity = model.DeliveryNoteLines?.Sum( s => s.Ordered ),
+                    };
+
+                    clservice.Create( load );
+                }
+
+                #endregion
+
+                scope.Complete();
             }
-            catch ( Exception ex )
+
+            Notify( "The selected Delivery Note details were successfully updated.", NotificationType.Success );
+
+            return DeliveryNotes( new PagingModel(), new CustomSearchModel() );
+        }
+
+        //
+        // POST: /Pallet/DeleteDeliveryNote/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteDeliveryNote( DeliveryNoteViewModel model, PagingModel pm, CustomSearchModel csm )
+        {
+            using ( DeliveryNoteService service = new DeliveryNoteService() )
             {
-                ViewBag.Message = ex.Message;
-                //  return View();
-                return PartialView( "_GenerateDeliveryNote", model );
+                DeliveryNote note = service.GetById( model.Id );
+
+                if ( note == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                note.Status = ( note.Status == ( int ) Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.Update( note );
+
+                Notify( "The selected Delivery Note was successfully Updated.", NotificationType.Success );
+            }
+
+            return DeliveryNotes( pm, csm );
+        }
+
+        //
+        // POST: /Pallet/DeleteDeliveryNoteLine/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteDeliveryNoteLine( int id )
+        {
+            using ( DeliveryNoteLineService dnlservice = new DeliveryNoteLineService() )
+            {
+                DeliveryNoteLine line = dnlservice.GetById( id );
+
+                if ( line == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                int lineId = line.Id;
+
+                DeliveryNote note = line.DeliveryNote;
+
+                dnlservice.Delete( line );
+
+                Notify( "The selected Delivery Note Line was successfully Deleted.", NotificationType.Success );
+
+                DeliveryNoteViewModel model = new DeliveryNoteViewModel()
+                {
+                    DeliveryNoteLines = new List<DeliveryNoteLineViewModel>()
+                };
+
+                foreach ( DeliveryNoteLine l in note.DeliveryNoteLines )
+                {
+                    if ( lineId == l.Id ) continue;
+
+                    model.DeliveryNoteLines.Add( new DeliveryNoteLineViewModel()
+                    {
+                        Id = l.Id,
+                        Product = l.Product,
+                        Status = ( Status ) l.Status,
+                        Returned = ( int ) l.Returned,
+                        Delivered = ( int ) l.Delivered,
+                        Ordered = ( int ) l.OrderQuantity,
+                        DeliveryNoteId = l.DeliveryNoteId,
+                        ProductDescription = l.ProductDescription,
+                    } );
+                }
+
+                return PartialView( "_DeliveryNoteLines", model );
             }
         }
 
-        // POST: Pallet/GenerateDeliveryNote
-        //[HttpPost]
-        //[Requires(PermissionTo.Create)]
-        //public ActionResult CreateDeliveryNote(DeliveryNoteViewModel model)
-        //{
-        //    try
-        //    {
-
-        //        return Json(data: "True", behavior: JsonRequestBehavior.AllowGet);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ViewBag.Message = ex.Message;
-        //        //return View();
-        //        return Json(data: "Error", behavior: JsonRequestBehavior.AllowGet);
-        //    }
-        //}
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetDeliveryNoteNumber()
+        //
+        // POST: /Pallet/EmailDeliveryNote
+        [HttpPost]
+        public ActionResult EmailDeliveryNote( int id, string email, string subject )
         {
-            string noteNumber = null;
+            if ( string.IsNullOrWhiteSpace( email ) || string.IsNullOrWhiteSpace( subject ) )
+            {
+                return PartialView( "_Fail" );
+            }
 
             using ( DeliveryNoteService service = new DeliveryNoteService() )
             {
-                noteNumber = service.GetDeliveryNoteNumber(); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
+                DeliveryNote note = service.GetById( id );
+
+                if ( note == null )
+                    return PartialView( "_AccessDenied" );
+
+                string body = RenderViewToString( ControllerContext, "~/Views/Shared/_DeliveryNotePdf.cshtml", note, true );
+
+                MemoryStream stream = new MemoryStream();
+
+                iTextSharp.text.Document document = new iTextSharp.text.Document( iTextSharp.text.PageSize.A4, 10, 10, 10, 10 );
+
+                PdfWriter pWriter = PdfWriter.GetInstance( document, stream );
+
+                document.Open();
+
+                XMLWorkerHelper.GetInstance().ParseXHtml( pWriter, document, new StringReader( body ) );
+
+                pWriter.CloseStream = false;
+                document.Close();
+
+                stream.Position = 0;
+
+                List<string> receivers = new List<string>() { email };
+
+                EmailModel e = new EmailModel
+                {
+                    Body = body,
+                    Subject = subject,
+                    Recipients = receivers,
+                    From = CurrentUser.Email,
+                };
+
+                e.Attachments = new List<System.Net.Mail.Attachment>
+                {
+                    new System.Net.Mail.Attachment( stream, $"Delivery Note {note.InvoiceNumber} ({DateTime.Now.ToString( "yyyy_MM_dd_HH_mm_ss" )}).pdf" )
+                };
+
+                Mail.Send( e );
             }
-            //var jsonList = JsonConvert.SerializeObject(sites);
-            // var data = JsonConvert.SerializeObject(sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
-            if ( noteNumber != null )
-            {
-                return Json( data: noteNumber, behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
+
+            return PartialView( "_Success" );
         }
 
-        #region DeliveryNote AJAX
-        public JsonResult RemoveDeliveryNoteLine( int? id = null, int? delnoteid = null )
+        //
+        // POST: /Pallet/PrintDeliveryNote
+        public ActionResult PrintDeliveryNote( int id )
         {
-            int lineId = ( id != null ? ( int ) id : 0 );
-            if ( lineId > 0 )
+            using ( DeliveryNoteService service = new DeliveryNoteService() )
             {
-                using ( TransactionScope scope = new TransactionScope() )
-                using ( DeliveryNoteLineService service = new DeliveryNoteLineService() )
+                DeliveryNote note = service.GetById( id );
+
+                if ( note == null )
+                    return PartialView( "_AccessDenied" );
+
+                string body = RenderViewToString( ControllerContext, "~/Views/Shared/_DeliveryNotePdf.cshtml", note, true );
+
+                MemoryStream stream = new MemoryStream();
+
+                using ( iTextSharp.text.Document document = new iTextSharp.text.Document( iTextSharp.text.PageSize.A4, 10, 10, 10, 10 ) )
                 {
+                    PdfWriter pWriter = PdfWriter.GetInstance( document, stream );
 
-                    DeliveryNoteLine line = service.GetById( lineId );
-                    line.Status = ( int ) Status.Inactive;
-                    service.Update( line );
+                    PdfAction action = new PdfAction( PdfAction.PRINTDIALOG );
+                    pWriter.SetOpenAction( action );
 
-                    scope.Complete();
+                    document.Open();
+
+                    XMLWorkerHelper.GetInstance().ParseXHtml( pWriter, document, new StringReader( body ) );
                 }
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
 
-        }
-        public JsonResult SaveDeliveryNoteLine( int? id = null, int? delnoteid = null, string product = null, string productdesc = null, string qty = null, string delqty = null, string outqty = null )
-        {
-            int noteId = ( delnoteid != null ? ( int ) delnoteid : 0 );
-            int noteLineId = ( id != null ? ( int ) id : 0 );
-            if ( noteId > 0 && noteLineId == 0 )
-            {
-                DeliveryNoteLine line = new DeliveryNoteLine() { };
-                line.Product = product;
-                line.ProductDescription = productdesc;
-                line.DeliveryNoteId = noteId;
-                if ( qty != null )
-                {
-                    decimal quant = 0;
-                    decimal.TryParse( qty, out quant );
-                    line.OrderQuantity = quant;
-                }
-                if ( delqty != null )
-                {
-                    decimal quant = 0;
-                    decimal.TryParse( delqty, out quant );
-                    line.Delivered = quant;
-                }
-                line.Status = ( int ) Status.Active;
-
-                using ( TransactionScope scope = new TransactionScope() )
-                using ( DeliveryNoteLineService service = new DeliveryNoteLineService() )
-                {
-                    service.Create( line );
-                    scope.Complete();
-                }
-            }
-            else if ( noteId > 0 && noteLineId > 0 ) //updates
-            {
-
-            }
-            return Json( data: noteLineId, behavior: JsonRequestBehavior.AllowGet ); //returnms ID of line to view
-        }
-
-        public ActionResult ListDeliveryNoteLines( int? delnoteid = null )
-        {
-            List<DeliveryNoteLine> linelist = new List<DeliveryNoteLine>();
-            int noteLlineId = ( delnoteid != null ? ( int ) delnoteid : 0 );
-            if ( noteLlineId > 0 )
-            {
-                using ( DeliveryNoteLineService service = new DeliveryNoteLineService() )
-                {
-                    linelist = service.ListByColumnsWhere( "DeliveryNoteId", noteLlineId, "Status", ( int ) Status.Active );
-                }
-            }
-            if ( linelist != null )
-            {
-                return Json( linelist, JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
+                return File( stream.ToArray(), "application/pdf" );
             }
         }
-        #endregion
 
         #endregion
 
@@ -2521,6 +2630,34 @@ namespace ACT.UI.Controllers
             }
 
             return File( new System.Text.UTF8Encoding().GetBytes( csv ), "text/csv", filename );
+        }
+
+        #endregion
+
+
+        #region Partial Views
+
+        //
+        // POST || GET: /Pallet/DeliveryNotes
+        public ActionResult DeliveryNotes( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            using ( DeliveryNoteService service = new DeliveryNoteService() )
+            {
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "DeliveryNotes";
+
+                    return PartialView( "_DeliveryNotesCustomSearch", new CustomSearchModel( "DeliveryNotes" ) );
+                }
+
+                List<DeliveryNoteCustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_DeliveryNotes", paging );
+            }
         }
 
         #endregion

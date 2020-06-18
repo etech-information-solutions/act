@@ -1,0 +1,228 @@
+﻿@model DeliveryNote
+
+@using ACT.Data.Models
+@using ACT.Core.Models
+@using ACT.Core.Enums 
+
+@{
+    int count = 1;
+
+    UserModel user = User.Get();
+
+    String absoluteUrlBase = Request.Url.Scheme + "://" + Request.Url.Host + ( Request.Url.IsDefaultPort ? "" : ":" + Request.Url.Port );
+}
+    <table cellspacing="10" cellpadding="5" width="100%" style="width: 100%; font-size: 11px; margin: 0 auto; background-color: #fff; font-family: Helvetica, 'Segoe UI', Verdana, Sans-Serif;">
+
+        <tbody>
+            <tr>
+                <td colspan="2" style="border-bottom: 1px solid #ddd;">
+                    <table cellspacing="0" cellpadding="0" width="100%" style="width: 100%; font-size: 11px; margin: 0 auto; background-color: #fff; font-family: Helvetica, 'Segoe UI', Verdana, Sans-Serif;">
+                        <tbody>
+                            <tr>
+                                <td style="text-align: left;">
+                                    <img src="http://www.testact.co.za/Images/act-logo.png" style="width: 200px;" />
+                                </td>
+                                <td valign="middle" style="text-align: center; font-size: 20px;">
+                                    #@Model.InvoiceNumber
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2" height="20"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2" height="20"></td>
+            </tr>
+
+            <tr>
+                <td style="font-weight: bold;">
+                    Order Date
+                </td>
+                <td style="font-weight: bold;">
+                    Customer Name
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @( Model.OrderDate?.ToString( "yyyy-MM-dd" ) )
+                </td>
+                <td>
+                    @Model.CustomerName
+                </td>
+            </tr>
+
+            <tr>
+                <td style="font-weight: bold;">
+                    Order Number
+                </td>
+                <td style="font-weight: bold;">
+                    Email Address
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Model.OrderNumber
+                </td>
+                <td>
+                    @Model.EmailAddress
+                </td>
+            </tr>
+
+            <tr>
+                <td style="font-weight: bold;">
+                    Reference 306
+                </td>
+                <td style="font-weight: bold;">
+                    Contact Number
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Model.Reference306
+                </td>
+                <td>
+                    @Model.ContactNumber
+                </td>
+            </tr>
+
+            <tr>
+                <td style="font-weight: bold;">
+                    Delivery Note Number
+                </td>
+                <td style="font-weight: bold;">
+                    Address
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Model.InvoiceNumber
+                </td>
+                <td>
+                    @( $"{Model.CustomerAddress?.Replace( "~", "," )}, {Model.CustomerPostalCode}, {( ( Province ) Model.CustomerProvince ).GetDisplayText()}" )
+                </td>
+            </tr>
+
+            <tr>
+                <td style="font-weight: bold;">
+                    Client
+                </td>
+                <td style="font-weight: bold;">
+                    Delivery Address
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @( Model.Client?.CompanyName )
+                </td>
+                <td>
+                    @( $"{Model.DeliveryAddress?.Replace( "~", "," )}, {Model.DeliveryPostalCode}, {( ( Province ) Model.DeliveryProvince ).GetDisplayText()}" )
+                </td>
+            </tr>
+
+            <tr>
+                <td style="font-weight: bold;">
+                    Site
+                </td>
+                <td style="font-weight: bold;">
+                    Billing Address
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @( Model.ClientSite?.Site?.Description )
+                </td>
+                <td>
+                    @( $"{Model.BillingAddress?.Replace( "~", "," )}, {Model.BililngPostalCode}, {( ( Province ) Model.BillingProvince ).GetDisplayText()}" )
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2" height="20"></td>
+            </tr>
+
+            <tr>
+                <td colspan="2">
+
+                    <table cellspacing="0" cellpadding="10" width="100%" style="width: 100%; border: 1px solid #ddd; font-size: 11px; margin: 0 auto; background-color: #fff; font-family: Helvetica, 'Segoe UI', Verdana, Sans-Serif;">
+
+                        <thead>
+                            <tr>
+                                <th style="border-bottom: 1px solid #ddd; text-align: left;">#</th>
+                                <th style="border-bottom: 1px solid #ddd; text-align: left;">Product</th>
+                                <th style="border-bottom: 1px solid #ddd; text-align: left;">Description</th>
+                                <th style="border-bottom: 1px solid #ddd; text-align: left;">Ordered</th>
+                                <th style="border-bottom: 1px solid #ddd; text-align: left;">Delivered</th>
+                                <th style="border-bottom: 1px solid #ddd; text-align: left;">Returned</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach ( DeliveryNoteLine item in Model.DeliveryNoteLines )
+                            {
+                                <tr>
+                                    <td width="1%">
+                                        @count
+                                    </td>
+                                    <td>
+                                        @item.Product
+                                    </td>
+                                    <td>
+                                        @item.ProductDescription
+                                    </td>
+                                    <td>
+                                        @item.OrderQuantity
+                                    </td>
+                                    <td>
+                                        @item.Delivered
+                                    </td>
+                                    <td>
+                                        @item.Returned
+                                    </td>
+                                </tr>
+
+                                count++;
+                            }
+                        </tbody>
+
+                    </table>
+
+                </td>
+            </tr>
+
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="2" height="20"><br /></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center; font-size: 12px;">
+                    Requested By: <strong>@user.Name @user.Surname</strong> <br />
+                    <a href="mailto:@user.Email">@user.Email</a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" height="10"><br /><br /></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center; color: #aaa;">
+                    <i>Copyright &copy; @DateTime.Now.Year | ACT. All Rights Reserved</i>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center; color: #aaa;">
+                    <p>
+                        <strong>Email queries to:</strong>
+                    </p>
+                    <p>
+                        <a href="mailto:@VariableExtension.SystemRules.SystemContactEmail">@VariableExtension.SystemRules.SystemContactEmail</a>
+                    </p>
+                </td>
+            </tr>
+        </tfoot>
+
+    </table>

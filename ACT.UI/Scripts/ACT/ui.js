@@ -113,6 +113,11 @@
             this.DataGSData( $( '[data-gs-data="1"]' ) );
             this.DataGSearch( $( '*[data-g-search="1"]' ) ); // Search button on Dashboard
 
+            // Delivery Note
+            this.DataDNClient( $( '*[data-dn-client="1"]' ) );
+            this.DataCopyAddress( $( '*[data-copy-address="1"]' ) );
+            this.DataEmailDeliveryNote( $( '*[data-email-delivery-note="1"]' ) );
+
             if ( window.location.search !== "" && !$( "tr.edit" ).length && $( ".dataTable" ).length && !ACT.UI.PageViewIdProcessed )
             {
                 var viewid = false,
@@ -1282,6 +1287,7 @@
                         html = clone.html().replace( /\[0]/g, "[" + total + "]" ).replace( /\-0-/g, "-" + total + "-" );
                         clone.html( html );
 
+                        clone.find( '.del' ).remove();
                         clone.find( '.slick-counter' ).html( '' );
                         clone.find( '.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea' ).val( "" );
 
@@ -4085,6 +4091,155 @@
 
                             //ACT.Loader.Hide();
                         } );
+                    } );
+            } );
+        },
+
+        DataDNClient: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() === "" )
+                        {
+                            return;
+                        }
+
+                        ACT.Loader.Show( $( '[for="' + i.attr( "id" ) + '"]' ), true );
+
+                        $( "#site-options" ).load( siteurl + "GetClientSites", { clientId: $( this ).val() }, function ()
+                        {
+                            $( "#site-options" ).show( 900 );
+                        } );
+
+                        $( "#vehicle-options" ).load( siteurl + "GetClientVehicles", { clientId: $( this ).val() }, function ()
+                        {
+                            $( "#vehicle-options" ).show( 900 );
+
+                            ACT.Loader.Hide();
+                            ACT.Init.PluginInit( $( "#site-options" ).add( $( this ) ) );
+                        } );
+                    } );
+            } );
+        },
+
+        DataCopyAddress: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var to = $( i.attr( "data-to" ) );
+                var from = $( i.attr( "data-from" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( !$( this ).is( ":checked" ) )
+                        {
+                            return;
+                        }
+
+                        from.find( '[data-field]' ).each( function ()
+                        {
+                            to.find( '[data-field="' + $( this ).attr( "data-field" ) + '"]' ).val( $( this ).val() );
+                        } );
+                    } );
+            } );
+        },
+
+        DataEmailDeliveryNote: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var title = i.attr( "original-title" );
+                        var message = '<p style="margin-top: 10px;">Please enter an e-mail address below to continue.</p>';
+
+                        message += '<p>';
+                        message += '  Email Address:<br />';
+                        message += '  <input id="email" name="email" value="" type="text" placeholder="Enter E-mail Address" />';
+                        message += '</p>';
+
+                        message += '<p>';
+                        message += '  Subject of the Email:<br />';
+                        message += '  <textarea id="subject" name="subject" placeholder="Enter Subject of the Email" style="width: 95%; height: auto;"></textarea>';
+                        message += '</p>';
+
+                        /*message += '<p style="padding-bottom: 5px; border-bottom: 1px dashed #ddd;">';
+                        message += '  Message for the Email Recipient:<br />';
+                        message += '  <textarea id="message" name="message" placeholder="Enter Message for the Email Recipient" style="width: 95%;"></textarea>';
+                        message += '</p>';*/
+
+                        message += '<p>';
+                        message += '  <input id="yes-btn" value="Send" type="button" class="btn-yes" />';
+                        message += '  <span style="padding: 0 5px;">/</span>';
+                        message += '  <input id="no-btn" value="Cancel" type="button" class="btn-no" />';
+                        message += '</p>';
+
+                        ACT.Sticky.Show( i, title, message, [], "center-right" );
+
+                        var no = ACT.Sticky.StickyOne.find( "#no-btn" );
+                        var yes = ACT.Sticky.StickyOne.find( "#yes-btn" );
+
+                        no
+                            .unbind( "click" )
+                            .bind( "click", function ()
+                            {
+                                ACT.Sticky.Hide();
+                            } );
+
+                        yes
+                            .unbind( "click" )
+                            .bind( "click", function ()
+                            {
+                                var valid = true;
+
+                                var email = ACT.Sticky.StickyOne.find( "#email" );
+                                var subject = ACT.Sticky.StickyOne.find( "#subject" );
+                                //var message = ACT.Sticky.StickyOne.find( "#message" );
+
+                                if ( email.val().trim() == '' )
+                                {
+                                    valid = false;
+                                    email.addClass( 'invalid' ).focus();
+                                }
+                                if ( subject.val().trim() == '' )
+                                {
+                                    valid = false;
+                                    subject.addClass( 'invalid' ).focus();
+                                }
+
+                                if ( !valid )
+                                {
+                                    return false;
+                                }
+
+                                ACT.Loader.Show( yes, true );
+
+                                $.post( siteurl + "/EmailDeliveryNote", { id: id, email: email.val(), subject: subject.val()/*, message: message.val()*/ }, function ( data )
+                                {
+                                    var d = $( "<div/>" ).html( data );
+
+                                    ACT.Loader.Hide();
+                                    ACT.Sticky.Show( i, d.find( ".title" ).text(), d.find( ".message" ).html(), [], "center-right" );
+                                } );
+                            } );
+
+                        return false;
                     } );
             } );
         }

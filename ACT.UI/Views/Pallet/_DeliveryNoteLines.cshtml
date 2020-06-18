@@ -1,0 +1,88 @@
+﻿@model DeliveryNoteViewModel
+
+@using ACT.UI.Models
+
+@Html.Partial( "_Notification" )
+
+<table class="da-table">
+
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Description</th>
+            <th>Ordered</th>
+            <th>Delivered</th>
+            <th>Returned</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model.DeliveryNoteLines.NullableAny() )
+        {
+            int count = 0;
+
+            foreach ( DeliveryNoteLineViewModel item in Model.DeliveryNoteLines )
+            {
+                <tr id="row-line-@count" class="add-more-row">
+                    <td style="position: relative;">
+
+                        @if ( ( count + 1 ) == Model.DeliveryNoteLines.Count )
+                        {
+                            <a data-add-one-more="1" data-target="#row-line-0" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                                <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                            </a>
+                        }
+
+                        <input name="DeliveryNoteLines[@count].Id" type="hidden" value="@item.Id" />
+                        <input name="DeliveryNoteLines[@count].Product" type="text" value="@item.Product" placeholder="Enter product name" />
+                    </td>
+                    <td>
+                        <input name="DeliveryNoteLines[@count].ProductDescription" type="text" value="@item.ProductDescription" placeholder="Enter product description" />
+                    </td>
+                    <td>
+                        <input name="DeliveryNoteLines[@count].Ordered" type="number" value="@item.Ordered" placeholder="Enter quantity ordered" />
+                    </td>
+                    <td>
+                        <input name="DeliveryNoteLines[@count].Delivered" type="number" value="@item.Delivered" placeholder="Enter quantity delivered" />
+                    </td>
+                    <td>
+                        <input name="DeliveryNoteLines[@count].Returned" type="number" value="@item.Returned" placeholder="Enter quantity returned" />
+                    </td>
+                    <td>
+                        @Html.ActionLink( "Remove", "DeleteDeliveryNoteLine", new { id = item.Id }, new { @class = "del", @data_delete = "1", @data_id = item.Id, @data_target = "row-line-" + count, @data_refresh_target = "#delivery-note-lines", @rel = "tipsyE", @title = "Remove this item?" } )
+                    </td>
+                </tr>
+
+                count++;
+            }
+        }
+        else
+        {
+            <tr id="row-line-0" class="add-more-row">
+                <td style="position: relative;">
+                    <a data-add-one-more="1" data-target="#row-line-0" rel="tipsyW" title="Add another line?" style="display: inline-block; margin-left: -25px; margin-right: 10px;">
+                        <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                    </a>
+
+                    <input name="DeliveryNoteLines[0].Product" type="text" placeholder="Enter product name" />
+                </td>
+                <td>
+                    <input name="DeliveryNoteLines[0].ProductDescription" type="text" placeholder="Enter product description" />
+                </td>
+                <td>
+                    <input name="DeliveryNoteLines[0].Ordered" type="number" placeholder="Enter quantity ordered" />
+                </td>
+                <td>
+                    <input name="DeliveryNoteLines[0].Delivered" type="number" placeholder="Enter quantity delivered" />
+                </td>
+                <td>
+                    <input name="DeliveryNoteLines[0].Returned" type="number" placeholder="Enter quantity returned" />
+                </td>
+                <td>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>

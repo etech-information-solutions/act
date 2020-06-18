@@ -1,0 +1,201 @@
+﻿@model DeliveryNote
+
+@using ACT.Core.Enums
+@using ACT.Data.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Details";
+
+    int count = 1;
+}
+
+@if ( ViewBag.IncludeLayout != null )
+{
+    <h2>
+        <img alt="" src="@Url.Content( "~/images/info.png" )" />
+        <span>Delivery Note Details</span>
+    </h2>
+}
+
+<div id="item-details" class="item-details" style="width: auto;">
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <h2>
+            <img alt="" src="@Url.Content( "~/images/info.png" )" />
+            <span>Delivery Note Details</span>
+        </h2>
+    }
+
+    <div class="left" style="width: 48%; margin-right: 3%;">
+
+        <div class="display-label">
+            Order Date
+        </div>
+        <div class="display-field">
+            @( Model.OrderDate?.ToString( "yyyy-MM-dd" ) )
+        </div>
+
+        <div class="display-label">
+            Order Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.OrderNumber )
+        </div>
+
+        <div class="display-label">
+            Reference 306
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Reference306 )
+        </div>
+
+        <div class="display-label">
+            Delivery Note Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.InvoiceNumber )
+        </div>
+
+        <div class="display-label">
+            Client
+        </div>
+        <div class="display-field">
+            @( Model.Client?.CompanyName )
+        </div>
+
+        <div class="display-label">
+            Site
+        </div>
+        <div class="display-field">
+            @( Model.ClientSite?.Site?.Description )
+        </div>
+
+        <div class="display-label">
+            Status
+        </div>
+        <div class="display-field">
+            @(( ( Status ) Model.Status ).GetDisplayText())
+        </div>
+
+    </div>
+
+    <div class="left" style="width: 48%;">
+
+        <div class="display-label">
+            Customer Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.CustomerName )
+        </div>
+
+        <div class="display-label">
+            Email Address
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.EmailAddress )
+        </div>
+
+        <div class="display-label">
+            Contact Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ContactNumber )
+        </div>
+
+        <div class="display-label">
+            Address
+        </div>
+        <div class="display-field">
+            @( $"{Model.CustomerAddress?.Replace( "~", "," )}, {Model.CustomerPostalCode}, {( ( Province ) Model.CustomerProvince ).GetDisplayText()}" )
+        </div>
+
+        <div class="display-label">
+            Delivery Address
+        </div>
+        <div class="display-field">
+            @( $"{Model.DeliveryAddress?.Replace( "~", "," )}, {Model.DeliveryPostalCode}, {( ( Province ) Model.DeliveryProvince ).GetDisplayText()}" )
+        </div>
+
+        <div class="display-label">
+            Billing Address
+        </div>
+        <div class="display-field">
+            @( $"{Model.BillingAddress?.Replace( "~", "," )}, {Model.BililngPostalCode}, {( ( Province ) Model.BillingProvince ).GetDisplayText()}" )
+        </div>
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    <table id="delivery-note-lines" class="da-table">
+
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Product</th>
+                <th>Description</th>
+                <th>Ordered</th>
+                <th>Delivered</th>
+                <th>Returned</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach ( DeliveryNoteLine item in Model.DeliveryNoteLines )
+            {
+                <tr>
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.Product
+                    </td>
+                    <td>
+                        @item.ProductDescription
+                    </td>
+                    <td>
+                        @item.OrderQuantity
+                    </td>
+                    <td>
+                        @item.Delivered
+                    </td>
+                    <td>
+                        @item.Returned
+                    </td>
+                </tr>
+
+                count++;
+            }
+        </tbody>
+
+    </table>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <p>
+            @Html.ActionLink( "Edit", "EditDeliveryNote", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+
+            @if ( ViewBag.IncludeLayout == null )
+            {
+                <span style="padding: 0 5px;">/</span>
+                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
+            }
+        </p>
+    }
+
+    @if ( ViewBag.IncludeLayout != null )
+    {
+        <div class="back-to-list">
+            @Html.ActionLink( "Back to List", "Index" )
+        </div>
+    }
+
+</div>

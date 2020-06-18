@@ -35,8 +35,8 @@ namespace ACT.Data.Models
     
         public virtual ChepLoad ChepLoad { get; set; }
         public virtual Client Client { get; set; }
+        public virtual ClientLoad ClientLoad { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserTask> UserTasks { get; set; }
-        public virtual ClientLoad ClientLoad { get; set; }
     }
 }

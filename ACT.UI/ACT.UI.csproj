@@ -52,6 +52,12 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="itextsharp, Version=5.5.13.1, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\iTextSharp.5.5.13.1\lib\itextsharp.dll</HintPath>
+    </Reference>
+    <Reference Include="itextsharp.xmlworker, Version=5.5.13.1, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\itextsharp.xmlworker.5.5.13.1\lib\itextsharp.xmlworker.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
@@ -539,7 +545,6 @@
     <Content Include="Views\Pallet\_PoolingAgentData.cshtml" />
     <Content Include="Views\Pallet\Index.cshtml" />
     <Content Include="Views\Pallet\_ClientData.cshtml" />
-    <Content Include="Views\Pallet\_GenerateDeliveryNote.cshtml" />
     <Content Include="Views\Pallet\_Disputes.cshtml" />
     <Content Include="Views\Pallet\_Exceptions.cshtml" />
     <Content Include="Views\Pallet\_ReconcileInvoice.cshtml" />
@@ -570,11 +575,8 @@
     <Content Include="Views\Shared\_PoolingAgentDataCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ClientDataCustomSearch.cshtml" />
     <Content Include="Views\Pallet\__AddDeliveryNote.cshtml" />
-    <Content Include="Views\Pallet\DetailsDeliveryNote.cshtml" />
     <Content Include="Views\Pallet\_EditDeliveryNote.cshtml" />
-    <Content Include="Views\Pallet\IndexDeliveryNote.cshtml" />
     <Content Include="Views\Pallet\AddDeliveryNote.cshtml" />
-    <Content Include="Views\Pallet\EditDeliveryNote.cshtml" />
     <Content Include="Views\ClientReporting\AddChepAudit.cshtml" />
     <Content Include="Views\ClientReporting\ChepAuditDetails.cshtml" />
     <Content Include="Views\ClientReporting\ClientAuditDetails.cshtml" />
@@ -595,7 +597,6 @@
     <Content Include="Views\DashBoard\_NumberOfPalletsManaged.cshtml" />
     <Content Include="Views\DashBoard\_NumberOfDisputes.cshtml" />
     <Content Include="Views\DashBoard\_KPIMeasurement.cshtml" />
-    <Content Include="Views\Pallet\_ListDeliveryNoteLines.cshtml" />
     <Content Include="Views\Shared\_DashBoardCustomSearch.cshtml" />
     <Content Include="Views\DashBoard\_Sites.cshtml" />
     <Content Include="Views\DashBoard\_Regions.cshtml" />
@@ -611,6 +612,14 @@
     <Content Include="Views\ClientReporting\ExceptionDetails.cshtml" />
     <Content Include="Views\Shared\_OutstandingPalletsCustomSearch.cshtml" />
     <Content Include="Views\ClientReporting\_OutstandingPallets.cshtml" />
+    <Content Include="Views\Pallet\_DeliveryNotes.cshtml" />
+    <Content Include="Views\Shared\_DeliveryNotesCustomSearch.cshtml" />
+    <Content Include="Views\Pallet\_Sites.cshtml" />
+    <Content Include="Views\Pallet\_Vehicles.cshtml" />
+    <Content Include="Views\Pallet\DeliveryNoteDetails.cshtml" />
+    <Content Include="Views\Pallet\EditDeliveryNote.cshtml" />
+    <Content Include="Views\Pallet\_DeliveryNoteLines.cshtml" />
+    <Content Include="Views\Shared\_DeliveryNotePdf.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

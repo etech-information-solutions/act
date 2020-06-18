@@ -19,6 +19,7 @@ namespace ACT.Data.Models
         {
             this.ClientAuthorisations = new HashSet<ClientAuthorisation>();
             this.ClientLoads = new HashSet<ClientLoad>();
+            this.DeliveryNotes = new HashSet<DeliveryNote>();
         }
     
         public int Id { get; set; }
@@ -33,8 +34,10 @@ namespace ACT.Data.Models
         public virtual Client Client { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
-        public virtual Site Site { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads { get; set; }
+        public virtual Site Site { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<DeliveryNote> DeliveryNotes { get; set; }
     }
 }

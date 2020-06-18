@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+
 using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Core.Models.Custom;
@@ -11,28 +12,28 @@ namespace ACT.Core.Services
 {
     public class ClientProductService : BaseService<ClientProduct>, IDisposable
     {
-            public ClientProductService()
-            {
+        public ClientProductService()
+        {
 
+        }
+        /// <summary>
+        /// Gets a list of PSPs matching the specified search params
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public List<ClientProductCustomModel> ListCSM( PagingModel pm, CustomSearchModel csm )
+        {
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
+            {
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
             }
-            /// <summary>
-            /// Gets a list of PSPs matching the specified search params
-            /// </summary>
-            /// <param name="pm"></param>
-            /// <param name="csm"></param>
-            /// <returns></returns>
-            public List<ClientProductCustomModel> ListCSM(PagingModel pm, CustomSearchModel csm)
-            {
-                if (csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date)
-                {
-                    csm.ToDate = csm.ToDate?.AddDays(1);
-                }
 
-                // Parameters
+            // Parameters
 
-                #region Parameters
+            #region Parameters
 
-                List<object> parameters = new List<object>()
+            List<object> parameters = new List<object>()
             {
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
@@ -44,9 +45,9 @@ namespace ACT.Core.Services
                 //{ new SqlParameter( "clientid", clientId > 0 ? clientId : 0 ) },
             };
 
-                #endregion
+            #endregion
 
-                string query = @"SELECT
+            string query = @"SELECT
                                 p.*, pr.*,
                                 (SELECT COUNT(1) FROM [dbo].[ProductPrice] pp WHERE pp.ProductId=p.Id) AS [ProductPriceCount],
                                 (SELECT COUNT(1) FROM [dbo].[Document] d WHERE p.Id=d.ObjectId AND d.ObjectType='Product') AS [DocumentCount],
@@ -54,82 +55,82 @@ namespace ACT.Core.Services
                              FROM
                                 [dbo].[ClientProduct] p LEFT JOIN [dbo].[Product] pr ON pr.Id = p.ProductId LEFT JOIN [dbo].[Client] cc ON cc.Id = p.ClientId";
 
-                // WHERE
+            // WHERE
 
-                #region WHERE
+            #region WHERE
 
-                query = $"{query} WHERE (1=1)";
+            query = $"{query} WHERE (1=1)";
 
-                #endregion
+            #endregion
 
-                #region WHERE IF CLIENT
-                if (csm.ClientId > 0)
-                {
-                    query = $"{query} AND p.ClientId = @csmClientId ";
-                }
-
-                #endregion
-
-
-                // Custom Search
-
-                #region Custom Search
-
-                if (csm.FromDate.HasValue && csm.ToDate.HasValue)
-                {
-                    query = $"{query} AND (p.CreatedOn >= @csmFromDate AND p.CreatedOn <= @csmToDate) ";
-                }
-                else if (csm.FromDate.HasValue || csm.ToDate.HasValue)
-                {
-                    if (csm.FromDate.HasValue)
-                    {
-                        query = $"{query} AND (p.CreatedOn>=@csmFromDate) ";
-                    }
-                    if (csm.ToDate.HasValue)
-                    {
-                        query = $"{query} AND (p.CreatedOn<=@csmToDate) ";
-                    }
-                }
-
-                #endregion
-
-                // Normal Search
-
-                #region Normal Search
-
-                if (!string.IsNullOrEmpty(csm.Query))
-                {
-                    query = string.Format(@"{0} AND (p.[Name] LIKE '%{1}%' OR
-                                                  p.[Description] LIKE '%{1}%'
-                                                 ) ", query, csm.Query.Trim());
-                }
-
-                #endregion
-
-                // ORDER
-
-                query = $"{query} ORDER BY p.{pm.SortBy} {pm.Sort}";
-
-                // SKIP, TAKE
-
-                query = string.Format("{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query);
-
-                List<ClientProductCustomModel> model = context.Database.SqlQuery<ClientProductCustomModel>(query, parameters.ToArray()).ToList();
-
-                if (model.NullableAny(p => p.DocumentCount > 0))
-                {
-                    using (DocumentService dservice = new DocumentService())
-                    {
-                        foreach (ClientProductCustomModel item in model.Where(p => p.DocumentCount > 0))
-                        {
-                            item.Documents = dservice.List(item.Id, "Product");
-                        }
-                    }
-                }
-
-                return model;
+            #region WHERE IF CLIENT
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND p.ClientId = @csmClientId ";
             }
 
-        
+            #endregion
+
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (p.CreatedOn >= @csmFromDate AND p.CreatedOn <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (p.CreatedOn>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (p.CreatedOn<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
+            {
+                query = string.Format( @"{0} AND (p.[Name] LIKE '%{1}%' OR
+                                                  p.[Description] LIKE '%{1}%'
+                                                 ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            // ORDER
+
+            query = $"{query} ORDER BY p.{pm.SortBy} {pm.Sort}";
+
+            // SKIP, TAKE
+
+            query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
+
+            List<ClientProductCustomModel> model = context.Database.SqlQuery<ClientProductCustomModel>( query, parameters.ToArray() ).ToList();
+
+            if ( model.NullableAny( p => p.DocumentCount > 0 ) )
+            {
+                using ( DocumentService dservice = new DocumentService() )
+                {
+                    foreach ( ClientProductCustomModel item in model.Where( p => p.DocumentCount > 0 ) )
+                    {
+                        item.Documents = dservice.List( item.Id, "Product" );
+                    }
+                }
+            }
+
+            return model;
+        }
+
+
     }
 }

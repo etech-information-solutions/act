@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+
 using ACT.Core.Models;
 using ACT.Core.Models.Custom;
 using ACT.Data.Models;
@@ -168,7 +169,7 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format(@"{0} AND (LOWER(REPLACE(v.Registration, ' ', '')) LIKE '%{1}%') ", query, csm.Query.Trim().ToLower() );
+                query = string.Format( @"{0} AND (LOWER(REPLACE(v.Registration, ' ', '')) LIKE '%{1}%') ", query, csm.Query.Trim().ToLower() );
             }
 
             #endregion
@@ -182,6 +183,53 @@ namespace ACT.Core.Services
             query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
             return context.Database.SqlQuery<VehicleCustomModel>( query.Trim(), parameters.ToArray() ).ToList();
+        }
+
+
+        /// <summary>
+        /// Gets a list of clients
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public Dictionary<int, string> List( bool v, int objectId = 0, string objectType = "" )
+        {
+            Dictionary<int, string> clientOptions = new Dictionary<int, string>();
+            List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "objectId", objectId ) },
+                { new SqlParameter( "objectType", objectType ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+            };
+
+            string query = string.Empty;
+
+            query = $"SELECT v.[Id] AS [TKey], v.[Descriptoin] AS [TValue] FROM [dbo].[Vehicle] v WHERE (1=1)";
+
+            if ( objectId > 0 )
+            {
+                query = $"{query} AND v.ObjectId=@objectId";
+            }
+            if ( !string.IsNullOrEmpty( objectType ) )
+            {
+                query = $"{query} AND v.ObjectType=@objectType";
+            }
+
+            model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();
+
+            if ( model != null && model.Any() )
+            {
+                foreach ( var k in model )
+                {
+                    if ( clientOptions.Keys.Any( x => x == k.TKey ) )
+                        continue;
+
+                    clientOptions.Add( k.TKey, ( k.TValue ?? "" ).Trim() );
+                }
+            }
+
+            return clientOptions;
         }
     }
 }

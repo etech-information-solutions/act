@@ -22,6 +22,7 @@ namespace ACT.Data.Models
     
         public int Id { get; set; }
         public int ClientId { get; set; }
+        public Nullable<int> ClientSiteId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -42,9 +43,9 @@ namespace ACT.Data.Models
         public string ContactNumber { get; set; }
         public string Reference306 { get; set; }
         public int Status { get; set; }
-        public Nullable<int> ClientSiteId { get; set; }
     
         public virtual Client Client { get; set; }
+        public virtual ClientSite ClientSite { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<DeliveryNoteLine> DeliveryNoteLines { get; set; }
     }

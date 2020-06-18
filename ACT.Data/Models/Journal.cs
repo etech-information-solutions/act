@@ -28,8 +28,8 @@ namespace ACT.Data.Models
         public int Status { get; set; }
         public string JournalType { get; set; }
     
+        public virtual ClientLoad ClientLoad { get; set; }
         public virtual Document Document { get; set; }
         public virtual SiteAudit SiteAudit { get; set; }
-        public virtual ClientLoad ClientLoad { get; set; }
     }
 }

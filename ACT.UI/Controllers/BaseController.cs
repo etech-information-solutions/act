@@ -955,6 +955,26 @@ namespace ACT.UI.Controllers
             }
         }
 
+        public ActionResult GetClientSites( int clientId )
+        {
+            using ( ClientSiteService sservice = new ClientSiteService() )
+            {
+                Dictionary<int, string> siteOptions = sservice.List( true, clientId );
+
+                return PartialView( "_Sites", new DeliveryNoteViewModel() { SiteOptions = siteOptions } ); // Views/Pallet/_Sites
+            }
+        }
+
+        public ActionResult GetClientVehicles( int clientId )
+        {
+            using ( VehicleService vservice = new VehicleService() )
+            {
+                Dictionary<int, string> vehicleOptions = vservice.List( true, clientId, "Client" );
+
+                return PartialView( "_Vehicles", new DeliveryNoteViewModel() { VehicleOptions = vehicleOptions } ); // Views/Pallet/_Vehicles
+            }
+        }
+
         #endregion
 
 

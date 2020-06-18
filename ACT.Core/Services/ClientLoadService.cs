@@ -29,6 +29,16 @@ namespace ACT.Core.Services
             return base.GetById( id );
         }
 
+        /// <summary>
+        /// Gets a Client Load using the specified refernce number
+        /// </summary>
+        /// <param name="referenceNumber"></param>
+        /// <returns></returns>
+        public ClientLoad GetByRefernce( string referenceNumber )
+        {
+            return context.ClientLoads.FirstOrDefault( cl => cl.ReferenceNumber == referenceNumber );
+        }
+
 
         /// <summary>
         /// Gets a total count of Items matching the specified search params

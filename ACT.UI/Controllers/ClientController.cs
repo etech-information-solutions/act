@@ -2136,7 +2136,7 @@ namespace ACT.UI.Controllers
                                     ProductId = productId,
                                     ActiveDate = DateTime.Now,
                                     ProductDescription = pcm.Description,
-                                    HireRate = hrate,
+                                    Rate = hrate,
                                     IssueRate = irate,
                                     LostRate = lrate,
                                     PassonDays = 0, //to be edited by client
@@ -2616,7 +2616,7 @@ namespace ACT.UI.Controllers
                     }
                     //product.PassonRate = model.PassonRate;
                     //product.PassonDays = model.PassonDays;
-                    product.HireRate = hrate;
+                    product.Rate = hrate;
                     product.IssueRate = irate;
                     product.LostRate = lrate;
                 }

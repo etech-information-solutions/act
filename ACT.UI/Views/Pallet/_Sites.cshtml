@@ -1,0 +1,11 @@
+﻿@model DeliveryNoteViewModel
+
+@using ACT.UI.Models
+
+<div class="edit-label">
+    @Html.LabelFor( model => model.SiteId )
+</div>
+<div class="edit-field">
+    @Html.DropDownListFor( model => model.SiteId, model => model.SiteOptions, s => s.Key, s => s.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+    @Html.ValidationMessageFor( model => model.SiteId )
+</div>

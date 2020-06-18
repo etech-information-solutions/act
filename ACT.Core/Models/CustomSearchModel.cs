@@ -441,6 +441,7 @@ namespace ACT.Core.Models
 
                 case "Disputes":
                 case "Exceptions":
+                case "DeliveryNotes":
                 case "OutstandingPallets":
 
                     using ( SiteService sservice = new SiteService() )

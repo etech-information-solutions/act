@@ -803,7 +803,7 @@ namespace ACT.Core.Services
         {
             string number = string.Empty;
 
-            // Reduce 
+            // Reduce
             if ( max < 10 )
             {
                 number = string.Format( "{0}00000000{1}", prefix, max );
