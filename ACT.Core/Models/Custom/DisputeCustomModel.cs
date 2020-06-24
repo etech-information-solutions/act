@@ -14,7 +14,7 @@ namespace ACT.Core.Models.Custom
         public string DisputeReason { get; set; }
         public string DisputeEmail { get; set; }
         public string TDNNumber { get; set; }
-        public Nullable<int> DisputeStatus { get; set; }
+        public Nullable<int> Status { get; set; }
         public string Reference { get; set; }
         public string Equipment { get; set; }
         public string OtherParty { get; set; }
@@ -23,9 +23,11 @@ namespace ACT.Core.Models.Custom
         public string Declarer { get; set; }
         public string Product { get; set; }
         public Nullable<decimal> Quantity { get; set; }
-        public Nullable<int> ActionedBy { get; set; }
+        public Nullable<int> ActionedById { get; set; }
         public Nullable<System.DateTime> ResolvedOn { get; set; }
-        public Nullable<int> ResolvedBy { get; set; }
+        public Nullable<int> ResolvedById { get; set; }
+        public Nullable<int> ProductId { get; set; }
+        public bool Imported { get; set; }
 
         public string ActionUser { get; set; }
         public string ResolvedUser { get; set; }

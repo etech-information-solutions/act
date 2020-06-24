@@ -30,6 +30,72 @@ namespace ACT.UI.Controllers
             return View();
         }
 
+        #region Exports
+
+        //
+        // GET: /Administration/Export
+        public FileContentResult Export( PagingModel pm, CustomSearchModel csm, string type = "poolingagentdata" )
+        {
+            string csv = "";
+            string filename = string.Format( "{0}-{1}.csv", type.ToUpperInvariant(), DateTime.Now.ToString( "yyyy_MM_dd_HH_mm" ) );
+
+            pm.Skip = 0;
+            pm.Take = int.MaxValue;
+
+            switch ( type )
+            {
+                case "disputes":
+
+                    #region Disputes
+
+                    csv = String.Format( "Account Number,TDN Number,Raised Date,Docket Number,Reference,Action By,Resolved On,Resolved By,Other Party,Sender,Receiver,Declarer,Dispute Email,Product,Dispute Status,Equipment,Quantity,Reason fo Dispute {0}", Environment.NewLine );
+
+                    using ( DisputeService dservice = new DisputeService() )
+                    {
+                        List<DisputeCustomModel> disputes = dservice.List1( pm, csm );
+
+                        if ( disputes != null && disputes.Any() )
+                        {
+                            foreach ( DisputeCustomModel item in disputes )
+                            {
+                                csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18} {19}",
+                                                    csv,
+                                                    item.ChepLoadAccountNumber,
+                                                    item.TDNNumber,
+                                                    item.CreatedOn,
+                                                    item.DocketNumber,
+                                                    item.Reference,
+                                                    item.ActionUser,
+                                                    item.ResolvedOn,
+                                                    item.ResolvedUser,
+                                                    item.OtherParty,
+                                                    item.Sender,
+                                                    item.Receiver,
+                                                    item.Declarer,
+                                                    item.DisputeEmail,
+                                                    item.Product,
+                                                    item.Status,
+                                                    item.Equipment,
+                                                    item.Quantity,
+                                                    item.DisputeReason,
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+            }
+
+            return File( new System.Text.UTF8Encoding().GetBytes( csv ), "text/csv", filename );
+        }
+
+        #endregion
+
+
+
         #region Pallet PoolingAgentData
         //
         // GET: /Pallet/PoolingAgentData
@@ -967,29 +1033,26 @@ namespace ACT.UI.Controllers
             }
 
             using ( TransactionScope scope = new TransactionScope() )
-            using ( ClientSiteService csservice = new ClientSiteService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
             using ( DeliveryNoteService dnservice = new DeliveryNoteService() )
             using ( DeliveryNoteLineService dnlservice = new DeliveryNoteLineService() )
             {
-                ClientSite cs = csservice.GetBySiteId( model.ClientId, model.SiteId );
-
                 string number = ( dnservice.Max( "InvoiceNumber" ) as string ) ?? "0";
 
-                int.TryParse( number.Trim().Replace( "ACTDN", "" ), out int n );
+                int.TryParse( number.Trim().Replace( "DN", "" ), out int n );
 
-                model.InvoiceNumber = dnservice.FormatNumber( "ACTDN", ( n + 1 ) );
+                model.InvoiceNumber = dnservice.FormatNumber( "DN", ( n + 1 ) );
 
                 #region Create Delivery Note
 
                 // Create Delivery Note
                 DeliveryNote note = new DeliveryNote()
                 {
-                    ClientSiteId = cs?.Id,
                     ClientId = model.ClientId,
                     OrderDate = model.OrderDate,
                     Status = ( int ) Status.Active,
                     OrderNumber = model.OrderNumber,
+                    ClientSiteId = model.ClientSiteId,
                     CustomerName = model.CustomerName,
                     EmailAddress = model.EmailAddress,
                     Reference306 = model.Reference306,
@@ -1020,6 +1083,7 @@ namespace ACT.UI.Controllers
                         {
                             Product = l.Product,
                             Equipment = l.Product,
+                            Returned = l.Returned,
                             Delivered = l.Delivered,
                             DeliveryNoteId = note.Id,
                             OrderQuantity = l.Ordered,
@@ -1037,13 +1101,13 @@ namespace ACT.UI.Controllers
 
                 ClientLoad load = new ClientLoad()
                 {
-                    ClientSiteId = cs?.Id,
                     NotifyDate = DateTime.Now,
                     ClientId = model.ClientId,
                     LoadDate = model.OrderDate,
                     VehicleId = model.VehicleId,
                     EffectiveDate = DateTime.Now,
                     LoadNumber = model.OrderNumber,
+                    ClientSiteId = model.ClientSiteId,
                     DeliveryNote = model.InvoiceNumber,
                     AccountNumber = model.Reference306,
                     ReceiverNumber = model.ContactNumber,
@@ -1102,12 +1166,12 @@ namespace ACT.UI.Controllers
                     ClientId = note.ClientId,
                     OrderDate = note.OrderDate,
                     OrderNumber = note.OrderNumber,
-                    SiteId = note.ClientSite.SiteId,
                     Status = ( Status ) note.Status,
                     VehicleId = load?.VehicleId ?? 0,
                     Reference306 = note.Reference306,
                     CustomerName = note.CustomerName,
                     EmailAddress = note.EmailAddress,
+                    ClientSiteId = note.ClientSite.Id,
                     ContactNumber = note.ContactNumber,
                     InvoiceNumber = note.InvoiceNumber,
                     BillingPostalCode = note.BililngPostalCode,
@@ -1142,8 +1206,8 @@ namespace ACT.UI.Controllers
                     {
                         Id = line.Id,
                         Product = line.Product,
-                        Status = ( Status ) line.Status,
                         Returned = ( int ) line.Returned,
+                        Status = ( Status ) line.Status,
                         Delivered = ( int ) line.Delivered,
                         Ordered = ( int ) line.OrderQuantity,
                         DeliveryNoteId = line.DeliveryNoteId,
@@ -1164,7 +1228,6 @@ namespace ACT.UI.Controllers
         public ActionResult EditDeliveryNote( DeliveryNoteViewModel model )
         {
             using ( TransactionScope scope = new TransactionScope() )
-            using ( ClientSiteService csservice = new ClientSiteService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
             using ( DeliveryNoteService dnservice = new DeliveryNoteService() )
             using ( DeliveryNoteLineService dnlservice = new DeliveryNoteLineService() )
@@ -1178,16 +1241,14 @@ namespace ACT.UI.Controllers
                     return View( model );
                 }
 
-                ClientSite cs = csservice.GetBySiteId( model.ClientId, model.SiteId );
-
                 #region Update Delivery Note
 
                 // Update Delivery Note
-                note.ClientSiteId = cs?.Id;
                 note.ClientId = model.ClientId;
                 note.OrderDate = model.OrderDate;
                 note.Status = ( int ) model.Status;
                 note.OrderNumber = model.OrderNumber;
+                note.ClientSiteId = model.ClientSiteId;
                 note.CustomerName = model.CustomerName;
                 note.EmailAddress = model.EmailAddress;
                 note.Reference306 = model.Reference306;
@@ -1253,11 +1314,11 @@ namespace ACT.UI.Controllers
 
                 if ( load != null )
                 {
-                    load.ClientSiteId = cs?.Id;
                     load.ClientId = model.ClientId;
                     load.LoadDate = model.OrderDate;
                     load.VehicleId = model.VehicleId;
                     load.LoadNumber = model.OrderNumber;
+                    load.ClientSiteId = model.ClientSiteId;
                     load.AccountNumber = model.Reference306;
                     load.ReceiverNumber = model.ContactNumber;
                     load.ClientDescription = model.CustomerName;
@@ -1273,13 +1334,13 @@ namespace ACT.UI.Controllers
                 {
                     load = new ClientLoad()
                     {
-                        ClientSiteId = cs?.Id,
                         NotifyDate = DateTime.Now,
                         ClientId = model.ClientId,
                         LoadDate = model.OrderDate,
                         VehicleId = model.VehicleId,
                         EffectiveDate = DateTime.Now,
                         LoadNumber = model.OrderNumber,
+                        ClientSiteId = model.ClientSiteId,
                         DeliveryNote = model.InvoiceNumber,
                         AccountNumber = model.Reference306,
                         ReceiverNumber = model.ContactNumber,
@@ -1474,94 +1535,485 @@ namespace ACT.UI.Controllers
 
         //-------------------------------------------------------------------------------------
 
-        #region Pallet Disputes
+
+        #region Disputes
+
         //
-        // GET: /Pallet/Disputes
-        public ActionResult Disputes( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        // GET: /Pallet/DisputeDetails/5
+        public ActionResult DisputeDetails( int id, bool layout = true )
         {
-            if ( givecsm )
+            using ( DisputeService service = new DisputeService() )
             {
-                ViewBag.ViewName = "Disputes";
+                Dispute model = service.GetById( id );
 
-                return PartialView( "_DisputesCustomSearch", new CustomSearchModel( "Disputes" ) );
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return RedirectToAction( "Index" );
+                }
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                return View( model );
             }
-            ViewBag.ViewName = "Disputes";
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-                                                                      //    model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            List<Client> clientList = new List<Client>();
-            //TODO
-            using ( ClientService clientService = new ClientService() )
-            {
-                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-            }
-
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            } );
-            ViewBag.ClientList = clientDDL;
-            int total = 0;
-
-            List<Site> model = new List<Site>();
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
-
-            return PartialView( "_Disputes", paging );
         }
+
+        //
+        // GET: /Pallet/AddDispute/5 
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddDispute()
+        {
+            DisputeViewModel model = new DisputeViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        //
+        // POST: /Pallet/AddDispute/5
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddDispute( DisputeViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the Dispute was not created. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( DisputeService dservice = new DisputeService() )
+            using ( ChepLoadService clservice = new ChepLoadService() )
+            {
+                //if ( dservice.Exist( model.DocketNumber ) )
+                //{
+                //    // Dispute already exist!
+                //    Notify( $"Sorry, an ACTIVE Dispute for the Docket Number \"{model.DocketNumber}\" already exists!", NotificationType.Error );
+
+                //    return View( model );
+                //}
+
+                if ( !model.ChepLoadId.HasValue )
+                {
+                    // Attempt to locate ChepLoad using the specified DocketNumber
+                    ChepLoad cl = clservice.GetByDocketNumber( model.DocketNumber?.Trim() );
+
+                    model.ChepLoadId = ( cl != null ) ? cl.Id : model.ChepLoadId;
+                }
+
+                model.ActionById = ( !model.ActionById.HasValue ) ? CurrentUser.Id : model.ActionById;
+                model.ResolvedOn = ( model.Status != DisputeStatus.Active && !model.ResolvedOn.HasValue ) ? DateTime.Now : model.ResolvedOn;
+                model.ResolvedById = ( model.Status != DisputeStatus.Active && !model.ResolvedById.HasValue ) ? CurrentUser.Id : model.ResolvedById;
+
+                Dispute dispute = new Dispute()
+                {
+                    Sender = model.Sender,
+                    Product = model.Product,
+                    Declarer = model.Declarer,
+                    Quantity = model.Quantity,
+                    Receiver = model.Receiver,
+                    Equipment = model.Equipment,
+                    TDNNumber = model.TDNNumber,
+                    OtherParty = model.OtherParty,
+                    Status = ( int ) model.Status,
+                    ResolvedOn = model.ResolvedOn,
+                    ChepLoadId = model.ChepLoadId,
+                    Reference = model.DocketNumber,
+                    ActionedById = model.ActionById,
+                    DocketNumber = model.DocketNumber,
+                    DisputeEmail = model.DisputeEmail,
+                    ResolvedById = model.ResolvedById,
+                    DisputeReason = model.DisputeReason,
+                };
+
+                dservice.Create( dispute );
+
+                Notify( "The Dispute was successfully created.", NotificationType.Success );
+
+                return RedirectToAction( "Disputes" );
+            }
+        }
+
+        //
+        // GET: /Pallet/EditDispute/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditDispute( int id )
+        {
+            using ( DisputeService service = new DisputeService() )
+            {
+                Dispute dispute = service.GetById( id );
+
+                if ( dispute == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                DisputeViewModel model = new DisputeViewModel()
+                {
+                    Id = dispute.Id,
+                    EditMode = true,
+                    Sender = dispute.Sender,
+                    Product = dispute.Product,
+                    Declarer = dispute.Declarer,
+                    Receiver = dispute.Receiver,
+                    TDNNumber = dispute.TDNNumber,
+                    Equipment = dispute.Equipment,
+                    OtherParty = dispute.OtherParty,
+                    ResolvedOn = dispute.ResolvedOn,
+                    ChepLoadId = dispute.ChepLoadId,
+                    ActionById = dispute.ActionedById,
+                    DocketNumber = dispute.DocketNumber,
+                    Quantity = ( int ) dispute.Quantity,
+                    ResolvedById = dispute.ResolvedById,
+                    DisputeEmail = dispute.DisputeEmail,
+                    DisputeReason = dispute.DisputeReason,
+                    Status = ( DisputeStatus ) dispute.Status,
+                };
+
+                return View( model );
+            }
+        }
+
+        //
+        // POST: /Pallet/EditDispute/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditDispute( DisputeViewModel model )
+        {
+            using ( DisputeService service = new DisputeService() )
+            using ( ChepLoadService clservice = new ChepLoadService() )
+            {
+                if ( !ModelState.IsValid )
+                {
+                    Notify( "Sorry, the selected Dispute was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                Dispute dispute = service.GetById( model.Id );
+
+                if ( dispute == null )
+                {
+                    Notify( "Sorry, that Dispute does not exist! Please specify a valid Dispute Id and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                //if ( !dispute.DocketNumber.Equals( model.DocketNumber ) && service.Exist( model.DocketNumber ) )
+                //{
+                //    // Dispute already exist!
+                //    Notify( $"Sorry, an ACTIVE Dispute with the Docket Number \"{model.DocketNumber}\" already exists!", NotificationType.Error );
+
+                //    return View( model );
+                //}
+
+                if ( !model.ChepLoadId.HasValue )
+                {
+                    // Attempt to locate ChepLoad using the specified DocketNumber
+                    ChepLoad cl = clservice.GetByDocketNumber( model.DocketNumber?.Trim() );
+
+                    model.ChepLoadId = ( cl != null ) ? cl.Id : model.ChepLoadId;
+                }
+
+                model.ActionById = ( !model.ActionById.HasValue ) ? CurrentUser.Id : model.ActionById;
+                model.ResolvedOn = ( model.Status != DisputeStatus.Active && !model.ResolvedOn.HasValue ) ? DateTime.Now : model.ResolvedOn;
+                model.ResolvedById = ( model.Status != DisputeStatus.Active && !model.ResolvedById.HasValue ) ? CurrentUser.Id : model.ResolvedById;
+
+                dispute.Sender = model.Sender;
+                dispute.Product = model.Product;
+                dispute.Declarer = model.Declarer;
+                dispute.Quantity = model.Quantity;
+                dispute.Receiver = model.Receiver;
+                dispute.Equipment = model.Equipment;
+                dispute.TDNNumber = model.TDNNumber;
+                dispute.OtherParty = model.OtherParty;
+                dispute.Status = ( int ) model.Status;
+                dispute.ResolvedOn = model.ResolvedOn;
+                dispute.ChepLoadId = model.ChepLoadId;
+                dispute.Reference = model.DocketNumber;
+                dispute.ActionedById = model.ActionById;
+                dispute.DocketNumber = model.DocketNumber;
+                dispute.DisputeEmail = model.DisputeEmail;
+                dispute.ResolvedById = model.ResolvedById;
+                dispute.DisputeReason = model.DisputeReason;
+
+                service.Update( dispute );
+
+                Notify( "The selected Dispute's details were successfully updated.", NotificationType.Success );
+
+                return Disputes( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
+        //
+        // POST: /Pallet/DeleteDispute/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteDispute( DisputeViewModel model )
+        {
+            using ( DisputeService service = new DisputeService() )
+            {
+                Dispute dispute = service.GetById( model.Id );
+
+                if ( dispute == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                dispute.Status = ( ( ( DisputeStatus ) dispute.Status ) == DisputeStatus.Active ) ? ( int ) DisputeStatus.Cancelled : ( int ) DisputeStatus.Active;
+
+                if ( ( DisputeStatus ) dispute.Status == DisputeStatus.Cancelled )
+                {
+                    dispute.ResolvedOn = DateTime.Now;
+                    dispute.ResolvedById = CurrentUser.Id;
+                }
+                else
+                {
+                    dispute.ResolvedOn = null;
+                    dispute.ResolvedById = null;
+                }
+
+                service.Update( dispute );
+
+                Notify( "The selected Dispute was successfully updated.", NotificationType.Success );
+
+                return Disputes( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
         #endregion
 
-        //-------------------------------------------------------------------------------------
 
         //-------------------------------------------------------------------------------------
 
-        #region Pallet AuthorisationCode
+
+        #region Authorisation Code
+
         //
-        // GET: /Pallet/AuthorisationCode
-        public ActionResult AuthorisationCode( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        // GET: /Pallet/AuthorisationCodeDetails/5
+        public ActionResult AuthorisationCodeDetails( int id, bool layout = true )
         {
-            if ( givecsm )
+            using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
             {
-                ViewBag.ViewName = "AuthorisationCode";
+                ClientAuthorisation model = caservice.GetById( id );
 
-                return PartialView( "_AuthorisationCodeCustomSearch", new CustomSearchModel( "AuthorisationCode" ) );
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return RedirectToAction( "Index" );
+                }
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                return View( model );
             }
-            ViewBag.ViewName = "AuthorisationCode";
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-                                                                      //    model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            List<Client> clientList = new List<Client>();
-            //TODO
-            using ( ClientService clientService = new ClientService() )
-            {
-                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-            }
-
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            } );
-            ViewBag.ClientList = clientDDL;
-            int total = 0;
-
-            List<Site> model = new List<Site>();
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
-
-            return PartialView( "_AuthorisationCode", paging );
         }
+
+        //
+        // GET: /Pallet/AddAuthorisationCode/5 
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddAuthorisationCode()
+        {
+            AuthorisationCodeViewModel model = new AuthorisationCodeViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        //
+        // POST: /Pallet/AddAuthorisationCode/5
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddAuthorisationCode( AuthorisationCodeViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the Authorisation Code was not created. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
+            using ( ChepLoadService clservice = new ChepLoadService() )
+            {
+                if ( caservice.ExistByDocketNumber( model.DocketNumber ) )
+                {
+                    // AuthorisationCode already exist!
+                    Notify( $"Sorry, an Authorisation Code with the Docket Number \"{model.DocketNumber}\" already exists!", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                if ( caservice.ExistByLoadNumber( model.LoadNumber ) )
+                {
+                    // AuthorisationCode already exist!
+                    Notify( $"Sorry, an Authorisation Code with the Load Number \"{model.LoadNumber}\" already exists!", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                string number = ( caservice.Max( "Code" ) as string ) ?? "0";
+
+                int.TryParse( number.Trim().Replace( "AC", "" ), out int n );
+
+                model.Code = caservice.FormatNumber( "AC", ( n + 1 ) );
+
+                ClientAuthorisation code = new ClientAuthorisation()
+                {
+                    Code = model.Code,
+                    LoadNumber = model.LoadNumber,
+                    Status = ( int ) model.Status,
+                    DocketNumber = model.DocketNumber,
+                    ClientSiteId = model.ClientSiteId,
+                    TransporterId = model.TransporterId,
+                    AuthorisationDate = model.AuthorisationDate.Value,
+                };
+
+                caservice.Create( code );
+
+                Notify( "The Authorisation Code was successfully created.", NotificationType.Success );
+
+                return AuthorisationCodes( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
+        //
+        // GET: /Pallet/EditAuthorisationCode/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditAuthorisationCode( int id )
+        {
+            using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
+            {
+                ClientAuthorisation code = caservice.GetById( id );
+
+                if ( code == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                AuthorisationCodeViewModel model = new AuthorisationCodeViewModel()
+                {
+                    Id = code.Id,
+                    EditMode = true,
+                    Code = code.Code,
+                    LoadNumber = code.LoadNumber,
+                    Status = ( Status ) code.Status,
+                    ClientSiteId = code.ClientSiteId,
+                    DocketNumber = code.DocketNumber,
+                    TransporterId = code.TransporterId,
+                    AuthorisationDate = code.AuthorisationDate,
+                };
+
+                return View( model );
+            }
+        }
+
+        //
+        // POST: /Pallet/EditAuthorisationCode/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditAuthorisationCode( AuthorisationCodeViewModel model )
+        {
+            using ( ClientAuthorisationService service = new ClientAuthorisationService() )
+            using ( ChepLoadService clservice = new ChepLoadService() )
+            {
+                if ( !ModelState.IsValid )
+                {
+                    Notify( "Sorry, the selected Authorisation Code was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                ClientAuthorisation code = service.GetById( model.Id );
+
+                if ( code == null )
+                {
+                    Notify( "Sorry, that Authorisation Code does not exist! Please specify a valid AuthorisationCode Id and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                if ( !code.DocketNumber.Equals( model.DocketNumber ) && service.ExistByDocketNumber( model.DocketNumber ) )
+                {
+                    // Authorisation Code already exist!
+                    Notify( $"Sorry, an Authorisation Code with the Docket Number \"{model.DocketNumber}\" already exists!", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                if ( !code.LoadNumber.Equals( model.LoadNumber ) && service.ExistByLoadNumber( model.LoadNumber ) )
+                {
+                    // Authorisation Code already exist!
+                    Notify( $"Sorry, an Authorisation Code with the Load Number \"{model.LoadNumber}\" already exists!", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                code.LoadNumber = model.LoadNumber;
+                code.Status = ( int ) model.Status;
+                code.DocketNumber = model.DocketNumber;
+                code.ClientSiteId = model.ClientSiteId;
+                code.TransporterId = model.TransporterId;
+                code.AuthorisationDate = model.AuthorisationDate.Value;
+
+                service.Update( code );
+
+                Notify( "The selected Authorisation Code's details were successfully updated.", NotificationType.Success );
+
+                return AuthorisationCodes( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
+        //
+        // POST: /Pallet/DeleteAuthorisationCode/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteAuthorisationCode( AuthorisationCodeViewModel model )
+        {
+            using ( ClientAuthorisationService service = new ClientAuthorisationService() )
+            {
+                ClientAuthorisation code = service.GetById( model.Id );
+
+                if ( code == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                code.Status = ( ( ( Status ) code.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.Update( code );
+
+                Notify( "The selected Authorisation Code was successfully updated.", NotificationType.Success );
+
+                return AuthorisationCodes( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
         #endregion
 
+
         //-------------------------------------------------------------------------------------
+
 
         #region General
 
 
         #endregion
+
 
         //-------------------------------------------------------------------------------------
 
@@ -2308,10 +2760,11 @@ namespace ACT.UI.Controllers
                 using ( PSPConfigService confservice = new PSPConfigService() )
                 {
                     PSPConfig conf = confservice.GetById( int.Parse( pspId ) );
+
                     if ( conf.ImportEmailHost != null && conf.ImportEmailPort != null )
                     {
                         OpenPop.Pop3.Pop3Client pop3Client = new OpenPop.Pop3.Pop3Client();
-                        pop3Client.Connect( conf.ImportEmailHost, int.Parse( conf.ImportEmailPort ), true );
+                        pop3Client.Connect( conf.ImportEmailHost, conf.ImportEmailPort ?? 110, true );
                         pop3Client.Authenticate( conf.ImportEmailUsername, conf.ImportEmailPassword, OpenPop.Pop3.AuthenticationMethod.UsernameAndPassword );
 
                         int count = pop3Client.GetMessageCount();
@@ -2394,245 +2847,6 @@ namespace ACT.UI.Controllers
 
         #endregion
 
-        #region Exports
-
-        //
-        // GET: /Administration/Export
-        public FileContentResult Export( PagingModel pm, CustomSearchModel csm, string type = "configurations" )
-        {
-            string csv = "";
-            string filename = string.Format( "{0}-{1}.csv", type.ToUpperInvariant(), DateTime.Now.ToString( "yyyy_MM_dd_HH_mm" ) );
-
-            pm.Skip = 0;
-            pm.Take = int.MaxValue;
-
-            switch ( type )
-            {
-                case "clientlist":
-                    #region ClientList
-                    csv = String.Format( "Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine );
-
-                    List<Client> clients = new List<Client>();
-
-                    using ( ClientService service = new ClientService() )
-                    {
-                        clients = service.ListCSM( pm, csm );
-                    }
-
-                    if ( clients != null && clients.Any() )
-                    {
-                        foreach ( Client item in clients )
-                        {
-                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
-                                                csv,
-                                                item.Id,
-                                                item.CompanyName,
-                                                item.CompanyRegistrationNumber,
-                                                item.TradingAs,
-                                                item.VATNumber,
-                                                item.ChepReference,
-                                                item.ContactPerson,
-                                                item.ContactNumber,
-                                                item.Email,
-                                                item.AdminPerson,
-                                                item.AdminEmail,
-                                                item.FinancialPerson,
-                                                item.FinPersonEmail,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
-                        }
-                    }
-
-
-                    #endregion
-
-                    break;
-                case "awaitingactivation":
-                    #region AwaitingActivation
-                    csv = String.Format( "Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine );
-
-                    List<Client> inactiveclients = new List<Client>();
-                    csm.Status = Status.Pending;
-                    using ( ClientService service = new ClientService() )
-                    {
-                        inactiveclients = service.ListCSM( pm, csm );
-                    }
-
-                    if ( inactiveclients != null && inactiveclients.Any() )
-                    {
-                        foreach ( Client item in inactiveclients )
-                        {
-                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
-                                                csv,
-                                                item.Id,
-                                                item.CompanyName,
-                                                item.CompanyRegistrationNumber,
-                                                item.TradingAs,
-                                                item.VATNumber,
-                                                item.ChepReference,
-                                                item.ContactPerson,
-                                                item.ContactNumber,
-                                                item.Email,
-                                                item.AdminPerson,
-                                                item.AdminEmail,
-                                                item.FinancialPerson,
-                                                item.FinPersonEmail,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
-                        }
-                    }
-
-
-                    #endregion
-
-                    break;
-                case "managesites":
-                    #region AwaitingActivation
-                    csv = String.Format( "Id, Name, Description, X Coord, Y Coord, Address, Postal Code, Contact Name,Contact No,Planning Point, Depot, Chep Sitecode, Site Type, Status {0}", Environment.NewLine );
-
-                    List<Site> siteList = new List<Site>();
-
-                    using ( SiteService service = new SiteService() )
-                    {
-                        siteList = service.ListCSM( pm, csm );
-                    }
-
-                    if ( siteList != null && siteList.Any() )
-                    {
-                        foreach ( Site item in siteList )
-                        {
-                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10}, {11}, {12}, {13}, {14} {15}",
-                                                csv,
-                                                item.Id,
-                                                item.Name,
-                                                item.Description,
-                                                item.XCord,
-                                                item.YCord,
-                                                item.Address,
-                                                item.PostalCode,
-                                                item.ContactName,
-                                                item.ContactNo,
-                                                item.PlanningPoint,
-                                                item.Depot,
-                                                item.SiteCodeChep,
-                                                ( SiteType ) ( int ) item.SiteType,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
-                        }
-                    }
-                    #endregion
-                    break;
-
-                case "linkproducts":
-                    #region linkproducts
-                    csv = String.Format( "Id, ClientId, Company Name, ProductId, Product Name, Product Description, Active Date, HireRate, LostRate, IssueRate, PassonRate, PassonDays, Status {0}", Environment.NewLine );
-
-                    List<ClientProductCustomModel> product = new List<ClientProductCustomModel>();
-
-                    using ( ClientProductService service = new ClientProductService() )
-                    {
-                        product = service.ListCSM( pm, csm );
-                    }
-
-                    if ( product != null && product.Any() )
-                    {
-                        foreach ( ClientProductCustomModel item in product )
-                        {
-                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} {14}",
-                                                csv,
-                                                item.Id,
-                                                item.ClientId,
-                                                item.CompanyName,
-                                                item.ProductId,
-                                                item.Name,
-                                                item.ProductDescription,
-                                                item.ActiveDate,
-                                                item.HireRate,
-                                                item.LostRate,
-                                                item.IssueRate,
-                                                item.PassonRate,
-                                                item.PassonDays,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
-                        }
-                    }
-
-
-                    #endregion
-
-                    break;
-
-                case "clientgroups":
-                    #region ClientGroup
-                    csv = String.Format( "Id, Group Name, Description, Status {0}", Environment.NewLine );
-
-                    List<ClientGroupCustomModel> clientGroups = new List<ClientGroupCustomModel>();
-
-                    using ( ClientGroupService service = new ClientGroupService() )
-                    {
-                        clientGroups = service.ListCSM( pm, csm );
-                    }
-
-                    if ( clientGroups != null && clientGroups.Any() )
-                    {
-                        foreach ( ClientGroupCustomModel item in clientGroups )
-                        {
-                            csv = String.Format( "{0} {1},{2},{3},{4} {5}",
-                                                csv,
-                                                item.Id,
-                                                item.Name,
-                                                item.Description,
-                                                 ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
-                        }
-                    }
-
-
-                    #endregion
-
-                    break;
-                case "clientkpis":
-                    #region ClientKPI
-                    csv = String.Format( "Id, Client Id,Description, Weight %, TargetAmount, Target Period, Status {0}", Environment.NewLine );
-
-                    List<ClientKPI> kpis = new List<ClientKPI>();
-
-                    using ( ClientKPIService service = new ClientKPIService() )
-                    {
-                        kpis = service.ListCSM( pm, csm );
-                    }
-
-                    if ( kpis != null && kpis.Any() )
-                    {
-                        foreach ( ClientKPI item in kpis )
-                        {
-                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
-                                                csv,
-                                                item.Id,
-                                                item.ClientId,
-                                                item.KPIDescription,
-                                                //item.Disputes,
-                                                //item.OutstandingPallets,
-                                                //item.OutstandingDays,
-                                                //item.Passons,
-                                                item.Weight,
-                                                item.TargetAmount,
-                                                item.TargetPeriod,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
-                        }
-                    }
-
-
-                    #endregion
-
-                    break;
-            }
-
-            return File( new System.Text.UTF8Encoding().GetBytes( csv ), "text/csv", filename );
-        }
-
-        #endregion
 
 
         #region Partial Views
@@ -2657,6 +2871,52 @@ namespace ACT.UI.Controllers
                 PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
                 return PartialView( "_DeliveryNotes", paging );
+            }
+        }
+
+        //
+        // GET: /Pallet/Disputes
+        public ActionResult Disputes( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            using ( DisputeService service = new DisputeService() )
+            {
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "Disputes";
+
+                    return PartialView( "_DisputesCustomSearch", new CustomSearchModel( "Disputes" ) );
+                }
+
+                List<DisputeCustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_Disputes", paging );
+            }
+        }
+
+        //
+        // GET: /Pallet/AuthorisationCodes
+        public ActionResult AuthorisationCodes( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            using ( ClientAuthorisationService service = new ClientAuthorisationService() )
+            {
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "AuthorisationCodes";
+
+                    return PartialView( "_AuthorisationCodesCustomSearch", new CustomSearchModel( "AuthorisationCodes" ) );
+                }
+
+                List<ClientAuthorisationCustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_AuthorisationCodes", paging );
             }
         }
 

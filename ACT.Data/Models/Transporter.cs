@@ -14,6 +14,12 @@ namespace ACT.Data.Models
     
     public partial class Transporter
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Transporter()
+        {
+            this.ClientAuthorisations = new HashSet<ClientAuthorisation>();
+        }
+    
         public int Id { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
@@ -24,5 +30,8 @@ namespace ACT.Data.Models
         public string TradingName { get; set; }
         public string RegistrationNumber { get; set; }
         public int Status { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
     }
 }

@@ -29,6 +29,16 @@ namespace ACT.Core.Services
             return base.GetById( id );
         }
 
+        /// <summary>
+        /// Gets a Dispute using the specified docket number
+        /// </summary>
+        /// <param name="docketNumber"></param>
+        /// <returns></returns>
+        public Dispute GetByDocketNumber( string docketNumber )
+        {
+            return context.Disputes.FirstOrDefault( d => d.DocketNumber == docketNumber );
+        }
+
         public int Total1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
@@ -58,8 +68,9 @@ namespace ACT.Core.Services
 	                            COUNT(d.[Id]) AS [Total]
                              FROM
 	                            [dbo].[Dispute] d
-                                INNER JOIN [dbo].[ChepLoad] cl ON cl.[Id]=d.[ChepLoadId]
-                                LEFT OUTER JOIN [dbo].[User] u1 ON u1.[Id]=d.[ActionedBy]";
+                                LEFT OUTER JOIN [dbo].[ChepLoad] cl ON cl.[Id]=d.[ChepLoadId]
+                                LEFT OUTER JOIN [dbo].[User] u1 ON u1.[Id]=d.[ActionedById]
+                                LEFT OUTER JOIN [dbo].[User] u2 ON u2.[Id]=d.[ResolvedById]";
 
             // WHERE
 
@@ -212,9 +223,9 @@ namespace ACT.Core.Services
 	                            u2.Name + ' ' + u2.Surname AS [ResolvedUser]
                              FROM
 	                            [dbo].[Dispute] d
-                                INNER JOIN [dbo].[ChepLoad] cl ON cl.[Id]=d.[ChepLoadId]
-                                LEFT OUTER JOIN [dbo].[User] u1 ON u1.[Id]=d.[ActionedBy]
-                                LEFT OUTER JOIN [dbo].[User] u2 ON u2.[Id]=d.[ResolvedBy]";
+                                LEFT OUTER JOIN [dbo].[ChepLoad] cl ON cl.[Id]=d.[ChepLoadId]
+                                LEFT OUTER JOIN [dbo].[User] u1 ON u1.[Id]=d.[ActionedById]
+                                LEFT OUTER JOIN [dbo].[User] u2 ON u2.[Id]=d.[ResolvedById]";
 
             // WHERE
 
@@ -367,9 +378,9 @@ namespace ACT.Core.Services
 	                            COUNT(d.[Id]) AS [Total]
                              FROM
 	                            [dbo].[Dispute] d
-                                INNER JOIN [dbo].[ChepLoad] cl ON cl.[Id]=d.[ChepLoadId]
-                                INNER JOIN [dbo].[ChepClient] cc ON cc.[ChepLoadsId]=cl.[Id]
-	                            INNER JOIN [dbo].[ClientLoad] cl1 ON cc.[ClientLoadsId]=cl1.[Id]
+                                LEFT OUTER JOIN [dbo].[ChepLoad] cl ON cl.[Id]=d.[ChepLoadId]
+                                LEFT OUTER JOIN [dbo].[ChepClient] cc ON cc.[ChepLoadsId]=cl.[Id]
+	                            LEFT OUTER JOIN [dbo].[ClientLoad] cl1 ON cc.[ClientLoadsId]=cl1.[Id]
                              WHERE
                                 (1=1)";
 
@@ -433,6 +444,16 @@ namespace ACT.Core.Services
             #endregion
 
             return context.Database.SqlQuery<NumberOfDisputes>( query, parameters.ToArray() ).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Checks if a dispute with the specified docket number already exists
+        /// </summary>
+        /// <param name="docketNumber"></param>
+        /// <returns></returns>
+        public bool Exist( string docketNumber )
+        {
+            return context.Disputes.Any( d => d.DocketNumber == docketNumber );
         }
     }
 }

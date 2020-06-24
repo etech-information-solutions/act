@@ -35,11 +35,11 @@ namespace ACT.Data.Models
         public string WebsiteUrl { get; set; }
         public string PlatformTnCDocumentUrl { get; set; }
         public string ClientTnCDocumentUrl { get; set; }
-        public Nullable<System.TimeSpan> EmailBatchMonitorStart { get; set; }
-        public Nullable<System.TimeSpan> EmailBatchMonitorEnd { get; set; }
-        public Nullable<decimal> EmailBatchMonitorPoll { get; set; }
-        public string EmailBatchMonitorPath { get; set; }
-        public Nullable<System.DateTime> LastEmailBatchMonitorRun { get; set; }
-        public Nullable<int> LastEmailBatchMonitorCount { get; set; }
+        public Nullable<System.TimeSpan> DisputeMonitorTime { get; set; }
+        public string DisputeMonitorInterval { get; set; }
+        public string DisputeMonitorPath { get; set; }
+        public bool DisputeMonitorEnabled { get; set; }
+        public Nullable<System.DateTime> LastDisputeMonitorRun { get; set; }
+        public Nullable<int> LastDisputeMonitorCount { get; set; }
     }
 }

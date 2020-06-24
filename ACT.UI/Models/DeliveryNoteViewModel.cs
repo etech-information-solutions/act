@@ -15,7 +15,7 @@ namespace ACT.UI.Models
 
         [Required]
         [Display( Name = "Site" )]
-        public int SiteId { get; set; }
+        public int ClientSiteId { get; set; }
 
         [Required]
         [Display( Name = "Client" )]

@@ -21,6 +21,7 @@ namespace ACT.Data.Models
             this.ProductPrices = new HashSet<ProductPrice>();
             this.PSPProducts = new HashSet<PSPProduct>();
             this.SiteBillings = new HashSet<SiteBilling>();
+            this.Disputes = new HashSet<Dispute>();
         }
     
         public int Id { get; set; }
@@ -39,5 +40,7 @@ namespace ACT.Data.Models
         public virtual ICollection<PSPProduct> PSPProducts { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SiteBilling> SiteBillings { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Dispute> Disputes { get; set; }
     }
 }

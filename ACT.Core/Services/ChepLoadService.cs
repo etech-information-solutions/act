@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+
 using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Core.Models.Custom;
@@ -22,11 +23,11 @@ namespace ACT.Core.Services
         /// <param name="pm"></param>
         /// <param name="csm"></param>
         /// <returns></returns>
-        public List<ChepLoadCustomModel> ListCSM(PagingModel pm, CustomSearchModel csm)
+        public List<ChepLoadCustomModel> ListCSM( PagingModel pm, CustomSearchModel csm )
         {
-            if (csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date)
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
-                csm.ToDate = csm.ToDate?.AddDays(1);
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
             }
 
             // Parameters
@@ -72,7 +73,8 @@ namespace ACT.Core.Services
             #endregion
 
             #region WHERE IF CLIENT
-            if (csm.ClientId > 0)
+
+            if ( csm.ClientId > 0 )
             {
                 //TODO: Give this attention for Client COntext
                 //query = $"{query} AND EXISTS (SELECT Id FROM [dbo].[ClientProduct] cp WHERE cp.ProductId = p.Id AND cp.ClientId = @clientid)";
@@ -85,24 +87,24 @@ namespace ACT.Core.Services
 
             #region Custom Search
 
-            if (csm.FromDate.HasValue && csm.ToDate.HasValue)
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
                 query = $"{query} AND (p.CreatedOn >= @csmFromDate AND p.CreatedOn <= @csmToDate) ";
             }
-            else if (csm.FromDate.HasValue || csm.ToDate.HasValue)
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
-                if (csm.FromDate.HasValue)
+                if ( csm.FromDate.HasValue )
                 {
                     query = $"{query} AND (p.CreatedOn>=@csmFromDate) ";
                 }
-                if (csm.ToDate.HasValue)
+                if ( csm.ToDate.HasValue )
                 {
                     query = $"{query} AND (p.CreatedOn<=@csmToDate) ";
                 }
             }
 
 
-            if (csm.ReconciliationStatus != ReconciliationStatus.Unreconcilable)
+            if ( csm.ReconciliationStatus != ReconciliationStatus.Unreconcilable )
             {
                 query = $"{query} AND (p.Status=@csmReconciliation)";
             }
@@ -113,24 +115,24 @@ namespace ACT.Core.Services
             //    query = $"{query} AND (p.Status=@csmReconciliation)";
             //}
 
-            if (!string.IsNullOrEmpty(csm.Name))
+            if ( !string.IsNullOrEmpty( csm.Name ) )
             {
-                query = string.Format(@"{0} AND (p.ClientDescription LIKE '%{1}%' )", query, csm.Description);
+                query = string.Format( @"{0} AND (p.ClientDescription LIKE '%{1}%' )", query, csm.Description );
             }
 
-            if (!string.IsNullOrEmpty(csm.ReferenceNumber))
+            if ( !string.IsNullOrEmpty( csm.ReferenceNumber ) )
             {
-                query = string.Format(@"{0} AND (p.DocketNumber LIKE '%{1}%' OR p.ReferenceNumber LIKE '%{1}%' OR p.ReceiverNumber LIKE '%{1}%' OR p.AccountNumber LIKE '%{1}%' )", query, csm.ReferenceNumber);
+                query = string.Format( @"{0} AND (p.DocketNumber LIKE '%{1}%' OR p.ReferenceNumber LIKE '%{1}%' OR p.ReceiverNumber LIKE '%{1}%' OR p.AccountNumber LIKE '%{1}%' )", query, csm.ReferenceNumber );
             }
 
-            if (!string.IsNullOrEmpty(csm.ReferenceNumberOther))
+            if ( !string.IsNullOrEmpty( csm.ReferenceNumberOther ) )
             {
-                query = string.Format(@"{0} AND (p.DocketNumber LIKE '%{1}%' OR p.ReferenceNumber LIKE '%{1}%' OR p.ReceiverNumber LIKE '%{1}%' OR p.AccountNumber LIKE '%{1}%' )", query, csm.ReferenceNumberOther);
+                query = string.Format( @"{0} AND (p.DocketNumber LIKE '%{1}%' OR p.ReferenceNumber LIKE '%{1}%' OR p.ReceiverNumber LIKE '%{1}%' OR p.AccountNumber LIKE '%{1}%' )", query, csm.ReferenceNumberOther );
             }
 
-            if (!string.IsNullOrEmpty(csm.Description))
+            if ( !string.IsNullOrEmpty( csm.Description ) )
             {
-                query = string.Format(@"{0} AND (p.Equipment LIKE '%{1}%' OR p.ClientDescription LIKE '%{1}%' )", query, csm.Description);
+                query = string.Format( @"{0} AND (p.Equipment LIKE '%{1}%' OR p.ClientDescription LIKE '%{1}%' )", query, csm.Description );
             }
 
             #endregion
@@ -139,19 +141,15 @@ namespace ACT.Core.Services
 
             #region Normal Search
 
-            if (!string.IsNullOrEmpty(csm.Query))
+            if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format(@"{0} AND (p.[DocketNumber] LIKE '%{1}%' OR
-                                                  p.[ReferenceNumber] LIKE '%{1}%'
-                                                                               OR
-                                                  p.[DeliveryNote] LIKE '%{1}%'
-                                                                                OR
-                                                  p.[ClientDescription] LIKE '%{1}%'
-                                                                                OR
-                                                  p.[Equipment] LIKE '%{1}%'
-                                                                                OR
+                query = string.Format( @"{0} AND (p.[DocketNumber] LIKE '%{1}%' OR
+                                                  p.[ReferenceNumber] LIKE '%{1}%' OR
+                                                  p.[DeliveryNote] LIKE '%{1}%' OR
+                                                  p.[ClientDescription] LIKE '%{1}%' OR
+                                                  p.[Equipment] LIKE '%{1}%' OR
                                                   p.[ReceiverNumber] LIKE '%{1}%'
-                                                 ) ", query, csm.Query.Trim());
+                                                 ) ", query, csm.Query.Trim() );
             }
 
             #endregion
@@ -162,17 +160,17 @@ namespace ACT.Core.Services
 
             // SKIP, TAKE
 
-            query = string.Format("{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query);
+            query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
-            List<ChepLoadCustomModel> model = context.Database.SqlQuery<ChepLoadCustomModel>(query, parameters.ToArray()).ToList();
+            List<ChepLoadCustomModel> model = context.Database.SqlQuery<ChepLoadCustomModel>( query, parameters.ToArray() ).ToList();
 
-            if (model.NullableAny(p => p.DocumentCount > 0))
+            if ( model.NullableAny( p => p.DocumentCount > 0 ) )
             {
-                using (DocumentService dservice = new DocumentService())
+                using ( DocumentService dservice = new DocumentService() )
                 {
-                    foreach (ChepLoadCustomModel item in model.Where(p => p.DocumentCount > 0))
+                    foreach ( ChepLoadCustomModel item in model.Where( p => p.DocumentCount > 0 ) )
                     {
-                        item.Documents = dservice.List(item.Id, "ChepLoad");
+                        item.Documents = dservice.List( item.Id, "ChepLoad" );
                     }
                 }
             }
@@ -181,6 +179,59 @@ namespace ACT.Core.Services
         }
 
 
+        /// <summary>
+        /// Gets a list of Chep Loads
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public Dictionary<int, string> List( bool v )
+        {
+            List<IntStringKeyValueModel> model;
+            Dictionary<int, string> chepLoadOptions = new Dictionary<int, string>();
 
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "actStatus", Status.Active ) },
+            };
+
+            string query = string.Empty;
+
+            query = $"SELECT cl.[Id] AS [TKey], cl.[AccountNumber] + ' (Docket # ' + cl.[DocketNumber] + ')' AS [TValue] FROM [dbo].[ChepLoad] cl WHERE (1=1)";
+
+            // Limit to only show PSP for logged in user
+            //if ( CurrentUser.RoleType == RoleType.PSP )
+            //{
+            //    query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu WHERE u.Id=pu.UserId AND pu.PSPId IN({string.Join( ",", CurrentUser.PSPs.Select( s => s.Id ) )})) ";
+            //}
+            //else if ( CurrentUser.RoleType == RoleType.Client )
+            //{
+            //    query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE u.Id=cu.UserId AND cu.ClientId IN({string.Join( ",", CurrentUser.Clients.Select( s => s.Id ) )})) ";
+            //}
+
+            model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();
+
+            if ( model != null && model.Any() )
+            {
+                foreach ( var k in model )
+                {
+                    if ( chepLoadOptions.Keys.Any( x => x == k.TKey ) )
+                        continue;
+
+                    chepLoadOptions.Add( k.TKey, ( k.TValue ?? "" ).Trim() );
+                }
+            }
+
+            return chepLoadOptions;
+        }
+
+        /// <summary>
+        /// Gets a ChepLoad using the specified docketNumber
+        /// </summary>
+        /// <param name="docketNumber"></param>
+        /// <returns></returns>
+        public ChepLoad GetByDocketNumber( string docketNumber )
+        {
+            return context.ChepLoads.FirstOrDefault( cl => cl.DocketNumber.Trim() == docketNumber );
+        }
     }
 }

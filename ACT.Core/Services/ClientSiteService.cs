@@ -44,7 +44,7 @@ namespace ACT.Core.Services
 
             string query = string.Empty;
 
-            query = $"SELECT s.[Id] AS [TKey], s.[Description] AS [TValue] FROM [dbo].[ClientSite] cs, [dbo].[Site] s WHERE (s.Id=cs.SiteId)";
+            query = $"SELECT cs.[Id] AS [TKey], s.[Description] AS [TValue] FROM [dbo].[ClientSite] cs, [dbo].[Site] s WHERE (s.Id=cs.SiteId)";
 
             if ( clientId > 0 )
             {

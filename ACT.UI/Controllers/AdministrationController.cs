@@ -541,6 +541,11 @@ namespace ACT.UI.Controllers
                 FinancialEmail = config.FinancialContactEmail,
                 SystemContactEmail = config.SystemContactEmail,
                 CorrespondenceEmail = config.CorrespondenceEmail,
+
+                DisputeMonitorPath = config.DisputeMonitorPath,
+                DisputeMonitorTime = config.DisputeMonitorTime,
+                DisputeMonitorInterval = config.DisputeMonitorInterval,
+                DisputeMonitorEnabled = config.DisputeMonitorEnabled ? YesNo.Yes : YesNo.No,
             };
 
             return View( model );
@@ -592,6 +597,11 @@ namespace ACT.UI.Controllers
 
                 config.WebsiteUrl = model.WebsiteUrl;
                 config.AppDownloadUrl = model.AppDownloadUrl;
+
+                config.DisputeMonitorPath = model.DisputeMonitorPath;
+                config.DisputeMonitorTime = model.DisputeMonitorTime;
+                config.DisputeMonitorInterval = model.DisputeMonitorInterval;
+                config.DisputeMonitorEnabled = model.DisputeMonitorEnabled.GetBoolValue();
 
                 service.Update( config );
             }
@@ -1729,6 +1739,7 @@ namespace ACT.UI.Controllers
                         ImportEmailPassword = psp.PSPConfigs.FirstOrDefault().ImportEmailPassword,
                         ImportEmailPort = psp.PSPConfigs.FirstOrDefault().ImportEmailPort,
                         ImportEmailUsername = psp.PSPConfigs.FirstOrDefault().ImportEmailUsername,
+                        ImportUseSSL = psp.PSPConfigs.FirstOrDefault().ImportUseSSL == true ? YesNo.Yes : YesNo.No,
                     };
                 }
 
@@ -1774,7 +1785,7 @@ namespace ACT.UI.Controllers
                         ImportEmailUsername = model.ImportEmailUsername,
                         ImportEmailPassword = model.ImportEmailPassword,
                         ImportEmailPort = model.ImportEmailPort,
-
+                        ImportUseSSL = model.ImportUseSSL == YesNo.Yes ? true : false,
                     };
 
                     pservice.Create( config );
@@ -1793,6 +1804,12 @@ namespace ACT.UI.Controllers
                     config.BillingFileLocation = model.BillingFileLocation;
                     config.ReceivingManagerEmail = model.ReceivingManagerEmail;
                     config.ClientCorrespondenceName = model.ClientCorrespondenceName;
+
+                    config.ImportEmailHost = model.ImportEmailHost;
+                    config.ImportEmailUsername = model.ImportEmailUsername;
+                    config.ImportEmailPassword = model.ImportEmailPassword;
+                    config.ImportEmailPort = model.ImportEmailPort;
+                    config.ImportUseSSL = model.ImportUseSSL == YesNo.Yes ? true : false;
 
                     pservice.Update( config );
                 }
@@ -1982,6 +1999,7 @@ namespace ACT.UI.Controllers
                 return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
+        
         #endregion
 
 

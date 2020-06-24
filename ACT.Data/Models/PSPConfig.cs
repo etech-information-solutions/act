@@ -37,7 +37,8 @@ namespace ACT.Data.Models
         public string ImportEmailHost { get; set; }
         public string ImportEmailUsername { get; set; }
         public string ImportEmailPassword { get; set; }
-        public string ImportEmailPort { get; set; }
+        public Nullable<int> ImportEmailPort { get; set; }
+        public Nullable<bool> ImportUseSSL { get; set; }
     
         public virtual PSP PSP { get; set; }
     }

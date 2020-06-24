@@ -70,7 +70,7 @@ namespace ACT.UI.Controllers
                                                     item.Declarer,
                                                     item.DisputeEmail,
                                                     item.Product,
-                                                    item.DisputeStatus,
+                                                    item.Status,
                                                     item.Equipment,
                                                     item.Quantity,
                                                     item.DisputeReason,

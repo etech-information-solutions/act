@@ -58,6 +58,15 @@ namespace ACT.Core.Models
         }
 
         /// <summary>
+        /// Can be used as a selected Transporter
+        /// </summary>
+        [Display( Name = "Transporter" )]
+        public int TransporterId
+        {
+            get; set;
+        }
+
+        /// <summary>
         /// Can be used as selected Clients
         /// </summary>
         [ Display( Name = "Client Ids" )]
@@ -365,6 +374,8 @@ namespace ACT.Core.Models
 
         public Dictionary<int, string> RegionOptions { get; set; }
 
+        public Dictionary<int, string> TransporterOptions { get; set; }
+
         public List<string> TableNameOptions
         {
             get
@@ -485,6 +496,19 @@ namespace ACT.Core.Models
                         RegionOptions = rservice.List( true );
                         ClientOptions = cservice.List( true );
                         ProductOptions = pservice.List( true );
+                    }
+
+                    break;
+
+                case "AuthorisationCodes":
+
+                    using ( SiteService sservice = new SiteService() )
+                    using ( ClientService cservice = new ClientService() )
+                    using ( TransporterService tservice = new TransporterService() )
+                    {
+                        SiteOptions = sservice.List( true );
+                        ClientOptions = cservice.List( true );
+                        TransporterOptions = tservice.List( true );
                     }
 
                     break;

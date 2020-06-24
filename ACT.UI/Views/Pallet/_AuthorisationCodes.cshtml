@@ -1,0 +1,134 @@
+﻿@model PagingExtension
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
+@using ACT.UI.Models;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_AuthorisationCodes";
+}
+
+
+@Html.Partial( "_Notification" )
+
+
+@{
+    UserModel user = User.Get();
+
+    Int32 count = Model.Start;
+
+    List<ClientAuthorisationCustomModel> items = ( List<ClientAuthorisationCustomModel> ) Model.Items;
+}
+
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Authorisation Codes available matching your search criteria.
+    </div>
+}
+
+<p>
+    @Html.ActionLink( "Add", "AddAuthorisationCode", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Authorisation Code?", @data_edit = "1", @data_id = 0, @data_target = "#authorisationcodes" } )
+    <span class="loader"></span>
+</p>
+
+<table id="authorisationcodes-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#authorisationcodes-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="Actions" data-column="ca.AuthorisationDate">
+                Date
+            </th>
+            <th data-name="Actions" data-column="ca.Code">
+                Code
+            </th>
+            <th data-name="Actions" data-column="s.Description">
+                Site
+            </th>
+            <th data-name="Actions" data-column="c.CompanyName">
+                Client
+            </th>
+            <th data-name="Actions" data-column="t.TradingName">
+                Transporter
+            </th>
+            <th data-name="Actions" data-column="ca.LoadNumber">
+                Load #
+            </th>
+            <th data-name="Actions" data-column="ca.DocketNumber">
+                Docket #
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                Status status = ( Status ) item.Status;
+
+                String active = status.Equals( Status.Active ) ? "active" : "inactive";
+                String enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.AuthorisationDate.ToString( "yyyy-MM-dd @ HH:mm tt" )
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="ClientAuthorisation">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.Code
+                    </td>
+                    <td>
+                        @item.SiteName
+                    </td>
+                    <td>
+                        @item.ClientName
+                    </td>
+                    <td>
+                        @item.TransporterName
+                    </td>
+                    <td>
+                        @item.LoadNumber
+                    </td>
+                    <td>
+                        @item.DocketNumber
+                    </td>
+                    <td width="15%">
+                        @Html.ActionLink( "Details", "AuthorisationCodeDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( "Edit", "EditAuthorisationCode", new { id = item.Id, returnView = "AuthorisationCodes" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( enable, "DeleteAuthorisationCode", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#authorisationcodes", @rel = "tipsyE", @title = enable + " this item?" } )
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )

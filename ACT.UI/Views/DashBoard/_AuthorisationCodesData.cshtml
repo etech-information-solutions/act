@@ -27,16 +27,22 @@
                     Date
                 </th>
                 <th>
+                    Code
+                </th>
+                <th>
                     Client
                 </th>
                 <th>
                     Site
                 </th>
                 <th>
-                    Code
+                    Transporter
                 </th>
                 <th>
                     Load #
+                </th>
+                <th>
+                    Docket #
                 </th>
             </tr>
         </thead>
@@ -53,7 +59,10 @@
                             @count
                         </td>
                         <td>
-                            @item.CreatedOn.ToString( "yyyy-MM-dd @ HH:mm tt" )
+                            @item.AuthorisationDate.ToString( "yyyy-MM-dd @ HH:mm tt" )
+                        </td>
+                        <td>
+                            @item.Code
                         </td>
                         <td>
                             @item.ClientName
@@ -62,10 +71,13 @@
                             @item.SiteName
                         </td>
                         <td>
-                            @item.AuthorisationCode
+                            @item.TransporterName
                         </td>
                         <td>
                             @item.LoadNumber
+                        </td>
+                        <td>
+                            @item.DocketNumber
                         </td>
 
                     </tr>

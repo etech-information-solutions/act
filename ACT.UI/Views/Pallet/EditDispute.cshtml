@@ -1,0 +1,185 @@
+﻿@model DisputeViewModel
+
+@using ACT.UI.Models;
+@using ACT.Core.Enums;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Edit";
+
+    string readOnly = ( Model.ChepLoadId.HasValue ) ? "readonly" : "";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "EditDispute", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#disputes", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content( "~/images/edit.png" )" />
+            <span>Edit Dispute</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        @Html.HiddenFor( model => model.Id )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="left" style="width: 48%; margin-right: 3%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.ChepLoadId )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.ChepLoadId, model => model.ChepLoadOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @data_dispute_chepload = "1", @data_target = ".cheploaded", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.ChepLoadId )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.DocketNumber )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.DocketNumber, new { @placeholder = "Enter Docket Number", @class = "cheploaded", @readonly = readOnly } )
+                    @Html.ValidationMessageFor( model => model.DocketNumber )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Equipment )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Equipment, new { @placeholder = "Enter Dispute Equipment", @class = "cheploaded", @readonly = readOnly } )
+                    @Html.ValidationMessageFor( model => model.Equipment )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.ActionById )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.ActionById, model => model.UserOptions, u => u.Key, u => u.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.ActionById )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Status )
+                </div>
+                <div class="edit-field">
+                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @data_dispute_status = "1", @data_target = "#dispute-resolved-details", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.Status )
+                </div>
+
+                <div id="dispute-resolved-details" class="@( ( Model.Status == DisputeStatus.Resolved || Model.Status == DisputeStatus.Cancelled ) ? "block" : "none" )">
+
+                    <div class="editor-label">
+                        @Html.LabelFor( model => model.ResolvedById )
+                    </div>
+                    <div class="editor-field">
+                        @Html.DropDownListFor( model => model.ResolvedById, model => model.UserOptions, u => u.Key, u => u.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                        @Html.ValidationMessageFor( model => model.ResolvedById )
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.ResolvedOn )
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor( model => model.ResolvedOn, new { @placeholder = "Select Date Resolved", @class = "date-picker", @readonly = "readonly" } )
+                        @Html.ValidationMessageFor( model => model.ResolvedOn )
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 48%;">
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.TDNNumber )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.TDNNumber, new { @placeholder = "Enter TDN Number" } )
+                    @Html.ValidationMessageFor( model => model.TDNNumber )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.DisputeReason )
+                </div>
+                <div class="edit-field">
+                    @Html.TextAreaFor( model => model.DisputeReason, 5, 10, new { @placeholder = "Enter Dispute Reason", @style = "width: 93%;" } )
+                    @Html.ValidationMessageFor( model => model.DisputeReason )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.DisputeEmail )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.DisputeEmail, new { @placeholder = "Enter Dispute Email" } )
+                    @Html.ValidationMessageFor( model => model.DisputeEmail )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.OtherParty )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.OtherParty, new { @placeholder = "Enter Other Party" } )
+                    @Html.ValidationMessageFor( model => model.OtherParty )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Sender )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Sender, new { @placeholder = "Enter Sender" } )
+                    @Html.ValidationMessageFor( model => model.Sender )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Receiver )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Receiver, new { @placeholder = "Enter Receiver" } )
+                    @Html.ValidationMessageFor( model => model.Receiver )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Declarer )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Declarer, new { @placeholder = "Enter Declarer" } )
+                    @Html.ValidationMessageFor( model => model.Declarer )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Product )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Product, new { @placeholder = "Enter Disputed Product Name" } )
+                    @Html.ValidationMessageFor( model => model.Product )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Quantity )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Quantity, new { @placeholder = "Enter Disputed Quantity" } )
+                    @Html.ValidationMessageFor( model => model.Quantity )
+                </div>
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+                <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+            </p>
+
+        </div>
+
+    </div>
+}

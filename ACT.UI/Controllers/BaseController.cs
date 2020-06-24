@@ -485,6 +485,29 @@ namespace ACT.UI.Controllers
         }
 
         /// <summary>
+        /// Gets a ChepLoad using the specified bankId and returns a JSON representation. More fields can be added when need be
+        /// </summary>
+        /// <param name="bankId"></param>
+        /// <returns></returns>
+        public JsonResult GetChepLoad( int chepLoadId = 0 )
+        {
+            using ( ChepLoadService service = new ChepLoadService() )
+            {
+                ChepLoad chepLoad = service.GetById( chepLoadId );
+
+                return new JsonResult()
+                {
+                    Data = new
+                    {
+                        chepLoad.Id,
+                        chepLoad.Equipment,
+                        chepLoad.DocketNumber,
+                    }
+                };
+            }
+        }
+
+        /// <summary>
         /// Gets a client using the specified clientId and returns a JSON representation. More fields can be added when need be
         /// </summary>
         /// <param name="clientId"></param>

@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.ComponentModel.DataAnnotations;
+using ACT.Core.Enums;
 
 namespace ACT.UI.Models
 {
@@ -85,8 +86,10 @@ namespace ACT.UI.Models
         public string ImportEmailPassword { get; set; }
 
         [Display(Name = "Import Email Port")]
-        [StringLength(10, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
-        public string ImportEmailPort { get; set; }
+        public int? ImportEmailPort { get; set; }
+
+        [Display( Name = "Import Use SSL" )]
+        public YesNo ImportUseSSL { get; set; }
 
         #endregion
 

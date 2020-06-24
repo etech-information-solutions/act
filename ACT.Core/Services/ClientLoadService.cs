@@ -692,19 +692,19 @@ namespace ACT.Core.Services
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
                 clQuery = $"{clQuery} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
-                caQuery = $"{caQuery} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
+                caQuery = $"{caQuery} AND (ca.AuthorisationDate >= @csmFromDate AND ca.AuthorisationDate <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
                     clQuery = $"{clQuery} AND (cl.LoadDate>=@csmFromDate) ";
-                    caQuery = $"{caQuery} AND (cl.LoadDate>=@csmFromDate) ";
+                    caQuery = $"{caQuery} AND (ca.AuthorisationDate>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
                     clQuery = $"{clQuery} AND (cl.LoadDate<=@csmToDate) ";
-                    caQuery = $"{caQuery} AND (cl.LoadDate<=@csmToDate) ";
+                    caQuery = $"{caQuery} AND (ca.AuthorisationDate<=@csmToDate) ";
                 }
             }
 

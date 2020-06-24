@@ -3,9 +3,9 @@
 @using ACT.UI.Models
 
 <div class="edit-label">
-    @Html.LabelFor( model => model.SiteId )
+    @Html.LabelFor( model => model.ClientSiteId )
 </div>
 <div class="edit-field">
-    @Html.DropDownListFor( model => model.SiteId, model => model.SiteOptions, s => s.Key, s => s.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-    @Html.ValidationMessageFor( model => model.SiteId )
+    @Html.DropDownListFor( model => model.ClientSiteId, model => model.SiteOptions, s => s.Key, s => s.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+    @Html.ValidationMessageFor( model => model.ClientSiteId )
 </div>

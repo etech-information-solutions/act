@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+
 using ACT.Data.Models;
 
 namespace ACT.Core.Services
@@ -8,6 +10,18 @@ namespace ACT.Core.Services
         public PSPConfigService()
         {
 
+        }
+
+        /// <summary>
+        /// Gets a list of PSPConfigs
+        /// </summary>
+        /// <returns></returns>
+        public override List<PSPConfig> List()
+        {
+            context.Configuration.LazyLoadingEnabled = true;
+            context.Configuration.ProxyCreationEnabled = true;
+
+            return base.List();
         }
     }
 }

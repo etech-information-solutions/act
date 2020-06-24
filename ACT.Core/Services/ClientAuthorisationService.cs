@@ -16,6 +16,18 @@ namespace ACT.Core.Services
 
         }
 
+        /// <summary>
+        /// Gets a Client Authorisation using the specified Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public override ClientAuthorisation GetById( int id )
+        {
+            context.Configuration.LazyLoadingEnabled = true;
+            context.Configuration.ProxyCreationEnabled = true;
+
+            return base.GetById( id );
+        }
 
         /// <summary>
         /// Gets a total count of Items matching the specified search params
@@ -42,8 +54,9 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmSiteId", csm.ClientId ) },
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmTransporterId", csm.TransporterId ) },
             };
 
             #endregion
@@ -52,9 +65,10 @@ namespace ACT.Core.Services
                                 COUNT(ca.Id) AS [Total]
                              FROM
                                 [dbo].[ClientAuthorisation] ca
+                                LEFT OUTER JOIN [dbo].[Transporter] t ON t.[Id]=ca.[TransporterId]
                                 LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=ca.[ClientSiteId]
                                 LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
-                                INNER JOIN [dbo].[Client] c ON c.[Id]=cs.[ClientId]";
+                                LEFT OUTER JOIN [dbo].[Client] c ON c.[Id]=cs.[ClientId]";
 
             // WHERE
 
@@ -85,20 +99,24 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (c.Id=@csmClientId)";
             }
+            if ( csm.TransporterId > 0 )
+            {
+                query = $"{query} AND (t.Id=@csmTransporterId)";
+            }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (ca.CreatedOn >= @csmFromDate AND ca.CreatedOn <= @csmToDate) ";
+                query = $"{query} AND (ca.AuthorisationDate >= @csmFromDate AND ca.AuthorisationDate <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (ca.CreatedOn>=@csmFromDate) ";
+                    query = $"{query} AND (ca.AuthorisationDate>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (ca.CreatedOn<=@csmToDate) ";
+                    query = $"{query} AND (ca.AuthorisationDate<=@csmToDate) ";
                 }
             }
 
@@ -112,7 +130,11 @@ namespace ACT.Core.Services
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
                 query = string.Format( @"{0} AND (ca.[LoadNumber] LIKE '%{1}%' OR
-                                                  ca.[AuthorisationCode] LIKE '%{1}%'
+                                                  ca.[DocketNumber] LIKE '%{1}%' OR
+                                                  ca.[Code] LIKE '%{1}%' OR
+                                                  s.[Description] LIKE '%{1}%' OR
+                                                  c.[CompanyName] LIKE '%{1}%' OR
+                                                  t.[Name] LIKE '%{1}%'
                                                  ) ", query, csm.Query.Trim() );
             }
 
@@ -128,7 +150,7 @@ namespace ACT.Core.Services
         /// Gets a list of Items matching the specified search params
         /// </summary>
         /// <param name="pm"></param>
-        /// <param name="csm"></param>
+        /// <param name="csm"></param> 
         /// <returns></returns>
         public List<ClientAuthorisationCustomModel> List1( PagingModel pm, CustomSearchModel csm )
         {
@@ -149,8 +171,9 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmSiteId", csm.ClientId ) },
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmTransporterId", csm.TransporterId ) },
             };
 
             #endregion
@@ -158,12 +181,14 @@ namespace ACT.Core.Services
             string query = @"SELECT
                             ca.*,
                             c.CompanyName AS [ClientName],
-                            s.Description AS [SiteName]
+                            s.Name AS [SiteName],
+                            t.TradingName AS [TransporterName]
                           FROM
                             [dbo].[ClientAuthorisation] ca
+                            LEFT OUTER JOIN [dbo].[Transporter] t ON t.[Id]=ca.[TransporterId]
                             LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=ca.[ClientSiteId]
                             LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
-                            INNER JOIN [dbo].[Client] c ON c.[Id]=cs.[ClientId]";
+                            LEFT OUTER JOIN [dbo].[Client] c ON c.[Id]=cs.[ClientId]";
 
             // WHERE
 
@@ -194,20 +219,24 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (c.Id=@csmClientId)";
             }
+            if ( csm.TransporterId > 0 )
+            {
+                query = $"{query} AND (t.Id=@csmTransporterId)";
+            }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (ca.CreatedOn >= @csmFromDate AND ca.CreatedOn <= @csmToDate) ";
+                query = $"{query} AND (ca.AuthorisationDate >= @csmFromDate AND ca.AuthorisationDate <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (ca.CreatedOn>=@csmFromDate) ";
+                    query = $"{query} AND (ca.AuthorisationDate>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (ca.CreatedOn<=@csmToDate) ";
+                    query = $"{query} AND (ca.AuthorisationDate<=@csmToDate) ";
                 }
             }
 
@@ -221,7 +250,11 @@ namespace ACT.Core.Services
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
                 query = string.Format( @"{0} AND (ca.[LoadNumber] LIKE '%{1}%' OR
-                                                  ca.[AuthorisationCode] LIKE '%{1}%'
+                                                  ca.[DocketNumber] LIKE '%{1}%' OR
+                                                  ca.[Code] LIKE '%{1}%' OR
+                                                  s.[Description] LIKE '%{1}%' OR
+                                                  c.[CompanyName] LIKE '%{1}%' OR
+                                                  t.[Name] LIKE '%{1}%'
                                                  ) ", query, csm.Query.Trim() );
             }
 
@@ -238,6 +271,24 @@ namespace ACT.Core.Services
             return context.Database.SqlQuery<ClientAuthorisationCustomModel>( query, parameters.ToArray() ).ToList();
         }
 
+        /// <summary>
+        /// Checks if a Client Authorisation with the specified docket number already exists
+        /// </summary>
+        /// <param name="loadNumber"></param>
+        /// <returns></returns>
+        public bool ExistByDocketNumber( string docketNumber )
+        {
+            return context.ClientAuthorisations.Any( d => d.DocketNumber == docketNumber );
+        }
 
+        /// <summary>
+        /// Checks if a Client Authorisation with the specified load number already exists
+        /// </summary>
+        /// <param name="loadNumber"></param>
+        /// <returns></returns>
+        public bool ExistByLoadNumber( string loadNumber )
+        {
+            return context.ClientAuthorisations.Any( d => d.LoadNumber == loadNumber );
+        }
     }
 }

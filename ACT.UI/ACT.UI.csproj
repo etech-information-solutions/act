@@ -152,6 +152,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\ClientReportingController.cs" />
     <Compile Include="Controllers\DashBoardController.cs" />
+    <Compile Include="Models\AuthorisationCodeViewModel.cs" />
     <Compile Include="Models\ChepAuditViewModel.cs" />
     <Compile Include="Models\ClientLoadViewModel.cs" />
     <Compile Include="Models\ChepLoadViewModel.cs" />
@@ -175,6 +176,7 @@
     <Compile Include="Models\BudgetViewModel.cs" />
     <Compile Include="Models\ClientKPIViewModel.cs" />
     <Compile Include="Models\DeliveryNoteLineViewModel.cs" />
+    <Compile Include="Models\DisputeViewModel.cs" />
     <Compile Include="Models\ObjectDocumentsViewModel.cs" />
     <Compile Include="Models\ImportFileModel.cs" />
     <Compile Include="Models\GroupViewModel.cs" />
@@ -588,7 +590,7 @@
     <Content Include="Views\Shared\_ChepAuditCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ClientAuditCustomSearch.cshtml" />
     <Content Include="Views\Shared\_MovementReportCustomSearch.cshtml" />
-    <Content Include="Views\Pallet\_AuthorisationCode.cshtml" />
+    <Content Include="Views\Pallet\_AuthorisationCodes.cshtml" />
     <Content Include="Views\Shared\_ListDocumentsTable.cshtml" />
     <Content Include="Views\DashBoard\Index.cshtml" />
     <Content Include="Views\DashBoard\_AgeOfOutstandingPallets.cshtml" />
@@ -620,6 +622,13 @@
     <Content Include="Views\Pallet\EditDeliveryNote.cshtml" />
     <Content Include="Views\Pallet\_DeliveryNoteLines.cshtml" />
     <Content Include="Views\Shared\_DeliveryNotePdf.cshtml" />
+    <Content Include="Views\Pallet\AddDispute.cshtml" />
+    <Content Include="Views\Pallet\EditDispute.cshtml" />
+    <Content Include="Views\Pallet\DisputeDetails.cshtml" />
+    <Content Include="Views\Shared\_AuthorisationCodesCustomSearch.cshtml" />
+    <Content Include="Views\Pallet\AddAuthorisationCode.cshtml" />
+    <Content Include="Views\Pallet\EditAuthorisationCode.cshtml" />
+    <Content Include="Views\Pallet\AuthorisationCodeDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

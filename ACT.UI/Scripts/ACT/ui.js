@@ -118,6 +118,10 @@
             this.DataCopyAddress( $( '*[data-copy-address="1"]' ) );
             this.DataEmailDeliveryNote( $( '*[data-email-delivery-note="1"]' ) );
 
+            // Disputes
+            this.DataDisputeStatus( $( '*[data-dispute-status="1"]' ) );
+            this.DataDisputeChepLoad( $( '*[data-dispute-chepload="1"]' ) );
+
             if ( window.location.search !== "" && !$( "tr.edit" ).length && $( ".dataTable" ).length && !ACT.UI.PageViewIdProcessed )
             {
                 var viewid = false,
@@ -1518,6 +1522,7 @@
                 PSPClientStatus: ACT.UI[t].PagePSPClientStatus || ACT.UI.PagePSPClientStatus || 0,
                 SiteId: ACT.UI[t].PageSiteId || ACT.UI.PageSiteId || 0,
                 ClientId: ACT.UI[t].PageClientId || ACT.UI.PageClientId || 0,
+                TransporterId: ACT.UI[t].PageTransporterId || ACT.UI.PageTransporterId || 0,
                 ProductId: ACT.UI[t].PageProductId || ACT.UI.PageProductId || 0,
                 CampaignId: ACT.UI[t].PageCampaignId || ACT.UI.PageCampaignId || 0,
                 SelectedItems: ACT.UI[t].SelectedItems || ACT.UI.SelectedItems || [],
@@ -1558,10 +1563,11 @@
             ACT.UI[t].PageSortBy = ACT.UI.PageSortBy = "Id";
             ACT.UI[t].PageUserId = ACT.UI.PageUserId = 0;
             ACT.UI[t].PageSiteId = ACT.UI.PageSiteId = 0;
+            ACT.UI[t].PageStatus = ACT.UI.PageStatusId = 0;
             ACT.UI[t].PageClientId = ACT.UI.PageClientId = 0;
             ACT.UI[t].PageProductId = ACT.UI.PageProductId = 0;
             ACT.UI[t].PageCampaignId = ACT.UI.PageCampaignId = 0;
-            ACT.UI[t].PageStatus = ACT.UI.PageStatusId = 0;
+            ACT.UI[t].PageTransporterId = ACT.UI.PageTransporterId = 0;
             ACT.UI[t].PagePSPClientStatus = ACT.UI.PagePSPClientStatus = 0;
             ACT.UI[t].SelectedItems = ACT.UI.SelectedItems = [];
             ACT.UI[t].PageFromDate = ACT.UI.PageFromDate = "";
@@ -2677,7 +2683,7 @@
                 }
                 if ( ACT.UI[t].PageSiteId && ACT.UI[t].PageSiteId !== 0 )
                 {
-                    h += "Client: <b>" + sender.find( 'select#SiteId:first option[value="' + ACT.UI[t].PageSiteId + '"]' ).text() + "</b>~";
+                    h += "Site: <b>" + sender.find( 'select#SiteId:first option[value="' + ACT.UI[t].PageSiteId + '"]' ).text() + "</b>~";
                     q += " <b class='italic'>[ Site: <a style='color: #69f95a;'>" + sender.find( 'select#SiteId:first option[value="' + ACT.UI[t].PageSiteId + '"]' ).text() + "</a> ]</b> ";
 
                     sender.find( 'select#SiteId' ).val( ACT.UI[t].PageSiteId );
@@ -2688,6 +2694,13 @@
                     q += " <b class='italic'>[ Client: <a style='color: #69f95a;'>" + sender.find( 'select#ClientId:first option[value="' + ACT.UI[t].PageClientId + '"]' ).text() + "</a> ]</b> ";
 
                     sender.find( 'select#ClientId' ).val( ACT.UI[t].PageClientId );
+                }
+                if ( ACT.UI[t].PageTransporterId && ACT.UI[t].PageTransporterId !== 0 )
+                {
+                    h += "Transporter: <b>" + sender.find( 'select#TransporterId:first option[value="' + ACT.UI[t].PageTransporterId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Transporter: <a style='color: #69f95a;'>" + sender.find( 'select#TransporterId:first option[value="' + ACT.UI[t].PageTransporterId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#TransporterId' ).val( ACT.UI[t].PageTransporterId );
                 }
                 if ( ACT.UI[t].PageProductId && ACT.UI[t].PageProductId !== 0 )
                 {
@@ -4095,6 +4108,8 @@
             } );
         },
 
+
+
         DataDNClient: function ( sender )
         {
             sender.each( function ()
@@ -4240,6 +4255,76 @@
                             } );
 
                         return false;
+                    } );
+            } );
+        },
+
+
+        DataDisputeStatus: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() !== "1" )
+                        {
+                            target.show( 900 );
+                        }
+                        else
+                        {
+                            target.hide( 900 );
+                        }
+                    } );
+            } );
+        },
+
+        DataDisputeChepLoad: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() !== "" )
+                        {
+                            // Get Chep
+
+                            $.ajax( {
+                                url: siteurl + "/GetChepLoad",
+                                type: "POST",
+                                data: JSON.stringify( { ChepLoadId: $( this ).val() } ),
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json",
+                                error: function ( e )
+                                {
+
+                                },
+                                success: function ( s )
+                                {
+                                    $( "#Equipment" ).val( s.Equipment.trim() ).attr( "readonly", "readonly" );
+                                    $( "#DocketNumber" ).val( s.DocketNumber.trim() ).attr( "readonly", "readonly" );
+
+                                    ACT.UI.DataHighlightFields( target.parent() );
+                                }
+                            } );
+                        }
+                        else
+                        {
+                            target.val( "" ).removeAttr( "readonly" );
+
+                            ACT.UI.DataHighlightFields( target.parent() );
+                        }
                     } );
             } );
         }

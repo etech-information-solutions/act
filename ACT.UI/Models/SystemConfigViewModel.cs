@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.ComponentModel.DataAnnotations;
+using ACT.Core.Enums;
 
 namespace ACT.UI.Models
 {
@@ -61,6 +62,22 @@ namespace ACT.UI.Models
         [Display( Name = "Website Url" )]
         [StringLength( 250, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string WebsiteUrl { get; internal set; }
+
+
+
+        [Display( Name = "Dispute Monitor Path" )]
+        [StringLength( 250, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        public string DisputeMonitorPath { get; set; }
+
+        [Display( Name = "Dispute Monitor Interval" )]
+        public string DisputeMonitorInterval { get; set; }
+
+        [Display( Name = "Dispute Monitor Time" )]
+        public TimeSpan? DisputeMonitorTime { get; set; }
+
+        [Display( Name = "Dispute Monitor Enabled" )]
+        public YesNo DisputeMonitorEnabled { get; set; }
+
 
         #endregion
 

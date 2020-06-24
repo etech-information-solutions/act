@@ -61,7 +61,7 @@
 
             foreach ( var item in Model )
             {
-                DisputeStatus status = ( DisputeStatus ) item.DisputeStatus;
+                DisputeStatus status = ( DisputeStatus ) item.Status;
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
 
@@ -69,13 +69,13 @@
                         @count
                     </td>
                     <td>
-                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
-                    </td>
-                    <td>
                         @item.ChepLoadAccountNumber
                     </td>
                     <td>
                         @item.TDNNumber
+                    </td>
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
                     </td>
                     <td>
                         @item.DocketNumber

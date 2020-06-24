@@ -23,6 +23,7 @@ namespace ACT.Data.Models
             this.SiteBillings = new HashSet<SiteBilling>();
             this.SiteBudgets = new HashSet<SiteBudget>();
             this.Site1 = new HashSet<Site>();
+            this.ChepLoads = new HashSet<ChepLoad>();
         }
     
         public int Id { get; set; }
@@ -64,5 +65,7 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Site> Site1 { get; set; }
         public virtual Site Site2 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChepLoad> ChepLoads { get; set; }
     }
 }

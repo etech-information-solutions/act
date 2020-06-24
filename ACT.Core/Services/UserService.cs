@@ -47,6 +47,28 @@ namespace ACT.Core.Services
         }
 
         /// <summary>
+        /// Gets a user using the specified name or surname
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="surname"></param>
+        /// <returns></returns>
+        public User GetByNameOrSurname( string name, string surname )
+        {
+            return context.Users.FirstOrDefault( u => ( u.Name.ToLower() == name || u.Name.ToLower().Contains( name ) ) || ( u.Surname.ToLower() == surname || u.Surname.ToLower().Contains( surname ) ) );
+        }
+
+        /// <summary>
+        /// Gets a user using the specified name and surname
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="surname"></param>
+        /// <returns></returns>
+        public User GetByNameAndSurname( string name, string surname )
+        {
+            return context.Users.FirstOrDefault( u => ( u.Name.ToLower() == name || u.Name.ToLower().Contains( name ) ) && ( u.Surname.ToLower() == surname || u.Surname.ToLower().Contains( surname ) ) );
+        }
+
+        /// <summary>
         /// Gets a user using the specified id
         /// </summary>
         /// <param name="id">Id of the user to be fetched</param>
@@ -117,6 +139,16 @@ namespace ACT.Core.Services
             if ( roleType != RoleType.All )
             {
                 query = $" {query} AND u.Type={( int ) roleType} ";
+            }
+
+            // Limit to only show PSP for logged in user
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu WHERE u.Id=pu.UserId AND pu.PSPId IN({string.Join( ",", CurrentUser.PSPs.Select( s => s.Id ) )})) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE u.Id=cu.UserId AND cu.ClientId IN({string.Join( ",", CurrentUser.Clients.Select( s => s.Id ) )})) ";
             }
 
             model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();

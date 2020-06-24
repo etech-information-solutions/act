@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+
 using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Core.Models.Custom;
@@ -106,7 +107,7 @@ namespace ACT.Core.Services
         /// <param name="pm"></param>
         /// <param name="csm"></param>
         /// <returns></returns>
-        public List<ProductCustomModel> ListCSM( PagingModel pm, CustomSearchModel csm)
+        public List<ProductCustomModel> ListCSM( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
@@ -146,7 +147,8 @@ namespace ACT.Core.Services
             #endregion
 
             #region WHERE IF CLIENT
-            if (csm.ClientId > 0)
+
+            if ( csm.ClientId > 0 )
             {
                 query = $"{query} AND EXISTS (SELECT Id FROM [dbo].[ClientProduct] cp WHERE cp.ProductId = p.Id AND cp.ClientId = @clientid)";
             }
