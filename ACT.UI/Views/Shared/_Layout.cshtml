@@ -29,47 +29,6 @@
 
         <div class="@(Request.IsAuthenticated ? "logged-in" : "")">
 
-            @if ( Request.IsAuthenticated )
-            {
-                @*<div id="my-account" class="header my-account" style="border-bottom: 1px solid #eee1e0;">
-
-                        <div class="left" style="width: 22%;">
-
-                            <a href="@Url.Action( "Index", "DashBoard" )">
-                                <img alt="ACT - Pallets" src="@Url.Content( "~/images/act-logo.png" )" style="width: 40%; border-right: 1px solid #848484; padding-right: 73px;" />
-                            </a>
-
-                            <strong style="font-size: 13px; padding-left: 20px;">
-                                @DateTime.Now.ToString( "dd / MM / yyyy" )
-                            </strong>
-
-                        </div>
-
-                        <div class="right" style="font-size: 13px;">
-
-                            <span class="left" style="text-align: right;">
-                                Welcome:
-
-                                <strong class="block">@user.Name @user.Surname</strong>
-                            </span>
-
-                            <div class="clear"></div>
-
-                        </div>
-
-                        <div class="clear"></div>
-
-                    </div>*@
-            }
-            else
-            {
-                @*<div class="logo @(Request.IsAuthenticated ? "logged-in" : "")">
-                        <a href="@Url.Action( "Login", "Account" )">
-                            <img alt="ACT - Pallets" src="@Url.Content( "~/images/act-logo.png" )" />
-                        </a>
-                    </div>*@
-            }
-
             <div class="sep @(Request.IsAuthenticated ? "logged-in" : "")"></div>
 
         </div>
@@ -88,11 +47,6 @@
         <div id="main-content" class="content @(Request.IsAuthenticated ? "logged-in" : "")" style="margin-bottom: 0;">
 
             @Html.Partial( "_Notification" )
-
-            @if ( Request.IsAuthenticated )
-            {
-                @*<strong class="main-title">@ViewBag.Title</strong>*@
-            }
 
             <div id="item-list" class="body">
 
@@ -185,44 +139,5 @@
     @Scripts.Render( "~/bundles/act" )
 
     <div id="empty-div" style="display: none;"></div>
-
-    <script>
-        $( function ()
-        {
-            /*
-            $("body").keydown(function (e) {
-                e.preventDefault();
-                $("#modalform").show();
-                var keyCode = e.keyCode || e.which;
-                if (keyCode == 113) {
-                    //toastr["success"]("test message", "hello");
-                    $("#dialog-select").dialog({
-                        height: 200,
-                        width: 400,
-                        'padding-left': '30%',
-                        modal: true,
-                        //position: {
-                        //    my: "center bottom",
-                        //    at: "center top",
-                        //    of: $("#submitbutton"),
-                        //    within: $(".container")
-                        //},
-                        buttons: {
-                            "Delete all items": function () {
-                                $(this).dialog("close");
-                            },
-                            Cancel: function () {
-                                $(this).dialog("close");
-                            }
-                        }
-
-                    });
-                }
-                $("#ui-dialog").css("margin-left", "35%");
-                console.log(keyCode);
-            });
-            */
-        } );
-    </script>
 </body>
 </html>

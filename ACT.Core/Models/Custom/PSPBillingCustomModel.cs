@@ -16,10 +16,15 @@ namespace ACT.Core.Models.Custom
         public Nullable<decimal> Rate { get; set; }
         public Nullable<int> Units { get; set; }
         public decimal InvoiceAmount { get; set; }
+        public Nullable<decimal> TaxAmount { get; set; }
         public Nullable<decimal> PaymentAmount { get; set; }
         public Nullable<System.DateTime> PaymentDate { get; set; }
         public string ReferenceNumber { get; set; }
         public string NominatedAccount { get; set; }
         public int Status { get; set; }
+
+
+        public string PSPName { get; set; }
+        public string ProductName { get; set; }
     }
 }

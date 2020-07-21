@@ -685,12 +685,76 @@ namespace ACT.UI.Controllers
         }
 
         //
+        // GET: /Image/ViewImage/5
+        public ActionResult ViewImage( int id )
+        {
+            using ( ImageService service = new ImageService() )
+            {
+                Image i = service.GetById( id );
+
+                if ( i == null )
+                    return PartialView( "_AccessDenied" );
+
+                string path = Server.MapPath( string.Format( "{0}/{1}", VariableExtension.SystemRules.ImagesLocation, i.Location ) );
+
+                return File( path, System.Web.MimeMapping.GetMimeMapping( path ) );
+            }
+        }
+
+        //
+        // GET: /Image/DownloadImage/5
+        public ActionResult DownloadImage( int id )
+        {
+            using ( ImageService service = new ImageService() )
+            {
+                Image d = service.GetById( id );
+
+                if ( d == null )
+                    return PartialView( "_AccessDenied" );
+
+                string path = Server.MapPath( string.Format( "{0}/{1}", VariableExtension.SystemRules.ImagesLocation, d.Location ) );
+
+                return File( path, System.Web.MimeMapping.GetMimeMapping( path ), Path.GetFileName( path ) );
+            }
+        }
+
+        //
+        // POST: /Document/DeleteImage/5
+        public ActionResult DeleteImage( int id )
+        {
+            using ( ImageService service = new ImageService() )
+            {
+                Image i = service.GetById( id );
+
+                if ( i == null )
+                    return PartialView( "_AccessDenied" );
+
+                string path = Server.MapPath( string.Format( "{0}/{1}", VariableExtension.SystemRules.ImagesLocation, i.Location ) );
+                string folder = Path.GetDirectoryName( path );
+
+                service.Delete( i );
+
+                if ( System.IO.File.Exists( path ) )
+                {
+                    System.IO.File.Delete( path );
+                }
+
+                if ( Directory.Exists( folder ) && Directory.GetFiles( folder )?.Length <= 0 )
+                {
+                    Directory.Delete( folder );
+                }
+            }
+
+            return PartialView( "_Empty" );
+        }
+
+        //
         // Returns a general list of all active clients allowed in the current context to be selected from
         [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
         public JsonResult GetClientList()
         {
 
-            List<Client> model = new List<Client>();
+            List<ClientCustomModel> model = new List<ClientCustomModel>();
             PagingModel pm = new PagingModel();
             CustomSearchModel csm = new CustomSearchModel();
 
@@ -701,7 +765,7 @@ namespace ACT.UI.Controllers
                 csm.Status = Status.Active;
                 csm.Status = Status.Active;
 
-                model = service.ListCSM( pm, csm );
+                model = service.List1( pm, csm );
             }
             if ( model.Any() )
             {

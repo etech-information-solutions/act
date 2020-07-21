@@ -22,6 +22,7 @@ namespace ACT.Core.Enums
         [StringEnumDisplayText( "Inactive" )]
         Inactive = 3,
 
+        [UiIgnoreEnumValue]
         NA
     }
 }

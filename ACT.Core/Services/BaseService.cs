@@ -28,11 +28,23 @@ namespace ACT.Core.Services
 
         internal ACTEntities context = new ACTEntities();
 
-        private UserModel _currentUser;
-
         public int ItemId { get; set; }
 
-        public SystemConfig Config
+        /// <summary>
+        /// Used to store Client currently selected by the logged in user
+        /// </summary>
+        public Client SelectedClient
+        {
+            get
+            {
+                return ( Client ) ContextExtensions.GetCachedUserData( "SEL_client" );
+            }
+        }
+
+        /// <summary>
+        /// Used to store the System Configuration
+        /// </summary>
+        public SystemConfig SystemConfig
         {
             get
             {
@@ -57,9 +69,8 @@ namespace ACT.Core.Services
             {
                 if ( HttpContext.Current == null )
                     return null;
-                //return new UserModel() { Id = 1 };
 
-                string email = ( _currentUser != null && !string.IsNullOrEmpty( _currentUser.Email ) ) ? _currentUser.Email : HttpContext.Current.User.Identity.Name;
+                string email = HttpContext.Current.User.Identity.Name;
 
 
                 if ( !( ContextExtensions.GetCachedUserData( email ) is UserModel user ) )
@@ -67,7 +78,7 @@ namespace ACT.Core.Services
                     user = GetUser( email );
                 }
 
-                return _currentUser = user ?? new UserModel() { Id = 0 };
+                return user ?? new UserModel() { Id = 0 };
             }
         }
 

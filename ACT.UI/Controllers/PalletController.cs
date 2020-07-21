@@ -48,7 +48,7 @@ namespace ACT.UI.Controllers
 
                     #region Disputes
 
-                    csv = String.Format( "Account Number,TDN Number,Raised Date,Docket Number,Reference,Action By,Resolved On,Resolved By,Other Party,Sender,Receiver,Declarer,Dispute Email,Product,Dispute Status,Equipment,Quantity,Reason fo Dispute {0}", Environment.NewLine );
+                    csv = string.Format( "Account Number,TDN Number,Raised Date,Docket Number,Reference,Action By,Resolved On,Resolved By,Other Party,Sender,Receiver,Declarer,Dispute Email,Product,Dispute Status,Equipment,Quantity,Reason fo Dispute {0}", Environment.NewLine );
 
                     using ( DisputeService dservice = new DisputeService() )
                     {
@@ -58,7 +58,7 @@ namespace ACT.UI.Controllers
                         {
                             foreach ( DisputeCustomModel item in disputes )
                             {
-                                csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18} {19}",
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18} {19}",
                                                     csv,
                                                     item.ChepLoadAccountNumber,
                                                     item.TDNNumber,
@@ -124,11 +124,11 @@ namespace ACT.UI.Controllers
             int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
             ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
             //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            List<Client> clientList = new List<Client>();
+            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
             //TODO
             using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
             IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
@@ -379,11 +379,11 @@ namespace ACT.UI.Controllers
             int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
             ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
             //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            List<Client> clientList = new List<Client>();
+            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
             //TODO
             using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
             IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
@@ -826,10 +826,10 @@ namespace ACT.UI.Controllers
             int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
             ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
             ViewBag.ClientId = clientId;
-            List<Client> clientList = new List<Client>();
+            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
             using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
             IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
@@ -916,11 +916,11 @@ namespace ACT.UI.Controllers
             int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
             ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
                                                                       // model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            List<Client> clientList = new List<Client>();
+            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
             //TODO
             using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
             IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
@@ -957,11 +957,11 @@ namespace ACT.UI.Controllers
             int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
             ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
             //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            List<Client> clientList = new List<Client>();
+            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
             //TODO
             using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
             IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
@@ -2418,7 +2418,7 @@ namespace ACT.UI.Controllers
                                     model.Equipment = rows[ 10 ];
                                     model.CreatedOn = DateTime.Now;
                                     model.ModfiedOn = DateTime.Now;
-                                    model.OriginalQuantity = ( Decimal.TryParse( rows[ 11 ], out decimal oQty ) ? oQty : 0 );
+                                    model.OriginalQuantity = ( decimal.TryParse( rows[ 11 ], out decimal oQty ) ? oQty : 0 );
                                     model.NewQuantity = model.OriginalQuantity;
 
                                     service.Create( model );
@@ -2593,9 +2593,9 @@ namespace ACT.UI.Controllers
                                         model.PCNNumber = rows[ 5 ];
                                         model.DeliveryNote = rows[ 6 ];
                                         //model.PRNNumber = rows[7];
-                                        model.OriginalQuantity = ( Decimal.TryParse( rows[ 7 ], out decimal oQty ) ? oQty : 0 );
+                                        model.OriginalQuantity = ( decimal.TryParse( rows[ 7 ], out decimal oQty ) ? oQty : 0 );
                                         model.NewQuantity = model.OriginalQuantity;
-                                        model.ReturnQty = ( Decimal.TryParse( rows[ 8 ], out decimal rQty ) ? rQty : 0 );
+                                        model.ReturnQty = ( decimal.TryParse( rows[ 8 ], out decimal rQty ) ? rQty : 0 );
                                         //model.RetQuantity = decimal.Parse(rows[9]);
                                         //       model.ARPMComments = rows[10];
                                         //some of the columns are malaligned but leaving it as is, I added 3 new columns

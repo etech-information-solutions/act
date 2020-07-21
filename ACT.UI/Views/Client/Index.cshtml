@@ -11,13 +11,13 @@
 
     <ul>
 
-        <li data-hot-spot="1" data-c="Client" data-t="ClientList">
-            <a data-ap-tab="1" data-target="#clientlist" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientList">Client List</a>
+        <li data-hot-spot="1" data-c="Client" data-t="Clients">
+            <a data-ap-tab="1" data-target="#clients" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Clients">Client</a>
         </li>
-        <li data-hot-spot="1" data-c="Client" data-t="ClientKPIS">
-            <a data-ap-tab="1" data-target="#clientkpis" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientKPIS">Client KPIs</a>
+        <li data-hot-spot="1" data-c="Client" data-t="ClientKPI">
+            <a data-ap-tab="1" data-target="#clientkpi" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientKPI">Client KPI</a>
         </li>
-        <li data-hot-spot="1" data-c="Client" data-t="ClientGroups">
+        <li data-hot-spot="1" data-c="Client" data-t="Groups">
             <a data-ap-tab="1" data-target="#clientgroups" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientGroups">Client Groups</a>
         </li>
         <li data-hot-spot="1" data-c="Client" data-t="ManageSites">
@@ -29,12 +29,12 @@
         <li data-hot-spot="1" data-c="Client" data-t="LinkProducts">
             <a data-ap-tab="1" data-target="#linkproducts" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="LinkProducts">Link Products</a>
         </li>
-        @*<li data-hot-spot="1" data-c="Client" data-t="ManageTransporters">
+        <li data-hot-spot="1" data-c="Client" data-t="ManageTransporters">
             <a data-ap-tab="1" data-target="#managetransporters" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ManageTransporters">Manage Transporters</a>
-        </li>*@
-        <li data-hot-spot="1" data-c="Client" data-t="AwaitingActivation">
-            <a data-ap-tab="1" data-target="#awaitingactivation" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="AwaitingActivation">Awaiting Activation</a>
         </li>
+        @*<li data-hot-spot="1" data-c="Client" data-t="AwaitingActivation">
+            <a data-ap-tab="1" data-target="#awaitingactivation" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="AwaitingActivation">Awaiting Activation</a>
+        </li>*@
 
         <li class="last"></li>
     </ul>
@@ -43,9 +43,9 @@
 
     <div id="tab-data" class="tab-data">
 
-        <div id="clientlist" class="da-tab none" data-load-url="ClientList"> </div>
+        <div id="clients" class="da-tab none" data-load-url="Clients"> </div>
 
-        <div id="clientkpis" class="da-tab none" data-load-url="ClientKPIs"> </div>
+        <div id="clientkpi" class="da-tab none" data-load-url="ClientKPI"> </div>
 
         <div id="clientgroups" class="da-tab none" data-load-url="ClientGroups"> </div>
 
@@ -55,9 +55,9 @@
 
         <div id="linkproducts" class="da-tab none" data-load-url="LinkProducts"> </div>
 
-        @*<div id="managetransporters" class="da-tab none" data-load-url="ManageTransporters"> </div>*@
+        <div id="managetransporters" class="da-tab none" data-load-url="ManageTransporters"> </div>
 
-        <div id="awaitingactivation" class="da-tab none" data-load-url="AwaitingActivation"> </div>
+        @*<div id="awaitingactivation" class="da-tab none" data-load-url="AwaitingActivation"> </div>*@
     </div>
 
 </div>

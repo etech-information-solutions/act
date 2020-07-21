@@ -392,11 +392,11 @@ namespace ACT.Core.Services
 
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl1.[ClientId] AND pu.[UserId]=@userid) ";
             }
             else if ( CurrentUser.RoleType == RoleType.Client )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl1.[ClientId] AND cu.[UserId]=@userid) ";
             }
 
             #endregion

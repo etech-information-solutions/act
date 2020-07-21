@@ -39,13 +39,32 @@ namespace ACT.Core.Models
             get; set;
         }
 
+        private int clientId;
+
         /// <summary>
         /// Can be used as a selected Client 
         /// </summary>
         [Display( Name = "Client" )]
         public int ClientId
         {
-            get; set;
+            get
+            {
+                using ( ClientService cservice = new ClientService() )
+                {
+                    clientId = 0;
+
+                    if ( cservice.SelectedClient != null )
+                    {
+                        clientId = cservice.SelectedClient.Id;
+                    }
+
+                    return clientId;
+                }
+            }
+            set
+            {
+                value = clientId;
+            }
         }
 
         /// <summary>
@@ -69,7 +88,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// Can be used as selected Clients
         /// </summary>
-        [ Display( Name = "Client Ids" )]
+        [Display( Name = "Client Ids" )]
         public List<int> ClientIds
         {
             get; set;
@@ -89,6 +108,15 @@ namespace ACT.Core.Models
         /// </summary>
         [Display( Name = "Product" )]
         public int ProductId
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// Can be used as a selected PSP Product 
+        /// </summary>
+        [Display( Name = "PSP Product" )]
+        public int PSPProductId
         {
             get; set;
         }
@@ -273,7 +301,7 @@ namespace ACT.Core.Models
             set;
         }
 
-        [Display(Name = "Reconciliation Status")]
+        [Display( Name = "Reconciliation Status" )]
         public ReconciliationStatus ReconciliationStatus
         {
             get;
@@ -283,7 +311,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// Can be used for a Filter date range
         /// </summary>
-        [Display(Name = "Filter Date")]
+        [Display( Name = "Filter Date" )]
         public DateTime? FilterDate
         {
             get; set;
@@ -293,7 +321,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// Can be used for a Filter date range
         /// </summary>
-        [Display(Name = "Filter Additional Date")]
+        [Display( Name = "Filter Additional Date" )]
         public DateTime? Filter2Date
         {
             get; set;
@@ -372,6 +400,10 @@ namespace ACT.Core.Models
 
         public Dictionary<int, string> ProductOptions { get; set; }
 
+        public Dictionary<int, string> PSPOptions { get; set; }
+
+        public Dictionary<int, string> PSPProductOptions { get; set; }
+
         public Dictionary<int, string> RegionOptions { get; set; }
 
         public Dictionary<int, string> TransporterOptions { get; set; }
@@ -421,6 +453,7 @@ namespace ACT.Core.Models
 
                     break;
 
+
                 case "PSPs":
 
                     using ( ClientService cservice = new ClientService() )
@@ -432,6 +465,7 @@ namespace ACT.Core.Models
 
                     break;
 
+
                 case "Regions":
 
                     using ( RegionService cservice = new RegionService() )
@@ -441,14 +475,18 @@ namespace ACT.Core.Models
 
                     break;
 
+
                 case "Clients":
 
-                    using (ClientService cservice = new ClientService())
+                    using ( PSPService pservice = new PSPService() )
+                    using ( ClientService cservice = new ClientService() )
                     {
+                        PSPOptions = pservice.List( true );
                         ClientOptions = cservice.List( true );
                     }
 
                     break;
+
 
                 case "Disputes":
                 case "Exceptions":
@@ -463,6 +501,7 @@ namespace ACT.Core.Models
                     }
 
                     break;
+
 
                 case "ChepAudit":
                 case "ClientAudit":
@@ -500,6 +539,7 @@ namespace ACT.Core.Models
 
                     break;
 
+
                 case "AuthorisationCodes":
 
                     using ( SiteService sservice = new SiteService() )
@@ -509,6 +549,18 @@ namespace ACT.Core.Models
                         SiteOptions = sservice.List( true );
                         ClientOptions = cservice.List( true );
                         TransporterOptions = tservice.List( true );
+                    }
+
+                    break;
+
+
+                case "Billing":
+
+                    using ( PSPService pservice = new PSPService() )
+                    using ( PSPProductService p1service = new PSPProductService() )
+                    {
+                        PSPOptions = pservice.List( true );
+                        PSPProductOptions = p1service.List( true );
                     }
 
                     break;

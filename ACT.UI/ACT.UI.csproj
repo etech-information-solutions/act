@@ -163,7 +163,7 @@
     <Compile Include="Controllers\EmailController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ControllerTemplate.cs" />
-    <Compile Include="Controllers\ReportingController.cs" />
+    <Compile Include="Controllers\FinanceController.cs" />
     <Compile Include="Controllers\PalletController.cs" />
     <Compile Include="Extensions\ControllerExtensions.cs" />
     <Compile Include="Extensions\HtmlHelperExtensions.cs" />
@@ -504,7 +504,7 @@
     <Content Include="Views\Shared\_RegionCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ProductCustomSearch.cshtml" />
     <Content Include="Views\Client\Index.cshtml" />
-    <Content Include="Views\Client\_ClientList.cshtml" />
+    <Content Include="Views\Client\_Clients.cshtml" />
     <Content Include="Views\Client\AddClient.cshtml" />
     <Content Include="Views\Client\_ClientGroups.cshtml" />
     <Content Include="Views\Client\_ManageSites.cshtml" />
@@ -530,7 +530,7 @@
     <Content Include="Views\Administration\AddTransporter.cshtml" />
     <Content Include="Views\Administration\EditTransporter.cshtml" />
     <Content Include="Views\Administration\TransporterDetails.cshtml" />
-    <Content Include="Views\Shared\_ClientListCustomSearch.cshtml" />
+    <Content Include="Views\Shared\_ClientsCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ManageSitesCustomSearch.cshtml" />
     <Content Include="Views\Shared\_LinkProductsCustomSearch.cshtml" />
     <Content Include="Views\Shared\_AwaitingActivationCustomSearch.cshtml" />
@@ -539,8 +539,8 @@
     <Content Include="Views\Client\partials\_ManageSitesList.cshtml" />
     <Content Include="Views\Client\bak_ManageSites.cshtml" />
     <Content Include="Views\Shared\_ListDocuments.cshtml" />
-    <Content Include="Views\Client\_ClientKPIS.cshtml" />
-    <Content Include="Views\Shared\_ClientKPIsCustomSearch.cshtml" />
+    <Content Include="Views\Client\_ClientKPI.cshtml" />
+    <Content Include="Views\Shared\_ClientKPICustomSearch.cshtml" />
     <Content Include="Views\Client\AddKPI.cshtml" />
     <Content Include="Views\Client\EditKPI.cshtml" />
     <Content Include="Views\Client\KPIDetails.cshtml" />
@@ -551,14 +551,7 @@
     <Content Include="Views\Pallet\_Exceptions.cshtml" />
     <Content Include="Views\Pallet\_ReconcileInvoice.cshtml" />
     <Content Include="Views\Pallet\_ReconcileLoads.cshtml" />
-    <Content Include="Views\Reporting\_ClientData.cshtml" />
-    <Content Include="Views\Reporting\_Disputes.cshtml" />
-    <Content Include="Views\Reporting\_Exceptions.cshtml" />
-    <Content Include="Views\Reporting\_GenerateDeliveryNote.cshtml" />
-    <Content Include="Views\Reporting\_PoolingAgentData.cshtml" />
-    <Content Include="Views\Reporting\_ReconcileInvoice.cshtml" />
-    <Content Include="Views\Reporting\_ReconcileLoads.cshtml" />
-    <Content Include="Views\Reporting\Index.cshtml" />
+    <Content Include="Views\Finance\Index.cshtml" />
     <Content Include="Views\Generic\_ClientData.cshtml" />
     <Content Include="Views\Generic\_Disputes.cshtml" />
     <Content Include="Views\Generic\_Exceptions.cshtml" />
@@ -629,6 +622,12 @@
     <Content Include="Views\Pallet\AddAuthorisationCode.cshtml" />
     <Content Include="Views\Pallet\EditAuthorisationCode.cshtml" />
     <Content Include="Views\Pallet\AuthorisationCodeDetails.cshtml" />
+    <Content Include="Views\Finance\_Billing.cshtml" />
+    <Content Include="Views\Shared\_BillingCustomSearch.cshtml" />
+    <Content Include="Views\Client\_ClientBudgets.cshtml" />
+    <Content Include="Views\Client\_ClientInvoices.cshtml" />
+    <Content Include="Views\Client\_ClientProducts.cshtml" />
+    <Content Include="Views\Client\_ClientUsers.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,30 +1,32 @@
-﻿@model PSP
+﻿@model Client
 
-@using ACT.Core.Enums;
 @using ACT.Data.Models;
+
+@{ 
+    List<ClientInvoice> invoices = Model.ClientLoads.SelectMany( s => s.ClientInvoices ).ToList();
+}
 
 
 <div id="item-details" class="item-details" style="width: auto;">
 
     <h2>
         <img alt="" src="@Url.Content( "~/images/info.png" )" />
-        <span>PSP Invoices (@Model.PSPBillings.Count)</span>
+        <span>Client Invoices @(invoices?.Count)</span>
     </h2>
 
     <ul class="list">
-        @foreach ( PSPBilling item in Model.PSPBillings )
+        @foreach ( Invoice item in invoices.Select(s=>s.Invoice) )
         {
             <li>
                 <a data-quick-link="1" data-target="#invoices" data-id="@item.Id">
-                    Invoie #: @item.StatementNumber<br />
-                    Invoie Ref: @item.ReferenceNumber<br />
-                    Invoie Date: @item.StatementDate<br />
-                    Invoie Amount: @item.InvoiceAmount.ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) )<br />
-                    
+                    Invoie #: @item.Number<br />
+                    Load #: @item.LoadNumber<br />
+                    Invoie Date: @item.Date<br />
+
                     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 5px;">&nbsp;</div>
-                    
-                    Amount Paid: @(( item.PaymentAmount ?? 0 ).ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ))<br />
-                    Date Paid: @item.PaymentDate<br />
+
+                    Invoie Quantity: @item.Quantity<br />
+                    Invoie Amount: @(item.Amount?.ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ))
                 </a>
             </li>
         }

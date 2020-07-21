@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 
 namespace ACT.UI.Controllers
 {
-    [Requires(PermissionTo.View, PermissionContext.Client)]
+    [Requires( PermissionTo.View, PermissionContext.Client )]
     public class ClientController : BaseController
     {
         // GET: Client
@@ -27,132 +27,294 @@ namespace ACT.UI.Controllers
 
 
 
-        #region Clients
+        #region Exports
 
         //
-        // POST || GET: /Client/ClientList
-        public ActionResult ClientList( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        // GET: /Administration/Export
+        public FileContentResult Export( PagingModel pm, CustomSearchModel csm, string type = "configurations" )
         {
-            if ( givecsm )
+            string csv = "";
+            string filename = string.Format( "{0}-{1}.csv", type.ToUpperInvariant(), DateTime.Now.ToString( "yyyy_MM_dd_HH_mm" ) );
+
+            pm.Skip = 0;
+            pm.Take = int.MaxValue;
+
+            switch ( type )
             {
-                ViewBag.ViewName = "ClientList";
+                case "clientlist":
+                    #region ClientList
+                    csv = string.Format( "Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine );
 
-                return PartialView( "_ClientListCustomSearch", new CustomSearchModel( "ClientList" ) );
-            }
-            int total = 0;
+                    List<ClientCustomModel> clients = new List<ClientCustomModel>();
 
-            List<Client> model = new List<Client>();
-            List<ClientViewModel> viewModel = new List<ClientViewModel>();
-
-            using ( ClientService service = new ClientService() )
-            {
-                pm.Sort = pm.Sort ?? "ASC";
-                pm.SortBy = pm.SortBy ?? "Name";
-                csm.Status = Status.Active;
-                csm.Status = Status.Active;
-                if ( CurrentUser == null )
-                {
-                    Notify( "Sorry, it seems the session had expired. Please log in again.", NotificationType.Error );
-
-                    return RedirectToAction( "Index", "Administration" ); //Return to login as session is invalid
-                }
-                //if (CurrentUser.PSPs.Count > 0)
-                //{
-                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-                int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-                if ( clientId > 0 )
-                {
-                    csm.ClientId = clientId;
-                }
-
-                model = service.ListCSM( pm, csm );//service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
-                foreach ( Client cl in model )
-                {
-                    ClientViewModel vm = new ClientViewModel()
+                    using ( ClientService service = new ClientService() )
                     {
-                        Id = cl.Id,
-                        CompanyName = cl.CompanyName,
-                        CompanyRegistrationNumber = cl.CompanyRegistrationNumber,
-                        TradingAs = cl.TradingAs,
-                        Description = cl.Description,
-                        VATNumber = cl.VATNumber,
-                        ChepReference = cl.ChepReference,
-                        ContactNumber = cl.ContactNumber,
-                        ContactPerson = cl.ContactPerson,
-                        AdminPerson = cl.AdminPerson,
-                        AdminEmail = cl.AdminEmail,
-                        FinancialPerson = cl.FinancialPerson,
-                        FinPersonEmail = cl.FinPersonEmail,
-                        Email = cl.Email,
-                        Status = cl.Status,
-                    };
-                    viewModel.Add( vm );
-                }
-                //}
-                //else
-                //{
-                //    model = null;
-                //}
+                        clients = service.List1( pm, csm );
+                    }
 
-                // var testModel = service.ListByColumn(null, "CompanyRegistrationNumber", "123456");
-                total = ( viewModel.Count < pm.Take && pm.Skip == 0 ) ? viewModel.Count : service.Total();
+                    if ( clients != null && clients.Any() )
+                    {
+                        foreach ( ClientCustomModel item in clients )
+                        {
+                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
+                                                csv,
+                                                item.Id,
+                                                item.CompanyName,
+                                                item.CompanyRegistrationNumber,
+                                                item.TradingAs,
+                                                item.VATNumber,
+                                                item.ChepReference,
+                                                item.ContactPerson,
+                                                item.ContactNumber,
+                                                item.Email,
+                                                item.AdminPerson,
+                                                item.AdminEmail,
+                                                item.FinancialPerson,
+                                                item.FinPersonEmail,
+                                                ( Status ) ( int ) item.Status,
+                                                Environment.NewLine );
+                        }
+                    }
+
+
+                    #endregion
+
+                    break;
+                case "awaitingactivation":
+                    #region AwaitingActivation
+                    csv = string.Format( "Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine );
+
+                    List<ClientCustomModel> inactiveclients = new List<ClientCustomModel>();
+                    csm.Status = Status.Pending;
+                    using ( ClientService service = new ClientService() )
+                    {
+                        inactiveclients = service.List1( pm, csm );
+                    }
+
+                    if ( inactiveclients != null && inactiveclients.Any() )
+                    {
+                        foreach ( ClientCustomModel item in inactiveclients )
+                        {
+                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
+                                                csv,
+                                                item.Id,
+                                                item.CompanyName,
+                                                item.CompanyRegistrationNumber,
+                                                item.TradingAs,
+                                                item.VATNumber,
+                                                item.ChepReference,
+                                                item.ContactPerson,
+                                                item.ContactNumber,
+                                                item.Email,
+                                                item.AdminPerson,
+                                                item.AdminEmail,
+                                                item.FinancialPerson,
+                                                item.FinPersonEmail,
+                                                ( Status ) ( int ) item.Status,
+                                                Environment.NewLine );
+                        }
+                    }
+
+
+                    #endregion
+
+                    break;
+                case "managesites":
+                    #region AwaitingActivation
+                    csv = string.Format( "Id, Name, Description, X Coord, Y Coord, Address, Postal Code, Contact Name,Contact No,Planning Point, Depot, Chep Sitecode, Site Type, Status {0}", Environment.NewLine );
+
+                    List<Site> siteList = new List<Site>();
+
+                    using ( SiteService service = new SiteService() )
+                    {
+                        siteList = service.ListCSM( pm, csm );
+                    }
+
+                    if ( siteList != null && siteList.Any() )
+                    {
+                        foreach ( Site item in siteList )
+                        {
+                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10}, {11}, {12}, {13}, {14} {15}",
+                                                csv,
+                                                item.Id,
+                                                item.Name,
+                                                item.Description,
+                                                item.XCord,
+                                                item.YCord,
+                                                item.Address,
+                                                item.PostalCode,
+                                                item.ContactName,
+                                                item.ContactNo,
+                                                item.PlanningPoint,
+                                                item.Depot,
+                                                item.SiteCodeChep,
+                                                ( SiteType ) ( int ) item.SiteType,
+                                                ( Status ) ( int ) item.Status,
+                                                Environment.NewLine );
+                        }
+                    }
+                    #endregion
+                    break;
+
+                case "linkproducts":
+                    #region linkproducts
+                    csv = string.Format( "Id, ClientId, Company Name, ProductId, Product Name, Product Description, Active Date, HireRate, LostRate, IssueRate, PassonRate, PassonDays, Status {0}", Environment.NewLine );
+
+                    List<ClientProductCustomModel> product = new List<ClientProductCustomModel>();
+
+                    using ( ClientProductService service = new ClientProductService() )
+                    {
+                        product = service.ListCSM( pm, csm );
+                    }
+
+                    if ( product != null && product.Any() )
+                    {
+                        foreach ( ClientProductCustomModel item in product )
+                        {
+                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} {14}",
+                                                csv,
+                                                item.Id,
+                                                item.ClientId,
+                                                item.CompanyName,
+                                                item.ProductId,
+                                                item.Name,
+                                                item.ProductDescription,
+                                                item.ActiveDate,
+                                                item.HireRate,
+                                                item.LostRate,
+                                                item.IssueRate,
+                                                item.PassonRate,
+                                                item.PassonDays,
+                                                ( Status ) ( int ) item.Status,
+                                                Environment.NewLine );
+                        }
+                    }
+
+
+                    #endregion
+
+                    break;
+
+                case "clientgroups":
+                    #region ClientGroup
+                    csv = string.Format( "Id, Group Name, Description, Status {0}", Environment.NewLine );
+
+                    List<ClientGroupCustomModel> clientGroups = new List<ClientGroupCustomModel>();
+
+                    using ( ClientGroupService service = new ClientGroupService() )
+                    {
+                        clientGroups = service.ListCSM( pm, csm );
+                    }
+
+                    if ( clientGroups != null && clientGroups.Any() )
+                    {
+                        foreach ( ClientGroupCustomModel item in clientGroups )
+                        {
+                            csv = string.Format( "{0} {1},{2},{3},{4} {5}",
+                                                csv,
+                                                item.Id,
+                                                item.Name,
+                                                item.Description,
+                                                 ( Status ) ( int ) item.Status,
+                                                Environment.NewLine );
+                        }
+                    }
+
+
+                    #endregion
+
+                    break;
+                case "clientkpis":
+                    #region ClientKPI
+                    csv = string.Format( "Id, Client Id,Description, Weight %, TargetAmount, Target Period, Status {0}", Environment.NewLine );
+
+                    List<ClientKPI> kpis = new List<ClientKPI>();
+
+                    using ( ClientKPIService service = new ClientKPIService() )
+                    {
+                        kpis = service.ListCSM( pm, csm );
+                    }
+
+                    if ( kpis != null && kpis.Any() )
+                    {
+                        foreach ( ClientKPI item in kpis )
+                        {
+                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
+                                                csv,
+                                                item.Id,
+                                                item.ClientId,
+                                                item.KPIDescription,
+                                                //item.Disputes,
+                                                //item.OutstandingPallets,
+                                                //item.OutstandingDays,
+                                                //item.Passons,
+                                                item.Weight,
+                                                item.TargetAmount,
+                                                item.TargetPeriod,
+                                                ( Status ) ( int ) item.Status,
+                                                Environment.NewLine );
+                        }
+                    }
+
+
+                    #endregion
+
+                    break;
             }
 
-            PagingExtension paging = PagingExtension.Create( viewModel, total, pm.Skip, pm.Take, pm.Page );
-
-
-            return PartialView( "_ClientList", paging );
+            return File( new System.Text.UTF8Encoding().GetBytes( csv ), "text/csv", filename );
         }
+
+        #endregion
+
+
+
+        #region Clients
 
         //
         // GET: /Client/ClientDetails/5
         public ActionResult ClientDetails( int id, bool layout = true )
         {
-            Client model = new Client();
-
-            using ( ClientService service = new ClientService() )
+            using ( ImageService iservice = new ImageService() )
+            using ( ClientService cservice = new ClientService() )
             using ( AddressService aservice = new AddressService() )
             using ( DocumentService dservice = new DocumentService() )
-            using ( ClientKPIService kservice = new ClientKPIService() )
             {
-                model = service.GetById( id );
+                Client model = cservice.GetById( id );
+
                 if ( model == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
                     return RedirectToAction( "Index" );
                 }
-                // Session["ClientId"] = id;
+
                 Address address = aservice.Get( model.Id, "Client" );
 
+                List<Image> images = iservice.List( model.Id, "Client" );
+
                 List<Document> documents = dservice.List( model.Id, "Client" );
-                List<Document> logo = dservice.List( model.Id, "ClientLogo" );
-                ClientKPI kpi = kservice.GetByColumnWhere( "ClientId", id );
 
                 if ( address != null )
                 {
                     ViewBag.Address = address;
                 }
+                if ( images != null )
+                {
+                    ViewBag.Images = images;
+                }
                 if ( documents != null )
                 {
                     ViewBag.Documents = documents;
                 }
-                if ( logo != null )
-                {
-                    ViewBag.Logo = logo;
-                }
-                if ( kpi != null )
-                {
-                    ViewBag.KPI = kpi;
-                }
-            }
 
-            if ( layout )
-            {
-                ViewBag.IncludeLayout = true;
-            }
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
 
-            return View( model );
+                return View( model );
+            }
         }
 
         // GET: Client/AddClient
@@ -160,6 +322,7 @@ namespace ACT.UI.Controllers
         public ActionResult AddClient()
         {
             ClientViewModel model = new ClientViewModel() { EditMode = true };
+
             return View( model );
         }
 
@@ -189,6 +352,7 @@ namespace ACT.UI.Controllers
                 // using (ClientBudgetService bservice = new ClientBudgetService())
                 {
                     #region Validation
+
                     if ( !string.IsNullOrEmpty( model.CompanyRegistrationNumber ) && service.ExistByCompanyRegistrationNumber( model.CompanyRegistrationNumber.Trim() ) )
                     {
                         // Bank already exist!
@@ -196,8 +360,11 @@ namespace ACT.UI.Controllers
 
                         return View( model );
                     }
+
                     #endregion
+
                     #region Create Client
+
                     Client client = new Client()
                     {
                         Email = model.Email,
@@ -212,35 +379,40 @@ namespace ACT.UI.Controllers
                         FinPersonEmail = model.FinPersonEmail,
                         AdminPerson = model.AdminPerson,
                         AdminEmail = model.AdminEmail,
-                        Status = ( int ) Status.Active,//model.Status,
+                        Status = ( int ) Status.Active,
                         ServiceRequired = ( int ) ServiceType.ManageOwnPallets,
-                        //ServiceRequired = (int)model.ServiceRequired,
                         CompanyRegistrationNumber = model.CompanyRegistrationNumber
                     };
+
                     client = service.Create( client );
+
                     #endregion
 
                     #region Create Client PSP link
-                    //int pspId = Session[ "UserPSP" ];
+
                     int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
+
                     PSPClient pClient = new PSPClient()
                     {
                         PSPId = pspId,
                         ClientId = client.Id,
                         Status = ( int ) Status.Active
                     };
-                    pClient = pspclientservice.Create( pClient );
+
+                    pspclientservice.Create( pClient );
+
                     #endregion
 
                     #region Create Client Budget
+
                     //Moved to  seperate API calls to get and set from view
+
                     #endregion
 
                     #region Create Address (s)
 
                     if ( model.Address != null )
                     {
-                        //Enum.TryParse(model.Address.Province.ToString().Replace(" ", "").Replace("-", ""), out Province mappedProvinceVal);
                         Address address = new Address()
                         {
                             ObjectId = client.Id,
@@ -252,7 +424,6 @@ namespace ACT.UI.Controllers
                             Addressline1 = model.Address.AddressLine1,
                             Addressline2 = model.Address.AddressLine2,
                             Province = ( int ) model.Address.Province,
-                            // Province = (int)mappedProvinceVal,
                         };
 
                         aservice.Create( address );
@@ -261,10 +432,11 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     #region Any File Uploads
+
                     //moved to seperate ajax function
                     if ( !string.IsNullOrEmpty( model.DocsList ) )
                     {
-                        String[] dList = model.DocsList.Split( ',' );
+                        string[] dList = model.DocsList.Split( ',' );
                         string lastId = "0";
                         foreach ( string itm in dList )
                         {
@@ -289,6 +461,7 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     #region Any Logo Uploads
+
                     if ( model.Logo != null && model.Logo.File != null )
                     {
                         // Create folder
@@ -324,6 +497,7 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     #region KPI
+
                     //if (model.KPIDisputes > 0)
                     //{
 
@@ -341,12 +515,15 @@ namespace ACT.UI.Controllers
                     //    kpiservice.Create(newKPI);
 
                     //}
+
                     #endregion
 
 
                     scope.Complete();
                 }
+
                 Notify( "The Client was successfully created.", NotificationType.Success );
+
                 return RedirectToAction( "ClientList" );
             }
             catch ( Exception ex )
@@ -460,7 +637,7 @@ namespace ACT.UI.Controllers
         // POST: Client/EditClient/5
         [HttpPost]
         [Requires( PermissionTo.Edit )]
-        public ActionResult EditClient( ClientViewModel model, PagingModel pm, bool isstructure = false )
+        public ActionResult EditClient( ClientViewModel model )
         {
             try
             {
@@ -719,8 +896,85 @@ namespace ACT.UI.Controllers
             }
         }
 
+        //
+        // GET: /Client/ClientUsers/5
+        public ActionResult ClientUsers( int id )
+        {
+            using ( ClientService cservice = new ClientService() )
+            {
+                Client model = cservice.GetById( id );
+
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_Notification" );
+                }
+
+                return PartialView( "_ClientUsers", model );
+            }
+        }
+
+        //
+        // GET: /Client/ClientProducts/5
+        public ActionResult ClientProducts( int id )
+        {
+            using ( ClientService cservice = new ClientService() )
+            {
+                Client model = cservice.GetById( id );
+
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_Notification" );
+                }
+
+                return PartialView( "_ClientProducts", model );
+            }
+        }
+
+        //
+        // GET: /Client/ClientInvoices/5
+        public ActionResult ClientInvoices( int id )
+        {
+            using ( ClientService cservice = new ClientService() )
+            {
+                Client model = cservice.GetById( id );
+
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_Notification" );
+                }
+
+                return PartialView( "_ClientInvoices", model );
+            }
+        }
+
+        //
+        // GET: /Client/ClientBudgets/5
+        public ActionResult ClientBudgets( int id )
+        {
+            using ( ClientService cservice = new ClientService() )
+            {
+                Client model = cservice.GetById( id );
+
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_Notification" );
+                }
+
+                return PartialView( "_ClientBudgets", model );
+            }
+        }
+
 
         #endregion
+
 
         #region Manage Sites
         //
@@ -747,10 +1001,10 @@ namespace ACT.UI.Controllers
             //string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
             //int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
 
-            List<Client> clientList = new List<Client>();
+            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
             using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
 
             }
 
@@ -1414,6 +1668,7 @@ namespace ACT.UI.Controllers
 
         #endregion
 
+
         #region Sub Sites
         //
         // POST || GET: /Client/SubSites
@@ -1425,7 +1680,7 @@ namespace ACT.UI.Controllers
             int total = 0;
 
             List<Site> model = new List<Site>();
-            List<Client> clientList = new List<Client>();
+            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
             List<Site> mainSiteList;
 
             //int pspId = Session[ "UserPSP" ];
@@ -1453,7 +1708,7 @@ namespace ACT.UI.Controllers
             //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
             using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
             IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
             {
@@ -1679,6 +1934,7 @@ namespace ACT.UI.Controllers
 
         #endregion
 
+
         #region Client Group
         //
         // GET: /Client/ClientGroups`
@@ -1734,11 +1990,11 @@ namespace ACT.UI.Controllers
             int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
             ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
             model.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            List<Client> clientList = new List<Client>();
+            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
             //TODO
             using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
             IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
@@ -1786,7 +2042,7 @@ namespace ACT.UI.Controllers
                     #region Create Group Client Links
                     if ( !string.IsNullOrEmpty( model.GroupClientList ) )
                     {
-                        String[] clientList = model.GroupClientList.Split( ',' );
+                        string[] clientList = model.GroupClientList.Split( ',' );
                         string lastId = "0";
                         foreach ( string itm in clientList )
                         {
@@ -2171,7 +2427,7 @@ namespace ACT.UI.Controllers
             int total = 0;
 
             List<ProductCustomModel> model = new List<ProductCustomModel>();
-            List<Client> clientList = new List<Client>();
+            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
             //int pspId = Session[ "UserPSP" ];
             int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
             string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
@@ -2209,7 +2465,7 @@ namespace ACT.UI.Controllers
                             model.Add( prod );
                         }
                     }
-                    clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { Status = Status.Active, ClientId = clientId } );
+                    clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { Status = Status.Active, ClientId = clientId } );
                 }
             }
             else
@@ -2219,7 +2475,7 @@ namespace ACT.UI.Controllers
                 {
                     model = service.ListCSM( pm, csm );
                     total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
-                    clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { Status = Status.Active, ClientId = clientId } );
+                    clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { Status = Status.Active, ClientId = clientId } );
                 }
             }
 
@@ -2763,6 +3019,7 @@ namespace ACT.UI.Controllers
 
         #endregion    
 
+
         #region Awaiting Activation 
 
         //
@@ -2807,257 +3064,18 @@ namespace ACT.UI.Controllers
         }
         #endregion
 
-        #region Exports
 
-        //
-        // GET: /Administration/Export
-        public FileContentResult Export( PagingModel pm, CustomSearchModel csm, string type = "configurations" )
-        {
-            string csv = "";
-            string filename = string.Format( "{0}-{1}.csv", type.ToUpperInvariant(), DateTime.Now.ToString( "yyyy_MM_dd_HH_mm" ) );
-
-            pm.Skip = 0;
-            pm.Take = int.MaxValue;
-
-            switch ( type )
-            {
-                case "clientlist":
-                    #region ClientList
-                    csv = String.Format( "Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine );
-
-                    List<Client> clients = new List<Client>();
-
-                    using ( ClientService service = new ClientService() )
-                    {
-                        clients = service.ListCSM( pm, csm );
-                    }
-
-                    if ( clients != null && clients.Any() )
-                    {
-                        foreach ( Client item in clients )
-                        {
-                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
-                                                csv,
-                                                item.Id,
-                                                item.CompanyName,
-                                                item.CompanyRegistrationNumber,
-                                                item.TradingAs,
-                                                item.VATNumber,
-                                                item.ChepReference,
-                                                item.ContactPerson,
-                                                item.ContactNumber,
-                                                item.Email,
-                                                item.AdminPerson,
-                                                item.AdminEmail,
-                                                item.FinancialPerson,
-                                                item.FinPersonEmail,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
-                        }
-                    }
-
-
-                    #endregion
-
-                    break;
-                case "awaitingactivation":
-                    #region AwaitingActivation
-                    csv = String.Format( "Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine );
-
-                    List<Client> inactiveclients = new List<Client>();
-                    csm.Status = Status.Pending;
-                    using ( ClientService service = new ClientService() )
-                    {
-                        inactiveclients = service.ListCSM( pm, csm );
-                    }
-
-                    if ( inactiveclients != null && inactiveclients.Any() )
-                    {
-                        foreach ( Client item in inactiveclients )
-                        {
-                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
-                                                csv,
-                                                item.Id,
-                                                item.CompanyName,
-                                                item.CompanyRegistrationNumber,
-                                                item.TradingAs,
-                                                item.VATNumber,
-                                                item.ChepReference,
-                                                item.ContactPerson,
-                                                item.ContactNumber,
-                                                item.Email,
-                                                item.AdminPerson,
-                                                item.AdminEmail,
-                                                item.FinancialPerson,
-                                                item.FinPersonEmail,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
-                        }
-                    }
-
-
-                    #endregion
-
-                    break;
-                case "managesites":
-                    #region AwaitingActivation
-                    csv = String.Format( "Id, Name, Description, X Coord, Y Coord, Address, Postal Code, Contact Name,Contact No,Planning Point, Depot, Chep Sitecode, Site Type, Status {0}", Environment.NewLine );
-
-                    List<Site> siteList = new List<Site>();
-
-                    using ( SiteService service = new SiteService() )
-                    {
-                        siteList = service.ListCSM( pm, csm );
-                    }
-
-                    if ( siteList != null && siteList.Any() )
-                    {
-                        foreach ( Site item in siteList )
-                        {
-                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10}, {11}, {12}, {13}, {14} {15}",
-                                                csv,
-                                                item.Id,
-                                                item.Name,
-                                                item.Description,
-                                                item.XCord,
-                                                item.YCord,
-                                                item.Address,
-                                                item.PostalCode,
-                                                item.ContactName,
-                                                item.ContactNo,
-                                                item.PlanningPoint,
-                                                item.Depot,
-                                                item.SiteCodeChep,
-                                                ( SiteType ) ( int ) item.SiteType,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
-                        }
-                    }
-                    #endregion
-                    break;
-
-                case "linkproducts":
-                    #region linkproducts
-                    csv = String.Format( "Id, ClientId, Company Name, ProductId, Product Name, Product Description, Active Date, HireRate, LostRate, IssueRate, PassonRate, PassonDays, Status {0}", Environment.NewLine );
-
-                    List<ClientProductCustomModel> product = new List<ClientProductCustomModel>();
-
-                    using ( ClientProductService service = new ClientProductService() )
-                    {
-                        product = service.ListCSM( pm, csm );
-                    }
-
-                    if ( product != null && product.Any() )
-                    {
-                        foreach ( ClientProductCustomModel item in product )
-                        {
-                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} {14}",
-                                                csv,
-                                                item.Id,
-                                                item.ClientId,
-                                                item.CompanyName,
-                                                item.ProductId,
-                                                item.Name,
-                                                item.ProductDescription,
-                                                item.ActiveDate,
-                                                item.HireRate,
-                                                item.LostRate,
-                                                item.IssueRate,
-                                                item.PassonRate,
-                                                item.PassonDays,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
-                        }
-                    }
-
-
-                    #endregion
-
-                    break;
-
-                case "clientgroups":
-                    #region ClientGroup
-                    csv = String.Format( "Id, Group Name, Description, Status {0}", Environment.NewLine );
-
-                    List<ClientGroupCustomModel> clientGroups = new List<ClientGroupCustomModel>();
-
-                    using ( ClientGroupService service = new ClientGroupService() )
-                    {
-                        clientGroups = service.ListCSM( pm, csm );
-                    }
-
-                    if ( clientGroups != null && clientGroups.Any() )
-                    {
-                        foreach ( ClientGroupCustomModel item in clientGroups )
-                        {
-                            csv = String.Format( "{0} {1},{2},{3},{4} {5}",
-                                                csv,
-                                                item.Id,
-                                                item.Name,
-                                                item.Description,
-                                                 ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
-                        }
-                    }
-
-
-                    #endregion
-
-                    break;
-                case "clientkpis":
-                    #region ClientKPI
-                    csv = String.Format( "Id, Client Id,Description, Weight %, TargetAmount, Target Period, Status {0}", Environment.NewLine );
-
-                    List<ClientKPI> kpis = new List<ClientKPI>();
-
-                    using ( ClientKPIService service = new ClientKPIService() )
-                    {
-                        kpis = service.ListCSM( pm, csm );
-                    }
-
-                    if ( kpis != null && kpis.Any() )
-                    {
-                        foreach ( ClientKPI item in kpis )
-                        {
-                            csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
-                                                csv,
-                                                item.Id,
-                                                item.ClientId,
-                                                item.KPIDescription,
-                                                //item.Disputes,
-                                                //item.OutstandingPallets,
-                                                //item.OutstandingDays,
-                                                //item.Passons,
-                                                item.Weight,
-                                                item.TargetAmount,
-                                                item.TargetPeriod,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
-                        }
-                    }
-
-
-                    #endregion
-
-                    break;
-            }
-
-            return File( new System.Text.UTF8Encoding().GetBytes( csv ), "text/csv", filename );
-        }
-
-        #endregion
-
-        #region Clients
+        #region KPIS
 
         //
         // POST || GET: /Client/ClientKPIS
-        public ActionResult ClientKPIS( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        public ActionResult ClientKPI( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
             if ( givecsm )
             {
-                ViewBag.ViewName = "ClientKPIS";
+                ViewBag.ViewName = "ClientKPI";
 
-                return PartialView( "_ClientKPISCustomSearch", new CustomSearchModel( "ClientKPIS" ) );
+                return PartialView( "_ClientKPICustomSearch", new CustomSearchModel( "ClientKPI" ) );
             }
             int total = 0;
 
@@ -3123,7 +3141,7 @@ namespace ACT.UI.Controllers
             PagingExtension paging = PagingExtension.Create( viewModel, total, pm.Skip, pm.Take, pm.Page );
 
 
-            return PartialView( "_ClientKPIS", paging );
+            return PartialView( "_ClientKPI", paging );
         }
 
         //
@@ -3177,14 +3195,14 @@ namespace ACT.UI.Controllers
         public ActionResult AddKPI()
         {
             ClientKPIViewModel model = new ClientKPIViewModel() { EditMode = true };
-            List<Client> clientList = new List<Client>();
+            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
             string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
             int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
             ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
             model.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
             using ( ClientService clientService = new ClientService() )
             {
-                clientList = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
             }
 
             IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
@@ -3401,6 +3419,7 @@ namespace ACT.UI.Controllers
 
 
         #endregion
+
 
         #region General
 
@@ -3784,9 +3803,10 @@ namespace ACT.UI.Controllers
         }
 
 
-       
+
 
         #endregion
+
 
         #region Budgets
         [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
@@ -3809,9 +3829,9 @@ namespace ACT.UI.Controllers
         }
 
         [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetClientBudget( string Id, string ClientId, string BudgetYear, 
-            string January, string February, string March, string April, string May, 
-            string June, string July, string August, string September, string October, 
+        public JsonResult SetClientBudget( string Id, string ClientId, string BudgetYear,
+            string January, string February, string March, string April, string May,
+            string June, string July, string August, string September, string October,
             string November, string December )
         {
             if ( Id != null )
@@ -3894,9 +3914,9 @@ namespace ACT.UI.Controllers
         }
 
         [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetSiteBudget( string Id, string SiteId, string BudgetYear, 
-            string January, string February, string March, string April, string May, 
-            string June, string July, string August, string September, string October, 
+        public JsonResult SetSiteBudget( string Id, string SiteId, string BudgetYear,
+            string January, string February, string March, string April, string May,
+            string June, string July, string August, string September, string October,
             string November, string December )
         {
             if ( Id != null )
@@ -3964,5 +3984,37 @@ namespace ACT.UI.Controllers
 
         #endregion
 
+
+        #region Partial Views
+
+        //
+        // POST || GET: /Client/Clients
+        public ActionResult Clients( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            using ( ClientService service = new ClientService() )
+            {
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "Clients";
+
+                    return PartialView( "_ClientsCustomSearch", new CustomSearchModel( "Clients" ) );
+                }
+
+                pm.Sort = pm.Sort ?? "ASC";
+                pm.SortBy = pm.SortBy ?? "c.CompanyName";
+
+                List<ClientCustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+
+                return PartialView( "_Clients", paging );
+            }
+        }
+
+
+        #endregion
     }
 }

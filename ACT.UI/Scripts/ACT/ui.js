@@ -1518,12 +1518,13 @@
                 Sort: ACT.UI[t].PageSort || ACT.UI.PageSort || "ASC",
                 SortBy: ACT.UI[t].PageSortBy || ACT.UI.PageSortBy || "Id",
                 UserId: ACT.UI[t].PageUserId || ACT.UI.PageUserId || 0,
-                Status: ACT.UI[t].PageStatus || ACT.UI.PageStatus || 0,
-                PSPClientStatus: ACT.UI[t].PagePSPClientStatus || ACT.UI.PagePSPClientStatus || 0,
+                Status: ACT.UI[t].PageStatus || ACT.UI.PageStatus || -1,
+                PSPClientStatus: ACT.UI[t].PagePSPClientStatus || ACT.UI.PagePSPClientStatus || -1,
                 SiteId: ACT.UI[t].PageSiteId || ACT.UI.PageSiteId || 0,
                 ClientId: ACT.UI[t].PageClientId || ACT.UI.PageClientId || 0,
                 TransporterId: ACT.UI[t].PageTransporterId || ACT.UI.PageTransporterId || 0,
                 ProductId: ACT.UI[t].PageProductId || ACT.UI.PageProductId || 0,
+                PSPProductId: ACT.UI[t].PageProductId || ACT.UI.PagePSPProductId || 0,
                 CampaignId: ACT.UI[t].PageCampaignId || ACT.UI.PageCampaignId || 0,
                 SelectedItems: ACT.UI[t].SelectedItems || ACT.UI.SelectedItems || [],
                 FromDate: ACT.UI[t].PageFromDate || ACT.UI.PageFromDate || "",
@@ -1563,12 +1564,13 @@
             ACT.UI[t].PageSortBy = ACT.UI.PageSortBy = "Id";
             ACT.UI[t].PageUserId = ACT.UI.PageUserId = 0;
             ACT.UI[t].PageSiteId = ACT.UI.PageSiteId = 0;
-            ACT.UI[t].PageStatus = ACT.UI.PageStatusId = 0;
+            ACT.UI[t].PageStatus = ACT.UI.PageStatusId = -1;
             ACT.UI[t].PageClientId = ACT.UI.PageClientId = 0;
             ACT.UI[t].PageProductId = ACT.UI.PageProductId = 0;
+            ACT.UI[t].PagePSPProductId = ACT.UI.PagePSPProductId = 0;
             ACT.UI[t].PageCampaignId = ACT.UI.PageCampaignId = 0;
             ACT.UI[t].PageTransporterId = ACT.UI.PageTransporterId = 0;
-            ACT.UI[t].PagePSPClientStatus = ACT.UI.PagePSPClientStatus = 0;
+            ACT.UI[t].PagePSPClientStatus = ACT.UI.PagePSPClientStatus = -1;
             ACT.UI[t].SelectedItems = ACT.UI.SelectedItems = [];
             ACT.UI[t].PageFromDate = ACT.UI.PageFromDate = "";
             ACT.UI[t].PageToDate = ACT.UI.PageToDate = "";
@@ -2674,6 +2676,13 @@
                 var q = "", h = "";
                 q += "Custom search for: ";
 
+                if ( ACT.UI[t].PagePSPId && ACT.UI[t].PagePSPId !== 0 )
+                {
+                    h += "PSP: <b>" + sender.find( 'select#PSPId:first option[value="' + ACT.UI[t].PagePSPId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ PSP: <a style='color: #69f95a;'>" + sender.find( 'select#PSPId:first option[value="' + ACT.UI[t].PagePSPId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#PSPId' ).val( ACT.UI[t].PagePSPId );
+                }
                 if ( ACT.UI[t].PageUserId && ACT.UI[t].PageUserId !== 0 )
                 {
                     h += "User: <b>" + sender.find( 'select#UserId:first option[value="' + ACT.UI[t].PageUserId + '"]' ).text() + "</b>~";
@@ -2708,6 +2717,13 @@
                     q += " <b class='italic'>[ Product: <a style='color: #69f95a;'>" + sender.find( 'select#ProductId:first option[value="' + ACT.UI[t].PageProductId + '"]' ).text() + "</a> ]</b> ";
 
                     sender.find( 'select#ProductId' ).val( ACT.UI[t].PageProductId );
+                }
+                if ( ACT.UI[t].PagePSPProductId && ACT.UI[t].PagePSPProductId !== 0 )
+                {
+                    h += "PSP Product: <b>" + sender.find( 'select#PSPProductId:first option[value="' + ACT.UI[t].PagePSPProductId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ PSP Product: <a style='color: #69f95a;'>" + sender.find( 'select#PSPProductId:first option[value="' + ACT.UI[t].PagePSPProductId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#PSPProductId' ).val( ACT.UI[t].PageProductId );
                 }
                 if ( ACT.UI[t].PageCampaignId && ACT.UI[t].PageCampaignId !== 0 )
                 {

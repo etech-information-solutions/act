@@ -23,68 +23,215 @@
     </h2>
 }
 
-    <div id="item-details" class="item-details" style="width: auto;">
+<div id="item-details" class="item-details" style="width: auto;">
 
-        @if (ViewBag.IncludeLayout == null)
-        {
-            <h2>
-                <img alt="" src="@Url.Content( "~/images/info.png" )" />
-                <span>PSP Details</span>
-            </h2>
-        }
-        @Html.HiddenFor(model => model.Id)
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <h2>
+            <img alt="" src="@Url.Content( "~/images/info.png" )" />
+            <span>PSP Details</span>
+        </h2>
+    }
+    @Html.HiddenFor( model => model.Id )
+    <div class="left" style="width: 48%; margin-right: 4%;">
+
+        <div class="display-label">
+            Company Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.CompanyName )
+        </div>
+
+        <div class="display-label">
+            Trading As
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.TradingAs )
+        </div>
+
+        <div class="display-label">
+            VAT Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.VATNumber )
+        </div>
+
+        <div class="display-label">
+            Company Registration Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.CompanyRegistrationNumber )
+        </div>
+
+        <div class="display-label">
+            Company Registration File
+        </div>
+        <div class="display-field">
+            @if ( documents != null && documents.Any() )
+            {
+                foreach ( Document d in documents )
+                {
+                    <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
+                        <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+
+                        @d.Name (@d.Type)
+                    </a>
+                }
+            }
+        </div>
+
+        <div class="display-label">
+            Description
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Description )
+        </div>
+
+    </div>
+
+    <div class="left" style="width: 48%;">
+
+        <div class="display-label">
+            Contact Person
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ContactPerson )
+        </div>
+
+        <div class="display-label">
+            Contact Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ContactNumber )
+        </div>
+
+        <div class="display-label">
+            Email Address
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Email )
+        </div>
+
+        <div class="display-label">
+            Admin Email Address
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.AdminEmail )
+        </div>
+
+        <div class="display-label">
+            Service Required
+        </div>
+        <div class="display-field">
+            @(((ServiceType)Model.ServiceRequired).GetDisplayText())
+        </div>
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+    <div id="budgets">
+        <div class="display-label">
+            Estimated Load Per Month
+        </div>
+        <div class="display-field">
+
+            <table id="PSPBudget-table" class="da-table" style="border-bottom: 0;">
+
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Jan</th>
+                        <th>Feb</th>
+                        <th>Mar</th>
+                        <th>Apr</th>
+                        <th>May</th>
+                        <th>Jun</th>
+                        <th>Jul</th>
+                        <th>Aug</th>
+                        <th>Sep</th>
+                        <th>Oct</th>
+                        <th>Nov</th>
+                        <th>Dec</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach ( PSPBudget b in Model.PSPBudgets )
+                    {
+                        <tr>
+                            <td>
+                                @b.BudgetYear
+                            </td>
+                            <td>
+                                @b.January
+                            </td>
+                            <td>
+                                @b.February
+                            </td>
+                            <td>
+                                @b.March
+                            </td>
+                            <td>
+                                @b.April
+                            </td>
+                            <td>
+                                @b.May
+                            </td>
+                            <td>
+                                @b.June
+                            </td>
+                            <td>
+                                @b.July
+                            </td>
+                            <td>
+                                @b.August
+                            </td>
+                            <td>
+                                @b.September
+                            </td>
+                            <td>
+                                @b.October
+                            </td>
+                            <td>
+                                @b.November
+                            </td>
+                            <td>
+                                @b.December
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+    @if ( address != null )
+    {
         <div class="left" style="width: 48%; margin-right: 4%;">
 
             <div class="display-label">
-                Company Name
+                Address Line 1
             </div>
             <div class="display-field">
-                @Html.DisplayFor(model => model.CompanyName)
+                @address.Addressline1
             </div>
 
             <div class="display-label">
-                Trading As
+                Town
             </div>
             <div class="display-field">
-                @Html.DisplayFor(model => model.TradingAs)
+                @address.Town
             </div>
 
             <div class="display-label">
-                VAT Number
+                Postal Code
             </div>
             <div class="display-field">
-                @Html.DisplayFor(model => model.VATNumber)
-            </div>
-
-            <div class="display-label">
-                Company Registration Number
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.CompanyRegistrationNumber)
-            </div>
-
-            <div class="display-label">
-                Company Registration File
-            </div>
-            <div class="display-field">
-                @if (documents != null && documents.Any())
-                {
-                    foreach (Document d in documents)
-                    {
-                        <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
-                            <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
-
-                            @d.Name (@d.Type)
-                        </a>
-                    }
-                }
-            </div>
-
-            <div class="display-label">
-                Description
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.Description)
+                @address.PostalCode
             </div>
 
         </div>
@@ -92,287 +239,153 @@
         <div class="left" style="width: 48%;">
 
             <div class="display-label">
-                Contact Person
+                Address Line 2
             </div>
             <div class="display-field">
-                @Html.DisplayFor(model => model.ContactPerson)
+                @address.Addressline2
             </div>
 
             <div class="display-label">
-                Contact Number
+                Province
             </div>
             <div class="display-field">
-                @Html.DisplayFor(model => model.ContactNumber)
-            </div>
-
-            <div class="display-label">
-                Email Address
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.Email)
-            </div>
-
-            <div class="display-label">
-                Admin Email Address
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.AdminEmail)
-            </div>
-
-            <div class="display-label">
-                Service Required
-            </div>
-            <div class="display-field">
-                @(((ServiceType)Model.ServiceRequired).GetDisplayText())
+                @(((Province)address.Province).GetDisplayText())
             </div>
 
         </div>
+    }
+    else
+    {
+        <div class="message-warn">
+            No address details found. Please edit and add address details.
+        </div>
+    }
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
 
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
-        <div id="budgets">
-            <div class="display-label">
-                Estimated Load Per Month
+    @*<div id="budgets">
+
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+            <div class="editor-label" style="margin-bottom: 10px;">
+                Budgets
             </div>
-            <div class="display-field">
 
-                <table id="PSPBudget-table" class="da-table" style="border-bottom: 0;">
+            <div class="editor-field">
+                <table id="clientBudget-table" class="da-table" style="border-bottom: 0;">
 
                     <thead>
                         <tr>
-                            <th>Year</th>
-                            <th>Jan</th>
-                            <th>Feb</th>
-                            <th>Mar</th>
-                            <th>Apr</th>
-                            <th>May</th>
-                            <th>Jun</th>
-                            <th>Jul</th>
-                            <th>Aug</th>
-                            <th>Sep</th>
-                            <th>Oct</th>
-                            <th>Nov</th>
-                            <th>Dec</th>
+                            <th style="width: 7%;">Year</th>
+                            <th style="width: 7%;">Jan</th>
+                            <th style="width: 7%;">Feb</th>
+                            <th style="width: 7%;">Mar</th>
+                            <th style="width: 7%;">Apr</th>
+                            <th style="width: 7%;">May</th>
+                            <th style="width: 7%;">Jun</th>
+                            <th style="width: 7%;">Jul</th>
+                            <th style="width: 7%;">Aug</th>
+                            <th style="width: 7%;">Sep</th>
+                            <th style="width: 7%;">Oct</th>
+                            <th style="width: 7%;">Nov</th>
+                            <th style="width: 7%;">Dec</th>
                         </tr>
                     </thead>
 
-                    <tbody>
-                        @*<tr>
-                            <td>
-                                @Model.PSPBudgets.FirstOrDefault().January
-                            </td>
-                            <td>
-                                @Model.PSPBudgets.FirstOrDefault().February
-                            </td>
-                            <td>
-                                @Model.PSPBudgets.FirstOrDefault().March
-                            </td>
-                            <td>
-                                @Model.PSPBudgets.FirstOrDefault().April
-                            </td>
-                            <td>
-                                @Model.PSPBudgets.FirstOrDefault().May
-                            </td>
-                            <td>
-                                @Model.PSPBudgets.FirstOrDefault().June
-                            </td>
-                            <td>
-                                @Model.PSPBudgets.FirstOrDefault().July
-                            </td>
-                            <td>
-                                @Model.PSPBudgets.FirstOrDefault().August
-                            </td>
-                            <td>
-                                @Model.PSPBudgets.FirstOrDefault().September
-                            </td>
-                            <td>
-                                @Model.PSPBudgets.FirstOrDefault().October
-                            </td>
-                            <td>
-                                @Model.PSPBudgets.FirstOrDefault().November
-                            </td>
-                            <td>
-                                @Model.PSPBudgets.FirstOrDefault().December
-                            </td>
-                        </tr>*@
-                    </tbody>
+                    <tbody></tbody>
 
                 </table>
 
             </div>
-            </div>
-
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
-
-            @if (address != null)
-            {
-                <div class="left" style="width: 48%; margin-right: 4%;">
-
-                    <div class="display-label">
-                        Address Line 1
-                    </div>
-                    <div class="display-field">
-                        @address.Addressline1
-                    </div>
-
-                    <div class="display-label">
-                        Town
-                    </div>
-                    <div class="display-field">
-                        @address.Town
-                    </div>
-
-                    <div class="display-label">
-                        Postal Code
-                    </div>
-                    <div class="display-field">
-                        @address.PostalCode
-                    </div>
-
-                </div>
-
-                <div class="left" style="width: 48%;">
-
-                    <div class="display-label">
-                        Address Line 2
-                    </div>
-                    <div class="display-field">
-                        @address.Addressline2
-                    </div>
-
-                    <div class="display-label">
-                        Province
-                    </div>
-                    <div class="display-field">
-                        @(((Province)address.Province).GetDisplayText())
-                    </div>
-
-                </div>
-            }
-            else
-            {
-                <div class="message-warn">
-                    No address details found. Please edit and add address details.
-                </div>
-            }
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-            @*<div id="budgets">
-
-
-                <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-
-                <div class="editor-label" style="margin-bottom: 10px;">
-                    Budgets
-                </div>
-
-                <div class="editor-field">
-                    <table id="clientBudget-table" class="da-table" style="border-bottom: 0;">
-
-                        <thead>
-                            <tr>
-                                <th style="width: 7%;">Year</th>
-                                <th style="width: 7%;">Jan</th>
-                                <th style="width: 7%;">Feb</th>
-                                <th style="width: 7%;">Mar</th>
-                                <th style="width: 7%;">Apr</th>
-                                <th style="width: 7%;">May</th>
-                                <th style="width: 7%;">Jun</th>
-                                <th style="width: 7%;">Jul</th>
-                                <th style="width: 7%;">Aug</th>
-                                <th style="width: 7%;">Sep</th>
-                                <th style="width: 7%;">Oct</th>
-                                <th style="width: 7%;">Nov</th>
-                                <th style="width: 7%;">Dec</th>
-                            </tr>
-                        </thead>
-
-                        <tbody></tbody>
-
-                    </table>
-
-                </div>
-            </div>
-
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>*@
-
-            @if (ViewBag.IncludeLayout == null)
-            {
-                <p>
-                    @Html.ActionLink("Edit", "EditPSP", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
-
-                    @if (ViewBag.IncludeLayout == null)
-                    {
-                        <span style="padding: 0 5px;">/</span>
-                        <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
-                    }
-                </p>
-            }
-
-            @if (ViewBag.IncludeLayout != null)
-            {
-                <div class="back-to-list">
-                    @Html.ActionLink("Back to List", "Index")
-                </div>
-            }
-
         </div>
 
-        <script>
-            $(document).ready(function () {
-                var cId = $("#Id").val();
-                LoadBudgets(cId);
-                //$(".budgets").hide();
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>*@
 
-            });
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <p>
+            @Html.ActionLink( "Edit", "EditPSP", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
 
-            function ViewBudget() {
-                $('.budgets').show();
-            };
-
-            function LoadBudgets(id) {
-                var rowDiv = $("#PSPBudget-table tbody");
-                rowDiv.html('');
-
-
-                var savecopy = '<a id="savebudget" onclick="SaveBudget([BUDGETID])" name="savebudget"><i class="fa fa-save"></i></a>';
-                $.ajax({
-                    type: "GET",
-                    url: "GetPSPBudgets",
-                    data: { clientId: id },
-                    contentType: "application/json;charset=utf-8",
-                    dataType: "json",
-                    success: function (data) {
-                        var count = Object.keys(data).length;
-                        var result = "";
-                        if (count > 0) {
-                            //var fieldcopy = '<input class="input" id="ClientBudget_[FIELDNAME]-[FIELDVALUE]" style="padding: 0 5px; width: 87%;" type="number" value="[FIELDVALUE]">';
-                            $.each(data, function (id, budget) {
-                                var tabledata = '<tr id="budg-' + budget.Id + '-row" name="budg-' + budget.Id + '">';//<form id="budg-' + budget.Id + '-frm" name="budg-' + budget.Id + '-frm" >
-                                tabledata += '<td>' + budget.BudgetYear + '</td>';
-                                tabledata += '<td>' + budget.January + '</td>';
-                                tabledata += '<td>' + budget.February + '</td>';
-                                tabledata += '<td>' + budget.March + '</td>';
-                                tabledata += '<td>' + budget.April + '</td>';
-                                tabledata += '<td>' + budget.May + '</td>';
-                                tabledata += '<td>' + budget.June + '</td>';
-                                tabledata += '<td>' + budget.July + '</td>';
-                                tabledata += '<td>' + budget.August + '</td>';
-                                tabledata += '<td>' + budget.September + '</td>';
-                                tabledata += '<td>' + budget.October + '</td>';
-                                tabledata += '<td>' + budget.November + '</td>';
-                                tabledata += '<td>' + budget.December + '</td>';
-                                tabledata += '</tr>';
-                                result += tabledata;
-                            });
-
-                        }
-
-                        rowDiv.html(result);
-
-                    },
-                    error: function (response) {
-                        alert('error');
-                    }
-                });
-
+            @if ( ViewBag.IncludeLayout == null )
+            {
+                <span style="padding: 0 5px;">/</span>
+                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
             }
-        </script>
+        </p>
+    }
+
+    @if ( ViewBag.IncludeLayout != null )
+    {
+        <div class="back-to-list">
+            @Html.ActionLink( "Back to List", "Index" )
+        </div>
+    }
+
+</div>
+
+<script>
+    //$(document).ready(function () {
+    //    var cId = $("#Id").val();
+    //    LoadBudgets(cId);
+    //    //$(".budgets").hide();
+
+    //});
+
+    function ViewBudget()
+    {
+        $( '.budgets' ).show();
+    };
+
+    function LoadBudgets( id )
+    {
+        var rowDiv = $( "#PSPBudget-table tbody" );
+        rowDiv.html( '' );
+
+
+        var savecopy = '<a id="savebudget" onclick="SaveBudget([BUDGETID])" name="savebudget"><i class="fa fa-save"></i></a>';
+        $.ajax( {
+            type: "GET",
+            url: "GetPSPBudgets",
+            data: { clientId: id },
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function ( data )
+            {
+                var count = Object.keys( data ).length;
+                var result = "";
+                if ( count > 0 )
+                {
+                    //var fieldcopy = '<input class="input" id="ClientBudget_[FIELDNAME]-[FIELDVALUE]" style="padding: 0 5px; width: 87%;" type="number" value="[FIELDVALUE]">';
+                    $.each( data, function ( id, budget )
+                    {
+                        var tabledata = '<tr id="budg-' + budget.Id + '-row" name="budg-' + budget.Id + '">';//<form id="budg-' + budget.Id + '-frm" name="budg-' + budget.Id + '-frm" >
+                        tabledata += '<td>' + budget.BudgetYear + '</td>';
+                        tabledata += '<td>' + budget.January + '</td>';
+                        tabledata += '<td>' + budget.February + '</td>';
+                        tabledata += '<td>' + budget.March + '</td>';
+                        tabledata += '<td>' + budget.April + '</td>';
+                        tabledata += '<td>' + budget.May + '</td>';
+                        tabledata += '<td>' + budget.June + '</td>';
+                        tabledata += '<td>' + budget.July + '</td>';
+                        tabledata += '<td>' + budget.August + '</td>';
+                        tabledata += '<td>' + budget.September + '</td>';
+                        tabledata += '<td>' + budget.October + '</td>';
+                        tabledata += '<td>' + budget.November + '</td>';
+                        tabledata += '<td>' + budget.December + '</td>';
+                        tabledata += '</tr>';
+                        result += tabledata;
+                    } );
+
+                }
+
+                rowDiv.html( result );
+
+            },
+            error: function ( response )
+            {
+                alert( 'error' );
+            }
+        } );
+
+    }
+</script>

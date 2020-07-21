@@ -1,0 +1,131 @@
+﻿
+@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+    ViewBag.ViewName = "_Billing";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@{
+    Int32 count = Model.Start;
+    List<PSPBillingCustomModel> items = ( List<PSPBillingCustomModel> ) Model.Items;
+}
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Billing items available matching your search criteria.
+    </div>
+}
+
+<table id="billing-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#billing-table_wrapper" data-starting-point=".ap-tabs ul">
+
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="StatementDate" data-column="b.StatementDate">
+                Statement Date
+            </th>
+            <th data-name="StatementNumber" data-column="b.StatementNumber">
+                Statement #
+            </th>
+            <th data-name="PSPName" data-column="p.CompanyName">
+                PSP
+            </th>
+            <th data-name="ProductName" data-column="p1.Name">
+                Product
+            </th>
+            <th data-name="PaymentAmount" data-column="b.PaymentAmount">
+                Statement Amount
+            </th>
+            <th data-name="InvoiceAmount" data-column="b.InvoiceAmount">
+                Invoice Amount
+            </th>
+            <th data-name="TaxAmount" data-column="b.TaxAmount">
+                Tax Amount
+            </th>
+            <th data-name="PaymentDate" data-column="b.PaymentDate">
+                Payment Date
+            </th>
+            <th data-name="ReferenceNumber" data-column="b.ReferenceNumber">
+                Ref #
+            </th>
+            <th data-name="NominatedAccount" data-column="b.NominatedAccount">
+                Nominated Account
+            </th>
+            @*<th data-name="Actions">
+                    Actions
+                </th>*@
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @( item.StatementDate?.ToString( "yyyy-MM-dd" ) )
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="PSPBilling">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.StatementNumber
+                    </td>
+                    <td>
+                        @item.PSPName
+                    </td>
+                    <td>
+                        @item.ProductName
+                    </td>
+                    <td>
+                        @(item.PaymentAmount?.ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ))
+                    </td>
+                    <td>
+                        @(item.InvoiceAmount.ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ))
+                    </td>
+                    <td>
+                        @(item.TaxAmount?.ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ))
+                    </td>
+                    <td>
+                        @( item.PaymentDate?.ToString( "yyyy-MM-dd" ) )
+                    </td>
+                    <td>
+                        @item.ReferenceNumber
+                    </td>
+                    <td>
+                        @item.NominatedAccount
+                    </td>
+                    @*<td width="4%">
+                            @Html.ActionLink( "Details", "BillingDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        </td>*@
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_BillingCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
+
+@Html.Partial( "_Paging" )

@@ -44,7 +44,7 @@ namespace ACT.UI.Controllers
 
                     #region Disputes
 
-                    csv = String.Format( "Account Number,TDN Number,Raised Date,Docket Number,Reference,Action By,Resolved On,Resolved By,Other Party,Sender,Receiver,Declarer,Dispute Email,Product,Dispute Status,Equipment,Quantity,Reason fo Dispute {0}", Environment.NewLine );
+                    csv = string.Format( "Account Number,TDN Number,Raised Date,Docket Number,Reference,Action By,Resolved On,Resolved By,Other Party,Sender,Receiver,Declarer,Dispute Email,Product,Dispute Status,Equipment,Quantity,Reason fo Dispute {0}", Environment.NewLine );
 
                     using ( DisputeService dservice = new DisputeService() )
                     {
@@ -54,7 +54,7 @@ namespace ACT.UI.Controllers
                         {
                             foreach ( DisputeCustomModel item in disputes )
                             {
-                                csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18} {19}",
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18} {19}",
                                                     csv,
                                                     item.ChepLoadAccountNumber,
                                                     item.TDNNumber,
@@ -87,7 +87,7 @@ namespace ACT.UI.Controllers
 
                     #region Chep Audit
 
-                    csv = String.Format( "Date Created,Site,Equipment,Stock Balance,Invoice In,Invoice Out,Req Adjustment,MCC In,MCC Out,MCC Balance,Suspend ITL,Suspend MCC,Adjusted Invoice Balance {0}", Environment.NewLine );
+                    csv = string.Format( "Date Created,Site,Equipment,Stock Balance,Invoice In,Invoice Out,Req Adjustment,MCC In,MCC Out,MCC Balance,Suspend ITL,Suspend MCC,Adjusted Invoice Balance {0}", Environment.NewLine );
 
                     using ( ChepAuditService dservice = new ChepAuditService() )
                     {
@@ -97,7 +97,7 @@ namespace ACT.UI.Controllers
                         {
                             foreach ( ChepAuditCustomModel item in audits )
                             {
-                                csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} {14}",
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} {14}",
                                                     csv,
                                                     item.CreatedOn,
                                                     item.SiteName,
@@ -125,7 +125,7 @@ namespace ACT.UI.Controllers
 
                     #region Client Audit
 
-                    csv = String.Format( "Date Created,Audit Date,Site,Equipment,Pallets Outstanding,Pallets Counted,Writeoff Pallets,Customer Name,Rep Name,Pallet Auditor,Status {0}", Environment.NewLine );
+                    csv = string.Format( "Date Created,Audit Date,Site,Equipment,Pallets Outstanding,Pallets Counted,Writeoff Pallets,Customer Name,Rep Name,Pallet Auditor,Status {0}", Environment.NewLine );
 
                     using ( SiteAuditService dservice = new SiteAuditService() )
                     {
@@ -135,7 +135,7 @@ namespace ACT.UI.Controllers
                         {
                             foreach ( SiteAuditCustomModel item in siteAudits )
                             {
-                                csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11} {12}",
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11} {12}",
                                                     csv,
                                                     item.CreatedOn,
                                                     item.AuditDate,
@@ -161,7 +161,7 @@ namespace ACT.UI.Controllers
 
                     #region Movement Report
 
-                    csv = String.Format( "Movement Date,Effective Date,Date of Notification,Docket Number,Posting Type,Trading Partner,Customer Reference Number,Equipment,POP Number,PCN Number,PRN Number {0}", Environment.NewLine );
+                    csv = string.Format( "Movement Date,Effective Date,Date of Notification,Docket Number,Posting Type,Trading Partner,Customer Reference Number,Equipment,POP Number,PCN Number,PRN Number {0}", Environment.NewLine );
 
                     using ( ClientLoadService dservice = new ClientLoadService() )
                     {
@@ -171,7 +171,7 @@ namespace ACT.UI.Controllers
                         {
                             foreach ( ClientLoadCustomModel item in clientload )
                             {
-                                csv = String.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11} {12}",
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11} {12}",
                                                     csv,
                                                     item.LoadDate,
                                                     item.EffectiveDate,
@@ -197,7 +197,7 @@ namespace ACT.UI.Controllers
 
                     #region Exceptions
 
-                    csv = String.Format( "Site,Sub-site,Load Date,Exception {0}", Environment.NewLine );
+                    csv = string.Format( "Site,Sub-site,Load Date,Exception {0}", Environment.NewLine );
 
                     using ( ClientLoadService dservice = new ClientLoadService() )
                     {
@@ -209,7 +209,7 @@ namespace ACT.UI.Controllers
                         {
                             foreach ( ClientLoadCustomModel item in clientload )
                             {
-                                csv = String.Format( "{0} {1},{2},{3} {12}",
+                                csv = string.Format( "{0} {1},{2},{3} {12}",
                                                     csv,
                                                     item.SiteName,
                                                     item.SubSiteName,

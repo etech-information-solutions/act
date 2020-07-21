@@ -1,6 +1,5 @@
-﻿@model PSP
+﻿@model Client
 
-@using ACT.Core.Enums;
 @using ACT.Data.Models;
 
 
@@ -8,10 +7,10 @@
 
     <h2>
         <img alt="" src="@Url.Content( "~/images/info.png" )" />
-        <span>PSP Budget</span>
+        <span>Client Budget</span>
     </h2>
 
-    <table id="PSPBudget-table" class="da-table" style="border-bottom: 0;">
+    <table id="clien-tbudget-table" class="da-table" style="border-bottom: 0;">
 
         <thead>
             <tr>
@@ -32,7 +31,7 @@
         </thead>
 
         <tbody>
-            @foreach ( PSPBudget b in Model.PSPBudgets )
+            @foreach ( ClientBudget b in Model.ClientBudgets )
             {
                 <tr>
                     <td>
@@ -85,7 +84,7 @@
     @if ( ViewBag.IncludeLayout == null )
     {
         <p>
-            @Html.ActionLink( "Edit", "EditPSP", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+            @Html.ActionLink( "Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
 
             @if ( ViewBag.IncludeLayout == null )
             {

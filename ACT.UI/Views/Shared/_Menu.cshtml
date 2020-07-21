@@ -5,7 +5,7 @@
 
     var user = ( Request.IsAuthenticated && ViewBag.CurrentUser != null ) ? ( ACT.Core.Models.UserModel ) ViewBag.CurrentUser : User.Get();
 
-    string sessClient = ( HttpContext.Current.Session[ "ClientId" ] != null ? HttpContext.Current.Session[ "ClientId" ].ToString() : "0" );
+    //string sessClient = ( HttpContext.Current.Session[ "ClientId" ] != null ? HttpContext.Current.Session[ "ClientId" ].ToString() : "0" );
 }
 
 <div class="menu">
@@ -20,7 +20,7 @@
         <li class="welcome">
             Welcome <strong>@user.Name</strong>
         </li>
-        @if ( User.Has( PermissionTo.View, PermissionContext.Client ) )
+        @*@if ( User.Has( PermissionTo.View, PermissionContext.Client ) )
         {
             <li class="welcome">
                 Select Client
@@ -28,7 +28,7 @@
                 <br />
                 <br />
             </li>
-        }
+        }*@
 
         @if ( User.Has( PermissionTo.View, PermissionContext.DashBoard ) )
         {
@@ -75,14 +75,14 @@
             </li>
         }
 
-        @*@if ( User.Has( PermissionTo.View, PermissionContext.Reports ) )
+        @if ( User.Has( PermissionTo.View, PermissionContext.Finance ) )
         {
-            <li data-hot-spot="1" data-c="Report" data-t="" class="@(controller.ToLower().Equals( "report" ) ? "current" : "")">
-                <a rel="tipsyW" title="Reports" href="@Url.Action( "Index", "Report" )">
-                    <span>Reports</span>
+            <li data-hot-spot="1" data-c="Finance" data-t="" class="@(controller.ToLower().Equals( "finance" ) ? "current" : "")">
+                <a rel="tipsyW" title="Finance" href="@Url.Action( "Index", "Finance" )">
+                    <span>Finance</span>
                 </a>
             </li>
-        }*@
+        }
 
         <li style="border-top: 5px solid #f5f5f5; border-bottom: 5px solid #f5f5f5;">
             <a class="red-bg" href="@Url.Action( "LogOff", "Account" )" style="padding: 10px 20px;">
@@ -96,7 +96,7 @@
 
 
     <script>
-        $(document).ready(function () {
+        @*$(document).ready(function () {
             GetClientList();
 
             $("#ClientListAdmin").change(function () {
@@ -136,6 +136,6 @@
                     location.reload();
                 }
             });
-        }
+        }*@
     </script>
 </div>
