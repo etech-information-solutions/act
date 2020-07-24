@@ -219,7 +219,7 @@ namespace ACT.Core.Services
             model.Role = r;
             model.RoleType = ( RoleType ) r.Type;
             model.IsAdmin = ( r.Type == ( int ) RoleType.SuperAdmin );
-            model.IsPSPAdmin = (r.Type == (int)RoleType.PSP);
+            model.IsPSPAdmin = ( r.Type == ( int ) RoleType.PSP );
 
             RoleModel role = new RoleModel()
             {
@@ -643,10 +643,10 @@ namespace ACT.Core.Services
         /// <param name="column"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public List<T> ListByColumnWhere(string column = "", object value = null)
+        public List<T> ListByColumnWhere( string column = "", object value = null )
         {
             return context.Set<T>()
-                          .Where(ColumnWhere(column, value))
+                          .Where( ColumnWhere( column, value ) )
                           .Distinct()
                           .ToList();
         }
@@ -658,11 +658,11 @@ namespace ACT.Core.Services
         /// <param name="column"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public List<T> ListByColumnsWhere(string column = "", object value = null, string column2 = "", object value2 = null)
+        public List<T> ListByColumnsWhere( string column = "", object value = null, string column2 = "", object value2 = null )
         {
             return context.Set<T>()
-                            .Where(ColumnWhere(column, value))
-                            .Where(ColumnWhere(column2, value2))
+                            .Where( ColumnWhere( column, value ) )
+                            .Where( ColumnWhere( column2, value2 ) )
                           .Distinct()
                           .ToList();
         }
@@ -674,10 +674,10 @@ namespace ACT.Core.Services
         /// <param name="column"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public T GetByColumnWhere(string column = "", object value = null)
+        public T GetByColumnWhere( string column = "", object value = null )
         {
             return context.Set<T>()
-                          .Where(ColumnWhere(column, value))                          
+                          .Where( ColumnWhere( column, value ) )
                           .Distinct()
                           .FirstOrDefault();
         }
@@ -692,13 +692,13 @@ namespace ACT.Core.Services
         /// <param name="column2"></param>
         /// <param name="value2"></param>/// 
         /// <returns></returns>
-        public T GetByColumnsWhere(string column = "", object value = null, string column2 = "", object value2 = null)
+        public T GetByColumnsWhere( string column = "", object value = null, string column2 = "", object value2 = null )
         {
-            if (!string.IsNullOrEmpty(column) && !string.IsNullOrEmpty(column2))
+            if ( !string.IsNullOrEmpty( column ) && !string.IsNullOrEmpty( column2 ) )
             {
                 return context.Set<T>()
-                              .Where(ColumnWhere(column, value))
-                              .Where(ColumnWhere(column2, value2))
+                              .Where( ColumnWhere( column, value ) )
+                              .Where( ColumnWhere( column2, value2 ) )
                               .Distinct()
                               .FirstOrDefault();
             }
@@ -895,34 +895,34 @@ namespace ACT.Core.Services
             return await context.Set<T>().ToListAsync();
         }
 
-        public T Get(int id)
+        public T Get( int id )
         {
-            return context.Set<T>().Find(id);
+            return context.Set<T>().Find( id );
         }
 
-        public async Task<T> GetAsync(int id)
+        public async Task<T> GetAsync( int id )
         {
-            return await context.Set<T>().FindAsync(id);
+            return await context.Set<T>().FindAsync( id );
         }
 
-        public T Find(Expression<Func<T, bool>> match)
+        public T Find( Expression<Func<T, bool>> match )
         {
-            return context.Set<T>().SingleOrDefault(match);
+            return context.Set<T>().SingleOrDefault( match );
         }
 
-        public async Task<T> FindAsync(Expression<Func<T, bool>> match)
+        public async Task<T> FindAsync( Expression<Func<T, bool>> match )
         {
-            return await context.Set<T>().SingleOrDefaultAsync(match);
+            return await context.Set<T>().SingleOrDefaultAsync( match );
         }
 
-        public ICollection<T> FindAll(Expression<Func<T, bool>> match)
+        public ICollection<T> FindAll( Expression<Func<T, bool>> match )
         {
-            return context.Set<T>().Where(match).ToList();
+            return context.Set<T>().Where( match ).ToList();
         }
 
-        public async Task<ICollection<T>> FindAllAsync(Expression<Func<T, bool>> match)
+        public async Task<ICollection<T>> FindAllAsync( Expression<Func<T, bool>> match )
         {
-            return await context.Set<T>().Where(match).ToListAsync();
+            return await context.Set<T>().Where( match ).ToListAsync();
         }
 
         public int Count()

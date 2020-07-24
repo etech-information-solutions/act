@@ -194,7 +194,7 @@
                             </div>
                         }
 
-                        @if ( item.Documents != null && item.Documents.Any( s => s.Status == ( Int32 ) Status.Active ) )
+                        @if ( item.Documents != null && item.Documents.Any( s => s.Name.ToLower() != "logo" && s.Status == ( Int32 ) Status.Active ) )
                         {
                             <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
@@ -203,11 +203,11 @@
                                 </a>
                                 <div id="client-@item.Id-docs" class="none">
                                     <ul class="list">
-                                        @foreach ( var d in item.Documents.Where( s => s.Status == ( Int32 ) Status.Active ) )
+                                        @foreach ( var d in item.Documents.Where( s => s.Name.ToLower() != "logo" && s.Status == ( Int32 ) Status.Active ) )
                                         {
                                             <li style="line-height: 20px;">
                                                 <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )" target="_blank">
-                                                    @d.Name (@d.Type)
+                                                    @d.Description (@d.Type)
                                                 </a>
                                             </li>
                                         }

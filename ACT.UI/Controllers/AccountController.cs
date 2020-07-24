@@ -92,7 +92,7 @@ namespace ACT.UI.Controllers
 
             return RedirectToAction( "Index", "DashBoard" );
 
-           // return DoLogin( user.RoleType );
+            // return DoLogin( user.RoleType );
         }
 
         public ActionResult DoLogin( RoleType roleType )
@@ -319,7 +319,7 @@ namespace ACT.UI.Controllers
                     {
                         Email = model.EmailAddress,
                         TradingAs = model.TradingAs,
-                        VATNumber = model.VATNumber, 
+                        VATNumber = model.VATNumber,
                         AdminEmail = model.AdminEmail,
                         CompanyName = model.CompanyName,
                         Description = model.Description,
@@ -367,6 +367,7 @@ namespace ACT.UI.Controllers
                     {
                         ObjectId = objectId,
                         ObjectType = objectType,
+                        BudgetYear = model.EstimatedLoad.BudgetYear,
                         January = model.EstimatedLoad.January,
                         February = model.EstimatedLoad.February,
                         March = model.EstimatedLoad.March,

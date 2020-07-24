@@ -20,6 +20,7 @@ namespace ACT.Data.Models
         public string ModifiedBy { get; set; }
         public Nullable<int> ObjectId { get; set; }
         public string ObjectType { get; set; }
+        public Nullable<int> BudgetYear { get; set; }
         public Nullable<decimal> January { get; set; }
         public Nullable<decimal> February { get; set; }
         public Nullable<decimal> March { get; set; }

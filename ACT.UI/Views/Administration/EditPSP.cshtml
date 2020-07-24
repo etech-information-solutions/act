@@ -4,7 +4,7 @@
 @using ACT.Core.Enums;
 
 @{
-    if (ViewBag.IncludeLayout == null)
+    if ( ViewBag.IncludeLayout == null )
     {
         Layout = null;
     }
@@ -13,9 +13,9 @@
 }
 
 
-@Html.Partial("_Notification")
+@Html.Partial( "_Notification" )
 
-@using (Html.BeginForm("EditPSP", "Administration", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#psps", @class = "custom-validate", @style = "width: auto;" }))
+@using ( Html.BeginForm( "EditPSP", "Administration", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#psps", @class = "custom-validate", @style = "width: auto;" } ) )
 {
     <div id="edit-item">
 
@@ -24,67 +24,67 @@
             <span>Edit PSP</span>
         </h2>
 
-        @Html.ValidationSummary(true)
+        @Html.ValidationSummary( true )
 
-        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor( model => model.Id )
 
         <div id="item-details" class="item-details" style="width: auto;">
 
             <div class="left" style="width: 48%; margin-right: 4%;">
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor(model => model.CompanyName)
+                    @Html.LabelFor( model => model.CompanyName )
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" })
-                    @Html.ValidationMessageFor(model => model.CompanyName)
+                    @Html.TextBoxFor( model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" } )
+                    @Html.ValidationMessageFor( model => model.CompanyName )
                 </div>
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor(model => model.TradingAs)
+                    @Html.LabelFor( model => model.TradingAs )
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.TradingAs, new { @class = "input", @placeholder = "Enter Company Trading Name" })
-                    @Html.ValidationMessageFor(model => model.TradingAs)
+                    @Html.TextBoxFor( model => model.TradingAs, new { @class = "input", @placeholder = "Enter Company Trading Name" } )
+                    @Html.ValidationMessageFor( model => model.TradingAs )
                 </div>
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor(model => model.VATNumber)
+                    @Html.LabelFor( model => model.VATNumber )
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.VATNumber, new { @class = "input", @placeholder = "Enter VAT Number" })
-                    @Html.ValidationMessageFor(model => model.VATNumber)
+                    @Html.TextBoxFor( model => model.VATNumber, new { @class = "input", @placeholder = "Enter VAT Number" } )
+                    @Html.ValidationMessageFor( model => model.VATNumber )
                 </div>
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor(model => model.Description)
+                    @Html.LabelFor( model => model.Description )
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextAreaFor(model => model.Description, new { @class = "input", @style = "height: 81px; width: 93%;", @placeholder = "Briefely describe this PSP" })
-                    @Html.ValidationMessageFor(model => model.Description)
+                    @Html.TextAreaFor( model => model.Description, new { @class = "input", @style = "height: 81px; width: 93%;", @placeholder = "Briefely describe this PSP" } )
+                    @Html.ValidationMessageFor( model => model.Description )
                 </div>
 
                 <div class="editor-label uppercase" style="margin-bottom: 10px;">
-                    @Html.LabelFor(model => model.ServiceType)
+                    @Html.LabelFor( model => model.ServiceType )
                 </div>
 
                 <div class="editor-field">
-                    @foreach (int k in Enum.GetValues(typeof(ServiceType)))
+                    @foreach ( int k in Enum.GetValues( typeof( ServiceType ) ) )
                     {
-                        ServiceType serviceType = (ServiceType)k;
+                        ServiceType serviceType = ( ServiceType ) k;
 
-                        if (k < 0 || serviceType == ServiceType.ManageOwnPallets || serviceType == ServiceType.ProvidePalletManagement)
+                        if ( k < 0 || serviceType == ServiceType.ManageOwnPallets || serviceType == ServiceType.ProvidePalletManagement )
                         {
                             continue;
                         }
 
-                        string desc = ((ServiceType)k).GetDisplayText();
+                        string desc = ( ( ServiceType ) k ).GetDisplayText();
 
-                        string chk = (serviceType == Model.ServiceType) ? "checked=checked" : string.Empty;
+                        string chk = ( serviceType == Model.ServiceType ) ? "checked=checked" : string.Empty;
 
                         <label class="block" for="ServiceType-@k">
 
@@ -95,7 +95,7 @@
                         </label>
                         <div></div>
                     }
-                    @Html.ValidationMessageFor(model => model.ServiceType)
+                    @Html.ValidationMessageFor( model => model.ServiceType )
                 </div>
 
             </div>
@@ -103,23 +103,23 @@
             <div class="left" style="width: 48%;">
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor(model => model.CompanyRegistrationNumber)
+                    @Html.LabelFor( model => model.CompanyRegistrationNumber )
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Company Registration Number" })
-                    @Html.ValidationMessageFor(model => model.CompanyRegistrationNumber)
+                    @Html.TextBoxFor( model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Company Registration Number" } )
+                    @Html.ValidationMessageFor( model => model.CompanyRegistrationNumber )
                 </div>
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor(model => model.RegistrationFile)
+                    @Html.LabelFor( model => model.RegistrationFile )
                 </div>
 
                 <div class="editor-field" style="margin-bottom: 10px;">
 
-                    @if (Model.RegistrationFile != null && Model.RegistrationFile.Id > 0)
+                    @if ( Model.RegistrationFile != null && Model.RegistrationFile.Id > 0 )
                     {
-                        @Html.HiddenFor(model => model.RegistrationFile.Id)
+                        @Html.HiddenFor( model => model.RegistrationFile.Id )
 
                         <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
 
@@ -136,44 +136,44 @@
                     <input id="RegistrationFile.Name" name="RegistrationFile.Name" type="hidden" value="Company Registration File" />
                     <input id="RegistrationFile.Description" name="RegistrationFile.Description" class="input" type="hidden" value="Company Registration File" />
 
-                    @Html.ValidationMessageFor(model => model.RegistrationFile)
+                    @Html.ValidationMessageFor( model => model.RegistrationFile )
 
                 </div>
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor(model => model.ContactPerson)
+                    @Html.LabelFor( model => model.ContactPerson )
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Person's Full Name" })
-                    @Html.ValidationMessageFor(model => model.ContactPerson)
+                    @Html.TextBoxFor( model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Person's Full Name" } )
+                    @Html.ValidationMessageFor( model => model.ContactPerson )
                 </div>
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor(model => model.ContactNumber)
+                    @Html.LabelFor( model => model.ContactNumber )
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" })
-                    @Html.ValidationMessageFor(model => model.ContactNumber)
+                    @Html.TextBoxFor( model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" } )
+                    @Html.ValidationMessageFor( model => model.ContactNumber )
                 </div>
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor(model => model.EmailAddress)
+                    @Html.LabelFor( model => model.EmailAddress )
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.EmailAddress, new { @class = "input", @placeholder = "Enter Email Address" })
-                    @Html.ValidationMessageFor(model => model.EmailAddress)
+                    @Html.TextBoxFor( model => model.EmailAddress, new { @class = "input", @placeholder = "Enter Email Address" } )
+                    @Html.ValidationMessageFor( model => model.EmailAddress )
                 </div>
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor(model => model.AdminEmail)
+                    @Html.LabelFor( model => model.AdminEmail )
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.AdminEmail, new { @class = "input", @placeholder = "Enter Administrator Email Address" })
-                    @Html.ValidationMessageFor(model => model.AdminEmail)
+                    @Html.TextBoxFor( model => model.AdminEmail, new { @class = "input", @placeholder = "Enter Administrator Email Address" } )
+                    @Html.ValidationMessageFor( model => model.AdminEmail )
                 </div>
 
             </div>
@@ -181,7 +181,7 @@
             <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
             <div class="budgets">
                 <div class="editor-label" style="margin-bottom: 10px;">
-                    @Html.LabelFor(model => model.PSPBudget)
+                    @Html.LabelFor( model => model.PSPBudget )
                 </div>
 
                 <div class="editor-field">
@@ -210,175 +210,182 @@
 
                         <tbody>
                             @*<tr>
-                    <td>
-                        @Html.TextBoxFor(model => model.PSPBudget.January, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 10" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.PSPBudget.February, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 20" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.PSPBudget.March, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 30" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.PSPBudget.April, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 40" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.PSPBudget.May, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 50" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.PSPBudget.June, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 60" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.PSPBudget.July, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 70" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.PSPBudget.August, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 80" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.PSPBudget.September, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 45" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.PSPBudget.October, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 15" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.PSPBudget.November, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 25" })
-                    </td>
-                    <td>
-                        @Html.TextBoxFor(model => model.PSPBudget.December, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 35" })
-                    </td>
-                </tr>*@
+                                    <td>
+                                        @Html.TextBoxFor(model => model.PSPBudget.January, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 10" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(model => model.PSPBudget.February, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 20" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(model => model.PSPBudget.March, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 30" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(model => model.PSPBudget.April, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 40" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(model => model.PSPBudget.May, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 50" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(model => model.PSPBudget.June, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 60" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(model => model.PSPBudget.July, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 70" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(model => model.PSPBudget.August, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 80" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(model => model.PSPBudget.September, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 45" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(model => model.PSPBudget.October, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 15" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(model => model.PSPBudget.November, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 25" })
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(model => model.PSPBudget.December, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 35" })
+                                    </td>
+                                </tr>*@
                         </tbody>
 
                     </table>
 
                 </div>
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+            <p>
+                <strong class="uppercase">Address Details</strong>
+            </p>
+
+            <div class="left" style="width: 48%; margin-right: 4%;">
+
+                @Html.HiddenFor( model => model.Address.Id )
+                @Html.HiddenFor( model => model.Address.AddressType )
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Address.AddressLine1 )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Address.AddressLine1, new { @class = "input", @placeholder = "Enter Company Address Line 1" } )
+                    @Html.ValidationMessageFor( model => model.Address.AddressLine1 )
                 </div>
 
-                <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-
-                <p>
-                    <strong class="uppercase">Address Details</strong>
-                </p>
-
-                <div class="left" style="width: 48%; margin-right: 4%;">
-
-                    @Html.HiddenFor(model => model.Address.Id)
-                    @Html.HiddenFor(model => model.Address.AddressType)
-
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.Address.AddressLine1)
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Address.AddressLine1, new { @class = "input", @placeholder = "Enter Company Address Line 1" })
-                        @Html.ValidationMessageFor(model => model.Address.AddressLine1)
-                    </div>
-
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.Address.Town)
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Address.Town, new { @class = "input", @placeholder = "Enter Company Address Town" })
-                        @Html.ValidationMessageFor(model => model.Address.Town)
-                    </div>
-
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.Address.PostCode)
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Address.PostCode, new { @class = "input", @placeholder = "Enter Company Address Postal Code" })
-                        @Html.ValidationMessageFor(model => model.Address.PostCode)
-                    </div>
-
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Address.Town )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Address.Town, new { @class = "input", @placeholder = "Enter Company Address Town" } )
+                    @Html.ValidationMessageFor( model => model.Address.Town )
                 </div>
 
-                <div class="left" style="width: 48%;">
-
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.Address.AddressLine2)
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter Company Address Line 2" })
-                        @Html.ValidationMessageFor(model => model.Address.AddressLine2)
-                    </div>
-
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.Address.Province)
-                    </div>
-                    <div class="editor-field">
-
-                        <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
-                            <option value="">-- select</option>
-                            @foreach (int p in Enum.GetValues(typeof(Province)))
-                            {
-                                Province province = (Province)p;
-
-                                string text = province.GetDisplayText();
-
-                                if (text.ToLower() == "all")
-                                {
-                                    continue;
-                                }
-
-                                string sel = (province == Model.Address.Province) ? "selected=selected" : string.Empty;
-
-                                <option value="@p" @sel>@text</option>
-                            }
-                        </select>
-
-                        @Html.ValidationMessageFor(model => model.Address.Province)
-                    </div>
-
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Address.PostCode )
                 </div>
-
-                <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
-
-                <p>
-                    <input id="save-btn" type="submit" value="Save" />
-
-                    <span style="padding: 0 5px;">/</span>
-
-                    <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
-                </p>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Address.PostCode, new { @class = "input", @placeholder = "Enter Company Address Postal Code" } )
+                    @Html.ValidationMessageFor( model => model.Address.PostCode )
+                </div>
 
             </div>
 
+            <div class="left" style="width: 48%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Address.AddressLine2 )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter Company Address Line 2" } )
+                    @Html.ValidationMessageFor( model => model.Address.AddressLine2 )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Address.Province )
+                </div>
+                <div class="editor-field">
+
+                    <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
+                        <option value="">-- select</option>
+                        @foreach ( int p in Enum.GetValues( typeof( Province ) ) )
+                        {
+                            Province province = ( Province ) p;
+
+                            string text = province.GetDisplayText();
+
+                            if ( text.ToLower() == "all" )
+                            {
+                                continue;
+                            }
+
+                            string sel = ( province == Model.Address.Province ) ? "selected=selected" : string.Empty;
+
+                            <option value="@p" @sel>@text</option>
+                        }
+                    </select>
+
+                    @Html.ValidationMessageFor( model => model.Address.Province )
+                </div>
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+            </p>
+
         </div>
 
+    </div>
+
     <script>
-        $(document).ready(function () {
-            var cId = $("#Id").val();
-            LoadBudgets(cId);
-           // $(".budgets").hide();
+        $( document ).ready( function ()
+        {
+            var cId = $( "#Id" ).val();
+            LoadBudgets( cId );
+            // $(".budgets").hide();
 
-        });
+        } );
 
-        function ViewBudget() {
-           // $('.budgets').show();
+        function ViewBudget()
+        {
+            // $('.budgets').show();
         };
 
-        function SaveBudget(id) {
-            var cId = $("#Id").val();
+        function SaveBudget( id )
+        {
+            var cId = $( "#Id" ).val();
             var data = {
-                "Id": id, "PSPId": cId, "BudgetYear": $('#ClientBudget_' + id + '_BudgetYear').val(), "January": $('#ClientBudget_' + id + '_January').val(), "February": $('#ClientBudget_' + id + '_February').val(), "March": $('#ClientBudget_' + id + '_March').val(), "April": $('#ClientBudget_' + id + '_April').val(), "May": $('#ClientBudget_' + id + '_May').val(), "June": $('#ClientBudget_' + id + '_June').val(), "July": $('#ClientBudget_' + id + '_July').val(), "August": $('#ClientBudget_' + id + '_August').val(), "September": $('#ClientBudget_' + id + '_September').val(), "October": $('#ClientBudget_' + id + '_October').val(), "November": $('#ClientBudget_' + id + '_November').val(), "December": $('#ClientBudget_' + id + '_December').val()
+                "Id": id, "PSPId": cId, "BudgetYear": $( '#ClientBudget_' + id + '_BudgetYear' ).val(), "January": $( '#ClientBudget_' + id + '_January' ).val(), "February": $( '#ClientBudget_' + id + '_February' ).val(), "March": $( '#ClientBudget_' + id + '_March' ).val(), "April": $( '#ClientBudget_' + id + '_April' ).val(), "May": $( '#ClientBudget_' + id + '_May' ).val(), "June": $( '#ClientBudget_' + id + '_June' ).val(), "July": $( '#ClientBudget_' + id + '_July' ).val(), "August": $( '#ClientBudget_' + id + '_August' ).val(), "September": $( '#ClientBudget_' + id + '_September' ).val(), "October": $( '#ClientBudget_' + id + '_October' ).val(), "November": $( '#ClientBudget_' + id + '_November' ).val(), "December": $( '#ClientBudget_' + id + '_December' ).val()
             };
-            $.ajax({
+            $.ajax( {
                 type: 'POST',
                 url: "SetPSPBudget",
                 data: data,//$(this).serialize(),
-                success: function (response) {
-                    if (response == "True") {
-                        alert('Budget Saved.');
-                    } else {
-                        alert('Budget could not be saved. Try again.');
+                success: function ( response )
+                {
+                    if ( response == "True" )
+                    {
+                        alert( 'Budget Saved.' );
+                    } else
+                    {
+                        alert( 'Budget could not be saved. Try again.' );
                     }
                 }
-            });
+            } );
 
 
         }
 
-        function AddRow() {
-            var rowDiv = $("#PSPBudget-table tbody");
+        function AddRow()
+        {
+            var rowDiv = $( "#PSPBudget-table tbody" );
             //var fieldcopy = '<input class="input" id="ClientBudget_0-[FIELDNAME]-" style="padding: 0 5px; width: 87%;" type="number" value="0">';
             var fieldvalue = "0";
             var savecopy = '<a id="savebudget" onclick="SaveBudget(' + fieldvalue + ')" name="savebudget"><i class="fa fa-save"></i></a>';
@@ -396,34 +403,38 @@
             tabledata += '<td><input class="input" id="ClientBudget_0_October" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
             tabledata += '<td><input class="input" id="ClientBudget_0_November" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
             tabledata += '<td><input class="input" id="ClientBudget_0_December" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-            tabledata += '<td>' + savecopy.replace("[BUDGETID]", "0") + '</td>';
+            tabledata += '<td>' + savecopy.replace( "[BUDGETID]", "0" ) + '</td>';
             tabledata += '</tr>';
 
 
             result = tabledata;
 
-            rowDiv.append(result);
+            rowDiv.append( result );
 
         }
 
-        function LoadBudgets(id) {
-            var rowDiv = $("#PSPBudget-table tbody");
-            rowDiv.html('');
+        function LoadBudgets( id )
+        {
+            var rowDiv = $( "#PSPBudget-table tbody" );
+            rowDiv.html( '' );
 
 
             var savecopy = '<a id="savebudget" onclick="SaveBudget([BUDGETID])" name="savebudget"><i class="fa fa-save"></i></a>';
-            $.ajax({
+            $.ajax( {
                 type: "GET",
                 url: "GetPSPBudgets",
                 data: { PSPId: id },
                 contentType: "application/json;charset=utf-8",
                 dataType: "json",
-                success: function (data) {
-                    var count = Object.keys(data).length;
+                success: function ( data )
+                {
+                    var count = Object.keys( data ).length;
                     var result = "";
-                    if (count > 0) {
+                    if ( count > 0 )
+                    {
                         //var fieldcopy = '<input class="input" id="ClientBudget_[FIELDNAME]-[FIELDVALUE]" style="padding: 0 5px; width: 87%;" type="number" value="[FIELDVALUE]">';
-                        $.each(data, function (id, budget) {
+                        $.each( data, function ( id, budget )
+                        {
                             var tabledata = '<tr id="budg-' + budget.Id + '-row" name="budg-' + budget.Id + '">';//<form id="budg-' + budget.Id + '-frm" name="budg-' + budget.Id + '-frm" >
                             tabledata += '<td><input class="input" id="ClientBudget_' + budget.Id + '_BudgetYear" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.BudgetYear + '"></td>';
                             tabledata += '<td><input class="input" id="ClientBudget_' + budget.Id + '_January" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.January + '"></td>';
@@ -439,20 +450,21 @@
                             tabledata += '<td><input class="input" id="ClientBudget_' + budget.Id + '_November" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.November + '"></td>';
                             tabledata += '<td><input class="input" id="ClientBudget_' + budget.Id + '_December" style="padding: 0 5px; width: 87%;" type="number" value="' + budget.December + '"></td>';
                             //tabledata += '<td>' + fieldcopy.replace("[FIELDNAME]", "December").replace("[FIELDVALUE]", //budget.December) + '</td>';
-                            tabledata += '<td>' + savecopy.replace("[BUDGETID]", budget.Id) + '</td>';
+                            tabledata += '<td>' + savecopy.replace( "[BUDGETID]", budget.Id ) + '</td>';
                             tabledata += '</tr>';
                             result += tabledata;
-                        });
+                        } );
 
                     }
 
-                    rowDiv.html(result);
+                    rowDiv.html( result );
 
                 },
-                error: function (response) {
-                    alert('error');
+                error: function ( response )
+                {
+                    alert( 'error' );
                 }
-            });
+            } );
 
         }
 

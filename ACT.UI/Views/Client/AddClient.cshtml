@@ -2,566 +2,296 @@
 
 @using ACT.UI.Models;
 @using ACT.Core.Enums;
+@using ACT.Core.Models;
 
 @{
-    if (ViewBag.IncludeLayout == null)
+    if ( ViewBag.IncludeLayout == null )
     {
         Layout = null;
     }
 
     ViewBag.Title = "Add Client";
+
+    UserModel user = User.Get();
+
+    string logoUrl = ( Model.Files.NullableAny( d => d.Name.ToLower() == "logo" ) ) ? $"/Client/ViewDocument/{Model.Files.FirstOrDefault( d => d.Name.ToLower() == "logo" ).Id}" : Url.Content( "~/Images/no-preview.png" );
 }
 
 
-@Html.Partial("_Notification")
+@Html.Partial( "_Notification" )
 
-@using (Html.BeginForm("AddClient", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clientlist", @class = "custom-validate", @style = "width: auto;" }))
+@using ( Html.BeginForm( "AddClient", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clients", @class = "custom-validate", @style = "width: auto;" } ) )
 {
-<div id="edit-item">
+    <div id="edit-item">
 
-    <h2 class="" style="width: auto;">
-        <img alt="" src="@Url.Content("~/images/add.png")" />
-        <span>Add Client</span>
-    </h2>
+        <h2 class="" style="width: auto;">
+            <img alt="" src="@Url.Content("~/images/add.png")" />
+            <span>Add Client</span>
+        </h2>
 
-    @Html.ValidationSummary(true)
-
-    @Html.HiddenFor(model => model.Id)
-    @Html.HiddenFor(model => model.DocsList)
-    <input type="hidden" id="docslist" name="docslist" value="0" />
+        @Html.ValidationSummary( true )
 
     <div id="item-details" class="item-details" style="width: auto;">
-        <div class="left" style="width: 60%; margin-right: 2%;">
 
-            <div class="left" style="width: 50%; margin-right: 2%;">
-                <h3>Client Details</h3>
-                <div class="editor-label ">
-                    Client Name
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" })
-                    @Html.ValidationMessageFor(model => model.CompanyName)
-                </div>
-                <div class="editor-label ">
-                    Trading As
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.TradingAs, new { @class = "input", @placeholder = "Enter Trading As details" })
-                    @Html.ValidationMessageFor(model => model.TradingAs)
-                </div>
+        <div class="left" style="width: 31%; margin-right: 3%;">
 
-                <div class="editor-label ">
-                    Company Registration Number
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" })
-                    @Html.ValidationMessageFor(model => model.CompanyRegistrationNumber)
-                </div>
-                <div class="editor-label ">
-                    VAT Number
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.VATNumber, new { @class = "input", @placeholder = "Enter VAT Number" })
-                    @Html.ValidationMessageFor(model => model.VATNumber)
-                </div>
+            <div class="editor-field" style="text-align: center; margin-bottom: 20px; border: 1px dashed #ddd; padding: 10px;">
 
-                <div class="editor-label ">
-                    Chep Reference
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.ChepReference, new { @class = "input", @placeholder = "Enter Chep reference Number" })
-                    @Html.ValidationMessageFor(model => model.ChepReference)
-                </div>
-            </div>
+                <label for="Files-0-File">
+                    Company Logo <br />
+                    <img class="image-preview" style="margin-bottom: 10px; display: inline-block; width: 50%; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
 
-            <div class="left" style="width: 45%;">
-                <h3>Contact Details</h3>
+                </label>
 
-
-
-                <div class="editor-label ">
-                    Contact Person Name
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" })
-                    @Html.ValidationMessageFor(model => model.ContactPerson)
-                </div>
-                <div class="editor-label ">
-                    Contact Person Number
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" })
-                    @Html.ValidationMessageFor(model => model.ContactNumber)
-                </div>
-                <div class="editor-label ">
-                    Contact Person Email
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.Email, new { @class = "input", @placeholder = "Enter Email Address", type = "email" })
-                    @Html.ValidationMessageFor(model => model.Email)
-                </div>
-
-
-
-                <div class="editor-label ">
-                    Administrator Name
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.AdminPerson, new { @class = "input", @placeholder = "Enter Name" })
-                    @Html.ValidationMessageFor(model => model.AdminPerson)
-                </div>
-
-                <div class="editor-label">
-                    Administrator Email
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.AdminEmail, new { @class = "input", @placeholder = "Enter Email Address", type = "email" })
-                    @Html.ValidationMessageFor(model => model.AdminEmail)
-                </div>
-
-
-
-                <div class="editor-label ">
-                    Financial Person Name
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.FinancialPerson, new { @class = "input", @placeholder = "Enter Name" })
-                    @Html.ValidationMessageFor(model => model.FinancialPerson)
-                </div>
-                <div class="editor-label">
-                    Financial Person Email
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.FinPersonEmail, new { @class = "input", @placeholder = "Enter Email Address", type = "email" })
-                    @Html.ValidationMessageFor(model => model.FinPersonEmail)
-                </div>
-            </div>
-
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-            <div class="left" style="width: 90%; margin-right: 4%;">
-                <div id="locationField">
-                    Type your address below:
-                    <input id="autocomplete"
-                           placeholder="Enter your address"
-                           onFocus="geolocate()"
-                           type="text" />
-                </div>
-            </div>
-            <div class="clear" style="height: 10px;">&nbsp;</div>
-            <div class="left" style="width: 48%; margin-right: 4%;">
-                <input id="Address.AddressType" name="Address.AddressType" type="hidden" value="@( (int)AddressType.Postal )" />
-
-                <div class="editor-label">
-                    Street Address
-                </div>
-                <div class="editor-field">
-                    @*<input type="text" id="street_number" style="width:15%;" name="street_number" readonly="readonly" value="" />*@
-                    @Html.TextBoxFor(model => model.Address.AddressLine1, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
-                    @Html.ValidationMessageFor(model => model.Address.AddressLine1)
-                </div>
-
-                <div class="editor-label">
-                    Town/City
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.Address.Town, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Town/City" })
-                    @Html.ValidationMessageFor(model => model.Address.Town)
-                </div>
-
-                <div class="editor-label">
-                    Postal Code
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.Address.PostCode, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Postal Code" })
-                    @Html.ValidationMessageFor(model => model.Address.PostCode)
-                </div>
+                <p class="company-files">
+                    <input id="Files-0-File" name="Files[0].File" type="file" value="" data-val-file="1" data-increment="1" data-upload-image="1" class="input" />
+                    <input id="Files-0-Name" name="Files[0].Name" type="hidden" value="Logo" />
+                    <input id="Files-0-Description" name="Files[0].Description" class="input" type="hidden" value="Company Logo" />
+                </p>
 
             </div>
 
-            <div class="left" style="width: 48%;">
-
-
-                <div class="editor-label">
-                    Suburb/Area
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.Address.AddressLine2, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Suburb/Area " })
-                    @Html.ValidationMessageFor(model => model.Address.AddressLine2)
-                </div>
-
-                <div class="editor-label">
-                    Province
-                </div>
-                <div class="editor-field">
-
-                    <select id="Address_Province" name="Address_Province" required="required" style="width: 100%;">
-                        <!--class="chzn"-->
-                        <option value="">-- select</option>
-                        @*@foreach (int p in Enum.GetValues(typeof(Province)))
-                            {
-                                string text = ((Province)p).GetDisplayText();
-
-                                if (text.ToLower() == "all")
-                                {
-                                    continue;
-                                }
-
-                                <option value="@p">@text</option>
-                            }*@
-                    </select>
-                    @*@Html.TextBoxFor(model => model.Address.Province, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Province" })*@
-                    @*@Html.ValidationMessageFor(model => model.Address.Province)*@
-                </div>
-
+            <div class="editor-label">
+                @Html.LabelFor( model => model.CompanyName )
             </div>
-        </div>
 
-        <div class="left" style="width: 33%; margin-right: 4%;">
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" } )
+                @Html.ValidationMessageFor( model => model.CompanyName )
+            </div>
 
-            <div class="editor-label ">
-                Logo
+            <div class="editor-label">
+                @Html.LabelFor( model => model.TradingAs )
             </div>
             <div class="editor-field">
-                <input id="Logo.File" name="Logo.File" type="file" value="" data-val-file="1" class="input" />
-                <input id="Logo.Name" name="Logo.Name" type="hidden" value="Company Logo" />
-                <input id="Logo.Description" name="Logo.Description" class="input" type="hidden" value="Company Logo" />
+                @Html.TextBoxFor( model => model.TradingAs, new { @class = "input", @placeholder = "Enter Trading As details" } )
+                @Html.ValidationMessageFor( model => model.TradingAs )
+            </div>
+            <div class="editor-label">
+                Company Registration Number
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" } )
+                @Html.ValidationMessageFor( model => model.CompanyRegistrationNumber )
             </div>
 
-            <br /><br /><br />
             <div class="editor-label">
-                Upload Documents
-                <div class="editor-field" style="margin-bottom: 10px;" id="companydocslist" name="companydocslist">
-                    <div id="documentsdiv">
-                        @*@if (Model.CompanyFile != null && Model.CompanyFile.Count() > 0)
-                    {
-                        foreach (Document companyFile in Model.CompanyFile.Where(s => s.Status == (Int32)Status.Active))
-                        {
-                            @Html.HiddenFor(model => companyFile.Id)
+                @Html.LabelFor( model => model.VATNumber )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.VATNumber, new { @class = "input", @placeholder = "Enter VAT Number" } )
+                @Html.ValidationMessageFor( model => model.VATNumber )
+            </div>
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ChepReference )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ChepReference, new { @class = "input", @placeholder = "Enter Chep reference Number" } )
+                @Html.ValidationMessageFor( model => model.ChepReference )
+            </div>
 
-                            <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
+            <div class="edit-label">
+                @Html.LabelFor( model => model.Status )
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.Status )
+            </div>
 
-                                <a target="_blank" href="@Url.Action("ViewDocument", "Client", new { @id = companyFile.Id })">
-                                    <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
+            @if ( user.RoleType == RoleType.SuperAdmin )
+            {
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.PSPId )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.PSPId, model => model.PSPOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                </div>
+            }
 
-                                    companyFile.Name (companyFile.Extension)
-                                </a>
+        </div>
 
-                            </div>
+        <div class="left" style="width: 31%; margin-right: 3%;">
 
-                        }
-                    }*@
-                    </div>
-                    <input id="companyfile" name="companyfile" type="file" value="" data-val-file="1" class="input" />
-                    <span id="uploaded_file"></span>
-                    @*<input id="NewCompanyFile.File" name="NewCompanyFile.File" type="file" value="" data-val-file="1" class="input" />
-                <input id="NewCompanyFile.Name" name="NewCompanyFile.Name" type="hidden" value="Company File" />
-                <input id="NewCompanyFile.Description" name="NewCompanyFile.Description" class="input" type="hidden" value="Company File" />*@
-                    @*@Html.ValidationMessageFor(model => companyFile.RegistrationFile)*@
+            <p>
+                <strong class="uppercase">Contact Details</strong>
+            </p>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ContactPerson )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" } )
+                @Html.ValidationMessageFor( model => model.ContactPerson )
+            </div>
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ContactNumber )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" } )
+                @Html.ValidationMessageFor( model => model.ContactNumber )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.Email )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Email, new { @class = "input", @placeholder = "Enter Email Address", type = "email" } )
+                @Html.ValidationMessageFor( model => model.Email )
+            </div>
+
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.AdminPerson )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.AdminPerson, new { @class = "input", @placeholder = "Enter Administrator Name" } )
+                @Html.ValidationMessageFor( model => model.AdminPerson )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.AdminEmail )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.AdminEmail, new { @class = "input", @placeholder = "Enter Administrator Email Address", type = "email" } )
+                @Html.ValidationMessageFor( model => model.AdminEmail )
+            </div>
+
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.FinancialPerson )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.FinancialPerson, new { @class = "input", @placeholder = "Enter Financial Person Name" } )
+                @Html.ValidationMessageFor( model => model.FinancialPerson )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.FinPersonEmail )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.FinPersonEmail, new { @class = "input", @placeholder = "Enter Financial Person Email Address", type = "email" } )
+                @Html.ValidationMessageFor( model => model.FinPersonEmail )
+            </div>
+
+        </div>
+
+        <div class="left" style="width: 31%;">
+
+            <div class="editor-label" style="margin-bottom: 10px;">
+                Documents
+            </div>
+
+            <div class="grouped-area" style="padding: 20px;">
+
+                <div id="document-list">
+
+                    <p class="company-files" style="border-bottom: 1px dashed #ccc; padding-bottom: 20px;">
+
+                        <input id="Files-0-Name" name="Files[1].Name" type="hidden" value="File" />
+
+                        <label for="Files-0-File">Select File</label>
+                        <input id="Files-0-File" name="Files[1].File" type="file" value="" data-val-file="1" data-increment="1" class="input" />
+                        <span class="block" style="height: 10px;">&nbsp;</span>
+
+                        <label for="Files-0-File">File Description</label>
+                        <input id="Files-0-Description" name="Files[1].Description" class="input" type="text" value="File Description" placeholder="Company File" />
+                    </p>
 
                 </div>
+
+                <div style="padding: 10px 0 0 0;">
+                    <a rel="tipsyW" title="Add another document?" class="add" data-add-one-more="1" data-target="#document-list" data-auto-increment="1" data-increment-val=".company-files">Add more</a>
+                </div>
+
             </div>
+
+            <div class="clear"></div>
+
+            <div class="grouped-area">
+
+                <p>
+                    <strong class="uppercase">Address Details</strong>
+                </p>
+
+                <input id="Address.AddressType" name="Address.AddressType" type="hidden" value="@( ( int ) AddressType.Postal )" />
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Address.AddressLine1 )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Address.AddressLine1, new { @class = "input", @placeholder = "Enter Company Address Line 1" } )
+                    @Html.ValidationMessageFor( model => model.Address.AddressLine1 )
+                </div>
+
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter Company Address Line 2" } )
+                    @Html.ValidationMessageFor( model => model.Address.AddressLine2 )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Address.Town )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Address.Town, new { @class = "input", @placeholder = "Enter Company Address Town" } )
+                    @Html.ValidationMessageFor( model => model.Address.Town )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Address.PostCode )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Address.PostCode, new { @class = "input", @placeholder = "Enter Company Address Postal Code" } )
+                    @Html.ValidationMessageFor( model => model.Address.PostCode )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Address.Province )
+                </div>
+                <div class="editor-field">
+
+                    <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
+                        <option value="">-- select</option>
+                        @foreach ( int p in Enum.GetValues( typeof( Province ) ) )
+                        {
+                            Province province = ( Province ) p;
+
+                            string text = province.GetDisplayText();
+
+                            if ( text.ToLower() == "all" )
+                            {
+                                continue;
+                            }
+
+                            <option value="@p">@text</option>
+                        }
+                    </select>
+
+                    @Html.ValidationMessageFor( model => model.Address.Province )
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
+
+        <div id="client-budget">
+
+            @Html.Partial( "_ClientBudgets", Model.ClientBudgets )
+
         </div>
 
         <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-     
+
         <p>
             <input id="save-btn" type="submit" value="Save" />
 
             <span style="padding: 0 5px;">/</span>
 
-            <a data-refresh="1" data-target="#clientlist">Cancel</a>
+            <a data-refresh="1" data-target="#clients">Cancel</a>
         </p>
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+
     </div>
 
-    @*<div id="ex1" class="modal">
-            <!-- Modal HTML embedded directly into document -->
-            <form action="" class="login_form modal" id="ex2" style="display:none;">
-                <h3>Please login to continue</h3>
-                <p><label>Username:</label><input type="text" /></p>
-                <p><label>Password:</label><input type="password" /></p>
-                <p><input type="submit" value="Login" /></p>
-            </form>
-        </div>
-
-        <!-- Link to open the modal -->
-        <p><a href="#ex1" rel="modal:open">Open Modal</a></p>*@
-
-</div>
-
-
-    <script>
-    $(document).ready(function () {
-        var cId = '@Model.Id';
-        //alert('h1' + cId);
-       // LoadBudgets(cId);
-
-        //$('#managekpis').click(function (event) {
-        //    $("#ex1").modal();
-        //    return false;
-        //});
-
-        $(document).on('change', '#companyfile', function () {
-            var cId = $("#Id").val();
-            var docsList = $('#DocsList').val();
-            var name = document.getElementById("companyfile").files[0].name;
-            var form_data = new FormData();
-            var ext = name.split('.').pop().toLowerCase();
-            if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx']) == -1) {
-                alert("Invalid File");
-            }
-            var oFReader = new FileReader();
-            oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
-            var f = document.getElementById("companyfile").files[0];
-            var fsize = f.size || f.fileSize;
-            if (fsize > 2000000) {
-                alert("File Size is too large");
-            }
-            else {
-                form_data.append("file", document.getElementById('companyfile').files[0]);
-                form_data.append("id", $("#Id").val());
-                $.ajax({
-                    url: "Upload?id=" + cId + "&utype=Client&uname=Company",
-                    method: "POST",
-                    data: form_data,
-                    contentType: false,
-                    cache: false,
-                    processData: false,
-                    beforeSend: function () {
-                        $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
-                    },
-                    success: function (data) {
-                        debugger;
-                        docsList = docsList + data.Id + ",";
-                        $('#DocsList').val(docsList);
-                        //$('#uploaded_file').html(data);
-                        populateDocs(cId, "Client");
-                        $('#uploaded_file').html("<label class='text-success'></label>");
-                    }
-                });
-            }
-        });
-    });
-
-    function populateDocs(id, doctype) {
-
-        $.ajax({
-
-            url: '@Url.Action("ListFiles", "Client")',
-            type: "GET",
-            dataType: "html",
-            data: { objId: id, objType:doctype },//this is as per your requirement
-            success: function (data) {
-                $('#documentsdiv').html(data);
-            },
-        });
-    }
-
-    //function SaveBudget(id) {
-    //    debugger;
-    //    var data = $('#budg-' + id + ' :input').serialize();
-
-    //    $.ajax({
-    //        type: 'POST',
-    //        url: "SetClientBudget",
-    //        data: data,
-    //        //data : {'_token':csrfdata,'inputstr': strToSend},
-    //        beforeSend: function () {
-    //        },
-    //        success: function (response) {
-    //            if (response == "true") {
-    //                alert('Budget Saved.');
-
-    //            } else {
-    //                alert('Email Could Not Be Sent. Try again.');
-    //            }
-    //        }
-    //    });
-
-
-    //}
-
-        function LoadBudgets(cId) {
-
-        }
-    function SaveBudget(id) {
-        var data = {
-            "Id": id, "ClientId": "0", "BudgetYear": $('#ClientBudget_' + id + '_BudgetYear').val(), "January": $('#ClientBudget_' + id + '_January').val(), "February": $('#ClientBudget_' + id + '_February').val(), "March": $('#ClientBudget_' + id + '_March').val(), "April": $('#ClientBudget_' + id + '_April').val(), "May": $('#ClientBudget_' + id + '_May').val(), "June": $('#ClientBudget_' + id + '_June').val(), "July": $('#ClientBudget_' + id + '_July').val(), "August": $('#ClientBudget_' + id + '_August').val(), "September": $('#ClientBudget_' + id + '_September').val(), "October": $('#ClientBudget_' + id + '_October').val(), "November": $('#ClientBudget_' + id + '_November').val(), "December": $('#ClientBudget_' + id + '_December').val()
-        };
-        $.ajax({
-            type: 'POST',
-            url: "SetClientBudget",
-            data: data,
-            success: function (response) {
-                if (response == "True") {
-                    alert('Budget Saved.');
-                } else {
-                    alert('Budget could not be saved. Try again.');
-                }
-            }
-        });
-    }
-
-    function AddRow() {
-        var rowDiv = $("#clientBudget-table tbody");
-        var fieldvalue = "0";
-        var savecopy = '<a id="savebudget" onclick="SaveBudget(' + fieldvalue + ')" name="savebudget"><i class="fa fa-save"></i></a>';
-        var tabledata = '<tr id="budg-0-row" name="budg-0-row">';//<form id="budg-0-frm" name="budg-0-frm">
-        tabledata += '<td><input class="input" id="ClientBudget_0_BudgetYear" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="ClientBudget_0_January" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="ClientBudget_0_February" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="ClientBudget_0_March" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="ClientBudget_0_April" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="ClientBudget_0_May" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="ClientBudget_0_June" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="ClientBudget_0_July" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="ClientBudget_0_August" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="ClientBudget_0_September" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="ClientBudget_0_October" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="ClientBudget_0_November" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="ClientBudget_0_December" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td>' + savecopy.replace("[BUDGETID]", "0") + '</td>';
-        tabledata += '</tr>';
-
-
-        result = tabledata;
-
-        rowDiv.append(result);
-
-    }
-
-    </script>
-
-    <script>
-        //The Google Stuff
-        var placeSearch, autocomplete;
-
-        var componentForm = {
-            street_number: 'short_name',
-            route: 'long_name',
-            sublocality_level_1: 'long_name',
-            sublocality_level_2: 'long_name',
-            locality: 'long_name',
-            administrative_area_level_2: 'long_name',
-            administrative_area_level_1: 'long_name',
-            //country: 'long_name',
-            postal_code: 'short_name'
-        };
-        var componentFormFields = {
-            street_number: 'Address_AddressLine1',
-            route: 'Address_AddressLine1',
-            locality: 'Address_Town',
-            sublocality_level_1: 'Address_AddressLine2',
-            sublocality_level_2: 'Address_AddressLine2',
-            administrative_area_level_2: 'Address_Province',
-            administrative_area_level_1: 'Address_Province',
-            //country: 'long_name',
-            postal_code: 'Address_PostCode'
-        };
-
-
-        function initAutocomplete() {
-            autocomplete = new google.maps.places.Autocomplete(
-                document.getElementById('autocomplete'), { types: ['geocode'] });
-            autocomplete.setFields(['address_component']);
-            autocomplete.addListener('place_changed', fillInAddress);
-        }
-
-        function fillInAddress() {
-            var place = autocomplete.getPlace();
-            console.log(place);
-            var fullAddress = "";           
-
-            for (var component in componentForm) {
-                document.getElementById(componentFormFields[component]).value = '';
-                document.getElementById(componentFormFields[component]).disabled = false;
-            }
-            for (var i = 0; i < place.address_components.length; i++) {
-                var addressType = place.address_components[i].types[0];
-                if (componentForm[addressType]) {
-                    var val = place.address_components[i][componentForm[addressType]];
-                    if (addressType == "route") {
-                        var streetaddress = document.getElementById("Address_AddressLine1");
-                        document.getElementById("Address_AddressLine1").value = streetaddress.value +" " + val;
-                    } else {
-                       // debugger;
-                        if (addressType == "administrative_area_level_1") {
-                            var idx = -1;
-                            switch (val) {
-                                case "Eastern Cape":
-                                    idx = 0;
-                                    break;
-                                case "Free State":
-                                    idx = 1;
-                                    break;
-                                case "Gauteng":
-                                    idx = 2;
-                                    break;
-                                case "KwaZulu-Natal":
-                                    idx = 3;
-                                    break;
-                                case "Limpopo":
-                                    idx = 4;
-                                    break;
-                                case "Mpumalanga":
-                                    idx = 5;
-                                    break;
-                                case "Northern Cape":
-                                    idx = 6;
-                                    break;
-                                case "North West":
-                                    idx = 7;
-                                    break;
-                                case "Western Cape":
-                                    idx = 8;
-                                    break;
-                                default:
-                                // code block
-                            }
-                            //setSelectedIndex(document.getElementById("Address.Province"), idx);
-                            document.getElementById("Address_Province").options.length = 0;
-                            var opt = document.createElement("option");
-                            opt.text = val;
-                            opt.value = idx;
-                            document.getElementById("Address_Province").options.add(opt);
-                        } else {
-                            document.getElementById(componentFormFields[addressType]).value = val;
-                        }
-                    }
-                }
-                //change for 1st element
-                if (i == 0) {
-                    fullAddress = place.address_components[i].long_name;
-                } else {
-                    fullAddress = fullAddress + "," + place.address_components[i].long_name;
-                }
-                //for elements with Coords, call 2nd API here to locate coords with fulladdress
-
-            }
-            //alert(fullAddress);
-        }
-
-        function geolocate() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    var geolocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };                    
-                    var circle = new google.maps.Circle(
-                        { center: geolocation, radius: position.coords.accuracy });
-                    autocomplete.setBounds(circle.getBounds());
-                });
-            }
-        }
-        function setSelectedIndex(s, i) {
-            s.options[i - 1].selected = true;
-
-            return;
-
-        }
-
-    </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeQFyrVUFUjsQOK_RdtfAC57jMJkc_3Co&libraries=places&callback=initAutocomplete"
-            async defer></script>
+    </div>
 }

@@ -114,7 +114,7 @@ namespace ACT.Core.Services
                                 COUNT(c.Id) AS [Total]
                              FROM
                                 [dbo].[Client] c
-                                LEFT OUTER JOIN [dbo].[PSPClient] pc ON c.Id=(SELECT TOP 1 pc1.ClientId FROM [dbo].[PSPClient] pc1 WHERE pc1.ClientId=c.Id)
+                                LEFT OUTER JOIN [dbo].[PSPClient] pc ON pc.Id=(SELECT TOP 1 pc1.Id FROM [dbo].[PSPClient] pc1 WHERE pc1.ClientId=pc.ClientId AND pc1.ClientId=c.Id)
                                 LEFT OUTER JOIN [dbo].[PSP] p ON p.Id=pc.PSPId";
 
             // WHERE
@@ -239,7 +239,7 @@ namespace ACT.Core.Services
                                 (SELECT COUNT(1) FROM [dbo].[ClientInvoice] ci, [dbo].[ClientLoad] cl WHERE cl.Id=ci.ClientLoadId AND c.Id=cl.ClientId) AS [InvoiceCount]
                              FROM
                                 [dbo].[Client] c
-                                LEFT OUTER JOIN [dbo].[PSPClient] pc ON c.Id=(SELECT TOP 1 pc1.ClientId FROM [dbo].[PSPClient] pc1 WHERE pc1.ClientId=pc.Id)
+                                LEFT OUTER JOIN [dbo].[PSPClient] pc ON pc.Id=(SELECT TOP 1 pc1.Id FROM [dbo].[PSPClient] pc1 WHERE pc1.ClientId=pc.ClientId AND pc1.ClientId=c.Id)
                                 LEFT OUTER JOIN [dbo].[PSP] p ON p.Id=pc.PSPId";
 
             // WHERE

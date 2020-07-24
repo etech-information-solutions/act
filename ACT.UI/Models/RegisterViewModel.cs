@@ -34,6 +34,16 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string VATNumber { get; set; }
 
+        [Display( Name = "VAT Registration Document" )]
+        public FileViewModel VATRegistrationFile { get; set; }
+
+        [Display( Name = "BEE Level" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string BEELevel { get; set; }
+
+        [Display( Name = "BEE Registration Document" )]
+        public FileViewModel BEERegistrationFile { get; set; }
+
         [Display( Name = "Description of business" )]
         [StringLength( 500, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string Description { get; set; }
@@ -68,6 +78,9 @@ namespace ACT.UI.Models
 
         [Display( Name = "Company Registration Document" )]
         public FileViewModel RegistrationFile { get; set; }
+
+        [Display( Name = "Signed PSP Contract Document" )]
+        public FileViewModel SignedPSPContractFile { get; set; }
 
         [Display( Name = "I accept the Terms and Conditions" )]
         public bool IsAccpetedTC { get; set; }

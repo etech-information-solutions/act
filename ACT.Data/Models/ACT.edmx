@@ -515,6 +515,7 @@
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="ObjectId" Type="int" />
           <Property Name="ObjectType" Type="varchar" MaxLength="50" />
+          <Property Name="BudgetYear" Type="int" />
           <Property Name="January" Type="numeric" Precision="18" Scale="0" />
           <Property Name="February" Type="numeric" Precision="18" Scale="0" />
           <Property Name="March" Type="numeric" Precision="18" Scale="0" />
@@ -2359,7 +2360,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySet Name="DeclineReasons" EntityType="ACTModel.DeclineReason" />
           <EntitySet Name="DeliveryNotes" EntityType="ACTModel.DeliveryNote" />
           <EntitySet Name="Documents" EntityType="ACTModel.Document" />
-          <EntitySet Name="EstimatedLoads" EntityType="ACTModel.EstimatedLoad" />
           <EntitySet Name="Groups" EntityType="ACTModel.Group" />
           <EntitySet Name="Images" EntityType="ACTModel.Image" />
           <EntitySet Name="Invoices" EntityType="ACTModel.Invoice" />
@@ -2673,6 +2673,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="Dispute" EntitySet="Disputes" />
           </AssociationSet>
           <EntitySet Name="SystemConfigs" EntityType="ACTModel.SystemConfig" />
+          <EntitySet Name="EstimatedLoads" EntityType="ACTModel.EstimatedLoad" />
           </EntityContainer>
         <EntityType Name="Address">
           <Key>
@@ -3131,29 +3132,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Url" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Journals" Relationship="ACTModel.FK_Journal_Document" FromRole="Document" ToRole="Journal" />
           <NavigationProperty Name="UserDocuments" Relationship="ACTModel.FK_UserDocument_Document" FromRole="Document" ToRole="UserDocument" />
-        </EntityType>
-        <EntityType Name="EstimatedLoad">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="ObjectId" Type="Int32" />
-          <Property Name="ObjectType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="January" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="February" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="March" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="April" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="May" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="June" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="July" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="August" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="September" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="October" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="November" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="December" Type="Decimal" Precision="18" Scale="0" />
         </EntityType>
         <EntityType Name="Group">
           <Key>
@@ -4755,6 +4733,30 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="LastDisputeMonitorRun" Type="DateTime" Precision="3" />
           <Property Name="LastDisputeMonitorCount" Type="Int32" />
         </EntityType>
+        <EntityType Name="EstimatedLoad">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="ObjectId" Type="Int32" />
+          <Property Name="ObjectType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="BudgetYear" Type="Int32" />
+          <Property Name="January" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="February" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="March" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="April" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="May" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="June" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="July" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="August" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="September" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="October" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="November" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="December" Type="Decimal" Precision="18" Scale="0" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -5188,30 +5190,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="ObjectType" ColumnName="ObjectType" />
                 <ScalarProperty Name="ObjectId" ColumnName="ObjectId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="EstimatedLoads">
-            <EntityTypeMapping TypeName="ACTModel.EstimatedLoad">
-              <MappingFragment StoreEntitySet="EstimatedLoad">
-                <ScalarProperty Name="December" ColumnName="December" />
-                <ScalarProperty Name="November" ColumnName="November" />
-                <ScalarProperty Name="October" ColumnName="October" />
-                <ScalarProperty Name="September" ColumnName="September" />
-                <ScalarProperty Name="August" ColumnName="August" />
-                <ScalarProperty Name="July" ColumnName="July" />
-                <ScalarProperty Name="June" ColumnName="June" />
-                <ScalarProperty Name="May" ColumnName="May" />
-                <ScalarProperty Name="April" ColumnName="April" />
-                <ScalarProperty Name="March" ColumnName="March" />
-                <ScalarProperty Name="February" ColumnName="February" />
-                <ScalarProperty Name="January" ColumnName="January" />
-                <ScalarProperty Name="ObjectType" ColumnName="ObjectType" />
-                <ScalarProperty Name="ObjectId" ColumnName="ObjectId" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -5928,6 +5906,31 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="ActivationEmail" ColumnName="ActivationEmail" />
                 <ScalarProperty Name="AutoLogoff" ColumnName="AutoLogoff" />
                 <ScalarProperty Name="LogoffSeconds" ColumnName="LogoffSeconds" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EstimatedLoads">
+            <EntityTypeMapping TypeName="ACTModel.EstimatedLoad">
+              <MappingFragment StoreEntitySet="EstimatedLoad">
+                <ScalarProperty Name="December" ColumnName="December" />
+                <ScalarProperty Name="November" ColumnName="November" />
+                <ScalarProperty Name="October" ColumnName="October" />
+                <ScalarProperty Name="September" ColumnName="September" />
+                <ScalarProperty Name="August" ColumnName="August" />
+                <ScalarProperty Name="July" ColumnName="July" />
+                <ScalarProperty Name="June" ColumnName="June" />
+                <ScalarProperty Name="May" ColumnName="May" />
+                <ScalarProperty Name="April" ColumnName="April" />
+                <ScalarProperty Name="March" ColumnName="March" />
+                <ScalarProperty Name="February" ColumnName="February" />
+                <ScalarProperty Name="January" ColumnName="January" />
+                <ScalarProperty Name="BudgetYear" ColumnName="BudgetYear" />
+                <ScalarProperty Name="ObjectType" ColumnName="ObjectType" />
+                <ScalarProperty Name="ObjectId" ColumnName="ObjectId" />
                 <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
                 <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />

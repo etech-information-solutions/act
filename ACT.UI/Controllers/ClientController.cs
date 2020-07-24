@@ -13,6 +13,7 @@ using System.Transactions;
 using System.Web.Mvc;
 using System.Web;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace ACT.UI.Controllers
 {
@@ -291,17 +292,11 @@ namespace ACT.UI.Controllers
 
                 Address address = aservice.Get( model.Id, "Client" );
 
-                List<Image> images = iservice.List( model.Id, "Client" );
-
                 List<Document> documents = dservice.List( model.Id, "Client" );
 
                 if ( address != null )
                 {
                     ViewBag.Address = address;
-                }
-                if ( images != null )
-                {
-                    ViewBag.Images = images;
                 }
                 if ( documents != null )
                 {
@@ -321,7 +316,7 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Create )]
         public ActionResult AddClient()
         {
-            ClientViewModel model = new ClientViewModel() { EditMode = true };
+            ClientViewModel model = new ClientViewModel() { EditMode = true, Address = new AddressViewModel(), Files = new List<FileViewModel>(), ClientBudgets = new List<ClientBudget>() };
 
             return View( model );
         }
@@ -331,222 +326,186 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Create )]
         public ActionResult AddClient( ClientViewModel model )
         {
-            try
+            //if ( !ModelState.IsValid )
+            //{
+            //    Notify( "Sorry, the Client was not created. Please correct all errors and try again.", NotificationType.Error );
+
+            //    return View( model );
+            //}
+
+            using ( ClientService service = new ClientService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( DocumentService dservice = new DocumentService() )
+            using ( PSPClientService pcservice = new PSPClientService() )
+            using ( ClientBudgetService bservice = new ClientBudgetService() )
             {
-                if ( !ModelState.IsValid )
+                #region Validation
+
+                if ( !string.IsNullOrEmpty( model.CompanyRegistrationNumber ) && service.ExistByCompanyRegistrationNumber( model.CompanyRegistrationNumber.Trim() ) )
                 {
-                    Notify( "Sorry, the Client was not created. Please correct all errors and try again.", NotificationType.Error );
+                    // Bank already exist!
+                    Notify( $"Sorry, a Client with the Registration number \"{model.CompanyRegistrationNumber}\" already exists!", NotificationType.Error );
 
                     return View( model );
                 }
 
-                //On adding Client, reset the client session variable so that the client list can load fully
-                Session[ "ClientId" ] = null;
+                #endregion
 
-                using ( ClientService service = new ClientService() )
-                using ( PSPClientService pspclientservice = new PSPClientService() )
-                using ( AddressService aservice = new AddressService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                using ( DocumentService dservice = new DocumentService() )
-                using ( ClientKPIService kpiservice = new ClientKPIService() )
-                // using (ClientBudgetService bservice = new ClientBudgetService())
+                #region Create Client
+
+                Client client = new Client()
                 {
-                    #region Validation
+                    Email = model.Email,
+                    TradingAs = model.TradingAs,
+                    VATNumber = model.VATNumber,
+                    AdminEmail = model.AdminEmail,
+                    Status = ( int ) model.Status,
+                    AdminPerson = model.AdminPerson,
+                    CompanyName = model.CompanyName,
+                    Description = model.CompanyName,
+                    ChepReference = model.ChepReference,
+                    ContactPerson = model.ContactPerson,
+                    ContactNumber = model.ContactNumber,
+                    FinPersonEmail = model.FinPersonEmail,
+                    FinancialPerson = model.FinancialPerson,
+                    ServiceRequired = ( int ) ServiceType.ManageOwnPallets,
+                    CompanyRegistrationNumber = model.CompanyRegistrationNumber
+                };
 
-                    if ( !string.IsNullOrEmpty( model.CompanyRegistrationNumber ) && service.ExistByCompanyRegistrationNumber( model.CompanyRegistrationNumber.Trim() ) )
+                client = service.Create( client );
+
+                #endregion
+
+                #region Create Client PSP link
+
+                int pspId = ( model.PSPId > 0 ) ? model.PSPId.Value : CurrentUser.PSPs.FirstOrDefault().Id;
+
+                PSPClient pClient = new PSPClient()
+                {
+                    PSPId = pspId,
+                    ClientId = client.Id,
+                    Status = ( int ) Status.Active
+                };
+
+                pcservice.Create( pClient );
+
+                #endregion
+
+                #region Create Client Budget
+
+                if ( model.ClientBudgets.NullableAny() )
+                {
+                    foreach ( ClientBudget l in model.ClientBudgets )
                     {
-                        // Bank already exist!
-                        Notify( $"Sorry, a Client with the Registration number \"{model.CompanyRegistrationNumber}\" already exists!", NotificationType.Error );
-
-                        return View( model );
-                    }
-
-                    #endregion
-
-                    #region Create Client
-
-                    Client client = new Client()
-                    {
-                        Email = model.Email,
-                        TradingAs = model.TradingAs,
-                        VATNumber = model.VATNumber,
-                        ChepReference = model.ChepReference,
-                        CompanyName = model.CompanyName,
-                        Description = model.CompanyName,
-                        ContactPerson = model.ContactPerson,
-                        ContactNumber = model.ContactNumber,
-                        FinancialPerson = model.FinancialPerson, //regional manager
-                        FinPersonEmail = model.FinPersonEmail,
-                        AdminPerson = model.AdminPerson,
-                        AdminEmail = model.AdminEmail,
-                        Status = ( int ) Status.Active,
-                        ServiceRequired = ( int ) ServiceType.ManageOwnPallets,
-                        CompanyRegistrationNumber = model.CompanyRegistrationNumber
-                    };
-
-                    client = service.Create( client );
-
-                    #endregion
-
-                    #region Create Client PSP link
-
-                    int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-
-                    PSPClient pClient = new PSPClient()
-                    {
-                        PSPId = pspId,
-                        ClientId = client.Id,
-                        Status = ( int ) Status.Active
-                    };
-
-                    pspclientservice.Create( pClient );
-
-                    #endregion
-
-                    #region Create Client Budget
-
-                    //Moved to  seperate API calls to get and set from view
-
-                    #endregion
-
-                    #region Create Address (s)
-
-                    if ( model.Address != null )
-                    {
-                        Address address = new Address()
+                        ClientBudget b = new ClientBudget()
                         {
-                            ObjectId = client.Id,
-                            ObjectType = "Client",
-                            Town = model.Address.Town,
+                            ClientId = client.Id,
+                            BudgetYear = l.BudgetYear,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
                             Status = ( int ) Status.Active,
-                            PostalCode = model.Address.PostCode,
-                            Type = ( int ) model.Address.AddressType,
-                            Addressline1 = model.Address.AddressLine1,
-                            Addressline2 = model.Address.AddressLine2,
-                            Province = ( int ) model.Address.Province,
                         };
 
-                        aservice.Create( address );
+                        bservice.Create( b );
                     }
+                }
 
-                    #endregion
+                #endregion
 
-                    #region Any File Uploads
+                #region Create Address (s)
 
-                    //moved to seperate ajax function
-                    if ( !string.IsNullOrEmpty( model.DocsList ) )
+                if ( model.Address != null )
+                {
+                    Address address = new Address()
                     {
-                        string[] dList = model.DocsList.Split( ',' );
-                        string lastId = "0";
-                        foreach ( string itm in dList )
-                        {
-                            if ( !string.IsNullOrEmpty( itm ) )
-                            {
-                                int itmId = 0;
-                                if ( int.TryParse( itm, out itmId ) )
-                                {
-                                    Document doc = dservice.GetById( itmId );
-                                    if ( doc != null )
-                                    {
-                                        doc.ObjectId = itmId;//should be null for client adds, so we can update it later
-                                        doc.Status = ( int ) Status.Active;
+                        ObjectId = client.Id,
+                        ObjectType = "Client",
+                        Town = model.Address.Town,
+                        Status = ( int ) Status.Active,
+                        PostalCode = model.Address.PostCode,
+                        Type = ( int ) model.Address.AddressType,
+                        Addressline1 = model.Address.AddressLine1,
+                        Addressline2 = model.Address.AddressLine2,
+                        Province = ( int ) model.Address.Province,
+                    };
 
-                                        dservice.Update( doc );
-                                    }
-                                }
-                            }
-                            lastId = itm;
-                        }
-                    }
-                    #endregion
+                    aservice.Create( address );
+                }
 
-                    #region Any Logo Uploads
+                #endregion
 
-                    if ( model.Logo != null && model.Logo.File != null )
+                #region Any File Uploads
+
+                if ( model.Files.NullableAny( f => f.File != null ) )
+                {
+                    foreach ( FileViewModel f in model.Files.Where( f => f.File != null ) )
                     {
                         // Create folder
-                        string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/{client.Id}/Logo/" );
+                        string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/Clients/{client.Id}/" );
 
                         if ( !Directory.Exists( path ) )
                         {
                             Directory.CreateDirectory( path );
                         }
 
+                        f.Name = f.Name ?? "File";
+
                         string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
 
                         Document doc = new Document()
                         {
+                            Name = f.Name,
+                            Category = f.Name,
                             ObjectId = client.Id,
                             ObjectType = "Client",
+                            Title = f.File.FileName,
+                            Size = f.File.ContentLength,
+                            Description = f.Description,
                             Status = ( int ) Status.Active,
-                            Name = model.Logo.Name,
-                            Category = model.Logo.Name,
-                            Title = model.Logo.File.FileName,
-                            Size = model.Logo.File.ContentLength,
-                            Description = model.Logo.Description,
-                            Type = Path.GetExtension( model.Logo.File.FileName ),
-                            Location = $"Client/{client.Id}/Logo/{now}-{model.Logo.File.FileName}"
+                            Type = Path.GetExtension( f.File.FileName ),
+                            Location = $"Clients/{client.Id}/{now}-{f.File.FileName}"
                         };
 
                         dservice.Create( doc );
 
-                        string fullpath = Path.Combine( path, $"{now}-{model.Logo.File.FileName}" );
-                        model.Logo.File.SaveAs( fullpath );
+                        string fullpath = Path.Combine( path, $"{now}-{f.File.FileName}" );
+
+                        f.File.SaveAs( fullpath );
                     }
-
-                    #endregion
-
-                    #region KPI
-
-                    //if (model.KPIDisputes > 0)
-                    //{
-
-                    //    ClientKPI newKPI = new ClientKPI()
-                    //    {
-                    //        ClientId = client.Id,
-                    //        Disputes = model.KPIDisputes,
-                    //        OutstandingPallets = model.KPIOutstanding,
-                    //        Passons = 0, //TODO: Fix
-                    //        MonthlyCost = 0, //TODO: Fix
-                    //        ResolveDays = model.KPIDaysToResolve,
-                    //        OutstandingDays = model.KPIDaysOutstanding,
-                    //        Status = (int)Status.Active
-                    //    };
-                    //    kpiservice.Create(newKPI);
-
-                    //}
-
-                    #endregion
-
-
-                    scope.Complete();
                 }
 
-                Notify( "The Client was successfully created.", NotificationType.Success );
+                #endregion
 
-                return RedirectToAction( "ClientList" );
+                scope.Complete();
             }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
+
+            Notify( "The Client was successfully created.", NotificationType.Success );
+
+            return Clients( new PagingModel(), new CustomSearchModel() );
         }
 
         // GET: Client/EditClient/5
         [Requires( PermissionTo.Edit )]
         public ActionResult EditClient( int id )
         {
-            Client client;
-
             using ( ClientService service = new ClientService() )
             using ( AddressService aservice = new AddressService() )
             using ( DocumentService dservice = new DocumentService() )
             using ( EstimatedLoadService eservice = new EstimatedLoadService() )
             using ( ClientKPIService kpiservice = new ClientKPIService() )
             {
-                client = service.GetById( id );
-
+                Client client = service.GetById( id );
 
                 if ( client == null )
                 {
@@ -554,25 +513,27 @@ namespace ACT.UI.Controllers
 
                     return PartialView( "_AccessDenied" );
                 }
-                //Session["ClientId"] = id;
+
                 Address address = aservice.Get( client.Id, "Client" );
 
-                List<Document> logo = dservice.List( client.Id, "ClientLogo" );
                 List<Document> documents = dservice.List( client.Id, "Client" );
 
-                ClientKPI kpi = kpiservice.GetByColumnWhere( "ClientId", client.Id );
-
-                EstimatedLoad load = new EstimatedLoad();
+                List<EstimatedLoad> loads = new List<EstimatedLoad>();
 
                 bool unverified = ( client.Status == ( int ) PSPClientStatus.Unverified );
 
                 if ( unverified )
                 {
-                    load = eservice.Get( client.Id, "Client" );
+                    loads = eservice.List( client.Id, "Client" );
                 }
+
+                int? pspId = ( client.PSPClients.NullableAny() ) ? client.PSPClients?.FirstOrDefault()?.PSPId : CurrentUser?.PSPs?.FirstOrDefault()?.Id;
+
+                #region Client
 
                 ClientViewModel model = new ClientViewModel()
                 {
+                    PSPId = pspId,
                     Id = client.Id,
                     CompanyName = client.CompanyName,
                     CompanyRegistrationNumber = client.CompanyRegistrationNumber,
@@ -588,9 +549,9 @@ namespace ACT.UI.Controllers
                     AdminPerson = client.AdminPerson,
                     AdminEmail = client.AdminEmail,
                     DeclinedReason = client.DeclinedReason,
-                    //ServiceRequired = client.ServiceRequired,
-                    Status = client.Status,
+                    Status = ( PSPClientStatus ) client.Status,
                     EditMode = true,
+
                     Address = new AddressViewModel()
                     {
                         EditMode = true,
@@ -602,33 +563,83 @@ namespace ACT.UI.Controllers
                         Province = ( address != null ) ? ( Province ) address.Province : Province.All,
                         AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
                     },
-                    KPIDisputes = ( kpi != null ? kpi.Disputes : 0 ),
-                    KPIOutstanding = ( kpi != null ? kpi.OutstandingPallets : 0 ),
-                    KPIDaysToResolve = ( kpi != null ? kpi.ResolveDays : 0 ),
-                    KPIDaysOutstanding = ( kpi != null ? kpi.OutstandingDays : 0 ),
+
+                    ClientBudgets = new List<ClientBudget>(),
+
+                    Files = new List<FileViewModel>(),
                 };
-                if ( logo != null && logo.Count > 0 )
+
+                #endregion
+
+                #region Client Budgets
+
+                if ( unverified && loads.NullableAny() )
                 {
-                    List<FileViewModel> logofvm = new List<FileViewModel>();
-                    foreach ( Document doc in logo )
+                    foreach ( EstimatedLoad l in loads )
                     {
-                        FileViewModel tfvm = new FileViewModel()
+                        model.ClientBudgets.Add( new ClientBudget()
                         {
-                            Id = doc.Id,
-                            Location = doc.Location,
-                            Name = doc.Name,
-                            Description = doc.Description
-
-                        };
-                        logofvm.Add( tfvm );
-                        //model.CompanyFile.Add(fvm);
-
+                            Id = l.Id,
+                            BudgetYear = l.BudgetYear,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
+                        } );
                     }
-                    model.Logo = logofvm.LastOrDefault();
-                    ViewBag.Logo = logo;
                 }
-                //Removed for validation purposes
-                //Documents moved to seperate AJAX calls
+                else if ( client.ClientBudgets.NullableAny() )
+                {
+                    foreach ( ClientBudget l in client.ClientBudgets )
+                    {
+                        model.ClientBudgets.Add( new ClientBudget()
+                        {
+                            Id = l.Id,
+                            BudgetYear = l.BudgetYear,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
+                        } );
+                    }
+                }
+
+                #endregion
+
+                #region Client Files
+
+                if ( documents.NullableAny() )
+                {
+                    foreach ( Document d in documents )
+                    {
+                        model.Files.Add( new FileViewModel()
+                        {
+                            Id = d.Id,
+                            Name = d.Name,
+                            Extension = d.Type,
+                            Size = ( decimal ) d.Size,
+                            Description = d.Description,
+                        } );
+                    }
+                }
+
+                #endregion
 
                 return View( model );
             }
@@ -639,224 +650,251 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Edit )]
         public ActionResult EditClient( ClientViewModel model )
         {
-            try
+            using ( ClientService cservice = new ClientService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( DocumentService dservice = new DocumentService() )
+            using ( PSPClientService pcservice = new PSPClientService() )
+            using ( ClientBudgetService bservice = new ClientBudgetService() )
             {
-                if ( !ModelState.IsValid )
+                //if ( !ModelState.IsValid )
+                //{
+                //    Notify( "Sorry, the selected Client was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                //    return View( model );
+                //}
+
+                Client client = cservice.GetById( model.Id );
+
+                #region Validations
+
+                if ( client == null )
                 {
-                    Notify( "Sorry, the selected Client was not updated. Please correct all errors and try again.", NotificationType.Error );
+                    Notify( "Sorry, that Client does not exist! Please specify a valid Role Id and try again.", NotificationType.Error );
 
                     return View( model );
                 }
 
-                Client client;
-
-                using ( ClientService service = new ClientService() )
-                using ( AddressService aservice = new AddressService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                using ( DocumentService dservice = new DocumentService() )
-                using ( EstimatedLoadService eservice = new EstimatedLoadService() )
-                using ( ClientKPIService kpiservice = new ClientKPIService() )
-                // using (ClientBudgetService bservice = new ClientBudgetService())
+                if ( !string.IsNullOrEmpty( model.CompanyRegistrationNumber ) && model.CompanyRegistrationNumber.Trim().ToLower() != client.CompanyRegistrationNumber.Trim().ToLower() && cservice.ExistByCompanyRegistrationNumber( model.CompanyRegistrationNumber.Trim() ) )
                 {
-                    client = service.GetById( model.Id );
-                    Address address = aservice.Get( client.Id, "Client" );
+                    // Role already exist!
+                    Notify( $"Sorry, a Client with the Registration Number \"{model.CompanyRegistrationNumber} ({model.CompanyRegistrationNumber})\" already exists!", NotificationType.Error );
 
-                    if ( client == null )
+                    return View( model );
+                }
+
+                #endregion
+
+                #region Client
+
+                client.Email = model.Email;
+                client.TradingAs = model.TradingAs;
+                client.VATNumber = model.VATNumber;
+                client.AdminEmail = model.AdminEmail;
+                client.Status = ( int ) model.Status;
+                client.AdminPerson = model.AdminPerson;
+                client.Description = model.Description;
+                client.CompanyName = model.CompanyName;
+                client.ChepReference = model.ChepReference;
+                client.ContactNumber = model.ContactNumber;
+                client.ContactPerson = model.ContactPerson;
+                client.FinPersonEmail = model.FinPersonEmail;
+                client.FinancialPerson = model.FinancialPerson;
+                client.CompanyRegistrationNumber = model.CompanyRegistrationNumber;
+
+                cservice.Update( client );
+
+                #endregion
+
+                #region Create Client PSP link
+
+                int pspId = ( model.PSPId > 0 ) ? model.PSPId.Value : CurrentUser.PSPs.FirstOrDefault().Id;
+
+                if ( client.PSPClients.NullableAny() )
+                {
+                    pcservice.Query( $"DELETE FROM [PSPClient] WHERE ClientId={client.Id}" );
+                }
+
+                PSPClient pClient = new PSPClient()
+                {
+                    PSPId = pspId,
+                    ClientId = client.Id,
+                    Status = ( int ) Status.Active
+                };
+
+                pcservice.Create( pClient );
+
+                #endregion
+
+                #region Client Budgets
+
+                if ( model.ClientBudgets.NullableAny() )
+                {
+                    foreach ( ClientBudget l in model.ClientBudgets )
                     {
-                        Notify( "Sorry, that Client does not exist! Please specify a valid Role Id and try again.", NotificationType.Error );
+                        ClientBudget b = bservice.GetById( l.Id );
 
-                        return View( model );
-                    }
-
-                    // Address address = aservice.Get(client.Id, "Client");
-
-                    List<Document> documents = dservice.List( client.Id, "Client" );
-                    List<Document> logos = dservice.List( client.Id, "ClientLogo" );
-
-                    #region Validations
-
-                    if ( !string.IsNullOrEmpty( model.CompanyRegistrationNumber ) && model.CompanyRegistrationNumber.Trim().ToLower() != client.CompanyRegistrationNumber.Trim().ToLower() && service.ExistByCompanyRegistrationNumber( model.CompanyRegistrationNumber.Trim() ) )
-                    {
-                        // Role already exist!
-                        Notify( $"Sorry, a Client with the Registration Number \"{model.CompanyRegistrationNumber} ({model.CompanyRegistrationNumber})\" already exists!", NotificationType.Error );
-
-                        return View( model );
-                    }
-
-                    #endregion
-
-                    #region Update Client
-
-                    // Update Client
-                    client.Id = model.Id;
-                    client.CompanyName = model.CompanyName;
-                    client.CompanyRegistrationNumber = model.CompanyRegistrationNumber;
-                    client.TradingAs = model.TradingAs;
-                    client.Description = model.Description;
-                    client.VATNumber = model.VATNumber;
-                    client.ChepReference = model.ChepReference;
-                    client.ContactNumber = model.ContactNumber;
-                    client.ContactPerson = model.ContactPerson;
-                    client.FinPersonEmail = model.FinPersonEmail;
-                    client.FinancialPerson = model.FinancialPerson;
-                    client.Email = model.Email;
-                    client.AdminPerson = model.AdminPerson;
-                    client.AdminEmail = model.AdminEmail;
-                    //client.DeclinedReason = model.DeclinedReason;
-                    //client.ServiceRequired = model.ServiceRequired;
-                    client.Status = ( int ) model.Status;
-
-                    service.Update( client );
-
-                    #endregion
-
-
-                    #region Create Address (s)
-
-                    if ( model.Address != null )
-                    {
-                        Address clientAddress = aservice.GetById( model.Address.Id );
-                        //Enum.TryParse(model.Address.Province.ToString().Replace(" ", "").Replace("-", ""), out Province mappedProvinceVal);
-
-                        if ( clientAddress == null )
+                        if ( b == null )
                         {
-
-                            clientAddress = new Address()
+                            b = new ClientBudget()
                             {
-                                ObjectId = model.Id,
-                                ObjectType = "Client",
-                                Town = model.Address.Town,
+                                ClientId = client.Id,
+                                BudgetYear = l.BudgetYear,
+                                January = l.January,
+                                February = l.February,
+                                March = l.March,
+                                April = l.April,
+                                May = l.May,
+                                June = l.June,
+                                July = l.July,
+                                August = l.August,
+                                September = l.September,
+                                October = l.October,
+                                November = l.November,
+                                December = l.December,
                                 Status = ( int ) Status.Active,
-                                PostalCode = model.Address.PostCode,
-                                Type = ( int ) model.Address.AddressType,
-                                Addressline1 = model.Address.AddressLine1,
-                                Addressline2 = model.Address.AddressLine2,
-                                Province = ( int ) model.Address.Province,
-                                //Province = (int)mappedProvinceVal,
                             };
 
-                            aservice.Create( clientAddress );
+                            bservice.Create( b );
                         }
                         else
                         {
-                            clientAddress.Town = model.Address.Town;
-                            clientAddress.PostalCode = model.Address.PostCode;
-                            clientAddress.Type = ( int ) model.Address.AddressType;
-                            clientAddress.Addressline1 = model.Address.AddressLine1;
-                            clientAddress.Addressline2 = model.Address.AddressLine2;
-                            clientAddress.Province = ( int ) model.Address.Province;
-                            //clientAddress.Province = (int)mappedProvinceVal;
+                            b.BudgetYear = l.BudgetYear;
+                            b.January = l.January;
+                            b.February = l.February;
+                            b.March = l.March;
+                            b.April = l.April;
+                            b.May = l.May;
+                            b.June = l.June;
+                            b.July = l.July;
+                            b.August = l.August;
+                            b.September = l.September;
+                            b.October = l.October;
+                            b.November = l.November;
+                            b.December = l.December;
+                            b.Status = ( int ) Status.Active;
 
-                            aservice.Update( clientAddress );
+                            bservice.Update( b );
                         }
                     }
+                }
 
-                    #endregion
+                #endregion
 
-                    #region Any Uploads
-                    //File Uploads moved to AJAX
+                #region Address (s)
 
-                    #endregion
+                if ( model.Address != null )
+                {
+                    Address address = aservice.GetById( model.Address.Id );
 
-                    #region Any Logos
-                    if ( model.Logo.File != null )
+                    if ( address == null )
                     {
-                        //foreach (FileViewModel logo in model.Logo)
-                        //{
-                        if ( model.Logo.Name != null )
+                        address = new Address()
                         {
-                            // Create folder
-                            string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/Client/{model.Id}/Logo/" );
+                            ObjectId = model.Id,
+                            ObjectType = "Client",
+                            Town = model.Address.Town,
+                            Status = ( int ) Status.Active,
+                            PostalCode = model.Address.PostCode,
+                            Type = ( int ) model.Address.AddressType,
+                            Addressline1 = model.Address.AddressLine1,
+                            Addressline2 = model.Address.AddressLine2,
+                            Province = ( int ) model.Address.Province,
+                        };
 
-                            if ( !Directory.Exists( path ) )
-                            {
-                                Directory.CreateDirectory( path );
-                            }
+                        aservice.Create( address );
+                    }
+                    else
+                    {
+                        address.Town = model.Address.Town;
+                        address.PostalCode = model.Address.PostCode;
+                        address.Type = ( int ) model.Address.AddressType;
+                        address.Addressline1 = model.Address.AddressLine1;
+                        address.Addressline2 = model.Address.AddressLine2;
+                        address.Province = ( int ) model.Address.Province;
 
-                            string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+                        aservice.Update( address );
+                    }
+                }
 
-                            Document doc = dservice.GetById( model.Logo.Id );
+                #endregion
+
+                #region Any Uploads
+
+                if ( model.Files.NullableAny( f => f.File != null ) )
+                {
+                    foreach ( FileViewModel f in model.Files.Where( f => f.File != null ) )
+                    {
+                        string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/Clients/{client.Id}/" );
+
+                        if ( !Directory.Exists( path ) )
+                        {
+                            Directory.CreateDirectory( path );
+                        }
+
+                        Document doc;
+
+                        string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+
+                        if ( f.Name?.ToLower() == "logo" )
+                        {
+                            doc = dservice.Get( client.Id, "Client", f.Name );
 
                             if ( doc != null )
                             {
-                                // Disable this file...
-                                doc.Status = ( int ) Status.Inactive;
+                                try
+                                {
+                                    string p = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/{doc.Location}" );
 
-                                dservice.Update( doc );
+                                    if ( System.IO.File.Exists( p ) )
+                                    {
+                                        System.IO.File.Delete( p );
+                                    }
+                                }
+                                catch ( Exception ex )
+                                {
+
+                                }
+
+                                dservice.Delete( doc );
                             }
-
-                            doc = new Document()
-                            {
-                                ObjectId = model.Id,
-                                ObjectType = "ClientLogo",
-                                Status = ( int ) Status.Active,
-                                Name = model.Logo.Name,
-                                Category = model.Logo.Name,
-                                Title = model.Logo.File.FileName,
-                                Size = model.Logo.File.ContentLength,
-                                Description = "Logo",
-                                Type = Path.GetExtension( model.Logo.File.FileName ),
-                                Location = $"Client/{model.Id}/Logo/{now}-{model.Logo.File.FileName}"
-
-                            };
-
-                            dservice.Create( doc );
-
-                            string fullpath = Path.Combine( path, $"{now}-{model.Logo.File.FileName}" );
-                            model.Logo.File.SaveAs( fullpath );
                         }
-                        //}
+
+                        f.Name = f.Name ?? "File";
+
+                        doc = new Document()
+                        {
+                            Name = f.Name,
+                            Category = f.Name,
+                            ObjectId = client.Id,
+                            ObjectType = "Client",
+                            Title = f.File.FileName,
+                            Size = f.File.ContentLength,
+                            Description = f.Description,
+                            Status = ( int ) Status.Active,
+                            Type = Path.GetExtension( f.File.FileName ),
+                            Location = $"Clients/{client.Id}/{now}-{f.File.FileName}"
+                        };
+
+                        dservice.Create( doc );
+
+                        string fullpath = Path.Combine( path, $"{now}-{f.File.FileName}" );
+
+                        f.File.SaveAs( fullpath );
                     }
-
-                    #endregion
-
-                    #region ClientKPIS
-                    //if (model.KPIDisputes > 0)
-                    //{
-                    //    ClientKPI kpi = kpiservice.GetByColumnWhere("ClientId", model.Id);
-                    //    if (kpi != null)
-                    //    {
-                    //        //foreach (ClientKPI k in kpi) {                            
-                    //            kpi.OutstandingPallets = model.KPIOutstanding;
-                    //            kpi.Disputes = model.KPIDisputes;
-                    //            kpi.OutstandingDays = model.KPIDaysOutstanding;
-                    //            kpi.ResolveDays = model.KPIDaysToResolve;
-
-                    //            kpiservice.Update(kpi);
-                    //        //}
-                    //    }
-                    //    else
-                    //    {
-                    //        ClientKPI newKPI = new ClientKPI()
-                    //        {
-                    //            ClientId = client.Id,
-                    //            Disputes = model.KPIDisputes,
-                    //            OutstandingPallets = model.KPIOutstanding,
-                    //            Passons = 0, //TODO: Fix
-                    //            MonthlyCost = 0, //TODO: Fix
-                    //            Status = (int)Status.Active
-                    //        };
-                    //        kpiservice.Create(newKPI);
-                    //    }
-                    //}
-
-                    #endregion
-
-                    scope.Complete();
                 }
 
-                Notify( "The selected Client details were successfully updated.", NotificationType.Success );
+                #endregion
 
-                return RedirectToAction( "ClientList" );
+                scope.Complete();
             }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
+
+            Notify( "The selected Client details were successfully updated.", NotificationType.Success );
+
+            return Clients( new PagingModel(), new CustomSearchModel() );
         }
 
-        // POST: Client/DeleteClient/5
+        // POST: /Client/DeleteClient/5
         [HttpPost]
         [Requires( PermissionTo.Delete )]
         public ActionResult DeleteClient( ClientViewModel model )
@@ -894,6 +932,234 @@ namespace ACT.UI.Controllers
                 ViewBag.Message = ex.Message;
                 return View();
             }
+        }
+
+        //
+        // GET: /Client/ApproveDeclineClient/5
+        public ActionResult ApproveDeclineClient( int id )
+        {
+            using ( ClientService service = new ClientService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( DocumentService dservice = new DocumentService() )
+            using ( EstimatedLoadService eservice = new EstimatedLoadService() )
+            using ( ClientKPIService kpiservice = new ClientKPIService() )
+            {
+                Client client = service.GetById( id );
+
+                if ( client == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                Address address = aservice.Get( client.Id, "Client" );
+
+                List<Document> documents = dservice.List( client.Id, "Client" );
+
+                List<EstimatedLoad> loads = new List<EstimatedLoad>();
+
+                bool unverified = ( client.Status == ( int ) PSPClientStatus.Unverified );
+
+                if ( unverified )
+                {
+                    loads = eservice.List( client.Id, "Client" );
+                }
+
+                PSP psp = ( client.PSPClients.NullableAny() ) ? client.PSPClients?.FirstOrDefault()?.PSP : null;
+                int? pspId = ( client.PSPClients.NullableAny() ) ? client.PSPClients?.FirstOrDefault()?.PSPId : CurrentUser?.PSPs?.FirstOrDefault()?.Id;
+
+                #region Client
+
+                ClientViewModel model = new ClientViewModel()
+                {
+                    PSP = psp,
+                    PSPId = pspId,
+                    Id = client.Id,
+                    CompanyName = client.CompanyName,
+                    CompanyRegistrationNumber = client.CompanyRegistrationNumber,
+                    TradingAs = client.TradingAs,
+                    Description = client.Description,
+                    VATNumber = client.VATNumber,
+                    ChepReference = client.ChepReference,
+                    ContactNumber = client.ContactNumber,
+                    ContactPerson = client.ContactPerson,
+                    FinancialPerson = client.FinancialPerson,
+                    FinPersonEmail = client.FinPersonEmail,
+                    Email = client.Email,
+                    AdminPerson = client.AdminPerson,
+                    AdminEmail = client.AdminEmail,
+                    DeclinedReason = client.DeclinedReason,
+                    Status = ( PSPClientStatus ) client.Status,
+                    EditMode = true,
+
+                    Address = new AddressViewModel()
+                    {
+                        EditMode = true,
+                        Town = address?.Town,
+                        Id = address?.Id ?? 0,
+                        PostCode = address?.PostalCode,
+                        AddressLine1 = address?.Addressline1,
+                        AddressLine2 = address?.Addressline2,
+                        Province = ( address != null ) ? ( Province ) address.Province : Province.All,
+                        AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
+                    },
+
+                    ClientBudgets = new List<ClientBudget>(),
+
+                    Files = new List<FileViewModel>(),
+                };
+
+                #endregion
+
+                #region Client Budgets
+
+                if ( unverified && loads.NullableAny() )
+                {
+                    foreach ( EstimatedLoad l in loads )
+                    {
+                        model.ClientBudgets.Add( new ClientBudget()
+                        {
+                            Id = l.Id,
+                            BudgetYear = l.BudgetYear,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
+                        } );
+                    }
+                }
+                else if ( client.ClientBudgets.NullableAny() )
+                {
+                    foreach ( ClientBudget l in client.ClientBudgets )
+                    {
+                        model.ClientBudgets.Add( new ClientBudget()
+                        {
+                            Id = l.Id,
+                            BudgetYear = l.BudgetYear,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
+                        } );
+                    }
+                }
+
+                #endregion
+
+                #region Client Files
+
+                if ( documents.NullableAny() )
+                {
+                    foreach ( Document d in documents )
+                    {
+                        model.Files.Add( new FileViewModel()
+                        {
+                            Id = d.Id,
+                            Name = d.Name,
+                            Extension = d.Type,
+                            Size = ( decimal ) d.Size,
+                            Description = d.Description,
+                        } );
+                    }
+                }
+
+                #endregion
+
+                return PartialView( "_ApproveDeclineClient", model );
+            }
+        }
+
+        //
+        // POST: /Client/ApproveDeclineClient/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult ApproveDeclineClient( ClientViewModel model )
+        {
+            using ( ClientService cservice = new ClientService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( PSPClientService pcservice = new PSPClientService() )
+            using ( ClientBudgetService bservice = new ClientBudgetService() )
+            {
+                Client client = cservice.GetById( model.Id );
+
+                #region Validations
+
+                if ( client == null )
+                {
+                    Notify( "Sorry, that Client does not exist! Please specify a valid Role Id and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                #endregion
+
+                #region Client
+
+                client.Status = ( int ) model.Status;
+
+                if ( !string.IsNullOrEmpty( model.DeclineReason ) )
+                {
+                    client.DeclinedReason = model.DeclineReason;
+                }
+
+                cservice.Update( client );
+
+                #endregion
+
+                #region Client Budgets
+
+                if ( model.ClientBudgets.NullableAny() )
+                {
+                    foreach ( ClientBudget l in model.ClientBudgets )
+                    {
+                        ClientBudget b = new ClientBudget()
+                        {
+                            ClientId = client.Id,
+                            BudgetYear = l.BudgetYear,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
+                            Status = ( int ) Status.Active,
+                        };
+
+                        bservice.Create( b );
+                    }
+                }
+
+                #endregion
+
+                Notify( $"The selected Client ({client.CompanyName}) was successfully approved.", NotificationType.Success );
+
+                scope.Complete();
+            }
+
+            return Clients( new PagingModel(), new CustomSearchModel() );
         }
 
         //
@@ -968,10 +1234,96 @@ namespace ACT.UI.Controllers
                     return PartialView( "_Notification" );
                 }
 
+                return PartialView( "_ClientBudgetsView", model );
+            }
+        }
+
+        //
+        // POST: /Client/DeleteClientBudget/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteClientBudget( int id )
+        {
+            using ( ClientBudgetService bservice = new ClientBudgetService() )
+            {
+                ClientBudget b = bservice.GetById( id );
+
+                if ( b == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                int clientId = b.ClientId;
+
+                bservice.Delete( b );
+
+                Notify( "The selected Budget was successfully Deleted.", NotificationType.Success );
+
+                List<ClientBudget> model = bservice.ListByColumnWhere( "ClientId", clientId );
+
                 return PartialView( "_ClientBudgets", model );
             }
         }
 
+        //
+        // POST: /Client/DeleteClientFile/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteClientDocument( int id )
+        {
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                Document doc = dservice.GetById( id );
+
+                if ( doc == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                int clientId = doc.ObjectId ?? 0;
+
+                try
+                {
+                    string p = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/{doc.Location}" );
+
+                    if ( System.IO.File.Exists( p ) )
+                    {
+                        System.IO.File.Delete( p );
+                    }
+                }
+                catch ( Exception ex )
+                {
+
+                }
+
+                dservice.Delete( doc );
+
+                List<FileViewModel> model = new List<FileViewModel>();
+
+                List<Document> documents = dservice.List( clientId, "Client" );
+
+                if ( documents.NullableAny() )
+                {
+                    foreach ( Document d in documents )
+                    {
+                        model.Add( new FileViewModel()
+                        {
+                            Id = d.Id,
+                            Name = d.Name,
+                            Extension = d.Type,
+                            Size = ( decimal ) d.Size,
+                            Description = d.Description,
+                        } );
+                    }
+                }
+
+                return PartialView( "_ClientDocuments", model );
+            }
+        }
 
         #endregion
 
@@ -4013,7 +4365,6 @@ namespace ACT.UI.Controllers
                 return PartialView( "_Clients", paging );
             }
         }
-
 
         #endregion
     }

@@ -1481,6 +1481,7 @@ namespace ACT.UI.Controllers
                     PSPBudget = new EstimatedLoadViewModel()
                     {
                         Id = ( unverified ) ? 0 : psp.PSPBudgets?.FirstOrDefault()?.Id ?? 0,
+                        BudgetYear = ( unverified ) ? 0 : psp.PSPBudgets?.FirstOrDefault()?.BudgetYear ?? 0,
                         January = ( unverified ) ? load.January : psp.PSPBudgets?.FirstOrDefault()?.January,
                         February = ( unverified ) ? load.February : psp.PSPBudgets?.FirstOrDefault()?.February,
                         March = ( unverified ) ? load.March : psp.PSPBudgets?.FirstOrDefault()?.March,
@@ -1582,6 +1583,11 @@ namespace ACT.UI.Controllers
                 #region Update PSP
 
                 psp.Status = ( int ) model.Status;
+
+                if ( !string.IsNullOrEmpty( model.DeclineReason ) )
+                {
+                    psp.DeclinedReason = model.DeclineReason;
+                }
 
                 psp = pservice.Update( psp );
 
@@ -1999,7 +2005,7 @@ namespace ACT.UI.Controllers
                 return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
-        
+
         #endregion
 
 

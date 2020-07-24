@@ -128,9 +128,11 @@
         var imgurl = "@absoluteUrlBase/";
         var siteurl = "@Url.Content( String.Format( "~/{0}/", controller ) )";
 
-            var lgt = "@( ( Request.IsAuthenticated ) ? alo : "-1")";
-            var atr = "@( ( Request.IsAuthenticated ) ? atr : "-1")";
-            var cas = "@( ( Request.IsAuthenticated ) ? VariableExtension.SystemRules.LogoffSeconds : 0)";
+        var lgt = "@( ( Request.IsAuthenticated ) ? alo : "-1")";
+        var atr = "@( ( Request.IsAuthenticated ) ? atr : "-1")";
+        var cas = "@( ( Request.IsAuthenticated ) ? VariableExtension.SystemRules.LogoffSeconds : 0)";
+
+        var authenticated = @Request.IsAuthenticated.ToString().ToLower();
     </script>
 
     @Scripts.Render( "~/bundles/jqueryval" )

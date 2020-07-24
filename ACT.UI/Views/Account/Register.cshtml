@@ -32,7 +32,7 @@
             @Html.AntiForgeryToken()
             @Html.ValidationSummary( true )
 
-            <div class="left" style="width: 48%; margin-right: 4%;">
+            <div class="left" style="width: 32%; margin-right: 2%;">
 
                 <div class="editor-label uppercase">
                     @Html.LabelFor( model => model.CompanyName )
@@ -100,7 +100,7 @@
 
             </div>
 
-            <div class="left" style="width: 48%;">
+            <div class="left" style="width: 32%; margin-right: 2%;">
 
                 <div class="editor-label uppercase">
                     @Html.LabelFor( model => model.CompanyRegistrationNumber )
@@ -112,26 +112,21 @@
                 </div>
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.RegistrationFile )
-                </div>
-
-                <div class="editor-field" style="margin-bottom: 10px;">
-
-                    <input id="RegistrationFile.File" name="RegistrationFile.File" type="file" value="" required="required" data-val-file="1" class="input" />
-                    <input id="RegistrationFile.Name" name="RegistrationFile.Name" type="hidden" value="Company Registration File" />
-                    <input id="RegistrationFile.Description" name="RegistrationFile.Description" class="input" type="hidden" value="Company Registration File" />
-
-                    @Html.ValidationMessageFor( model => model.RegistrationFile )
-
-                </div>
-
-                <div class="editor-label uppercase">
                     @Html.LabelFor( model => model.VATNumber )
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.VATNumber, new { @class = "input", @placeholder = "Enter your VAT Number" } )
+                    @Html.TextBoxFor( model => model.VATNumber, new { @class = "input", @data_input_show = "1", @data_target = "#vat-file-upload", @placeholder = "Enter your VAT Number" } )
                     @Html.ValidationMessageFor( model => model.VATNumber )
+                </div>
+
+                <div class="editor-label uppercase">
+                    @Html.LabelFor( model => model.BEELevel )
+                </div>
+
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.BEELevel, new { @class = "input", @data_input_show = "1", @data_target = "#bee-file-upload", @placeholder = "Enter your VAT Number" } )
+                    @Html.ValidationMessageFor( model => model.BEELevel )
                 </div>
 
                 <div class="editor-label uppercase">
@@ -172,6 +167,74 @@
 
             </div>
 
+            <div class="left" style="width: 32%;">
+
+                <div class="editor-label uppercase">
+                    @Html.LabelFor( model => model.RegistrationFile )
+                </div>
+
+                <div class="editor-field" style="margin-bottom: 10px;">
+
+                    <input id="RegistrationFile.File" name="RegistrationFile.File" type="file" value="" required="required" data-val-file="1" class="input" />
+                    <input id="RegistrationFile.Name" name="RegistrationFile.Name" type="hidden" value="CompanyRegistrationFile" />
+                    <input id="RegistrationFile.Description" name="RegistrationFile.Description" class="input" type="hidden" value="Company Registration File" />
+
+                    @Html.ValidationMessageFor( model => model.RegistrationFile )
+
+                </div>
+
+                <div class="editor-label uppercase">
+                    @Html.LabelFor( model => model.SignedPSPContractFile )
+                </div>
+
+                <div class="editor-field" style="margin-bottom: 10px;">
+
+                    <input id="SignedPSPContractFile.File" name="SignedPSPContractFile.File" type="file" value="" required="required" data-val-file="1" class="input" />
+                    <input id="SignedPSPContractFile.Name" name="SignedPSPContractFile.Name" type="hidden" value="SignedPSPContractFile" />
+                    <input id="SignedPSPContractFile.Description" name="SignedPSPContractFile.Description" class="input" type="hidden" value="Signed PSP Contract File" />
+
+                    @Html.ValidationMessageFor( model => model.SignedPSPContractFile )
+
+                </div>
+
+                <div id="vat-file-upload" class="none">
+
+                    <div class="editor-label uppercase">
+                        @Html.LabelFor( model => model.VATRegistrationFile )
+                    </div>
+
+                    <div class="editor-field" style="margin-bottom: 10px;">
+
+                        <input id="VATRegistrationFile.File" name="VATRegistrationFile.File" type="file" value="" data-val-file="1" class="input" />
+                        <input id="VATRegistrationFile.Name" name="VATRegistrationFile.Name" type="hidden" value="VATRegistration File" />
+                        <input id="VATRegistrationFile.Description" name="VATRegistrationFile.Description" class="input" type="hidden" value="VAT Registration File" />
+
+                        @Html.ValidationMessageFor( model => model.VATRegistrationFile )
+
+                    </div>
+
+                </div>
+
+                <div id="bee-file-upload" class="none">
+
+                    <div class="editor-label uppercase">
+                        @Html.LabelFor( model => model.BEERegistrationFile )
+                    </div>
+
+                    <div class="editor-field" style="margin-bottom: 10px;">
+
+                        <input id="BEERegistrationFile.File" name="BEERegistrationFile.File" type="file" value="" data-val-file="1" class="input" />
+                        <input id="BEERegistrationFile.Name" name="BEERegistrationFile.Name" type="hidden" value="BEE Registration File" />
+                        <input id="BEERegistrationFile.Description" name="BEERegistrationFile.Description" class="input" type="hidden" value="BEE Registration File" />
+
+                        @Html.ValidationMessageFor( model => model.BEERegistrationFile )
+
+                    </div>
+
+                </div>
+
+            </div>
+
             <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
 
             <div class="editor-label" style="margin-bottom: 10px;">
@@ -184,6 +247,7 @@
 
                     <thead>
                         <tr>
+                            <th>Total</th>
                             <th>Jan</th>
                             <th>Feb</th>
                             <th>Mar</th>
@@ -202,40 +266,43 @@
                     <tbody>
                         <tr>
                             <td>
-                                <input id="EstimatedLoad.January" name="EstimatedLoad.January" type="number" value="" placeholder="E.g 10" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad-Total" type="number" value="" placeholder="E.g @DateTime.Now.Year" data-budget-total="1" data-spread-to=".el-input" style="padding: 0 5px;width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.February" name="EstimatedLoad.February" type="number" value="" placeholder="E.g 20" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.January" name="EstimatedLoad.January" class="el-input" type="number" value="" placeholder="E.g 10" style="padding: 0 5px;width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.March" name="EstimatedLoad.March" type="number" value="" placeholder="E.g 30" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.February" name="EstimatedLoad.February" class="el-input" type="number" value="" placeholder="E.g 20" style="padding: 0 5px;width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.April" name="EstimatedLoad.April" type="number" value="" placeholder="E.g 40" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.March" name="EstimatedLoad.March" class="el-input" type="number" value="" placeholder="E.g 30" style="padding: 0 5px;width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.May" name="EstimatedLoad.May" type="number" value="" placeholder="E.g 50" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.April" name="EstimatedLoad.April" class="el-input" type="number" value="" placeholder="E.g 40" style="padding: 0 5px;width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.June" name="EstimatedLoad.June" type="number" value="" placeholder="E.g 60" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.May" name="EstimatedLoad.May" class="el-input" type="number" value="" placeholder="E.g 50" style="padding: 0 5px;width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.July" name="EstimatedLoad.July" type="number" value="" placeholder="E.g 70" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.June" name="EstimatedLoad.June" class="el-input" type="number" value="" placeholder="E.g 60" style="padding: 0 5px;width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.August" name="EstimatedLoad.August" type="number" value="" placeholder="E.g 80" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.July" name="EstimatedLoad.July" class="el-input" type="number" value="" placeholder="E.g 70" style="padding: 0 5px;width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.September" name="EstimatedLoad.September" type="number" value="" placeholder="E.g 45" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.August" name="EstimatedLoad.August" class="el-input" type="number" value="" placeholder="E.g 80" style="padding: 0 5px;width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.October" name="EstimatedLoad.October" type="number" value="" placeholder="E.g 15" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.September" name="EstimatedLoad.September" class="el-input" type="number" value="" placeholder="E.g 45" style="padding: 0 5px;width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.November" name="EstimatedLoad.November" type="number" value="" placeholder="E.g 25" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.October" name="EstimatedLoad.October" class="el-input" type="number" value="" placeholder="E.g 15" style="padding: 0 5px;width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.December" name="EstimatedLoad.December" type="number" value="" placeholder="E.g 35" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.November" name="EstimatedLoad.November" class="el-input" type="number" value="" placeholder="E.g 25" style="padding: 0 5px;width: 87%;" />
+                            </td>
+                            <td>
+                                <input id="EstimatedLoad.December" name="EstimatedLoad.December" class="el-input" type="number" value="" placeholder="E.g 35" style="padding: 0 5px;width: 87%;" />
                             </td>
                         </tr>
                     </tbody>

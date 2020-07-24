@@ -628,6 +628,9 @@
     <Content Include="Views\Client\_ClientInvoices.cshtml" />
     <Content Include="Views\Client\_ClientProducts.cshtml" />
     <Content Include="Views\Client\_ClientUsers.cshtml" />
+    <Content Include="Views\Client\_ClientDocuments.cshtml" />
+    <Content Include="Views\Client\_ApproveDeclineClient.cshtml" />
+    <Content Include="Views\Client\_ClientBudgetsView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

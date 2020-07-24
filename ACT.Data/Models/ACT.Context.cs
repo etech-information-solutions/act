@@ -47,7 +47,6 @@ namespace ACT.Data.Models
         public virtual DbSet<DeclineReason> DeclineReasons { get; set; }
         public virtual DbSet<DeliveryNote> DeliveryNotes { get; set; }
         public virtual DbSet<Document> Documents { get; set; }
-        public virtual DbSet<EstimatedLoad> EstimatedLoads { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<Image> Images { get; set; }
         public virtual DbSet<Invoice> Invoices { get; set; }
@@ -85,5 +84,6 @@ namespace ACT.Data.Models
         public virtual DbSet<PSPConfig> PSPConfigs { get; set; }
         public virtual DbSet<Dispute> Disputes { get; set; }
         public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
+        public virtual DbSet<EstimatedLoad> EstimatedLoads { get; set; }
     }
 }

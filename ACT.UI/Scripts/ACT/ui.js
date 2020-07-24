@@ -62,6 +62,7 @@
             this.DataAjaxForm( $( '*[data-ajax-form="1"]' ) );
             this.DataShowHide( $( '*[data-show-hide="1"]' ) );
             this.DataStickyOne( $( '*[data-sticky-one="1"]' ) );
+            this.DataDeleteFile( $( '*[data-delete-file="1"]' ) );
             this.DataAddOneMore( $( '*[data-add-one-more="1"]' ) );
             this.DataDelOneMore( $( '*[data-del-one-more="1"]' ) );
             this.DataDeleteImage( $( '*[data-delete-image="1"]' ) );
@@ -321,6 +322,8 @@
 
         DataStayAlive: function ()
         {
+            if ( !authenticated ) return false;
+
             clearTimeout( ACT.UI.PageStayAliveTimer );
 
             ACT.UI.PageStayAliveTimer = setTimeout( function ()
@@ -1186,6 +1189,34 @@
             } );
         },
 
+        DataDeleteFile: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        ACT.Loader.Show( i, true );
+
+                        target.load( i.attr( "href" ), { id: id }, function ()
+                        {
+                            ACT.Loader.Hide();
+                            ACT.Init.PluginInit( target );
+                        } );
+
+                        $( ".tipsy" ).remove();
+
+                        return false;
+                    } );
+            } );
+        },
+
         DataUploadImage: function ( sender )
         {
             var img = $( ".image-preview:visible" );
@@ -1340,6 +1371,14 @@
 
                         // Append clone to the defined target like so:
                         clone.appendTo( target );
+                    }
+
+                    if ( $( i.attr( "data-increment-val" ) ).length > 0 )
+                    {
+                        $( i.attr( "data-increment-val" ) ).each( function ( indx )
+                        {
+                            ACT.UI.DataIndex( $( this ).find( "input,textarea,select" ), indx );
+                        } );
                     }
 
                     // Restart JT JS DOM
@@ -3640,15 +3679,15 @@
                     {
                         if ( v === "1" || v === "2" )
                         {
-                            t.show( 900 );
-
-                            tncLink.attr( "href", cTnC );
-                        }
-                        else
-                        {
                             t.hide( 900 );
 
                             tncLink.attr( "href", pTnC );
+                        }
+                        else if ( v === "4" )
+                        {
+                            t.show( 900 );
+
+                            tncLink.attr( "href", cTnC );
                         }
                     } );
             } );

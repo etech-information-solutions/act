@@ -13,6 +13,8 @@ namespace ACT.UI.Models
 
         public string ObjectType { get; set; }
 
+        public int BudgetYear { get; set; }
+
         public Nullable<decimal> January { get; set; }
 
         public Nullable<decimal> February { get; set; }

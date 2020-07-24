@@ -1,0 +1,391 @@
+﻿@model ClientViewModel
+
+@using ACT.UI.Models;
+@using ACT.Core.Enums;
+@using ACT.Data.Models; 
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "ApproveDeclineClient", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clients", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    string logoUrl = ( Model.Files.NullableAny( d => d.Name.ToLower() == "logo" ) ) ? $"/Client/ViewDocument/{Model.Files.FirstOrDefault( d => d.Name.ToLower() == "logo" ).Id}" : Url.Content( "~/Images/no-preview.png" );
+
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto; margin-top: 10px;">
+            <img alt="" src="@Url.Content( "~/images/thumbs-up.png" )" style="margin-bottom: 2px; margin-right: 5px;" />
+
+            <span>Approve / Decline PSP</span>
+
+            <img alt="" src="@Url.Content( "~/images/thumbs-down.png" )" style="margin-bottom: 2px; margin-left: 5px;" />
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        @Html.HiddenFor( model => model.Id )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="left" style="width: 30%; margin-right: 4%;">
+
+                <div class="display-field" style="text-align: center;">
+
+                    <img style="margin-bottom: 10px; display: inline-block; width: 50%; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
+
+                    <strong class="block uppercase">@Html.DisplayFor( model => model.CompanyName )</strong>
+                </div>
+
+                <div class="display-label">
+                    Trading As
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.TradingAs )
+                </div>
+
+                <div class="display-label">
+                    Company Registration Number
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.CompanyRegistrationNumber )
+                </div>
+
+                <div class="display-label">
+                    VAT Number
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.VATNumber )
+                </div>
+
+                <div class="display-label">
+                    Chep Reference
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.ChepReference )
+                </div>
+
+                <div class="display-label">
+                    Status
+                </div>
+                <div class="display-field">
+                    @( ( ( PSPClientStatus ) Model.Status ).GetDisplayText() )
+                </div>
+
+                <div class="display-label">
+                    PSP
+                </div>
+                <div class="display-field">
+                    @( Model.PSP?.CompanyName )
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 30%; margin-right: 4%;">
+
+                <p>
+                    <strong class="uppercase">Contact Details</strong>
+                </p>
+
+                <div class="display-label">
+                    Contact Person
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.ContactPerson )
+                </div>
+
+                <div class="display-label">
+                    Contact Number
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.ContactNumber )
+                </div>
+
+                <div class="display-label">
+                    Contact Email
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.Email )
+                </div>
+
+                <div class="display-label">
+                    Administrator
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.AdminPerson )
+                </div>
+
+                <div class="display-label">
+                    Administrator Email
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.AdminEmail )
+                </div>
+
+                <div class="display-label">
+                    Financial Person
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.FinancialPerson )
+                </div>
+
+                <div class="display-label">
+                    Financial Email
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.FinPersonEmail )
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 30%;">
+
+                <div class="display-label">
+                    Uploaded Documents
+                </div>
+
+                @if ( Model.Files.NullableAny( d => d.Name?.ToLower() != "logo" ) )
+                {
+                    <div id="client-documents">
+
+                        @Html.Partial( "_ClientDocuments", Model.Files )
+
+                    </div>
+                }
+
+                <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+                @if ( Model.Address != null )
+                {
+                    <div class="grouped-area">
+
+                        <p>
+                            <strong class="uppercase">Addres Details</strong>
+                        </p>
+
+                        <div class="display-label">
+                            Addres
+                        </div>
+                        <div class="display-field">
+                            @Model.Address.AddressLine1
+                        </div>
+                        <div class="display-field">
+                            @Model.Address.AddressLine2
+                        </div>
+
+                        <div class="display-label">
+                            Town/City
+                        </div>
+                        <div class="display-field">
+                            @Model.Address.Town
+                        </div>
+
+                        <div class="display-label">
+                            Postal Code
+                        </div>
+                        <div class="display-field">
+                            @Model.Address.PostCode
+                        </div>
+
+                        <div class="display-label">
+                            Province
+                        </div>
+                        <div class="display-field">
+                            @(( ( Province ) Model.Address.Province ).GetDisplayText())
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="message-warn">
+                        No address details found.
+                    </div>
+                }
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+            <div class="display-label" style="margin-bottom: 10px;">
+
+                <p>
+                    <strong class="uppercase">Budgets (@Model.ClientBudgets.NullableCount())</strong>
+                </p>
+
+            </div>
+
+            <table id="client-budget-table" class="da-table" style="border-bottom: 0;">
+
+                <thead>
+                    <tr>
+                        <td>#</td>
+                        <th><b>Year</b></th>
+                        <th>Jan</th>
+                        <th>Feb</th>
+                        <th>Mar</th>
+                        <th>Apr</th>
+                        <th>May</th>
+                        <th>Jun</th>
+                        <th>Jul</th>
+                        <th>Aug</th>
+                        <th>Sep</th>
+                        <th>Oct</th>
+                        <th>Nov</th>
+                        <th>Dec</th>
+                        <th><b>Total</b></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if ( Model.ClientBudgets.NullableAny() )
+                    {
+                        int count = 0;
+
+                        foreach ( ClientBudget b in Model.ClientBudgets )
+                        {
+                            decimal? total = b.January + b.February + b.March + b.April + b.May + b.June + b.July + b.August + b.September + b.October + b.November + b.December;
+
+                            <tr>
+                                <td width="1%">
+                                    @(count + 1)
+                                </td>
+                                <td>
+                                    <b>@b.BudgetYear</b>
+                                    <input name="ClientBudgets[@count].BudgetYear" type="hidden" value="@b.BudgetYear">
+                                </td>
+                                <td>
+                                    @b.January
+                                    <input name="ClientBudgets[@count].January" type="hidden" value="@b.January">
+                                </td>
+                                <td>
+                                    @b.February
+                                    <input name="ClientBudgets[@count].February" type="hidden" value="@b.February">
+                                </td>
+                                <td>
+                                    @b.March
+                                    <input name="ClientBudgets[@count].March" type="hidden" value="@b.March">
+                                </td>
+                                <td>
+                                    @b.April
+                                    <input name="ClientBudgets[@count].April" type="hidden" value="@b.April">
+                                </td>
+                                <td>
+                                    @b.May
+                                    <input name="ClientBudgets[@count].May" type="hidden" value="@b.May">
+                                </td>
+                                <td>
+                                    @b.June
+                                    <input name="ClientBudgets[@count].June" type="hidden" value="@b.June">
+                                </td>
+                                <td>
+                                    @b.July
+                                    <input name="ClientBudgets[@count].July" type="hidden" value="@b.July">
+                                </td>
+                                <td>
+                                    @b.August
+                                    <input name="ClientBudgets[@count].August" type="hidden" value="@b.August">
+                                </td>
+                                <td>
+                                    @b.September
+                                    <input name="ClientBudgets[@count].September" type="hidden" value="@b.September">
+                                </td>
+                                <td>
+                                    @b.October
+                                    <input name="ClientBudgets[@count].October" type="hidden" value="@b.October">
+                                </td>
+                                <td>
+                                    @b.November
+                                    <input name="ClientBudgets[@count].November" type="hidden" value="@b.November">
+                                </td>
+                                <td>
+                                    @b.December
+                                    <input name="ClientBudgets[@count].December" type="hidden" value="@b.December">
+                                </td>
+                                <td>
+                                    <b>@Math.Round( total ?? 0, 2 )</b>
+                                </td>
+                            </tr>
+
+                            count++;
+                        }
+                    }
+                </tbody>
+
+            </table>
+
+            <div class="grouped-area">
+
+                <div class="left" style="width: 48%; margin-right: 4%;">
+
+                    <div class="editor-label">
+                        @Html.LabelFor( model => model.Status )
+                    </div>
+                    <div class="editor-field">
+
+                        <select id="ApproveDeclinePSPClientStatus" name="Status" data-approve-decline-psp="1" data-active-target="#nothing-to-show" data-rejected-target="#decline-reason-details" class="chzn" style="width: 100%;">
+                            <option value="">-- Select</option>
+
+                            @foreach ( int item in Enum.GetValues( typeof( PSPClientStatus ) ) )
+                            {
+                                PSPClientStatus status = ( PSPClientStatus ) item;
+
+                                if ( status != PSPClientStatus.Rejected && status != PSPClientStatus.Verified )
+                                {
+                                    continue;
+                                }
+
+                                <option value="@item">@status.GetDisplayText()</option>
+                            }
+                        </select>
+
+                        @Html.ValidationMessageFor( model => model.Status )
+                    </div>
+
+                </div>
+
+                <div class="left" style="width: 48%;">
+
+                    <div id="decline-reason-details" class="none">
+
+                        <div class="editor-label">
+                            @Html.LabelFor( model => model.DeclineReason )
+                        </div>
+
+                        <div class="editor-field">
+
+                            <select id="DeclineReason" name="DeclineReason" class="chzn" style="width: 100%;">
+                                <option value="">-- Select</option>
+
+                                @foreach ( string item in Model.DeclineReasonOptions )
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            </select>
+
+                            @Html.ValidationMessageFor( model => model.DeclineReason )
+                        </div>
+
+                    </div>
+
+                    <div id="nothing-to-show"></div>
+
+                </div>
+
+                <div class="clear"></div>
+
+            </div>
+
+            <div class="grouped-area">
+
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+
+            </div>
+
+        </div>
+
+    </div>
+}
