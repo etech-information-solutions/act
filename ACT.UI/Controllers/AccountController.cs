@@ -199,13 +199,6 @@ namespace ACT.UI.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Register( RegisterViewModel model )
         {
-            PSP psp;
-            User user;
-            Client client;
-
-            int objectId;
-            string objectType;
-
             using ( PSPService pservice = new PSPService() )
             using ( UserService uservice = new UserService() )
             using ( RoleService rservice = new RoleService() )
@@ -215,16 +208,23 @@ namespace ACT.UI.Controllers
             using ( DocumentService dservice = new DocumentService() )
             using ( EstimatedLoadService eservice = new EstimatedLoadService() )
             {
+                PSP psp;
+                User user;
+                Client client;
+
+                int objectId;
+                string objectType;
+
                 model.PSPOptions = pservice.List();
 
                 if ( !ModelState.IsValid )
                 {
-                    Notify( "The supplied information is invalid. Please try again.", NotificationType.Error );
+                    Notify( "The supplied information is not complete. Please try again.", NotificationType.Error );
 
                     return View( model );
                 }
 
-                bool isClient = ( model.ServiceType == ServiceType.ManageOwnPallets || model.ServiceType == ServiceType.ProvidePalletManagement );
+                bool isClient = ( model.ServiceType == ServiceType.RequirePalletManagement || model.ServiceType == ServiceType.HaveCompany );
 
                 #region Validations
 
@@ -277,6 +277,14 @@ namespace ACT.UI.Controllers
                         Status = ( int ) PSPClientStatus.Unverified,
                         ServiceRequired = ( int ) model.ServiceType,
                         CompanyRegistrationNumber = model.CompanyRegistrationNumber,
+                        AdminPerson = model.ContactPerson,
+                        BBBEELevel = model.BBBEELevel,
+                        CompanyType = ( int ) model.CompanyType,
+                        FinPersonEmail = model.EmailAddress,
+                        NumberOfLostPallets = model.NumberOfLostPallets,
+                        PalletType = ( int ) model.TypeOfPalletUse,
+                        PalletTypeOther = model.OtherTypeOfPalletUse,
+                        PSPName = model.PSPName,
 
                     };
 
@@ -329,6 +337,11 @@ namespace ACT.UI.Controllers
                         Status = ( int ) PSPClientStatus.Unverified,
                         ServiceRequired = ( int ) model.ServiceType,
                         CompanyRegistrationNumber = model.CompanyRegistrationNumber,
+                        BBBEELevel = model.BBBEELevel,
+                        CompanyType = ( int ) model.CompanyType,
+                        NumberOfLostPallets = model.NumberOfLostPallets,
+                        PalletType = ( int ) model.TypeOfPalletUse,
+                        PalletTypeOther = model.OtherTypeOfPalletUse,
 
                     };
 
@@ -380,7 +393,7 @@ namespace ACT.UI.Controllers
                         October = model.EstimatedLoad.October,
                         November = model.EstimatedLoad.November,
                         December = model.EstimatedLoad.December,
-
+                        Total = model.EstimatedLoad.Total,
                     };
 
                     load = eservice.Create( load );
@@ -414,7 +427,7 @@ namespace ACT.UI.Controllers
 
                 #region Any Uploads
 
-                if ( model.RegistrationFile.File != null )
+                if ( model.Files.NullableAny( f => f.File != null ) )
                 {
                     // Create folder
                     string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/{objectType}/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/" );
@@ -426,24 +439,35 @@ namespace ACT.UI.Controllers
 
                     string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
 
-                    Document doc = new Document()
+                    foreach ( FileViewModel f in model.Files.Where( f => f.File != null ) )
                     {
-                        ObjectId = objectId,
-                        ObjectType = objectType,
-                        Status = ( int ) Status.Active,
-                        Name = model.RegistrationFile.Name,
-                        Category = model.RegistrationFile.Name,
-                        Title = model.RegistrationFile.File.FileName,
-                        Size = model.RegistrationFile.File.ContentLength,
-                        Description = model.RegistrationFile.Description,
-                        Type = Path.GetExtension( model.RegistrationFile.File.FileName ),
-                        Location = $"{objectType}/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/{now}-{model.RegistrationFile.File.FileName}"
-                    };
+                        Document doc = new Document()
+                        {
+                            ObjectId = objectId,
+                            ObjectType = objectType,
+                            Status = ( int ) Status.Active,
+                            Name = f.Name,
+                            Category = f.Name,
+                            Title = f.File.FileName,
+                            Size = f.File.ContentLength,
+                            Description = f.Description,
+                            Type = Path.GetExtension( f.File.FileName ),
+                            Location = $"{objectType}/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/{now}-{f.File.FileName}"
+                        };
 
-                    dservice.Create( doc );
+                        dservice.Create( doc );
 
-                    string fullpath = Path.Combine( path, $"{now}-{model.RegistrationFile.File.FileName}" );
-                    model.RegistrationFile.File.SaveAs( fullpath );
+                        string fullpath = Path.Combine( path, $"{now}-{f.File.FileName}" );
+
+                        try
+                        {
+                            f.File.SaveAs( fullpath );
+                        }
+                        catch ( Exception ex )
+                        {
+
+                        }
+                    }
                 }
 
                 #endregion

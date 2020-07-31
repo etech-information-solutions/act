@@ -33,6 +33,7 @@ namespace ACT.Data.Models
         public Nullable<decimal> November { get; set; }
         public Nullable<decimal> December { get; set; }
         public Nullable<int> Status { get; set; }
+        public Nullable<decimal> Total { get; set; }
     
         public virtual PSP PSP { get; set; }
     }

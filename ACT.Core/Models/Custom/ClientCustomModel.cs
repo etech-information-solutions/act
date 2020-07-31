@@ -29,6 +29,12 @@ namespace ACT.Core.Models.Custom
         public string AdminPerson { get; set; }
         public string FinPersonEmail { get; set; }
         public string ChepReference { get; set; }
+        public Nullable<int> PalletType { get; set; }
+        public string PalletTypeOther { get; set; }
+        public string BBBEELevel { get; set; }
+        public Nullable<int> CompanyType { get; set; }
+        public string PSPName { get; set; }
+        public Nullable<int> NumberOfLostPallets { get; set; }
 
 
         public int UserCount { get; set; }
@@ -38,7 +44,9 @@ namespace ACT.Core.Models.Custom
         public int InvoiceCount { get; set; }
         public int DocumentCount { get; set; }
 
-        public string PSPName { get; set; }
+        public int EstimatedLoadCount { get; set; }
+
+        public string PSPCompanyName { get; set; }
 
 
         public List<Document> Documents { get; set; }

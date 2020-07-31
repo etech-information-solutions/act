@@ -22,9 +22,12 @@
                         @d.Description (@d.Extension)
                     </a>
 
-                    <a data-delete-file="1" data-target="#client-documents" data-id="@d.Id" href="@Url.Action( "DeleteClientDocument", new { @id = d.Id } )" rel="tipsyE" title="Delete this file?" style="float: right;">
-                        <img alt="delete" src="@Url.Content( "~/images/delete.png" )" />
-                    </a>
+                    @if ( ViewBag.DisplayOnly == null )
+                    {
+                        <a data-delete-file="1" data-target="#client-documents" data-id="@d.Id" href="@Url.Action( "DeleteClientDocument", new { @id = d.Id } )" rel="tipsyE" title="Delete this file?" style="float: right;">
+                            <img alt="delete" src="@Url.Content( "~/images/delete.png" )" />
+                        </a>
+                    }
 
                     <div class="clear"></div>
                 </li>

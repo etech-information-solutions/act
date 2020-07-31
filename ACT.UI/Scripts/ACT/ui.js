@@ -61,6 +61,7 @@
             this.DataModal( $( '*[data-modal="1"]' ) );
             this.DataAjaxForm( $( '*[data-ajax-form="1"]' ) );
             this.DataShowHide( $( '*[data-show-hide="1"]' ) );
+            this.DataInputShow( $( '*[data-input-show="1"]' ) );
             this.DataStickyOne( $( '*[data-sticky-one="1"]' ) );
             this.DataDeleteFile( $( '*[data-delete-file="1"]' ) );
             this.DataAddOneMore( $( '*[data-add-one-more="1"]' ) );
@@ -105,7 +106,10 @@
 
             // Sign Up
             this.DataDOB( $( '*[data-dob="1"]' ) );
+            this.DataPSPReg( $( '*[data-psp-reg="1"]' ) );
+            this.DataPalletUse( $( '*[data-pallet-use="1"]' ) );
             this.DataServiceType( $( '*[data-service-type="1"]' ) );
+            this.DataBudgetTotal( $( '*[data-budget-total="1"]' ) );
 
             // Dashboard / Graphs
             this.DataGSSite( $( '*[data-gs-site="1"]' ) );
@@ -1204,10 +1208,33 @@
                     {
                         ACT.Loader.Show( i, true );
 
-                        target.load( i.attr( "href" ), { id: id }, function ()
+                        var load = target;
+
+                        var selfDestruct = ( typeof ( i.attr( "data-self-destruct" ) ) !== 'undefined' );
+
+                        if ( selfDestruct )
                         {
-                            ACT.Loader.Hide();
+                            load = $( "<div/>" );
+                        }
+
+                        load.load( i.attr( "href" ), { id: id, selfDestruct: selfDestruct }, function ()
+                        {
                             ACT.Init.PluginInit( target );
+
+                            if ( selfDestruct )
+                            {
+                                target.hide( 900, function ()
+                                {
+                                    $( this ).remove();
+                                } );
+                            }
+
+                            if ( typeof ( i.attr( "data-enforce-required" ) ) && typeof ( i.attr( "data-check-against" ) ) && $( i.attr( "data-check-against" ) ).val() !== "" )
+                            {
+                                $( i.attr( "data-enforce-required" ) ).attr( "required", "required" );
+                            }
+
+                            ACT.Loader.Hide();
                         } );
 
                         $( ".tipsy" ).remove();
@@ -1272,6 +1299,44 @@
                         {
                             hide.find( "input[id], textarea[id], select[id]" ).removeAttr( "required" );
                             show.find( "input[id], textarea[id], select[id]" ).attr( "required", "required" );
+                        }
+                    } );
+            } );
+        },
+
+        DataInputShow: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "keyup" )
+                    .bind( "keyup", function ()
+                    {
+                        if ( $( this ).val().trim() !== "" )
+                        {
+                            if ( target.is( ":visible" ) ) return;
+
+                            target.show( 1000, function ()
+                            {
+                                ACT.UI.DataHighlightFields( target );
+
+                                target.find( "input:visible" ).attr( "required", "required" );
+                            } );
+                        }
+                        else
+                        {
+                            if ( !target.is( ":visible" ) ) return;
+
+                            target.hide( 1000, function ()
+                            {
+                                ACT.UI.DataHighlightFields( target );
+
+                                target.find( "input" ).removeAttr( "required", "required" );
+                            } );
                         }
                     } );
             } );
@@ -2607,24 +2672,6 @@
                             var header = target.find( "table.fixedHeader-floating" );
 
                             ACT.UI.ShowFixedHeader( header, table );
-
-                            /*var scrolled = $( document ).scrollTop();
-
-                            if ( scrolled > ( spHeight + 22 ) )
-                            {
-                                header.find( "th" ).each( function ()
-                                {
-                                    $( this )
-                                        .removeAttr( "style" )
-                                        .css( "width", table.find( 'th[data-name="' + $( this ).attr( "data-name" ) + '"]' ).width() );
-                                } );
-
-                                header.css( { "display": "block", "width": table.outerWidth() } );
-                            }
-                            else if ( scrolled < ( spHeight + 22 ) && header.is( ":visible" ) )
-                            {
-                                header.css( "display", "none" );
-                            }*/
                         } );
                 }
 
@@ -3434,7 +3481,7 @@
 
         DataGetBroadcast: function ()
         {
-            if ( ACT.UI.PageBroadcast ) return;
+            if ( ACT.UI.PageBroadcast || !authenticated ) return;
 
             ACT.UI.PageBroadcast = 1;
 
@@ -3659,6 +3706,7 @@
             } );
         },
 
+
         DataServiceType: function ( sender )
         {
             var cTnC = $( "#ClientTnCDocumentUrl" ).val(),
@@ -3671,27 +3719,133 @@
                 var i = $( this );
 
                 var v = i.val();
-                var t = $( i.attr( "data-target" ) );
+                var target = $( i.attr( "data-target" ) );
 
                 i
                     .unbind( "click" )
                     .bind( "click", function ()
                     {
-                        if ( v === "1" || v === "2" )
+                        if ( v === "4" )
                         {
-                            t.hide( 900 );
+                            target.show( 900, function ()
+                            {
+                                target.find( "select,input:visible" ).each( function ()
+                                {
+                                    if ( $( this ).hasClass( "select2-input" ) ) return;
 
-                            tncLink.attr( "href", pTnC );
-                        }
-                        else if ( v === "4" )
-                        {
-                            t.show( 900 );
+                                    $( this ).attr( "required", "required" );
+                                } );
+                            } );
 
                             tncLink.attr( "href", cTnC );
+                        }
+                        else
+                        {
+                            target.hide( 900, function ()
+                            {
+                                target.find( "select,input" ).removeAttr( "required" );
+                            } );
+
+                            tncLink.attr( "href", pTnC );
                         }
                     } );
             } );
         },
+
+        DataPalletUse: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var v = i.val();
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( v === "3" )
+                        {
+                            target.show( 900, function ()
+                            {
+                                ACT.UI.DataHighlightFields( target );
+
+                                target.find( "input:visible" ).attr( "required", "required" );
+                            } );
+                        }
+                        else
+                        {
+                            target.hide( 900, function ()
+                            {
+                                target.find( "input" ).removeAttr( "required" );
+                            } );
+                        }
+                    } );
+            } );
+        },
+
+        DataPSPReg: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() === "-1" )
+                        {
+                            target.show( 900, function ()
+                            {
+                                ACT.UI.DataHighlightFields( target );
+
+                                target.find( "input:visible" ).attr( "required", "required" );
+                            } );
+                        }
+                        else
+                        {
+                            target.hide( 900, function ()
+                            {
+                                target.find( "input" ).removeAttr( "required" );
+                            } );
+                        }
+                    } );
+            } );
+        },
+
+        DataBudgetTotal: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        var t = $( this ).val();
+
+                        if ( !parseInt( t ) ) return;
+
+                        var total = parseInt( t );
+
+                        var shares = ( total / target.length ).toFixed( 0 );
+
+                        target.each( function ()
+                        {
+                            $( this ).val( shares );
+                            ACT.UI.DataHighlightFields( $( this ).parent() );
+                        } );
+                    } );
+            } );
+        },
+
 
         DataAuditLog: function ( sender )
         {

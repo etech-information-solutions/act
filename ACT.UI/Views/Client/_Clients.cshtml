@@ -61,11 +61,11 @@
                 Contact
             </th>
             @*<th data-name="Suburb" data-column="c.FinancialPerson">
-                Finance Contact
-            </th>
-            <th data-name="ContactPerson" data-column="c.AdminPerson">
-                Admin Contact
-            </th>*@
+                    Finance Contact
+                </th>
+                <th data-name="ContactPerson" data-column="c.AdminPerson">
+                    Admin Contact
+                </th>*@
             <th data-name="ChepReference" data-column="c.ChepReference">
                 Chep Ref
             </th>
@@ -75,9 +75,9 @@
             <th data-name="Status" data-column="c.Status">
                 Status
             </th>
-            <th data-name="UserCount" data-column="UserCount">
+            @*<th data-name="UserCount" data-column="UserCount">
                 Users
-            </th>
+            </th>*@
             <th data-name="ProductCount" data-column="ProductCount">
                 Products
             </th>
@@ -104,6 +104,11 @@
                 String enable = status.Equals( PSPClientStatus.Verified ) ? "Disable" : "Enable";
                 String active = status == PSPClientStatus.Verified ? "active" : status == PSPClientStatus.Unverified ? "pending" : "inactive";
 
+                if ( item.BudgetCount <= 0 && item.EstimatedLoadCount > 0 )
+                {
+                    item.BudgetCount = item.EstimatedLoadCount;
+                }
+
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
                     <td width="1%">
@@ -118,7 +123,14 @@
                         </a>
                     </td>
                     <td>
-                        @item.PSPName
+                        @(item.PSPCompanyName ?? item.PSPName )
+
+                        @if ( string.IsNullOrEmpty( item.PSPCompanyName ) && !string.IsNullOrEmpty( item.PSPName ) )
+                        {
+                            <a rel="tipsyW" title="This PSP might not exist in this system yet!">
+                                <img alt="" src="@Url.Content( "~/Images/warn.png" )" />
+                            </a>
+                        }
                     </td>
                     <td>
                         @item.CompanyName
@@ -130,13 +142,13 @@
                         <a class="block" href="mailto:@item.Email">@item.Email @item.ContactNumber</a>
                     </td>
                     @*<td>
-                        @item.FinancialPerson
-                        <a class="block" href="mailto:@item.FinPersonEmail">@item.FinPersonEmail</a>
-                    </td>
-                    <td>
-                        @item.AdminPerson
-                        <a class="block" href="mailto:@item.AdminEmail">@item.AdminEmail</a>
-                    </td>*@
+                            @item.FinancialPerson
+                            <a class="block" href="mailto:@item.FinPersonEmail">@item.FinPersonEmail</a>
+                        </td>
+                        <td>
+                            @item.AdminPerson
+                            <a class="block" href="mailto:@item.AdminEmail">@item.AdminEmail</a>
+                        </td>*@
                     <td>
                         @item.ChepReference
                     </td>
@@ -151,12 +163,12 @@
                             <i class="block">@item.DeclinedReason</i>
                         }
                     </td>
-                    <td>
+                    @*<td>
                         @if ( item.UserCount > 0 )
                         {
                             @Html.ActionLink( item.UserCount.ToString(), "ClientUsers", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
                         }
-                    </td>
+                    </td>*@
                     <td>
                         @if ( item.ProductCount > 0 )
                         {

@@ -231,11 +231,12 @@ namespace ACT.Core.Services
 
             string query = @"SELECT
                                 c.*,
-                                p.CompanyName as [PSPName],
+                                p.CompanyName as [PSPCompanyName],
                                 (SELECT COUNT(1) FROM [dbo].[ClientUser] cu WHERE c.Id=cu.ClientId) AS [UserCount],
                                 (SELECT COUNT(1) FROM [dbo].[ClientBudget] cb WHERE c.Id=cb.ClientId) AS [BudgetCount],
                                 (SELECT COUNT(1) FROM [dbo].[ClientProduct] cp WHERE c.Id=cp.ClientId) AS [ProductCount],
                                 (SELECT COUNT(1) FROM [dbo].[Document] d WHERE c.Id=d.ObjectId AND d.ObjectType='Client') AS [DocumentCount],
+                                (SELECT COUNT(1) FROM [dbo].[EstimatedLoad] el WHERE c.Id=el.ObjectId AND el.ObjectType='Client') AS [EstimatedLoadCount],
                                 (SELECT COUNT(1) FROM [dbo].[ClientInvoice] ci, [dbo].[ClientLoad] cl WHERE cl.Id=ci.ClientLoadId AND c.Id=cl.ClientId) AS [InvoiceCount]
                              FROM
                                 [dbo].[Client] c

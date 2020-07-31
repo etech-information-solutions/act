@@ -3,7 +3,7 @@
 @using ACT.Core.Enums;
 @using ACT.Data.Models;
 
-@{ 
+@{
     int count = 1;
 }
 
@@ -20,6 +20,7 @@
             <tr>
                 <th>#</th>
                 <th>Year</th>
+                <th>Total</th>
                 <th>Jan</th>
                 <th>Feb</th>
                 <th>Mar</th>
@@ -32,14 +33,13 @@
                 <th>Oct</th>
                 <th>Nov</th>
                 <th>Dec</th>
-                <th>Total</th>
             </tr>
         </thead>
 
         <tbody>
             @foreach ( ClientBudget b in Model.ClientBudgets )
             {
-                decimal? total = b.January + b.February + b.March + b.April + b.May + b.June + b.July + b.August + b.September + b.October + b.November + b.December;
+                decimal? total = b.Total > 0 ? b.Total : b.January + b.February + b.March + b.April + b.May + b.June + b.July + b.August + b.September + b.October + b.November + b.December;
 
                 <tr>
                     <td>
@@ -47,6 +47,9 @@
                     </td>
                     <td>
                         @b.BudgetYear
+                    </td>
+                    <td>
+                        <b>@Math.Round( total ?? 0, 0 )</b>
                     </td>
                     <td>
                         @b.January
@@ -83,9 +86,6 @@
                     </td>
                     <td>
                         @b.December
-                    </td>
-                    <td>
-                        <b>@Math.Round( total ?? 0, 2 )</b>
                     </td>
                 </tr>
 

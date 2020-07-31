@@ -15,6 +15,8 @@ namespace ACT.UI.Models
 
         public int BudgetYear { get; set; }
 
+        public int Total { get; set; }
+
         public Nullable<decimal> January { get; set; }
 
         public Nullable<decimal> February { get; set; }

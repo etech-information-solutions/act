@@ -498,7 +498,7 @@ form fieldset, fieldset {
 }
 
 input.input-validation-error {
-    border: 1px solid #e80c4d;
+    border: 1px solid #e80c4d !important;
 }
 
 input[type="checkbox"].input-validation-error {

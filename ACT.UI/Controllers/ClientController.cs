@@ -552,6 +552,14 @@ namespace ACT.UI.Controllers
                     Status = ( PSPClientStatus ) client.Status,
                     EditMode = true,
 
+                    BBBEELevel = client.BBBEELevel,
+                    CompanyType = ( CompanyType ) client.CompanyType,
+                    NumberOfLostPallets = client.NumberOfLostPallets,
+                    OtherTypeOfPalletUse = client.PalletTypeOther,
+                    PSPName = client.PSPName,
+                    ServiceType = ( ServiceType ) client.ServiceRequired,
+                    TypeOfPalletUse = ( TypeOfPalletUse ) client.PalletType,
+
                     Address = new AddressViewModel()
                     {
                         EditMode = true,
@@ -581,6 +589,7 @@ namespace ACT.UI.Controllers
                         {
                             Id = l.Id,
                             BudgetYear = l.BudgetYear,
+                            Total = l.Total,
                             January = l.January,
                             February = l.February,
                             March = l.March,
@@ -604,6 +613,7 @@ namespace ACT.UI.Controllers
                         {
                             Id = l.Id,
                             BudgetYear = l.BudgetYear,
+                            Total = l.Total,
                             January = l.January,
                             February = l.February,
                             March = l.March,
@@ -702,6 +712,14 @@ namespace ACT.UI.Controllers
                 client.FinancialPerson = model.FinancialPerson;
                 client.CompanyRegistrationNumber = model.CompanyRegistrationNumber;
 
+                client.BBBEELevel = model.BBBEELevel;
+                client.CompanyType = ( int ) model.CompanyType;
+                client.NumberOfLostPallets = model.NumberOfLostPallets;
+                client.PalletTypeOther = model.OtherTypeOfPalletUse;
+                client.PSPName = model.PSPName;
+                client.ServiceRequired = ( int ) model.ServiceType;
+                client.PalletType = ( int ) model.TypeOfPalletUse;
+
                 cservice.Update( client );
 
                 #endregion
@@ -740,6 +758,7 @@ namespace ACT.UI.Controllers
                             {
                                 ClientId = client.Id,
                                 BudgetYear = l.BudgetYear,
+                                Total = l.Total,
                                 January = l.January,
                                 February = l.February,
                                 March = l.March,
@@ -760,6 +779,7 @@ namespace ACT.UI.Controllers
                         else
                         {
                             b.BudgetYear = l.BudgetYear;
+                            b.Total = l.Total;
                             b.January = l.January;
                             b.February = l.February;
                             b.March = l.March;
@@ -860,7 +880,7 @@ namespace ACT.UI.Controllers
                             }
                         }
 
-                        f.Name = f.Name ?? "File";
+                        f.Name = f.Name ?? f.Description?.Replace( " ", "" ) ?? "File";
 
                         doc = new Document()
                         {
@@ -941,8 +961,8 @@ namespace ACT.UI.Controllers
             using ( ClientService service = new ClientService() )
             using ( AddressService aservice = new AddressService() )
             using ( DocumentService dservice = new DocumentService() )
-            using ( EstimatedLoadService eservice = new EstimatedLoadService() )
             using ( ClientKPIService kpiservice = new ClientKPIService() )
+            using ( EstimatedLoadService eservice = new EstimatedLoadService() )
             {
                 Client client = service.GetById( id );
 
@@ -993,6 +1013,14 @@ namespace ACT.UI.Controllers
                     Status = ( PSPClientStatus ) client.Status,
                     EditMode = true,
 
+                    BBBEELevel = client.BBBEELevel,
+                    CompanyType = ( CompanyType ) client.CompanyType,
+                    NumberOfLostPallets = client.NumberOfLostPallets,
+                    OtherTypeOfPalletUse = client.PalletTypeOther,
+                    PSPName = client.PSPName,
+                    ServiceType = ( ServiceType ) client.ServiceRequired,
+                    TypeOfPalletUse = ( TypeOfPalletUse ) client.PalletType,
+
                     Address = new AddressViewModel()
                     {
                         EditMode = true,
@@ -1022,6 +1050,7 @@ namespace ACT.UI.Controllers
                         {
                             Id = l.Id,
                             BudgetYear = l.BudgetYear,
+                            Total = l.Total,
                             January = l.January,
                             February = l.February,
                             March = l.March,
@@ -1045,6 +1074,7 @@ namespace ACT.UI.Controllers
                         {
                             Id = l.Id,
                             BudgetYear = l.BudgetYear,
+                            Total = l.Total,
                             January = l.January,
                             February = l.February,
                             March = l.March,
@@ -1113,6 +1143,7 @@ namespace ACT.UI.Controllers
                 #region Client
 
                 client.Status = ( int ) model.Status;
+                client.ChepReference = model.ChepReference;
 
                 if ( !string.IsNullOrEmpty( model.DeclineReason ) )
                 {
@@ -1133,6 +1164,7 @@ namespace ACT.UI.Controllers
                         {
                             ClientId = client.Id,
                             BudgetYear = l.BudgetYear,
+                            Total = l.Total,
                             January = l.January,
                             February = l.February,
                             March = l.March,
@@ -1224,6 +1256,7 @@ namespace ACT.UI.Controllers
         public ActionResult ClientBudgets( int id )
         {
             using ( ClientService cservice = new ClientService() )
+            using ( EstimatedLoadService eservice = new EstimatedLoadService() )
             {
                 Client model = cservice.GetById( id );
 
@@ -1232,6 +1265,36 @@ namespace ACT.UI.Controllers
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
                     return PartialView( "_Notification" );
+                }
+
+                if ( !model.ClientBudgets.NullableAny() )
+                {
+                    List<EstimatedLoad> loads = eservice.List( id, "Client" );
+
+                    if ( loads.NullableAny() )
+                    {
+                        foreach ( EstimatedLoad l in loads )
+                        {
+                            model.ClientBudgets.Add( new ClientBudget()
+                            {
+                                Id = l.Id,
+                                BudgetYear = l.BudgetYear,
+                                Total = l.Total,
+                                January = l.January,
+                                February = l.February,
+                                March = l.March,
+                                April = l.April,
+                                May = l.May,
+                                June = l.June,
+                                July = l.July,
+                                August = l.August,
+                                September = l.September,
+                                October = l.October,
+                                November = l.November,
+                                December = l.December,
+                            } );
+                        }
+                    }
                 }
 
                 return PartialView( "_ClientBudgetsView", model );
@@ -1271,7 +1334,7 @@ namespace ACT.UI.Controllers
         // POST: /Client/DeleteClientFile/5
         [HttpPost]
         [Requires( PermissionTo.Delete )]
-        public ActionResult DeleteClientDocument( int id )
+        public ActionResult DeleteClientDocument( int id, bool selfDestruct = false )
         {
             using ( DocumentService dservice = new DocumentService() )
             {
@@ -1301,6 +1364,11 @@ namespace ACT.UI.Controllers
                 }
 
                 dservice.Delete( doc );
+
+                if ( selfDestruct )
+                {
+                    return PartialView( "_Empty" );
+                }
 
                 List<FileViewModel> model = new List<FileViewModel>();
 

@@ -1,21 +1,35 @@
 ﻿@model RegisterViewModel
 
-@using ACT.Core.Enums;
 @using ACT.UI.Models;
+@using ACT.Core.Enums;
+@using ACT.Data.Models;
 
 @{
     ViewBag.Title = "Register";
 
     VariableExtension.SetRules();
+
+    List<PSP> pSPOptions = Model.PSPOptions;
+
+    if ( !pSPOptions.NullableAny() )
+    {
+        pSPOptions = new List<PSP>();
+    }
+
+    pSPOptions.Add( new PSP()
+    {
+        Id = -1,
+        CompanyName = "Other"
+    } );
 }
 
-<div style="width: 76%; margin: 0 auto; position: relative;">
+<div style="width: 96%; margin: 0 auto; position: relative;">
 
-    <div class="left" style="width: 20%;">
+    <div class="left" style="width: 13%;">
         <img alt="" src="@Url.Content("~/Images/act-logo.png")" style="width: 100%;" />
     </div>
 
-    <div class="right" style="text-transform: uppercase; margin-top: 5%;">
+    <div class="right" style="text-transform: uppercase; margin-top: 3%;">
         <strong style="display: block; color: #012d71; font-size: 20px;">Register</strong>
     </div>
 
@@ -23,7 +37,7 @@
 
 </div>
 
-<div class="sign-in" style="width: 70%;">
+<div class="sign-in" style="width: 90%;">
 
     <div class="details">
 
@@ -57,11 +71,11 @@
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextAreaFor( model => model.Description, new { @class = "input", @style = "height: 81px;", @placeholder = "Briefely describe your business" } )
+                    @Html.TextAreaFor( model => model.Description, new { @class = "input", @style = "height: 82px;", @placeholder = "Briefely describe your business" } )
                     @Html.ValidationMessageFor( model => model.Description )
                 </div>
 
-                <div class="editor-label uppercase" style="margin-bottom: 10px;">
+                <div class="editor-label uppercase" style="margin: 20px 0 10px 0;">
                     @Html.LabelFor( model => model.ServiceType )
                 </div>
 
@@ -86,16 +100,37 @@
                     }
                 </div>
 
-                <div id="psp-list" class="none grouped-area" style="margin-top: 20px;">
+                <div id="psp-list" class="none" style="margin-top: 20px;">
 
                     <div class="editor-label uppercase">
                         @Html.LabelFor( model => model.PSPId )
                     </div>
 
                     <div class="editor-field">
-                        @Html.DropDownListFor( model => model.PSPId, model => Model.PSPOptions, p => p.Id, p => p.CompanyName, true, new { @class = "chzn", @style = "width: 98%;" } )
+                        @Html.DropDownListFor( model => model.PSPId, model => pSPOptions, p => p.Id, p => p.CompanyName, true, new { @class = "chzn", @data_psp_reg = "1", @data_target = "#other-psp-name", @style = "width: 98%;" } )
                     </div>
 
+                    <div id="other-psp-name" style="margin-top: 20px; display: none;">
+
+                        <div class="editor-label uppercase">
+                            @Html.LabelFor( model => model.PSPName )
+                        </div>
+
+                        <div class="editor-field">
+                            @Html.TextBoxFor( model => model.PSPName, new { @class = "input", @placeholder = "Enter the Name of your Service Provider" } )
+                            @Html.ValidationMessageFor( model => model.PSPName )
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="edit-label uppercase" style="margin-top: 20px;">
+                    @Html.LabelFor( model => model.CompanyType )
+                </div>
+                <div class="edit-field">
+                    @Html.EnumDropDownFor( model => model.CompanyType, false, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.CompanyType )
                 </div>
 
             </div>
@@ -121,12 +156,12 @@
                 </div>
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.BEELevel )
+                    @Html.LabelFor( model => model.BBBEELevel )
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.BEELevel, new { @class = "input", @data_input_show = "1", @data_target = "#bee-file-upload", @placeholder = "Enter your VAT Number" } )
-                    @Html.ValidationMessageFor( model => model.BEELevel )
+                    @Html.TextBoxFor( model => model.BBBEELevel, new { @class = "input", @data_input_show = "1", @data_target = "#bbbee-file-upload", @placeholder = "Enter your BBBEE Level" } )
+                    @Html.ValidationMessageFor( model => model.BBBEELevel )
                 </div>
 
                 <div class="editor-label uppercase">
@@ -170,65 +205,95 @@
             <div class="left" style="width: 32%;">
 
                 <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.RegistrationFile )
+                    <label for="RegistrationFile">Upload Company Registration File</label>
                 </div>
 
-                <div class="editor-field" style="margin-bottom: 10px;">
+                <div class="editor-field" style="margin-bottom: 17px;">
 
-                    <input id="RegistrationFile.File" name="RegistrationFile.File" type="file" value="" required="required" data-val-file="1" class="input" />
-                    <input id="RegistrationFile.Name" name="RegistrationFile.Name" type="hidden" value="CompanyRegistrationFile" />
-                    <input id="RegistrationFile.Description" name="RegistrationFile.Description" class="input" type="hidden" value="Company Registration File" />
-
-                    @Html.ValidationMessageFor( model => model.RegistrationFile )
-
-                </div>
-
-                <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.SignedPSPContractFile )
-                </div>
-
-                <div class="editor-field" style="margin-bottom: 10px;">
-
-                    <input id="SignedPSPContractFile.File" name="SignedPSPContractFile.File" type="file" value="" required="required" data-val-file="1" class="input" />
-                    <input id="SignedPSPContractFile.Name" name="SignedPSPContractFile.Name" type="hidden" value="SignedPSPContractFile" />
-                    <input id="SignedPSPContractFile.Description" name="SignedPSPContractFile.Description" class="input" type="hidden" value="Signed PSP Contract File" />
-
-                    @Html.ValidationMessageFor( model => model.SignedPSPContractFile )
+                    <input id="RegistrationFile" name="Files[0].File" type="file" value="" required="required" data-val-file="1" class="input" />
+                    <input name="Files[0].Name" type="hidden" value="CompanyRegistrationFile" />
+                    <input name="Files[0].Description" class="input" type="hidden" value="Company Registration File" />
 
                 </div>
 
                 <div id="vat-file-upload" class="none">
 
                     <div class="editor-label uppercase">
-                        @Html.LabelFor( model => model.VATRegistrationFile )
+                        <label for="VATRegistrationFile">Upload VAT Registration File</label>
                     </div>
 
-                    <div class="editor-field" style="margin-bottom: 10px;">
+                    <div class="editor-field" style="margin-bottom: 17px;">
 
-                        <input id="VATRegistrationFile.File" name="VATRegistrationFile.File" type="file" value="" data-val-file="1" class="input" />
-                        <input id="VATRegistrationFile.Name" name="VATRegistrationFile.Name" type="hidden" value="VATRegistration File" />
-                        <input id="VATRegistrationFile.Description" name="VATRegistrationFile.Description" class="input" type="hidden" value="VAT Registration File" />
-
-                        @Html.ValidationMessageFor( model => model.VATRegistrationFile )
+                        <input id="VATRegistrationFile" name="Files[1].File" type="file" value="" data-val-file="1" class="input" />
+                        <input name="Files[1].Name" type="hidden" value="VATRegistrationFile" />
+                        <input name="Files[1].Description" class="input" type="hidden" value="VAT Registration File" />
 
                     </div>
 
                 </div>
 
-                <div id="bee-file-upload" class="none">
+                <div id="bbbee-file-upload" class="none">
 
                     <div class="editor-label uppercase">
-                        @Html.LabelFor( model => model.BEERegistrationFile )
+                        <label for="BBBEELevelFile">Upload BBBEE Level Certificate</label>
                     </div>
 
-                    <div class="editor-field" style="margin-bottom: 10px;">
+                    <div class="editor-field" style="margin-bottom: 17px;">
 
-                        <input id="BEERegistrationFile.File" name="BEERegistrationFile.File" type="file" value="" data-val-file="1" class="input" />
-                        <input id="BEERegistrationFile.Name" name="BEERegistrationFile.Name" type="hidden" value="BEE Registration File" />
-                        <input id="BEERegistrationFile.Description" name="BEERegistrationFile.Description" class="input" type="hidden" value="BEE Registration File" />
+                        <input id="BBBEELevelFile" name="Files[2].File" type="file" value="" data-val-file="1" class="input" />
+                        <input name="Files[2].Name" type="hidden" value="BBBEELevelCertificate" />
+                        <input name="Files[2].Description" class="input" type="hidden" value="BBBEE Level Certificate" />
 
-                        @Html.ValidationMessageFor( model => model.BEERegistrationFile )
+                    </div>
 
+                </div>
+
+                <div class="editor-label uppercase">
+                    <label for="SignedPSPContractFile">Upload Signed PSP Contract Document</label>
+                </div>
+
+                <div class="editor-field" style="margin-bottom: 20px;">
+
+                    <input id="SignedPSPContractFile" name="Files[3].File" type="file" value="" required="required" data-val-file="1" class="input" />
+                    <input name="Files[3].Name" type="hidden" value="SignedPSPContractFile" />
+                    <input name="Files[3].Description" class="input" type="hidden" value="Signed PSP Contract File" />
+
+                </div>
+
+                <div class="editor-label uppercase" style="margin-bottom: 10px;">
+                    @Html.LabelFor( model => model.TypeOfPalletUse )
+                </div>
+
+                <div class="editor-field">
+                    @foreach ( int k in Enum.GetValues( typeof( TypeOfPalletUse ) ) )
+                    {
+                        if ( k < 0 )
+                        {
+                            continue;
+                        }
+
+                        string desc = ( ( TypeOfPalletUse ) k ).GetDisplayText();
+
+                        <label class="block" for="TypeOfPalletUse-@k">
+
+                            <input id="TypeOfPalletUse-@k" name="TypeOfPalletUse" type="radio" value="@k" data-pallet-use="1" data-target="#other-pallet-use" />
+
+                            @desc
+
+                        </label>
+                        <div></div>
+                    }
+                </div>
+
+                <div id="other-pallet-use" class="none" style="margin-top: 15px;">
+
+                    <div class="editor-label">
+                        @Html.LabelFor( model => model.OtherTypeOfPalletUse )
+                    </div>
+
+                    <div class="editor-field">
+                        @Html.TextBoxFor( model => model.OtherTypeOfPalletUse, new { @class = "input", @placeholder = "Enter your Type of Pallet Use" } )
+                        @Html.ValidationMessageFor( model => model.OtherTypeOfPalletUse )
                     </div>
 
                 </div>
@@ -266,48 +331,61 @@
                     <tbody>
                         <tr>
                             <td>
-                                <input id="EstimatedLoad-Total" type="number" value="" placeholder="E.g @DateTime.Now.Year" data-budget-total="1" data-spread-to=".el-input" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad-Total" name="EstimatedLoad.Total" type="number" value="" title="Changing this value will override values from Jan - Dec" placeholder="E.g @DateTime.Now.Year" data-budget-total="1" data-target=".el-input" style="padding: 0 5px; width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.January" name="EstimatedLoad.January" class="el-input" type="number" value="" placeholder="E.g 10" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.January" name="EstimatedLoad.January" class="el-input" type="number" value="" placeholder="E.g 10" style="padding: 0 5px; width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.February" name="EstimatedLoad.February" class="el-input" type="number" value="" placeholder="E.g 20" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.February" name="EstimatedLoad.February" class="el-input" type="number" value="" placeholder="E.g 20" style="padding: 0 5px; width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.March" name="EstimatedLoad.March" class="el-input" type="number" value="" placeholder="E.g 30" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.March" name="EstimatedLoad.March" class="el-input" type="number" value="" placeholder="E.g 30" style="padding: 0 5px; width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.April" name="EstimatedLoad.April" class="el-input" type="number" value="" placeholder="E.g 40" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.April" name="EstimatedLoad.April" class="el-input" type="number" value="" placeholder="E.g 40" style="padding: 0 5px; width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.May" name="EstimatedLoad.May" class="el-input" type="number" value="" placeholder="E.g 50" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.May" name="EstimatedLoad.May" class="el-input" type="number" value="" placeholder="E.g 50" style="padding: 0 5px; width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.June" name="EstimatedLoad.June" class="el-input" type="number" value="" placeholder="E.g 60" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.June" name="EstimatedLoad.June" class="el-input" type="number" value="" placeholder="E.g 60" style="padding: 0 5px; width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.July" name="EstimatedLoad.July" class="el-input" type="number" value="" placeholder="E.g 70" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.July" name="EstimatedLoad.July" class="el-input" type="number" value="" placeholder="E.g 70" style="padding: 0 5px; width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.August" name="EstimatedLoad.August" class="el-input" type="number" value="" placeholder="E.g 80" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.August" name="EstimatedLoad.August" class="el-input" type="number" value="" placeholder="E.g 80" style="padding: 0 5px; width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.September" name="EstimatedLoad.September" class="el-input" type="number" value="" placeholder="E.g 45" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.September" name="EstimatedLoad.September" class="el-input" type="number" value="" placeholder="E.g 45" style="padding: 0 5px; width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.October" name="EstimatedLoad.October" class="el-input" type="number" value="" placeholder="E.g 15" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.October" name="EstimatedLoad.October" class="el-input" type="number" value="" placeholder="E.g 15" style="padding: 0 5px; width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.November" name="EstimatedLoad.November" class="el-input" type="number" value="" placeholder="E.g 25" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.November" name="EstimatedLoad.November" class="el-input" type="number" value="" placeholder="E.g 25" style="padding: 0 5px; width: 87%;" />
                             </td>
                             <td>
-                                <input id="EstimatedLoad.December" name="EstimatedLoad.December" class="el-input" type="number" value="" placeholder="E.g 35" style="padding: 0 5px;width: 87%;" />
+                                <input id="EstimatedLoad.December" name="EstimatedLoad.December" class="el-input" type="number" value="" placeholder="E.g 35" style="padding: 0 5px; width: 87%;" />
                             </td>
                         </tr>
                     </tbody>
 
                 </table>
+
+            </div>
+
+            <div style="width: 32%; margin-top: 20px;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.NumberOfLostPallets )
+                </div>
+
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.NumberOfLostPallets, new { @class = "input", @placeholder = "Enter Number Of Lost Pallets" } )
+                    @Html.ValidationMessageFor( model => model.NumberOfLostPallets )
+                </div>
 
             </div>
 
@@ -317,7 +395,7 @@
                 <strong class="uppercase">Your Address</strong>
             </p>
 
-            <div class="left" style="width: 48%; margin-right: 4%;">
+            <div class="left" style="width: 32%; margin-right: 2%;">
 
                 <input id="Address.AddressType" name="Address.AddressType" type="hidden" value="@( ( int ) AddressType.Postal )" />
 
@@ -328,6 +406,18 @@
                     @Html.TextBoxFor( model => model.Address.AddressLine1, new { @class = "input", @placeholder = "Enter your Company Address Line 1" } )
                     @Html.ValidationMessageFor( model => model.Address.AddressLine1 )
                 </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Address.AddressLine2 )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter your Company Address Line 2" } )
+                    @Html.ValidationMessageFor( model => model.Address.AddressLine2 )
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 32%; margin-right: 2%;">
 
                 <div class="editor-label">
                     @Html.LabelFor( model => model.Address.Town )
@@ -347,15 +437,7 @@
 
             </div>
 
-            <div class="left" style="width: 48%;">
-
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.Address.AddressLine2 )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter your Company Address Line 2" } )
-                    @Html.ValidationMessageFor( model => model.Address.AddressLine2 )
-                </div>
+            <div class="left" style="width: 32%;">
 
                 <div class="editor-label">
                     @Html.LabelFor( model => model.Address.Province )

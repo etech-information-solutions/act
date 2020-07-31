@@ -19,6 +19,10 @@ namespace ACT.UI.Models
 
         public PSP PSP { get; set; }
 
+        [Display( Name = "Name of your OTHER Service Provider" )]
+        [StringLength( 200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string PSPName { get; set; }
+
         [Required]
         [Display( Name = "Company Registration Number" )]
         [StringLength( 15, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
@@ -88,6 +92,17 @@ namespace ACT.UI.Models
         [Display( Name = "Service Required" )]
         public ServiceType ServiceType { get; set; }
 
+        [Required]
+        [Display( Name = "Type of Pallet Use" )]
+        public TypeOfPalletUse TypeOfPalletUse { get; set; }
+
+        [Display( Name = "Your Type of Pallet Use" )]
+        public string OtherTypeOfPalletUse { get; set; }
+
+        [Required]
+        [Display( Name = "Company Type" )]
+        public CompanyType CompanyType { get; set; }
+
         [Display( Name = "Status" )]
         public PSPClientStatus Status { get; set; }
 
@@ -96,6 +111,13 @@ namespace ACT.UI.Models
         public AddressViewModel Address { get; set; }
 
         public List<FileViewModel> Files { get; set; }
+
+        [Display( Name = "BBBEE Level" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string BBBEELevel { get; set; }
+
+        [Display( Name = "Number Of Pallets Lost" )]
+        public int? NumberOfLostPallets { get; set; }
 
 
         [Display( Name = "Select a reason why you're declining this Client" )]

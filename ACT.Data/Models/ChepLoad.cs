@@ -18,8 +18,8 @@ namespace ACT.Data.Models
         public ChepLoad()
         {
             this.ChepClients = new HashSet<ChepClient>();
-            this.Tasks = new HashSet<Task>();
             this.Disputes = new HashSet<Dispute>();
+            this.Tasks = new HashSet<Task>();
         }
     
         public int Id { get; set; }
@@ -51,8 +51,8 @@ namespace ACT.Data.Models
         public virtual ICollection<ChepClient> ChepClients { get; set; }
         public virtual Site Site { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Task> Tasks { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Dispute> Disputes { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Task> Tasks { get; set; }
     }
 }
