@@ -22,7 +22,7 @@ namespace ACT.Data.Models
         public string ModifiedBy { get; set; }
         public int Status { get; set; }
     
-        public virtual PSP PSP { get; set; }
         public virtual User User { get; set; }
+        public virtual PSP PSP { get; set; }
     }
 }

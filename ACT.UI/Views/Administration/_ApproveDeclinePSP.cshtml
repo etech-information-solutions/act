@@ -1,6 +1,7 @@
 ﻿@model PSPViewModel
 
 @using ACT.UI.Models;
+@using ACT.Data.Models;
 @using ACT.Core.Enums;
 
 
@@ -8,6 +9,8 @@
 
 @using ( Html.BeginForm( "ApproveDeclinePSP", "Administration", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#psps", @class = "custom-validate", @style = "width: auto;" } ) )
 {
+    string logoUrl = ( Model.Files.NullableAny( d => d.Name.ToLower() == "logo" ) ) ? Url.Action( "ViewDocument", new { id = Model.Files.FirstOrDefault( d => d.Name.ToLower() == "logo" ).Id } ) : Url.Content( "~/Images/no-preview.png" );
+
     <div id="edit-item">
 
         <h2 class="uppercase" style="width: auto; margin-top: 10px;">
@@ -24,14 +27,13 @@
 
         <div id="item-details" class="item-details" style="width: auto;">
 
-            <div class="left" style="width: 48%; margin-right: 4%;">
+            <div class="left" style="width: 30%; margin-right: 4%;">
 
-                <div class="display-label">
-                    Company Name
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor( model => model.CompanyName )
-                    @Html.HiddenFor( model => model.CompanyName )
+                <div class="display-field" style="text-align: center;">
+
+                    <img style="margin-bottom: 10px; display: inline-block; width: 50%; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
+
+                    <strong class="block uppercase">@Html.DisplayFor( model => model.CompanyName )</strong>
                 </div>
 
                 <div class="display-label">
@@ -39,15 +41,6 @@
                 </div>
                 <div class="display-field">
                     @Html.DisplayFor( model => model.TradingAs )
-                    @Html.HiddenFor( model => model.TradingAs )
-                </div>
-
-                <div class="display-label">
-                    VAT Number
-                </div>
-                <div class="display-field">
-                    @Html.DisplayFor( model => model.VATNumber )
-                    @Html.HiddenFor( model => model.VATNumber )
                 </div>
 
                 <div class="display-label">
@@ -55,27 +48,6 @@
                 </div>
                 <div class="display-field">
                     @Html.DisplayFor( model => model.CompanyRegistrationNumber )
-                    @Html.HiddenFor( model => model.CompanyRegistrationNumber )
-                </div>
-
-                <div class="display-label">
-                    Company Registration File
-                </div>
-                <div class="display-field">
-                    @if ( Model.RegistrationFile != null && Model.RegistrationFile.Id > 0 )
-                    {
-                        <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = Model.RegistrationFile.Id } )">
-                            <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
-
-                            @Model.RegistrationFile.Name (@Model.RegistrationFile.Extension)
-                        </a>
-                    }
-                    else
-                    {
-                        <div class="message-warn">
-                            No file was uploaded
-                        </div>
-                    }
                 </div>
 
                 <div class="display-label">
@@ -83,19 +55,59 @@
                 </div>
                 <div class="display-field">
                     @Html.DisplayFor( model => model.Description )
-                    @Html.HiddenFor( model => model.Description )
+                </div>
+
+                <div class="display-label">
+                    Service Required
+                </div>
+                <div class="display-field">
+                    @( ( ( ServiceType ) Model.ServiceType ).GetDisplayText() )
+                </div>
+
+                <div class="display-label">
+                    Type of Pallet Use
+                </div>
+                <div class="display-field">
+                    @( ( ( TypeOfPalletUse ) Model.TypeOfPalletUse ).GetDisplayText() )
+
+                    @if ( ( ( TypeOfPalletUse ) Model.TypeOfPalletUse ) == TypeOfPalletUse.Other && !string.IsNullOrEmpty( Model.OtherTypeOfPalletUse ) )
+                    {
+                        <i class="block bold" style="border-top: 1px solid #ddd; padding-top: 5px;">
+                            @Model.OtherTypeOfPalletUse
+                        </i>
+                    }
+                </div>
+
+                <div class="display-label">
+                    Company Type
+                </div>
+                <div class="display-field">
+                    @( ( ( CompanyType ) Model.CompanyType ).GetDisplayText() )
                 </div>
 
             </div>
 
-            <div class="left" style="width: 48%;">
+            <div class="left" style="width: 30%; margin-right: 4%;">
+
+                <div class="display-label">
+                    VAT Number
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.VATNumber )
+                </div>
+
+                <div class="display-label">
+                    BBBEE Level
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.BBBEELevel )
+                </div>
 
                 <div class="display-label">
                     Contact Person
                 </div>
                 <div class="display-field">
                     @Html.DisplayFor( model => model.ContactPerson )
-                    @Html.HiddenFor( model => model.ContactPerson )
                 </div>
 
                 <div class="display-label">
@@ -103,45 +115,130 @@
                 </div>
                 <div class="display-field">
                     @Html.DisplayFor( model => model.ContactNumber )
-                    @Html.HiddenFor( model => model.ContactNumber )
                 </div>
 
                 <div class="display-label">
-                    Email Address
+                    Contact Email
                 </div>
                 <div class="display-field">
                     @Html.DisplayFor( model => model.EmailAddress )
-                    @Html.HiddenFor( model => model.EmailAddress )
                 </div>
 
                 <div class="display-label">
-                    Admin Email Address
+                    Administrator
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.AdminPerson )
+                </div>
+
+                <div class="display-label">
+                    Administrator Email
                 </div>
                 <div class="display-field">
                     @Html.DisplayFor( model => model.AdminEmail )
-                    @Html.HiddenFor( model => model.AdminEmail )
                 </div>
 
                 <div class="display-label">
-                    Service Required
+                    Financial Person
                 </div>
                 <div class="display-field">
-                    @Model.ServiceType.GetDisplayText()
-                    @Html.HiddenFor( model => model.ServiceType )
+                    @Html.DisplayFor( model => model.FinancialPerson )
                 </div>
+
+                <div class="display-label">
+                    Financial Email
+                </div>
+                <div class="display-field">
+                    @Html.DisplayFor( model => model.FinPersonEmail )
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 30%;">
+
+                <div class="display-label">
+                    Uploaded Documents
+                </div>
+
+                @if ( Model.Files.NullableAny( d => d.Name?.ToLower() != "logo" ) )
+                {
+                    ViewBag.DisplayOnly = true;
+
+                    <div id="psp-documents">
+
+                        @Html.Partial( "_PSPDocuments", Model.Files )
+
+                    </div>
+                }
+
+                <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+                @if ( Model.Address != null )
+                {
+                    <div class="grouped-area">
+
+                        <p>
+                            <strong class="uppercase">Addres Details</strong>
+                        </p>
+
+                        <div class="display-label">
+                            Addres
+                        </div>
+                        <div class="display-field">
+                            @Model.Address.AddressLine1
+                        </div>
+                        <div class="display-field">
+                            @Model.Address.AddressLine2
+                        </div>
+
+                        <div class="display-label">
+                            Town/City
+                        </div>
+                        <div class="display-field">
+                            @Model.Address.Town
+                        </div>
+
+                        <div class="display-label">
+                            Postal Code
+                        </div>
+                        <div class="display-field">
+                            @Model.Address.PostCode
+                        </div>
+
+                        <div class="display-label">
+                            Province
+                        </div>
+                        <div class="display-field">
+                            @(( ( Province ) Model.Address.Province ).GetDisplayText())
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="message-warn">
+                        No address details found.
+                    </div>
+                }
 
             </div>
 
             <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
 
-            <div class="display-label">
-                Estimated Load Per Month
+            <div class="display-label" style="margin-bottom: 10px;">
+
+                <p>
+                    <strong class="uppercase">Budgets (@Model.PSPBudgets.NullableCount())</strong>
+                </p>
+
             </div>
 
             <table id="PSPBudget-table" class="da-table" style="border-bottom: 0;">
 
                 <thead>
                     <tr>
+                        <td>#</td>
+                        <th><b>Total</b></th>
                         <th>Jan</th>
                         <th>Feb</th>
                         <th>Mar</th>
@@ -158,120 +255,91 @@
                 </thead>
 
                 <tbody>
-                    <tr>
-                        <td>
-                            @Model.PSPBudget.January
-                            @Html.HiddenFor( model => model.PSPBudget.January )
-                        </td>
-                        <td>
-                            @Model.PSPBudget.February
-                            @Html.HiddenFor( model => model.PSPBudget.February )
-                        </td>
-                        <td>
-                            @Model.PSPBudget.March
-                            @Html.HiddenFor( model => model.PSPBudget.March )
-                        </td>
-                        <td>
-                            @Model.PSPBudget.April
-                            @Html.HiddenFor( model => model.PSPBudget.April )
-                        </td>
-                        <td>
-                            @Model.PSPBudget.May
-                            @Html.HiddenFor( model => model.PSPBudget.May )
-                        </td>
-                        <td>
-                            @Model.PSPBudget.June
-                            @Html.HiddenFor( model => model.PSPBudget.June )
-                        </td>
-                        <td>
-                            @Model.PSPBudget.July
-                            @Html.HiddenFor( model => model.PSPBudget.July )
-                        </td>
-                        <td>
-                            @Model.PSPBudget.August
-                            @Html.HiddenFor( model => model.PSPBudget.August )
-                        </td>
-                        <td>
-                            @Model.PSPBudget.September
-                            @Html.HiddenFor( model => model.PSPBudget.September )
-                        </td>
-                        <td>
-                            @Model.PSPBudget.October
-                            @Html.HiddenFor( model => model.PSPBudget.October )
-                        </td>
-                        <td>
-                            @Model.PSPBudget.November
-                            @Html.HiddenFor( model => model.PSPBudget.November )
-                        </td>
-                        <td>
-                            @Model.PSPBudget.December
-                            @Html.HiddenFor( model => model.PSPBudget.December )
-                        </td>
-                    </tr>
+                    @if ( Model.PSPBudgets.NullableAny() )
+                    {
+                        int count = 0;
+
+                        foreach ( PSPBudget b in Model.PSPBudgets )
+                        {
+                            decimal? total = b.Total > 0 ? b.Total : b.January + b.February + b.March + b.April + b.May + b.June + b.July + b.August + b.September + b.October + b.November + b.December;
+
+                            <tr>
+                                <td width="1%">
+                                    @(count + 1)
+                                </td>
+                                <td>
+                                    <b>@Math.Round( total ?? 0, 0 )</b>
+                                    <input name="PSPBudgets[@count].Total" type="hidden" value="@total">
+                                </td>
+                                <td>
+                                    @b.January
+                                    <input name="PSPBudgets[@count].January" type="hidden" value="@b.January">
+                                </td>
+                                <td>
+                                    @b.February
+                                    <input name="PSPBudgets[@count].February" type="hidden" value="@b.February">
+                                </td>
+                                <td>
+                                    @b.March
+                                    <input name="PSPBudgets[@count].March" type="hidden" value="@b.March">
+                                </td>
+                                <td>
+                                    @b.April
+                                    <input name="PSPBudgets[@count].April" type="hidden" value="@b.April">
+                                </td>
+                                <td>
+                                    @b.May
+                                    <input name="PSPBudgets[@count].May" type="hidden" value="@b.May">
+                                </td>
+                                <td>
+                                    @b.June
+                                    <input name="PSPBudgets[@count].June" type="hidden" value="@b.June">
+                                </td>
+                                <td>
+                                    @b.July
+                                    <input name="PSPBudgets[@count].July" type="hidden" value="@b.July">
+                                </td>
+                                <td>
+                                    @b.August
+                                    <input name="PSPBudgets[@count].August" type="hidden" value="@b.August">
+                                </td>
+                                <td>
+                                    @b.September
+                                    <input name="PSPBudgets[@count].September" type="hidden" value="@b.September">
+                                </td>
+                                <td>
+                                    @b.October
+                                    <input name="PSPBudgets[@count].October" type="hidden" value="@b.October">
+                                </td>
+                                <td>
+                                    @b.November
+                                    <input name="PSPBudgets[@count].November" type="hidden" value="@b.November">
+                                </td>
+                                <td>
+                                    @b.December
+                                    <input name="PSPBudgets[@count].December" type="hidden" value="@b.December">
+                                </td>
+                            </tr>
+
+                            count++;
+                        }
+                    }
                 </tbody>
 
             </table>
 
             <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
 
-            @if ( Model.Address != null )
-            {
-                <div class="left" style="width: 48%; margin-right: 4%;">
+            <div style="width: 32%; margin-top: 20px;">
 
-                    <div class="display-label">
-                        Address Line 1
-                    </div>
-                    <div class="display-field">
-                        @Model.Address.AddressLine1
-                        @Html.HiddenFor( model => model.Address.AddressLine1 )
-                    </div>
-
-                    <div class="display-label">
-                        Town
-                    </div>
-                    <div class="display-field">
-                        @Model.Address.Town
-                        @Html.HiddenFor( model => model.Address.Town )
-                    </div>
-
-                    <div class="display-label">
-                        Postal Code
-                    </div>
-                    <div class="display-field">
-                        @Model.Address.PostCode
-                        @Html.HiddenFor( model => model.Address.PostCode )
-                    </div>
-
+                <div class="display-label">
+                    Number Of Pallets Lost
+                </div>
+                <div class="display-field">
+                    @Model.NumberOfLostPallets
                 </div>
 
-                <div class="left" style="width: 48%;">
-
-                    <div class="display-label">
-                        Address Line 2
-                    </div>
-                    <div class="display-field">
-                        @Model.Address.AddressLine2
-                        @Html.HiddenFor( model => model.Address.AddressLine2 )
-                    </div>
-
-                    <div class="display-label">
-                        Province
-                    </div>
-                    <div class="display-field">
-                        @Model.Address.Province.GetDisplayText()
-                        @Html.HiddenFor( model => model.Address.Province )
-                    </div>
-
-                </div>
-            }
-            else
-            {
-                <div class="message-warn">
-                    No address details found. Please edit and add address details.
-                </div>
-            }
-
-            <div class="clear"></div>
+            </div>
 
             <div class="grouped-area">
 
@@ -296,6 +364,7 @@
                                 <option value="@item">@status.GetDisplayText()</option>
                             }
                         </select>
+
                         @Html.ValidationMessageFor( model => model.Status )
                     </div>
 

@@ -54,8 +54,9 @@
 
                 <label for="Files-0-File">
                     Company Logo <br />
-                    <img class="image-preview" style="margin-bottom: 10px; display: inline-block; width: 50%; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
-
+                    <a href="@logoUrl" target="_blank">
+                        <img class="image-preview" style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
+                    </a>
                 </label>
 
                 <p class="company-files">
@@ -115,7 +116,7 @@
             <div class="editor-field">
                 @foreach ( int k in Enum.GetValues( typeof( ServiceType ) ) )
                 {
-                    if ( k < 0 )
+                    if ( k < 3 )
                     {
                         continue;
                     }

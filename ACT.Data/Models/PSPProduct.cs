@@ -35,8 +35,8 @@ namespace ACT.Data.Models
         public int Status { get; set; }
     
         public virtual Product Product { get; set; }
-        public virtual PSP PSP { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PSPBilling> PSPBillings { get; set; }
+        public virtual PSP PSP { get; set; }
     }
 }

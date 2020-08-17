@@ -316,7 +316,13 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Create )]
         public ActionResult AddClient()
         {
-            ClientViewModel model = new ClientViewModel() { EditMode = true, Address = new AddressViewModel(), Files = new List<FileViewModel>(), ClientBudgets = new List<ClientBudget>() };
+            ClientViewModel model = new ClientViewModel()
+            {
+                EditMode = true,
+                Address = new AddressViewModel(),
+                Files = new List<FileViewModel>(),
+                ClientBudgets = new List<ClientBudget>()
+            };
 
             return View( model );
         }
@@ -369,8 +375,15 @@ namespace ACT.UI.Controllers
                     ContactNumber = model.ContactNumber,
                     FinPersonEmail = model.FinPersonEmail,
                     FinancialPerson = model.FinancialPerson,
-                    ServiceRequired = ( int ) ServiceType.ManageOwnPallets,
-                    CompanyRegistrationNumber = model.CompanyRegistrationNumber
+                    ServiceRequired = ( int ) model.ServiceType,
+
+                    PSPName = model.PSPName,
+                    BBBEELevel = model.BBBEELevel,
+                    CompanyType = ( int ) model.CompanyType,
+                    PalletType = ( int ) model.TypeOfPalletUse,
+                    PalletTypeOther = model.OtherTypeOfPalletUse,
+                    NumberOfLostPallets = model.NumberOfLostPallets,
+                    CompanyRegistrationNumber = model.CompanyRegistrationNumber,
                 };
 
                 client = service.Create( client );
@@ -379,16 +392,19 @@ namespace ACT.UI.Controllers
 
                 #region Create Client PSP link
 
-                int pspId = ( model.PSPId > 0 ) ? model.PSPId.Value : CurrentUser.PSPs.FirstOrDefault().Id;
-
-                PSPClient pClient = new PSPClient()
+                if ( model.ServiceType == ServiceType.HaveCompany && ( ( model.PSPId > 0 ) ? model.PSPId : CurrentUser.PSPs?.FirstOrDefault()?.Id ).HasValue )
                 {
-                    PSPId = pspId,
-                    ClientId = client.Id,
-                    Status = ( int ) Status.Active
-                };
+                    int? pspId = ( model.PSPId > 0 ) ? model.PSPId : CurrentUser.PSPs?.FirstOrDefault()?.Id;
 
-                pcservice.Create( pClient );
+                    PSPClient pClient = new PSPClient()
+                    {
+                        PSPId = pspId.Value,
+                        ClientId = client.Id,
+                        Status = ( int ) Status.Active
+                    };
+
+                    pcservice.Create( pClient );
+                }
 
                 #endregion
 
@@ -402,6 +418,7 @@ namespace ACT.UI.Controllers
                         {
                             ClientId = client.Id,
                             BudgetYear = l.BudgetYear,
+                            Total = l.Total,
                             January = l.January,
                             February = l.February,
                             March = l.March,
@@ -726,21 +743,24 @@ namespace ACT.UI.Controllers
 
                 #region Create Client PSP link
 
-                int pspId = ( model.PSPId > 0 ) ? model.PSPId.Value : CurrentUser.PSPs.FirstOrDefault().Id;
-
-                if ( client.PSPClients.NullableAny() )
+                if ( model.ServiceType == ServiceType.HaveCompany && ( ( model.PSPId > 0 ) ? model.PSPId : CurrentUser.PSPs?.FirstOrDefault()?.Id ).HasValue )
                 {
-                    pcservice.Query( $"DELETE FROM [PSPClient] WHERE ClientId={client.Id}" );
+                    int? pspId = ( model.PSPId > 0 ) ? model.PSPId : CurrentUser.PSPs?.FirstOrDefault()?.Id;
+
+                    if ( client.PSPClients.NullableAny() )
+                    {
+                        pcservice.Query( $"DELETE FROM [PSPClient] WHERE ClientId={client.Id}" );
+                    }
+
+                    PSPClient pClient = new PSPClient()
+                    {
+                        PSPId = pspId.Value,
+                        ClientId = client.Id,
+                        Status = ( int ) Status.Active
+                    };
+
+                    pcservice.Create( pClient );
                 }
-
-                PSPClient pClient = new PSPClient()
-                {
-                    PSPId = pspId,
-                    ClientId = client.Id,
-                    Status = ( int ) Status.Active
-                };
-
-                pcservice.Create( pClient );
 
                 #endregion
 

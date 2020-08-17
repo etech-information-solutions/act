@@ -69,19 +69,19 @@
                 </div>
 
                 <div class="edit-label">
-                    @Html.LabelFor( model => model.Status )
-                </div>
-                <div class="edit-field">
-                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.Status )
-                </div>
-
-                <div class="edit-label">
                     @Html.LabelFor( model => model.Cell )
                 </div>
                 <div class="edit-field">
                     @Html.TextBoxFor( model => model.Cell, new { @placeholder = "Enter Cell Number" } )
                     @Html.ValidationMessageFor( model => model.Cell )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Status )
+                </div>
+                <div class="edit-field">
+                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.Status )
                 </div>
 
                 <div class="edit-label">

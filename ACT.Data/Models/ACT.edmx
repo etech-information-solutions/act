@@ -670,6 +670,8 @@
           <Property Name="DeclinedReason" Type="varchar" MaxLength="500" />
           <Property Name="ServiceRequired" Type="int" Nullable="false" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="AdminPerson" Type="varchar" MaxLength="50" />
+          <Property Name="FinPersonEmail" Type="varchar" MaxLength="50" />
           <Property Name="PalletType" Type="int" />
           <Property Name="PalletTypeOther" Type="varchar" MaxLength="150" />
           <Property Name="BBBEELevel" Type="varchar" MaxLength="50" />
@@ -2389,7 +2391,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySet Name="OutstandingReasons" EntityType="ACTModel.OutstandingReason" />
           <EntitySet Name="Products" EntityType="ACTModel.Product" />
           <EntitySet Name="ProductPrices" EntityType="ACTModel.ProductPrice" />
-          <EntitySet Name="PSPs" EntityType="ACTModel.PSP" />
           <EntitySet Name="PSPBillings" EntityType="ACTModel.PSPBilling" />
           <EntitySet Name="PSPClients" EntityType="ACTModel.PSPClient" />
           <EntitySet Name="PSPConfigs" EntityType="ACTModel.PSPConfig" />
@@ -2533,10 +2534,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="Product" EntitySet="Products" />
             <End Role="ClientProduct" EntitySet="ClientProducts" />
           </AssociationSet>
-          <AssociationSet Name="FK_PSPClientProduct_PSP" Association="ACTModel.FK_PSPClientProduct_PSP">
-            <End Role="PSP" EntitySet="PSPs" />
-            <End Role="ClientProduct" EntitySet="ClientProducts" />
-          </AssociationSet>
           <AssociationSet Name="FK_ClientSites_Sites" Association="ACTModel.FK_ClientSites_Sites">
             <End Role="Site" EntitySet="Sites" />
             <End Role="ClientSite" EntitySet="ClientSites" />
@@ -2592,30 +2589,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <AssociationSet Name="FK_SiteBilling_Products" Association="ACTModel.FK_SiteBilling_Products">
             <End Role="Product" EntitySet="Products" />
             <End Role="SiteBilling" EntitySet="SiteBillings" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PSPBilling_PSP" Association="ACTModel.FK_PSPBilling_PSP">
-            <End Role="PSP" EntitySet="PSPs" />
-            <End Role="PSPBilling" EntitySet="PSPBillings" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PSPClients_PSP" Association="ACTModel.FK_PSPClients_PSP">
-            <End Role="PSP" EntitySet="PSPs" />
-            <End Role="PSPClient" EntitySet="PSPClients" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PSPConfigs_PSP" Association="ACTModel.FK_PSPConfigs_PSP">
-            <End Role="PSP" EntitySet="PSPs" />
-            <End Role="PSPConfig" EntitySet="PSPConfigs" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PSPProducts_PSP" Association="ACTModel.FK_PSPProducts_PSP">
-            <End Role="PSP" EntitySet="PSPs" />
-            <End Role="PSPProduct" EntitySet="PSPProducts" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PSPUser_PSP" Association="ACTModel.FK_PSPUser_PSP">
-            <End Role="PSP" EntitySet="PSPs" />
-            <End Role="PSPUser" EntitySet="PSPUsers" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Regions_PSP" Association="ACTModel.FK_Regions_PSP">
-            <End Role="PSP" EntitySet="PSPs" />
-            <End Role="Region" EntitySet="Regions" />
           </AssociationSet>
           <AssociationSet Name="FK_PSPBilling_PSPProducts" Association="ACTModel.FK_PSPBilling_PSPProducts">
             <End Role="PSPProduct" EntitySet="PSPProducts" />
@@ -2688,9 +2661,38 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="Client" EntitySet="Clients" />
             <End Role="ClientBudget" EntitySet="ClientBudgets" />
           </AssociationSet>
+          <EntitySet Name="PSPs" EntityType="ACTModel.PSP" />
+          <AssociationSet Name="FK_PSPClientProduct_PSP" Association="ACTModel.FK_PSPClientProduct_PSP">
+            <End Role="PSP" EntitySet="PSPs" />
+            <End Role="ClientProduct" EntitySet="ClientProducts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PSPBilling_PSP" Association="ACTModel.FK_PSPBilling_PSP">
+            <End Role="PSP" EntitySet="PSPs" />
+            <End Role="PSPBilling" EntitySet="PSPBillings" />
+          </AssociationSet>
           <AssociationSet Name="FK_PSPBudget_PSP" Association="ACTModel.FK_PSPBudget_PSP">
             <End Role="PSP" EntitySet="PSPs" />
             <End Role="PSPBudget" EntitySet="PSPBudgets" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PSPClients_PSP" Association="ACTModel.FK_PSPClients_PSP">
+            <End Role="PSP" EntitySet="PSPs" />
+            <End Role="PSPClient" EntitySet="PSPClients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PSPConfigs_PSP" Association="ACTModel.FK_PSPConfigs_PSP">
+            <End Role="PSP" EntitySet="PSPs" />
+            <End Role="PSPConfig" EntitySet="PSPConfigs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PSPProducts_PSP" Association="ACTModel.FK_PSPProducts_PSP">
+            <End Role="PSP" EntitySet="PSPs" />
+            <End Role="PSPProduct" EntitySet="PSPProducts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PSPUser_PSP" Association="ACTModel.FK_PSPUser_PSP">
+            <End Role="PSP" EntitySet="PSPs" />
+            <End Role="PSPUser" EntitySet="PSPUsers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Regions_PSP" Association="ACTModel.FK_Regions_PSP">
+            <End Role="PSP" EntitySet="PSPs" />
+            <End Role="Region" EntitySet="Regions" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Address">
@@ -3359,41 +3361,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Type" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Product" Relationship="ACTModel.FK_ProductPrices_Products" FromRole="ProductPrice" ToRole="Product" />
         </EntityType>
-        <EntityType Name="PSP">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="CompanyRegistrationNumber" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="CompanyName" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="TradingAs" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="VATNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ContactNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ContactPerson" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="FinancialPerson" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="Email" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="AdminEmail" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="DeclinedReason" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="ServiceRequired" Type="Int32" Nullable="false" />
-          <Property Name="Status" Type="Int32" Nullable="false" />
-          <Property Name="PalletType" Type="Int32" />
-          <Property Name="PalletTypeOther" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="BBBEELevel" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="CompanyType" Type="Int32" />
-          <Property Name="NumberOfLostPallets" Type="Int32" />
-          <NavigationProperty Name="ClientProducts" Relationship="ACTModel.FK_PSPClientProduct_PSP" FromRole="PSP" ToRole="ClientProduct" />
-          <NavigationProperty Name="PSPBillings" Relationship="ACTModel.FK_PSPBilling_PSP" FromRole="PSP" ToRole="PSPBilling" />
-          <NavigationProperty Name="PSPClients" Relationship="ACTModel.FK_PSPClients_PSP" FromRole="PSP" ToRole="PSPClient" />
-          <NavigationProperty Name="PSPConfigs" Relationship="ACTModel.FK_PSPConfigs_PSP" FromRole="PSP" ToRole="PSPConfig" />
-          <NavigationProperty Name="PSPProducts" Relationship="ACTModel.FK_PSPProducts_PSP" FromRole="PSP" ToRole="PSPProduct" />
-          <NavigationProperty Name="PSPUsers" Relationship="ACTModel.FK_PSPUser_PSP" FromRole="PSP" ToRole="PSPUser" />
-          <NavigationProperty Name="Regions" Relationship="ACTModel.FK_Regions_PSP" FromRole="PSP" ToRole="Region" />
-          <NavigationProperty Name="PSPBudgets" Relationship="ACTModel.FK_PSPBudget_PSP" FromRole="PSP" ToRole="PSPBudget" />
-        </EntityType>
         <EntityType Name="PSPBilling">
           <Key>
             <PropertyRef Name="Id" />
@@ -3415,8 +3382,8 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="NominatedAccount" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <Property Name="TaxAmount" Type="Decimal" Precision="19" Scale="4" />
-          <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPBilling_PSP" FromRole="PSPBilling" ToRole="PSP" />
           <NavigationProperty Name="PSPProduct" Relationship="ACTModel.FK_PSPBilling_PSPProducts" FromRole="PSPBilling" ToRole="PSPProduct" />
+          <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPBilling_PSP" FromRole="PSPBilling" ToRole="PSP" />
         </EntityType>
         <EntityType Name="PSPClient">
           <Key>
@@ -3482,8 +3449,8 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="RateUnit" Type="Int32" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Product" Relationship="ACTModel.FK_PSPProduct_Product" FromRole="PSPProduct" ToRole="Product" />
-          <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPProducts_PSP" FromRole="PSPProduct" ToRole="PSP" />
           <NavigationProperty Name="PSPBillings" Relationship="ACTModel.FK_PSPBilling_PSPProducts" FromRole="PSPProduct" ToRole="PSPBilling" />
+          <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPProducts_PSP" FromRole="PSPProduct" ToRole="PSP" />
         </EntityType>
         <EntityType Name="PSPUser">
           <Key>
@@ -3496,8 +3463,8 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPUser_PSP" FromRole="PSPUser" ToRole="PSP" />
           <NavigationProperty Name="User" Relationship="ACTModel.FK_PSPUser_User" FromRole="PSPUser" ToRole="User" />
+          <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPUser_PSP" FromRole="PSPUser" ToRole="PSP" />
         </EntityType>
         <EntityType Name="Region">
           <Key>
@@ -3512,9 +3479,9 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Name" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="Description" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="PSP" Relationship="ACTModel.FK_Regions_PSP" FromRole="Region" ToRole="PSP" />
           <NavigationProperty Name="User" Relationship="ACTModel.FK_Regions_Users" FromRole="Region" ToRole="User" />
           <NavigationProperty Name="Sites" Relationship="ACTModel.FK_Sites_Regions" FromRole="Region" ToRole="Site" />
+          <NavigationProperty Name="PSP" Relationship="ACTModel.FK_Regions_PSP" FromRole="Region" ToRole="PSP" />
         </EntityType>
         <EntityType Name="Role">
           <Key>
@@ -4244,18 +4211,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_PSPClientProduct_PSP">
-          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
-          <End Type="ACTModel.ClientProduct" Role="ClientProduct" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSP">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ClientProduct">
-              <PropertyRef Name="PSPId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_ClientSites_Sites">
           <End Type="ACTModel.Site" Role="Site" Multiplicity="1" />
           <End Type="ACTModel.ClientSite" Role="ClientSite" Multiplicity="*" />
@@ -4425,78 +4380,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="SiteBilling">
               <PropertyRef Name="ProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PSPBilling_PSP">
-          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
-          <End Type="ACTModel.PSPBilling" Role="PSPBilling" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSP">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PSPBilling">
-              <PropertyRef Name="PSPId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PSPClients_PSP">
-          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
-          <End Type="ACTModel.PSPClient" Role="PSPClient" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSP">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PSPClient">
-              <PropertyRef Name="PSPId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PSPConfigs_PSP">
-          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
-          <End Type="ACTModel.PSPConfig" Role="PSPConfig" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSP">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PSPConfig">
-              <PropertyRef Name="PSPId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PSPProducts_PSP">
-          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
-          <End Type="ACTModel.PSPProduct" Role="PSPProduct" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSP">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PSPProduct">
-              <PropertyRef Name="PSPId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PSPUser_PSP">
-          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
-          <End Type="ACTModel.PSPUser" Role="PSPUser" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSP">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PSPUser">
-              <PropertyRef Name="PSPId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Regions_PSP">
-          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
-          <End Type="ACTModel.Region" Role="Region" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSP">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Region">
-              <PropertyRef Name="PSPId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4781,6 +4664,67 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="PSP">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyRegistrationNumber" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyName" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="TradingAs" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="VATNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ContactNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ContactPerson" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="FinancialPerson" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="AdminEmail" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="DeclinedReason" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="ServiceRequired" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="AdminPerson" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FinPersonEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="PalletType" Type="Int32" />
+          <Property Name="PalletTypeOther" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="BBBEELevel" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyType" Type="Int32" />
+          <Property Name="NumberOfLostPallets" Type="Int32" />
+          <NavigationProperty Name="ClientProducts" Relationship="ACTModel.FK_PSPClientProduct_PSP" FromRole="PSP" ToRole="ClientProduct" />
+          <NavigationProperty Name="PSPBillings" Relationship="ACTModel.FK_PSPBilling_PSP" FromRole="PSP" ToRole="PSPBilling" />
+          <NavigationProperty Name="PSPBudgets" Relationship="ACTModel.FK_PSPBudget_PSP" FromRole="PSP" ToRole="PSPBudget" />
+          <NavigationProperty Name="PSPClients" Relationship="ACTModel.FK_PSPClients_PSP" FromRole="PSP" ToRole="PSPClient" />
+          <NavigationProperty Name="PSPConfigs" Relationship="ACTModel.FK_PSPConfigs_PSP" FromRole="PSP" ToRole="PSPConfig" />
+          <NavigationProperty Name="PSPProducts" Relationship="ACTModel.FK_PSPProducts_PSP" FromRole="PSP" ToRole="PSPProduct" />
+          <NavigationProperty Name="PSPUsers" Relationship="ACTModel.FK_PSPUser_PSP" FromRole="PSP" ToRole="PSPUser" />
+          <NavigationProperty Name="Regions" Relationship="ACTModel.FK_Regions_PSP" FromRole="PSP" ToRole="Region" />
+        </EntityType>
+        <Association Name="FK_PSPClientProduct_PSP">
+          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
+          <End Type="ACTModel.ClientProduct" Role="ClientProduct" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PSP">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ClientProduct">
+              <PropertyRef Name="PSPId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PSPBilling_PSP">
+          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
+          <End Type="ACTModel.PSPBilling" Role="PSPBilling" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PSP">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PSPBilling">
+              <PropertyRef Name="PSPId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_PSPBudget_PSP">
           <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
           <End Type="ACTModel.PSPBudget" Role="PSPBudget" Multiplicity="*" />
@@ -4789,6 +4733,66 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="PSPBudget">
+              <PropertyRef Name="PSPId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PSPClients_PSP">
+          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
+          <End Type="ACTModel.PSPClient" Role="PSPClient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PSP">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PSPClient">
+              <PropertyRef Name="PSPId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PSPConfigs_PSP">
+          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
+          <End Type="ACTModel.PSPConfig" Role="PSPConfig" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PSP">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PSPConfig">
+              <PropertyRef Name="PSPId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PSPProducts_PSP">
+          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
+          <End Type="ACTModel.PSPProduct" Role="PSPProduct" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PSP">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PSPProduct">
+              <PropertyRef Name="PSPId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PSPUser_PSP">
+          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
+          <End Type="ACTModel.PSPUser" Role="PSPUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PSP">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PSPUser">
+              <PropertyRef Name="PSPId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Regions_PSP">
+          <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
+          <End Type="ACTModel.Region" Role="Region" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PSP">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Region">
               <PropertyRef Name="PSPId" />
             </Dependent>
           </ReferentialConstraint>
@@ -5426,34 +5430,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="PSPs">
-            <EntityTypeMapping TypeName="ACTModel.PSP">
-              <MappingFragment StoreEntitySet="PSP">
-                <ScalarProperty Name="NumberOfLostPallets" ColumnName="NumberOfLostPallets" />
-                <ScalarProperty Name="CompanyType" ColumnName="CompanyType" />
-                <ScalarProperty Name="BBBEELevel" ColumnName="BBBEELevel" />
-                <ScalarProperty Name="PalletTypeOther" ColumnName="PalletTypeOther" />
-                <ScalarProperty Name="PalletType" ColumnName="PalletType" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="ServiceRequired" ColumnName="ServiceRequired" />
-                <ScalarProperty Name="DeclinedReason" ColumnName="DeclinedReason" />
-                <ScalarProperty Name="AdminEmail" ColumnName="AdminEmail" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="FinancialPerson" ColumnName="FinancialPerson" />
-                <ScalarProperty Name="ContactPerson" ColumnName="ContactPerson" />
-                <ScalarProperty Name="ContactNumber" ColumnName="ContactNumber" />
-                <ScalarProperty Name="VATNumber" ColumnName="VATNumber" />
-                <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="TradingAs" ColumnName="TradingAs" />
-                <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
-                <ScalarProperty Name="CompanyRegistrationNumber" ColumnName="CompanyRegistrationNumber" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="PSPBillings">
             <EntityTypeMapping TypeName="ACTModel.PSPBilling">
               <MappingFragment StoreEntitySet="PSPBilling">
@@ -5984,6 +5960,36 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="PSPId" ColumnName="PSPId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PSPs">
+            <EntityTypeMapping TypeName="ACTModel.PSP">
+              <MappingFragment StoreEntitySet="PSP">
+                <ScalarProperty Name="NumberOfLostPallets" ColumnName="NumberOfLostPallets" />
+                <ScalarProperty Name="CompanyType" ColumnName="CompanyType" />
+                <ScalarProperty Name="BBBEELevel" ColumnName="BBBEELevel" />
+                <ScalarProperty Name="PalletTypeOther" ColumnName="PalletTypeOther" />
+                <ScalarProperty Name="PalletType" ColumnName="PalletType" />
+                <ScalarProperty Name="FinPersonEmail" ColumnName="FinPersonEmail" />
+                <ScalarProperty Name="AdminPerson" ColumnName="AdminPerson" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ServiceRequired" ColumnName="ServiceRequired" />
+                <ScalarProperty Name="DeclinedReason" ColumnName="DeclinedReason" />
+                <ScalarProperty Name="AdminEmail" ColumnName="AdminEmail" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="FinancialPerson" ColumnName="FinancialPerson" />
+                <ScalarProperty Name="ContactPerson" ColumnName="ContactPerson" />
+                <ScalarProperty Name="ContactNumber" ColumnName="ContactNumber" />
+                <ScalarProperty Name="VATNumber" ColumnName="VATNumber" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="TradingAs" ColumnName="TradingAs" />
+                <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
+                <ScalarProperty Name="CompanyRegistrationNumber" ColumnName="CompanyRegistrationNumber" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

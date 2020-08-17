@@ -492,7 +492,6 @@
     <Content Include="Views\Administration\_PSPClients.cshtml" />
     <Content Include="Views\Administration\_PSPProducts.cshtml" />
     <Content Include="Views\Administration\_PSPInvoices.cshtml" />
-    <Content Include="Views\Administration\_PSPBudgets.cshtml" />
     <Content Include="Views\Administration\_Regions.cshtml" />
     <Content Include="Views\Administration\AddRegion.cshtml" />
     <Content Include="Views\Administration\RegionDetails.cshtml" />
@@ -631,6 +630,9 @@
     <Content Include="Views\Client\_ClientDocuments.cshtml" />
     <Content Include="Views\Client\_ApproveDeclineClient.cshtml" />
     <Content Include="Views\Client\_ClientBudgetsView.cshtml" />
+    <Content Include="Views\Administration\_PSPBudgetsView.cshtml" />
+    <Content Include="Views\Administration\_PSPDocuments.cshtml" />
+    <Content Include="Views\Administration\_PSPBudgets.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

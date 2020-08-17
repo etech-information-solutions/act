@@ -1016,7 +1016,12 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Create )]
         public ActionResult AddPSP()
         {
-            PSPViewModel model = new PSPViewModel();
+            PSPViewModel model = new PSPViewModel()
+            {
+                Address = new AddressViewModel(),
+                Files = new List<FileViewModel>(),
+                PSPBudgets = new List<PSPBudget>()
+            };
 
             return View( model );
         }
@@ -1059,15 +1064,22 @@ namespace ACT.UI.Controllers
                     TradingAs = model.TradingAs,
                     VATNumber = model.VATNumber,
                     AdminEmail = model.AdminEmail,
+                    AdminPerson = model.AdminPerson,
                     CompanyName = model.CompanyName,
                     Description = model.Description,
                     ContactPerson = model.ContactPerson,
                     ContactNumber = model.ContactNumber,
-                    FinancialPerson = model.ContactPerson,
+                    FinPersonEmail = model.FinPersonEmail,
+                    FinancialPerson = model.FinancialPerson,
                     Status = ( int ) PSPClientStatus.Verified,
                     ServiceRequired = ( int ) model.ServiceType,
                     CompanyRegistrationNumber = model.CompanyRegistrationNumber,
 
+                    BBBEELevel = model.BBBEELevel,
+                    CompanyType = ( int ) model.CompanyType,
+                    PalletType = ( int ) model.TypeOfPalletUse,
+                    PalletTypeOther = model.OtherTypeOfPalletUse,
+                    NumberOfLostPallets = model.NumberOfLostPallets,
                 };
 
                 psp = pservice.Create( psp );
@@ -1076,29 +1088,32 @@ namespace ACT.UI.Controllers
 
                 #region Create PSP Budget
 
-                if ( model.PSPBudget != null )
+                if ( model.PSPBudgets.NullableAny() )
                 {
-                    PSPBudget budget = new PSPBudget()
+                    foreach ( PSPBudget l in model.PSPBudgets )
                     {
-                        PSPId = psp.Id,
-                        Status = ( int ) Status.Active,
-                        BudgetYear = DateTime.Now.Year,
-                        January = model.PSPBudget.January,
-                        February = model.PSPBudget.February,
-                        March = model.PSPBudget.March,
-                        April = model.PSPBudget.April,
-                        May = model.PSPBudget.May,
-                        June = model.PSPBudget.June,
-                        July = model.PSPBudget.July,
-                        August = model.PSPBudget.August,
-                        September = model.PSPBudget.September,
-                        October = model.PSPBudget.October,
-                        November = model.PSPBudget.November,
-                        December = model.PSPBudget.December,
+                        PSPBudget b = new PSPBudget()
+                        {
+                            PSPId = psp.Id,
+                            BudgetYear = l.BudgetYear,
+                            Total = l.Total,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
+                            Status = ( int ) Status.Active,
+                        };
 
-                    };
-
-                    budget = bservice.Create( budget );
+                        bservice.Create( b );
+                    }
                 }
 
                 #endregion
@@ -1125,38 +1140,44 @@ namespace ACT.UI.Controllers
 
                 #endregion
 
-                #region Any Uploads
+                #region Any File Uploads
 
-                if ( model.RegistrationFile != null )
+                if ( model.Files.NullableAny( f => f.File != null ) )
                 {
-                    // Create folder
-                    string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/PSP/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/" );
-
-                    if ( !Directory.Exists( path ) )
+                    foreach ( FileViewModel f in model.Files.Where( f => f.File != null ) )
                     {
-                        Directory.CreateDirectory( path );
+                        // Create folder
+                        string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/PSP/{psp.Id}/" );
+
+                        if ( !Directory.Exists( path ) )
+                        {
+                            Directory.CreateDirectory( path );
+                        }
+
+                        f.Name = f.Name ?? "File";
+
+                        string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+
+                        Document doc = new Document()
+                        {
+                            Name = f.Name,
+                            Category = f.Name,
+                            ObjectId = psp.Id,
+                            ObjectType = "PSP",
+                            Title = f.File.FileName,
+                            Size = f.File.ContentLength,
+                            Description = f.Description,
+                            Status = ( int ) Status.Active,
+                            Type = Path.GetExtension( f.File.FileName ),
+                            Location = $"PSP/{psp.Id}/{now}-{f.File.FileName}"
+                        };
+
+                        dservice.Create( doc );
+
+                        string fullpath = Path.Combine( path, $"{now}-{f.File.FileName}" );
+
+                        f.File.SaveAs( fullpath );
                     }
-
-                    string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
-
-                    Document doc = new Document()
-                    {
-                        ObjectId = psp.Id,
-                        ObjectType = "PSP",
-                        Status = ( int ) Status.Active,
-                        Name = model.RegistrationFile.Name,
-                        Category = model.RegistrationFile.Name,
-                        Title = model.RegistrationFile.File.FileName,
-                        Size = model.RegistrationFile.File.ContentLength,
-                        Description = model.RegistrationFile.Description,
-                        Type = Path.GetExtension( model.RegistrationFile.File.FileName ),
-                        Location = $"PSP/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/{now}-{model.RegistrationFile.File.FileName}"
-                    };
-
-                    dservice.Create( doc );
-
-                    string fullpath = Path.Combine( path, $"{now}-{model.RegistrationFile.File.FileName}" );
-                    model.RegistrationFile.File.SaveAs( fullpath );
                 }
 
                 #endregion
@@ -1202,14 +1223,12 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Edit )]
         public ActionResult EditPSP( PSPViewModel model, PagingModel pm )
         {
-            if ( !ModelState.IsValid )
-            {
-                Notify( "Sorry, the selected PSP was not updated. Please correct all errors and try again.", NotificationType.Error );
+            //if ( !ModelState.IsValid )
+            //{
+            //    Notify( "Sorry, the selected PSP was not updated. Please correct all errors and try again.", NotificationType.Error );
 
-                return View( model );
-            }
-
-            PSP psp;
+            //    return View( model );
+            //}
 
             using ( PSPService pservice = new PSPService() )
             using ( AddressService aservice = new AddressService() )
@@ -1217,7 +1236,7 @@ namespace ACT.UI.Controllers
             using ( DocumentService dservice = new DocumentService() )
             using ( PSPBudgetService bservice = new PSPBudgetService() )
             {
-                psp = pservice.GetById( model.Id );
+                PSP psp = pservice.GetById( model.Id );
 
                 if ( psp == null )
                 {
@@ -1244,73 +1263,87 @@ namespace ACT.UI.Controllers
                 psp.Email = model.EmailAddress;
                 psp.TradingAs = model.TradingAs;
                 psp.VATNumber = model.VATNumber;
-                //psp.Status = ( int ) model.Status;
+                psp.Status = ( int ) model.Status;
                 psp.AdminEmail = model.AdminEmail;
+                psp.AdminPerson = model.AdminPerson;
                 psp.CompanyName = model.CompanyName;
                 psp.Description = model.Description;
                 psp.ContactPerson = model.ContactPerson;
                 psp.ContactNumber = model.ContactNumber;
-                psp.FinancialPerson = model.ContactPerson;
+                psp.FinPersonEmail = model.FinPersonEmail;
+                psp.FinancialPerson = model.FinancialPerson;
                 psp.ServiceRequired = ( int ) model.ServiceType;
                 psp.CompanyRegistrationNumber = model.CompanyRegistrationNumber;
+
+                psp.BBBEELevel = model.BBBEELevel;
+                psp.CompanyType = ( int ) model.CompanyType;
+                psp.NumberOfLostPallets = model.NumberOfLostPallets;
+                psp.PalletTypeOther = model.OtherTypeOfPalletUse;
+                psp.ServiceRequired = ( int ) model.ServiceType;
+                psp.PalletType = ( int ) model.TypeOfPalletUse;
 
                 psp = pservice.Update( psp );
 
                 #endregion
 
-                #region Update PSP Budget
+                #region Client Budgets
 
-                if ( model.PSPBudget != null )
+                if ( model.PSPBudgets.NullableAny() )
                 {
-                    PSPBudget budget = bservice.GetById( model.PSPBudget.Id );
-
-                    if ( budget == null )
+                    foreach ( PSPBudget l in model.PSPBudgets )
                     {
-                        budget = new PSPBudget()
+                        PSPBudget b = bservice.GetById( l.Id );
+
+                        if ( b == null )
                         {
-                            PSPId = psp.Id,
-                            Status = ( int ) Status.Active,
-                            BudgetYear = DateTime.Now.Year,
-                            January = model.PSPBudget.January,
-                            February = model.PSPBudget.February,
-                            March = model.PSPBudget.March,
-                            April = model.PSPBudget.April,
-                            May = model.PSPBudget.May,
-                            June = model.PSPBudget.June,
-                            July = model.PSPBudget.July,
-                            August = model.PSPBudget.August,
-                            September = model.PSPBudget.September,
-                            October = model.PSPBudget.October,
-                            November = model.PSPBudget.November,
-                            December = model.PSPBudget.December,
+                            b = new PSPBudget()
+                            {
+                                PSPId = psp.Id,
+                                BudgetYear = l.BudgetYear,
+                                Total = l.Total,
+                                January = l.January,
+                                February = l.February,
+                                March = l.March,
+                                April = l.April,
+                                May = l.May,
+                                June = l.June,
+                                July = l.July,
+                                August = l.August,
+                                September = l.September,
+                                October = l.October,
+                                November = l.November,
+                                December = l.December,
+                                Status = ( int ) Status.Active,
+                            };
 
-                        };
+                            bservice.Create( b );
+                        }
+                        else
+                        {
+                            b.BudgetYear = l.BudgetYear;
+                            b.Total = l.Total;
+                            b.January = l.January;
+                            b.February = l.February;
+                            b.March = l.March;
+                            b.April = l.April;
+                            b.May = l.May;
+                            b.June = l.June;
+                            b.July = l.July;
+                            b.August = l.August;
+                            b.September = l.September;
+                            b.October = l.October;
+                            b.November = l.November;
+                            b.December = l.December;
+                            b.Status = ( int ) Status.Active;
 
-                        bservice.Create( budget );
-                    }
-                    else
-                    {
-                        budget.BudgetYear = DateTime.Now.Year;
-                        budget.January = model.PSPBudget.January;
-                        budget.February = model.PSPBudget.February;
-                        budget.March = model.PSPBudget.March;
-                        budget.April = model.PSPBudget.April;
-                        budget.May = model.PSPBudget.May;
-                        budget.June = model.PSPBudget.June;
-                        budget.July = model.PSPBudget.July;
-                        budget.August = model.PSPBudget.August;
-                        budget.September = model.PSPBudget.September;
-                        budget.October = model.PSPBudget.October;
-                        budget.November = model.PSPBudget.November;
-                        budget.December = model.PSPBudget.December;
-
-                        bservice.Update( budget );
+                            bservice.Update( b );
+                        }
                     }
                 }
 
                 #endregion
 
-                #region Create Address (s)
+                #region Address (s)
 
                 if ( model.Address != null )
                 {
@@ -1320,8 +1353,8 @@ namespace ACT.UI.Controllers
                     {
                         address = new Address()
                         {
-                            ObjectId = psp.Id,
                             ObjectType = "PSP",
+                            ObjectId = model.Id,
                             Town = model.Address.Town,
                             Status = ( int ) Status.Active,
                             PostalCode = model.Address.PostCode,
@@ -1350,46 +1383,67 @@ namespace ACT.UI.Controllers
 
                 #region Any Uploads
 
-                if ( model.RegistrationFile.File != null )
+                if ( model.Files.NullableAny( f => f.File != null ) )
                 {
-                    // Create folder
-                    string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/PSP/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/" );
-
-                    if ( !Directory.Exists( path ) )
+                    foreach ( FileViewModel f in model.Files.Where( f => f.File != null ) )
                     {
-                        Directory.CreateDirectory( path );
+                        string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/PSP/{psp.Id}/" );
+
+                        if ( !Directory.Exists( path ) )
+                        {
+                            Directory.CreateDirectory( path );
+                        }
+
+                        Document doc;
+
+                        string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+
+                        if ( f.Name?.ToLower() == "logo" )
+                        {
+                            doc = dservice.Get( psp.Id, "PSP", f.Name );
+
+                            if ( doc != null )
+                            {
+                                try
+                                {
+                                    string p = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/{doc.Location}" );
+
+                                    if ( System.IO.File.Exists( p ) )
+                                    {
+                                        System.IO.File.Delete( p );
+                                    }
+                                }
+                                catch ( Exception ex )
+                                {
+
+                                }
+
+                                dservice.Delete( doc );
+                            }
+                        }
+
+                        f.Name = f.Name ?? f.Description?.Replace( " ", "" ) ?? "File";
+
+                        doc = new Document()
+                        {
+                            Name = f.Name,
+                            Category = f.Name,
+                            ObjectId = psp.Id,
+                            ObjectType = "PSP",
+                            Title = f.File.FileName,
+                            Size = f.File.ContentLength,
+                            Description = f.Description,
+                            Status = ( int ) Status.Active,
+                            Type = Path.GetExtension( f.File.FileName ),
+                            Location = $"PSP/{psp.Id}/{now}-{f.File.FileName}"
+                        };
+
+                        dservice.Create( doc );
+
+                        string fullpath = Path.Combine( path, $"{now}-{f.File.FileName}" );
+
+                        f.File.SaveAs( fullpath );
                     }
-
-                    string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
-
-                    Document doc = dservice.GetById( model.RegistrationFile.Id );
-
-                    if ( doc != null )
-                    {
-                        // Disable this file...
-                        doc.Status = ( int ) Status.Inactive;
-
-                        dservice.Update( doc );
-                    }
-
-                    doc = new Document()
-                    {
-                        ObjectId = psp.Id,
-                        ObjectType = "PSP",
-                        Status = ( int ) Status.Active,
-                        Name = model.RegistrationFile.Name,
-                        Category = model.RegistrationFile.Name,
-                        Title = model.RegistrationFile.File.FileName,
-                        Size = model.RegistrationFile.File.ContentLength,
-                        Description = model.RegistrationFile.Description,
-                        Type = Path.GetExtension( model.RegistrationFile.File.FileName ),
-                        Location = $"PSP/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/{now}-{model.RegistrationFile.File.FileName}"
-                    };
-
-                    dservice.Create( doc );
-
-                    string fullpath = Path.Combine( path, $"{now}-{model.RegistrationFile.File.FileName}" );
-                    model.RegistrationFile.File.SaveAs( fullpath );
                 }
 
                 #endregion
@@ -1400,7 +1454,7 @@ namespace ACT.UI.Controllers
 
             Notify( "The selected PSP's details were successfully updated.", NotificationType.Success );
 
-            return RedirectToAction( "PSPs" );
+            return PSPs( new PagingModel(), new CustomSearchModel() );
         }
 
         //
@@ -1429,7 +1483,7 @@ namespace ACT.UI.Controllers
                 Notify( "The selected PSP was successfully updated.", NotificationType.Success );
             }
 
-            return RedirectToAction( "PSPs" );
+            return PSPs( new PagingModel(), new CustomSearchModel() );
         }
 
         /// <summary>
@@ -1447,14 +1501,16 @@ namespace ACT.UI.Controllers
 
                 List<Document> documents = dservice.List( psp.Id, "PSP" );
 
-                EstimatedLoad load = new EstimatedLoad();
+                List<EstimatedLoad> loads = new List<EstimatedLoad>();
 
                 bool unverified = ( psp.Status == ( int ) PSPClientStatus.Unverified );
 
                 if ( unverified )
                 {
-                    load = eservice.Get( psp.Id, "PSP" );
+                    loads = eservice.List( psp.Id, "PSP" );
                 }
+
+                #region PSP
 
                 PSPViewModel model = new PSPViewModel()
                 {
@@ -1467,34 +1523,19 @@ namespace ACT.UI.Controllers
                     Description = psp.Description,
                     ContactNumber = psp.ContactNumber,
                     ContactPerson = psp.ContactPerson,
+                    AdminPerson = psp.AdminPerson,
+                    FinancialPerson = psp.FinancialPerson,
+                    FinPersonEmail = psp.FinPersonEmail,
                     Status = ( PSPClientStatus ) psp.Status,
                     ServiceType = ( ServiceType ) psp.ServiceRequired,
                     CompanyRegistrationNumber = psp.CompanyRegistrationNumber,
 
-                    RegistrationFile = new FileViewModel()
-                    {
-                        Name = documents?.FirstOrDefault()?.Name,
-                        Id = documents?.FirstOrDefault()?.Id ?? 0,
-                        Extension = documents?.FirstOrDefault()?.Type,
-                        Description = documents?.FirstOrDefault()?.Description,
-                    },
-                    PSPBudget = new EstimatedLoadViewModel()
-                    {
-                        Id = ( unverified ) ? 0 : psp.PSPBudgets?.FirstOrDefault()?.Id ?? 0,
-                        BudgetYear = ( unverified ) ? 0 : psp.PSPBudgets?.FirstOrDefault()?.BudgetYear ?? 0,
-                        January = ( unverified ) ? load.January : psp.PSPBudgets?.FirstOrDefault()?.January,
-                        February = ( unverified ) ? load.February : psp.PSPBudgets?.FirstOrDefault()?.February,
-                        March = ( unverified ) ? load.March : psp.PSPBudgets?.FirstOrDefault()?.March,
-                        April = ( unverified ) ? load.April : psp.PSPBudgets?.FirstOrDefault()?.April,
-                        May = ( unverified ) ? load.May : psp.PSPBudgets?.FirstOrDefault()?.May,
-                        June = ( unverified ) ? load.June : psp.PSPBudgets?.FirstOrDefault()?.June,
-                        July = ( unverified ) ? load.July : psp.PSPBudgets?.FirstOrDefault()?.July,
-                        August = ( unverified ) ? load.August : psp.PSPBudgets?.FirstOrDefault()?.August,
-                        September = ( unverified ) ? load.September : psp.PSPBudgets?.FirstOrDefault()?.September,
-                        October = ( unverified ) ? load.October : psp.PSPBudgets?.FirstOrDefault()?.October,
-                        November = ( unverified ) ? load.November : psp.PSPBudgets?.FirstOrDefault()?.November,
-                        December = ( unverified ) ? load.December : psp.PSPBudgets?.FirstOrDefault()?.December,
-                    },
+                    BBBEELevel = psp.BBBEELevel,
+                    CompanyType = ( CompanyType ) psp.CompanyType,
+                    NumberOfLostPallets = psp.NumberOfLostPallets,
+                    OtherTypeOfPalletUse = psp.PalletTypeOther,
+                    TypeOfPalletUse = ( TypeOfPalletUse ) psp.PalletType,
+
                     Address = new AddressViewModel()
                     {
                         EditMode = true,
@@ -1518,8 +1559,86 @@ namespace ACT.UI.Controllers
                         Email = psp.PSPUsers?.FirstOrDefault()?.User?.Email,
                         Surname = psp.PSPUsers?.FirstOrDefault()?.User?.Surname,
                         RoleId = psp.PSPUsers?.FirstOrDefault()?.User?.UserRoles?.FirstOrDefault()?.RoleId ?? 0,
-                    }
+                    },
+
+                    PSPBudgets = new List<PSPBudget>(),
+
+                    Files = new List<FileViewModel>(),
                 };
+
+                #endregion
+
+                #region PSP Budgets
+
+                if ( unverified && loads.NullableAny() )
+                {
+                    foreach ( EstimatedLoad l in loads )
+                    {
+                        model.PSPBudgets.Add( new PSPBudget()
+                        {
+                            Id = l.Id,
+                            BudgetYear = l.BudgetYear ?? 0,
+                            Total = l.Total,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
+                        } );
+                    }
+                }
+                else if ( psp.PSPBudgets.NullableAny() )
+                {
+                    foreach ( PSPBudget l in psp.PSPBudgets )
+                    {
+                        model.PSPBudgets.Add( new PSPBudget()
+                        {
+                            Id = l.Id,
+                            BudgetYear = l.BudgetYear,
+                            Total = l.Total,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
+                        } );
+                    }
+                }
+
+                #endregion
+
+                #region PSP Files
+
+                if ( documents.NullableAny() )
+                {
+                    foreach ( Document d in documents )
+                    {
+                        model.Files.Add( new FileViewModel()
+                        {
+                            Id = d.Id,
+                            Name = d.Name,
+                            Extension = d.Type,
+                            Size = ( decimal ) d.Size,
+                            Description = d.Description,
+                        } );
+                    }
+                }
+
+                #endregion
 
                 return model;
             }
@@ -1571,14 +1690,14 @@ namespace ACT.UI.Controllers
                     return PartialView( "_Notification" );
                 }
 
-                if ( !ModelState.IsValid )
-                {
-                    Notify( "Sorry, the selected PSP was not updated. Please correct all errors and try again.", NotificationType.Error );
+                //if ( !ModelState.IsValid )
+                //{
+                //    Notify( "Sorry, the selected PSP was not updated. Please correct all errors and try again.", NotificationType.Error );
 
-                    model = ConstructPSPViewModel( psp );
+                //    model = ConstructPSPViewModel( psp );
 
-                    return PartialView( "_ApproveDeclinePSP", model );
-                }
+                //    return PartialView( "_ApproveDeclinePSP", model );
+                //}
 
                 #region Update PSP
 
@@ -1639,30 +1758,34 @@ namespace ACT.UI.Controllers
 
                 #endregion
 
-                #region Create PSPBilling
+                #region PSP Budgets
 
-                if ( model.PSPBudget != null )
+                if ( model.PSPBudgets.NullableAny() )
                 {
-                    PSPBudget budget = new PSPBudget()
+                    foreach ( PSPBudget l in model.PSPBudgets )
                     {
-                        PSPId = psp.Id,
-                        BudgetYear = DateTime.Now.Year,
-                        Status = ( int ) Status.Active,
-                        January = model.PSPBudget.January,
-                        February = model.PSPBudget.February,
-                        March = model.PSPBudget.March,
-                        April = model.PSPBudget.April,
-                        May = model.PSPBudget.May,
-                        June = model.PSPBudget.June,
-                        July = model.PSPBudget.July,
-                        August = model.PSPBudget.August,
-                        September = model.PSPBudget.September,
-                        October = model.PSPBudget.October,
-                        November = model.PSPBudget.November,
-                        December = model.PSPBudget.December,
-                    };
+                        PSPBudget b = new PSPBudget()
+                        {
+                            PSPId = psp.Id,
+                            BudgetYear = l.BudgetYear,
+                            Total = l.Total,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
+                            Status = ( int ) Status.Active,
+                        };
 
-                    bservice.Create( budget );
+                        bservice.Create( b );
+                    }
                 }
 
                 #endregion
@@ -1827,6 +1950,98 @@ namespace ACT.UI.Controllers
         }
 
         //
+        // POST: /PSP/DeletePSPBudget/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeletePSPBudget( int id )
+        {
+            using ( PSPBudgetService bservice = new PSPBudgetService() )
+            {
+                PSPBudget b = bservice.GetById( id );
+
+                if ( b == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                int PSPId = b.PSPId;
+
+                bservice.Delete( b );
+
+                Notify( "The selected Budget was successfully Deleted.", NotificationType.Success );
+
+                List<PSPBudget> model = bservice.ListByColumnWhere( "PSPId", PSPId );
+
+                return PartialView( "_PSPBudgets", model );
+            }
+        }
+
+        //
+        // POST: /PSP/DeletePSPFile/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeletePSPDocument( int id, bool selfDestruct = false )
+        {
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                Document doc = dservice.GetById( id );
+
+                if ( doc == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                int PSPId = doc.ObjectId ?? 0;
+
+                try
+                {
+                    string p = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/{doc.Location}" );
+
+                    if ( System.IO.File.Exists( p ) )
+                    {
+                        System.IO.File.Delete( p );
+                    }
+                }
+                catch ( Exception ex )
+                {
+
+                }
+
+                dservice.Delete( doc );
+
+                if ( selfDestruct )
+                {
+                    return PartialView( "_Empty" );
+                }
+
+                List<FileViewModel> model = new List<FileViewModel>();
+
+                List<Document> documents = dservice.List( PSPId, "PSP" );
+
+                if ( documents.NullableAny() )
+                {
+                    foreach ( Document d in documents )
+                    {
+                        model.Add( new FileViewModel()
+                        {
+                            Id = d.Id,
+                            Name = d.Name,
+                            Extension = d.Type,
+                            Size = ( decimal ) d.Size,
+                            Description = d.Description,
+                        } );
+                    }
+                }
+
+                return PartialView( "_PSPDocuments", model );
+            }
+        }
+
+        //
         // GET: /Administration/PSPUsers/5
         public ActionResult PSPUsers( int id )
         {
@@ -1917,92 +2132,7 @@ namespace ACT.UI.Controllers
                     return PartialView( "_Notification" );
                 }
 
-                return PartialView( "_PSPBudgets", model );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetPSPBudgets( string PSPId )
-        {
-            if ( PSPId != null && PSPId != "" )
-            {
-                List<ClientBudget> load = null;
-
-                using ( ClientBudgetService bservice = new ClientBudgetService() )
-                {
-                    load = bservice.ListByColumnWhere( "PSPId", int.Parse( PSPId ) );
-                    // return Json(load.Any(l => l.Status == (int)Status.Active), JsonRequestBehavior.AllowGet);
-                    return Json( load, JsonRequestBehavior.AllowGet );
-                }
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetPSPBudget( string Id, string PSPId, string BudgetYear, string January, string February, string March, string April, string May, string June, string July, string August, string September, string October, string November, string December )
-        {
-            if ( Id != null )
-            {
-                using ( PSPBudgetService bservice = new PSPBudgetService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    //Collection of budgets or singular?
-                    if ( int.Parse( Id ) > 0 )
-                    {
-                        PSPBudget budget = bservice.GetById( int.Parse( Id ) );
-
-                        budget.PSPId = int.Parse( PSPId );
-                        budget.Status = ( int ) Status.Active;
-                        budget.BudgetYear = DateTime.Now.Year;
-                        budget.January = int.Parse( January );
-                        budget.February = int.Parse( February );
-                        budget.March = int.Parse( March );
-                        budget.April = int.Parse( April );
-                        budget.May = int.Parse( May );
-                        budget.June = int.Parse( June );
-                        budget.July = int.Parse( July );
-                        budget.August = int.Parse( August );
-                        budget.September = int.Parse( September );
-                        budget.October = int.Parse( October );
-                        budget.November = int.Parse( November );
-                        budget.December = int.Parse( December );
-                        budget.Status = ( int ) Status.Active;
-
-
-                        bservice.Update( budget );
-                    }
-                    else
-                    {
-                        PSPBudget budget = new PSPBudget();
-                        budget.PSPId = int.Parse( PSPId );
-                        budget.BudgetYear = DateTime.Now.Year;
-                        budget.January = int.Parse( January );
-                        budget.February = int.Parse( February );
-                        budget.March = int.Parse( March );
-                        budget.April = int.Parse( April );
-                        budget.May = int.Parse( May );
-                        budget.June = int.Parse( June );
-                        budget.July = int.Parse( July );
-                        budget.August = int.Parse( August );
-                        budget.September = int.Parse( September );
-                        budget.October = int.Parse( October );
-                        budget.November = int.Parse( November );
-                        budget.December = int.Parse( December );
-                        budget.Status = ( int ) Status.Active;
-
-                        bservice.Create( budget );
-                    }
-                    scope.Complete();
-                }
-
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
+                return PartialView( "_PSPBudgetsView", model );
             }
         }
 

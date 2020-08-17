@@ -9,7 +9,7 @@
 
 @using ( Html.BeginForm( "ApproveDeclineClient", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clients", @class = "custom-validate", @style = "width: auto;" } ) )
 {
-    string logoUrl = ( Model.Files.NullableAny( d => d.Name.ToLower() == "logo" ) ) ? $"/Client/ViewDocument/{Model.Files.FirstOrDefault( d => d.Name.ToLower() == "logo" ).Id}" : Url.Content( "~/Images/no-preview.png" );
+    string logoUrl = ( Model.Files.NullableAny( d => d.Name.ToLower() == "logo" ) ) ? Url.Action( "ViewDocument", new { id = Model.Files.FirstOrDefault( d => d.Name.ToLower() == "logo" ).Id } )  : Url.Content( "~/Images/no-preview.png" );
 
     <div id="edit-item">
 
@@ -31,7 +31,7 @@
 
                 <div class="display-field" style="text-align: center;">
 
-                    <img style="margin-bottom: 10px; display: inline-block; width: 50%; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
+                    <img style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
 
                     <strong class="block uppercase">@Html.DisplayFor( model => model.CompanyName )</strong>
                 </div>

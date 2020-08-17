@@ -14,7 +14,7 @@
     Address address = ViewBag.Address;
     List<Document> documents = ViewBag.Documents;
 
-    string logoUrl = ( documents.NullableAny( d => d.Name.ToLower() == "logo" ) ) ? $"/Client/ViewDocument/{documents.FirstOrDefault( d => d.Name.ToLower() == "logo" ).Id}" : Url.Content( "~/Images/no-preview.png" );
+    string logoUrl = ( documents.NullableAny( d => d.Name.ToLower() == "logo" ) ) ? Url.Action( "ViewDocument", new { id = documents.FirstOrDefault( d => d.Name.ToLower() == "logo" ).Id } ) : Url.Content( "~/Images/no-preview.png" );
 }
 
 <div id="item-details" class="item-details" style="width: auto;">
@@ -31,7 +31,9 @@
 
         <div class="display-field" style="text-align: center;">
 
-            <img style="margin-bottom: 10px; display: inline-block; width: 50%; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
+            <a href="@logoUrl" target="_blank">
+                <img style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
+            </a>
 
             <strong class="block uppercase">@Html.DisplayFor( model => model.CompanyName )</strong>
         </div>
@@ -58,13 +60,6 @@
         </div>
 
         <div class="display-label">
-            VAT Number
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.VATNumber )
-        </div>
-
-        <div class="display-label">
             Chep Reference
         </div>
         <div class="display-field">
@@ -83,6 +78,27 @@
         </div>
         <div class="display-field">
             @( ( ( ServiceType ) Model.ServiceRequired ).GetDisplayText() )
+        </div>
+
+        <div class="display-label">
+            Type of Pallet Use
+        </div>
+        <div class="display-field">
+            @( ( ( TypeOfPalletUse ) Model.PalletType ).GetDisplayText() )
+
+            @if ( ( ( TypeOfPalletUse ) Model.PalletType ) == TypeOfPalletUse.Other && !string.IsNullOrEmpty( Model.PalletTypeOther ) )
+            {
+                <i class="block bold" style="border-top: 1px solid #ddd; padding-top: 5px;">
+                    @Model.PalletTypeOther
+                </i>
+            }
+        </div>
+
+        <div class="display-label">
+            Company Type
+        </div>
+        <div class="display-field">
+            @( ( ( CompanyType ) Model.CompanyType ).GetDisplayText() )
         </div>
 
         <div class="display-label">
@@ -105,31 +121,17 @@
     <div class="left" style="width: 30%; margin-right: 4%;">
 
         <div class="display-label">
+            VAT Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.VATNumber )
+        </div>
+
+        <div class="display-label">
             BBBEE Level
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.BBBEELevel )
-        </div>
-
-        <div class="display-label">
-            Type of Pallet Use
-        </div>
-        <div class="display-field">
-            @( ( ( TypeOfPalletUse ) Model.PalletType ).GetDisplayText() )
-
-            @if ( ( ( TypeOfPalletUse ) Model.PalletType ) == TypeOfPalletUse.Other && !string.IsNullOrEmpty( Model.PalletTypeOther ) )
-            {
-                <i class="block bold" style="border-top: 1px solid #ddd; padding-top: 5px;">
-                    @Model.PalletTypeOther
-                </i>
-            }
-        </div>
-
-        <div class="display-label">
-            Company Type
-        </div>
-        <div class="display-field">
-            @( ( ( CompanyType ) Model.CompanyType ).GetDisplayText() )
         </div>
 
         <div class="display-label">

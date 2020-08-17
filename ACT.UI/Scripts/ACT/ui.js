@@ -1447,7 +1447,7 @@
                     }
 
                     // Restart JT JS DOM
-                    //ACT.Init.Start();
+                    ACT.Init.Start( true );
 
                     return false;
                 } );
@@ -3823,7 +3823,8 @@
             {
                 var i = $( this );
 
-                var target = $( i.attr( "data-target" ) );
+                             // <td>    // <tr>
+                var target = i.parent().parent().find( i.attr( "data-target" ) );
 
                 i
                     .unbind( "change" )

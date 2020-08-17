@@ -38,7 +38,6 @@
         <EntityTypeShape EntityType="ACTModel.OutstandingReason" Width="1.5" PointX="13.375" PointY="56.375" />
         <EntityTypeShape EntityType="ACTModel.Product" Width="1.5" PointX="8.125" PointY="66.125" />
         <EntityTypeShape EntityType="ACTModel.ProductPrice" Width="1.5" PointX="10.375" PointY="82.125" />
-        <EntityTypeShape EntityType="ACTModel.PSP" Width="1.5" PointX="3.625" PointY="57.375" />
         <EntityTypeShape EntityType="ACTModel.PSPBilling" Width="1.5" PointX="20.625" PointY="65" />
         <EntityTypeShape EntityType="ACTModel.PSPClient" Width="1.5" PointX="11.875" PointY="45.375" />
         <EntityTypeShape EntityType="ACTModel.PSPConfig" Width="1.5" PointX="5.875" PointY="65.5" />
@@ -92,7 +91,6 @@
         <AssociationConnector Association="ACTModel.FK_UserTasks_ClientLoads" />
         <AssociationConnector Association="ACTModel.FK_ClientProductMonthlys_ClientProducts" />
         <AssociationConnector Association="ACTModel.FK_ClientProducts_Products" />
-        <AssociationConnector Association="ACTModel.FK_PSPClientProduct_PSP" />
         <AssociationConnector Association="ACTModel.FK_ClientSites_Sites" />
         <AssociationConnector Association="ACTModel.FK_DeliveryNote_ClientSite" />
         <AssociationConnector Association="ACTModel.FK_ClientUsers_Users" />
@@ -107,12 +105,6 @@
         <AssociationConnector Association="ACTModel.FK_ProductPrices_Products" />
         <AssociationConnector Association="ACTModel.FK_PSPProduct_Product" />
         <AssociationConnector Association="ACTModel.FK_SiteBilling_Products" />
-        <AssociationConnector Association="ACTModel.FK_PSPBilling_PSP" />
-        <AssociationConnector Association="ACTModel.FK_PSPClients_PSP" />
-        <AssociationConnector Association="ACTModel.FK_PSPConfigs_PSP" />
-        <AssociationConnector Association="ACTModel.FK_PSPProducts_PSP" />
-        <AssociationConnector Association="ACTModel.FK_PSPUser_PSP" />
-        <AssociationConnector Association="ACTModel.FK_Regions_PSP" />
         <AssociationConnector Association="ACTModel.FK_PSPBilling_PSPProducts" />
         <AssociationConnector Association="ACTModel.FK_PSPUser_User" />
         <AssociationConnector Association="ACTModel.FK_Regions_Users" />
@@ -133,7 +125,15 @@
         <EntityTypeShape EntityType="ACTModel.ClientBudget" Width="1.5" PointX="5.875" PointY="18.125" />
         <EntityTypeShape EntityType="ACTModel.PSPBudget" Width="1.5" PointX="5.875" PointY="58.25" />
         <AssociationConnector Association="ACTModel.FK_ClientBudget_Clients" />
+        <EntityTypeShape EntityType="ACTModel.PSP" Width="1.5" PointX="3.625" PointY="57.875" />
+        <AssociationConnector Association="ACTModel.FK_PSPClientProduct_PSP" />
+        <AssociationConnector Association="ACTModel.FK_PSPBilling_PSP" />
         <AssociationConnector Association="ACTModel.FK_PSPBudget_PSP" />
+        <AssociationConnector Association="ACTModel.FK_PSPClients_PSP" />
+        <AssociationConnector Association="ACTModel.FK_PSPConfigs_PSP" />
+        <AssociationConnector Association="ACTModel.FK_PSPProducts_PSP" />
+        <AssociationConnector Association="ACTModel.FK_PSPUser_PSP" />
+        <AssociationConnector Association="ACTModel.FK_Regions_PSP" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

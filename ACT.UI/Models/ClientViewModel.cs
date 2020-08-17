@@ -25,7 +25,7 @@ namespace ACT.UI.Models
 
         [Required]
         [Display( Name = "Company Registration Number" )]
-        [StringLength( 15, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string CompanyRegistrationNumber { get; set; }
 
         [Required]

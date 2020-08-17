@@ -19,12 +19,12 @@ namespace ACT.Data.Models
         {
             this.ClientProducts = new HashSet<ClientProduct>();
             this.PSPBillings = new HashSet<PSPBilling>();
+            this.PSPBudgets = new HashSet<PSPBudget>();
             this.PSPClients = new HashSet<PSPClient>();
             this.PSPConfigs = new HashSet<PSPConfig>();
             this.PSPProducts = new HashSet<PSPProduct>();
             this.PSPUsers = new HashSet<PSPUser>();
             this.Regions = new HashSet<Region>();
-            this.PSPBudgets = new HashSet<PSPBudget>();
         }
     
         public int Id { get; set; }
@@ -44,6 +44,8 @@ namespace ACT.Data.Models
         public string DeclinedReason { get; set; }
         public int ServiceRequired { get; set; }
         public int Status { get; set; }
+        public string AdminPerson { get; set; }
+        public string FinPersonEmail { get; set; }
         public Nullable<int> PalletType { get; set; }
         public string PalletTypeOther { get; set; }
         public string BBBEELevel { get; set; }
@@ -55,6 +57,8 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PSPBilling> PSPBillings { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<PSPBudget> PSPBudgets { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PSPClient> PSPClients { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PSPConfig> PSPConfigs { get; set; }
@@ -64,7 +68,5 @@ namespace ACT.Data.Models
         public virtual ICollection<PSPUser> PSPUsers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Region> Regions { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<PSPBudget> PSPBudgets { get; set; }
     }
 }

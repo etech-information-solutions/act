@@ -60,43 +60,43 @@
                             <input class="input" name="ClientBudgets[@count].BudgetYear" placeholder="E.g 2020" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@b.BudgetYear">
                         </td>
                         <td>
-                            <input class="input" name="ClientBudgets[@count].Total" title="Changing this value will override values from Jan - Dec" placeholder="E.g 34900" required="required" data-budget-total="1" data-target=".el-input" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( total ?? 0, 0 )">
+                            <input class="input" name="ClientBudgets[@count].Total" title="Changing this value will override values from Jan - Dec" placeholder="E.g 34900" required="required" data-budget-total="1" data-target=".el-input-@b.Id" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( total ?? 0, 0 )">
                         </td>
                         <td>
-                            <input class="input el-input" name="ClientBudgets[@count].January" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.January ?? 0, 0 )">
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].January" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.January ?? 0, 0 )">
                         </td>
                         <td>
-                            <input class="input el-input" name="ClientBudgets[@count].February" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.February ?? 0, 0 )">
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].February" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.February ?? 0, 0 )">
                         </td>
                         <td>
-                            <input class="input el-input" name="ClientBudgets[@count].March" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.March ?? 0, 0 )">
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].March" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.March ?? 0, 0 )">
                         </td>
                         <td>
-                            <input class="input el-input" name="ClientBudgets[@count].April" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.April ?? 0, 0 )">
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].April" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.April ?? 0, 0 )">
                         </td>
                         <td>
-                            <input class="input el-input" name="ClientBudgets[@count].May" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.May ?? 0, 0 )">
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].May" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.May ?? 0, 0 )">
                         </td>
                         <td>
-                            <input class="input el-input" name="ClientBudgets[@count].June" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.June ?? 0, 0 )">
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].June" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.June ?? 0, 0 )">
                         </td>
                         <td>
-                            <input class="input el-input" name="ClientBudgets[@count].July" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.July ?? 0, 0 )">
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].July" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.July ?? 0, 0 )">
                         </td>
                         <td>
-                            <input class="input el-input" name="ClientBudgets[@count].August" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.August ?? 0, 0 )">
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].August" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.August ?? 0, 0 )">
                         </td>
                         <td>
-                            <input class="input el-input" name="ClientBudgets[@count].September" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.September ?? 0, 0 )">
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].September" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.September ?? 0, 0 )">
                         </td>
                         <td>
-                            <input class="input el-input" name="ClientBudgets[@count].October" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.October ?? 0, 0 )">
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].October" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.October ?? 0, 0 )">
                         </td>
                         <td>
-                            <input class="input el-input" name="ClientBudgets[@count].November" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.November ?? 0, 0 )">
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].November" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.November ?? 0, 0 )">
                         </td>
                         <td>
-                            <input class="input el-input" name="ClientBudgets[@count].December" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.December ?? 0, 0 )">
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].December" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.December ?? 0, 0 )">
                         </td>
                         <td>
                             @Html.ActionLink( "Remove", "DeleteClientBudget", new { id = b.Id }, new { @class = "del", @data_delete = "1", @data_id = b.Id, @data_target = "#row-line-" + count, @data_refresh_target = "#client-budget", @rel = "tipsyE", @title = "Remove this item?" } )
