@@ -22,5 +22,6 @@ namespace ACT.Core.Models.Custom
         public Nullable<decimal> TargetAmount { get; set; }
         public Nullable<int> TargetPeriod { get; set; }
 
+        public string ClientName { get; set; }
     }
 }

@@ -39,32 +39,13 @@ namespace ACT.Core.Models
             get; set;
         }
 
-        private int clientId;
-
         /// <summary>
         /// Can be used as a selected Client 
         /// </summary>
         [Display( Name = "Client" )]
         public int ClientId
         {
-            get
-            {
-                using ( ClientService cservice = new ClientService() )
-                {
-                    clientId = 0;
-
-                    if ( cservice.SelectedClient != null )
-                    {
-                        clientId = cservice.SelectedClient.Id;
-                    }
-
-                    return clientId;
-                }
-            }
-            set
-            {
-                value = clientId;
-            }
+            get; set;
         }
 
         /// <summary>
@@ -482,6 +463,16 @@ namespace ACT.Core.Models
                     using ( ClientService cservice = new ClientService() )
                     {
                         PSPOptions = pservice.List( true );
+                        ClientOptions = cservice.List( true );
+                    }
+
+                    break;
+
+
+                case "ClientKPI":
+
+                    using ( ClientService cservice = new ClientService() )
+                    {
                         ClientOptions = cservice.List( true );
                     }
 

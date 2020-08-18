@@ -137,7 +137,7 @@ namespace ACT.UI.Controllers
 
                             csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
                                                 csv,
-                                                item.CreatedOn.ToString( "yyyy/MM/dd" ),
+                                                item.CreatedOn,
                                                 activity.GetDisplayText(),
                                                 item.User.Name + " " + item.User.Surname,
                                                 item.ActionTable,

@@ -42,9 +42,11 @@ namespace ACT.UI.Controllers
 
             switch ( type )
             {
-                case "clientlist":
-                    #region ClientList
-                    csv = string.Format( "Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine );
+                case "clients":
+
+                    #region Clients
+
+                    csv = string.Format( "Date Created, Company Name, Trading As, Reg #, Description, Chep reference, Status, Service Required, Type of Pallet Use, Other Type of Pallet Use, Company Type, PSP, VAT Number, BBBEE Level, Contact Person, Contact Number, Contact Email, Administrator, Administrator Email, Financial Person, Financial Person Email {0}", Environment.NewLine );
 
                     List<ClientCustomModel> clients = new List<ClientCustomModel>();
 
@@ -57,14 +59,22 @@ namespace ACT.UI.Controllers
                     {
                         foreach ( ClientCustomModel item in clients )
                         {
-                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
+                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21} {22}",
                                                 csv,
-                                                item.Id,
+                                                item.CreatedOn,
                                                 item.CompanyName,
-                                                item.CompanyRegistrationNumber,
                                                 item.TradingAs,
-                                                item.VATNumber,
+                                                item.CompanyRegistrationNumber,
+                                                item.Description,
                                                 item.ChepReference,
+                                                ( ( Status ) item.Status ).GetDisplayText(),
+                                                ( ( ServiceType ) item.ServiceRequired ).GetDisplayText(),
+                                                ( ( TypeOfPalletUse ) item.PalletType ).GetDisplayText(),
+                                                item.PalletTypeOther,
+                                                ( ( CompanyType ) item.CompanyType ).GetDisplayText(),
+                                                ( item.PSPName ?? item.PSPCompanyName ),
+                                                item.VATNumber,
+                                                item.BBBEELevel,
                                                 item.ContactPerson,
                                                 item.ContactNumber,
                                                 item.Email,
@@ -72,7 +82,6 @@ namespace ACT.UI.Controllers
                                                 item.AdminEmail,
                                                 item.FinancialPerson,
                                                 item.FinPersonEmail,
-                                                ( Status ) ( int ) item.Status,
                                                 Environment.NewLine );
                         }
                     }
@@ -81,46 +90,9 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     break;
-                case "awaitingactivation":
-                    #region AwaitingActivation
-                    csv = string.Format( "Id, Company Name, Reg #, Trading As, Vat Number, Chep reference, Contact Person, Contact Person Number,  Contact Person Email, Administrator Name,Administrator Email,Financial Person,Financial Person Email, Status {0}", Environment.NewLine );
 
-                    List<ClientCustomModel> inactiveclients = new List<ClientCustomModel>();
-                    csm.Status = Status.Pending;
-                    using ( ClientService service = new ClientService() )
-                    {
-                        inactiveclients = service.List1( pm, csm );
-                    }
-
-                    if ( inactiveclients != null && inactiveclients.Any() )
-                    {
-                        foreach ( ClientCustomModel item in inactiveclients )
-                        {
-                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
-                                                csv,
-                                                item.Id,
-                                                item.CompanyName,
-                                                item.CompanyRegistrationNumber,
-                                                item.TradingAs,
-                                                item.VATNumber,
-                                                item.ChepReference,
-                                                item.ContactPerson,
-                                                item.ContactNumber,
-                                                item.Email,
-                                                item.AdminPerson,
-                                                item.AdminEmail,
-                                                item.FinancialPerson,
-                                                item.FinPersonEmail,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
-                        }
-                    }
-
-
-                    #endregion
-
-                    break;
                 case "managesites":
+
                     #region AwaitingActivation
                     csv = string.Format( "Id, Name, Description, X Coord, Y Coord, Address, Postal Code, Contact Name,Contact No,Planning Point, Depot, Chep Sitecode, Site Type, Status {0}", Environment.NewLine );
 
@@ -155,9 +127,11 @@ namespace ACT.UI.Controllers
                         }
                     }
                     #endregion
+
                     break;
 
                 case "linkproducts":
+
                     #region linkproducts
                     csv = string.Format( "Id, ClientId, Company Name, ProductId, Product Name, Product Description, Active Date, HireRate, LostRate, IssueRate, PassonRate, PassonDays, Status {0}", Environment.NewLine );
 
@@ -197,6 +171,7 @@ namespace ACT.UI.Controllers
                     break;
 
                 case "clientgroups":
+
                     #region ClientGroup
                     csv = string.Format( "Id, Group Name, Description, Status {0}", Environment.NewLine );
 
@@ -225,38 +200,42 @@ namespace ACT.UI.Controllers
                     #endregion
 
                     break;
-                case "clientkpis":
-                    #region ClientKPI
-                    csv = string.Format( "Id, Client Id,Description, Weight %, TargetAmount, Target Period, Status {0}", Environment.NewLine );
 
-                    List<ClientKPI> kpis = new List<ClientKPI>();
+                case "clientkpi":
+
+                    #region Client KPI
 
                     using ( ClientKPIService service = new ClientKPIService() )
                     {
-                        kpis = service.ListCSM( pm, csm );
-                    }
+                        csv = string.Format( "Date Created, Client, KPI Description, Outstanding Pallets, Disputes, Passons, Resolve Days, Outstanding Days, Monthly Cost, Weight %, Target Amount, Target Period, Status {0}", Environment.NewLine );
 
-                    if ( kpis != null && kpis.Any() )
-                    {
-                        foreach ( ClientKPI item in kpis )
+                        List<ClientKPICustomModel> kpis = new List<ClientKPICustomModel>();
+
+                        kpis = service.List1( pm, csm );
+
+                        if ( kpis != null && kpis.Any() )
                         {
-                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
-                                                csv,
-                                                item.Id,
-                                                item.ClientId,
-                                                item.KPIDescription,
-                                                //item.Disputes,
-                                                //item.OutstandingPallets,
-                                                //item.OutstandingDays,
-                                                //item.Passons,
-                                                item.Weight,
-                                                item.TargetAmount,
-                                                item.TargetPeriod,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
+                            foreach ( ClientKPICustomModel item in kpis )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} {14}",
+                                                    csv,
+                                                    item.CreatedOn,
+                                                    "\"" + item.ClientName + "\"",
+                                                    "\"" + item.KPIDescription + "\"",
+                                                    "\"" + item.OutstandingPallets + "\"",
+                                                    "\"" + item.Disputes + "\"",
+                                                    "\"" + item.Passons + "\"",
+                                                    "\"" + item.ResolveDays + "\"",
+                                                    "\"" + item.OutstandingDays + "\"",
+                                                    "\"" + item.MonthlyCost + "\"",
+                                                    "\"" + item.Weight + "\"",
+                                                    "\"" + item.TargetAmount + "\"",
+                                                    ( ( TargetPeriod ) item.TargetPeriod ).GetDisplayText(),
+                                                    ( ( Status ) item.Status ).GetDisplayText(),
+                                                    Environment.NewLine );
+                            }
                         }
                     }
-
 
                     #endregion
 
@@ -1416,6 +1395,614 @@ namespace ACT.UI.Controllers
         #endregion
 
 
+
+        #region KPIS
+
+        //
+        // GET: /Client/ClientDetails/5
+        public ActionResult KPIDetails( int id, bool layout = true )
+        {
+            using ( ClientKPIService kservice = new ClientKPIService() )
+            {
+                ClientKPI model = kservice.GetById( id );
+
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return RedirectToAction( "Index" );
+                }
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                return View( model );
+            }
+        }
+
+        // GET: Client/AddKPI
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddKPI()
+        {
+            ClientKPIViewModel model = new ClientKPIViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        // POST: Client/AddKPI
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddKPI( ClientKPIViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the Client KPI was not created. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( ClientKPIService kservice = new ClientKPIService() )
+            {
+                #region Validation
+
+                if ( kservice.ExistByKPIDescription( model.KPIDescription.Trim(), model.ClientId ) )
+                {
+                    // Bank already exist!
+                    Notify( $"Sorry, a KPI with the Description \"{model.KPIDescription}\" already exists for the selected client!", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                #endregion
+
+                #region Create Client KPI
+
+                ClientKPI kpi = new ClientKPI()
+                {
+                    Weight = model.Weight,
+                    Passons = model.Passons,
+                    ClientId = model.ClientId,
+                    Disputes = model.Disputes,
+                    Status = ( int ) model.Status,
+                    MonthlyCost = model.MonthlyCost,
+                    ResolveDays = model.ResolveDays,
+                    TargetAmount = model.TargetAmount,
+                    KPIDescription = model.KPIDescription,
+                    OutstandingDays = model.OutstandingDays,
+                    TargetPeriod = ( int ) model.TargetPeriod,
+                    OutstandingPallets = model.OutstandingPallets,
+                };
+
+                kservice.Create( kpi );
+
+                #endregion
+
+                Notify( "The Client KPI was successfully created.", NotificationType.Success );
+
+                return ClientKPI( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
+        // GET: Client/EditKPI/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditKPI( int id )
+        {
+            using ( ClientKPIService kservice = new ClientKPIService() )
+            {
+                ClientKPI kpi = kservice.GetById( id );
+
+                if ( kpi == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                ClientKPIViewModel model = new ClientKPIViewModel()
+                {
+                    Id = kpi.Id,
+                    EditMode = true,
+                    Weight = kpi.Weight,
+                    Passons = kpi.Passons,
+                    Disputes = kpi.Disputes,
+                    ClientId = kpi.ClientId,
+                    MonthlyCost = kpi.MonthlyCost,
+                    ResolveDays = kpi.ResolveDays,
+                    Status = ( Status ) kpi.Status,
+                    TargetAmount = kpi.TargetAmount,
+                    KPIDescription = kpi.KPIDescription,
+                    OutstandingDays = kpi.OutstandingDays,
+                    OutstandingPallets = kpi.OutstandingPallets,
+                    TargetPeriod = ( TargetPeriod ) kpi.TargetPeriod,
+                };
+
+                return View( model );
+            }
+        }
+
+        // POST: Client/EditKPI/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditKPI( ClientKPIViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the selected Client was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( ClientKPIService kservice = new ClientKPIService() )
+            {
+                ClientKPI kpi = kservice.GetById( model.Id );
+
+                #region Validation
+
+                if ( kpi == null )
+                {
+                    Notify( "Sorry, that Client KPI does not exist! Please specify a valid Role Id and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                if ( kpi.KPIDescription.Trim().ToLower() != model.KPIDescription.Trim().ToLower() && kservice.ExistByKPIDescription( model.KPIDescription.Trim(), model.ClientId ) )
+                {
+                    // KPI already exist!
+                    Notify( $"Sorry, a KPI with the Description \"{model.KPIDescription}\" already exists for the selected client!", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                #endregion
+
+                #region Update Client KPI
+
+                // Update Client KPI
+                kpi.Id = model.Id;
+                kpi.Weight = model.Weight;
+                kpi.Passons = model.Passons;
+                kpi.ClientId = model.ClientId;
+                kpi.Disputes = model.Disputes;
+                kpi.Status = ( int ) model.Status;
+                kpi.MonthlyCost = model.MonthlyCost;
+                kpi.ResolveDays = model.ResolveDays;
+                kpi.TargetAmount = model.TargetAmount;
+                kpi.KPIDescription = model.KPIDescription;
+                kpi.OutstandingDays = model.OutstandingDays;
+                kpi.TargetPeriod = ( int ) model.TargetPeriod;
+                kpi.OutstandingPallets = model.OutstandingPallets;
+
+                kservice.Update( kpi );
+
+                #endregion
+
+                Notify( "The selected Client KPI details were successfully updated.", NotificationType.Success );
+
+                return ClientKPI( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
+        // POST: Client/DeleteKPI/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteKPI( ClientViewModel model )
+        {
+            using ( ClientKPIService service = new ClientKPIService() )
+            {
+                ClientKPI kpi = service.GetById( model.Id );
+
+                if ( kpi == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                kpi.Status = ( ( ( Status ) kpi.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.Update( kpi );
+
+                Notify( "The selected Client KPI was successfully updated.", NotificationType.Success );
+
+                return ClientKPI( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
+        #endregion
+
+
+
+        #region Client Group
+
+        //
+        // GET: /Client/ClientGroups`
+        public ActionResult ClientGroups( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            ViewBag.ViewName = "ClientGroups";
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "ClientGroups";
+
+                return PartialView( "_ClientGroupsCustomSearch", new CustomSearchModel( "ClientGroups" ) );
+            }
+            int total = 0;
+
+            List<Group> model = new List<Group>();
+            //int pspId = Session[ "UserPSP" ];
+            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+            //get group list, and their associated clients. TRhis woill be extended with an api call to get clients included and excluded as the button is clicked, and as the groups are changed
+            using ( ClientService clientService = new ClientService() )
+            //using (ClientGroupService clientGroupService = new ClientGroupService())
+            using ( GroupService groupService = new GroupService() )
+            {
+                pm.Sort = pm.Sort ?? "DESC";
+                pm.SortBy = pm.SortBy ?? "Name";
+
+                model = groupService.GetGroupsByPSP( pspId, new CustomSearchModel() { ClientId = clientId } );
+                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : groupService.Total();
+
+                //get the specific list of clients that exists for the first group, to render the tables, will use an api call to change it accordingly after reselection
+                //Group clientGroup = groupService.GetGroupsByPSP(pspId).FirstOrDefault();
+                //if (clientGroup != null)
+                //{
+                //    ViewBag.ClientListIncluded = clientService.GetClientsByPSPIncludedGroup(pspId, clientGroup.Id);
+                //    ViewBag.ClientListExcluded = clientService.GetClientsByPSPExcludedGroup(pspId, clientGroup.Id);
+                //    //ViewBag.GroupData = groupService.GetGroupsByPSP(pspId);
+                //}
+            }
+            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+            return PartialView( "_ClientGroups", paging );
+        }
+
+
+        // GET: Client/AddGroup
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddGroup()
+        {
+            GroupViewModel model = new GroupViewModel() { EditMode = true };
+            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
+            model.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
+            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
+            //TODO
+            using ( ClientService clientService = new ClientService() )
+            {
+                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+            }
+
+            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.CompanyName
+
+            } );
+            ViewBag.ClientList = clientDDL;
+
+
+            return View( model );
+        }
+
+
+        // POST: Client/AddGroup
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddGroup( GroupViewModel model )
+        {
+            try
+            {
+
+                if ( !ModelState.IsValid )
+                {
+                    Notify( "Sorry, the Group was not created. Please correct all errors and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                using ( GroupService gService = new GroupService() )
+                using ( ClientGroupService cgservice = new ClientGroupService() )
+                using ( TransactionScope scope = new TransactionScope() )
+                {
+                    #region Create Group
+                    Group group = new Group()
+                    {
+                        Name = model.Name,
+                        Description = model.Description,
+                        Status = ( int ) Status.Active
+                    };
+                    group = gService.Create( group );
+                    #endregion
+
+                    #region Create Group Client Links
+                    if ( !string.IsNullOrEmpty( model.GroupClientList ) )
+                    {
+                        string[] clientList = model.GroupClientList.Split( ',' );
+                        string lastId = "0";
+                        foreach ( string itm in clientList )
+                        {
+                            //test to see if its not been added before
+                            ClientGroup checkCG = cgservice.GetByColumnsWhere( "ClientId", int.Parse( itm ), "GroupId", group.Id );
+
+                            if ( !string.IsNullOrEmpty( itm ) && itm != lastId && checkCG == null )
+                            {
+                                ClientGroup client = new ClientGroup()
+                                {
+                                    ClientId = int.Parse( itm ),
+                                    GroupId = group.Id,
+                                    Status = ( int ) Status.Active
+                                };
+                                cgservice.Create( client );
+                            }
+                            lastId = itm;
+                        }
+                    }
+                    #endregion
+
+                    scope.Complete();
+                }
+
+                Notify( "The Group was successfully created.", NotificationType.Success );
+                return RedirectToAction( "ClientGroups" );
+            }
+            catch ( Exception ex )
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+
+        // GET: Client/EditGroupGet/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditGroupGet( int id )
+        {
+            Group group;
+
+            using ( GroupService service = new GroupService() )
+            {
+                group = service.GetById( id );
+
+
+                if ( group == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                GroupViewModel model = new GroupViewModel()
+                {
+                    Id = group.Id,
+                    Name = group.Name,
+                    Description = group.Description,
+                    Status = ( int ) group.Status,
+                    EditMode = true
+                };
+                return View( "EditGroup", model );
+            }
+        }
+
+        // POST: Client/EditGroup/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditGroup( GroupViewModel model, PagingModel pm, bool isstructure = false )
+        {
+            try
+            {
+                if ( !ModelState.IsValid )
+                {
+                    Notify( "Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                Group group;
+
+                using ( GroupService service = new GroupService() )
+                using ( TransactionScope scope = new TransactionScope() )
+                {
+                    group = service.GetById( model.Id );
+
+                    #region Update Group
+
+                    // Update Group
+                    //group.Id = model.Id;
+                    group.Name = model.Name;
+                    group.Description = model.Description;
+                    group.Status = ( int ) model.Status;
+
+                    service.Update( group );
+
+                    #endregion
+
+
+                    scope.Complete();
+                }
+
+                Notify( "The selected Group details were successfully updated.", NotificationType.Success );
+
+                return RedirectToAction( "ClientGroups" );
+            }
+            catch ( Exception ex )
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+        // POST: Client/DeleteGroup/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteGroup( GroupViewModel model )
+        {
+            Group group;
+            ClientGroup clientGroup;
+            try
+            {
+
+                using ( GroupService service = new GroupService() )
+                // using (ClientGroupService clientgroupservice = new ClientGroupService())
+                using ( TransactionScope scope = new TransactionScope() )
+                {
+                    group = service.GetById( model.Id );
+
+                    if ( group == null )
+                    {
+                        Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                        return PartialView( "_AccessDenied" );
+                    }
+
+                    group.Status = ( ( ( Status ) group.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                    //clientGroup = clientgroupservice.GetById(model.Id);
+                    //clientGroup.Status = (((Status)group.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;                    
+
+                    service.Update( group );
+                    // clientgroupservice.Update(clientGroup);
+                    scope.Complete();
+
+                }
+                Notify( "The selected Group was successfully updated.", NotificationType.Success );
+                return RedirectToAction( "ClientGroups" );
+            }
+            catch ( Exception ex )
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+
+
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult GetClientsForGroupIncluded( string groupId )
+        {
+            if ( groupId != null && groupId != "" )
+            {
+                List<Client> clients;
+                //int pspId = Session[ "UserPSP" ];
+                int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
+                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+                int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+                using ( ClientService clientService = new ClientService() )
+                {
+
+                    clients = clientService.GetClientsByPSPIncludedGroup( pspId, int.Parse( groupId ), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+
+                }
+                return Json( clients, JsonRequestBehavior.AllowGet );
+            }
+            else
+            {
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
+            }
+        }
+
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult GetClientsForGroupExcluded( string groupId )
+        {
+            if ( groupId != null && groupId != "" )
+            {
+                List<Client> clients;
+                //int pspId = Session[ "UserPSP" ];
+                int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
+                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+                int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+
+                using ( ClientService clientService = new ClientService() )
+                {
+
+                    clients = clientService.GetClientsByPSPExcludedGroup( pspId, int.Parse( groupId ), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+
+                }
+                return Json( clients, JsonRequestBehavior.AllowGet );
+            }
+            else
+            {
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
+            }
+        }
+
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult SetClientForGroupExcluded( string groupId, string clientId )
+        {
+            if ( !string.IsNullOrEmpty( groupId ) && !string.IsNullOrEmpty( clientId ) )
+            {
+                //using (GroupService service = new GroupService())
+                using ( ClientGroupService clientgroupservice = new ClientGroupService() )
+                using ( TransactionScope scope = new TransactionScope() )
+                {
+                    List<ClientGroup> group = new List<ClientGroup>();
+                    group = clientgroupservice.GetClientGroupsByClientGroup( int.Parse( groupId ), int.Parse( clientId ) );
+
+                    if ( group == null )
+                    {
+                        return Json( data: "False", behavior: JsonRequestBehavior.AllowGet );
+                    }
+                    foreach ( ClientGroup g in group )
+                    {
+                        clientgroupservice.Delete( g );
+                    }
+                    scope.Complete();
+                }
+
+
+                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
+            }
+            else
+            {
+                return Json( data: "False", behavior: JsonRequestBehavior.AllowGet );
+            }
+        }
+
+        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
+        public JsonResult SetClientForGroupIncluded( string groupId, string clientId )
+        {
+            if ( !string.IsNullOrEmpty( groupId ) && !string.IsNullOrEmpty( clientId ) )
+            {
+                //using (GroupService service = new GroupService())
+                using ( ClientGroupService clientgroupservice = new ClientGroupService() )
+                using ( GroupService groupservice = new GroupService() )
+                using ( ClientService clientService = new ClientService() )
+                using ( TransactionScope scope = new TransactionScope() )
+                {
+                    ClientGroup checkCG = clientgroupservice.GetByColumnsWhere( groupId, clientId );//check this link doesnt already exist, ignore if it does
+                    //Group groupObj = groupservice.GetById(int.Parse(groupId));
+                    if ( checkCG == null )
+                    {
+                        ClientGroup cgroup = new ClientGroup()
+                        {
+                            GroupId = int.Parse( groupId ),
+                            ClientId = int.Parse( clientId ),
+                            Status = ( int ) Status.Active,
+                        };
+                        clientgroupservice.Create( cgroup );
+
+                        scope.Complete();
+                    } //nothing to do here if the group is already linekd  to the same client
+                    else
+                    {
+                        //just update status to make sure its visible and active, maybe it was disabled
+                        checkCG.Status = ( int ) Status.Active;
+                        clientgroupservice.Update( checkCG );
+                    }
+                }
+
+
+            }
+            return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
+        }
+
+        #endregion
+
+
+
         #region Manage Sites
         //
         // GET: /Client/ManageSites
@@ -2109,6 +2696,7 @@ namespace ACT.UI.Controllers
         #endregion
 
 
+
         #region Sub Sites
         //
         // POST || GET: /Client/SubSites
@@ -2374,392 +2962,6 @@ namespace ACT.UI.Controllers
 
         #endregion
 
-
-        #region Client Group
-        //
-        // GET: /Client/ClientGroups`
-        public ActionResult ClientGroups( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
-        {
-            ViewBag.ViewName = "ClientGroups";
-            if ( givecsm )
-            {
-                ViewBag.ViewName = "ClientGroups";
-
-                return PartialView( "_ClientGroupsCustomSearch", new CustomSearchModel( "ClientGroups" ) );
-            }
-            int total = 0;
-
-            List<Group> model = new List<Group>();
-            //int pspId = Session[ "UserPSP" ];
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            //get group list, and their associated clients. TRhis woill be extended with an api call to get clients included and excluded as the button is clicked, and as the groups are changed
-            using ( ClientService clientService = new ClientService() )
-            //using (ClientGroupService clientGroupService = new ClientGroupService())
-            using ( GroupService groupService = new GroupService() )
-            {
-                pm.Sort = pm.Sort ?? "DESC";
-                pm.SortBy = pm.SortBy ?? "Name";
-
-                model = groupService.GetGroupsByPSP( pspId, new CustomSearchModel() { ClientId = clientId } );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : groupService.Total();
-
-                //get the specific list of clients that exists for the first group, to render the tables, will use an api call to change it accordingly after reselection
-                //Group clientGroup = groupService.GetGroupsByPSP(pspId).FirstOrDefault();
-                //if (clientGroup != null)
-                //{
-                //    ViewBag.ClientListIncluded = clientService.GetClientsByPSPIncludedGroup(pspId, clientGroup.Id);
-                //    ViewBag.ClientListExcluded = clientService.GetClientsByPSPExcludedGroup(pspId, clientGroup.Id);
-                //    //ViewBag.GroupData = groupService.GetGroupsByPSP(pspId);
-                //}
-            }
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
-
-            return PartialView( "_ClientGroups", paging );
-        }
-
-
-        // GET: Client/AddGroup
-        [Requires( PermissionTo.Create )]
-        public ActionResult AddGroup()
-        {
-            GroupViewModel model = new GroupViewModel() { EditMode = true };
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            model.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
-            //TODO
-            using ( ClientService clientService = new ClientService() )
-            {
-                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-            }
-
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            } );
-            ViewBag.ClientList = clientDDL;
-
-
-            return View( model );
-        }
-
-
-        // POST: Client/AddGroup
-        [HttpPost]
-        [Requires( PermissionTo.Create )]
-        public ActionResult AddGroup( GroupViewModel model )
-        {
-            try
-            {
-
-                if ( !ModelState.IsValid )
-                {
-                    Notify( "Sorry, the Group was not created. Please correct all errors and try again.", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                using ( GroupService gService = new GroupService() )
-                using ( ClientGroupService cgservice = new ClientGroupService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    #region Create Group
-                    Group group = new Group()
-                    {
-                        Name = model.Name,
-                        Description = model.Description,
-                        Status = ( int ) Status.Active
-                    };
-                    group = gService.Create( group );
-                    #endregion
-
-                    #region Create Group Client Links
-                    if ( !string.IsNullOrEmpty( model.GroupClientList ) )
-                    {
-                        string[] clientList = model.GroupClientList.Split( ',' );
-                        string lastId = "0";
-                        foreach ( string itm in clientList )
-                        {
-                            //test to see if its not been added before
-                            ClientGroup checkCG = cgservice.GetByColumnsWhere( "ClientId", int.Parse( itm ), "GroupId", group.Id );
-
-                            if ( !string.IsNullOrEmpty( itm ) && itm != lastId && checkCG == null )
-                            {
-                                ClientGroup client = new ClientGroup()
-                                {
-                                    ClientId = int.Parse( itm ),
-                                    GroupId = group.Id,
-                                    Status = ( int ) Status.Active
-                                };
-                                cgservice.Create( client );
-                            }
-                            lastId = itm;
-                        }
-                    }
-                    #endregion
-
-                    scope.Complete();
-                }
-
-                Notify( "The Group was successfully created.", NotificationType.Success );
-                return RedirectToAction( "ClientGroups" );
-            }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
-        }
-
-
-        // GET: Client/EditGroupGet/5
-        [Requires( PermissionTo.Edit )]
-        public ActionResult EditGroupGet( int id )
-        {
-            Group group;
-
-            using ( GroupService service = new GroupService() )
-            {
-                group = service.GetById( id );
-
-
-                if ( group == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return PartialView( "_AccessDenied" );
-                }
-
-                GroupViewModel model = new GroupViewModel()
-                {
-                    Id = group.Id,
-                    Name = group.Name,
-                    Description = group.Description,
-                    Status = ( int ) group.Status,
-                    EditMode = true
-                };
-                return View( "EditGroup", model );
-            }
-        }
-
-        // POST: Client/EditGroup/5
-        [Requires( PermissionTo.Edit )]
-        public ActionResult EditGroup( GroupViewModel model, PagingModel pm, bool isstructure = false )
-        {
-            try
-            {
-                if ( !ModelState.IsValid )
-                {
-                    Notify( "Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                Group group;
-
-                using ( GroupService service = new GroupService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    group = service.GetById( model.Id );
-
-                    #region Update Group
-
-                    // Update Group
-                    //group.Id = model.Id;
-                    group.Name = model.Name;
-                    group.Description = model.Description;
-                    group.Status = ( int ) model.Status;
-
-                    service.Update( group );
-
-                    #endregion
-
-
-                    scope.Complete();
-                }
-
-                Notify( "The selected Group details were successfully updated.", NotificationType.Success );
-
-                return RedirectToAction( "ClientGroups" );
-            }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
-        }
-
-        // POST: Client/DeleteGroup/5
-        [HttpPost]
-        [Requires( PermissionTo.Delete )]
-        public ActionResult DeleteGroup( GroupViewModel model )
-        {
-            Group group;
-            ClientGroup clientGroup;
-            try
-            {
-
-                using ( GroupService service = new GroupService() )
-                // using (ClientGroupService clientgroupservice = new ClientGroupService())
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    group = service.GetById( model.Id );
-
-                    if ( group == null )
-                    {
-                        Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                        return PartialView( "_AccessDenied" );
-                    }
-
-                    group.Status = ( ( ( Status ) group.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
-
-                    //clientGroup = clientgroupservice.GetById(model.Id);
-                    //clientGroup.Status = (((Status)group.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;                    
-
-                    service.Update( group );
-                    // clientgroupservice.Update(clientGroup);
-                    scope.Complete();
-
-                }
-                Notify( "The selected Group was successfully updated.", NotificationType.Success );
-                return RedirectToAction( "ClientGroups" );
-            }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
-        }
-
-
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetClientsForGroupIncluded( string groupId )
-        {
-            if ( groupId != null && groupId != "" )
-            {
-                List<Client> clients;
-                //int pspId = Session[ "UserPSP" ];
-                int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-                int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-                using ( ClientService clientService = new ClientService() )
-                {
-
-                    clients = clientService.GetClientsByPSPIncludedGroup( pspId, int.Parse( groupId ), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-
-                }
-                return Json( clients, JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetClientsForGroupExcluded( string groupId )
-        {
-            if ( groupId != null && groupId != "" )
-            {
-                List<Client> clients;
-                //int pspId = Session[ "UserPSP" ];
-                int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-                int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-
-                using ( ClientService clientService = new ClientService() )
-                {
-
-                    clients = clientService.GetClientsByPSPExcludedGroup( pspId, int.Parse( groupId ), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-
-                }
-                return Json( clients, JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetClientForGroupExcluded( string groupId, string clientId )
-        {
-            if ( !string.IsNullOrEmpty( groupId ) && !string.IsNullOrEmpty( clientId ) )
-            {
-                //using (GroupService service = new GroupService())
-                using ( ClientGroupService clientgroupservice = new ClientGroupService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    List<ClientGroup> group = new List<ClientGroup>();
-                    group = clientgroupservice.GetClientGroupsByClientGroup( int.Parse( groupId ), int.Parse( clientId ) );
-
-                    if ( group == null )
-                    {
-                        return Json( data: "False", behavior: JsonRequestBehavior.AllowGet );
-                    }
-                    foreach ( ClientGroup g in group )
-                    {
-                        clientgroupservice.Delete( g );
-                    }
-                    scope.Complete();
-                }
-
-
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "False", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetClientForGroupIncluded( string groupId, string clientId )
-        {
-            if ( !string.IsNullOrEmpty( groupId ) && !string.IsNullOrEmpty( clientId ) )
-            {
-                //using (GroupService service = new GroupService())
-                using ( ClientGroupService clientgroupservice = new ClientGroupService() )
-                using ( GroupService groupservice = new GroupService() )
-                using ( ClientService clientService = new ClientService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    ClientGroup checkCG = clientgroupservice.GetByColumnsWhere( groupId, clientId );//check this link doesnt already exist, ignore if it does
-                    //Group groupObj = groupservice.GetById(int.Parse(groupId));
-                    if ( checkCG == null )
-                    {
-                        ClientGroup cgroup = new ClientGroup()
-                        {
-                            GroupId = int.Parse( groupId ),
-                            ClientId = int.Parse( clientId ),
-                            Status = ( int ) Status.Active,
-                        };
-                        clientgroupservice.Create( cgroup );
-
-                        scope.Complete();
-                    } //nothing to do here if the group is already linekd  to the same client
-                    else
-                    {
-                        //just update status to make sure its visible and active, maybe it was disabled
-                        checkCG.Status = ( int ) Status.Active;
-                        clientgroupservice.Update( checkCG );
-                    }
-                }
-
-
-            }
-            return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-        }
-
-        #endregion
 
 
         #region Products
@@ -3460,406 +3662,6 @@ namespace ACT.UI.Controllers
         #endregion    
 
 
-        #region Awaiting Activation 
-
-        //
-        // POST || GET: /Client/AwaitingActivation
-        public ActionResult AwaitingActivation( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
-        {
-            if ( givecsm )
-            {
-                ViewBag.ViewName = "AwaitingActivation";
-
-                return PartialView( "_AwaitingActivationCustomSearch", new CustomSearchModel( "AwaitingActivation" ) );
-            }
-            int total = 0;
-
-            List<Client> model = new List<Client>();
-            //int pspId = Session[ "UserPSP" ];
-            //int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            if ( clientId > 0 )
-            {
-                // csm.ClientId = clientId;
-            }
-
-            using ( ClientService service = new ClientService() )
-            {
-                pm.Sort = pm.Sort ?? "ASC";
-                pm.SortBy = pm.SortBy ?? "Companyname";
-                // csm.PSPClientStatus = PSPClientStatus.Rejected;//Status 2
-                // csm.Status = Status.Pending;
-                model = service.ListAwaitingActivation( pm, csm );//service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
-
-                // var testModel = service.ListByColumn(null, "CompanyRegistrationNumber", "123456");
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total();
-            }
-
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
-
-
-            return PartialView( "_AwaitingActivation", paging );
-        }
-        #endregion
-
-
-        #region KPIS
-
-        //
-        // POST || GET: /Client/ClientKPIS
-        public ActionResult ClientKPI( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
-        {
-            if ( givecsm )
-            {
-                ViewBag.ViewName = "ClientKPI";
-
-                return PartialView( "_ClientKPICustomSearch", new CustomSearchModel( "ClientKPI" ) );
-            }
-            int total = 0;
-
-            List<ClientKPI> model = new List<ClientKPI>();
-            List<ClientKPIViewModel> viewModel = new List<ClientKPIViewModel>();
-
-            using ( ClientKPIService service = new ClientKPIService() )
-            using ( ClientService clientservice = new ClientService() )
-            {
-                pm.Sort = pm.Sort ?? "ASC";
-                pm.SortBy = pm.SortBy ?? "Name";
-                csm.Status = Status.Active;
-                csm.Status = Status.Active;
-                if ( CurrentUser == null )
-                {
-                    Notify( "Sorry, it seems the session had expired. Please log in again.", NotificationType.Error );
-
-                    return RedirectToAction( "Index", "Administration" ); //Return to login as session is invalid
-                }
-                if ( CurrentUser.PSPs.Count > 0 )
-                {
-                    string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-                    int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-                    if ( clientId > 0 )
-                    {
-                        csm.ClientId = clientId;
-                    }
-
-                    model = service.ListCSM( pm, csm );//service.GetClientsByPSP(CurrentUser.PSPs.FirstOrDefault().Id);
-
-                    foreach ( ClientKPI cl in model )
-                    {
-                        Client client = clientservice.GetById( cl.ClientId );
-                        ClientKPIViewModel vm = new ClientKPIViewModel()
-                        {
-                            Id = cl.Id,
-                            ClientName = client.CompanyName,
-                            TradingAs = client.TradingAs,
-                            KPIDescription = cl.KPIDescription,
-                            Weight = cl.Weight,
-                            TargetAmount = cl.TargetAmount,
-                            TargetPeriod = cl.TargetPeriod,
-                            Status = cl.Status,
-                            //Disputes = cl.Disputes,
-                            //OutstandingDays = cl.OutstandingDays,
-                            //OutstandingPallets = cl.OutstandingPallets,
-                            //Passons = cl.Passons,
-                            //MonthlyCost = cl.MonthlyCost,
-                            //ResolveDays = cl.ResolveDays,
-                        };
-                        viewModel.Add( vm );
-                    }
-                }
-                else
-                {
-                    model = null;
-                }
-
-                // var testModel = service.ListByColumn(null, "CompanyRegistrationNumber", "123456");
-                total = ( viewModel.Count < pm.Take && pm.Skip == 0 ) ? viewModel.Count : service.Total();
-            }
-
-            PagingExtension paging = PagingExtension.Create( viewModel, total, pm.Skip, pm.Take, pm.Page );
-
-
-            return PartialView( "_ClientKPI", paging );
-        }
-
-        //
-        // GET: /Client/ClientDetails/5
-        public ActionResult KPIDetails( int id, bool layout = true )
-        {
-            ClientKPI model = new ClientKPI();
-            Client client = new Client();
-            ClientKPIViewModel kpiview = new ClientKPIViewModel();
-            using ( ClientService service = new ClientService() )
-            using ( ClientKPIService kservice = new ClientKPIService() )
-            {
-
-                model = kservice.GetById( id );
-                if ( model == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return RedirectToAction( "Index" );
-                }
-                client = service.GetById( model.ClientId );
-
-                //repopulate the view model
-                kpiview.KPIDescription = model.KPIDescription;
-                kpiview.Id = model.Id;
-                kpiview.ClientId = model.ClientId;
-                kpiview.ClientName = client.CompanyName;
-                kpiview.TradingAs = client.TradingAs;
-                kpiview.Disputes = model.Disputes;
-                kpiview.OutstandingDays = model.OutstandingDays;
-                kpiview.OutstandingPallets = model.OutstandingPallets;
-                kpiview.Passons = model.Passons;
-                kpiview.MonthlyCost = model.MonthlyCost;
-                kpiview.ResolveDays = model.ResolveDays;
-                kpiview.Status = model.Status;
-                kpiview.Weight = model.Weight;
-                kpiview.TargetAmount = model.TargetAmount;
-                kpiview.TargetPeriod = model.TargetPeriod;
-            }
-
-            if ( layout )
-            {
-                ViewBag.IncludeLayout = true;
-            }
-
-            return View( kpiview );
-        }
-
-        // GET: Client/AddKPI
-        [Requires( PermissionTo.Create )]
-        public ActionResult AddKPI()
-        {
-            ClientKPIViewModel model = new ClientKPIViewModel() { EditMode = true };
-            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            model.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            using ( ClientService clientService = new ClientService() )
-            {
-                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-            }
-
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            } );
-            ViewBag.ClientList = clientDDL;
-            return View( model );
-        }
-
-        // POST: Client/AddKPI
-        [HttpPost]
-        [Requires( PermissionTo.Create )]
-        public ActionResult AddKPI( ClientKPIViewModel model )
-        {
-            try
-            {
-                if ( !ModelState.IsValid )
-                {
-                    Notify( "Sorry, the Client KPI was not created. Please correct all errors and try again.", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                using ( TransactionScope scope = new TransactionScope() )
-                using ( ClientKPIService kpiservice = new ClientKPIService() )
-                // using (ClientBudgetService bservice = new ClientBudgetService())
-                {
-                    #region Validation
-                    //if (!string.IsNullOrEmpty(model) && service.ExistByCompanyRegistrationNumber(model.CompanyRegistrationNumber.Trim()))
-                    //{
-                    //    // Bank already exist!
-                    //    Notify($"Sorry, a Client with the Registration number \"{model.CompanyRegistrationNumber}\" already exists!", NotificationType.Error);
-
-                    //    return View(model);
-                    //}
-                    #endregion
-                    #region Create ClientKPI
-                    ClientKPI clientkpi = new ClientKPI()
-                    {
-                        KPIDescription = model.KPIDescription,
-                        ClientId = model.ClientId,
-                        //Disputes = model.Disputes,
-                        //OutstandingPallets = model.OutstandingPallets,
-                        //Passons = model.Passons,
-                        //MonthlyCost = model.MonthlyCost,
-                        //OutstandingDays = model.OutstandingDays,
-                        //ResolveDays = model.ResolveDays,
-                        Status = ( int ) Status.Active,//model.Status,
-                        Weight = model.Weight,
-                        TargetAmount = model.TargetAmount,
-                        TargetPeriod = model.TargetPeriod
-                    };
-                    ClientKPI kpimodel = kpiservice.Create( clientkpi );
-                    #endregion
-
-                    scope.Complete();
-                }
-                Notify( "The Client KPI was successfully created.", NotificationType.Success );
-                return RedirectToAction( "ClientKPIS" );
-            }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
-        }
-
-        // GET: Client/EditKPI/5
-        [Requires( PermissionTo.Edit )]
-        public ActionResult EditKPI( int id )
-        {
-            ClientKPI clientkpi;
-
-            using ( ClientService clientservice = new ClientService() )
-            using ( ClientKPIService kpiservice = new ClientKPIService() )
-            {
-                clientkpi = kpiservice.GetById( id );
-
-                if ( clientkpi == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return PartialView( "_AccessDenied" );
-                }
-                Client client = clientservice.Get( clientkpi.ClientId );
-                ClientKPIViewModel model = new ClientKPIViewModel()
-                {
-                    KPIDescription = clientkpi.KPIDescription,
-                    Id = clientkpi.Id,
-                    ClientId = clientkpi.ClientId,
-                    ClientName = client.CompanyName,
-                    TradingAs = client.TradingAs,
-                    Disputes = clientkpi.Disputes,
-                    OutstandingDays = clientkpi.OutstandingDays,
-                    OutstandingPallets = clientkpi.OutstandingPallets,
-                    Passons = clientkpi.Passons,
-                    MonthlyCost = clientkpi.MonthlyCost,
-                    ResolveDays = clientkpi.ResolveDays,
-                    Status = clientkpi.Status,
-                    Weight = clientkpi.Weight,
-                    TargetAmount = clientkpi.TargetAmount,
-                    TargetPeriod = clientkpi.TargetPeriod,
-                    EditMode = true
-                };
-
-
-                return View( model );
-            }
-        }
-
-        // POST: Client/EditKPI/5
-        [HttpPost]
-        [Requires( PermissionTo.Edit )]
-        public ActionResult EditKPI( ClientKPIViewModel model, PagingModel pm, bool isstructure = false )
-        {
-            try
-            {
-                if ( !ModelState.IsValid )
-                {
-                    Notify( "Sorry, the selected Client was not updated. Please correct all errors and try again.", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                ClientKPI kpiview;
-
-                using ( TransactionScope scope = new TransactionScope() )
-                using ( ClientKPIService kpiservice = new ClientKPIService() )
-                // using (ClientBudgetService bservice = new ClientBudgetService())
-                {
-                    kpiview = kpiservice.GetById( model.Id );
-
-                    if ( kpiview == null )
-                    {
-                        Notify( "Sorry, that Client KPI does not exist! Please specify a valid Role Id and try again.", NotificationType.Error );
-
-                        return View( model );
-                    }
-
-                    #region Update Client KPI
-
-                    // Update Client KPI
-                    kpiview.KPIDescription = model.KPIDescription;
-                    kpiview.Id = model.Id;
-                    kpiview.ClientId = model.ClientId;
-                    kpiview.Disputes = model.Disputes;
-                    kpiview.OutstandingDays = model.OutstandingDays;
-                    kpiview.OutstandingPallets = model.OutstandingPallets;
-                    kpiview.Passons = model.Passons;
-                    kpiview.MonthlyCost = model.MonthlyCost;
-                    kpiview.ResolveDays = model.ResolveDays;
-                    kpiview.Status = model.Status;
-                    kpiview.Weight = model.Weight;
-                    kpiview.TargetAmount = model.TargetAmount;
-                    kpiview.TargetPeriod = model.TargetPeriod;
-
-                    kpiservice.Update( kpiview );
-
-                    #endregion
-
-                    scope.Complete();
-                }
-
-                Notify( "The selected Client KPI details were successfully updated.", NotificationType.Success );
-
-                return RedirectToAction( "ClientKPIS" );
-            }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
-        }
-
-        // POST: Client/DeleteKPI/5
-        [HttpPost]
-        [Requires( PermissionTo.Delete )]
-        public ActionResult DeleteKPI( ClientViewModel model )
-        {
-            ClientKPI clientkpi;
-            try
-            {
-
-                using ( ClientKPIService service = new ClientKPIService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    clientkpi = service.GetById( model.Id );
-
-                    if ( clientkpi == null )
-                    {
-                        Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                        return PartialView( "_AccessDenied" );
-                    }
-
-                    clientkpi.Status = ( ( ( Status ) clientkpi.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
-
-                    service.Update( clientkpi );
-                    scope.Complete();
-
-                }
-                Notify( "The selected Client KPI was successfully updated.", NotificationType.Success );
-                return RedirectToAction( "ClientKPIS" );
-            }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
-        }
-
-
-        #endregion
-
 
         #region General
 
@@ -4248,6 +4050,7 @@ namespace ACT.UI.Controllers
         #endregion
 
 
+
         #region Budgets
         [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
         public JsonResult GetClientBudgets( string clientId )
@@ -4425,21 +4228,22 @@ namespace ACT.UI.Controllers
         #endregion
 
 
+
         #region Partial Views
 
         //
         // POST || GET: /Client/Clients
         public ActionResult Clients( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "Clients";
+
+                return PartialView( "_ClientsCustomSearch", new CustomSearchModel( "Clients" ) );
+            }
+
             using ( ClientService service = new ClientService() )
             {
-                if ( givecsm )
-                {
-                    ViewBag.ViewName = "Clients";
-
-                    return PartialView( "_ClientsCustomSearch", new CustomSearchModel( "Clients" ) );
-                }
-
                 pm.Sort = pm.Sort ?? "ASC";
                 pm.SortBy = pm.SortBy ?? "c.CompanyName";
 
@@ -4451,6 +4255,32 @@ namespace ACT.UI.Controllers
 
 
                 return PartialView( "_Clients", paging );
+            }
+        }
+
+        //
+        // POST || GET: /Client/ClientKPIS
+        public ActionResult ClientKPI( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "ClientKPI";
+
+                return PartialView( "_ClientKPICustomSearch", new CustomSearchModel( "ClientKPI" ) );
+            }
+
+            using ( ClientKPIService service = new ClientKPIService() )
+            {
+                pm.Sort = pm.Sort ?? "ASC";
+                pm.SortBy = pm.SortBy ?? "c.CompanyName";
+
+                List<ClientKPICustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_ClientKPI", paging );
             }
         }
 

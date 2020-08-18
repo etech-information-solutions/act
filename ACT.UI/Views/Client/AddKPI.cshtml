@@ -5,7 +5,7 @@
 @{
     /**/
 
-    if (ViewBag.IncludeLayout == null)
+    if ( ViewBag.IncludeLayout == null )
     {
         Layout = null;
     }
@@ -14,87 +14,121 @@
 }
 
 
-@Html.Partial("_Notification")
+@Html.Partial( "_Notification" )
 
-@using (Html.BeginForm("AddKPI", "Client", FormMethod.Post, new { @data_ajax_form = "1", @data_target = "#clientkpis", @class = "custom-validate", @style = "width: auto;" }))
+@using ( Html.BeginForm( "AddKPI", "Client", FormMethod.Post, new { @data_ajax_form = "1", @data_target = "#clientkpi", @class = "custom-validate", @style = "width: auto;" } ) )
 {
     <div id="edit-item">
 
         <h2 class="uppercase" style="width: auto;">
-            <img alt="" src="@Url.Content("~/images/edit.png")" />
+            <img alt="" src="@Url.Content( "~/images/edit.png" )" />
             <span>Add KPI</span>
         </h2>
 
-        @Html.ValidationSummary(true)
+        @Html.ValidationSummary( true )
 
         <div id="item-details" class="item-details" style="width: auto;">
-            <p>
-                <strong class="uppercase">KPI</strong>
-            </p>
-            <div class="left" style="width: 40%; margin-right: 4%;">
+
+            <div class="left" style="width: 47%; margin-right: 4%;">
+
                 <div class="editor-label">
-                    Client Name
+                    @Html.LabelFor( model => model.ClientId )
                 </div>
                 <div class="editor-field">
-                    @Html.DropDownListFor(model => model.ClientId,
-                                  new SelectList(ViewBag.ClientList, "Value", "Text"),
-                                  "Please Select",
-                                  new { @class = "form-control", @onchange= "ClientListChanged()" })
-                    @*@Html.DropDownList("ClientList", "Please Select", new { @onchange = "ClientListChanged(this.value)" })*@
+                    @Html.DropDownListFor( model => model.ClientId, model => Model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.ClientId )
                 </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.KPIDescription )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.KPIDescription, new { @class = "input", @placeholder = "Enter KPI Description" } )
+                    @Html.ValidationMessageFor( model => model.KPIDescription )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.OutstandingPallets )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.OutstandingPallets, new { @class = "input", @placeholder = "Enter Outstanding Pallets" } )
+                    @Html.ValidationMessageFor( model => model.OutstandingPallets )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Disputes )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Disputes, new { @class = "input", @placeholder = "Enter Disputes" } )
+                    @Html.ValidationMessageFor( model => model.Disputes )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Passons )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Passons, new { @class = "input", @placeholder = "Enter Passons" } )
+                    @Html.ValidationMessageFor( model => model.Passons )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.ResolveDays )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.ResolveDays, new { @class = "input", @placeholder = "Enter Resolve Days" } )
+                    @Html.ValidationMessageFor( model => model.ResolveDays )
+                </div>
+
             </div>
 
-            <div class="left" style="width: 40%; margin-right: 4%;">
-                <div class="editor-label">
-                    Trading As
-                </div>
-                <div class="editor-field">
-                    <input type="text" id="TradingAs" name="TradingAs" value="Client Trading As" readonly="readonly" />
-                    @*@Html.DisplayFor(model => model.TradingAs, new { @class = "input", @placeholder = "Trading As", disabled = "disabled" })*@
-                </div>
-            </div>
+            <div class="left" style="width: 47%;">
 
-            <div class="clear" style="height: 10px;">&nbsp;</div>
-            <div class="left" style="width: 90%; margin-right: 4%;">
                 <div class="editor-label">
-                    KPI Description
+                    @Html.LabelFor( model => model.OutstandingDays )
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.KPIDescription, new { @class = "input", @placeholder = "Enter KPI Description" })
-                    @Html.ValidationMessageFor(model => model.KPIDescription)
-                </div>
-            </div>
-            <div class="clear" style="height: 10px;">&nbsp;</div>
-            <div class="left" style="width: 40%; margin-right: 4%;">
-                <div class="editor-label">
-                    Weighted Percentage(%)
-                </div>
-                <div class="editor-field">
-                    <input type="number" id="Weight" name="Weight" class="input" maxlength="3" min="0" max="100" step="1" value="0" placeholder="Enter Weighted Percentage no more than 100%" />
-                    @*@Html.TextBoxFor(model => model.Weight, new { @class = "input", @placeholder = "Enter Weighted Percentage", @maxlength = "3", type = "number", min = 0, step = 1, max = 100 })*@
-                    @Html.ValidationMessageFor(model => model.Weight)
-                </div>
-                <div class="editor-label">
-                    Target Value
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor(model => model.TargetAmount, new { @class = "input", @placeholder = "Enter Target Amount", type = "number", min = "0", step = "1" })
-                    @Html.ValidationMessageFor(model => model.TargetAmount)
+                    @Html.TextBoxFor( model => model.OutstandingDays, new { @class = "input", @placeholder = "Enter Outstanding Days" } )
+                    @Html.ValidationMessageFor( model => model.OutstandingDays )
                 </div>
 
                 <div class="editor-label">
-                    Target Period
+                    @Html.LabelFor( model => model.MonthlyCost )
                 </div>
                 <div class="editor-field">
-                    <select id="TargetPeriod" name="TargetPeriod" class="chzn" required="required" style="width: 100%;">
-                        <option value="">-- select</option>
-                        @foreach (int p in Enum.GetValues(typeof(TargetPeriod)))
-                        {
-                            string text = ((TargetPeriod)p).GetDisplayText();
+                    @Html.TextBoxFor( model => model.MonthlyCost, new { @class = "input", @placeholder = "Enter Monthly Cost" } )
+                    @Html.ValidationMessageFor( model => model.MonthlyCost )
+                </div>
 
-                            <option value="@p">@text</option>
-                        }
-                    </select>
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Weight )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Weight, new { @class = "input", @placeholder = "Enter Weighted %" } )
+                    @Html.ValidationMessageFor( model => model.Weight )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.TargetAmount )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.TargetAmount, new { @class = "input", @placeholder = "Enter Target Amount" } )
+                    @Html.ValidationMessageFor( model => model.TargetAmount )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.TargetPeriod )
+                </div>
+                <div class="edit-field">
+                    @Html.EnumDropDownFor( model => model.TargetPeriod, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.TargetPeriod )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Status )
+                </div>
+                <div class="edit-field">
+                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.Status )
                 </div>
 
             </div>
@@ -108,42 +142,8 @@
 
                 <a data-refresh="1" data-target="#clientkpis">Cancel</a>
             </p>
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+
         </div>
+
     </div>
-    <script>
-        $(document).ready(function () {
-            //$("#ClientList").change(function () {
-            //    alert('h1');
-            //    var client = $('option:selected', this).val();
-            //    GetClientDetail(client);
-            //});
-        });
-
-        function ClientListChanged() {
-            //debugger;
-            var client = $('#ClientId').val();            
-            GetClientDetail(client);
-
-        }
-
-        function GetClientDetail(cId) {
-            
-            var TradingAs = document.getElementById("TradingAs");
-            $.ajax({
-                type: "GET",
-                url: "GetClientDetail",
-                data: { clientId: cId },
-                contentType: "application/json;charset=utf-8",
-                dataType: "json",
-                success: function (data) {                    
-                    $('#TradingAs').val(data.TradingAs);                    
-                },
-                error: function (response) {
-                    alert('Error Retrieving Client Detail');
-                }
-            });
-
-        }
-    </script>
 }
