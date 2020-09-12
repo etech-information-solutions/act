@@ -4,9 +4,7 @@
 @using ACT.Data.Models;
 
 @{
-    /**/
-
-    if (ViewBag.IncludeLayout == null)
+    if ( ViewBag.IncludeLayout == null )
     {
         Layout = null;
     }
@@ -15,10 +13,10 @@
 }
 
 
-@Html.Partial("_Notification")
+@Html.Partial( "_Notification" )
 
-@using (Html.BeginForm("AddGroup", "Client", FormMethod.Post, new { @data_ajax_form = "1", @data_target = "#clientgroups", @class = "custom-validate", @style = "width: auto;" }))
-{    
+@using ( Html.BeginForm( "AddGroup", "Client", FormMethod.Post, new { @data_ajax_form = "1", @data_target = "#clientgroups", @class = "custom-validate", @style = "width: auto;" } ) )
+{
     <div id="edit-item">
 
         <h2 class="uppercase" style="width: auto;">
@@ -26,70 +24,80 @@
             <span>Add Group</span>
         </h2>
 
-        @Html.ValidationSummary(true)
+        @Html.ValidationSummary( true )
 
-        @Html.HiddenFor(model => model.Id)
-        @Html.HiddenFor(model => model.GroupClientList)
+        @Html.HiddenFor( model => model.Id )
 
         <div id="item-details" class="item-details" style="width: auto;">
 
-
-
-            <div class="left" style="width: 45%; margin-right: 1%;">
+            <div class="left" style="width: 45%; margin-right: 5%;">
 
                 <div class="editor-label">
                     Name
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.Name, new { @class = "input", @placeholder = "Enter Group Name" })
-                    @Html.ValidationMessageFor(model => model.Name)
+                    @Html.TextBoxFor( model => model.Name, new { @class = "input", @placeholder = "Enter Group Name" } )
+                    @Html.ValidationMessageFor( model => model.Name )
                 </div>
-            </div>
-            <div class="left" style="width: 45%; margin-right: 1%;">
+
                 <div class="editor-label">
                     Description
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.Description, new { @class = "input", @placeholder = "Enter Group Description" })
-                    @Html.ValidationMessageFor(model => model.Description)
+                    @Html.TextBoxFor( model => model.Description, new { @class = "input", @placeholder = "Enter Group Description" } )
+                    @Html.ValidationMessageFor( model => model.Description )
                 </div>
-            </div>
-            <div class="clear" style="margin-bottom: 20px;">&nbsp;</div>
-            <div class="left" style="width: 45%; margin-right: 1%;">
-                <div class="editor-label">
-                    Clients
-                </div>
-                <div class="editor-field">
-                    * Please select client(s) from the options below
-                    <select id="ClientListGroupDDL" name="ClientListGroupDDL" onchange="ClientListChanged()" class="chzn" multiple style="width: 98%;">
-                        <!--  -->
-                        @*@Html.DropDownListFor(model => model.ClientId,
-        new SelectList(ViewBag.ClientList, "Value", "Text"),
-        "Please Select",
-        new { @class = "form-control", @onchange= "ClientListChanged()" })*@
 
-                        @foreach (var item in ViewBag.ClientList)
-                        {
-                            <option value="@item.Value">@item.Text</option>
-                        }
-                    </select>
-                </div>
-            </div>
-
-            @*<div class="left" style="width: 45%;">
                 <div class="edit-label">
-                    @Html.LabelFor(model => model.Status)
+                    @Html.LabelFor( model => model.Status )
                 </div>
                 <div class="edit-field">
-                    @Html.EnumDropDownFor(model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" })
-                    @Html.ValidationMessageFor(model => model.Status)
+                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.Status )
                 </div>
 
-            </div>*@
-            @*@(((Status)Model.Status).GetDisplayText())*@
-            @*@Html.EnumDropDownFor(model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" })
-            @Html.ValidationMessageFor(model => model.Status)*@
+            </div>
 
+            <div class="left" style="width: 45%; margin-right: 1%;">
+
+                <div class="editor-label">
+                    <p>
+                        <strong>Clients</strong>
+                    </p>
+                </div>
+                <div class="editor-field" style="max-height: 500px; overflow-y: auto;">
+
+                    @if ( Model.ClientOptions.NullableAny() )
+                    {
+                        int c = 0;
+
+                        <ul class="list">
+                            @foreach ( KeyValuePair<int, string> item in Model.ClientOptions )
+                            {
+                                string chk = Model.Clients.Any( i => i.ClientId == item.Key ) ? "checked=checked" : "";
+
+                                <li style="background: none; padding-left: 0;">
+                                    <label>
+                                        <input type="hidden" value="@Model.Id" name="Clients[@c].GroupId" />
+                                        <input id="Clients-@item.Key" name="Clients[@c].ClientId" value="@item.Key" type="checkbox" @chk style="float: none; display: inline-block; margin: 0;" />
+                                        @item.Value
+                                    </label>
+                                </li>
+
+                                c++;
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="message-warn">
+                            There are no clients to be allocated to this group.
+                        </div>
+                    }
+
+                </div>
+
+            </div>
 
             <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
 
@@ -100,47 +108,8 @@
 
                 <a data-refresh="1" data-target="#clientgroups">Cancel</a>
             </p>
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+
         </div>
+
     </div>
 }
-    <script>
-        $(document).ready(function () {
-     //       $("#ClientListGroupDDL").change(function () {
-     //           debugger;
-     //       //var client = $('option:selected', this).val();
-     //       //var dd = document.getElementById("ClientListGroupDDL");
-     //       //var client = dd.options[dd.selectedIndex].value;   
-     //       //var clientlist = $('#GroupClientList').val();
-     //       //$('#GroupClientList').removeAttr("disabled");
-     //           //$('#GroupClientList').val(clientlist + client + ',');
-     //           var selectedValues = [];
-     //           $("#ClientListGroupDDL :selected").each(function () {
-     //               selectedValues.push($(this).val());
-     //           });
-     //           var clientlist = selectedValues.join();
-     //           $('#GroupClientList').val(clientlist);
-     //           //replace every time
-         
-     //});
- });
-
-        function ClientListChanged() {
-            
-            var selectedValues = [];
-            $("#ClientListGroupDDL :selected").each(function () {
-                selectedValues.push($(this).val());
-            });
-            var clientlist = selectedValues.join();
-            $('#GroupClientList').val(clientlist);
-        //    //debugger;
-        //    var dd = document.getElementById("ClientListGroupDDL");
-        //    var client = dd.options[dd.selectedIndex].value;   
-        //    //var clientTest = $('option:selected', this).val();
-        //    //var client = $('#ClientList').val();
-        //    var clientlist = $('#GroupClientList').val();
-        //     $('#GroupClientList').removeAttr("disabled");
-        //     $('#GroupClientList').val(clientlist + client + ',');
-
-        }
-    </script>

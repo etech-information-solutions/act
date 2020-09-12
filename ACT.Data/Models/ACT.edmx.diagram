@@ -48,7 +48,6 @@
         <EntityTypeShape EntityType="ACTModel.Site" Width="1.5" PointX="8.125" PointY="57" />
         <EntityTypeShape EntityType="ACTModel.SiteAudit" Width="1.5" PointX="10.375" PointY="55" />
         <EntityTypeShape EntityType="ACTModel.SiteBilling" Width="1.5" PointX="10.375" PointY="60.875" />
-        <EntityTypeShape EntityType="ACTModel.SiteBudget" Width="1.5" PointX="10.375" PointY="49.375" />
         <EntityTypeShape EntityType="ACTModel.SystemConfig" Width="1.5" PointX="10.625" PointY="3.25" />
         <EntityTypeShape EntityType="ACTModel.Task" Width="1.5" PointX="12.625" PointY="70.5" />
         <EntityTypeShape EntityType="ACTModel.Token" Width="1.5" PointX="2.875" PointY="95.875" />
@@ -112,7 +111,6 @@
         <AssociationConnector Association="ACTModel.FK_UserRoles_Roles" />
         <AssociationConnector Association="ACTModel.FK_Site_Audit_Sites" />
         <AssociationConnector Association="ACTModel.FK_SiteBilling_Sites" />
-        <AssociationConnector Association="ACTModel.FK_SiteBudgets_Sites" />
         <AssociationConnector Association="ACTModel.FK_Sites_Sites" />
         <AssociationConnector Association="ACTModel.FK_UserTask_Task" />
         <AssociationConnector Association="ACTModel.FK_Token_User" />
@@ -134,6 +132,8 @@
         <AssociationConnector Association="ACTModel.FK_PSPProducts_PSP" />
         <AssociationConnector Association="ACTModel.FK_PSPUser_PSP" />
         <AssociationConnector Association="ACTModel.FK_Regions_PSP" />
+        <EntityTypeShape EntityType="ACTModel.SiteBudget" Width="1.5" PointX="10.375" PointY="49.125" />
+        <AssociationConnector Association="ACTModel.FK_SiteBudgets_Sites" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

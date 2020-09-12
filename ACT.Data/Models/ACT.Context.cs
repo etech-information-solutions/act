@@ -68,7 +68,6 @@ namespace ACT.Data.Models
         public virtual DbSet<Site> Sites { get; set; }
         public virtual DbSet<SiteAudit> SiteAudits { get; set; }
         public virtual DbSet<SiteBilling> SiteBillings { get; set; }
-        public virtual DbSet<SiteBudget> SiteBudgets { get; set; }
         public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
         public virtual DbSet<Task> Tasks { get; set; }
         public virtual DbSet<Token> Tokens { get; set; }
@@ -85,5 +84,6 @@ namespace ACT.Data.Models
         public virtual DbSet<ClientBudget> ClientBudgets { get; set; }
         public virtual DbSet<PSPBudget> PSPBudgets { get; set; }
         public virtual DbSet<PSP> PSPs { get; set; }
+        public virtual DbSet<SiteBudget> SiteBudgets { get; set; }
     }
 }

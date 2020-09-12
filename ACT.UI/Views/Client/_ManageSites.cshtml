@@ -4,128 +4,75 @@
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
 @using ACT.Core.Models.Custom;
-@using ACT.Core.Services;
-@using System.Linq;
 
 @{
     ViewBag.ShowExport = true;
     ViewBag.ShowCustom = true;
-    //ViewBag.ShowQuickStructure = true;
 
     ViewBag.ViewName = "_ManageSites";
 
     UserModel user = User.Get();
 }
 
-
-@Html.Partial("_Notification")
-
+@Html.Partial( "_Notification" )
 
 @{
     Int32 count = Model.Start;
-    List<Site> items = (List<Site>)Model.Items;
-
+    List<SiteCustomModel> items = ( List<SiteCustomModel> ) Model.Items;
 }
 
-
-@if (Model == null || !items.Any())
+@if ( Model == null || !items.Any() )
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
         There are no Sites available matching your search criteria.
     </div>
 }
 
-@if (ViewBag.ContextualMode)
-{
-    <input type="hidden" id="context" name="context" value="1" />
-}
-else
-{
-    <input type="hidden" id="context" name="context" value="0" />
-}
-@using (Html.BeginForm("ImportSites", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#managesites", @class = "custom-validate", @style = "width: auto;", id = "importsites" }))
-{
-    <p>
-        <table style="width:100%" border="0">
-            <tr>
-                <td style="width:3%">
-                    <label for="file">Client:</label>
-                </td>
-                <td style="width:15%">
-                    @if (ViewBag.ContextualMode)
-                    {
-                        @Html.DropDownList("ClientList")
-                    }
-                    else
-                    {
-                        @Html.DropDownList("ClientList", "All Clients")
-                    }
-                </td>
-                <td style="width:2%">
-                    @Html.ActionLink("Add", "AddSite", new { sourceview = "ManageSites" }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#managesites" })
-                </td>
-                <td style="width:5%">
-                    &nbsp;
-                </td>
-                <td style="width:3%">
-                    <label for="file" class="importlabel">Browse:</label>
-                </td>
-                <td style="width:55%">
-                    <input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" />
-                </td>
-                <td style="width:10%">
-                    <input type="submit" value="Import Sites" class="importbutton" />
-                </td>
-                <td style="width:7%">
-                    <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "sitetemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
-                </td>
-            </tr>
-        </table>
-        <span class="loader"></span>
-    </p>
-}
+<p>
+    @Html.ActionLink( "Add", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#managesites" } )
 
-<div id="managesiteslist">
+    <span style="padding: 0 5px;">|</span>
 
-</div>
+    @Html.ActionLink( "Import", "ImportSite", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import new sites?", @data_edit = "1", @data_id = 0, @data_target = "#managesites" } )
+
+    <span class="loader"></span>
+</p>
+
 <table id="sites-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#sites-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
             <th data-name="Count">
                 #
             </th>
-            <th data-name="RegionId" data-column="RegionId">
+            <th data-name="CreatedOn" data-column="s.CreatedOn">
+                Date
+            </th>
+            <th data-name="RegionName" data-column="r.Name">
                 Region
             </th>
-            <th data-name="Name" data-column="Name">
-                Site Name
+            <th data-name="SiteName" data-column="s.Name">
+                Name
             </th>
-            <th data-name="XCord" data-column="XCord">
-                Site X Coordinate
+            <th data-name="Coordinates">
+                Coordinates
             </th>
-            <th data-name="YCord" data-column="YCord">
-                Site Y Coordinate
+            <th data-name="ContactNo" data-column="s.ContactNo">
+                Contact
             </th>
-            <th data-name="Address" data-column="Address">
-                Site Address
+            <th data-name="Address" data-column="s.FinanceContact">
+                Finance
             </th>
-            <th data-name="PostalCode" data-column="PostalCode">
-                Postal Code
+            <th data-name="PostalCode" data-column="s.ReceivingContact">
+                Receiver
             </th>
-            <th data-name="ContactNo" data-column="ContactNo">
-                Contact Number
-            </th>
-            <th data-name="ContactName" data-column="ContactName">
-                Contact Name
-            </th>
-            <th data-name="PlanningPoint" data-column="PlanningPoint">
+            <th data-name="PlanningPoint" data-column="s.PlanningPoint">
                 Planning Point
             </th>
-            <th data-name="SiteType" data-column="SiteType">
+            <th data-name="SiteType" data-column="s.SiteType">
                 Site Type
             </th>
-            <th data-name="SiteType" data-column="SubSites">
-                Subsites
+            <th data-name="Counts">
+
             </th>
             <th data-name="Actions">
                 Actions
@@ -134,63 +81,50 @@ else
     </thead>
 
     <tbody>
-        @if (Model != null && items != null && items.Count() > 0)
+        @if ( Model != null && items != null && items.Count() > 0 )
         {
-            foreach (var item in items)
+            foreach ( SiteCustomModel item in items )
             {
-                Status status = (Status)item.Status;
+                Status status = ( Status ) item.Status;
 
-                String active = status.Equals(Status.Active) ? "active" : "inactive";
-                String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+                string active = status.Equals( Status.Active ) ? "active" : "inactive";
+                string enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
 
-                string regionName = "N/A";
-                if (item.RegionId != null && item.RegionId > 0)
-                {
-                    using (RegionService reg = new RegionService())
-                    {
-                        Region region = reg.GetById((int)item.RegionId);
-                        regionName = region.Name;
-                    }
-                }
-                string siteTypeName = "N/A";
-                if (item.SiteType != null)
-                {
-                    siteTypeName = ((SiteType)item.SiteType).GetDisplayText();
-                }
-                int subSitesCount = 0;
-                using (SiteService sservice = new SiteService())
-                {
-                    subSitesCount = sservice.CountSubSitesBySite(item.Id);
-                }
+                string siteTypeName = ( item.SiteType != null ) ? ( ( SiteType ) item.SiteType ).GetDisplayText() : "N/A";
 
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
                     <td width="1%">
-                        @item.Id
+                        @count
                     </td>
                     <td>
-                        @regionName
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Site">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.RegionName
                     </td>
                     <td>
                         @item.Name
                     </td>
                     <td>
-                        @item.XCord
+                        @item.XCord,@item.YCord
                     </td>
                     <td>
-                        @item.YCord
-                    </td>
-                    <td>
-                        @item.Address
-                    </td>
-                    <td>
-                        @item.PostalCode
-                    </td>
-                    <td>
+                        @item.ContactName <br />
                         @item.ContactNo
                     </td>
                     <td>
-                        @item.ContactName
+                        @item.FinanceContact <br />
+                        @item.FinanceContactNo
+                    </td>
+                    <td>
+                        @item.ReceivingContact <br />
+                        @item.ReceivingContactNo
                     </td>
                     <td>
                         @item.PlanningPoint
@@ -198,19 +132,80 @@ else
                     <td>
                         @siteTypeName
                     </td>
+                    <td width="8%">
+                        <ul class="list">
+                            <li>
+                                <a data-sticky-one="1" data-target="#site-@item.Id-subsites" data-trigger="mouseover" data-arrow="center-right" data-title="Subsites">
+                                    @item.SubSiteCount Subsites
+                                </a>
 
-                    <td>
-                        @subSitesCount
+                                <div id="site-@item.Id-subsites" class="none">
+                                    @if ( item.SubSites.NullableAny() )
+                                    {
+                                        <ul class="list">
+                                            @foreach ( string ss in item.SubSites )
+                                            {
+                                                <li style="line-height: 20px;">
+                                                    @ss
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <div class="message-warn">
+                                            This Site has no sub-sites linked
+                                        </div>
+                                    }
+                                </div>
+
+                            </li>
+                            <li>
+                                <a data-sticky-one="1" data-target="#site-@item.Id-clients" data-trigger="mouseover" data-arrow="center-right" data-title="Clients">
+                                    @item.ClientCount Clients
+                                </a>
+
+                                <div id="site-@item.Id-clients" class="none">
+                                    @if ( item.Clients.NullableAny() )
+                                    {
+                                        <ul class="list">
+                                            @foreach ( string c in item.Clients )
+                                            {
+                                                <li style="line-height: 20px;">
+                                                    @c
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <div class="message-warn">
+                                            This site has no clients linked
+                                        </div>
+                                    }
+                                </div>
+                            </li>
+                            <li>
+                                @Html.ActionLink( item.BudgetCount + " Budgets", "SiteDetails", new { id = item.Id }, new { @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            </li>
+                        </ul>
                     </td>
 
+                    <td width="12%">
 
-                    <td>
-                        @Html.ActionLink("Details", "SiteDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                            @Html.ActionLink( "Details", "SiteDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item", @style = "margin-left: 0;" } )
 
-                        @Html.ActionLink("Edit", "EditSite", new { id = item.Id, returnView = "ManageSites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                            @Html.ActionLink( "Edit", "EditSite", new { id = item.Id, returnView = "ManageSites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        </div>
 
-                        @Html.ActionLink(enable, "DeleteSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managesites", @rel = "tipsyE", @title = enable + " this item?" })
-                        <a href="#" onclick="LinkToSubSites('@item.Id')"><i class="fa fa-link"></i>Subsites</a>
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                            @Html.ActionLink( enable, "DeleteSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managesites", @rel = "tipsyE", @title = enable + " this item?", @style = "margin-left: 0;" } )
+
+                            <a href="#" onclick="LinkToSubSites('@item.Id')">
+                                <i class="fa fa-link"></i>Subsites
+                            </a>
+                        </div>
                     </td>
                 </tr>
 
@@ -221,167 +216,5 @@ else
     </tbody>
 
 </table>
-<script>
-    function Redir(redirVal) {
-        window.location.href = '@Url.Action("SubSites", "Client")'; //SubSites?siteId=redirVal
-    }
-</script>
-@*<script type="text/javascript">
-    $(function(){
-      $("#btnRedirect").click(function(){
-        window.location.href = "@Url.Action("ActionName","Controller")";
-      });
-    });
-    </script>*@
-@*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
-<script>
-    $(document).ready(function () {
-        var cId = parseInt($("#ClientListSiteManage").val());
-        var context = $("#context").val();
-        if (context == "0") {
-            $('.add').hide();
-            $('.importlabel').hide();
-            $('.importbutton').hide();
-            $('#postedFile').hide();
-        }
-        //Clean Site List
-        // SetClient(cId);
-        //SortClients();
 
-
-        $("#ClientList").change(function () {
-            //debugger;
-            var cId = parseInt($('option:selected', this).val());
-            SetClient(cId);
-            if (cId > 0) {
-                $('.add').show();
-                $('.importlabel').show();
-                $('.importbutton').show();
-                $('#postedFile').show();
-                //GetIncludedSites(cId);
-            } else {
-                $('.add').hide();
-                $('.importlabel').hide();
-                $('.importbutton').hide();
-                $('#postedFile').hide();
-            }
-
-            //$.ajax({
-            //    type: 'POST',
-            //    url: "SetClient",
-            //    data: { "ClientId": id },
-            //    success: function (response) {
-            //        window.location.href = 'Index#managesites';
-            //        location.reload();
-            //    }
-            //});
-
-        });
-    });
-
-    function SortClients() {
-        var x = document.getElementById("ClientListSiteManage");
-        if (x.length > 1) {
-            for (var i = 0; i < x.length; i++) {
-                if (x.options[i].value == "0")
-                    x.remove(i);
-            }
-        }
-    }
-    function SetClient(cId) {
-        $.ajax({
-            type: 'POST',
-            url: "SetClient",
-            data: { "ClientId": cId },
-            success: function (response) {
-                //window.location.href = 'Index#managesites';
-                //location.reload();
-                GetIncludedSites(cId);
-            }
-        });
-    }
-    function SetSite(sId) {
-        $.ajax({
-            type: 'POST',
-            url: "SetClientSite",
-            data: { "SiteId": sId },
-            success: function (response) {
-                //window.location.href = 'Index#managesites';
-                //location.reload();
-                //GetIncludedSites(cId);
-            }
-        });
-    }
-    function LinkToSubSites(id) {
-        debugger;
-        var cId = $('#ClientList option:selected').val();
-        //SetClient(cId);
-        $.ajax({
-            type: 'POST',
-            url: "SetClientSite",
-            data: { "SiteId": id },
-            success: function (response) {
-                window.location.href = 'Index#subsites';
-                location.reload();
-            }
-        });
-    }
-
-    function GetIncludedSites(cId) {
-        // SetClient(cId);
-        location.reload();
-        //debugger;
-        //var rowDiv = $("#sites-table tbody");
-        //$.ajax({
-        //    type: "GET",
-        //    url: "GetSitesForClient",
-        //    data: { clientId: cId },
-        //    contentType: "application/json;charset=utf-8",
-        //    dataType: "json",
-        //    success: function (data) {
-        //        //debugger;
-        //        var obj = JSON.parse(data.data);
-        //        rowDiv.html('');
-        //        var result = "";
-        //        $.each(obj, function (id, site) {
-
-        //            var actionStr = '<a class="info" data-details="1" data-id="' + site.Id + '" data-target=".tr-' + site.Id + '-item" href="/Client/SiteDetails/' + site.Id + '"> Details</a>' +
-        //                '<a class="edit" data-edit="1" data-id="' + site.Id + '" data-target=".tr-' + site.Id + '-item" href = "/Client/EditSite/' + site.Id + '?returnView=ManageSites">Edit</a > ' +
-        //                '<a class="warn" data-delete="1" data-id="' + site.Id + '" data-refresh-target="#managesites" data-target="#tr-' + site.Id + '-item" href="/Client/DeleteSite/' + site.Id + '" rel="tipsyE" title="Disable this item?" > Disable</a > ';
-        //            var regionname = "";
-        //            if (site.Region !== undefined && site.Region !== null) {
-        //                regionname = site.Region.Name;
-        //            }
-        //            result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item" role="row">' +
-        //                '<td style = "width: 15%;">' +
-        //                regionname +
-        //                '</td><td>' +
-        //                site.Name +
-        //                '</td><td>' +
-        //                site.XCord +
-        //                '</td><td> ' +
-        //                site.YCord +
-        //                '</td><td> ' +
-        //                site.Address +
-        //                '</td><td> ' +
-        //                site.PostalCode +
-        //                '</td><td> ' +
-        //                site.ContactNo +
-        //                ' </td><td> ' +
-        //                site.ContactName +
-        //                '</td><td> ' +
-        //                site.PlanningPoint +
-        //                '</td><td>' + actionStr + '</td></tr>';//<input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" value="' + site.Id + '" />
-        //        });
-        //        rowDiv.html(result);
-
-        //    },
-        //    error: function (response) {
-
-        //        alert('Error retrieving sites');
-        //    }
-        //});
-
-    }
-</script>
-@Html.Partial("_Paging")
+@Html.Partial( "_Paging" )

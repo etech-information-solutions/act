@@ -184,7 +184,7 @@
     <Compile Include="Models\SiteViewImportModel.cs" />
     <Compile Include="Models\TransporterViewModel.cs" />
     <Compile Include="Models\SiteViewModel.cs" />
-    <Compile Include="Models\GroupClientsViewModel.cs" />
+    <Compile Include="Models\ClientGroupViewModel.cs" />
     <Compile Include="Models\ProductViewModel.cs" />
     <Compile Include="Models\RegionViewModel.cs" />
     <Compile Include="Models\ClientViewModel.cs" />
@@ -633,6 +633,7 @@
     <Content Include="Views\Administration\_PSPBudgetsView.cshtml" />
     <Content Include="Views\Administration\_PSPDocuments.cshtml" />
     <Content Include="Views\Administration\_PSPBudgets.cshtml" />
+    <Content Include="Views\Client\_SiteBudgets.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

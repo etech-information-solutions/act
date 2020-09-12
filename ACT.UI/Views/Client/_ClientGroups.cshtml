@@ -9,24 +9,22 @@
 @{
     ViewBag.ShowExport = true;
     ViewBag.ShowCustom = true;
-    //ViewBag.ShowQuickStructure = true;
 
-    ViewBag.ViewName = "_ClientGroup";
-
+    ViewBag.ViewName = "_ClientGroups";
 }
 
 
-@Html.Partial("_Notification")
+@Html.Partial( "_Notification" )
 
 
 @{
     UserModel user = User.Get();
     Int32 count = Model.Start;
-    List<Group> items = (List<Group>)Model.Items;
+    List<GroupCustomModel> items = ( List<GroupCustomModel> ) Model.Items;
 }
 
 
-@if (Model == null || !items.Any())
+@if ( Model == null || !items.Any() )
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
         There are no Groups available matching your search criteria.
@@ -34,25 +32,36 @@
 }
 
 
-@if (user.IsAdmin || user.IsPSPAdmin)
+@if ( user.IsAdmin || user.IsPSPAdmin )
 {
     <p>
-        @Html.ActionLink("Add", "AddGroup", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Group?", @data_edit = "1", @data_id = 0, @data_target = "#clientgroups" })
+        @Html.ActionLink( "Add", "AddGroup", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Group?", @data_edit = "1", @data_id = 0, @data_target = "#clientgroups" } )
         <span class="loader"></span>
     </p>
 }
+
 <input type="hidden" id="selectedgroup" name="selectedgroup" value="0" />
+
 <table id="groups-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#groups-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
-            @*<th data-name="Count">
-            #
-        </th>*@
-            <th data-name="Name" data-column="Name" style="width:40%;">
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="CreatedOn" data-column="g.CreatedOn">
+                Created
+            </th>
+            <th data-name="Name" data-column="g.Name">
                 Name
             </th>
-            <th data-name="Cell" data-column="Cell" style="width:40%;">
-                Group Description
+            <th data-name="Description" data-column="g.Description">
+                Description
+            </th>
+            <th data-name="Clients">
+                Clients
+            </th>
+            <th data-name="Status" data-column="g.Status">
+                Status
             </th>
             <th data-name="Actions">
                 Actions
@@ -61,32 +70,69 @@
     </thead>
 
     <tbody>
-        @if (Model != null && items != null && items.Count() > 0)
+        @if ( Model != null && items != null && items.Count() > 0 )
         {
-            foreach (var item in items)
+            foreach ( var item in items )
             {
-                Status status = (Status)item.Status;
+                Status status = ( Status ) item.Status;
 
-                String active = status.Equals(Status.Active) ? "activated" : "terminated";
-                String enable = status.Equals(Status.Active) ? "Terminate" : "Activate";
+                string active = status.Equals( Status.Active ) ? "active" : "inactive";
+                string enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
 
-        <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
-            @*<td width="1%">
-            @count
-        </td>*@
-            <td style="width: 15%;">
-                @item.Name
-            </td>
-            <td>
-                @item.Description
-            </td>
-            <td width="15%">
-                <input type="radio" id="group_id_@item.Id" onclick="UpdateGroups(@item.Id)" name="groups" value="@item.Id" />
-                @Html.ActionLink("Edit", "EditGroupGet", new { id = item.Id, returnView = "ClientGroups" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
 
-                @Html.ActionLink(enable, "DeleteGroup", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientgroups", @rel = "tipsyE", @title = enable + " this item?" })
-            </td>
-        </tr>
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Client">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td>
+                        @item.Description
+                    </td>
+                    <td>
+                        <a class="docs" data-sticky-one="1" data-target="#group-@item.Id-clients" data-trigger="mouseover" data-arrow="center-right" data-title="Group Clients">
+                            @item.ClientCount
+                        </a>
+
+                        <div id="group-@item.Id-clients" class="none">
+                            @if ( item.Clients.NullableAny() )
+                            {
+                                <ul class="list">
+                                    @foreach ( string c in item.Clients )
+                                    {
+                                        <li style="line-height: 20px;">
+                                            @c
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <div class="message-warn">
+                                    This group has no clients linked
+                                </div>
+                            }
+                        </div>
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+                    </td>
+                    <td width="15%">
+                        @Html.ActionLink( "Details", "GroupDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( "Edit", "EditGroup", new { id = item.Id, returnView = "ClientGroups" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( enable, "DeleteGroup", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientgroups", @rel = "tipsyE", @title = enable + " this item?" } )
+                    </td>
+                </tr>
 
                 count++;
             }
@@ -94,227 +140,5 @@
     </tbody>
 
 </table>
-<div id="BottomLists" style="display:none;">
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-    <div class="left" style="width: 42%; margin-right: 2%;">
-        <h3>Excluded from Group</h3>
-        <table id="groupsexcluded-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsexcluded-table_wrapper" data-starting-point=".ap-tabs ul">
-            <thead>
-                <tr>
-                    <th data-name="Name" data-column="Name" style="width:40%;">
-                        Client Name
-                    </th>
-                    <th data-name="TradingAs" data-column="TradingAs" style="width:40%;">
-                        Trading As
-                    </th>
-                    <th data-name="CompanyRegistrationNumber" style="width:15%;">
-                        Registration No
-                    </th>
-                    <th data-name="Actions" style="width:5%;">
-                        Select
-                    </th>
-                </tr>
-            </thead>
 
-            <tbody id="excludedtabledata">
-            </tbody>
-
-        </table>
-
-    </div>
-    <div class="left" style="width: 5%; margin-left: 1%;">
-        <br /><br /><br />
-        <button id="Copy">>></button>
-        <br />
-        <br />
-        <button id="Remove"><<</button>
-    </div>
-    <div class="left" style="width: 45%; margin-right: 2%;">
-        <h3>Included in Group</h3>
-        <table id="groupsincluded-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-fixed-header-target="#groupsincluded-table_wrapper" data-starting-point=".ap-tabs ul">
-            <thead>
-                <tr>
-                    <th data-name="Name" data-column="Name" style="width:40%;">
-                        Client Name
-                    </th>
-                    <th data-name="TradingAs" data-column="TradingAs" style="width:40%;">
-                        Trading As
-                    </th>
-                    <th data-name="CompanyRegistrationNumber" style="width:15%;">
-                        Registration No
-                    </th>
-                    <th data-name="Actions" style="width:5%;">
-                        Select
-                    </th>
-                </tr>
-            </thead>
-
-            <tbody id="includedtabledata">
-            </tbody>
-
-        </table>
-
-    </div>
-</div>
-<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-
-<script>
-        $(document).ready(function () {
-            $('#Copy').on('click', function () {
-                var gId = $('#selectedgroup').val();
-                $(".excllist").each(function () {
-                    if ($(this).is(':checked')) {
-                        var id = $(this).attr("id");
-                        SetIncludedGroup(gId, id);
-                    }
-                    else {
-                        // Checkbox isn't checked
-                    }
-                });
-                UpdateGroups(gId);
-                alert('Group Updated.');
-
-                //var checkedItem = $('#excludedtabledata input[type=radio]:checked').val();
-                //    if (checkedItem != undefined) {
-                //        //save it first
-                //        SetIncludedGroup(gId,checkedItem);
-                //        //then update
-                //        UpdateGroups(gId);
-                //    } else {
-                //        alert('Nothing to Copy is selected');
-                //    }
-                //alert(checkedItem);
-               
-            });
-
-            $('#Remove').on('click', function () {
-                var gId = $('#selectedgroup').val();
-                $(".incllist").each(function () {
-                    if ($(this).is(':checked')) {
-                        var id = $(this).attr("id");
-                        SetExcludedGroup(gId, id);
-                    }
-                    else {
-                        // Checkbox isn't checked
-                    }
-                });
-                UpdateGroups(gId);
-                alert('Group Updated.');
-            });
-        });
-
-    
-
-    function UpdateGroups(gId) {
-            $('#BottomLists').show();
-            GetIncludedGroups(gId);
-            GetExcludedGroups(gId);
-        }
-
-        function GetIncludedGroups(gId) {
-            $('#selectedgroup').val(gId);
-            var rowDiv = $("#groupsincluded-table tbody");
-            $.ajax({
-                type: "GET",
-                url: "GetClientsForGroupIncluded",
-                data: { groupId: gId },
-                contentType: "application/json;charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                    rowDiv.html('');
-                    var result = "";
-                    $.each(data, function (id, client) {
-                        result += '<tr id="tr-' + client.Id + '" class="tr-' + client.Id + '-item">' +                            
-                            '<td style = "width: 35%;">' +
-                            client.CompanyName +
-                            '</td><td  style = "width: 35%;">' +
-                            client.TradingAs +
-                            '</td><td  style = "width: 20%;"> ' +
-                            client.CompanyRegistrationNumber +
-                            '</td><td><input type="checkbox" id="' + client.Id + '" name="incl_item"  class="incllist"  value="' + client.Id +'" /></td></tr>';
-                    });
-                    rowDiv.html(result);
-
-                },
-                error: function (response) {
-                    //  debugger;
-                    alert('Error retrieving clients');
-                }
-            });
-
-        }
-
-        function GetExcludedGroups(gId) {
-            $('#selectedgroup').val(gId);
-            var rowDiv = $("#groupsexcluded-table tbody");
-            $.ajax({
-                type: "GET",
-                url: "GetClientsForGroupExcluded",
-                data: { groupId: gId },
-                contentType: "application/json;charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                    rowDiv.html('');
-                    var result = "";
-                    $.each(data, function (id, client) {
-
-                        result += '<tr id="tr-' + client.Id + '" class="tr-' + client.Id + '-item">' +
-                            '<td style = "width: 35%;">' +
-                            client.CompanyName +
-                            '</td><td  style = "width: 35%;">' +
-                            client.TradingAs +
-                            '</td><td  style = "width: 20%;"> ' +
-                            client.CompanyRegistrationNumber +
-                            '</td><td><input type="checkbox" id="' + client.Id + '" name="excl_item-' + client.Id + '" class="excllist" value="' + client.Id+'" /></td></tr>';
-                    });
-                    rowDiv.html(result);
-
-                },
-                error: function (response) {
-                    alert('Error retrieving clients');
-                }
-            });
-
-    }
-
-
-    function SetIncludedGroup(gId, cId) {
-        var data = {
-            "groupId": gId, "clientId": cId
-        };
-        $.ajax({
-            type: 'POST',
-            url: "SetClientForGroupIncluded",
-            data: data,
-            success: function (response) {
-                if (response == "True") {
-                    var x = 1;//Do Nothing
-                } else {
-                    alert('Group could not be saved. Try again.');
-                }
-            }
-        });
-    }
-
-    function SetExcludedGroup(gId, cId) {
-        var data = {
-            "groupId": gId, "clientId": cId
-        };
-        $.ajax({
-            type: 'POST',
-            url: "SetClientForGroupExcluded",
-            data: data,
-            success: function (response) {
-                if (response == "True") {
-                   // alert('Group Updated.');
-                    var x = 1; //do nothing
-                } else {
-                    alert('Group could not be saved. Try again.');
-                }
-            }
-        });
-    }
-</script>
-@*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
-
-@Html.Partial("_Paging")
+@Html.Partial( "_Paging" )

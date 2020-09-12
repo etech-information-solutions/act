@@ -1,31 +1,24 @@
 ﻿@model SiteViewModel
 
-@using ACT.Data.Models;
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
 @using ACT.UI.Models;
-@using ACT.Core.Models.Custom;
-@using ACT.Core.Services;
 
 @{
-    /**/
-
-    if (ViewBag.IncludeLayout == null)
+    if ( ViewBag.IncludeLayout == null )
     {
         Layout = null;
     }
 
     ViewBag.Title = "Add Site";
 
-    //List<Region> regionOptions = ViewBag.RegionOptions;
-    //List<Region> regionOptions = Model.RegionOptions;
-    //regionOptions = Model.RegionOptions.Where(r => r.PSPId == pspId).ToList();
+    UserModel user = User.Get();
 }
 
 
-@Html.Partial("_Notification")
+@Html.Partial( "_Notification" )
 
-@using (Html.BeginForm("AddSite", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#managesites", @class = "custom-validate", @style = "width: auto;" }))
+@using ( Html.BeginForm( "AddSite", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#managesites", @class = "custom-validate", @style = "width: auto;" } ) )
 {
     <div id="edit-item">
 
@@ -34,259 +27,270 @@
             <span>Add Site</span>
         </h2>
 
-        @Html.ValidationSummary(true)
+        @Html.ValidationSummary( true )
 
-        @Html.HiddenFor(model => model.Id)
-        @*@Html.HiddenFor(model => model.SiteType)*@
-        @Html.HiddenFor(model => model.SourceView)
+        <div class="left" style="width: 45%; margin-right: 4%;">
 
-        <div class="left" style="width: 45%; margin-right: 1%;">
-            <h3>Site Details</h3>
             <div class="editor-label">
-                Name
+                @Html.LabelFor( model => model.Name )
             </div>
             <div class="editor-field">
-                @Html.TextBoxFor(model => model.Name, new { @class = "input", @placeholder = "Enter Site Name" })
-                @Html.ValidationMessageFor(model => model.Name)
+                @Html.TextBoxFor( model => model.Name, new { @class = "input", @placeholder = "Enter Site Name" } )
+                @Html.ValidationMessageFor( model => model.Name )
             </div>
 
             <div class="editor-label">
-                Description
+                @Html.LabelFor( model => model.Description )
             </div>
             <div class="editor-field">
-                @Html.TextBoxFor(model => model.Description, new { @class = "input", @placeholder = "Enter Site Description" })
-                @Html.ValidationMessageFor(model => model.Description)
+                @Html.TextBoxFor( model => model.Description, new { @class = "input", @placeholder = "Enter Site Description" } )
+                @Html.ValidationMessageFor( model => model.Description )
             </div>
+
             <div class="editor-label">
-                Region
+                @Html.LabelFor( model => model.RegionId )
             </div>
             <div class="editor-field">
-                @Html.DropDownList("RegionId", new SelectList(ViewBag.RegionOptions as System.Collections.IEnumerable, "Value", "Text", "Select a Region"), new { @class = "chzn", @style = "width: 98%;", required = "required" })
-                @Html.ValidationMessageFor(model => model.RegionId)
+                @Html.DropDownListFor( model => model.RegionId, model => Model.RegionOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.RegionId )
             </div>
-            <br />
+
+            <div class="edit-label">
+                @Html.LabelFor( model => model.Status )
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.Status )
+            </div>
+
             <div class="editor-label">
-                Site Type
+                @Html.LabelFor( model => model.SiteType )
             </div>
             <div class="editor-field">
-                <select id="SiteType" name="SiteType" class="chzn" required="required" style="width: 98%;">
-                    @foreach (int p in Enum.GetValues(typeof(SiteType)))
+                @Html.EnumDropDownFor( model => model.SiteType, false, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.SiteType )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.AccountCode )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.AccountCode, new { @class = "input", @placeholder = "Enter Account Code" } )
+                @Html.ValidationMessageFor( model => model.AccountCode )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.PlanningPoint )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.PlanningPoint, new { @class = "input", @placeholder = "Enter Planning Point" } )
+                @Html.ValidationMessageFor( model => model.PlanningPoint )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.Depot )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Depot, new { @class = "input", @placeholder = "Enter Depot Code" } )
+                @Html.ValidationMessageFor( model => model.Depot )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.SiteCodeChep )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.SiteCodeChep, new { @class = "input", @placeholder = "EnterChep Site Code" } )
+                @Html.ValidationMessageFor( model => model.SiteCodeChep )
+            </div>
+
+        </div>
+
+        <div class="left" style="width: 45%;">
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ContactName )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ContactName, new { @class = "input", @placeholder = "Enter Owner Contact Name" } )
+                @Html.ValidationMessageFor( model => model.ContactName )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ContactNo )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ContactNo, new { @class = "input", @placeholder = "Enter Owner Contact Number" } )
+                @Html.ValidationMessageFor( model => model.ContactNo )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.FinanceContact )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.FinanceContact, new { @class = "input", @placeholder = "Enter Finance Contact Name" } )
+                @Html.ValidationMessageFor( model => model.FinanceContact )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.FinanceContactNo )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.FinanceContactNo, new { @class = "input", @placeholder = "Enter Finance Contact Number" } )
+                @Html.ValidationMessageFor( model => model.FinanceContactNo )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ReceivingContact )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ReceivingContact, new { @class = "input", @placeholder = "Enter Receiving Contact Name" } )
+                @Html.ValidationMessageFor( model => model.ReceivingContact )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ReceivingContactNo )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ReceivingContactNo, new { @class = "input", @placeholder = "Enter Receiving Contact Number" } )
+                @Html.ValidationMessageFor( model => model.ReceivingContactNo )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.Longitude )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Longitude, new { @class = "input", @placeholder = "Enter Site Longitude" } )
+                @Html.ValidationMessageFor( model => model.Longitude )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.Latitude )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Latitude, new { @class = "input", @placeholder = "Enter Site Latitude" } )
+                @Html.ValidationMessageFor( model => model.Latitude )
+            </div>
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+        <div class="left grouped-area" style="width: 40%; margin-right: 5%;">
+
+            <div class="editor-label">
+                <p>
+                    <strong>Clients</strong>
+                </p>
+            </div>
+            <div class="editor-field" style="max-height: 341px; overflow-y: auto;">
+
+                @if ( Model.ClientOptions.NullableAny() )
+                {
+                    int c = 0;
+
+                    <ul class="list">
+                        @foreach ( KeyValuePair<int, string> item in Model.ClientOptions )
+                        {
+                            string readOnly = !user.IsAdmin ? "readonly=readonly" : "";
+                            string chk = Model.Clients.Any( i => i.Id == item.Key ) || !user.IsAdmin ? "checked=checked" : "";
+
+                            <li style="background: none; padding-left: 0;">
+                                <label>
+                                    <input type="hidden" value="@Model.Id" name="Clients[@c].SiteId" />
+                                    <input id="Clients-@item.Key" name="Clients[@c].Id" value="@item.Key" type="checkbox" @chk @readOnly style="float: none; display: inline-block; margin: 0;" />
+                                    @item.Value
+                                </label>
+                            </li>
+
+                            c++;
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="message-warn">
+                        There are no clients to be allocated to this Site.
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+        <div class="left grouped-area" style="width: 40%;">
+
+            <p>
+                <strong class="uppercase">Address Details</strong>
+            </p>
+
+            @Html.HiddenFor( model => model.Address.Id )
+            @Html.HiddenFor( model => model.Address.AddressType )
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.Address.AddressLine1 )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Address.AddressLine1, new { @class = "input", @placeholder = "Enter Company Address Line 1" } )
+                @Html.ValidationMessageFor( model => model.Address.AddressLine1 )
+            </div>
+
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter Company Address Line 2" } )
+                @Html.ValidationMessageFor( model => model.Address.AddressLine2 )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.Address.Town )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Address.Town, new { @class = "input", @placeholder = "Enter Company Address Town" } )
+                @Html.ValidationMessageFor( model => model.Address.Town )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.Address.PostCode )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Address.PostCode, new { @class = "input", @placeholder = "Enter Company Address Postal Code" } )
+                @Html.ValidationMessageFor( model => model.Address.PostCode )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.Address.Province )
+            </div>
+            <div class="editor-field">
+
+                <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
+                    <option value="">-- select</option>
+                    @foreach ( int p in Enum.GetValues( typeof( Province ) ) )
                     {
-                        string text = ((SiteType)p).GetDisplayText();
+                        Province province = ( Province ) p;
 
-                        <option value="@p">@text</option>
+                        string text = province.GetDisplayText();
+
+                        if ( text.ToLower() == "all" )
+                        {
+                            continue;
+                        }
+
+                        string sel = ( province == Model.Address.Province ) ? "selected=selected" : string.Empty;
+
+                        <option value="@p" @sel>@text</option>
                     }
                 </select>
-            </div>
-            <br />
-            <div class="editor-label">
-                Account Code
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.AccountCode, new { @class = "input", @placeholder = "Enter Account Code" })
-                @Html.ValidationMessageFor(model => model.AccountCode)
-                @*@Html.DisplayFor( model => model.UserRoles.FirstOrDefault().Role.Name )*@
-            </div>
 
-            <div class="editor-label">
-                Planning Point/Code
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.PlanningPoint, new { @class = "input", @placeholder = "Enter Planning Point" })
-                @Html.ValidationMessageFor(model => model.PlanningPoint)
-            </div>
-
-            <div class="editor-label">
-                Depot Code
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.Depot, new { @class = "input", @placeholder = "Enter Depot Code" })
-                @Html.ValidationMessageFor(model => model.Depot)
-            </div>
-            @*<div class="editor-field">
-            @Html.DropDownListFor(model => model.Depot, (new[] { new SelectListItem { Text = "No", Value = "No" }, new SelectListItem { Text = "Yes", Value = "Yes" } }), new { @class = "chzn", @style = "width: 98%;" })
-        </div>*@
-            <br />
-            <div class="editor-label">
-                Chep SiteCode
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.SiteCodeChep, new { @class = "input", @placeholder = "EnterChep Site Code" })
-                @Html.ValidationMessageFor(model => model.SiteCodeChep)
+                @Html.ValidationMessageFor( model => model.Address.Province )
             </div>
 
         </div>
 
-        <div class="left" style="width: 45%;">
-            <h3>Contact Details</h3>
-            <div class="editor-label">
-                Owner Contact Name
-            </div>
-
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.ContactName, new { @class = "input", @placeholder = "Enter Owner Contact Name" })
-                @Html.ValidationMessageFor(model => model.ContactName)
-            </div>
-
-            <div class="editor-label">
-                Owner Contact Number
-            </div>
-
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.ContactNo, new { @class = "input", @placeholder = "Enter Owner Contact Number" })
-                @Html.ValidationMessageFor(model => model.ContactNo)
-            </div>
-
-            <div class="editor-label">
-                Finance Contact Name
-            </div>
-
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.FinanceContact, new { @class = "input", @placeholder = "Enter Finance Contact Name" })
-                @Html.ValidationMessageFor(model => model.FinanceContact)
-            </div>
-
-            <div class="editor-label">
-                Finance Contact Number
-            </div>
-
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.FinanceContactNo, new { @class = "input", @placeholder = "Enter Finance Contact Number" })
-                @Html.ValidationMessageFor(model => model.FinanceContactNo)
-            </div>
-
-            <div class="editor-label">
-                Receiving Contact Name
-            </div>
-
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.ReceivingContact, new { @class = "input", @placeholder = "Enter Receiving Contact Name" })
-                @Html.ValidationMessageFor(model => model.ReceivingContact)
-            </div>
-
-            <div class="editor-label">
-                Receiving Contact Number
-            </div>
-
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.ReceivingContactNo, new { @class = "input", @placeholder = "Enter Receiving Contact Number" })
-                @Html.ValidationMessageFor(model => model.ReceivingContactNo)
-            </div>
-
-
-
-
-
-
-            <h3>Coordinates</h3>
-            <div class="editor-label">
-                X Coordinate
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.XCord, new { @readonly = "readonly", @class = "input", @placeholder = "Enter X Coordinates" })
-                @Html.ValidationMessageFor(model => model.XCord)
-            </div>
-
-
-            <div class="editor-label">
-                Y Coordinate
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.YCord, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Y Coordinates" })
-                @Html.ValidationMessageFor(model => model.YCord)
-            </div>
-
-        </div>
         <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-        <div class="left" style="width: 95%; margin-right: 4%;">
-            <div id="locationField">
-                Type your address below:
-                <input id="autocomplete"
-                       placeholder="Enter your address"
-                       onFocus="geolocate()"
-                       type="text" />
-            </div>
-        </div>
-        <div class="clear" style="height: 10px;">&nbsp;</div>
-        <div class="left" style="width: 45%; margin-right: 1%;">
 
-            <input id="Address.AddressType" name="Address.AddressType" type="hidden" value="@( ( int ) AddressType.Postal )" />
+        <div id="site-budget">
 
-            <div class="editor-label">
-                Street Address
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.FullAddress.AddressLine1, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Street Address" })
-                @Html.ValidationMessageFor(model => model.FullAddress.AddressLine1)
-            </div>
-
-            <div class="editor-label">
-                Town/City
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.FullAddress.Town, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Town/City" })
-                @Html.ValidationMessageFor(model => model.FullAddress.Town)
-            </div>
-
-            <div class="editor-label">
-                Postal Code
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.FullAddress.PostCode, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Postal Code" })
-                @Html.ValidationMessageFor(model => model.FullAddress.PostCode)
-            </div>
-
+            @Html.Partial( "_SiteBudgets", Model.SiteBudgets )
 
         </div>
-
-        <div class="left" style="width: 45%;">
-            <div class="editor-label">
-                Suburb/Area
-            </div>
-            <div class="editor-field">
-                @Html.TextBoxFor(model => model.FullAddress.AddressLine2, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Suburb/Area" })
-                @Html.ValidationMessageFor(model => model.FullAddress.AddressLine2)
-            </div>
-
-            <div class="editor-label">
-                Province
-            </div>
-            <div class="editor-field">
-                <select id="FullAddress.Province" name="FullAddress.Province" required="required" style="width: 100%;">
-                    <!--class="chzn"-->
-                    <option value="">-- select</option>
-                    @*@foreach (int p in Enum.GetValues(typeof(Province)))
-                        {
-                            string text = ((Province)p).GetDisplayText();
-
-                            if (text.ToLower() == "all")
-                            {
-                                continue;
-                            }
-
-                            <option value="@p">@text</option>
-                        }*@
-                </select>
-                @*<select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
-                        <option value="">-- select</option>
-                        @foreach (int p in Enum.GetValues(typeof(Province)))
-                        {
-                            string text = ((Province)p).GetDisplayText();
-
-                            if (text.ToLower() == "all")
-                            {
-                                continue;
-                            }
-
-                            <option value="@p">@text</option>
-                        }
-                    </select>*@
-                @*@Html.TextBoxFor(model => model.FullAddress.Province, new { @readonly = "readonly", @class = "input", @placeholder = "Enter Province" })*@
-                @*@Html.ValidationMessageFor(model => model.FullAddress.Province)*@
-            </div>
-
-        </div>
-
 
         <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
 
@@ -297,280 +301,6 @@
 
             <a data-refresh="1" data-target="#managesites">Cancel</a>
         </p>
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+
     </div>
-    <script>
-        //The Page Stuff
-
-    $(document).ready(function () {
-        var sId = '@Model.Id';
-        LoadBudgets(sId);
-
-    });
-
-    //function SaveBudget(id) {
-    //    var data = $('#budg-' + id + ' :input').serialize();
-
-    //    $.ajax({
-    //        type: 'POST',
-    //        url: "SetSiteBudget",
-    //        data: data,
-    //        //data : {'_token':csrfdata,'inputstr': strToSend},
-    //        beforeSend: function () {
-    //        },
-    //        success: function (response) {
-    //            if (response == "true") {
-    //                alert('Budget Saved.');
-
-    //            } else {
-    //                alert('Email Could Not Be Sent. Try again.');
-    //            }
-    //        }
-    //    });
-
-
-    //}
-    function SaveBudget(id) {
-        var data = {
-            "Id": id, "SiteId": "0", "BudgetYear": $('#SiteBudget_' + id + '_BudgetYear').val(), "January": $('#SiteBudget_' + id + '_January').val(), "February": $('#SiteBudget_' + id + '_February').val(), "March": $('#SiteBudget_' + id + '_March').val(), "April": $('#SiteBudget_' + id + '_April').val(), "May": $('#SiteBudget_' + id + '_May').val(), "June": $('#SiteBudget_' + id + '_June').val(), "July": $('#SiteBudget_' + id + '_July').val(), "August": $('#SiteBudget_' + id + '_August').val(), "September": $('#SiteBudget_' + id + '_September').val(), "October": $('#SiteBudget_' + id + '_October').val(), "November": $('#SiteBudget_' + id + '_November').val(), "December": $('#SiteBudget_' + id + '_December').val()
-        };
-        $.ajax({
-            type: 'POST',
-            url: "SetSiteBudget",
-            data: data,//$(this).serialize(),
-            success: function (response) {
-                if (response == "True") {
-                    alert('Budget Saved.');
-                } else {
-                    alert('Budget could not be saved. Try again.');
-                }
-            }
-        });
-        }
-        function LoadBudgets(sId) {
-
-        }
-
-    function AddRow() {
-        var rowDiv = $("#siteBudget-table tbody");
-        //var fieldcopy = '<input class="input" id="SiteBudget_0-[FIELDNAME]-" style="padding: 0 5px; width: 87%;" type="number" value="0">';
-        var fieldvalue = "0";
-        var savecopy = '<a id="savebudget" onclick="SaveBudget(' + fieldvalue + ')" name="savebudget"><i class="fa fa-save"></i></a>';
-        var tabledata = '<tr id="budg-0-row" name="budg-0-row">';//<form id="budg-0-frm" name="budg-0-frm">
-        tabledata += '<td><input class="input" id="SiteBudget_0_BudgetYear" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="SiteBudget_0_January" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="SiteBudget_0_February" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="SiteBudget_0_March" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="SiteBudget_0_April" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="SiteBudget_0_May" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="SiteBudget_0_June" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="SiteBudget_0_July" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="SiteBudget_0_August" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="SiteBudget_0_September" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="SiteBudget_0_October" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="SiteBudget_0_November" style="padding: 0 5px; width:87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td><input class="input" id="SiteBudget_0_December" style="padding: 0 5px; width: 87%;" type="number" value="' + fieldvalue + '"></td>';
-        tabledata += '<td>' + savecopy.replace("[BUDGETID]", "0") + '</td>';
-        tabledata += '</tr>';
-
-
-        result = tabledata;
-
-        rowDiv.append(result);
-
-    }
-
-    </script>
-
-    <script>
-        //The Google Stuff
-        var placeSearch, autocomplete;
-
-        var componentForm = {
-            street_number: 'short_name',
-            route: 'long_name',
-            sublocality_level_1: 'long_name',
-            sublocality_level_2: 'long_name',
-            locality: 'long_name',
-            administrative_area_level_2: 'long_name',
-            administrative_area_level_1: 'long_name',
-            //country: 'long_name',
-            postal_code: 'short_name'
-        };
-        var componentFormFields = {
-            street_number: 'FullAddress_AddressLine1',
-            route: 'FullAddress_AddressLine1',
-            locality: 'FullAddress_Town',
-            sublocality_level_1: 'FullAddress_AddressLine2',
-            sublocality_level_2: 'FullAddress_AddressLine2',
-            administrative_area_level_2: 'FullAddress.Province',
-            administrative_area_level_1: 'FullAddress.Province',
-            //country: 'long_name',
-            postal_code: 'FullAddress_PostCode'
-        };
-
-
-        function initAutocomplete() {
-            autocomplete = new google.maps.places.Autocomplete(
-                document.getElementById('autocomplete'), { types: ['geocode'] });
-            autocomplete.setFields(['address_component']);
-            autocomplete.addListener('place_changed', fillInAddress);
-        }
-
-        function fillInAddress() {
-            var place = autocomplete.getPlace();
-            var fullAddress = "";
-
-            for (var component in componentForm) {
-                document.getElementById(componentFormFields[component]).value = '';
-                document.getElementById(componentFormFields[component]).disabled = false;
-            }
-            for (var i = 0; i < place.address_components.length; i++) {
-                var addressType = place.address_components[i].types[0];
-                if (componentForm[addressType]) {
-                    var val = place.address_components[i][componentForm[addressType]];
-                    if (addressType == "route") {
-                        var streetaddress = document.getElementById("FullAddress_AddressLine1");
-                        document.getElementById("FullAddress_AddressLine1").value = streetaddress.value + " " + val;
-                    } else {
-                        if (addressType == "administrative_area_level_1") {
-                            var idx = -1;
-                            switch (val) {
-                                case "Eastern Cape":
-                                    idx = 0;
-                                    break;
-                                case "Free State":
-                                    idx = 1;
-                                    break;
-                                case "Gauteng":
-                                    idx = 2;
-                                    break;
-                                case "KwaZulu-Natal":
-                                    idx = 3;
-                                    break;
-                                case "Limpopo":
-                                    idx = 4;
-                                    break;
-                                case "Mpumalanga":
-                                    idx = 5;
-                                    break;
-                                case "Northern Cape":
-                                    idx = 67;
-                                    break;
-                                case "North West":
-                                    idx = 7;
-                                    break;
-                                case "Western Cape":
-                                    idx = 8;
-                                    break;
-                                case "Western Cape":
-                                    idx = 8;
-                                    break;
-                                default:
-                            }
-                            document.getElementById("FullAddress.Province").options.length = 0;
-                            var opt = document.createElement("option");
-                            opt.text = val;
-                            opt.value = idx;
-                            document.getElementById("FullAddress.Province").options.add(opt);
-                        } else {
-                            document.getElementById(componentFormFields[addressType]).value = val;
-                        }
-                    }
-                }
-                //TODO: Enable Coordinates until test is on HTTPS
-                $("#FullAddress_AddressLine1").attr("readonly", false);
-                $("#FullAddress_Town").attr("readonly", false);
-                $("#FullAddress_AddressLine2").attr("readonly", false);
-                $("#FullAddress_PostCode").attr("readonly", false);
-                $("#FullAddress.Province").attr("readonly", true);
-                $("#XCord").attr("readonly", false);
-                $("#YCord").attr("readonly", false);
-                //change for 1st element
-                //if (i == 0) {
-                //    fullAddress = place.address_components[i].long_name;
-                //} else {
-                //    fullAddress = fullAddress + "," + place.address_components[i].long_name;
-                //}
-            }
-           // populateCoords(fullAddress);
-            //getLatLngFromAddress(fullAddress);
-        }
-
-        function geolocate() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    var geolocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    console.log(geolocation.lat);
-                    console.log(geolocation.lng);
-                    populateXY(geolocation.lng, geolocation.lat);
-                    var circle = new google.maps.Circle(
-                        { center: geolocation, radius: position.coords.accuracy });
-                    autocomplete.setBounds(circle.getBounds());
-                });
-            }
-        }
-        function setSelectedIndex(s, i) {
-            s.options[i - 1].selected = true;
-            return;
-        }
-        function populateXY(X, Y) {
-            X = parseFloat(X).toFixed(4);
-            Y = parseFloat(Y).toFixed(4);
-            $('#XCord').val(X);
-            $('#YCord').val(Y);
-            $("#XCord").attr("readonly", true);
-            $("#YCord").attr("readonly", true);
-        }
-        function getLatLngFromAddress(strAddress) {
-            var geocoder = new google.maps.Geocoder();
-            geocoder.geocode({ 'address': strAddress }, function (results, status) {
-                if (status == google.maps.GeocoderStatus.OK) {
-                   //console.log(results);
-                    var lng = results[0].geometry.location.Ua;
-                    var lat = results[0].geometry.location.Za;
-                    //console.log(lat + '_' + lng)
-                    if (lat == undefined) {
-                        lng = results[0].geometry.bounds.Ua.i;
-                        lat = results[0].geometry.bounds.Za.i;
-                    }
-                    $('#XCord').val(lng);
-                    $('#YCord').val(lat);
-                    //console.log(lat + '_' + lng)
-                } else {
-                    console.log("Geocode was not successful for the following reason: " + status);
-                }
-            });
-        }
-        function populateCoords(strAddress) {
-            if (strAddress != "") {
-                var geoAPI = 'https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=' + strAddress +'&inputtype=textquery&fields=geometry&key=AIzaSyAeQFyrVUFUjsQOK_RdtfAC57jMJkc_3Co&outputFormat=text/javascript&format_options=callback:getJson';//format=jsonp
-
-            $.ajax({
-                type: "GET",
-                url: geoAPI,
-                dataType: 'jsonp',
-                crossDomain: true,
-                success: function (data) {
-                    var obj = JSON.parse(data);
-
-                    $("#XCord").attr("readonly", true);
-                    $("#YCord").attr("readonly", true);
-                },
-                error: function (response) {
-                    alert('Error retrieving location Geocoding. Could not retrieve the X and Y coordinates. Please get these manually and enter them accordingly. X is Latitude and Y is longitude.');
-                    $("#XCord").attr("readonly", false);
-                    $("#YCord").attr("readonly", false);
-                }
-            });
-            }
-        }
-
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeQFyrVUFUjsQOK_RdtfAC57jMJkc_3Co&libraries=places&callback=initAutocomplete"
-            async defer></script>
-
 }

@@ -7,13 +7,19 @@ namespace ACT.Core.Enums
     public enum SiteType
     {
         [UiIgnoreEnumValue]
-        [StringEnumDisplayText("Transfer Customer")]
-        TransferCustomer = 1,
-    
-        [StringEnumDisplayText("Exchange Customer")]
-        ExchangeCustomer = 2,
+        [StringEnumDisplayText( "Transfer Customer" )]
+        All = -1,
 
-        [StringEnumDisplayText("Depot")]
-        Depot = 3, 
+        [StringEnumDisplayText( "Depot" )]
+        Depot = 0,
+
+        [StringEnumDisplayText( "Manufacturer" )]
+        Manufacturer = 1,
+
+        [StringEnumDisplayText( "Retailer" )]
+        Retailer = 2,
+
+        [StringEnumDisplayText( "Transporter Depot" )]
+        TransporterDepot = 3,
     }
 }

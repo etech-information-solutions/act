@@ -2,10 +2,8 @@
 
 @using ACT.Data.Models;
 @using ACT.Core.Enums;
-@using ACT.Core.Models;
-@using ACT.Core.Models.Custom;
 @using ACT.Core.Services;
-@using ACT.UI.Models;
+
 @{
     if ( ViewBag.IncludeLayout == null )
     {
@@ -13,366 +11,355 @@
     }
 
     ViewBag.Title = "Site Details";
+
     Address address = ViewBag.Address;
-    SiteType st = (SiteType)Model.SiteType;
-    string sttext = st.GetDisplayText();
-    //Region regionOptions = ViewBag.RegionOptions;
 }
 
 
 <div id="item-details" class="item-details" style="width: auto;">
 
-    @if (ViewBag.IncludeLayout == null)
+    @if ( ViewBag.IncludeLayout == null )
     {
         <h2>
             <img alt="" src="@Url.Content( "~/images/info.png" )" />
             <span>Site Details</span>
         </h2>
     }
-    @Html.HiddenFor(model => model.Id)
-        <div class="left" style="width: 45%; margin-right: 1%;">
-            <h3>Site Details</h3>
-            <div class="display-label">
-                Name
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.Name)
-            </div>
 
-            <div class="display-label">
-                Description
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.Description)
-                @*@(( ( Status ) Model.Status ).GetDisplayText())*@
-            </div>
-            <div class="display-label">
-                Region
-            </div>
-            <div class="display-field">
-                @using (RegionService reg = new RegionService())
-                {
-                    Region region = reg.GetById((int)Model.RegionId);
-                    <td style="width: 15%;">
-                        @region.Name
-                    </td>
-                }
-            </div>
-            <div class="display-label">
-                Site Type
-            </div>
-            <div class="display-field">
-                @sttext
-                @Html.HiddenFor(model => model.SiteType)
-            </div>
-            <div class="display-label">
-                Account Code
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.AccountCode)
-                @*@Html.DisplayFor( model => model.UserRoles.FirstOrDefault().Role.Name )*@
-            </div>
+    <div class="left" style="width: 30%; margin-right: 4%;">
 
-            <div class="display-label">
-                Planning Point/Code
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.PlanningPoint)
-            </div>
+        <div class="display-label">
+            Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Name )
+        </div>
 
-            <div class="display-label">
-                Depot Code
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.Depot)
-            </div>
+        <div class="display-label">
+            Description
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Description )
+        </div>
 
-            <div class="display-label">
-                Chep SiteCode
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.SiteCodeChep)
-            </div>
+        <div class="display-label">
+            Region
+        </div>
+        <div class="display-field">
+            @Model.Region.Description
+        </div>
+
+        <div class="display-label">
+            Status
+        </div>
+        <div class="display-field">
+            @( ( ( Status ) Model.Status ).GetDisplayText() )
+        </div>
+
+        <div class="display-label">
+            Site Type
+        </div>
+        <div class="display-field">
+            @( Model.SiteType.HasValue ? ( ( SiteType ) Model.SiteType ).GetDisplayText() : string.Empty )
+        </div>
+
+        <div class="display-label">
+            Account Code
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.AccountCode )
+        </div>
+
+        <div class="display-label">
+            Planning Point/Code
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.PlanningPoint )
+        </div>
+
+        <div class="display-label">
+            Depot Code
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Depot )
+        </div>
+
+        <div class="display-label">
+            Chep Site Code
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.SiteCodeChep )
+        </div>
+
+    </div>
+
+    <div class="left" style="width: 30%; margin-right: 4%;">
+
+        <div class="display-label">
+            Contact Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ContactName )
+        </div>
+
+        <div class="display-label">
+            Contact Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ContactNo )
+        </div>
+
+        <div class="display-label">
+            Finance Contact Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.FinanceContact )
+        </div>
+
+        <div class="display-label">
+            Finance Contact Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.FinanceContactNo )
+        </div>
+
+        <div class="display-label">
+            Receiving Contact Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ReceivingContact )
+        </div>
+
+        <div class="display-label">
+            Receiving Contact Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ReceivingContactNo )
+        </div>
+
+        <div class="display-label">
+            X Coordinate
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.XCord )
+        </div>
+
+        <div class="display-label">
+            Y Coordinate
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.YCord )
+        </div>
+
+    </div>
+
+    <div class="left" style="width: 30%;">
+
+        <div class="grouped-area">
+
+            <p>
+                <strong class="uppercase">Addres Details</strong>
+            </p>
+
+            @if ( address != null )
+            {
+                <div class="display-label">
+                    Addres
+                </div>
+                <div class="display-field">
+                    @address.Addressline1
+                </div>
+                <div class="display-field">
+                    @address.Addressline2
+                </div>
+
+                <div class="display-label">
+                    Town/City
+                </div>
+                <div class="display-field">
+                    @address.Town
+                </div>
+
+                <div class="display-label">
+                    Postal Code
+                </div>
+                <div class="display-field">
+                    @address.PostalCode
+                </div>
+
+                <div class="display-label">
+                    Province
+                </div>
+                <div class="display-field">
+                    @(( ( Province ) address.Province ).GetDisplayText())
+                </div>
+            }
+            else
+            {
+                <div class="message-warn">
+                    This site does not have address details
+                </div>
+            }
 
         </div>
 
-        <div class="left" style="width: 45%;">
-            <h3>Contact Details</h3>
+        <div class="grouped-area" style="max-height: 100px; overflow-y: auto;">
 
-            <div class="display-label">
-                Owner Contact Name
-            </div>
+            <p>
+                <strong class="uppercase">Sub Sites (@Model.Site1.NullableCount())</strong>
+            </p>
 
-            <div class="display-field">
-                @Html.DisplayFor(model => model.ContactName)
-            </div>
-            <div class="display-label">
-                Owner Contact Number
-            </div>
-
-            <div class="display-field">
-                @Html.DisplayFor(model => model.ContactNo)
-            </div>
-
-            <div class="display-label">
-                Finance Contact Name
-            </div>
-
-            <div class="display-field">
-                @Html.DisplayFor(model => model.FinanceContact)
-            </div>
-            <div class="display-label">
-                Finance Contact Number
-            </div>
-
-            <div class="display-field">
-                @Html.DisplayFor(model => model.FinanceContactNo)
-            </div>
-
-            <div class="display-label">
-                Receiving Contact Name
-            </div>
-
-            <div class="display-field">
-                @Html.DisplayFor(model => model.ReceivingContact)
-            </div>
-            <div class="display-label">
-                Receiving Contact Number
-            </div>
-
-            <div class="display-field">
-                @Html.DisplayFor(model => model.ReceivingContactNo)
-            </div>
-
-
-            <h3>Coordinates</h3>
-            <div class="display-label">
-                X Coordinate
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.XCord)
-            </div>
-
-
-            <div class="display-label">
-                Y Coordinate
-            </div>
-            <div class="display-field">
-                @Html.DisplayFor(model => model.YCord)
-            </div>
-
-        </div>
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-
-
-    @if (address != null)
-    {
-
-        <div class="left" style="width: 48%; margin-right: 4%;">
-
-            <div class="display-label">
-                Street Address
-            </div>
-            <div class="display-field">
-                @address.Addressline1
-            </div>
-
-            <div class="display-label">
-                Town/City
-            </div>
-            <div class="display-field">
-                @address.Town
-            </div>
-
-            <div class="display-label">
-                Postal Code
-            </div>
-            <div class="display-field">
-                @address.PostalCode
-            </div>
-
+            @if ( Model.Site1.NullableAny() )
+            {
+                <ul class="list">
+                    @foreach ( Site s in Model.Site1 )
+                    {
+                        <li>
+                            @s.Name
+                        </li>
+                    }
+                </ul>
+            }
 
         </div>
 
-        <div class="left" style="width: 48%;">
-            <div class="display-label">
-                Suburb/Area
-            </div>
-            <div class="display-field">
-                @address.Addressline2
-            </div>
-            <div class="display-label">
-                Province
-            </div>
-            <div class="display-field">
-                @(((Province)address.Province).GetDisplayText())
-            </div>
+        <div class="grouped-area" style="max-height: 170px; overflow-y: auto;">
 
-        </div>
-    }
-    else
-    {
-        <div class="left" style="width: 48%; margin-right: 4%;">
+            <p>
+                <strong class="uppercase">Clients (@Model.ClientSites.NullableCount())</strong>
+            </p>
 
-            <div class="display-label">
-                Street Address
-            </div>
-            <div class="display-field">
-                &nbsp;
-            </div>
-
-            <div class="display-label">
-                Town/City
-            </div>
-            <div class="display-field">
-                &nbsp;
-            </div>
-
-            <div class="display-label">
-                Postal Code
-            </div>
-            <div class="display-field">
-                &nbsp;
-            </div>
-
+            @if ( Model.ClientSites.NullableAny() )
+            {
+                <ul class="list">
+                    @foreach ( Client c in Model.ClientSites.Select( s => s.Client ) )
+                    {
+                        <li>
+                            @c.CompanyName
+                        </li>
+                    }
+                </ul>
+            }
 
         </div>
 
-        <div class="left" style="width: 48%;">
-            <div class="display-label">
-                Suburb/Area
-            </div>
-            <div class="display-field">
-                &nbsp;
-            </div>
-            <div class="display-label">
-                Province
-            </div>
-            <div class="display-field">
-                &nbsp;
-            </div>
-
-        </div>
-    }
+    </div>
 
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
     <div id="budgets">
 
-        <div class="editor-label" style="margin-bottom: 10px;">
-            Budgets
+        <div class="display-label" style="margin-bottom: 10px;">
+            Budgets (@Model.SiteBudgets.NullableCount())
         </div>
 
-        <div class="editor-field">
-            <table id="siteBudget-table" class="da-table" style="border-bottom: 0;">
+        <div class="display-field">
+
+            <table id="sitebudget-table" class="da-table" style="border-bottom: 0;">
 
                 <thead>
                     <tr>
-                        <th style="width: 6%;">Year</th>
-                        <th style="width: 7%;">Total</th>
-                        <th style="width: 7%;">Jan</th>
-                        <th style="width: 7%;">Feb</th>
-                        <th style="width: 7%;">Mar</th>
-                        <th style="width: 7%;">Apr</th>
-                        <th style="width: 7%;">May</th>
-                        <th style="width: 7%;">Jun</th>
-                        <th style="width: 7%;">Jul</th>
-                        <th style="width: 7%;">Aug</th>
-                        <th style="width: 7%;">Sep</th>
-                        <th style="width: 7%;">Oct</th>
-                        <th style="width: 7%;">Nov</th>
-                        <th style="width: 7%;">Dec</th>
+                        <th>#</th>
+                        <th>Year</th>
+                        <th>Total</th>
+                        <th>Jan</th>
+                        <th>Feb</th>
+                        <th>Mar</th>
+                        <th>Apr</th>
+                        <th>May</th>
+                        <th>Jun</th>
+                        <th>Jul</th>
+                        <th>Aug</th>
+                        <th>Sep</th>
+                        <th>Oct</th>
+                        <th>Nov</th>
+                        <th>Dec</th>
                     </tr>
                 </thead>
 
-                <tbody></tbody>
+                <tbody>
+                    @if ( Model.SiteBudgets.NullableAny() )
+                    {
+                        int count = 1;
+
+                        foreach ( SiteBudget b in Model.SiteBudgets )
+                        {
+                            decimal? total = b.Total > 0 ? b.Total : b.January + b.February + b.March + b.April + b.May + b.June + b.July + b.August + b.September + b.October + b.November + b.December;
+
+                            <tr>
+                                <td width="1%">
+                                    @count
+                                </td>
+                                <td>
+                                    <b>@b.BudgetYear</b>
+                                </td>
+                                <td>
+                                    <b>@Math.Round( total ?? 0, 0 )</b>
+                                </td>
+                                <td>
+                                    @b.January
+                                </td>
+                                <td>
+                                    @b.February
+                                </td>
+                                <td>
+                                    @b.March
+                                </td>
+                                <td>
+                                    @b.April
+                                </td>
+                                <td>
+                                    @b.May
+                                </td>
+                                <td>
+                                    @b.June
+                                </td>
+                                <td>
+                                    @b.July
+                                </td>
+                                <td>
+                                    @b.August
+                                </td>
+                                <td>
+                                    @b.September
+                                </td>
+                                <td>
+                                    @b.October
+                                </td>
+                                <td>
+                                    @b.November
+                                </td>
+                                <td>
+                                    @b.December
+                                </td>
+                            </tr>
+
+                            count++;
+                        }
+                    }
+                </tbody>
 
             </table>
 
         </div>
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
     </div>
 
-
-    @*@if (ViewBag.IncludeLayout == null)
-        {*@
     <p>
-        @Html.ActionLink("Edit", "EditSite", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
+        @Html.ActionLink( "Edit", "EditSite", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
 
-        @if (ViewBag.IncludeLayout == null)
+        @if ( ViewBag.IncludeLayout == null )
         {
             <span style="padding: 0 5px;">/</span>
             <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
         }
     </p>
-    @*}*@
 
-    @if (ViewBag.IncludeLayout != null)
+    @if ( ViewBag.IncludeLayout != null )
     {
         <div class="back-to-list">
-            @Html.ActionLink("Back to List", "Index")
+            @Html.ActionLink( "Back to List", "Index" )
         </div>
     }
 
 </div>
-<script>
-    $(document).ready(function () {
-        var sId = $("#Id").val();
-        LoadBudgets(sId);
-        //$(".budgets").hide();
-
-    });
-
-    function ViewBudget() {
-        $('.budgets').show();
-    };
-
-    function LoadBudgets(id) {
-        var rowDiv = $("#siteBudget-table tbody");
-        rowDiv.html('');
-
-
-        var savecopy = '<a id="savebudget" onclick="SaveBudget([BUDGETID])" name="savebudget"><i class="fa fa-save"></i></a>';
-        $.ajax({
-            type: "GET",
-            url: "GetSiteBudgetList",
-            data: { siteId: id },
-            contentType: "application/json;charset=utf-8",
-            dataType: "json",
-            success: function (data) {
-                var count = Object.keys(data).length;
-                var result = "";
-                if (count > 0) {
-                    //var fieldcopy = '<input class="input" id="ClientBudget_[FIELDNAME]-[FIELDVALUE]" style="padding: 0 5px; width: 87%;" type="number" value="[FIELDVALUE]">';
-                    $.each(data, function (id, budget) {
-                        var total = (budget.January + budget.February + budget.March + budget.April + budget.May + budget.June + budget.July + budget.August + budget.September + budget.October + budget.November + budget.December);
-                        var tabledata = '<tr id="budg-' + budget.Id + '-row" name="budg-' + budget.Id + '">';//<form id="budg-' + budget.Id + '-frm" name="budg-' + budget.Id + '-frm" >
-                        tabledata += '<td>' + budget.BudgetYear + '</td>';
-                        tabledata += '<td>' + total + '</td>';
-                        tabledata += '<td>' + budget.January + '</td>';
-                        tabledata += '<td>' + budget.February + '</td>';
-                        tabledata += '<td>' + budget.March + '</td>';
-                        tabledata += '<td>' + budget.April + '</td>';
-                        tabledata += '<td>' + budget.May + '</td>';
-                        tabledata += '<td>' + budget.June + '</td>';
-                        tabledata += '<td>' + budget.July + '</td>';
-                        tabledata += '<td>' + budget.August + '</td>';
-                        tabledata += '<td>' + budget.September + '</td>';
-                        tabledata += '<td>' + budget.October + '</td>';
-                        tabledata += '<td>' + budget.November + '</td>';
-                        tabledata += '<td>' + budget.December + '</td>';
-                        tabledata += '</tr>';
-                        result += tabledata;
-                    });
-
-                }
-
-                rowDiv.html(result);
-
-            },
-            error: function (response) {
-                alert('Error Retrieving Budgets');
-            }
-        });
-
-    }
-</script>

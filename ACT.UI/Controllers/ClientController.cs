@@ -93,39 +93,49 @@ namespace ACT.UI.Controllers
 
                 case "managesites":
 
-                    #region AwaitingActivation
-                    csv = string.Format( "Id, Name, Description, X Coord, Y Coord, Address, Postal Code, Contact Name,Contact No,Planning Point, Depot, Chep Sitecode, Site Type, Status {0}", Environment.NewLine );
+                    #region Manage Sites
 
-                    List<Site> siteList = new List<Site>();
+                    csv = string.Format( "Date Created, Name, Description, X Coord, Y Coord, Address Line 1, Address Line 2, Town, Province, Postal Code, Contact Name, Contact No, Finance Contact, Finance No., Receiver Contact, Receiver No., Planning Point, Depot, Chep Site Code, Site Type, Status {0}", Environment.NewLine );
 
                     using ( SiteService service = new SiteService() )
+                    using ( AddressService aservice = new AddressService() )
                     {
-                        siteList = service.ListCSM( pm, csm );
-                    }
+                        List<SiteCustomModel> sites = service.List1( pm, csm );
 
-                    if ( siteList != null && siteList.Any() )
-                    {
-                        foreach ( Site item in siteList )
+                        if ( sites != null && sites.Any() )
                         {
-                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10}, {11}, {12}, {13}, {14} {15}",
-                                                csv,
-                                                item.Id,
-                                                item.Name,
-                                                item.Description,
-                                                item.XCord,
-                                                item.YCord,
-                                                item.Address,
-                                                item.PostalCode,
-                                                item.ContactName,
-                                                item.ContactNo,
-                                                item.PlanningPoint,
-                                                item.Depot,
-                                                item.SiteCodeChep,
-                                                ( SiteType ) ( int ) item.SiteType,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
+                            foreach ( SiteCustomModel item in sites )
+                            {
+                                Address address = aservice.Get( item.Id, "Site" );
+
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21} {22}",
+                                                    csv,
+                                                    item.CreatedOn,
+                                                    item.Name,
+                                                    item.Description,
+                                                    item.XCord,
+                                                    item.YCord,
+                                                    address?.Addressline1,
+                                                    address?.Addressline2,
+                                                    address?.Town,
+                                                    ( address != null ? ( ( Province ) address.Province ).GetDisplayText() : string.Empty ),
+                                                    item.PostalCode,
+                                                    item.ContactName,
+                                                    item.ContactNo,
+                                                    item.FinanceContact,
+                                                    item.FinanceContactNo,
+                                                    item.ReceivingContact,
+                                                    item.ReceivingContactNo,
+                                                    item.PlanningPoint,
+                                                    item.Depot,
+                                                    item.SiteCodeChep,
+                                                    ( ( item.SiteType.HasValue ) ? ( ( SiteType ) item.SiteType ).GetDisplayText() : string.Empty ),
+                                                    ( ( Status ) item.Status ).GetDisplayText(),
+                                                    Environment.NewLine );
+                            }
                         }
                     }
+
                     #endregion
 
                     break;
@@ -172,30 +182,29 @@ namespace ACT.UI.Controllers
 
                 case "clientgroups":
 
-                    #region ClientGroup
-                    csv = string.Format( "Id, Group Name, Description, Status {0}", Environment.NewLine );
+                    #region Client Groups
 
-                    List<ClientGroupCustomModel> clientGroups = new List<ClientGroupCustomModel>();
+                    csv = string.Format( "Date Created, Name, Description, Clients, Status {0}", Environment.NewLine );
 
-                    using ( ClientGroupService service = new ClientGroupService() )
+                    using ( GroupService service = new GroupService() )
                     {
-                        clientGroups = service.ListCSM( pm, csm );
-                    }
+                        List<GroupCustomModel> clientGroups = service.List1( pm, csm );
 
-                    if ( clientGroups != null && clientGroups.Any() )
-                    {
-                        foreach ( ClientGroupCustomModel item in clientGroups )
+                        if ( clientGroups != null && clientGroups.Any() )
                         {
-                            csv = string.Format( "{0} {1},{2},{3},{4} {5}",
-                                                csv,
-                                                item.Id,
-                                                item.Name,
-                                                item.Description,
-                                                 ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
+                            foreach ( GroupCustomModel item in clientGroups )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5} {6}",
+                                                    csv,
+                                                    item.CreatedOn,
+                                                    item.Name,
+                                                    item.Description,
+                                                    item.ClientCount,
+                                                    ( ( Status ) item.Status ).GetDisplayText(),
+                                                    Environment.NewLine );
+                            }
                         }
                     }
-
 
                     #endregion
 
@@ -1617,157 +1626,101 @@ namespace ACT.UI.Controllers
         #region Client Group
 
         //
-        // GET: /Client/ClientGroups`
-        public ActionResult ClientGroups( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        // GET: /Client/GroupDetails/5
+        public ActionResult GroupDetails( int id, bool layout = true )
         {
-            ViewBag.ViewName = "ClientGroups";
-            if ( givecsm )
+            using ( GroupService gservice = new GroupService() )
             {
-                ViewBag.ViewName = "ClientGroups";
+                Group model = gservice.GetById( id );
 
-                return PartialView( "_ClientGroupsCustomSearch", new CustomSearchModel( "ClientGroups" ) );
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return RedirectToAction( "Index" );
+                }
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                return View( model );
             }
-            int total = 0;
-
-            List<Group> model = new List<Group>();
-            //int pspId = Session[ "UserPSP" ];
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            //get group list, and their associated clients. TRhis woill be extended with an api call to get clients included and excluded as the button is clicked, and as the groups are changed
-            using ( ClientService clientService = new ClientService() )
-            //using (ClientGroupService clientGroupService = new ClientGroupService())
-            using ( GroupService groupService = new GroupService() )
-            {
-                pm.Sort = pm.Sort ?? "DESC";
-                pm.SortBy = pm.SortBy ?? "Name";
-
-                model = groupService.GetGroupsByPSP( pspId, new CustomSearchModel() { ClientId = clientId } );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : groupService.Total();
-
-                //get the specific list of clients that exists for the first group, to render the tables, will use an api call to change it accordingly after reselection
-                //Group clientGroup = groupService.GetGroupsByPSP(pspId).FirstOrDefault();
-                //if (clientGroup != null)
-                //{
-                //    ViewBag.ClientListIncluded = clientService.GetClientsByPSPIncludedGroup(pspId, clientGroup.Id);
-                //    ViewBag.ClientListExcluded = clientService.GetClientsByPSPExcludedGroup(pspId, clientGroup.Id);
-                //    //ViewBag.GroupData = groupService.GetGroupsByPSP(pspId);
-                //}
-            }
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
-
-            return PartialView( "_ClientGroups", paging );
         }
-
 
         // GET: Client/AddGroup
         [Requires( PermissionTo.Create )]
         public ActionResult AddGroup()
         {
-            GroupViewModel model = new GroupViewModel() { EditMode = true };
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            model.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
-            //TODO
-            using ( ClientService clientService = new ClientService() )
-            {
-                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-            }
-
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            } );
-            ViewBag.ClientList = clientDDL;
-
+            GroupViewModel model = new GroupViewModel() { EditMode = true, Clients = new List<ClientGroupViewModel>() };
 
             return View( model );
         }
-
 
         // POST: Client/AddGroup
         [HttpPost]
         [Requires( PermissionTo.Create )]
         public ActionResult AddGroup( GroupViewModel model )
         {
-            try
+            if ( !ModelState.IsValid )
             {
+                Notify( "Sorry, the Group was not created. Please correct all errors and try again.", NotificationType.Error );
 
-                if ( !ModelState.IsValid )
+                return View( model );
+            }
+
+            using ( GroupService gservice = new GroupService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( ClientGroupService cgservice = new ClientGroupService() )
+            {
+                #region Create Group
+
+                Group group = new Group()
                 {
-                    Notify( "Sorry, the Group was not created. Please correct all errors and try again.", NotificationType.Error );
+                    Name = model.Name,
+                    Description = model.Description,
+                    Status = ( int ) Status.Active
+                };
 
-                    return View( model );
-                }
+                group = gservice.Create( group );
 
-                using ( GroupService gService = new GroupService() )
-                using ( ClientGroupService cgservice = new ClientGroupService() )
-                using ( TransactionScope scope = new TransactionScope() )
+                #endregion
+
+                #region Create Group Client
+
+                if ( model.Clients.NullableAny( c => c.ClientId > 0 ) )
                 {
-                    #region Create Group
-                    Group group = new Group()
+                    foreach ( ClientGroupViewModel cg in model.Clients.Where( c => c.ClientId > 0 ) )
                     {
-                        Name = model.Name,
-                        Description = model.Description,
-                        Status = ( int ) Status.Active
-                    };
-                    group = gService.Create( group );
-                    #endregion
-
-                    #region Create Group Client Links
-                    if ( !string.IsNullOrEmpty( model.GroupClientList ) )
-                    {
-                        string[] clientList = model.GroupClientList.Split( ',' );
-                        string lastId = "0";
-                        foreach ( string itm in clientList )
+                        ClientGroup client = new ClientGroup()
                         {
-                            //test to see if its not been added before
-                            ClientGroup checkCG = cgservice.GetByColumnsWhere( "ClientId", int.Parse( itm ), "GroupId", group.Id );
+                            GroupId = group.Id,
+                            ClientId = cg.ClientId,
+                            Status = ( int ) Status.Active
+                        };
 
-                            if ( !string.IsNullOrEmpty( itm ) && itm != lastId && checkCG == null )
-                            {
-                                ClientGroup client = new ClientGroup()
-                                {
-                                    ClientId = int.Parse( itm ),
-                                    GroupId = group.Id,
-                                    Status = ( int ) Status.Active
-                                };
-                                cgservice.Create( client );
-                            }
-                            lastId = itm;
-                        }
+                        cgservice.Create( client );
                     }
-                    #endregion
-
-                    scope.Complete();
                 }
+
+                #endregion
+
+                scope.Complete();
 
                 Notify( "The Group was successfully created.", NotificationType.Success );
-                return RedirectToAction( "ClientGroups" );
             }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
-        }
 
+            return ClientGroups( new PagingModel(), new CustomSearchModel() );
+        }
 
         // GET: Client/EditGroupGet/5
         [Requires( PermissionTo.Edit )]
-        public ActionResult EditGroupGet( int id )
+        public ActionResult EditGroup( int id )
         {
-            Group group;
-
             using ( GroupService service = new GroupService() )
             {
-                group = service.GetById( id );
-
+                Group group = service.GetById( id );
 
                 if ( group == null )
                 {
@@ -1781,58 +1734,82 @@ namespace ACT.UI.Controllers
                     Id = group.Id,
                     Name = group.Name,
                     Description = group.Description,
-                    Status = ( int ) group.Status,
-                    EditMode = true
+                    Status = ( Status ) group.Status,
+                    EditMode = true,
+                    Clients = new List<ClientGroupViewModel>()
                 };
+
+                if ( group.ClientGroups.NullableAny() )
+                {
+                    foreach ( ClientGroup cg in group.ClientGroups )
+                    {
+                        model.Clients.Add( new ClientGroupViewModel()
+                        {
+                            GroupId = cg.GroupId,
+                            ClientId = cg.ClientId,
+                        } );
+                    }
+                }
+
                 return View( "EditGroup", model );
             }
         }
 
         // POST: Client/EditGroup/5
+        [HttpPost]
         [Requires( PermissionTo.Edit )]
-        public ActionResult EditGroup( GroupViewModel model, PagingModel pm, bool isstructure = false )
+        public ActionResult EditGroup( GroupViewModel model )
         {
-            try
+            if ( !ModelState.IsValid )
             {
-                if ( !ModelState.IsValid )
-                {
-                    Notify( "Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error );
+                Notify( "Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error );
 
-                    return View( model );
+                return View( model );
+            }
+
+            using ( GroupService service = new GroupService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( ClientGroupService cgservice = new ClientGroupService() )
+            {
+                Group group = service.GetById( model.Id );
+
+                #region Update Group
+
+                group.Name = model.Name;
+                group.Status = ( int ) model.Status;
+                group.Description = model.Description;
+
+                service.Update( group );
+
+                #endregion
+
+                #region Create Group Client
+
+                cgservice.Query( $"DELETE FROM [dbo].[ClientGroup] WHERE [GroupId]={group.Id};" );
+
+                if ( model.Clients.NullableAny( c => c.ClientId > 0 ) )
+                {
+                    foreach ( ClientGroupViewModel cg in model.Clients.Where( c => c.ClientId > 0 ) )
+                    {
+                        ClientGroup client = new ClientGroup()
+                        {
+                            GroupId = group.Id,
+                            ClientId = cg.ClientId,
+                            Status = ( int ) Status.Active
+                        };
+
+                        cgservice.Create( client );
+                    }
                 }
 
-                Group group;
+                #endregion
 
-                using ( GroupService service = new GroupService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    group = service.GetById( model.Id );
-
-                    #region Update Group
-
-                    // Update Group
-                    //group.Id = model.Id;
-                    group.Name = model.Name;
-                    group.Description = model.Description;
-                    group.Status = ( int ) model.Status;
-
-                    service.Update( group );
-
-                    #endregion
-
-
-                    scope.Complete();
-                }
+                scope.Complete();
 
                 Notify( "The selected Group details were successfully updated.", NotificationType.Success );
+            }
 
-                return RedirectToAction( "ClientGroups" );
-            }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
+            return ClientGroups( new PagingModel(), new CustomSearchModel() );
         }
 
         // POST: Client/DeleteGroup/5
@@ -1840,163 +1817,25 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Delete )]
         public ActionResult DeleteGroup( GroupViewModel model )
         {
-            Group group;
-            ClientGroup clientGroup;
-            try
+            using ( GroupService service = new GroupService() )
             {
+                Group group = service.GetById( model.Id );
 
-                using ( GroupService service = new GroupService() )
-                // using (ClientGroupService clientgroupservice = new ClientGroupService())
-                using ( TransactionScope scope = new TransactionScope() )
+                if ( group == null )
                 {
-                    group = service.GetById( model.Id );
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
-                    if ( group == null )
-                    {
-                        Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                        return PartialView( "_AccessDenied" );
-                    }
-
-                    group.Status = ( ( ( Status ) group.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
-
-                    //clientGroup = clientgroupservice.GetById(model.Id);
-                    //clientGroup.Status = (((Status)group.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;                    
-
-                    service.Update( group );
-                    // clientgroupservice.Update(clientGroup);
-                    scope.Complete();
-
+                    return PartialView( "_AccessDenied" );
                 }
+
+                group.Status = ( ( ( Status ) group.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.Update( group );
+
                 Notify( "The selected Group was successfully updated.", NotificationType.Success );
-                return RedirectToAction( "ClientGroups" );
             }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
-        }
 
-
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetClientsForGroupIncluded( string groupId )
-        {
-            if ( groupId != null && groupId != "" )
-            {
-                List<Client> clients;
-                //int pspId = Session[ "UserPSP" ];
-                int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-                int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-                using ( ClientService clientService = new ClientService() )
-                {
-
-                    clients = clientService.GetClientsByPSPIncludedGroup( pspId, int.Parse( groupId ), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-
-                }
-                return Json( clients, JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetClientsForGroupExcluded( string groupId )
-        {
-            if ( groupId != null && groupId != "" )
-            {
-                List<Client> clients;
-                //int pspId = Session[ "UserPSP" ];
-                int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-                int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-
-                using ( ClientService clientService = new ClientService() )
-                {
-
-                    clients = clientService.GetClientsByPSPExcludedGroup( pspId, int.Parse( groupId ), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-
-                }
-                return Json( clients, JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetClientForGroupExcluded( string groupId, string clientId )
-        {
-            if ( !string.IsNullOrEmpty( groupId ) && !string.IsNullOrEmpty( clientId ) )
-            {
-                //using (GroupService service = new GroupService())
-                using ( ClientGroupService clientgroupservice = new ClientGroupService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    List<ClientGroup> group = new List<ClientGroup>();
-                    group = clientgroupservice.GetClientGroupsByClientGroup( int.Parse( groupId ), int.Parse( clientId ) );
-
-                    if ( group == null )
-                    {
-                        return Json( data: "False", behavior: JsonRequestBehavior.AllowGet );
-                    }
-                    foreach ( ClientGroup g in group )
-                    {
-                        clientgroupservice.Delete( g );
-                    }
-                    scope.Complete();
-                }
-
-
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "False", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetClientForGroupIncluded( string groupId, string clientId )
-        {
-            if ( !string.IsNullOrEmpty( groupId ) && !string.IsNullOrEmpty( clientId ) )
-            {
-                //using (GroupService service = new GroupService())
-                using ( ClientGroupService clientgroupservice = new ClientGroupService() )
-                using ( GroupService groupservice = new GroupService() )
-                using ( ClientService clientService = new ClientService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    ClientGroup checkCG = clientgroupservice.GetByColumnsWhere( groupId, clientId );//check this link doesnt already exist, ignore if it does
-                    //Group groupObj = groupservice.GetById(int.Parse(groupId));
-                    if ( checkCG == null )
-                    {
-                        ClientGroup cgroup = new ClientGroup()
-                        {
-                            GroupId = int.Parse( groupId ),
-                            ClientId = int.Parse( clientId ),
-                            Status = ( int ) Status.Active,
-                        };
-                        clientgroupservice.Create( cgroup );
-
-                        scope.Complete();
-                    } //nothing to do here if the group is already linekd  to the same client
-                    else
-                    {
-                        //just update status to make sure its visible and active, maybe it was disabled
-                        checkCG.Status = ( int ) Status.Active;
-                        clientgroupservice.Update( checkCG );
-                    }
-                }
-
-
-            }
-            return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
+            return ClientGroups( new PagingModel(), new CustomSearchModel() );
         }
 
         #endregion
@@ -2004,362 +1843,212 @@ namespace ACT.UI.Controllers
 
 
         #region Manage Sites
-        //
-        // GET: /Client/ManageSites
-        public ActionResult ManageSites( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
-        {
-            if ( givecsm )
-            {
-                ViewBag.ViewName = "ManageSites";
-
-                return PartialView( "_ManageSitesCustomSearch", new CustomSearchModel( "ManageSites" ) );
-            }
-            ViewBag.ViewName = "ManageSites";
-
-            int total = 0;
-
-            List<Site> model = new List<Site>();
-            //int pspId = Session[ "UserPSP" ];
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            //string sessSiteId = (Session["SiteId"] != null ? Session["SiteId"].ToString() : null);
-            //int SiteID = (!string.IsNullOrEmpty(sessSiteId) ? int.Parse(sessSiteId) : 0);
-
-            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
-            using ( ClientService clientService = new ClientService() )
-            {
-                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-
-            }
-
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            } );
-            ViewBag.ClientList = clientDDL;
-            //Now get sites for the contextual list
-            using ( SiteService service = new SiteService() )
-            {
-                pm.Sort = pm.Sort ?? "ASC";
-                pm.SortBy = pm.SortBy ?? "Name";
-                if ( clientId > 0 )
-                {
-                    csm.ClientId = clientId;
-                }
-                model = service.ListCSM( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total( pm, csm );
-
-            }
-
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
-            List<Region> regionOptions = new List<Region>();
-            using ( RegionService rservice = new RegionService() )
-            {
-                regionOptions = rservice.ListByColumnWhere( "PSPId", pspId );
-            }
-            ViewBag.RegionOptions = regionOptions;
-
-            return PartialView( "_ManageSites", paging );
-        }
 
         //
         // GET: /Client/SiteDetails/5
-        public ActionResult SiteDetails( int id, string sourceView = "ManageSites", bool layout = true )
+        public ActionResult SiteDetails( int id, bool layout = true )
         {
-            Site site;
-            //int pspId = Session[ "UserPSP" ];
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            List<Region> regionOptions = new List<Region>();
-
-            using ( SiteService service = new SiteService() )
-            using ( RegionService rservice = new RegionService() )
+            using ( SiteService sservice = new SiteService() )
             using ( AddressService aservice = new AddressService() )
             {
-                site = service.GetById( id );
-                // regionOptions = rservice.ListByColumnWhere("PSPId", pspId);
+                Site model = sservice.GetById( id );
 
-                if ( site == null )
+                if ( model == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
                     return PartialView( "_AccessDenied" );
                 }
 
-                Address address = aservice.Get( site.Id, "Site" );
+                Address address = aservice.Get( model.Id, "Site" );
 
-
-                bool unverified = ( site.Status == ( int ) PSPClientStatus.Unverified );
-
-                Site model = new Site()
-                {
-                    Id = site.Id,
-                    Name = site.Name,
-                    Description = site.Description,
-                    XCord = site.XCord,
-                    YCord = site.YCord,
-                    Address = site.Address,
-                    PostalCode = site.PostalCode,
-                    ContactName = site.ContactName,
-                    ContactNo = site.ContactNo,
-                    PlanningPoint = site.PlanningPoint,
-                    SiteType = ( int ) site.SiteType,
-                    AccountCode = site.AccountCode,
-                    Depot = site.Depot,
-                    SiteCodeChep = site.SiteCodeChep,
-                    Status = ( int ) site.Status,
-                    // EditMode = true,
-                    RegionId = ( site.RegionId != null ? site.RegionId : -1 ),
-                    // SourceView = sourceView,
-                    //RegionOptions = regionOptions,
-                    //FullAddress = new AddressViewModel()
-                    //{
-                    //    EditMode = true,
-                    //    Town = address?.Town,
-                    //    Id = address?.Id ?? 0,
-                    //    PostCode = address?.PostalCode,
-                    //    AddressLine1 = address?.Addressline1,
-                    //    AddressLine2 = address?.Addressline2,
-                    //    Province = (address != null) ? (Province)address.Province : Province.All,
-                    //    AddressType = (address != null) ? (AddressType)address.Type : AddressType.Postal,
-                    //}
-
-                };
                 if ( layout )
                 {
                     ViewBag.IncludeLayout = true;
                 }
+
                 ViewBag.Address = address;
-                // ViewBag.RegionOptions = regionOptions;
+
                 return View( model );
             }
         }
 
         // GET: Client/AddSite
         [Requires( PermissionTo.Create )]
-        public ActionResult AddSite( string sourceView )
+        public ActionResult AddSite()
         {
-
-            //int pspId = Session[ "UserPSP" ];
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            //regionOptions = Model.RegionOptions.Where(r => r.PSPId == pspId).ToList();
-            SiteViewModel model = new SiteViewModel() { EditMode = true, SourceView = sourceView };//, RegionOptions = regionOptions
-            List<Region> regionOptions = new List<Region>();
-            using ( RegionService rservice = new RegionService() )
+            SiteViewModel model = new SiteViewModel()
             {
-                regionOptions = rservice.ListByColumnWhere( "PSPId", pspId );
+                EditMode = true,
+                Clients = new List<Client>(),
+                SiteBudgets = new List<SiteBudget>(),
+                Address = new AddressViewModel()
+            };
 
-                IEnumerable<SelectListItem> regionDDL = regionOptions.Select( c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.Description
-
-                } );
-                ViewBag.RegionOptions = regionDDL;
-
-                //if (sourceView == "ManageSites")
-                //{
-                //    return RedirectToAction("ManageSites");
-                //}
-                //else
-                //{
-                //    return RedirectToAction("SubSites");
-                //}
-                return View( model );
-            }
+            return View( model );
         }
-
 
         // POST: Client/Site
         [HttpPost]
         [Requires( PermissionTo.Create )]
         public ActionResult AddSite( SiteViewModel model )
         {
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            List<Region> regionOptions = new List<Region>();
-            using ( RegionService rservice = new RegionService() )
+            if ( !ModelState.IsValid )
             {
-                regionOptions = rservice.ListByColumnWhere( "PSPId", pspId );
+                Notify( "Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
             }
-            IEnumerable<SelectListItem> regionDDL = regionOptions.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.Description
 
-            } );
-            ViewBag.RegionOptions = regionDDL;
-
-            try
+            using ( SiteService sservice = new SiteService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            using ( SiteBudgetService sbservice = new SiteBudgetService() )
             {
-                if ( !ModelState.IsValid )
+                #region Validation
+
+                if ( sservice.ExistByNameRegion( model.Name?.Trim()?.ToLower(), model.RegionId ) )
                 {
-                    Notify( "Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error );
+                    Notify( $"Sorry, a Site with the name {model.Name} in the specified region already exists.", NotificationType.Error );
 
                     return View( model );
                 }
-                //get clientId from session as there has to be one for the add button to have appeared in teh first place, grab it and assign sites to this until it changes
 
-                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-                int clientID = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-                //for subsites to add subsites under a mainsite
-                string sessSiteId = ( Session[ "SiteId" ] != null ? Session[ "SiteId" ].ToString() : null );
-                int SiteID = ( !string.IsNullOrEmpty( sessSiteId ) ? int.Parse( sessSiteId ) : 0 );
-                int siteType = 1;
-                // decimal latitudeY = decimal.Parse(model.YCord);
-                //latitudeY = decimal.Round(latitudeY, 4);                
-                //decimal longitudeX = decimal.Parse(model.XCord);
-                //longitudeX = decimal.Round(longitudeX, 4);
-                string strLatY = model.YCord;
-                decimal latitudeY = 0;
-                try
+                Site existingSite = sservice.ExistByXYCoords( model.Longitude, model.Latitude );
+
+                if ( existingSite != null )
                 {
-                    decimal.TryParse( model.YCord, out latitudeY );
-                    latitudeY = decimal.Round( latitudeY, 4 );
-                    strLatY = ( latitudeY != 0 ? latitudeY.ToString() : strLatY );
-                }
-                catch ( Exception ex )
-                {
-                    //ViewBag.Message = string.Concat(rows[3].ToString(), " ", ex.Message);
-                }
-                string strLngX = model.XCord;
-                decimal longitudeX = 0;
-                try
-                {
-                    decimal.TryParse( model.XCord, out longitudeX );
-                    longitudeX = decimal.Round( longitudeX, 4 );
-                    strLngX = ( longitudeX != 0 ? longitudeX.ToString() : strLngX );
-                }
-                catch ( Exception ex )
-                {
-                    // ViewBag.Message = string.Concat(model.XCord, " ", ex.Message);
+                    // Instead of pass back to view, we will create the new site as a subsite of the existing site.
+                    // Get the existing site first
+                    model.SiteId = existingSite.Id;
                 }
 
-                using ( SiteService siteService = new SiteService() )
-                using ( ClientSiteService csService = new ClientSiteService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                using ( AddressService aservice = new AddressService() )
+                #endregion
+
+                #region Create Site
+
+                Site site = new Site()
                 {
-                    #region Validation
-                    Site existingSite = null;
-                    //if (!string.IsNullOrEmpty(model.AccountCode) && siteService.ExistByAccountCode(model.AccountCode.Trim()))
-                    if ( !string.IsNullOrEmpty( strLngX ) && siteService.ExistByXYCoords( strLngX, strLatY ) )
+                    Name = model.Name,
+                    Depot = model.Depot,
+                    SiteId = model.SiteId,
+                    RegionId = model.RegionId,
+                    ContactNo = model.ContactNo,
+                    Status = ( int ) model.Status,
+                    ContactName = model.ContactName,
+                    Description = model.Description,
+                    AccountCode = model.AccountCode,
+                    SiteType = ( int ) model.SiteType,
+                    SiteCodeChep = model.SiteCodeChep,
+                    YCord = model.Latitude,
+                    XCord = model.Longitude,
+                    PlanningPoint = model.PlanningPoint,
+                    FinanceContact = model.FinanceContact,
+                    ReceivingContact = model.ReceivingContact,
+                    FinanceContactNo = model.FinanceContactNo,
+                    ReceivingContactNo = model.ReceivingContactNo,
+                };
+
+                site = sservice.Create( site );
+
+                #endregion
+
+                #region Create Address (s)
+
+                if ( model.Address != null )
+                {
+                    Address address = new Address()
                     {
-                        //Notify($"Sorry, a Site with the same X Y Coordinates already exists \"{model.XCord}\" already exists!", NotificationType.Error);
-                        //return View(model);
-
-                        //rather than pass back to view, we will create the new site as a subsite of the existing site. 
-                        //Get the existing site first
-                        existingSite = siteService.GetByColumnsWhere( "XCord", strLngX, "YCord", strLatY );
-                        SiteID = existingSite.Id;//This is the existing site retrieved by mapping same X and Y coord, read that into the model.SiteId which makes the new site a child site
-                        siteType = 2;//Mark teh site as a subsite by default
-                    }
-                    #endregion
-
-                    #region Create Site
-                    Site site = new Site()
-                    {
-                        Name = model.Name,
-                        Description = model.Description,
-                        XCord = strLngX,
-                        YCord = strLatY,
-                        Address = model.FullAddress.AddressLine1 + " " + model.FullAddress.Town + " " + model.FullAddress.PostCode, //model.Address,
-                        PostalCode = model.FullAddress.PostCode,
-                        ContactName = model.ContactName,
-                        ContactNo = model.ContactNo,
-                        PlanningPoint = model.PlanningPoint,
-                        SiteType = ( model.SiteType > 0 ? ( int ) model.SiteType : siteType ),
-                        AccountCode = model.AccountCode,
-                        Depot = model.Depot,
-                        SiteCodeChep = model.SiteCodeChep,
+                        ObjectId = site.Id,
+                        ObjectType = "Site",
+                        Town = model.Address.Town,
+                        Latitude = model.Latitude,
+                        Longitude = model.Longitude,
                         Status = ( int ) Status.Active,
-                        RegionId = model.RegionId,
-                        FinanceContact = model.FinanceContact,
-                        ReceivingContact = model.ReceivingContact,
-                        FinanceContactNo = model.FinanceContactNo,
-                        ReceivingContactNo = model.ReceivingContactNo,
+                        Type = ( int ) AddressType.Postal,
+                        PostalCode = model.Address.PostCode,
+                        Addressline1 = model.Address.AddressLine1,
+                        Addressline2 = model.Address.AddressLine2,
+                        Province = ( int ) model.Address.Province,
                     };
-                    if ( SiteID > 0 )
-                    {
-                        site.SiteId = SiteID;
-                    }
-                    site = siteService.Create( site );
-                    #endregion
 
-                    #region Create Address (s)
+                    aservice.Create( address );
+                }
 
-                    if ( model.FullAddress != null )
+                #endregion
+
+                #region Add Client Site
+
+                if ( model.Clients.NullableAny( c => c.Id > 0 ) )
+                {
+                    foreach ( Client c in model.Clients.Where( c => c.Id > 0 ) )
                     {
-                        Address address = new Address()
+                        if ( c.Id <= 0 ) continue;
+
+                        ClientSite csSite = new ClientSite()
                         {
-                            ObjectId = site.Id,
-                            ObjectType = "Site",
-                            Town = model.FullAddress.Town,
-                            Status = ( int ) Status.Active,
-                            PostalCode = model.FullAddress.PostCode,
-                            Type = ( int ) AddressType.Postal,
-                            Addressline1 = model.FullAddress.AddressLine1,
-                            Addressline2 = model.FullAddress.AddressLine2,
-                            Province = ( int ) model.FullAddress.Province,
-                            Longitude = strLngX,
-                            Latitude = strLatY
+                            ClientId = c.Id,
+                            SiteId = site.Id,
+                            Status = ( int ) model.Status,
+                            AccountingCode = site.AccountCode,
                         };
-                        aservice.Create( address );
+
+                        csservice.Create( csSite );
                     }
+                }
 
-                    #endregion
+                #endregion
 
-                    //tie Client in Session to New Site
-                    #region Add ClientSite
-                    ClientSite csSite = new ClientSite()
+                #region Create Client Budget
+
+                if ( model.SiteBudgets.NullableAny() )
+                {
+                    foreach ( SiteBudget l in model.SiteBudgets )
                     {
-                        ClientId = clientID,
-                        SiteId = site.Id,
-                        AccountingCode = site.AccountCode,
-                        Status = ( int ) Status.Active
-                    };
-                    csService.Create( csSite );
-                    #endregion
+                        SiteBudget sb = new SiteBudget()
+                        {
+                            SiteId = site.Id,
+                            BudgetYear = l.BudgetYear,
+                            Total = l.Total,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
+                            Status = ( int ) model.Status,
+                        };
 
-
-                    scope.Complete();
+                        sbservice.Create( sb );
+                    }
                 }
 
-                Notify( "The Site was successfully created.", NotificationType.Success );
-                if ( model.SourceView == "ManageSites" )
-                {
-                    return RedirectToAction( "ManageSites" );
-                }
-                else
-                {
-                    return RedirectToAction( "SubSites" );
-                }
+                #endregion
+
+                scope.Complete();
             }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
+
+            Notify( "The Site was successfully created.", NotificationType.Success );
+
+            return ManageSites( new PagingModel(), new CustomSearchModel() );
         }
-
-
 
         // GET: Client/EditSite/5
         [Requires( PermissionTo.Edit )]
-        public ActionResult EditSite( int id ) //, string sourceView
+        public ActionResult EditSite( int id )
         {
-            Site site;
-            //int pspId = Session[ "UserPSP" ];
-            //bool layout = true; //temporarily while i figure out why the table edit doesnt work
             using ( SiteService service = new SiteService() )
             using ( RegionService rservice = new RegionService() )
             using ( AddressService aservice = new AddressService() )
             {
-                site = service.GetById( id );
-                //regionOptions = rservice.ListByColumnWhere("PSPId", pspId);
+                Site site = service.GetById( id );
 
                 if ( site == null )
                 {
@@ -2370,37 +2059,86 @@ namespace ACT.UI.Controllers
 
                 Address address = aservice.Get( site.Id, "Site" );
 
-                bool unverified = ( site.Status == ( int ) PSPClientStatus.Unverified );
+                #region Site
 
                 SiteViewModel model = new SiteViewModel()
                 {
                     Id = site.Id,
+                    EditMode = true,
                     Name = site.Name,
-                    Description = site.Description,
-                    XCord = site.XCord,
-                    YCord = site.YCord,
-                    Address = site.Address,
-                    PostalCode = site.PostalCode,
-                    ContactName = site.ContactName,
-                    ContactNo = site.ContactNo,
-                    PlanningPoint = site.PlanningPoint,
-                    SiteType = ( site.SiteType != null ? ( int ) site.SiteType : ( int ) SiteType.Depot ),
-                    AccountCode = site.AccountCode,
                     Depot = site.Depot,
+                    Latitude = site.YCord,
+                    Longitude = site.XCord,
+                    RegionId = site.RegionId,
+                    ContactNo = site.ContactNo,
+                    ContactName = site.ContactName,
+                    Description = site.Description,
+                    AccountCode = site.AccountCode,
+                    Status = ( Status ) site.Status,
                     SiteCodeChep = site.SiteCodeChep,
-                    Status = ( int ) site.Status,
+                    PlanningPoint = site.PlanningPoint,
                     FinanceContact = site.FinanceContact,
                     FinanceContactNo = site.FinanceContactNo,
                     ReceivingContact = site.ReceivingContact,
                     ReceivingContactNo = site.ReceivingContactNo,
-                    EditMode = true,
-                    RegionId = ( site.RegionId.HasValue ? site.RegionId : null ),
-                    //RegionOptions = regionOptions,
-                    SourceView = "ManageSites",
+                    SiteType = ( site.SiteType.HasValue ? ( SiteType ) site.SiteType : SiteType.All ),
+
+
+                    Clients = new List<Client>(),
+                    SiteBudgets = new List<SiteBudget>(),
                 };
+
+                #endregion
+
+                #region Clients
+
+                if ( site.ClientSites.NullableAny() )
+                {
+                    foreach ( int cid in site.ClientSites.Select( s => s.ClientId ) )
+                    {
+                        model.Clients.Add( new Client()
+                        {
+                            Id = cid
+                        } );
+                    }
+                }
+
+                #endregion
+
+                #region Site Budgets
+
+                if ( site.SiteBudgets.NullableAny() )
+                {
+                    foreach ( SiteBudget l in site.SiteBudgets )
+                    {
+                        model.SiteBudgets.Add( new SiteBudget()
+                        {
+                            Id = l.Id,
+                            BudgetYear = l.BudgetYear,
+                            Total = l.Total,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
+                        } );
+                    }
+                }
+
+                #endregion
+
+                #region Address
+
                 if ( address != null )
                 {
-                    model.FullAddress = new AddressViewModel()
+                    model.Address = new AddressViewModel()
                     {
                         EditMode = true,
                         Town = address?.Town,
@@ -2409,38 +2147,13 @@ namespace ACT.UI.Controllers
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
                         Province = ( address != null ) ? ( Province ) address.Province : Province.All,
-                        AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
                         Longitude = address.Longitude,
-                        Latitude = address.Latitude
+                        Latitude = address.Latitude,
                     };
                 }
 
-                //SiteViewModel model = new SiteViewModel() { EditMode = true, SourceView = sourceView };//, RegionOptions = regionOptions
-                //int pspId = Session[ "UserPSP" ];
-                int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-                List<Region> regionOptions = new List<Region>();
+                #endregion
 
-                regionOptions = rservice.ListByColumnWhere( "PSPId", pspId );
-
-                IEnumerable<SelectListItem> regionDDL = regionOptions.Select( c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.Description
-
-                } );
-                ViewBag.RegionOptions = regionDDL;
-                //if (sourceView == "ManageSites")
-                //{
-                //    return RedirectToAction("ManageSites");
-                //}
-                //else
-                //{
-                //    return RedirectToAction("SubSites");
-                //}
-                //if (layout)
-                //{
-                //    ViewBag.IncludeLayout = true;
-                //}
                 return View( model );
             }
         }
@@ -2448,164 +2161,215 @@ namespace ACT.UI.Controllers
         // POST: Client/EditSite/5
         [HttpPost]
         [Requires( PermissionTo.Edit )]
-        public ActionResult EditSite( SiteViewModel model, PagingModel pm, bool isstructure = false )
+        public ActionResult EditSite( SiteViewModel model )
         {
-
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            List<Region> regionOptions = new List<Region>();
-            using ( RegionService rservice = new RegionService() )
+            if ( !ModelState.IsValid )
             {
-                regionOptions = rservice.ListByColumnWhere( "PSPId", pspId );
+                Notify( "Sorry, the selected Site was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
             }
-            IEnumerable<SelectListItem> regionDDL = regionOptions.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.Description
 
-            } );
-            ViewBag.RegionOptions = regionDDL;
-
-            try
+            using ( SiteService sservice = new SiteService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            using ( SiteBudgetService sbservice = new SiteBudgetService() )
             {
-                if ( !ModelState.IsValid )
+                Site site = sservice.GetById( model.Id );
+
+                #region Validations
+
+                if ( site == null )
                 {
-                    Notify( "Sorry, the selected Site was not updated. Please correct all errors and try again.", NotificationType.Error );
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                if ( site.Name?.Trim()?.ToLower() != model.Name?.Trim()?.ToLower() && site.RegionId != model.RegionId && sservice.ExistByNameRegion( model.Name?.Trim()?.ToLower(), model.RegionId ) )
+                {
+                    Notify( $"Sorry, a Site with the name {model.Name} in the specified region already exists.", NotificationType.Error );
 
                     return View( model );
                 }
 
-                Site site;
+                Site existingSite = sservice.ExistByXYCoords( model.Longitude?.Trim(), model.Latitude?.Trim() );
 
-                using ( SiteService service = new SiteService() )
-                using ( AddressService aservice = new AddressService() )
-                using ( TransactionScope scope = new TransactionScope() )
+                if ( existingSite != null && site.Id != existingSite.Id && site.SiteId != existingSite.Id )
                 {
-                    site = service.GetById( model.Id );
-                    Address address = aservice.Get( model.Id, "Client" );
+                    // Instead of pass back to view, we will create the new site as a subsite of the existing site.
+                    // Get the existing site first
+                    model.SiteId = existingSite.Id;
+                }
 
-                    #region Validations
+                #endregion
 
-                    //if (!string.IsNullOrEmpty(model.AccountCode) && service.ExistByAccountCode(model.AccountCode.Trim()))
-                    //{
-                    //    // Role already exist!
-                    //    Notify($"Sorry, a Site with the Account Code \"{model.AccountCode} ({model.AccountCode})\" already exists!", NotificationType.Error);
+                #region Update Site
 
-                    //    return View(model);
-                    //}
-                    #endregion
+                site.Name = model.Name;
+                site.Depot = model.Depot;
+                site.YCord = model.Latitude;
+                site.XCord = model.Longitude;
+                site.RegionId = model.RegionId;
+                site.ContactNo = model.ContactNo;
+                site.Status = ( int ) model.Status;
+                site.Description = model.Description;
+                site.ContactName = model.ContactName;
+                site.AccountCode = model.AccountCode;
+                site.SiteType = ( int ) model.SiteType;
+                site.SiteCodeChep = model.SiteCodeChep;
+                site.PlanningPoint = model.PlanningPoint;
+                site.FinanceContact = model.FinanceContact;
+                site.ReceivingContact = model.ReceivingContact;
+                site.FinanceContactNo = model.FinanceContactNo;
+                site.ReceivingContactNo = model.ReceivingContactNo;
 
-                    //stuff changed, lets redo this
-                    string strLatY = model.YCord;
-                    string strLngX = model.XCord;
+                sservice.Update( site );
 
-                    if ( site.XCord != strLngX )
+                #endregion
+
+                #region Add Client Site
+
+                csservice.Query( $"UPDATE [dbo].[ClientSite] SET [Status]={( int ) Status.Inactive} WHERE SiteId={site.Id}" );
+
+                if ( model.Clients.NullableAny( c => c.Id > 0 ) )
+                {
+                    foreach ( Client c in model.Clients.Where( c => c.Id > 0 ) )
                     {
-                        decimal latitudeY = 0;
-                        try
-                        {
-                            decimal.TryParse( model.YCord, out latitudeY );
-                            latitudeY = decimal.Round( latitudeY, 4 );
-                            strLatY = ( latitudeY != 0 ? latitudeY.ToString() : strLatY );
-                        }
-                        catch ( Exception ex )
-                        {
-                            //ViewBag.Message = string.Concat(rows[3].ToString(), " ", ex.Message);
-                        }
+                        if ( c.Id <= 0 ) continue;
 
-                        decimal longitudeX = 0;
-                        try
+                        ClientSite cs = csservice.GetBySiteId( c.Id, site.Id );
+
+                        if ( cs != null )
                         {
-                            decimal.TryParse( model.XCord, out longitudeX );
-                            longitudeX = decimal.Round( longitudeX, 4 );
-                            strLngX = ( longitudeX != 0 ? longitudeX.ToString() : strLngX );
-                        }
-                        catch ( Exception ex )
-                        {
-                            // ViewBag.Message = string.Concat(model.XCord, " ", ex.Message);
-                        }
+                            cs.Status = ( int ) model.Status;
+                            cs.AccountingCode = site.AccountCode;
 
-                    }
-
-                    #region Create Address (s)
-                    string stringAddress = "";
-                    if ( model.FullAddress != null )
-                    {
-                        Address siteAddress = aservice.GetById( model.FullAddress.Id );
-
-                        if ( siteAddress == null )
-                        {
-                            siteAddress = new Address()
-                            {
-                                ObjectId = model.Id,
-                                ObjectType = "Site",
-                                Town = model.FullAddress.Town,
-                                Status = ( int ) Status.Active,
-                                PostalCode = model.FullAddress.PostCode,
-                                Type = ( int ) model.FullAddress.AddressType,
-                                Addressline1 = model.FullAddress.AddressLine1,
-                                Addressline2 = model.FullAddress.AddressLine2,
-                                Province = ( int ) model.FullAddress.Province,
-                                Longitude = strLngX,
-                                Latitude = strLatY
-                            };
-
-                            aservice.Create( siteAddress );
+                            csservice.Update( cs );
                         }
                         else
                         {
-                            siteAddress.Town = model.FullAddress.Town;
-                            siteAddress.PostalCode = model.FullAddress.PostCode;
-                            siteAddress.Type = ( int ) model.FullAddress.AddressType;
-                            siteAddress.Addressline1 = model.FullAddress.AddressLine1;
-                            siteAddress.Addressline2 = model.FullAddress.AddressLine2;
-                            siteAddress.Province = ( int ) model.FullAddress.Province;
-                            siteAddress.Longitude = strLngX;
-                            siteAddress.Latitude = strLatY;
+                            cs = new ClientSite()
+                            {
+                                ClientId = c.Id,
+                                SiteId = site.Id,
+                                Status = ( int ) model.Status,
+                                AccountingCode = site.AccountCode,
+                            };
 
-                            aservice.Update( siteAddress );
+                            csservice.Create( cs );
                         }
-                        stringAddress = model.FullAddress.AddressLine1 + " " + model.FullAddress.Town + " " + model.FullAddress.PostCode;
                     }
-                    #endregion
-
-                    #region Update Site
-                    // Update Site
-                    site.Id = model.Id;
-                    site.Name = model.Name;
-                    site.Description = model.Description;
-                    site.XCord = strLngX;
-                    site.YCord = strLatY;
-                    site.Address = stringAddress;
-                    site.PostalCode = model.FullAddress.PostCode;
-                    site.ContactName = model.ContactName;
-                    site.ContactNo = model.ContactNo;
-                    site.PlanningPoint = model.PlanningPoint;
-                    site.SiteType = ( int ) model.SiteType;
-                    site.AccountCode = model.AccountCode;
-                    site.Depot = model.Depot;
-                    site.SiteCodeChep = model.SiteCodeChep;
-                    site.Status = ( int ) model.Status;
-                    site.RegionId = model.RegionId;
-                    site.FinanceContact = model.FinanceContact;
-                    site.ReceivingContact = model.ReceivingContact;
-                    site.FinanceContactNo = model.FinanceContactNo;
-                    site.ReceivingContactNo = model.ReceivingContactNo;
-
-                    service.Update( site );
-
-                    #endregion                  
-                    scope.Complete();
                 }
 
-                Notify( "The selected Site details were successfully updated.", NotificationType.Success );
+                #endregion
 
-                return RedirectToAction( "ManageSites" );
+                #region Client Budgets
+
+                if ( model.SiteBudgets.NullableAny() )
+                {
+                    foreach ( SiteBudget l in model.SiteBudgets )
+                    {
+                        SiteBudget b = sbservice.GetById( l.Id );
+
+                        if ( b == null )
+                        {
+                            b = new SiteBudget()
+                            {
+                                SiteId = site.Id,
+                                BudgetYear = l.BudgetYear,
+                                Total = l.Total,
+                                January = l.January,
+                                February = l.February,
+                                March = l.March,
+                                April = l.April,
+                                May = l.May,
+                                June = l.June,
+                                July = l.July,
+                                August = l.August,
+                                September = l.September,
+                                October = l.October,
+                                November = l.November,
+                                December = l.December,
+                                Status = ( int ) Status.Active,
+                            };
+
+                            sbservice.Create( b );
+                        }
+                        else
+                        {
+                            b.BudgetYear = l.BudgetYear;
+                            b.Total = l.Total;
+                            b.January = l.January;
+                            b.February = l.February;
+                            b.March = l.March;
+                            b.April = l.April;
+                            b.May = l.May;
+                            b.June = l.June;
+                            b.July = l.July;
+                            b.August = l.August;
+                            b.September = l.September;
+                            b.October = l.October;
+                            b.November = l.November;
+                            b.December = l.December;
+                            b.Status = ( int ) Status.Active;
+
+                            sbservice.Update( b );
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region Address (s)
+
+                if ( model.Address != null )
+                {
+                    Address address = aservice.GetById( model.Address.Id );
+
+                    if ( address == null )
+                    {
+                        address = new Address()
+                        {
+                            ObjectId = model.Id,
+                            ObjectType = "Client",
+                            Town = model.Address.Town,
+                            Latitude = model.Latitude,
+                            Longitude = model.Longitude,
+                            Status = ( int ) Status.Active,
+                            PostalCode = model.Address.PostCode,
+                            Type = ( int ) model.Address.AddressType,
+                            Addressline1 = model.Address.AddressLine1,
+                            Addressline2 = model.Address.AddressLine2,
+                            Province = ( int ) model.Address.Province,
+                        };
+
+                        aservice.Create( address );
+                    }
+                    else
+                    {
+                        address.Town = model.Address.Town;
+                        address.Latitude = model.Latitude;
+                        address.Longitude = model.Longitude;
+                        address.PostalCode = model.Address.PostCode;
+                        address.Type = ( int ) model.Address.AddressType;
+                        address.Addressline1 = model.Address.AddressLine1;
+                        address.Addressline2 = model.Address.AddressLine2;
+                        address.Province = ( int ) model.Address.Province;
+
+                        aservice.Update( address );
+                    }
+                }
+
+                #endregion
+
+                scope.Complete();
             }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
+
+            Notify( "The selected Site details were successfully updated.", NotificationType.Success );
+
+            return ManageSites( new PagingModel(), new CustomSearchModel() );
         }
 
         // POST: Client/DeleteSite/5
@@ -2613,84 +2377,54 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Delete )]
         public ActionResult DeleteSite( SiteViewModel model )
         {
-            Site site;
-            try
+            using ( SiteService service = new SiteService() )
             {
+                Site site = service.GetById( model.Id );
 
-                using ( SiteService service = new SiteService() )
-                using ( TransactionScope scope = new TransactionScope() )
+                if ( site == null )
                 {
-                    site = service.GetById( model.Id );
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
-                    if ( site == null )
-                    {
-                        Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                        return PartialView( "_AccessDenied" );
-                    }
-
-                    site.Status = ( ( ( Status ) site.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
-
-                    service.Update( site );
-                    scope.Complete();
-
+                    return PartialView( "_AccessDenied" );
                 }
-                Notify( "The selected Client was successfully updated.", NotificationType.Success );
-                return RedirectToAction( "ManageSites" );
-            }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
+
+                site.Status = ( ( ( Status ) site.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.Update( site );
+
+                Notify( "The selected Site was successfully updated.", NotificationType.Success );
+
+                return ManageSites( new PagingModel(), new CustomSearchModel() );
             }
         }
 
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetSitesForClient( string clientId )
+        //
+        // POST: /Site/DeleteSiteBudget/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteSiteBudget( int id )
         {
-            if ( !string.IsNullOrEmpty( clientId ) )
+            using ( SiteBudgetService bservice = new SiteBudgetService() )
             {
-                Session[ "ClientId" ] = clientId;//wroite to session to use for adds and updates
-                List<Site> sites = new List<Site>();
-                //int pspId = Session[ "UserPSP" ];
-                //int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
+                SiteBudget b = bservice.GetById( id );
 
-                using ( SiteService service = new SiteService() )
-                using ( RegionService regionservice = new RegionService() )
+                if ( b == null )
                 {
-                    List<Region> regions = regionservice.List( new PagingModel(), new CustomSearchModel() );
-                    sites = service.GetSitesByClientIncluded( int.Parse( clientId ) ); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
-                    foreach ( Site site in sites )
-                    {
-                        if ( site.RegionId != null )
-                        {
-                            site.Region = regions.FirstOrDefault( r => r.Id == site.RegionId );
-                        }
-                        else
-                        {
-                            site.Region = null;
-                        }
-                    }
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
                 }
-                //var jsonList = JsonConvert.SerializeObject(sites);
-                //return Json(sites, JsonRequestBehavior.AllowGet);
-                var data = JsonConvert.SerializeObject( sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore } );
-                return Json( new { data = data }, JsonRequestBehavior.AllowGet );
+
+                int SiteId = b.SiteId;
+
+                bservice.Delete( b );
+
+                Notify( "The selected Budget was successfully Deleted.", NotificationType.Success );
+
+                List<SiteBudget> model = bservice.ListByColumnWhere( "SiteId", SiteId );
+
+                return PartialView( "_SiteBudgets", model );
             }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        // POST || GET: /Client/GetSiteList
-        public ActionResult GetSiteList( Nullable<int> siteId )
-        {
-
-
-
-            return PartialView( "partials/_ManageSitesList" );
         }
 
         #endregion
@@ -2698,73 +2432,6 @@ namespace ACT.UI.Controllers
 
 
         #region Sub Sites
-        //
-        // POST || GET: /Client/SubSites
-        public ActionResult SubSites( int siteId = 0 )
-        {
-
-            ViewBag.ViewName = "_SubSites";
-
-            int total = 0;
-
-            List<Site> model = new List<Site>();
-            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
-            List<Site> mainSiteList;
-
-            //int pspId = Session[ "UserPSP" ];
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-
-            string sessSiteId = ( Session[ "SiteId" ] != null ? Session[ "SiteId" ].ToString() : null );
-            siteId = ( !string.IsNullOrEmpty( sessSiteId ) ? int.Parse( sessSiteId ) : 0 );
-
-            //check if site is in session but client is not, then retrieve clientid to pass through as context
-            if ( clientId == 0 && siteId > 0 )
-            {
-                if ( siteId > 0 )
-                {
-                    using ( SiteService service = new SiteService() )
-                    {
-                        clientId = service.GetClientBySite( siteId );
-                    }
-                    //Session["ClientId"] = clientId;
-                }
-            }
-
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            using ( ClientService clientService = new ClientService() )
-            {
-                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-            }
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            } );
-            ViewBag.ClientList = clientDDL;
-
-            ViewBag.ContextualModeSite = ( siteId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-
-            using ( SiteService service = new SiteService() )
-            {
-                mainSiteList = service.ListCSM( new PagingModel() { Sort = "ASC", SortBy = "Name" }, new CustomSearchModel() { SiteId = siteId, ClientId = clientId } );
-
-            }
-            IEnumerable<SelectListItem> siteDDL = mainSiteList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.Name
-
-            } );
-            ViewBag.ClientSiteList = siteDDL;
-            ViewBag.SelectedSiteId = siteId;
-
-
-            return PartialView( "_SubSites" );
-        }
 
         [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
         public JsonResult GetSiteListForClient( string clientId )
@@ -3665,15 +3332,6 @@ namespace ACT.UI.Controllers
 
         #region General
 
-        //[HttpPost]
-        //// GET: /Client/ImportSites
-        //public ActionResult ImportSubSites(HttpPostedFileBase postedFile)
-        //{
-
-        //    return RedirectToAction("ImportSites", "Client");
-        //}
-
-
         [HttpPost]
         // GET: /Client/ImportSites
         public ActionResult ImportSites( HttpPostedFileBase postedFile )
@@ -3697,15 +3355,17 @@ namespace ACT.UI.Controllers
                     string sessSiteId = ( Session[ "SiteId" ] != null ? Session[ "SiteId" ].ToString() : null );
                     int SiteID = ( !string.IsNullOrEmpty( sessSiteId ) ? int.Parse( sessSiteId ) : 0 );
 
-                    using ( var sreader = new StreamReader( postedFile.InputStream ) )
-                    using ( SiteService siteService = new SiteService() )
-                    using ( ClientSiteService csService = new ClientSiteService() )
-                    using ( TransactionScope scope = new TransactionScope() )
+                    using ( SiteService sservice = new SiteService() )
                     using ( AddressService aservice = new AddressService() )
+                    using ( TransactionScope scope = new TransactionScope() )
+                    using ( ClientSiteService csservice = new ClientSiteService() )
+                    using ( StreamReader sreader = new StreamReader( postedFile.InputStream ) )
                     {
                         //First line is header. If header is not passed in csv then we can neglect the below line.
                         string[] headers = sreader.ReadLine().Split( ',' );
+
                         //Loop through the records
+
                         while ( !sreader.EndOfStream )
                         {
                             string[] rows = sreader.ReadLine().Split( ',' );
@@ -3737,30 +3397,37 @@ namespace ACT.UI.Controllers
                                 ViewBag.Message = string.Concat( rows[ 3 ].ToString(), " ", ex.Message );
                             }
 
-                            Site existingSite = null;
+                            Site existingSite = sservice.ExistByXYCoords( strLngX, strLatY );
+
                             #region Validation
-                            if ( !string.IsNullOrEmpty( strLngX ) && siteService.ExistByXYCoords( strLngX, strLatY ) )
+
+                            if ( !string.IsNullOrEmpty( strLngX ) && existingSite != null )
                             {
                                 //Notify($"Sorry, a Site with the same X Y Coordinates already exists \"{model.XCord}\" already exists!", NotificationType.Error);
                                 //return View(model);
 
                                 //rather than pass back to view, we will create the new site as a subsite of the existing site. 
                                 //Get the existing site first
-                                existingSite = siteService.GetByColumnsWhere( "XCord", strLngX, "YCord", strLatY );
+                                existingSite = sservice.GetByColumnsWhere( "XCord", strLngX, "YCord", strLatY );
                                 SiteID = existingSite.Id;//This is the existing site retrieved by mapping same X and Y coord, read that into the model.SiteId which makes the new site a child site
                                 siteType = 2;//Mark teh site as a subsite by default
                             }
 
                             int regionId = 0;
+
                             if ( !string.IsNullOrEmpty( rows[ 16 ].ToString() ) )
                             {
                                 regionId = int.Parse( rows[ 16 ].ToString() );
                             }
+
                             int provinceId = 0;
+
                             string provinceName = "";
+
                             if ( !string.IsNullOrEmpty( rows[ 8 ].ToString() ) )
                             {
                                 int.TryParse( rows[ 8 ].ToString(), out provinceId );
+
                                 try
                                 {
                                     if ( provinceId > 0 )
@@ -3773,7 +3440,9 @@ namespace ACT.UI.Controllers
                                     ViewBag.Message = string.Concat( rows[ 8 ].ToString(), " ", ex.Message );
                                 }
                             }
+
                             #region Create Site
+
                             Site site = new Site()
                             {
                                 Name = rows[ 0 ].ToString(),
@@ -3796,12 +3465,15 @@ namespace ACT.UI.Controllers
                                 ReceivingContact = rows[ 19 ].ToString(),
                                 ReceivingContactNo = rows[ 20 ].ToString(),
                             };
+
                             //For Subsites
                             if ( SiteID > 0 )
                             {
                                 site.SiteId = SiteID;
                             }
-                            site = siteService.Create( site );
+                            
+                            site = sservice.Create( site );
+
                             #endregion
 
                             #region Create Address (s)
@@ -3820,13 +3492,16 @@ namespace ACT.UI.Controllers
                                     Addressline2 = rows[ 5 ].ToString(),
                                     Province = provinceId,
                                 };
+
                                 aservice.Create( address );
                             }
 
                             #endregion
 
                             //tie Client in Session to New Site
-                            #region Add ClientSite
+
+                            #region Add Client Site
+
                             ClientSite csSite = new ClientSite()
                             {
                                 ClientId = clientID,
@@ -3834,11 +3509,15 @@ namespace ACT.UI.Controllers
                                 AccountingCode = site.AccountCode,
                                 Status = ( int ) Status.Active
                             };
-                            csService.Create( csSite );
+
+                            csservice.Create( csSite );
+
                             #endregion
 
                         }
+
                         #endregion
+
                         scope.Complete();
                     }
 
@@ -3922,9 +3601,11 @@ namespace ACT.UI.Controllers
                                 ViewBag.Message = string.Concat( rows[ 3 ].ToString(), " ", ex.Message );
                             }
 
-                            Site existingSite = null;
+                            Site existingSite = siteService.ExistByXYCoords( strLngX, strLatY );
+
                             #region Validation
-                            if ( !string.IsNullOrEmpty( strLngX ) && siteService.ExistByXYCoords( strLngX, strLatY ) )
+
+                            if ( !string.IsNullOrEmpty( strLngX ) && existingSite != null )
                             {
                                 //Notify($"Sorry, a Site with the same X Y Coordinates already exists \"{model.XCord}\" already exists!", NotificationType.Error);
                                 //return View(model);
@@ -4043,9 +3724,6 @@ namespace ACT.UI.Controllers
             }
             return RedirectToAction( "ManageSites", "Client" );
         }
-
-
-
 
         #endregion
 
@@ -4282,6 +3960,125 @@ namespace ACT.UI.Controllers
 
                 return PartialView( "_ClientKPI", paging );
             }
+        }
+
+        //
+        // GET: /Client/ClientGroups
+        public ActionResult ClientGroups( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "ClientGroups";
+
+                return PartialView( "_ClientGroupsCustomSearch", new CustomSearchModel( "ClientGroups" ) );
+            }
+
+            using ( GroupService gservice = new GroupService() )
+            {
+                pm.Sort = pm.Sort ?? "DESC";
+                pm.SortBy = pm.SortBy ?? "Name";
+
+                List<GroupCustomModel> model = gservice.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : gservice.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_ClientGroups", paging );
+            }
+        }
+
+        //
+        // GET: /Client/ManageSites
+        public ActionResult ManageSites( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "ManageSites";
+
+                return PartialView( "_ManageSitesCustomSearch", new CustomSearchModel( "ManageSites" ) );
+            }
+
+            using ( SiteService service = new SiteService() )
+            {
+                pm.Sort = pm.Sort ?? "ASC";
+                pm.SortBy = pm.SortBy ?? "s.Name";
+
+                List<SiteCustomModel> model = service.List1( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_ManageSites", paging );
+            }
+        }
+
+        //
+        // POST || GET: /Client/SubSites
+        public ActionResult SubSites( int siteId = 0 )
+        {
+
+            ViewBag.ViewName = "_SubSites";
+
+            int total = 0;
+
+            List<Site> model = new List<Site>();
+            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
+            List<Site> mainSiteList;
+
+            //int pspId = Session[ "UserPSP" ];
+            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+
+            string sessSiteId = ( Session[ "SiteId" ] != null ? Session[ "SiteId" ].ToString() : null );
+            siteId = ( !string.IsNullOrEmpty( sessSiteId ) ? int.Parse( sessSiteId ) : 0 );
+
+            //check if site is in session but client is not, then retrieve clientid to pass through as context
+            if ( clientId == 0 && siteId > 0 )
+            {
+                if ( siteId > 0 )
+                {
+                    using ( SiteService service = new SiteService() )
+                    {
+                        clientId = service.GetClientBySite( siteId );
+                    }
+                    //Session["ClientId"] = clientId;
+                }
+            }
+
+            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
+            //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            using ( ClientService clientService = new ClientService() )
+            {
+                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+            }
+            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.CompanyName
+
+            } );
+            ViewBag.ClientList = clientDDL;
+
+            ViewBag.ContextualModeSite = ( siteId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
+
+            //using ( SiteService service = new SiteService() )
+            //{
+            //    mainSiteList = service.List1( new PagingModel() { Sort = "ASC", SortBy = "Name" }, new CustomSearchModel() { SiteId = siteId, ClientId = clientId } );
+
+            //}
+            //IEnumerable<SelectListItem> siteDDL = mainSiteList.Select( c => new SelectListItem
+            //{
+            //    Value = c.Id.ToString(),
+            //    Text = c.Name
+
+            //} );
+            //ViewBag.ClientSiteList = siteDDL;
+            ViewBag.SelectedSiteId = siteId;
+
+
+            return PartialView( "_SubSites" );
         }
 
         #endregion

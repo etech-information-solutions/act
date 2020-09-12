@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using ACT.Core.Enums;
 using ACT.Core.Models;
+using ACT.Core.Models.Custom;
 using ACT.Data.Models;
 
 namespace ACT.Core.Services
@@ -13,6 +14,19 @@ namespace ACT.Core.Services
         public SiteService()
         {
 
+        }
+
+        /// <summary>
+        /// Gets a site using the specified Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public override Site GetById( int id )
+        {
+            context.Configuration.LazyLoadingEnabled = true;
+            context.Configuration.ProxyCreationEnabled = true;
+
+            return base.GetById( id );
         }
 
         /// <summary>
@@ -28,12 +42,13 @@ namespace ACT.Core.Services
             List<object> parameters = new List<object>()
             {
                 { new SqlParameter( "regionId", regionId ) },
+                { new SqlParameter( "sAct", Status.Active ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
             };
 
             string query = string.Empty;
 
-            query = $"SELECT s.Id AS [TKey], s.Name AS [TValue] FROM [dbo].[Site] s WHERE (1=1)";
+            query = $"SELECT s.Id AS [TKey], s.Name AS [TValue] FROM [dbo].[Site] s WHERE (s.[Status]=@sAct)";
 
             if ( regionId > 0 )
             {
@@ -66,12 +81,12 @@ namespace ACT.Core.Services
         }
 
         /// <summary>
-        /// Gets a list of PSPs matching the specified search params
+        /// Gets a total count of Sites matching the specified search params
         /// </summary>
         /// <param name="pm"></param>
         /// <param name="csm"></param>
         /// <returns></returns>
-        public List<Site> ListCSM( PagingModel pm, CustomSearchModel csm )
+        public int Total1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
@@ -86,24 +101,23 @@ namespace ACT.Core.Services
             {
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
-                { new SqlParameter( "csmProductId", csm.ProductId ) },
+                { new SqlParameter( "csmRegionId", csm.RegionId ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmPSPClientStatus", ( int ) csm.PSPClientStatus ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmSiteId", csm.SiteId ) },
-                { new SqlParameter( "csmRegion", csm.RegionId ) },
 
             };
 
             #endregion
 
             string query = @"SELECT
-                                p.*
-                                FROM
-                                [dbo].[Site] p";
+                                COUNT(1) AS [Total]
+                             FROM
+                                [dbo].[Site] s
+                                LEFT OUTER JOIN [dbo].[Region] r ON r.[Id]=s.[RegionId]";
 
             // WHERE
 
@@ -111,21 +125,17 @@ namespace ACT.Core.Services
 
             query = $"{query} WHERE (1=1)";
 
-            // Limit to only show PSP for logged in user
+            // Limit to only show Sites for logged in user
             if ( !CurrentUser.IsAdmin )
             {
-                /*
-                 *     siteList = (from p in context.PSPClients
-                        join c in context.ClientSites
-                        on p.ClientId equals c.ClientId
-                        join e in context.Sites
-                        on c.SiteId equals e.Id
-                        where p.PSPId == pspId
-                        select e).ToList();
-                 */
-                //add to mke sure only correct sites are seen            
-                query = $"{query} AND EXISTS(SELECT 1 FROM[dbo].[PSPUser] pu LEFT JOIN[dbo].[PSPClient] pc ON pc.PSPId = pu.PSPId LEFT JOIN [dbo].[ClientSite] cs ON cs.ClientId=pc.ClientId WHERE pu.UserId = @userid) ";
-                //query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu WHERE p.Id=pu.PSPId AND pu.UserId=@userid) ";
+                query = $@"{query} AND EXISTS(SELECT
+                                                1
+                                              FROM
+                                                [dbo].[PSPClient] pc
+                                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.ClientId=pc.ClientId
+                                              WHERE
+                                                s.Id = cs.SiteId AND
+                                                pc.UserId = @userid) ";
             }
 
             #endregion
@@ -136,63 +146,30 @@ namespace ACT.Core.Services
 
             if ( csm.ClientId != 0 )
             {
-                //query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE p.Id=pc.PSPId AND pc.ClientId=@csmClientId) ";
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] pc WHERE p.Id=pc.SiteId AND pc.ClientId=@csmClientId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE s.Id=cs.SiteId AND cs.ClientId=@csmClientId) ";
             }
             if ( csm.SiteId != 0 )
             {
-                //query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE p.Id=pc.PSPId AND pc.ClientId=@csmClientId) ";
-                query = $"{query} AND p.Id=@csmSiteId ";
+                query = $"{query} AND s.SiteId=@csmSiteId ";
             }
             if ( csm.RegionId != 0 )
             {
-                //query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE p.Id=pc.PSPId AND pc.ClientId=@csmClientId) ";
-                query = $"{query} AND p.RegionId=@csmRegion ";
+                query = $"{query} AND s.RegionId=@csmRegionId ";
             }
-
-
-            if ( !string.IsNullOrEmpty( csm.SitePlanningPoint ) )
-            {
-                query = string.Format( @"{0} AND (p.PlanningPoint LIKE '%{1}%' OR p.[XCord] LIKE '%{1}%' OR p.[YCord] LIKE '%{1}%')", query, csm.SitePlanningPoint );
-            }
-
-            if ( !string.IsNullOrEmpty( csm.ContactName ) )
-            {
-                query = string.Format( @"{0} AND (p.[ContactName] LIKE '%{1}%' OR p.[ReceivingContact] LIKE '%{1}%' OR p.[FinanceContact] LIKE '%{1}%') ", query, csm.ContactName );
-            }
-
-            if ( !string.IsNullOrEmpty( csm.ContactNumber ) )
-            {
-                query = string.Format( @"{0} AND (p.[ContactNo] LIKE '%{1}%' OR p.[FinanceContactNo] LIKE '%{1}%' OR p.[ReceivingContactNo] LIKE '%{1}%') ", query, csm.ContactNumber );
-            }
-
-            if ( !string.IsNullOrEmpty( csm.ReferenceNumber ) )
-            {
-                query = string.Format( @"{0} AND (p.[AccountCode] LIKE '%{1}%' OR p.[SiteCodeChep] LIKE '%{1}%')", query, csm.ReferenceNumber );
-            }
-
-            //if (csm.ProductId != 0)
-            //{
-            //    query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPProduct] pp WHERE p.Id=pp.PSPId AND pp.ProductId=@csmProductId) ";
-            //}
-            //if (csm.PSPClientStatus != Enums.PSPClientStatus.All)
-            //{
-            //    query = $"{query} AND (p.Status=@csmPSPClientStatus) ";
-            //}
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (p.CreatedOn >= @csmFromDate AND p.CreatedOn <= @csmToDate) ";
+                query = $"{query} AND (s.CreatedOn >= @csmFromDate AND s.CreatedOn <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (p.CreatedOn>=@csmFromDate) ";
+                    query = $"{query} AND (s.CreatedOn>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (p.CreatedOn<=@csmToDate) ";
+                    query = $"{query} AND (s.CreatedOn<=@csmToDate) ";
                 }
             }
 
@@ -204,16 +181,23 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (p.[Name] LIKE '%{1}%' OR
-                                                  p.[Description] LIKE '%{1}%' OR
-                                                  p.[XCord] LIKE '%{1}%' OR
-                                                  p.[YCord] LIKE '%{1}%' OR
-                                                  p.[Address] LIKE '%{1}%' OR
-                                                  p.[AccountCode] LIKE '%{1}%' OR
-                                                  p.[ContactNo] LIKE '%{1}%' OR
-                                                  p.[ContactName] LIKE '%{1}%' OR
-                                                  p.[Depot] LIKE '%{1}%' OR
-                                                  p.[SiteCodeChep] LIKE '%{1}%'
+                query = string.Format( @"{0} AND (s.[Name] LIKE '%{1}%' OR
+                                                  s.[Description] LIKE '%{1}%' OR
+                                                  s.[XCord] LIKE '%{1}%' OR
+                                                  s.[YCord] LIKE '%{1}%' OR
+                                                  s.[Address] LIKE '%{1}%' OR
+                                                  s.[AccountCode] LIKE '%{1}%' OR
+                                                  s.[ContactNo] LIKE '%{1}%' OR
+                                                  s.[ContactName] LIKE '%{1}%' OR
+                                                  s.[Depot] LIKE '%{1}%' OR
+                                                  s.[SiteCodeChep] LIKE '%{1}%' OR
+                                                  s.[PlanningPoint] LIKE '%{1}%' OR
+                                                  s.[FinanceContact] LIKE '%{1}%' OR
+                                                  s.[FinanceContactNo] LIKE '%{1}%' OR
+                                                  s.[ReceivingContact] LIKE '%{1}%' OR
+                                                  s.[ReceivingContactNo] LIKE '%{1}%' OR
+                                                  r.[Name] LIKE '%{1}%' OR
+                                                  r.[Description] LIKE '%{1}%'
                                              ) ", query, csm.Query.Trim() );
             }
 
@@ -227,61 +211,165 @@ namespace ACT.Core.Services
 
             query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
-            List<Site> model = context.Database.SqlQuery<Site>( query, parameters.ToArray() ).ToList();
+            CountModel model = context.Database.SqlQuery<CountModel>( query, parameters.ToArray() ).FirstOrDefault();
 
-            //if (model.NullableAny(p => p.DocumentCount > 0))
-            //{
-            //    using (DocumentService dservice = new DocumentService())
-            //    {
-            //        foreach (PSPCustomModel item in model.Where(p => p.DocumentCount > 0))
-            //        {
-            //            item.Documents = dservice.List(item.Id, "PSP");
-            //        }
-            //    }
-            //}
+            return model.Total;
+        }
+
+        /// <summary>
+        /// Gets a list of Sites matching the specified search params
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public List<SiteCustomModel> List1( PagingModel pm, CustomSearchModel csm )
+        {
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
+            {
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
+            }
+
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmRegionId", csm.RegionId ) },
+                { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+
+            };
+
+            #endregion
+
+            string query = @"SELECT
+                                s.*,
+                                r.[Description] AS [RegionName],
+                                (SELECT COUNT (1) FROM [dbo].[Site] s1 WHERE s1.[SiteId]=s.[Id]) AS [SubSiteCount],
+                                (SELECT COUNT (1) FROM [dbo].[ClientSite] cs WHERE cs.[SiteId]=s.[Id]) AS [ClientCount],
+                                (SELECT COUNT (1) FROM [dbo].[SiteBudget] sb WHERE sb.[SiteId]=s.[Id]) AS [BudgetCount]
+                             FROM
+                                [dbo].[Site] s
+                                LEFT OUTER JOIN [dbo].[Region] r ON r.[Id]=s.[RegionId]";
+
+            // WHERE
+
+            #region WHERE
+
+            query = $"{query} WHERE (1=1)";
+
+            // Limit to only show Sites for logged in user
+            if ( !CurrentUser.IsAdmin )
+            {
+                query = $@"{query} AND EXISTS(SELECT
+                                                1
+                                              FROM
+                                                [dbo].[PSPClient] pc
+                                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.ClientId=pc.ClientId
+                                              WHERE
+                                                s.Id = cs.SiteId AND
+                                                pc.UserId = @userid) ";
+            }
+
+            #endregion
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.ClientId != 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE s.Id=cs.SiteId AND cs.ClientId=@csmClientId) ";
+            }
+            if ( csm.SiteId != 0 )
+            {
+                query = $"{query} AND s.SiteId=@csmSiteId ";
+            }
+            if ( csm.RegionId != 0 )
+            {
+                query = $"{query} AND s.RegionId=@csmRegionId ";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (s.CreatedOn >= @csmFromDate AND s.CreatedOn <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (s.CreatedOn>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (s.CreatedOn<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
+            {
+                query = string.Format( @"{0} AND (s.[Name] LIKE '%{1}%' OR
+                                                  s.[Description] LIKE '%{1}%' OR
+                                                  s.[XCord] LIKE '%{1}%' OR
+                                                  s.[YCord] LIKE '%{1}%' OR
+                                                  s.[Address] LIKE '%{1}%' OR
+                                                  s.[AccountCode] LIKE '%{1}%' OR
+                                                  s.[ContactNo] LIKE '%{1}%' OR
+                                                  s.[ContactName] LIKE '%{1}%' OR
+                                                  s.[Depot] LIKE '%{1}%' OR
+                                                  s.[SiteCodeChep] LIKE '%{1}%' OR
+                                                  s.[PlanningPoint] LIKE '%{1}%' OR
+                                                  s.[FinanceContact] LIKE '%{1}%' OR
+                                                  s.[FinanceContactNo] LIKE '%{1}%' OR
+                                                  s.[ReceivingContact] LIKE '%{1}%' OR
+                                                  s.[ReceivingContactNo] LIKE '%{1}%' OR
+                                                  r.[Name] LIKE '%{1}%' OR
+                                                  r.[Description] LIKE '%{1}%'
+                                             ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            // ORDER
+
+            query = $"{query} ORDER BY {pm.SortBy} {pm.Sort}";
+
+            // SKIP, TAKE
+
+            query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
+
+            List<SiteCustomModel> model = context.Database.SqlQuery<SiteCustomModel>( query, parameters.ToArray() ).ToList();
+
+            if ( model.NullableAny( p => p.ClientCount > 0 ) )
+            {
+                foreach ( SiteCustomModel item in model.Where( p => p.ClientCount > 0 ) )
+                {
+                    item.Clients = context.ClientSites.Where( cs => cs.SiteId == item.Id ).Select( s => s.Client.CompanyName ).ToList();
+                }
+            }
+
+            if ( model.NullableAny( p => p.SubSiteCount > 0 ) )
+            {
+                foreach ( SiteCustomModel item in model.Where( p => p.SubSiteCount > 0 ) )
+                {
+                    item.SubSites = context.Sites.Where( s => s.SiteId == item.Id ).Select( s => s.Name ).ToList();
+                }
+            }
 
             return model;
-        }
-
-        public List<Site> GetSitesByClient( int clientId )
-        {
-            List<Site> siteList;
-            //context.Roles.FirstOrDefault(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
-            siteList = ( from p in context.ClientSites
-                         join e in context.Sites
-                         on p.SiteId equals e.Id
-                         where p.ClientId == clientId
-                         select e ).ToList();
-
-            return siteList;
-        }
-
-        public List<Site> GetSubSitesBySiteClient( int clientId, int siteId )
-        {
-            List<Site> siteList;
-            //context.Roles.FirstOrDefault(c => c.Name.ToLower().Trim() == name.ToLower().Trim());
-            siteList = ( from p in context.ClientSites
-                         join e in context.Sites
-                         on p.SiteId equals e.Id
-                         where p.ClientId == clientId
-                         where e.SiteId == siteId
-                         select e ).ToList();
-
-            return siteList;
-        }
-
-        public List<Site> GetSitesByClientsOfPSP( int pspId )
-        {
-            List<Site> siteList;
-            siteList = ( from p in context.PSPClients
-                         join c in context.ClientSites
-                         on p.ClientId equals c.ClientId
-                         join e in context.Sites
-                         on c.SiteId equals e.Id
-                         where p.PSPId == pspId
-                         select e ).ToList();
-
-            return siteList;
         }
 
         public List<Site> GetSitesByClients( int clientId )
@@ -321,8 +409,6 @@ namespace ACT.Core.Services
             return clientId;
         }
 
-
-
         public List<Site> GetSitesByClientsIncluded( int clientId, int siteId )
         {
             List<Site> siteList;
@@ -336,6 +422,7 @@ namespace ACT.Core.Services
 
             return siteList;
         }
+        
         public List<Site> GetSitesByClientIncluded( int clientId )
         {
             List<Site> siteList;
@@ -346,7 +433,6 @@ namespace ACT.Core.Services
                          select s ).ToList();
             return siteList;
         }
-
 
         public List<Site> GetSitesByClientsExcluded( int clientId, int siteId )
         {
@@ -365,31 +451,25 @@ namespace ACT.Core.Services
             return siteList;
         }
 
-        public int CountSubSitesBySite( int siteId )
+        /// <summary>
+        /// Checks if a site already exists using the specified XY Coordinates
+        /// </summary>
+        /// <param name="xcoord"></param>
+        /// <param name="ycoord"></param>
+        /// <returns></returns>
+        public Site ExistByXYCoords( string xcoord, string ycoord )
         {
-
-            //return 0;
-            //me_employees.Count(me => me.me_login_name == this.me_login_name && me.me_pkey != this.me_pkey);
-            //return context.Sites.Count(s => s.SiteId == siteId && s.Status = (int)Status.Active);
-            int siteCount = ( from c in context.Sites
-                              where c.SiteId == siteId
-                              where c.Status == ( int ) Status.Active
-                              select c ).Count();
-
-            return siteCount;
+            return context.Sites.FirstOrDefault( c => c.XCord == xcoord && c.YCord == ycoord );
         }
 
-
-        public bool ExistByAccountCode( string accCode )
+        /// <summary>
+        /// Checks if a site with the same name already exists
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool ExistByNameRegion( string name, int? regionId )
         {
-            return context.Sites.Any( c => c.AccountCode == accCode );
-        }
-
-        public bool ExistByXYCoords( string xcoord, string ycoord )
-        {
-            bool bExists = false;
-            bExists = context.Sites.Any( c => c.XCord == xcoord && c.YCord == ycoord );
-            return bExists;
+            return context.Sites.Any( s => s.Name.Trim().ToLower() == name.Trim().ToLower() && s.RegionId == regionId );
         }
     }
 }

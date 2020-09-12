@@ -1626,8 +1626,9 @@
                 PSPClientStatus: ACT.UI[t].PagePSPClientStatus || ACT.UI.PagePSPClientStatus || -1,
                 SiteId: ACT.UI[t].PageSiteId || ACT.UI.PageSiteId || 0,
                 ClientId: ACT.UI[t].PageClientId || ACT.UI.PageClientId || 0,
-                TransporterId: ACT.UI[t].PageTransporterId || ACT.UI.PageTransporterId || 0,
+                RegionId: ACT.UI[t].PageRegionId || ACT.UI.PageRegionId || 0,
                 ProductId: ACT.UI[t].PageProductId || ACT.UI.PageProductId || 0,
+                TransporterId: ACT.UI[t].PageTransporterId || ACT.UI.PageTransporterId || 0,
                 PSPProductId: ACT.UI[t].PageProductId || ACT.UI.PagePSPProductId || 0,
                 CampaignId: ACT.UI[t].PageCampaignId || ACT.UI.PageCampaignId || 0,
                 SelectedItems: ACT.UI[t].SelectedItems || ACT.UI.SelectedItems || [],
@@ -1670,6 +1671,7 @@
             ACT.UI[t].PageSiteId = ACT.UI.PageSiteId = 0;
             ACT.UI[t].PageStatus = ACT.UI.PageStatusId = -1;
             ACT.UI[t].PageClientId = ACT.UI.PageClientId = 0;
+            ACT.UI[t].PageRegionId = ACT.UI.PageRegionId = 0;
             ACT.UI[t].PageProductId = ACT.UI.PageProductId = 0;
             ACT.UI[t].PagePSPProductId = ACT.UI.PagePSPProductId = 0;
             ACT.UI[t].PageCampaignId = ACT.UI.PageCampaignId = 0;
@@ -2783,6 +2785,13 @@
 
                     sender.find( 'select#SiteId' ).val( ACT.UI[t].PageSiteId );
                 }
+                if ( ACT.UI[t].PageRegionId && ACT.UI[t].PageRegionId !== 0 )
+                {
+                    h += "Region: <b>" + sender.find( 'select#RegionId:first option[value="' + ACT.UI[t].PageRegionId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Region: <a style='color: #69f95a;'>" + sender.find( 'select#RegionId:first option[value="' + ACT.UI[t].PageRegionId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#RegionId' ).val( ACT.UI[t].PageRegionId );
+                }
                 if ( ACT.UI[t].PageClientId && ACT.UI[t].PageClientId !== 0 )
                 {
                     h += "Client: <b>" + sender.find( 'select#ClientId:first option[value="' + ACT.UI[t].PageClientId + '"]' ).text() + "</b>~";
@@ -2818,16 +2827,16 @@
 
                     sender.find( 'select#CampaignId' ).val( ACT.UI[t].PageCampaignId );
                 }
-                if ( ACT.UI[t].PageStatus && ACT.UI[t].PageStatus !== 0 )
+                if ( ACT.UI[t].PageStatus && ACT.UI[t].PageStatus !== -1 )
                 {
-                    h += "User: <b>" + sender.find( 'select#Status:first option[value="' + ACT.UI[t].PageStatus + '"]' ).text() + "</b>~";
+                    h += "Status: <b>" + sender.find( 'select#Status:first option[value="' + ACT.UI[t].PageStatus + '"]' ).text() + "</b>~";
                     q += " <b class='italic'>[ Status: <a style='color: #69f95a;'>" + sender.find( 'select#Status:first option[value="' + ACT.UI[t].PageStatus + '"]' ).text() + "</a> ]</b> ";
 
                     sender.find( 'select#Status' ).val( ACT.UI[t].PageStatus );
                 }
-                if ( ACT.UI[t].PagePSPClientStatus && ACT.UI[t].PagePSPClientStatus !== 0 )
+                if ( ACT.UI[t].PagePSPClientStatus && ACT.UI[t].PagePSPClientStatus !== -1 )
                 {
-                    h += "User: <b>" + sender.find( 'select#PSPClientStatus:first option[value="' + ACT.UI[t].PagePSPClientStatus + '"]' ).text() + "</b>~";
+                    h += "Status: <b>" + sender.find( 'select#PSPClientStatus:first option[value="' + ACT.UI[t].PagePSPClientStatus + '"]' ).text() + "</b>~";
                     q += " <b class='italic'>[ Status: <a style='color: #69f95a;'>" + sender.find( 'select#PSPClientStatus:first option[value="' + ACT.UI[t].PagePSPClientStatus + '"]' ).text() + "</a> ]</b> ";
 
                     sender.find( 'select#PSPClientStatus' ).val( ACT.UI[t].PagePSPClientStatus );

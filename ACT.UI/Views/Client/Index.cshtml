@@ -17,9 +17,12 @@
         <li data-hot-spot="1" data-c="Client" data-t="ClientKPI">
             <a data-ap-tab="1" data-target="#clientkpi" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientKPI">Client KPI</a>
         </li>
-        <li data-hot-spot="1" data-c="Client" data-t="Groups">
-            <a data-ap-tab="1" data-target="#clientgroups" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientGroups">Client Groups</a>
-        </li>
+        @if ( user.IsAdmin )
+        {
+            <li data-hot-spot="1" data-c="Client" data-t="Groups">
+                <a data-ap-tab="1" data-target="#clientgroups" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientGroups">Client Groups</a>
+            </li>
+        }
         <li data-hot-spot="1" data-c="Client" data-t="ManageSites">
             <a data-ap-tab="1" data-target="#managesites" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ManageSites">Manage Sites</a>
         </li>
@@ -47,7 +50,10 @@
 
         <div id="clientkpi" class="da-tab none" data-load-url="ClientKPI"> </div>
 
-        <div id="clientgroups" class="da-tab none" data-load-url="ClientGroups"> </div>
+        @if ( user.IsAdmin )
+        {
+            <div id="clientgroups" class="da-tab none" data-load-url="ClientGroups"> </div>
+        }
 
         <div id="managesites" class="da-tab none" data-load-url="ManageSites"> </div>
 

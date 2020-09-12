@@ -2,7 +2,8 @@
 namespace ACT.Core.Models.Custom
 {
     using System;
-    
+    using System.Collections.Generic;
+
     public partial class SiteCustomModel
     {
         public int Id { get; set; }
@@ -25,5 +26,21 @@ namespace ACT.Core.Models.Custom
         public string Depot { get; set; }
         public string SiteCodeChep { get; set; }
         public int Status { get; set; }
+        public string FinanceContact { get; set; }
+        public string FinanceContactNo { get; set; }
+        public string ReceivingContact { get; set; }
+        public string ReceivingContactNo { get; set; }
+
+        public string RegionName { get; set; }
+
+        public int SubSiteCount { get; set; }
+
+        public int ClientCount { get; set; }
+
+        public int BudgetCount { get; set; }
+
+        public List<string> Clients { get; set; }
+
+        public List<string> SubSites { get; set; }
     }
 }

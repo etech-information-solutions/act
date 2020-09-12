@@ -555,6 +555,20 @@ namespace ACT.Core.Models
                     }
 
                     break;
+
+
+                case "ManageSites":
+
+                    using ( SiteService sservice = new SiteService() )
+                    using ( ClientService cservice = new ClientService() )
+                    using ( RegionService rservice = new RegionService() )
+                    {
+                        SiteOptions = sservice.List( true );
+                        ClientOptions = cservice.List( true );
+                        RegionOptions = rservice.List( true );
+                    }
+
+                    break;
             }
         }
 

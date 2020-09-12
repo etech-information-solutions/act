@@ -971,6 +971,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="November" Type="numeric" Precision="18" Scale="2" />
           <Property Name="December" Type="numeric" Precision="18" Scale="2" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="Total" Type="int" />
         </EntityType>
         <EntityType Name="SystemConfig">
           <Key>
@@ -2401,7 +2402,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySet Name="Sites" EntityType="ACTModel.Site" />
           <EntitySet Name="SiteAudits" EntityType="ACTModel.SiteAudit" />
           <EntitySet Name="SiteBillings" EntityType="ACTModel.SiteBilling" />
-          <EntitySet Name="SiteBudgets" EntityType="ACTModel.SiteBudget" />
           <EntitySet Name="SystemConfigs" EntityType="ACTModel.SystemConfig" />
           <EntitySet Name="Tasks" EntityType="ACTModel.Task" />
           <EntitySet Name="Tokens" EntityType="ACTModel.Token" />
@@ -2618,10 +2618,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="Site" EntitySet="Sites" />
             <End Role="SiteBilling" EntitySet="SiteBillings" />
           </AssociationSet>
-          <AssociationSet Name="FK_SiteBudgets_Sites" Association="ACTModel.FK_SiteBudgets_Sites">
-            <End Role="Site" EntitySet="Sites" />
-            <End Role="SiteBudget" EntitySet="SiteBudgets" />
-          </AssociationSet>
           <AssociationSet Name="FK_Sites_Sites" Association="ACTModel.FK_Sites_Sites">
             <End Role="Site" EntitySet="Sites" />
             <End Role="Site1" EntitySet="Sites" />
@@ -2693,6 +2689,11 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <AssociationSet Name="FK_Regions_PSP" Association="ACTModel.FK_Regions_PSP">
             <End Role="PSP" EntitySet="PSPs" />
             <End Role="Region" EntitySet="Regions" />
+          </AssociationSet>
+          <EntitySet Name="SiteBudgets" EntityType="ACTModel.SiteBudget" />
+          <AssociationSet Name="FK_SiteBudgets_Sites" Association="ACTModel.FK_SiteBudgets_Sites">
+            <End Role="Site" EntitySet="Sites" />
+            <End Role="SiteBudget" EntitySet="SiteBudgets" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Address">
@@ -3536,9 +3537,9 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="Region" Relationship="ACTModel.FK_Sites_Regions" FromRole="Site" ToRole="Region" />
           <NavigationProperty Name="SiteAudits" Relationship="ACTModel.FK_Site_Audit_Sites" FromRole="Site" ToRole="SiteAudit" />
           <NavigationProperty Name="SiteBillings" Relationship="ACTModel.FK_SiteBilling_Sites" FromRole="Site" ToRole="SiteBilling" />
-          <NavigationProperty Name="SiteBudgets" Relationship="ACTModel.FK_SiteBudgets_Sites" FromRole="Site" ToRole="SiteBudget" />
           <NavigationProperty Name="Site1" Relationship="ACTModel.FK_Sites_Sites" FromRole="Site" ToRole="Site1" />
           <NavigationProperty Name="Site2" Relationship="ACTModel.FK_Sites_Sites" FromRole="Site1" ToRole="Site" />
+          <NavigationProperty Name="SiteBudgets" Relationship="ACTModel.FK_SiteBudgets_Sites" FromRole="Site" ToRole="SiteBudget" />
         </EntityType>
         <EntityType Name="SiteAudit">
           <Key>
@@ -3583,31 +3584,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Product" Relationship="ACTModel.FK_SiteBilling_Products" FromRole="SiteBilling" ToRole="Product" />
           <NavigationProperty Name="Site" Relationship="ACTModel.FK_SiteBilling_Sites" FromRole="SiteBilling" ToRole="Site" />
-        </EntityType>
-        <EntityType Name="SiteBudget">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="SiteId" Type="Int32" Nullable="false" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="BudgetYear" Type="Int32" Nullable="false" />
-          <Property Name="January" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="February" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="March" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="April" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="May" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="June" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="July" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="August" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="September" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="October" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="November" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="December" Type="Decimal" Precision="18" Scale="2" />
-          <Property Name="Status" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Site" Relationship="ACTModel.FK_SiteBudgets_Sites" FromRole="SiteBudget" ToRole="Site" />
         </EntityType>
         <EntityType Name="SystemConfig">
           <Key>
@@ -4467,18 +4443,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_SiteBudgets_Sites">
-          <End Type="ACTModel.Site" Role="Site" Multiplicity="1" />
-          <End Type="ACTModel.SiteBudget" Role="SiteBudget" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Site">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="SiteBudget">
-              <PropertyRef Name="SiteId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Sites_Sites">
           <End Type="ACTModel.Site" Role="Site" Multiplicity="0..1" />
           <End Type="ACTModel.Site" Role="Site1" Multiplicity="*" />
@@ -4794,6 +4758,44 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="Region">
               <PropertyRef Name="PSPId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="SiteBudget">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SiteId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="BudgetYear" Type="Int32" Nullable="false" />
+          <Property Name="January" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="February" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="March" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="April" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="May" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="June" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="July" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="August" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="September" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="October" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="November" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="December" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="Total" Type="Int32" />
+          <NavigationProperty Name="Site" Relationship="ACTModel.FK_SiteBudgets_Sites" FromRole="SiteBudget" ToRole="Site" />
+        </EntityType>
+        <Association Name="FK_SiteBudgets_Sites">
+          <End Type="ACTModel.Site" Role="Site" Multiplicity="1" />
+          <End Type="ACTModel.SiteBudget" Role="SiteBudget" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Site">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SiteBudget">
+              <PropertyRef Name="SiteId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -5636,31 +5638,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="SiteBudgets">
-            <EntityTypeMapping TypeName="ACTModel.SiteBudget">
-              <MappingFragment StoreEntitySet="SiteBudget">
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="December" ColumnName="December" />
-                <ScalarProperty Name="November" ColumnName="November" />
-                <ScalarProperty Name="October" ColumnName="October" />
-                <ScalarProperty Name="September" ColumnName="September" />
-                <ScalarProperty Name="August" ColumnName="August" />
-                <ScalarProperty Name="July" ColumnName="July" />
-                <ScalarProperty Name="June" ColumnName="June" />
-                <ScalarProperty Name="May" ColumnName="May" />
-                <ScalarProperty Name="April" ColumnName="April" />
-                <ScalarProperty Name="March" ColumnName="March" />
-                <ScalarProperty Name="February" ColumnName="February" />
-                <ScalarProperty Name="January" ColumnName="January" />
-                <ScalarProperty Name="BudgetYear" ColumnName="BudgetYear" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="SiteId" ColumnName="SiteId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="SystemConfigs">
             <EntityTypeMapping TypeName="ACTModel.SystemConfig">
               <MappingFragment StoreEntitySet="SystemConfig">
@@ -5990,6 +5967,32 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
                 <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SiteBudgets">
+            <EntityTypeMapping TypeName="ACTModel.SiteBudget">
+              <MappingFragment StoreEntitySet="SiteBudget">
+                <ScalarProperty Name="Total" ColumnName="Total" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="December" ColumnName="December" />
+                <ScalarProperty Name="November" ColumnName="November" />
+                <ScalarProperty Name="October" ColumnName="October" />
+                <ScalarProperty Name="September" ColumnName="September" />
+                <ScalarProperty Name="August" ColumnName="August" />
+                <ScalarProperty Name="July" ColumnName="July" />
+                <ScalarProperty Name="June" ColumnName="June" />
+                <ScalarProperty Name="May" ColumnName="May" />
+                <ScalarProperty Name="April" ColumnName="April" />
+                <ScalarProperty Name="March" ColumnName="March" />
+                <ScalarProperty Name="February" ColumnName="February" />
+                <ScalarProperty Name="January" ColumnName="January" />
+                <ScalarProperty Name="BudgetYear" ColumnName="BudgetYear" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="SiteId" ColumnName="SiteId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
