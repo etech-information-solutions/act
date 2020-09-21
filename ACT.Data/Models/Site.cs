@@ -22,8 +22,8 @@ namespace ACT.Data.Models
             this.ClientSites = new HashSet<ClientSite>();
             this.SiteAudits = new HashSet<SiteAudit>();
             this.SiteBillings = new HashSet<SiteBilling>();
-            this.Site1 = new HashSet<Site>();
             this.SiteBudgets = new HashSet<SiteBudget>();
+            this.Site1 = new HashSet<Site>();
         }
     
         public int Id { get; set; }
@@ -50,6 +50,11 @@ namespace ACT.Data.Models
         public string FinanceContactNo { get; set; }
         public string ReceivingContact { get; set; }
         public string ReceivingContactNo { get; set; }
+        public string DepotManager { get; set; }
+        public string DepotManagerContact { get; set; }
+        public string FinanceEmail { get; set; }
+        public string ReceivingEmail { get; set; }
+        public string DepotManagerEmail { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepAudit> ChepAudits { get; set; }
@@ -63,9 +68,9 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SiteBilling> SiteBillings { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SiteBudget> SiteBudgets { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Site> Site1 { get; set; }
         public virtual Site Site2 { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SiteBudget> SiteBudgets { get; set; }
     }
 }

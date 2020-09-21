@@ -46,6 +46,8 @@ namespace ACT.Data.Models
         public string THAN { get; set; }
         public string ShipmentNo { get; set; }
         public string IssueNote { get; set; }
+        public string ChepCreatedBy { get; set; }
+        public Nullable<System.DateTime> ChepCreateOn { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }

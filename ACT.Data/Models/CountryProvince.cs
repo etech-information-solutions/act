@@ -12,17 +12,10 @@ namespace ACT.Data.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class PSPUser
+    public partial class CountryProvince
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
-        public int PSPId { get; set; }
-        public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModifiedOn { get; set; }
-        public string ModifiedBy { get; set; }
-        public int Status { get; set; }
-    
-        public virtual PSP PSP { get; set; }
-        public virtual User User { get; set; }
+        public Nullable<int> CountryId { get; set; }
+        public Nullable<int> ProvinceId { get; set; }
     }
 }

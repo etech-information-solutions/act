@@ -35,6 +35,7 @@ namespace ACT.Data.Models
         public virtual DbSet<ChepLoad> ChepLoads { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
+        public virtual DbSet<ClientBudget> ClientBudgets { get; set; }
         public virtual DbSet<ClientGroup> ClientGroups { get; set; }
         public virtual DbSet<ClientInvoice> ClientInvoices { get; set; }
         public virtual DbSet<ClientKPI> ClientKPIs { get; set; }
@@ -45,11 +46,13 @@ namespace ACT.Data.Models
         public virtual DbSet<ClientUser> ClientUsers { get; set; }
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Contact> Contacts { get; set; }
+        public virtual DbSet<CountryProvince> CountryProvinces { get; set; }
         public virtual DbSet<DeclineReason> DeclineReasons { get; set; }
         public virtual DbSet<DeliveryNote> DeliveryNotes { get; set; }
         public virtual DbSet<DeliveryNoteLine> DeliveryNoteLines { get; set; }
         public virtual DbSet<Dispute> Disputes { get; set; }
         public virtual DbSet<Document> Documents { get; set; }
+        public virtual DbSet<EstimatedLoad> EstimatedLoads { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<Image> Images { get; set; }
         public virtual DbSet<Invoice> Invoices { get; set; }
@@ -58,7 +61,9 @@ namespace ACT.Data.Models
         public virtual DbSet<OutstandingReason> OutstandingReasons { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<ProductPrice> ProductPrices { get; set; }
+        public virtual DbSet<PSP> PSPs { get; set; }
         public virtual DbSet<PSPBilling> PSPBillings { get; set; }
+        public virtual DbSet<PSPBudget> PSPBudgets { get; set; }
         public virtual DbSet<PSPClient> PSPClients { get; set; }
         public virtual DbSet<PSPConfig> PSPConfigs { get; set; }
         public virtual DbSet<PSPProduct> PSPProducts { get; set; }
@@ -68,6 +73,7 @@ namespace ACT.Data.Models
         public virtual DbSet<Site> Sites { get; set; }
         public virtual DbSet<SiteAudit> SiteAudits { get; set; }
         public virtual DbSet<SiteBilling> SiteBillings { get; set; }
+        public virtual DbSet<SiteBudget> SiteBudgets { get; set; }
         public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
         public virtual DbSet<Task> Tasks { get; set; }
         public virtual DbSet<Token> Tokens { get; set; }
@@ -80,10 +86,5 @@ namespace ACT.Data.Models
         public virtual DbSet<UserTask> UserTasks { get; set; }
         public virtual DbSet<Vehicle> Vehicles { get; set; }
         public virtual DbSet<PSPPeriod> PSPPeriods { get; set; }
-        public virtual DbSet<EstimatedLoad> EstimatedLoads { get; set; }
-        public virtual DbSet<ClientBudget> ClientBudgets { get; set; }
-        public virtual DbSet<PSPBudget> PSPBudgets { get; set; }
-        public virtual DbSet<PSP> PSPs { get; set; }
-        public virtual DbSet<SiteBudget> SiteBudgets { get; set; }
     }
 }

@@ -30,6 +30,17 @@ namespace ACT.Data.Models
         public string ModifiedBy { get; set; }
         public string AccountingCode { get; set; }
         public int Status { get; set; }
+        public string GLIDNo { get; set; }
+        public Nullable<int> SiteType { get; set; }
+        public string KAMName { get; set; }
+        public string KAMContact { get; set; }
+        public string KAMEmail { get; set; }
+        public string ClientSalesManager { get; set; }
+        public string ClientManagerContact { get; set; }
+        public string ClientManagerEmail { get; set; }
+        public string ClientSalesRep { get; set; }
+        public string ClientSalesRepContact { get; set; }
+        public string ClientSalesRegEmail { get; set; }
     
         public virtual Client Client { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

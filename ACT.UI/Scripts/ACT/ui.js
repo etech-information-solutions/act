@@ -2063,6 +2063,7 @@
             sender.each( function ()
             {
                 var i = $( this );
+
                 var papa = i.parent();
                 var total = papa.find( ".pr-total" );
 
