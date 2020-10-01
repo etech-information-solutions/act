@@ -22,7 +22,7 @@ namespace ACT.Core.Models.Custom
         public string Password { get; set; }
         public Nullable<System.DateTime> PasswordDate { get; set; }
 
-        public int RoleId { get; set; }
+        public int? RoleId { get; set; }
         public string RoleName { get; set; }
     }
 }
