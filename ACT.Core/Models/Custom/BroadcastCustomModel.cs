@@ -20,5 +20,9 @@ namespace ACT.Core.Models.Custom
 
         public string PSPName { get; set; }
         public string ClientName { get; set; }
+
+        public int ResponseCode { get; set; }
+
+        public string Description { get; set; }
     }
 }

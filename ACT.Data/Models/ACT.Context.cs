@@ -78,7 +78,6 @@ namespace ACT.Data.Models
         public virtual DbSet<Task> Tasks { get; set; }
         public virtual DbSet<Token> Tokens { get; set; }
         public virtual DbSet<Transporter> Transporters { get; set; }
-        public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserBroadcast> UserBroadcasts { get; set; }
         public virtual DbSet<UserDocument> UserDocuments { get; set; }
         public virtual DbSet<UserNotification> UserNotifications { get; set; }
@@ -86,5 +85,6 @@ namespace ACT.Data.Models
         public virtual DbSet<UserTask> UserTasks { get; set; }
         public virtual DbSet<Vehicle> Vehicles { get; set; }
         public virtual DbSet<PSPPeriod> PSPPeriods { get; set; }
+        public virtual DbSet<User> Users { get; set; }
     }
 }

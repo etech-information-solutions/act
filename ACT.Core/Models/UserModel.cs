@@ -34,6 +34,8 @@ namespace ACT.Core.Models
 
         public string TaxNumber { get; set; }
 
+        public string Pin { get; set; }
+
         public bool IsSAId { get; set; }
 
         public DateTime? DateOfBirth { get; set; }

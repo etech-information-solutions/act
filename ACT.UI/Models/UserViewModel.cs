@@ -54,6 +54,10 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ConfirmPassword { get; set; }
 
+        public string Pin { get; set; }
+
+        public string ConfirmPin { get; set; }
+
 
 
         //[Required]

@@ -63,22 +63,33 @@ namespace ACT.Core.Services
         /// <summary>
         /// Currently logged in user
         /// </summary>
+        private UserModel currentUser;
         public UserModel CurrentUser
         {
             get
             {
+                if ( currentUser != null ) return currentUser;
+
                 if ( HttpContext.Current == null )
                     return null;
 
                 string email = HttpContext.Current.User.Identity.Name;
 
+                if ( string.IsNullOrEmpty( email ) )
+                    return null;
 
                 if ( !( ContextExtensions.GetCachedUserData( email ) is UserModel user ) )
                 {
                     user = GetUser( email );
                 }
 
-                return user ?? new UserModel() { Id = 0 };
+                currentUser = user ?? new UserModel() { Id = 0 };
+
+                return currentUser;
+            }
+            set
+            {
+                currentUser = value;
             }
         }
 
@@ -99,7 +110,7 @@ namespace ACT.Core.Services
         /// <param name="email">Email Address of the user to be fetched</param>
         /// <param name="password">Password of the user to be fetched</param>
         /// <returns></returns>
-        public UserModel Login( string email, string password )
+        public UserModel Login( string email, string password, bool resetPin = false )
         {
             if ( string.IsNullOrEmpty( email ) || string.IsNullOrEmpty( password ) ) return null;
 
@@ -117,6 +128,7 @@ namespace ACT.Core.Services
                       select new UserModel()
                       {
                           Id = u.Id,
+                          Pin = u.Pin,
                           Cell = u.Cell,
                           Name = u.Name,
                           Email = u.Email,
@@ -125,6 +137,7 @@ namespace ACT.Core.Services
                           Status = ( Status ) u.Status,
                           RoleType = ( RoleType ) u.Type,
                           DisplayName = u.Name + " " + u.Surname,
+
                           NiceCreatedOn = u.CreatedOn,
                           IsAdmin = u.UserRoles.Any( ur => ur.Role.Administration ),
 
@@ -132,7 +145,10 @@ namespace ACT.Core.Services
                                              .OrderByDescending( r => r.Id )
                                              .ToList(),
                           PSPs = u.PSPUsers.Select( p => p.PSP ).ToList(),
-                          Clients = u.ClientUsers.Select( c => c.Client ).ToList()
+                          Clients = u.ClientUsers.Select( c => c.Client ).ToList(),
+                          SelfieUrl = context.Images
+                                             .Where( a => a.ObjectId == u.Id && a.ObjectType == "User" && a.Name.ToLower() == "selfie" )
+                                             .Select( s => SystemConfig.ImagesLocation + "//" + s.Location ).FirstOrDefault(),
                       } ).FirstOrDefault();
 
             if ( model != null )
@@ -140,16 +156,17 @@ namespace ACT.Core.Services
                 // Get roles
                 model = this.ConfigRoles( model );
 
-                //User user = context.Users.FirstOrDefault( u => u.Id == model.Id );
+                User user = context.Users.FirstOrDefault( u => u.Id == model.Id );
 
-                //user.LastLogin = DateTime.Now;
+                if ( resetPin )
+                {
+                    user.Pin = null;
+                }
 
-                //context.Entry( user ).State = EntityState.Modified;
-                //context.SaveChanges();
-                //if (model.PSPs.Any())
-                //{
-                //    System.Web.Session["UserPSP"] = model.PSPs.FirstOrDefault() .ToString();
-                //}
+                user.LastLogin = DateTime.Now;
+
+                context.Entry( user ).State = EntityState.Modified;
+                context.SaveChanges();
 
                 ContextExtensions.CacheUserData( model.Email, model );
             }
@@ -177,6 +194,7 @@ namespace ACT.Core.Services
                       select new UserModel()
                       {
                           Id = u.Id,
+                          Pin = u.Pin,
                           Cell = u.Cell,
                           Name = u.Name,
                           Email = u.Email,
@@ -185,13 +203,18 @@ namespace ACT.Core.Services
                           Status = ( Status ) u.Status,
                           RoleType = ( RoleType ) u.Type,
                           DisplayName = u.Name + " " + u.Surname,
+
                           NiceCreatedOn = u.CreatedOn,
                           IsAdmin = u.UserRoles.Any( ur => ur.Role.Administration ),
+
                           Roles = u.UserRoles.Select( ur => ur.Role )
                                              .OrderByDescending( r => r.Id )
                                              .ToList(),
                           PSPs = u.PSPUsers.Select( p => p.PSP ).ToList(),
-                          Clients = u.ClientUsers.Select( c => c.Client ).ToList()
+                          Clients = u.ClientUsers.Select( c => c.Client ).ToList(),
+                          SelfieUrl = context.Images
+                                             .Where( a => a.ObjectId == u.Id && a.ObjectType == "User" && a.Name.ToLower() == "selfie" )
+                                             .Select( s => SystemConfig.ImagesLocation + "//" + s.Location ).FirstOrDefault(),
                       } ).FirstOrDefault();
 
 
@@ -260,6 +283,20 @@ namespace ACT.Core.Services
             model.RoleModel = role;
 
             return model;
+        }
+
+        /// <summary>
+        /// Gets a user using the specified pin
+        /// </summary>
+        /// <param name="pin"></param>
+        /// <returns></returns>
+        public UserModel GetByPin( string pin, string email )
+        {
+            pin = GetSha1Md5String( pin );
+
+            User user = context.Users.FirstOrDefault( u => u.Pin == pin && u.Email == email );
+
+            return ( user != null ) ? GetUser( user.Email ) : null;
         }
 
 

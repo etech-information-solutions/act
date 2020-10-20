@@ -128,14 +128,13 @@ namespace ACT.Core.Services
             // Limit to only show Sites for logged in user
             if ( !CurrentUser.IsAdmin )
             {
-                query = $@"{query} AND EXISTS(SELECT
-                                                1
-                                              FROM
-                                                [dbo].[PSPClient] pc
-                                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.ClientId=pc.ClientId
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu
+                                                       INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId
+                                                       LEFT OUTER JOIN [dbo].[ClientSite] cs ON pc.ClientId=cs.ClientId
                                               WHERE
-                                                s.Id = cs.SiteId AND
-                                                pc.UserId = @userid) ";
+                                                cs.SiteId=s.Id AND
+                                                pu.UserId=@userid
+                                             ) ";
             }
 
             #endregion
@@ -265,17 +264,16 @@ namespace ACT.Core.Services
 
             query = $"{query} WHERE (1=1)";
 
-            // Limit to only show Sites for logged in user
+            // Limit to only show Sites for logged in user 
             if ( !CurrentUser.IsAdmin )
             {
-                query = $@"{query} AND EXISTS(SELECT
-                                                1
-                                              FROM
-                                                [dbo].[PSPClient] pc
-                                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.ClientId=pc.ClientId
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu
+                                                       INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId
+                                                       LEFT OUTER JOIN [dbo].[ClientSite] cs ON pc.ClientId=cs.ClientId
                                               WHERE
-                                                s.Id = cs.SiteId AND
-                                                pc.UserId = @userid) ";
+                                                cs.SiteId=s.Id AND
+                                                pu.UserId=@userid
+                                             ) ";
             }
 
             #endregion

@@ -24,6 +24,14 @@ namespace ACT.Core.Services
             return base.GetById( id );
         }
 
+        public override List<Broadcast> List( PagingModel pm, CustomSearchModel csm )
+        {
+            base.context.Configuration.LazyLoadingEnabled = true;
+            base.context.Configuration.ProxyCreationEnabled = true;
+
+            return base.List();
+        }
+
         public int Total1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
@@ -114,7 +122,7 @@ namespace ACT.Core.Services
             return model.Total;
         }
 
-        public List<BroadcastCustomModel> ListCSM( PagingModel pm, CustomSearchModel csm )
+        public List<BroadcastCustomModel> List1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {

@@ -50,11 +50,14 @@ namespace ACT.Core.Services
             {
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmPSPId", csm.PSPId ) },
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmSact", csm.Status ) },
             };
 
             #endregion
@@ -63,7 +66,10 @@ namespace ACT.Core.Services
 	                            COUNT(sa.[Id]) AS [Total]
                              FROM
 	                            [dbo].[SiteAudit] sa
-                                INNER JOIN [dbo].[Site] s ON s.[Id]=sa.[SiteId]";
+                                INNER JOIN [dbo].[Site] s ON s.[Id]=sa.[SiteId]
+                                LEFT OUTER JOIN [dbo].[Client] c ON c.[Id]=sa.[ClientId]
+                                LEFT OUTER JOIN [dbo].[PSPClient] pc ON pc.[ClientId]=c.[Id]
+                                LEFT OUTER JOIN [dbo].[PSP] p ON pc.[PSPId]=p.[Id]";
 
             // WHERE
 
@@ -90,6 +96,14 @@ namespace ACT.Core.Services
             if ( csm.SiteId != 0 )
             {
                 query = $"{query} AND (sa.SiteId=@csmSiteId) ";
+            }
+            if ( csm.ClientId != 0 )
+            {
+                query = $"{query} AND (sa.ClientId=@csmClientId) ";
+            }
+            if ( csm.PSPId != 0 )
+            {
+                query = $"{query} AND (sa.PSPId=@csmPSPId) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -118,6 +132,11 @@ namespace ACT.Core.Services
             {
                 query = string.Format( @"{0} AND (s.[Name] LIKE '%{1}%' OR
                                                   s.[Description] LIKE '%{1}%' OR
+                                                  c.[CompanyName] LIKE '%{1}%' OR
+                                                  c.[ChepReference] LIKE '%{1}%' OR
+                                                  c.[ContactPerson] LIKE '%{1}%' OR
+                                                  p.[CompanyName] LIKE '%{1}%' OR
+                                                  p.[ContactPerson] LIKE '%{1}%' OR
                                                   sa.[Equipment] LIKE '%{1}%' OR
                                                   sa.[CustomerName] LIKE '%{1}%' OR
                                                   sa.[RepName] LIKE '%{1}%' OR
@@ -153,12 +172,14 @@ namespace ACT.Core.Services
             {
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmPSPId", csm.PSPId ) },
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmSact", ( object ) Status.Active ) },
+                { new SqlParameter( "csmSact", csm.Status ) },
             };
 
             #endregion
@@ -166,10 +187,15 @@ namespace ACT.Core.Services
             string query = @"SELECT
 	                            sa.*,
 	                            s.Name AS [SiteName],
+	                            p.CompanyName AS [PSPName],
+	                            c.CompanyName AS [ClientName],
 	                            (SELECT TOP 1 d.Id FROM [dbo].[Document] d WHERE d.ObjectId=sa.Id AND d.ObjectType='SiteAudit' AND d.Status=@csmSact) AS [ReportDocumentId]
                              FROM
 	                            [dbo].[SiteAudit] sa
-                                INNER JOIN [dbo].[Site] s ON s.[Id]=sa.[SiteId]";
+                                INNER JOIN [dbo].[Site] s ON s.[Id]=sa.[SiteId]
+                                LEFT OUTER JOIN [dbo].[Client] c ON c.[Id]=sa.[ClientId]
+                                LEFT OUTER JOIN [dbo].[PSPClient] pc ON pc.[ClientId]=c.[Id]
+                                LEFT OUTER JOIN [dbo].[PSP] p ON pc.[PSPId]=p.[Id]";
 
             // WHERE
 
@@ -196,6 +222,14 @@ namespace ACT.Core.Services
             if ( csm.SiteId != 0 )
             {
                 query = $"{query} AND (sa.SiteId=@csmSiteId) ";
+            }
+            if ( csm.ClientId != 0 )
+            {
+                query = $"{query} AND (sa.ClientId=@csmClientId) ";
+            }
+            if ( csm.PSPId != 0 )
+            {
+                query = $"{query} AND (sa.PSPId=@csmPSPId) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -224,6 +258,11 @@ namespace ACT.Core.Services
             {
                 query = string.Format( @"{0} AND (s.[Name] LIKE '%{1}%' OR
                                                   s.[Description] LIKE '%{1}%' OR
+                                                  c.[CompanyName] LIKE '%{1}%' OR
+                                                  c.[ChepReference] LIKE '%{1}%' OR
+                                                  c.[ContactPerson] LIKE '%{1}%' OR
+                                                  p.[CompanyName] LIKE '%{1}%' OR
+                                                  p.[ContactPerson] LIKE '%{1}%' OR
                                                   sa.[Equipment] LIKE '%{1}%' OR
                                                   sa.[CustomerName] LIKE '%{1}%' OR
                                                   sa.[RepName] LIKE '%{1}%' OR

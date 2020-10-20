@@ -190,6 +190,7 @@
     <Compile Include="Models\JsonCommonModel.cs" />
     <Compile Include="Models\CountModel.cs" />
     <Compile Include="Models\KeyValueModel.cs" />
+    <Compile Include="Models\Simple\SimpleOutstandingPallets.cs" />
     <Compile Include="Models\Simple\SimpleBankModel.cs" />
     <Compile Include="Models\CustomSearchModel.cs" />
     <Compile Include="Models\EmailModel.cs" />

@@ -1,0 +1,154 @@
+
+<ion-content [fullscreen]="true">
+
+  <div style="background-color: #ffffff; text-align: center; padding: 10px 0; margin-bottom: 25px; box-shadow: 0 8px 20px -4px #d2d0d0;">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="2">
+          <img (click)="this.auth.OnShowContact()" alt="Contact" src="../../assets/imgs/contact.png" />
+        </ion-col>
+        <ion-col size="10" style="height: 120px;">
+          <img alt="ACT - Pallet Solutions" height="100%" src="../../assets/imgs/act-logo.png" />
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <div style="text-align: center; margin: 0 2%; width: auto;">
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="3">
+          <ion-avatar style="width: 60px; height: 60px;">
+            <img alt="User Profile" [src]="this.auth.SelfieUrl" />
+          </ion-avatar>
+        </ion-col>
+        <ion-col size="9" class="ion-align-self-center ion-text-left">
+          <ion-label *ngIf="this.auth.DeviceUser != undefined">
+            Hello, {{this.auth.DeviceUser.DisplayName}}
+          </ion-label>
+      
+          <ion-label *ngIf="this.auth.DeviceUser == undefined">
+              Hello, enter your <b>Email</b> and <b>Password</b>:
+          </ion-label>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+  </div>
+
+  <div *ngIf="this.auth.DeviceUser != undefined && this.auth.DeviceUser.Pin != undefined" style="margin-top: 20px; text-align: center; padding: 0 10px;">
+
+    <p>
+      Enter your 5 digit pin:
+    </p>
+  
+    <ul class="pin">
+      <li>
+        <img [src]="Pin1" />
+      </li>
+      <li>
+        <img [src]="Pin2" />
+      </li>
+      <li>
+        <img [src]="Pin3" />
+      </li>
+      <li>
+        <img [src]="Pin4" />
+      </li>
+      <li>
+        <img [src]="Pin5" />
+      </li>
+    </ul>
+
+    <ul class="pin number">
+      <li>
+        <img [src]="Number1" (click)="SetPin(1)" />
+      </li>
+      <li>
+        <img [src]="Number2" (click)="SetPin(2)" />
+      </li>
+      <li>
+        <img [src]="Number3" (click)="SetPin(3)" />
+      </li>
+      <li>
+        <img [src]="Number4" (click)="SetPin(4)" />
+      </li>
+      <li>
+        <img [src]="Number5" (click)="SetPin(5)" />
+      </li>
+      <li>
+        <img [src]="Number6" (click)="SetPin(6)" />
+      </li>
+      <li>
+        <img [src]="Number7" (click)="SetPin(7)" />
+      </li>
+      <li>
+        <img [src]="Number8" (click)="SetPin(8)" />
+      </li>
+      <li>
+        <img [src]="Number9" (click)="SetPin(9)" />
+      </li>
+      <li style="font-size: 13px; color: #012d71 !important;">
+        <a (click)="ForgotPin()">FORGOT PIN</a>
+        <br />
+        <br />
+      </li>
+      <li>
+        <img [src]="Number0" (click)="SetPin(0)" />
+      </li>
+      <li style="font-size: 30px; color: #012d71 !important;">
+        <ion-icon name="arrow-back-outline" (click)="SetPin(-1)" style="margin-bottom: 10px;"></ion-icon>
+      </li>
+    </ul>
+
+    <div *ngIf="FingerPrintAvailable" style="text-align: center; margin: 20px 40% 10px 39.5%; width: 30%;">
+  
+      <ion-avatar (click)="ShowFingerPrint()" style="width: 80px; height: 80px;">
+        <img alt="FingerPrint" src="../../assets/imgs/fingerprint.jpg" />
+      </ion-avatar>
+  
+    </div>
+
+  </div>
+
+  <div *ngIf="this.auth.DeviceUser == undefined || (this.auth.DeviceUser != undefined && this.auth.DeviceUser.Pin == undefined)" style="margin-top: 20px;">
+
+    <form (submit)="SignIn()">
+
+      <ion-item>
+        <ion-label position="floating">Email Address</ion-label>
+        <ion-input type="email" name="Email" [(ngModel)]="Email"></ion-input>
+      </ion-item>
+      
+      <ion-item>
+        <ion-label position="floating">Password</ion-label>
+        <ion-input type="password" name="Password" [(ngModel)]="Password"></ion-input>
+      </ion-item>
+      
+      <div style="margin-top: 30px; padding: 0 10px;">
+
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6">
+              <ion-button color="tertiary" type="submit" shape="round" expand="full" style="margin-bottom: 10px;">
+                SIGN IN
+                <ion-icon name="log-in" slot="end"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="6">
+              <ion-button margin-top color="warning" type="button" (click)="ForgotPassword()" shape="round" expand="full">
+                RESET
+                <ion-icon name="construct" slot="end"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        
+      </div>
+  
+    </form>
+
+  </div>
+
+</ion-content>

@@ -1,5 +1,7 @@
 {
   "name": "ACT.Mobile",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

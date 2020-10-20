@@ -3665,7 +3665,7 @@ namespace ACT.UI.Controllers
 
             using ( BroadcastService service = new BroadcastService() )
             {
-                model = service.ListCSM( pm, csm );
+                model = service.List1( pm, csm );
                 total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
             }
 

@@ -7,7 +7,9 @@ namespace ACT.Core.Models.Custom
     public partial class SiteAuditCustomModel
     {
         public int Id { get; set; }
+        public int PSPId { get; set; }
         public int SiteId { get; set; }
+        public int ClientId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -25,7 +27,9 @@ namespace ACT.Core.Models.Custom
         public string DocumentLocation { get; set; }
         public int Status { get; set; }
 
+        public string PSPName { get; set; }
         public string SiteName { get; set; }
+        public string ClientName { get; set; }
 
         public int? ReportDocumentId { get; set; }
     }

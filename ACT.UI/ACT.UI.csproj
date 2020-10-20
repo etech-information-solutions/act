@@ -150,6 +150,8 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\api\AccountController.cs" />
+    <Compile Include="Controllers\api\PalletController.cs" />
     <Compile Include="Controllers\ClientReportingController.cs" />
     <Compile Include="Controllers\DashBoardController.cs" />
     <Compile Include="Models\AuthorisationCodeViewModel.cs" />

@@ -1092,6 +1092,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="LastLogin" Type="datetime" />
           <Property Name="Password" Type="varchar" MaxLength="50" />
           <Property Name="PasswordDate" Type="datetime" />
+          <Property Name="Pin" Type="varchar" MaxLength="250" />
         </EntityType>
         <EntityType Name="UserBroadcast">
           <Key>
@@ -2439,7 +2440,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySet Name="Tasks" EntityType="ACTModel.Task" />
           <EntitySet Name="Tokens" EntityType="ACTModel.Token" />
           <EntitySet Name="Transporters" EntityType="ACTModel.Transporter" />
-          <EntitySet Name="Users" EntityType="ACTModel.User" />
           <EntitySet Name="UserBroadcasts" EntityType="ACTModel.UserBroadcast" />
           <EntitySet Name="UserDocuments" EntityType="ACTModel.UserDocument" />
           <EntitySet Name="UserNotifications" EntityType="ACTModel.UserNotification" />
@@ -2583,24 +2583,12 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="ClientSite" EntitySet="ClientSites" />
             <End Role="DeliveryNote" EntitySet="DeliveryNotes" />
           </AssociationSet>
-          <AssociationSet Name="FK_ClientUsers_Users" Association="ACTModel.FK_ClientUsers_Users">
-            <End Role="User" EntitySet="Users" />
-            <End Role="ClientUser" EntitySet="ClientUsers" />
-          </AssociationSet>
           <AssociationSet Name="FK_DeliveryNoteLines_DeliveryNote" Association="ACTModel.FK_DeliveryNoteLines_DeliveryNote">
             <End Role="DeliveryNote" EntitySet="DeliveryNotes" />
             <End Role="DeliveryNoteLine" EntitySet="DeliveryNoteLines" />
           </AssociationSet>
           <AssociationSet Name="FK_Dispute_Product" Association="ACTModel.FK_Dispute_Product">
             <End Role="Product" EntitySet="Products" />
-            <End Role="Dispute" EntitySet="Disputes" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Dispute_User" Association="ACTModel.FK_Dispute_User">
-            <End Role="User" EntitySet="Users" />
-            <End Role="Dispute" EntitySet="Disputes" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Dispute_User1" Association="ACTModel.FK_Dispute_User1">
-            <End Role="User" EntitySet="Users" />
             <End Role="Dispute" EntitySet="Disputes" />
           </AssociationSet>
           <AssociationSet Name="FK_Journal_Document" Association="ACTModel.FK_Journal_Document">
@@ -2663,14 +2651,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="PSPProduct" EntitySet="PSPProducts" />
             <End Role="PSPBilling" EntitySet="PSPBillings" />
           </AssociationSet>
-          <AssociationSet Name="FK_PSPUser_User" Association="ACTModel.FK_PSPUser_User">
-            <End Role="User" EntitySet="Users" />
-            <End Role="PSPUser" EntitySet="PSPUsers" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Regions_Users" Association="ACTModel.FK_Regions_Users">
-            <End Role="User" EntitySet="Users" />
-            <End Role="Region" EntitySet="Regions" />
-          </AssociationSet>
           <AssociationSet Name="FK_Sites_Regions" Association="ACTModel.FK_Sites_Regions">
             <End Role="Region" EntitySet="Regions" />
             <End Role="Site" EntitySet="Sites" />
@@ -2699,6 +2679,27 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="Task" EntitySet="Tasks" />
             <End Role="UserTask" EntitySet="UserTasks" />
           </AssociationSet>
+          <EntitySet Name="Users" EntityType="ACTModel.User" />
+          <AssociationSet Name="FK_ClientUsers_Users" Association="ACTModel.FK_ClientUsers_Users">
+            <End Role="User" EntitySet="Users" />
+            <End Role="ClientUser" EntitySet="ClientUsers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Dispute_User" Association="ACTModel.FK_Dispute_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Dispute" EntitySet="Disputes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Dispute_User1" Association="ACTModel.FK_Dispute_User1">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Dispute" EntitySet="Disputes" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PSPUser_User" Association="ACTModel.FK_PSPUser_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="PSPUser" EntitySet="PSPUsers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Regions_Users" Association="ACTModel.FK_Regions_Users">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Region" EntitySet="Regions" />
+          </AssociationSet>
           <AssociationSet Name="FK_Token_User" Association="ACTModel.FK_Token_User">
             <End Role="User" EntitySet="Users" />
             <End Role="Token" EntitySet="Tokens" />
@@ -2723,7 +2724,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="User" EntitySet="Users" />
             <End Role="UserTask" EntitySet="UserTasks" />
           </AssociationSet>
-        </EntityContainer>
+          </EntityContainer>
         <EntityType Name="Address">
           <Key>
             <PropertyRef Name="Id" />
@@ -3644,8 +3645,8 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Description" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="PSP" Relationship="ACTModel.FK_Regions_PSP" FromRole="Region" ToRole="PSP" />
-          <NavigationProperty Name="User" Relationship="ACTModel.FK_Regions_Users" FromRole="Region" ToRole="User" />
           <NavigationProperty Name="Sites" Relationship="ACTModel.FK_Sites_Regions" FromRole="Region" ToRole="Site" />
+          <NavigationProperty Name="User" Relationship="ACTModel.FK_Regions_Users" FromRole="Region" ToRole="User" />
         </EntityType>
         <EntityType Name="Role">
           <Key>
@@ -3860,35 +3861,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="RegistrationNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="ClientAuthorisations" Relationship="ACTModel.FK_ClientAuthorisation_Transporter" FromRole="Transporter" ToRole="ClientAuthorisation" />
-        </EntityType>
-        <EntityType Name="User">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Type" Type="Int32" />
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Surname" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Email" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="Cell" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Status" Type="Int32" Nullable="false" />
-          <Property Name="LastLogin" Type="DateTime" Precision="3" />
-          <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="PasswordDate" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="ClientUsers" Relationship="ACTModel.FK_ClientUsers_Users" FromRole="User" ToRole="ClientUser" />
-          <NavigationProperty Name="Disputes" Relationship="ACTModel.FK_Dispute_User" FromRole="User" ToRole="Dispute" />
-          <NavigationProperty Name="Disputes1" Relationship="ACTModel.FK_Dispute_User1" FromRole="User" ToRole="Dispute" />
-          <NavigationProperty Name="PSPUsers" Relationship="ACTModel.FK_PSPUser_User" FromRole="User" ToRole="PSPUser" />
-          <NavigationProperty Name="Regions" Relationship="ACTModel.FK_Regions_Users" FromRole="User" ToRole="Region" />
-          <NavigationProperty Name="Tokens" Relationship="ACTModel.FK_Token_User" FromRole="User" ToRole="Token" />
-          <NavigationProperty Name="UserBroadcasts" Relationship="ACTModel.FK_UserBroadcast_User" FromRole="User" ToRole="UserBroadcast" />
-          <NavigationProperty Name="UserDocuments" Relationship="ACTModel.FK_UserDocument_User" FromRole="User" ToRole="UserDocument" />
-          <NavigationProperty Name="UserNotifications" Relationship="ACTModel.FK_UserNotification_User" FromRole="User" ToRole="UserNotification" />
-          <NavigationProperty Name="UserRoles" Relationship="ACTModel.FK_UserRoles_Users" FromRole="User" ToRole="UserRole" />
-          <NavigationProperty Name="UserTasks" Relationship="ACTModel.FK_UserTask_User" FromRole="User" ToRole="UserTask" />
         </EntityType>
         <EntityType Name="UserBroadcast">
           <Key>
@@ -4429,18 +4401,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ClientUsers_Users">
-          <End Type="ACTModel.User" Role="User" Multiplicity="1" />
-          <End Type="ACTModel.ClientUser" Role="ClientUser" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ClientUser">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_DeliveryNoteLines_DeliveryNote">
           <End Type="ACTModel.DeliveryNote" Role="DeliveryNote" Multiplicity="1" />
           <End Type="ACTModel.DeliveryNoteLine" Role="DeliveryNoteLine" Multiplicity="*" />
@@ -4462,30 +4422,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="Dispute">
               <PropertyRef Name="ProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Dispute_User">
-          <End Type="ACTModel.User" Role="User" Multiplicity="0..1" />
-          <End Type="ACTModel.Dispute" Role="Dispute" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Dispute">
-              <PropertyRef Name="ActionedById" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Dispute_User1">
-          <End Type="ACTModel.User" Role="User" Multiplicity="0..1" />
-          <End Type="ACTModel.Dispute" Role="Dispute" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Dispute">
-              <PropertyRef Name="ResolvedById" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4673,30 +4609,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_PSPUser_User">
-          <End Type="ACTModel.User" Role="User" Multiplicity="1" />
-          <End Type="ACTModel.PSPUser" Role="PSPUser" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PSPUser">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Regions_Users">
-          <End Type="ACTModel.User" Role="User" Multiplicity="0..1" />
-          <End Type="ACTModel.Region" Role="Region" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Region">
-              <PropertyRef Name="RegionManagerId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Sites_Regions">
           <End Type="ACTModel.Region" Role="Region" Multiplicity="0..1" />
           <End Type="ACTModel.Site" Role="Site" Multiplicity="*" />
@@ -4778,6 +4690,96 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="UserTask">
               <PropertyRef Name="TaskId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Type" Type="Int32" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Surname" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Email" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Cell" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="LastLogin" Type="DateTime" Precision="3" />
+          <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="PasswordDate" Type="DateTime" Precision="3" />
+          <Property Name="Pin" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ClientUsers" Relationship="ACTModel.FK_ClientUsers_Users" FromRole="User" ToRole="ClientUser" />
+          <NavigationProperty Name="Disputes" Relationship="ACTModel.FK_Dispute_User" FromRole="User" ToRole="Dispute" />
+          <NavigationProperty Name="Disputes1" Relationship="ACTModel.FK_Dispute_User1" FromRole="User" ToRole="Dispute" />
+          <NavigationProperty Name="PSPUsers" Relationship="ACTModel.FK_PSPUser_User" FromRole="User" ToRole="PSPUser" />
+          <NavigationProperty Name="Regions" Relationship="ACTModel.FK_Regions_Users" FromRole="User" ToRole="Region" />
+          <NavigationProperty Name="Tokens" Relationship="ACTModel.FK_Token_User" FromRole="User" ToRole="Token" />
+          <NavigationProperty Name="UserBroadcasts" Relationship="ACTModel.FK_UserBroadcast_User" FromRole="User" ToRole="UserBroadcast" />
+          <NavigationProperty Name="UserDocuments" Relationship="ACTModel.FK_UserDocument_User" FromRole="User" ToRole="UserDocument" />
+          <NavigationProperty Name="UserNotifications" Relationship="ACTModel.FK_UserNotification_User" FromRole="User" ToRole="UserNotification" />
+          <NavigationProperty Name="UserRoles" Relationship="ACTModel.FK_UserRoles_Users" FromRole="User" ToRole="UserRole" />
+          <NavigationProperty Name="UserTasks" Relationship="ACTModel.FK_UserTask_User" FromRole="User" ToRole="UserTask" />
+        </EntityType>
+        <Association Name="FK_ClientUsers_Users">
+          <End Type="ACTModel.User" Role="User" Multiplicity="1" />
+          <End Type="ACTModel.ClientUser" Role="ClientUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ClientUser">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Dispute_User">
+          <End Type="ACTModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="ACTModel.Dispute" Role="Dispute" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Dispute">
+              <PropertyRef Name="ActionedById" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Dispute_User1">
+          <End Type="ACTModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="ACTModel.Dispute" Role="Dispute" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Dispute">
+              <PropertyRef Name="ResolvedById" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PSPUser_User">
+          <End Type="ACTModel.User" Role="User" Multiplicity="1" />
+          <End Type="ACTModel.PSPUser" Role="PSPUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PSPUser">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Regions_Users">
+          <End Type="ACTModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="ACTModel.Region" Role="Region" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Region">
+              <PropertyRef Name="RegionManagerId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -5933,25 +5935,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Users">
-            <EntityTypeMapping TypeName="ACTModel.User">
-              <MappingFragment StoreEntitySet="User">
-                <ScalarProperty Name="PasswordDate" ColumnName="PasswordDate" />
-                <ScalarProperty Name="Password" ColumnName="Password" />
-                <ScalarProperty Name="LastLogin" ColumnName="LastLogin" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="Cell" ColumnName="Cell" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="Surname" ColumnName="Surname" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Type" ColumnName="Type" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="UserBroadcasts">
             <EntityTypeMapping TypeName="ACTModel.UserBroadcast">
               <MappingFragment StoreEntitySet="UserBroadcast">
@@ -6074,6 +6057,26 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="Period1From" ColumnName="Period1From" />
                 <ScalarProperty Name="Period1" ColumnName="Period1" />
                 <ScalarProperty Name="PSPId" ColumnName="PSPId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="ACTModel.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="Pin" ColumnName="Pin" />
+                <ScalarProperty Name="PasswordDate" ColumnName="PasswordDate" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="LastLogin" ColumnName="LastLogin" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Cell" ColumnName="Cell" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Surname" ColumnName="Surname" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

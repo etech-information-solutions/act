@@ -5,6 +5,7 @@ using System.Linq;
 using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Core.Models.Custom;
+using ACT.Core.Models.Simple;
 using ACT.Data.Models;
 
 namespace ACT.Core.Services
@@ -830,6 +831,138 @@ namespace ACT.Core.Services
             #endregion
 
             return context.Database.SqlQuery<NumberOfPalletsManaged>( query, parameters.ToArray() ).FirstOrDefault();
+        }
+
+        public List<SimpleOutstandingPallets> ListOutstandingPalletsPerClient( CustomSearchModel csm )
+        {
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
+            };
+
+            #endregion
+
+            string query = @"SELECT
+	                            c.[Id] AS [ClientId],
+	                            c.[CompanyName] AS [ClientName],
+	                            SUM(ch.[NewQuantity] - cl.[NewQuantity]) AS [Total]
+                            FROM
+	                            [dbo].[ClientLoad] cl,
+	                            [dbo].[ChepClient] cc,
+	                            [dbo].[ChepLoad] ch,
+	                            [dbo].[Client] c
+                            WHERE
+	                            (cl.[Id]=cc.[ClientLoadsId]) AND
+	                            (ch.[Id]=cc.[ChepLoadsId]) AND
+	                            (c.[Id]=cl.[ClientId]) AND
+	                            (cl.[Status]=0)";
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND (cl.ClientId=@csmClientId) ";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (cl.LoadDate>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (cl.LoadDate<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            query = $@"{query} GROUP BY
+	                            c.[Id],
+	                            c.[CompanyName] ";
+
+            return context.Database.SqlQuery<SimpleOutstandingPallets>( query, parameters.ToArray() ).ToList();
+        }
+
+        public List<SimpleOutstandingPallets> ListOutstandingPalletsPerSite( CustomSearchModel csm )
+        {
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
+            };
+
+            #endregion
+
+            string query = @"SELECT
+	                        s.[Id] AS [SiteId],
+	                        s.[Name] AS [SiteName],
+	                        SUM(ch.[NewQuantity] - cl.[NewQuantity]) AS [Total]
+                         FROM
+	                        [dbo].[ClientLoad] cl,
+	                        [dbo].[ChepClient] cc,
+	                        [dbo].[ChepLoad] ch,
+	                        [dbo].[ClientSite] cs,
+	                        [dbo].[Site] s
+                         WHERE
+	                        (cl.[Id]=cc.[ClientLoadsId]) AND
+	                        (ch.[Id]=cc.[ChepLoadsId]) AND
+	                        (cs.[Id]=cl.[ClientSiteId]) AND
+	                        (s.[Id]=cs.[SiteId]) AND
+	                        (cl.[Status]=0)";
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND (cl.ClientId=@csmClientId) ";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (cl.LoadDate>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (cl.LoadDate<=@csmToDate) ";
+                }
+            }
+
+            query = $@"{query} GROUP BY
+	                           s.[Id],
+	                           s.[Name] ";
+
+            #endregion
+
+            return context.Database.SqlQuery<SimpleOutstandingPallets>( query, parameters.ToArray() ).ToList();
         }
     }
 }
