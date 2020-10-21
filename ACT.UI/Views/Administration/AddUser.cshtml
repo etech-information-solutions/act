@@ -92,7 +92,7 @@
                         @Html.LabelFor( model => model.PSPId )
                     </div>
                     <div class="editor-field">
-                        @Html.DropDownListFor( model => model.PSPId, model => model.PSPOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                        @Html.DropDownListFor( model => model.PSPId, model => model.PSPOptions, p => p.Key, p => p.Value, false, new { @class = "chzn", @style = "width: 98%;" } )
                     </div>
                 </div>
 
@@ -101,7 +101,7 @@
                         @Html.LabelFor( model => model.ClientId )
                     </div>
                     <div class="editor-field">
-                        @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                        @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, c => c.Key, c => c.Value, false, new { @class = "chzn", @style = "width: 98%;" } )
                     </div>
                 </div>
 

@@ -3767,7 +3767,7 @@ namespace ACT.UI.Controllers
 
             List<Transporter> model = new List<Transporter>();
             //int pspId = Session[ "UserPSP" ];
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
+            //int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
             using ( TransporterService service = new TransporterService() )
             {
                 pm.Sort = pm.Sort ?? "DESC";

@@ -238,6 +238,7 @@
                 <thead>
                     <tr>
                         <td>#</td>
+                        <th>Year</th>
                         <th><b>Total</b></th>
                         <th>Jan</th>
                         <th>Feb</th>
@@ -266,6 +267,10 @@
                             <tr>
                                 <td width="1%">
                                     @(count + 1)
+                                </td>
+                                <td>
+                                    @b.BudgetYear
+                                    <input name="PSPBudgets[@count].BudgetYear" type="hidden" value="@b.BudgetYear" >
                                 </td>
                                 <td>
                                     <b>@Math.Round( total ?? 0, 0 )</b>

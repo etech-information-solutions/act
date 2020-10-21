@@ -312,6 +312,7 @@
 
                     <thead>
                         <tr>
+                            <th>Budget Year</th>
                             <th>Total</th>
                             <th>Jan</th>
                             <th>Feb</th>
@@ -331,7 +332,10 @@
                     <tbody>
                         <tr>
                             <td>
-                                <input id="EstimatedLoad-Total" name="EstimatedLoad.Total" type="number" value="" title="Changing this value will override values from Jan - Dec" placeholder="E.g @DateTime.Now.Year" data-budget-total="1" data-target=".el-input" style="padding: 0 5px; width: 87%;" />
+                                <input id ="EstimatedLoad.BudgetYear" name="EstimatedLoad.BudgetYear" placeholder="E.g @DateTime.Now.Year" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                            </td>
+                            <td>
+                                <input id="EstimatedLoad-Total" name="EstimatedLoad.Total" type="number" value="" title="Changing this value will override values from Jan - Dec" placeholder="E.g 480" data-budget-total="1" data-target=".el-input" style="padding: 0 5px; width: 87%;" />
                             </td>
                             <td>
                                 <input id="EstimatedLoad.January" name="EstimatedLoad.January" class="el-input" type="number" value="" placeholder="E.g 10" style="padding: 0 5px; width: 87%;" />
