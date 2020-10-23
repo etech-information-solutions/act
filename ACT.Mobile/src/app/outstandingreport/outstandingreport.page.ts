@@ -11,9 +11,7 @@ export class OutstandingreportPage implements OnInit
 {
   @ViewChild( IonContent, { static: true } ) content: IonContent;
 
-  Clients: any = [];
   OutstandingPallets: any = [];
-  GroupedOutstandingPallets: any = [];
 
   Skip: number = 0;
   Query: string = "";

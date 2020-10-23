@@ -967,5 +967,134 @@ namespace ACT.Core.Services
 
             return context.Database.SqlQuery<SimpleOutstandingPallets>( query, parameters.ToArray() ).ToList();
         }
+
+
+        /// <summary>
+        /// Gets a list of Items matching the specified search params
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public List<ClientLoadCustomModel> ListOutstandingShipments( PagingModel pm, CustomSearchModel csm )
+        {
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
+            {
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
+            }
+
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmReconciliation", ( int ) csm.ReconciliationStatus ) },
+            };
+
+            #endregion
+
+            string query = @"SELECT
+                                cl.*,
+                                (SELECT COUNT(1) FROM [dbo].[Image] i WHERE cl.Id=i.ObjectId AND i.ObjectType IN('PCNNumber', 'PODNumber', 'PRNNumber')) AS [ImageCount]
+                              FROM
+                                [dbo].[ClientLoad] cl";
+
+            // WHERE
+
+            #region WHERE
+
+            query = $"{query} WHERE (1=1)";
+            //query = $"{query} WHERE (cl.[PCNNumber] IS NULL OR cl.[PODNumber] IS NULL OR cl.[PRNNumber] IS NULL)";
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND (cl.ClientId=@csmClientId)";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (cl.CreatedOn >= @csmFromDate AND cl.CreatedOn <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (cl.CreatedOn>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (cl.CreatedOn<=@csmToDate) ";
+                }
+            }
+
+            if ( csm.ReconciliationStatus != ReconciliationStatus.Unreconcilable )
+            {
+                query = $"{query} AND (cl.Status=@csmReconciliation)";
+            }
+
+
+            #endregion
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
+            {
+                query = string.Format( @"{0} AND (cl.[ARPMComments] LIKE '%{1}%' OR
+                                                  cl.[ReferenceNumber] LIKE '%{1}%' OR
+                                                  cl.[DeliveryNote] LIKE '%{1}%' OR
+                                                  cl.[ClientDescription] LIKE '%{1}%' OR
+                                                  cl.[Equipment] LIKE '%{1}%' OR
+                                                  cl.[LoadNumber] LIKE '%{1}%' OR
+                                                  cl.[ReceiverNumber] LIKE '%{1}%' OR
+                                                  cl.[AccountNumber] LIKE '%{1}%' OR
+                                                  cl.[PODNumber] LIKE '%{1}%' OR
+                                                  cl.[PCNNumber] LIKE '%{1}%' OR
+                                                  cl.[PRNNumber] LIKE '%{1}%'
+                                                 ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            // ORDER
+
+            query = $"{query} ORDER BY {pm.SortBy}";
+
+            List<ClientLoadCustomModel> model = context.Database.SqlQuery<ClientLoadCustomModel>( query, parameters.ToArray() ).ToList();
+
+            if ( model.NullableAny( p => p.ImageCount > 0 ) )
+            {
+                foreach ( ClientLoadCustomModel item in model.Where( p => p.ImageCount > 0 ) )
+                {
+                    item.Images = context.Images.Where( i => i.ObjectId == item.Id && new string[] { "PCNNumber", "PODNumber", "PRNNumber" }.Contains( i.ObjectType ) ).ToList();
+                }
+            }
+
+            return model;
+        }
     }
 }

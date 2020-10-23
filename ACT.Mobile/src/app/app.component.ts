@@ -22,17 +22,17 @@ export class AppComponent implements OnInit
     {
       title: 'Site Audit',
       url: '/siteaudit',
-      icon: 'site-audit'
+      icon: 'shield-checkmark'
     },
     {
       title: 'Outstanding Report',
       url: '/outstandingreport',
-      icon: 'outstandingreport'
+      icon: 'mail'
     },
     {
       title: 'POD Management',
       url: '/podmanagement',
-      icon: 'podmanagement'
+      icon: 'document-text'
     },
     {
       title: 'Notifications',

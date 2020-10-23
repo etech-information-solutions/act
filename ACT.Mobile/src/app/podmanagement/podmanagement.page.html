@@ -12,8 +12,72 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" (ionScroll)="this.auth.OnScroll($event)" [scrollEvents]="true">
+  
+  <!-- fab placed to the top end -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="this.auth.ShowScroll" (click)="this.auth.ScrollToTop();">
+    <ion-fab-button>
+      <ion-icon name="chevron-up"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
- 
+  <ion-refresher (ionRefresh)="Refresh($event)" slot="fixed">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-item-divider style="margin-bottom: 20px;">
+    <ion-label style="text-transform: uppercase;">
+      POD Management
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item>
+    
+    <ion-input type="search" name="Query" placeholder="search" [(ngModel)]="Query" (ionChange)="Search()">
+      <ion-icon name="search" slot="start" style="padding-right: 10px;"></ion-icon>
+    </ion-input>
+  </ion-item>
+
+  <p></p>
+
+  <ion-grid>
+    <ion-row style="border-bottom: 1px solid #ddd; text-transform: uppercase; font-size: 12px;">
+      <ion-col>
+        <b style="color: #002e70 !important;">Shipment Date</b>
+      </ion-col>
+      <ion-col>
+        <b style="color: #002e70 !important;">Shipment No.</b>
+      </ion-col>
+      <ion-col>
+        <b style="color: #002e70 !important;">PCN</b>
+      </ion-col>
+      <ion-col>
+        <b style="color: #002e70 !important;">POD</b>
+      </ion-col>
+      <ion-col>
+        <b style="color: #002e70 !important;">PRN</b>
+      </ion-col>
+    </ion-row>
+    
+    <ion-row *ngFor="let x of OutstandingShipments" (click)="GoToOutstandingShipment(x.Id)" style="border-bottom: 1px solid #ededed; padding: 10px 0; font-size: 12px;">
+      <ion-col class="ion-align-self-center">
+        {{this.auth.GetShortDate(x.LoadDate, 'yyyy/MM/dd')}}
+      </ion-col>
+      <ion-col class="ion-align-self-center">
+        {{x.DeliveryNote}}
+      </ion-col>
+      <ion-col class="ion-align-self-center">
+        {{x.PCNNumber}}
+      </ion-col>
+      <ion-col class="ion-align-self-center">
+        {{x.PODNumber}}
+      </ion-col>
+      <ion-col class="ion-align-self-center">
+        {{x.PRNNumber}}
+        <ion-icon name="chevron-forward-outline" class="ion-float-right"></ion-icon>
+      </ion-col>
+    </ion-row>
+
+  </ion-grid>
 
 </ion-content>
