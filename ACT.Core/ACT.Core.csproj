@@ -175,6 +175,7 @@
     <Compile Include="Models\Custom\PSPProductCustomModel.cs" />
     <Compile Include="Models\Custom\RegionCustomModel.cs" />
     <Compile Include="Models\Custom\EstimatedLoadCustomModel.cs" />
+    <Compile Include="Models\Custom\ResponseModel.cs" />
     <Compile Include="Models\Custom\RoleCustomModel.cs" />
     <Compile Include="Models\Custom\SiteCustomModel.cs" />
     <Compile Include="Models\Custom\SiteAuditCustomModel.cs" />

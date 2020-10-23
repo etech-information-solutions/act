@@ -227,11 +227,14 @@ namespace ACT.Core.Services
                             c.CompanyName AS [ClientName],
                             s1.Description AS [SubSiteName],
                             otr.[Description] AS [OutstandingReason],
+                            ch.[NewQuantity] AS [ChepNewQuantity],
                             (SELECT COUNT(1) FROM [dbo].[Task] t WHERE cl.Id=t.ClientLoadId) AS [TaskCount],
                             (SELECT COUNT(1) FROM [dbo].[Journal] j WHERE cl.Id=j.ClientLoadId) AS [JournalCount],
                             (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ClientLoad') AS [DocumentCount]
                           FROM
                             [dbo].[ClientLoad] cl
+                            INNER JOIN [dbo].[ChepClient] cc ON cl.[Id]=cc.[ClientLoadsId]
+                            INNER JOIN [dbo].[ChepLoad] ch ON ch.[Id]=cc.[ChepLoadsId]
                             INNER JOIN [dbo].[Client] c ON c.[Id]=cl.[ClientId]
                             LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=cl.[ClientSiteId]
                             LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]

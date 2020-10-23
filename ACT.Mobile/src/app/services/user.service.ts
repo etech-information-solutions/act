@@ -28,6 +28,7 @@ export class UserService
   SiteAudits: any;
   Notification: any;
   Notifications: any;
+  OutstandingPallets: any;
   APIAuthentication: any;
   APIAuthenticationHeader: any;
 
@@ -57,6 +58,7 @@ export class UserService
   ForgotPin: boolean = false;
   PinCreated: boolean = false;
   PinCreationSkipped: boolean = false;
+  
 
   // Paging
   Take: number = 20;
@@ -64,6 +66,7 @@ export class UserService
 
   // 
   ExitApp: boolean = false;
+  RemoveSiteAuditConfirmed: boolean = false;
 
   SelfieUrl: string = "../../assets/imgs/user-profile.png";
 
@@ -74,6 +77,8 @@ export class UserService
 
   OutstandingPalletsPerSiteData: any;
   OutstandingPalletsPerClientData: any;
+
+  ServerResult: any;
 
   constructor( public http: HttpClient, public fp: FileOpener, public platform: Platform, public storage: Storage, public loadingCtrl: LoadingController, public transfer: FileTransfer, public appVersion: AppVersion, public alertCtrl: AlertController, public imgViewer: PhotoViewer, public popCtrl: PopoverController, public callNumber: CallNumber, public navCtrl: NavController ) 
   { 
@@ -354,6 +359,83 @@ export class UserService
     return this.SiteAudits;
   }
 
+  SearchOutstandingPallets( query:string = "" )
+  {
+    var resp = [];
+
+    query = query.toLowerCase();
+
+    for ( let r of this.OutstandingPallets )
+    {
+      if ( r.ClientName.toLowerCase().includes( query ) ||
+           r.SiteName.toLowerCase().includes( query ) ||
+           r.SubSiteName.toLowerCase().includes( query ) ||
+           r.LoadNumber.toLowerCase().includes( query ) ||
+           r.AccountNumber.toLowerCase().includes( query ) ||
+           r.DeliveryNote.toLowerCase().includes( query ) ||
+           r.ReferenceNumber.toLowerCase().includes( query ) ||
+           r.ReceiverNumber.toLowerCase().includes( query ) ||
+           r.Equipment.toLowerCase().includes( query ) ||
+           r.PODNumber.toLowerCase().includes( query ) ||
+           r.PCNNumber.toLowerCase().includes( query ) ||
+           r.PRNNumber.toLowerCase().includes( query ) ||
+           r.ProvCode.toLowerCase().includes( query ) ||
+           r.DocketNumber.toLowerCase().includes( query ) ||
+           r.THAN.toLowerCase().includes( query )
+          )
+      {
+        resp.push( r );
+      }
+    }
+
+    return resp;
+  }
+
+  async GetOutstandingPallets( query:string = "" )
+  {
+    if ( this.OutstandingPallets != undefined && this.OutstandingPallets.length > 0 )
+    {
+      if ( query != "" )
+      {
+        return this.SearchOutstandingPallets( query );
+      }
+
+      return this.OutstandingPallets;
+    }
+
+    var loading = await this.ShowLoading( "Fetching report..." );
+
+    try
+    {
+      var url = `${this.APIUrl}/api/Pallet/OutstandingPallets?email=${this.CurrentUser.Email}&apikey=${this.APIKey}`;
+
+      this.OutstandingPallets = await this.http.get<iCommonModel>( url ).toPromise();
+
+      if ( query != "" )
+      {
+        return this.SearchOutstandingPallets( query );
+      }
+    }
+    catch( error )
+    {
+      loading.dismiss();
+
+      if ( this.OutstandingPallets == undefined )
+      {
+        this.OutstandingPallets = {};
+      }
+
+      this.OutstandingPallets.ResponseCode = -1;
+      this.OutstandingPallets.Description = JSON.stringify( error );
+
+      return [];
+    }
+
+    loading.dismiss();
+
+    return this.OutstandingPallets;
+  }
+
   async LogOut() 
   {
     await this.storage.remove( "CurrentUser" ).then( () =>
@@ -582,6 +664,143 @@ export class UserService
     loading.dismiss();
   }
 
+  async UpdateSiteAudit( audit: any, message: string = undefined )
+  {
+    var loading = await this.ShowLoading( message );
+
+    // API Call here
+    try
+    {
+      audit = `${audit}&email=${this.CurrentUser.Email}&apikey=${this.APIKey}`;
+
+      let httpOptions = 
+      {
+        headers: new HttpHeaders(
+        {
+          "Content-Type": "application/x-www-form-urlencoded"
+        })
+      };
+
+      // Update site audit
+      this.SiteAudit = await this.http.post<iCommonModel>( this.APIUrl + "/api/Pallet/UpdateSiteAudit", audit, httpOptions ).toPromise();
+
+      loading.dismiss();
+
+      return this.SiteAudit;
+    }
+    catch( error )
+    {
+      loading.dismiss();
+
+      return { Code: -1, Message: JSON.stringify( error ) };
+    }
+  }
+
+  async CreateSiteAudit( audit: any, message: string = undefined )
+  {
+    var loading = await this.ShowLoading( message );
+
+    // API Call here
+    try
+    {
+      audit = `${audit}&email=${this.CurrentUser.Email}&apikey=${this.APIKey}`;
+
+      let httpOptions = 
+      {
+        headers: new HttpHeaders(
+        {
+          "Content-Type": "application/x-www-form-urlencoded"
+        })
+      };
+
+      // Update site audit
+      this.SiteAudit = await this.http.post<iCommonModel>( this.APIUrl + "/api/Pallet/CreateSiteAudit", audit, httpOptions ).toPromise();
+
+      loading.dismiss();
+
+      return this.SiteAudit;
+    }
+    catch( error )
+    {
+      loading.dismiss();
+
+      return { Code: -1, Message: JSON.stringify( error ) };
+    }
+  }
+
+  async UploadSignature( id: string, type: number, fileurl: any, fileKey: string, fileName: string, mimeType: string, message: string = undefined )
+  {
+    var loading = await this.ShowLoading( message );
+
+    // API Call here
+    try
+    {
+      const fileTransfer: FileTransferObject = this.transfer.create();
+
+      let options: FileUploadOptions =
+      {
+        fileKey: fileKey,
+        fileName: fileName,
+        chunkedMode: false,
+        mimeType: mimeType,
+        params: {
+          id: id,
+          type: type,
+          apikey: this.APIKey,
+          email: this.CurrentUser.Email
+        }
+      };
+
+      await fileTransfer.upload( fileurl, `${this.APIUrl}/api/Pallet/UploadSignature?id=${id}&type=${type}&apikey=${this.APIKey}&email=${this.CurrentUser.Email}`, options ).then( ( data ) =>
+      {
+        //this.ServerResult.ResponseCode = 1;
+
+      }, ( err ) =>
+      {
+        //this.ServerResult.ResponseCode = 1;
+        //this.ServerResult.Description = JSON.stringify( err );
+      });
+    }
+    catch( error )
+    {
+      //this.ServerResult.ResponseCode = 1;
+      //this.ServerResult.Description = JSON.stringify( error );
+    }
+
+    loading.dismiss();
+  }
+
+  async DeleteSiteAudit( id: any, message: string = undefined )
+  {
+    var loading = await this.ShowLoading( message );
+
+    // API Call here
+    try
+    {
+      var p = `id=${id}&email=${this.CurrentUser.Email}&apikey=${this.APIKey}`;
+
+      let httpOptions = 
+      {
+        headers: new HttpHeaders(
+        {
+          "Content-Type": "application/x-www-form-urlencoded"
+        })
+      };
+
+      var resp = await this.http.post<iCommonModel>( this.APIUrl + "/api/Pallet/DeleteSiteAudit", p, httpOptions ).toPromise();
+
+      loading.dismiss();
+
+      return resp;
+    }
+    catch( error )
+    {
+      loading.dismiss();
+
+      return { Code: -1, Message: JSON.stringify( error ) };
+    }
+  }
+
   async UpdatePin( pin: string, confirmPin: string )
   {
     var loading = await this.ShowLoading( "Updating pin..." );
@@ -727,10 +946,8 @@ export class UserService
     {
       int8Array[ i ] = byteString.charCodeAt( i );
     }
-
-    const blob = new Blob( [ int8Array ], { type: mimeType } );    
-
-    return blob;
+    
+    return new Blob( [ int8Array ], { type: mimeType } );
   }
 
   GetISODateString( date: Date = new Date() )
@@ -758,7 +975,7 @@ export class UserService
     {
       switch ( format )
       {
-        case'yyyy/MM/dd':
+        case 'yyyy/MM/dd':
           return `${d.getFullYear()}/${this.Do0Check( d.getMonth() + 1 )}/${this.Do0Check( d.getDate() )}`;
       }
     }
@@ -972,6 +1189,18 @@ export class UserService
       header: title,
       message: message,
       buttons: [ 'OK' ]
+    });
+
+    await alert.present();
+  }
+
+  async ShowError( text ) 
+  {
+    let alert = await this.alertCtrl.create(
+    {
+      header: "Oops!",
+      message: text,
+      buttons: ["OK"]
     });
 
     await alert.present();

@@ -110,4 +110,5 @@
     <plugin name="uk.co.workingedge.phonegap.plugin.launchnavigator" spec="^5.0.5" />
     <plugin name="cordova-plugin-photo-library" spec="^2.3.1" />
     <plugin name="mx.ferreyra.callnumber" spec="~0.0.2" />
+    <engine name="browser" spec="^5.0.4" />
 </widget>

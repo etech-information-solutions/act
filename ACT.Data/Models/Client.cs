@@ -28,6 +28,7 @@ namespace ACT.Data.Models
             this.DeliveryNotes = new HashSet<DeliveryNote>();
             this.PSPClients = new HashSet<PSPClient>();
             this.Tasks = new HashSet<Task>();
+            this.SiteAudits = new HashSet<SiteAudit>();
         }
     
         public int Id { get; set; }
@@ -79,5 +80,7 @@ namespace ACT.Data.Models
         public virtual ICollection<PSPClient> PSPClients { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Tasks { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SiteAudit> SiteAudits { get; set; }
     }
 }

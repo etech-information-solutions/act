@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
+using System.Data.Entity;
 
+using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Core.Models.Custom;
 using ACT.Core.Models.Simple;
 using ACT.Core.Services;
+using ACT.Data.Models;
 
 namespace ACT.UI.Controllers.api
 {
@@ -17,7 +22,7 @@ namespace ACT.UI.Controllers.api
         BaseController baseC = new BaseController();
 
         // GET api/Pallet/GetOutstandingPalletsPerClient
-        [ HttpGet]
+        [HttpGet]
         public List<SimpleOutstandingPallets> ListOutstandingPalletsPerClient( string email, string apikey )
         {
             CustomSearchModel csm = new CustomSearchModel() { };
@@ -124,10 +129,262 @@ namespace ACT.UI.Controllers.api
             {
                 saservice.CurrentUser = saservice.GetUser( email );
 
-                List<SiteAuditCustomModel> response = saservice.List1( new PagingModel() { Take = int.MaxValue }, new CustomSearchModel() );
+                List<SiteAuditCustomModel> response = saservice.List1( new PagingModel() { Take = int.MaxValue }, new CustomSearchModel() { Status = Status.Active } );
 
                 return response;
             }
         }
+
+        [HttpPost]
+        public ResponseModel DeleteSiteAudit( SiteAuditCustomModel model )
+        {
+            using ( SiteAuditService saservice = new SiteAuditService() )
+            {
+                saservice.CurrentUser = saservice.GetUser( model.Email );
+
+                SiteAudit audit = saservice.GetById( model.Id );
+
+                if ( audit == null )
+                {
+                    return new ResponseModel() { Code = -1, Description = "Site Audit could not be found" };
+                }
+
+                audit.Status = ( int ) Status.Inactive;
+
+                saservice.Update( audit );
+
+                return new ResponseModel() { Code = 1, Description = "Site Audit deleted" };
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage CreateSiteAudit( SiteAuditCustomModel model )
+        {
+            using ( SiteAuditService saservice = new SiteAuditService() )
+            {
+                saservice.CurrentUser = saservice.GetUser( model.Email );
+
+                SiteAudit audit = new SiteAudit()
+                {
+                    SiteId = model.SiteId,
+                    RepName = model.RepName,
+                    ClientId = model.ClientId,
+                    AuditDate = model.AuditDate,
+                    Equipment = model.Equipment,
+                    Status = ( int ) Status.Active,
+                    CustomerName = model.CustomerName,
+                    PalletAuditor = model.PalletAuditor,
+                    PalletsCounted = model.PalletsCounted,
+                    WriteoffPallets = model.WriteoffPallets,
+                    PalletsOutstanding = model.PalletsOutstanding,
+                };
+
+                audit = saservice.Create( audit );
+
+                return Request.CreateResponse( HttpStatusCode.OK, audit );
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage UpdateSiteAudit( SiteAuditCustomModel model )
+        {
+            using ( SiteAuditService saservice = new SiteAuditService() )
+            {
+                saservice.CurrentUser = saservice.GetUser( model.Email );
+
+                SiteAudit audit = saservice.GetById( model.Id );
+
+                if ( audit == null )
+                {
+                    return Request.CreateResponse( HttpStatusCode.OK, new ResponseModel() { Code = -1, Description = "Site Audit could not be found" } );
+                }
+
+                audit.SiteId = model.SiteId;
+                audit.RepName = model.RepName;
+                audit.ClientId = model.ClientId;
+                audit.AuditDate = model.AuditDate;
+                audit.Equipment = model.Equipment;
+                audit.CustomerName = model.CustomerName;
+                audit.PalletAuditor = model.PalletAuditor;
+                audit.PalletsCounted = model.PalletsCounted;
+                audit.WriteoffPallets = model.WriteoffPallets;
+                audit.PalletsOutstanding = model.PalletsOutstanding;
+
+                saservice.Update( audit );
+
+                return Request.CreateResponse( HttpStatusCode.OK, saservice.OldObject );
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage UploadSignature( int id, int type, string email, string apikey )
+        {
+            try
+            {
+                using ( SiteAuditService saservice = new SiteAuditService() )
+                {
+                    saservice.CurrentUser = saservice.GetUser( email );
+
+                    SiteAudit audit = saservice.GetById( id );
+
+                    if ( audit == null )
+                    {
+                        return Request.CreateResponse( HttpStatusCode.OK, new ResponseModel() { Code = -1, Description = "Site Audit could not be found" } );
+                    }
+
+                    HttpPostedFile file = HttpContext.Current.Request.Files.Count > 0 ? HttpContext.Current.Request.Files[ 0 ] : null;
+
+                    if ( file == null )
+                    {
+                        return Request.CreateResponse( HttpStatusCode.OK, new ResponseModel() { Code = -1, Description = "No file uploaded!" } );
+                    }
+
+                    BinaryReader br = new BinaryReader( file.InputStream );
+
+                    byte[] bytes = br.ReadBytes( ( int ) file.ContentLength );
+
+                    if ( type == 1 )
+                    {
+                        audit.CustomerSignature = bytes;
+                    }
+                    else if ( type == 2 )
+                    {
+                        audit.RepSignature = bytes;
+                    }
+                    else if ( type == 3 )
+                    {
+                        audit.PalletAuditorSign = bytes;
+                    }
+
+                    saservice.Update( audit );
+
+                    return Request.CreateResponse( HttpStatusCode.OK, saservice.OldObject );
+                }
+            }
+            catch ( Exception ex )
+            {
+                return Request.CreateResponse( HttpStatusCode.OK, ex.Message.ToString() );
+            }
+        }
+
+        [HttpGet]
+        public HttpResponseMessage OutstandingPallets( string email, string apikey )
+        {
+            using ( ClientLoadService service = new ClientLoadService() )
+            {
+                service.CurrentUser = service.GetUser( email );
+
+                CustomSearchModel csm = new CustomSearchModel()
+                {
+                    ReconciliationStatus = ReconciliationStatus.Unreconciled
+                };
+
+                PagingModel pm = new PagingModel() { SortBy = "c.CompanyName", Sort = "ASC" };
+
+                List<ClientLoadCustomModel> model = service.ListCSM( pm, csm );
+
+                if ( !model.NullableAny() )
+                {
+                    return Request.CreateResponse( HttpStatusCode.OK, model );
+                }
+
+                List<int?> clientIds = new List<int?>();
+                List<OutstandingPalletsModel> resp = new List<OutstandingPalletsModel>();
+
+                foreach ( ClientLoadCustomModel item in model )
+                {
+                    if ( clientIds.Any( c => c == item.ClientSiteId ) ) continue;
+
+                    clientIds.Add( item.ClientId );
+
+                    OutstandingPalletsModel m = new OutstandingPalletsModel()
+                    {
+                        ClientLoad = item,
+                        OutstandingReasons = GetOutstandingReasons( item.ClientId, model ),
+                        GrandTotal = new OutstandingReasonModel()
+                        {
+                            Description = "Grand Total",
+                            To30Days = model.Where( c => c.ClientId == item.ClientId && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 30 ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                            To60Days = model.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 60 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                            To90Days = model.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 90 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                            To120Days = model.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 120 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                            To183Days = model.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 183 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                            To270Days = model.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 270 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                            To365Days = model.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 365 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                            GrandTotal = model.Where( c => c.ClientId == item.ClientId ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                        }
+                    };
+
+                    resp.Add( m );
+                }
+
+                return Request.CreateResponse( HttpStatusCode.OK, resp );
+            }
+        }
+
+        private List<OutstandingReasonModel> GetOutstandingReasons( int clientId, List<ClientLoadCustomModel> items )
+        {
+            List<string> outstandingIds = new List<string>();
+
+            List<OutstandingReasonModel> outstandingReasons = new List<OutstandingReasonModel>();
+
+            foreach ( ClientLoadCustomModel item in items )
+            {
+                if ( item.ClientId != clientId ) continue;
+
+                if ( outstandingIds.Any( c => c == item.OutstandingReasonId + "-" + clientId ) ) continue;
+
+                outstandingIds.Add( item.OutstandingReasonId + "-" + clientId );
+
+                OutstandingReasonModel r = new OutstandingReasonModel()
+                {
+                    Description = item.OutstandingReason,
+                    To30Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 30 ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                    To60Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 60 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                    To90Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 90 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                    To120Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 120 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                    To183Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 183 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                    To270Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 270 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                    To365Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 365 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                    GrandTotal = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
+                };
+
+                outstandingReasons.Add( r );
+            }
+
+            return outstandingReasons;
+        }
+
+
     }
+}
+
+public class OutstandingPalletsModel
+{
+    public ClientLoadCustomModel ClientLoad { get; set; }
+
+    public OutstandingReasonModel GrandTotal { get; set; }
+
+    public List<OutstandingReasonModel> OutstandingReasons { get; set; }
+}
+
+public class OutstandingReasonModel
+{
+    public string Description { get; set; }
+
+    public decimal? GrandTotal { get; set; }
+
+    public decimal? To30Days { get; set; }
+
+    public decimal? To60Days { get; set; }
+
+    public decimal? To90Days { get; set; }
+
+    public decimal? To120Days { get; set; }
+
+    public decimal? To183Days { get; set; }
+
+    public decimal? To270Days { get; set; }
+
+    public decimal? To365Days { get; set; }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+
 using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Core.Models.Custom;
@@ -57,7 +58,8 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmSact", csm.Status ) },
+                { new SqlParameter( "csmSact", Status.Active ) },
+                { new SqlParameter( "csmStatus", csm.Status ) },
             };
 
             #endregion
@@ -104,6 +106,11 @@ namespace ACT.Core.Services
             if ( csm.PSPId != 0 )
             {
                 query = $"{query} AND (sa.PSPId=@csmPSPId) ";
+            }
+
+            if ( csm.Status != Status.All )
+            {
+                query = $"{query} AND (sa.Status=@csmStatus) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -179,7 +186,8 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmSact", csm.Status ) },
+                { new SqlParameter( "csmSact", Status.Active ) },
+                { new SqlParameter( "csmStatus", csm.Status ) },
             };
 
             #endregion
@@ -230,6 +238,11 @@ namespace ACT.Core.Services
             if ( csm.PSPId != 0 )
             {
                 query = $"{query} AND (sa.PSPId=@csmPSPId) ";
+            }
+
+            if ( csm.Status != Status.All )
+            {
+                query = $"{query} AND (sa.Status=@csmStatus) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )

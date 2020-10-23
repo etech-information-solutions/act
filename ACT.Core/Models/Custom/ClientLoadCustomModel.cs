@@ -58,5 +58,7 @@ namespace ACT.Core.Models.Custom
 
         public int? TaskCount { get; set; }
         public int? JournalCount { get; set; }
+
+        public decimal? ChepNewQuantity { get; set; }
     }
 }

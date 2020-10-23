@@ -29,6 +29,8 @@ namespace System
         {
             try
             {
+                if ( HttpContext.Current.Cache == null ) return;
+
                 object _value = HttpContext.Current.Cache.Get( key );
 
                 if ( _value != null )
@@ -53,6 +55,8 @@ namespace System
         {
             try
             {
+                if ( HttpContext.Current.Session == null ) return;
+
                 object _value = HttpContext.Current.Session[ key ];
 
                 if ( _value != null )
@@ -72,6 +76,8 @@ namespace System
         {
             try
             {
+                if ( HttpContext.Current.Cache == null ) return null;
+
                 object value = HttpContext.Current.Cache.Get( key );
 
                 return value;
@@ -86,6 +92,8 @@ namespace System
         {
             try
             {
+                if ( HttpContext.Current.Session == null ) return null;
+
                 object value = HttpContext.Current.Session[ key ];
 
                 return value;
@@ -100,6 +108,8 @@ namespace System
         {
             try
             {
+                if ( HttpContext.Current.Cache == null ) return false;
+
                 HttpContext.Current.Cache.Remove( key );
             }
             catch ( Exception ex )
@@ -113,6 +123,8 @@ namespace System
         {
             try
             {
+                if ( HttpContext.Current.Cache == null ) return false;
+
                 HttpContext.Current.Session.Remove( key );
             }
             catch ( Exception ex )
@@ -126,6 +138,8 @@ namespace System
         {
             try
             {
+                if ( HttpContext.Current.Cache == null ) return false;
+
                 foreach ( string key in keys )
                 {
                     HttpContext.Current.Cache.Remove( key );
@@ -142,6 +156,8 @@ namespace System
         {
             try
             {
+                if ( HttpContext.Current.Session == null ) return false;
+
                 foreach ( string key in keys )
                 {
                     HttpContext.Current.Session.Remove( key );
@@ -158,6 +174,8 @@ namespace System
         {
             try
             {
+                if ( HttpContext.Current.Cache == null ) return false;
+
                 foreach ( DictionaryEntry entry in HttpContext.Current.Cache )
                 {
                     HttpContext.Current.Cache.Remove( ( string ) entry.Key );
@@ -174,6 +192,8 @@ namespace System
         {
             try
             {
+                if ( HttpContext.Current.Session == null ) return false;
+
                 foreach ( DictionaryEntry entry in HttpContext.Current.Session )
                 {
                     HttpContext.Current.Session.Remove( ( string ) entry.Key );

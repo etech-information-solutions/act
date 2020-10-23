@@ -71,7 +71,6 @@ namespace ACT.Data.Models
         public virtual DbSet<Region> Regions { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Site> Sites { get; set; }
-        public virtual DbSet<SiteAudit> SiteAudits { get; set; }
         public virtual DbSet<SiteBilling> SiteBillings { get; set; }
         public virtual DbSet<SiteBudget> SiteBudgets { get; set; }
         public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
@@ -86,5 +85,6 @@ namespace ACT.Data.Models
         public virtual DbSet<Vehicle> Vehicles { get; set; }
         public virtual DbSet<PSPPeriod> PSPPeriods { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<SiteAudit> SiteAudits { get; set; }
     }
 }

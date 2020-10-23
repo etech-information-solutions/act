@@ -21,8 +21,6 @@
     int? oldestYear = items.OrderBy( o => o.LoadDate.Value.Year )?.FirstOrDefault()?.LoadDate?.Year;
 
     int yearDiff = DateTime.Now.Year - ( oldestYear ?? 0 );
-
-    int cols = 11 + yearDiff;
 }
 
 @if ( Model == null || !items.Any() )
@@ -89,7 +87,7 @@
             int clientCount = 0;
 
             List<int?> clientIds = new List<int?>();
-            List<int?> outstandingIds = new List<int?>();
+            List<string> outstandingIds = new List<string>();
 
             foreach ( var item in items )
             {
@@ -138,12 +136,12 @@
                     }
                 }
 
-                if ( outstandingIds.Any( o => o == item.OutstandingReasonId ) )
+                if ( outstandingIds.Any( o => o == item.OutstandingReasonId + "-" + item.ClientId ) )
                 {
                     continue;
                 }
 
-                outstandingIds.Add( item.OutstandingReasonId );
+                outstandingIds.Add( item.OutstandingReasonId + "-" + item.ClientId );
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
 
@@ -156,26 +154,27 @@
                         @item.OutstandingReason
                     </td>
                     <td>
-                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 30 )
+                        @items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 30 ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                     </td>
                     <td>
-                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 60 ) )
+                        @items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 60 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                     </td>
                     <td>
-                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 90 ) )
+                        @items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 90 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                     </td>
                     <td>
-                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 120 ) )
+                        @items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 120 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                     </td>
                     <td>
-                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 183 ) )
+                        @items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 183 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                     </td>
                     <td>
-                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 270 ) )
+                        @items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 270 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                     </td>
                     <td>
-                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 365 ) )
+                        @items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 365 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                     </td>
+
                     @if ( yearDiff > 0 )
                     {
                         for ( int i = 1; i <= yearDiff; i++ )
@@ -183,13 +182,13 @@
                             int y = DateTime.Now.AddYears( -i ).Year;
 
                             <td width="2%">
-                                @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( item.LoadDate ?? item.CreatedOn ).Year == y )
+                                @items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( item.LoadDate ?? item.CreatedOn ).Year == y ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                             </td>
                         }
                     }
 
                     <td width="8%" style="border-left: 0 none; background-color: #7cf0f0; color: #123cdf; font-weight: bold;">
-                        @items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId )
+                        @items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                     </td>
 
                 </tr>
@@ -205,25 +204,25 @@
                             Grand Total
                         </td>
                         <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
-                            @items.Count( c => c.ClientId == item.ClientId && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 30 )
+                            @items.Where( c => c.ClientId == item.ClientId && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 30 ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                         </td>
                         <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
-                            @items.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 60 ) )
+                            @items.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 60 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                         </td>
                         <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
-                            @items.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 90 ) )
+                            @items.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 90 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                         </td>
                         <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
-                            @items.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 120 ) )
+                            @items.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 120 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                         </td>
                         <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
-                            @items.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 183 ) )
+                            @items.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 183 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                         </td>
                         <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
-                            @items.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 270 ) )
+                            @items.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 270 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                         </td>
                         <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
-                            @items.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 365 ) )
+                            @items.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( c.LoadDate ?? c.CreatedOn ) ).Days <= 365 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                         </td>
 
                         @if ( yearDiff > 0 )
@@ -233,13 +232,13 @@
                                 int y = DateTime.Now.AddYears( -i ).Year;
 
                                 <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
-                                    @items.Count( c => c.ClientId == item.ClientId && ( c.LoadDate ?? c.CreatedOn ).Year == y )
+                                    @items.Where( c => c.ClientId == item.ClientId && ( c.LoadDate ?? c.CreatedOn ).Year == y ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                                 </td>
                             }
                         }
 
                         <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
-                            @items.Count( c => c.ClientId == item.ClientId )
+                            @items.Where( c => c.ClientId == item.ClientId ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
                         </td>
                     </tr>
 

@@ -70,7 +70,12 @@
         {
             foreach ( var item in items )
             {
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+                Status status = ( Status ) item.Status;
+
+                string enable = status == Status.Active ? "Disable" : "Enable";
+                string active = status == Status.Active ? "active" : "inactive";
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
                     <td width="1%">
                         @count

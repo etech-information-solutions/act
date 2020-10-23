@@ -51,7 +51,6 @@
         <EntityTypeShape EntityType="ACTModel.Region" Width="1.5" PointX="3" PointY="42.625" />
         <EntityTypeShape EntityType="ACTModel.Role" Width="1.5" PointX="3.75" PointY="50.5" />
         <EntityTypeShape EntityType="ACTModel.Site" Width="1.5" PointX="5.25" PointY="58.125" />
-        <EntityTypeShape EntityType="ACTModel.SiteAudit" Width="1.5" PointX="7.5" PointY="55.75" />
         <EntityTypeShape EntityType="ACTModel.SiteBilling" Width="1.5" PointX="10.5" PointY="60.5" />
         <EntityTypeShape EntityType="ACTModel.SiteBudget" Width="1.5" PointX="7.5" PointY="79.75" />
         <EntityTypeShape EntityType="ACTModel.SystemConfig" Width="1.5" PointX="2.75" PointY="10.75" />
@@ -103,7 +102,6 @@
         <AssociationConnector Association="ACTModel.FK_Dispute_Product" />
         <AssociationConnector Association="ACTModel.FK_Journal_Document" />
         <AssociationConnector Association="ACTModel.FK_UserDocument_Document" />
-        <AssociationConnector Association="ACTModel.FK_Journals_SiteAudit" />
         <AssociationConnector Association="ACTModel.FK_UserNotification_Notification" />
         <AssociationConnector Association="ACTModel.FK_ProductPrices_Products" />
         <AssociationConnector Association="ACTModel.FK_PSPProduct_Product" />
@@ -118,7 +116,6 @@
         <AssociationConnector Association="ACTModel.FK_PSPBilling_PSPProducts" />
         <AssociationConnector Association="ACTModel.FK_Sites_Regions" />
         <AssociationConnector Association="ACTModel.FK_UserRoles_Roles" />
-        <AssociationConnector Association="ACTModel.FK_Site_Audit_Sites" />
         <AssociationConnector Association="ACTModel.FK_SiteBilling_Sites" />
         <AssociationConnector Association="ACTModel.FK_SiteBudgets_Sites" />
         <AssociationConnector Association="ACTModel.FK_Sites_Sites" />
@@ -135,6 +132,10 @@
         <AssociationConnector Association="ACTModel.FK_UserNotification_User" />
         <AssociationConnector Association="ACTModel.FK_UserRoles_Users" />
         <AssociationConnector Association="ACTModel.FK_UserTask_User" />
+        <EntityTypeShape EntityType="ACTModel.SiteAudit" Width="1.5" PointX="10.5" PointY="46.75" />
+        <AssociationConnector Association="ACTModel.FK_SiteAudit_Client" />
+        <AssociationConnector Association="ACTModel.FK_Journals_SiteAudit" />
+        <AssociationConnector Association="ACTModel.FK_Site_Audit_Sites" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

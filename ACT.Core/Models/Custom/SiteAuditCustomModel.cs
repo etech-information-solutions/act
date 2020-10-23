@@ -32,5 +32,11 @@ namespace ACT.Core.Models.Custom
         public string ClientName { get; set; }
 
         public int? ReportDocumentId { get; set; }
+
+
+        // Mobile API
+        public string Email { get; set; }
+
+        public string APIKey { get; set; }
     }
 }

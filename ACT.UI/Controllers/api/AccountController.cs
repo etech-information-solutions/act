@@ -455,6 +455,8 @@ namespace ACT.UI.Controllers.API
         {
             using ( UserService uservice = new UserService() )
             {
+                uservice.CurrentUser = uservice.GetUser( email );
+
                 return uservice.SystemConfig;
             }
         }

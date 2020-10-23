@@ -20,10 +20,10 @@ namespace ACT.Data.Models
             this.ChepAudits = new HashSet<ChepAudit>();
             this.ChepLoads = new HashSet<ChepLoad>();
             this.ClientSites = new HashSet<ClientSite>();
-            this.SiteAudits = new HashSet<SiteAudit>();
             this.SiteBillings = new HashSet<SiteBilling>();
             this.SiteBudgets = new HashSet<SiteBudget>();
             this.Site1 = new HashSet<Site>();
+            this.SiteAudits = new HashSet<SiteAudit>();
         }
     
         public int Id { get; set; }
@@ -64,13 +64,13 @@ namespace ACT.Data.Models
         public virtual ICollection<ClientSite> ClientSites { get; set; }
         public virtual Region Region { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SiteAudit> SiteAudits { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SiteBilling> SiteBillings { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SiteBudget> SiteBudgets { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Site> Site1 { get; set; }
         public virtual Site Site2 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SiteAudit> SiteAudits { get; set; }
     }
 }

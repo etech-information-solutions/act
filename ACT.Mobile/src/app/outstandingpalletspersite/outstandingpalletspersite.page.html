@@ -20,44 +20,47 @@
     </ion-label>
   </ion-item-divider>
 
-  <ion-grid>
-    <ion-row style="border-bottom: 1px solid #ddd; text-transform: uppercase; font-size: 12px;">
-      <ion-col>
-        <b style="color: #002e70 !important;">Site</b>
-      </ion-col>
-      <ion-col class="ion-text-center">
-        <b style="color: #002e70 !important;">0-3 Months</b>
-      </ion-col>
-      <ion-col class="ion-text-center">
-        <b style="color: #002e70 !important;">4-6 Months</b>
-      </ion-col>
-      <ion-col class="ion-text-center">
-        <b style="color: #002e70 !important;">7-12 Months</b>
-      </ion-col>
-      <ion-col class="ion-text-center">
-        <b style="color: #002e70 !important;">+12 Months</b>
-      </ion-col>
-    </ion-row>
-    
-    <ion-row *ngFor="let x of this.auth.OutstandingPalletsPerSite" style="border-bottom: 1px solid #ededed; padding: 10px 0; font-size: 12px;">
-      <ion-col>
-        {{x.SiteName}}
-      </ion-col>
-      <ion-col class="ion-text-center">
-        {{x.Month1}}
-      </ion-col>
-      <ion-col class="ion-text-center">
-        {{x.Month2}}
-      </ion-col>
-      <ion-col class="ion-text-center">
-        {{x.Month3}}
-      </ion-col>
-      <ion-col class="ion-text-center">
-        {{x.Month4}}
-      </ion-col>
-    </ion-row>
+  <div style="overflow: auto; white-space: nowrap;">
 
-  </ion-grid>
+    <ion-grid style="width: 600px;">
+      <ion-row style="border-bottom: 1px solid #ddd; text-transform: uppercase; font-size: 12px;">
+        <ion-col>
+          <b style="color: #002e70 !important;">Site</b>
+        </ion-col>
+        <ion-col class="ion-text-center">
+          <b style="color: #002e70 !important;">0-3 Months</b>
+        </ion-col>
+        <ion-col class="ion-text-center">
+          <b style="color: #002e70 !important;">4-6 Months</b>
+        </ion-col>
+        <ion-col class="ion-text-center">
+          <b style="color: #002e70 !important;">7-12 Months</b>
+        </ion-col>
+        <ion-col class="ion-text-center">
+          <b style="color: #002e70 !important;">+12 Months</b>
+        </ion-col>
+      </ion-row>
+      
+      <ion-row *ngFor="let x of this.auth.OutstandingPalletsPerSite" style="border-bottom: 1px solid #ededed; padding: 10px 0; font-size: 12px;">
+        <ion-col>
+          {{x.SiteName}}
+        </ion-col>
+        <ion-col class="ion-text-center">
+          {{x.Month1}}
+        </ion-col>
+        <ion-col class="ion-text-center">
+          {{x.Month2}}
+        </ion-col>
+        <ion-col class="ion-text-center">
+          {{x.Month3}}
+        </ion-col>
+        <ion-col class="ion-text-center">
+          {{x.Month4}}
+        </ion-col>
+      </ion-row>
+  
+    </ion-grid>
+  </div>
 
   
 

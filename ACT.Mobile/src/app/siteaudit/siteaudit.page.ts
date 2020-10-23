@@ -53,7 +53,7 @@ export class SiteauditPage implements OnInit
 
       var c = this.auth.Take;
 
-      for ( var i = this.Skip; i <= useSiteAudits.length; i++ )
+      for ( var i = this.Skip; i < useSiteAudits.length; i++ )
       {
         if ( c <= 0 )
         {
@@ -100,6 +100,11 @@ export class SiteauditPage implements OnInit
     this.auth.SiteAudit = this.auth.SiteAudits[ i ];
 
     this.auth.GoToPage( "siteauditdetail" );
+  }
+  
+  async Add()
+  {
+    this.auth.GoToPage( "addsiteaudit" );
   }
 
 }

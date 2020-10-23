@@ -1,0 +1,25 @@
+ion-label, ion-input, ion-select, ion-select-option, ion-datetime {
+    font-size: 13px !important;
+}
+
+ion-item-divider ion-label {
+    padding: 10px 0;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
+ion-item-divider.ios ion-label {
+    padding: 20px 0;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+ion-item-divider ion-icon {
+    font-size: 24px;
+    padding-right: 10px;
+}
+
+canvas {
+    width: 100vw !important;
+    display: block !important;
+}

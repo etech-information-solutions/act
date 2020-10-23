@@ -59,7 +59,7 @@ export class NotificationsPage implements OnInit
 
       var c = this.auth.Take;
 
-      for ( var i = this.Skip; i <= useNotifications.length; i++ )
+      for ( var i = this.Skip; i < useNotifications.length; i++ )
       {
         if ( c <= 0 )
         {

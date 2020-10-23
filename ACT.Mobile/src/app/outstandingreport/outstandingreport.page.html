@@ -12,8 +12,198 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" (ionScroll)="this.auth.OnScroll($event)" [scrollEvents]="true">
+  
+  <!-- fab placed to the top end -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="this.auth.ShowScroll" (click)="this.auth.ScrollToTop();">
+    <ion-fab-button>
+      <ion-icon name="chevron-up"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
- 
+  <ion-refresher (ionRefresh)="Refresh($event)" slot="fixed">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-item-divider style="margin-bottom: 20px;">
+    <ion-label style="text-transform: uppercase;">
+      Outstanding Report
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item>
+    
+    <ion-input type="search" name="Query" placeholder="search" [(ngModel)]="Query" (ionChange)="Search()">
+      <ion-icon name="search" slot="start" style="padding-right: 10px;"></ion-icon>
+    </ion-input>
+  </ion-item>
+
+  <p></p>
+
+  <div style="overflow: auto; white-space: nowrap;">
+
+    <ion-grid style="width: 1020px;">
+
+      <ion-row style="border-bottom: 1px solid #ddd; text-transform: uppercase; font-size: 12px;">
+
+        <ion-col>
+          <b style="color: #002e70 !important;">Client</b>
+        </ion-col>
+        <ion-col>
+          <b style="color: #002e70 !important;">Reason</b>
+        </ion-col>
+        <ion-col>
+          <b style="color: #002e70 !important;">0-30 Days</b>
+        </ion-col>
+        <ion-col>
+          <b style="color: #002e70 !important;">31-60 Days</b>
+        </ion-col>
+        <ion-col>
+          <b style="color: #002e70 !important;">61-90 Days</b>
+        </ion-col>
+        <ion-col>
+          <b style="color: #002e70 !important;">91-120 Days</b>
+        </ion-col>
+        <ion-col>
+          <b style="color: #002e70 !important;">121-183 Days</b>
+        </ion-col>
+        <ion-col>
+          <b style="color: #002e70 !important;">184-270 Days</b>
+        </ion-col>
+        <ion-col>
+          <b style="color: #002e70 !important;">271-365 Days</b>
+        </ion-col>
+        <ng-container *ngIf="this.Years.length > 0">
+
+          <ion-col *ngFor="let y of this.Years.reverse()">
+            <b style="color: #002e70 !important;">
+              {{y}}
+            </b>
+          </ion-col>
+
+        </ng-container>
+        <ion-col>
+          <b style="color: #002e70 !important;">Grand Total</b>
+        </ion-col>
+
+      </ion-row>
+
+      <ng-container *ngFor="let x of OutstandingPallets">
+      
+        <ion-row style="border-bottom: 1px solid #ededed; padding: 10px 0; font-size: 12px;">
+          
+          <ion-col style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+            {{x.ClientLoad.ClientName}}
+          </ion-col>
+          <ion-col style="border-left: 0 none; background-color: #012d71;">&nbsp;</ion-col>
+          <ion-col style="border-left: 0 none; background-color: #012d71;">&nbsp;</ion-col>
+          <ion-col style="border-left: 0 none; background-color: #012d71;">&nbsp;</ion-col>
+          <ion-col style="border-left: 0 none; background-color: #012d71;">&nbsp;</ion-col>
+          <ion-col style="border-left: 0 none; background-color: #012d71;">&nbsp;</ion-col>
+          <ion-col style="border-left: 0 none; background-color: #012d71;">&nbsp;</ion-col>
+          <ion-col style="border-left: 0 none; background-color: #012d71;">&nbsp;</ion-col>
+          <ion-col style="border-left: 0 none; background-color: #012d71;">&nbsp;</ion-col>
+          
+          <ng-container *ngIf="this.Years.length > 0">
+            
+            <ion-col style="border-left: 0 none; background-color: #012d71;">&nbsp;</ion-col>
+  
+          </ng-container>
+
+          <ion-col style="border-left: 0 none; background-color: #012d71;">&nbsp;</ion-col>
+  
+        </ion-row>
+      
+        <ion-row *ngFor="let r of x.OutstandingReasons" style="border-bottom: 1px solid #ededed; padding: 10px 0; font-size: 12px;">
+  
+          <ion-col>&nbsp;</ion-col>
+          <ion-col class="ion-align-self-center" style="border-left: 0 none; background-color: #7cf0f0; color: #123cdf; font-weight: bold;">
+            {{r.Description}} &nbsp;
+          </ion-col>
+          <ion-col class="ion-align-self-center">
+            {{r.To30Days}}
+          </ion-col>
+          <ion-col class="ion-align-self-center">
+            {{r.To60Days}}
+          </ion-col>
+          <ion-col class="ion-align-self-center">
+            {{r.To90Days}}
+          </ion-col>
+          <ion-col class="ion-align-self-center">
+            {{r.To120Days}}
+          </ion-col>
+          <ion-col class="ion-align-self-center">
+            {{r.To183Days}}
+          </ion-col>
+          <ion-col class="ion-align-self-center">
+            {{r.To270Days}}
+          </ion-col>
+          <ion-col class="ion-align-self-center">
+            {{r.To365Days}}
+          </ion-col>
+
+          <ng-container *ngIf="this.Years.length > 0">
+            
+            <ion-col *ngFor="let y of this.Years.reverse()">
+              {{y}}
+            </ion-col>
+  
+          </ng-container>
+
+          <ion-col class="ion-align-self-center">
+            {{r.GrandTotal}}
+          </ion-col>
+  
+        </ion-row>
+      
+        <ion-row style="border-bottom: 1px solid #ededed; padding: 10px 0; font-size: 12px; color: #fff; font-weight: bold;">
+          
+          <ion-col style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+            {{x.GrandTotal.Description}}
+          </ion-col>
+          <ion-col class="ion-align-self-center" style="border-left: 0 none; background-color: #012d71;">
+            &nbsp;
+          </ion-col>
+          <ion-col class="ion-align-self-center" style="border-left: 0 none; background-color: #012d71;">
+            {{x.GrandTotal.To30Days}}
+          </ion-col>
+          <ion-col class="ion-align-self-center" style="border-left: 0 none; background-color: #012d71;">
+            {{x.GrandTotal.To60Days}}
+          </ion-col>
+          <ion-col class="ion-align-self-center" style="border-left: 0 none; background-color: #012d71;">
+            {{x.GrandTotal.To90Days}}
+          </ion-col>
+          <ion-col class="ion-align-self-center" style="border-left: 0 none; background-color: #012d71;">
+            {{x.GrandTotal.To120Days}}
+          </ion-col>
+          <ion-col class="ion-align-self-center" style="border-left: 0 none; background-color: #012d71;">
+            {{x.GrandTotal.To183Days}}
+          </ion-col>
+          <ion-col class="ion-align-self-center" style="border-left: 0 none; background-color: #012d71;">
+            {{x.GrandTotal.To270Days}}
+          </ion-col>
+          <ion-col class="ion-align-self-center" style="border-left: 0 none; background-color: #012d71;">
+            {{x.GrandTotal.To365Days}}
+          </ion-col>
+
+          <ng-container *ngIf="this.Years.length > 0">
+            
+            <ion-col *ngFor="let y of this.Years.reverse()" class="ion-align-self-center" style="border-left: 0 none; background-color: #012d71;">
+              {{y}}
+            </ion-col>
+  
+          </ng-container>
+
+          <ion-col class="ion-align-self-center" style="border-left: 0 none; background-color: #012d71;">
+            {{x.GrandTotal.GrandTotal}}
+          </ion-col>
+  
+        </ion-row>
+
+      </ng-container>
+  
+    </ion-grid>
+    
+  </div>
 
 </ion-content>
