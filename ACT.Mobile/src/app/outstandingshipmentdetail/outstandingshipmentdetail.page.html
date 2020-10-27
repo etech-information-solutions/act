@@ -1,0 +1,110 @@
+<ion-header [translucent]="true" style="color: #002e70 !important;">
+  <ion-toolbar style="color: #002e70 !important;">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      <img (click)="this.auth.OnShowContact()" alt="Contact" src="../../assets/imgs/contact.png" style="width: 36px;" />
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-icon name="notifications" size="large" (click)="this.auth.GoToPage('notifications')"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content [fullscreen]="true" (ionScroll)="this.auth.OnScroll($event)" [scrollEvents]="true">
+
+  <ion-refresher (ionRefresh)="Refresh($event)" slot="fixed">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  
+  <!-- fab placed to the top end -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="this.auth.ShowScroll" (click)="this.auth.ScrollToTop();">
+    <ion-fab-button>
+      <ion-icon name="chevron-up"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-item-divider>
+    <ion-label>
+      PCN Details
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item>
+    <ion-label class="required">* PCN Number</ion-label>
+    <ion-input type="text" name="PCNNumber" [(ngModel)]="PCNNumber" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label class="required">* PCN Comment</ion-label>
+    <ion-input type="text" name="PCNComment" [(ngModel)]="PCNComment" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item lines="none" style="margin: 20px 0;">
+
+    <img [src]="this.PCNUrl" (click)="this.auth.OpenImage(this.PCNUrl)" style="width: 100px; height: 100px;" />
+
+    <ion-icon name="camera" (click)="PresentPhotoOptions(1)" style="padding-left: 15px;"></ion-icon>
+    
+  </ion-item>
+
+  <ion-item-divider>
+    <ion-label>
+      POD Details
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item>
+    <ion-label class="required">* POD Number</ion-label>
+    <ion-input type="text" name="PODNumber" [(ngModel)]="PODNumber" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label class="required">* POD Comment</ion-label>
+    <ion-input type="text" name="PODComment" [(ngModel)]="PODComment" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item lines="none" style="margin: 20px 0;">
+
+    <img [src]="this.PODUrl" (click)="this.auth.OpenImage(this.PODUrl)" style="width: 100px; height: 100px;" />
+
+    <ion-icon name="camera" (click)="PresentPhotoOptions(2)" style="padding-left: 15px;"></ion-icon>
+    
+  </ion-item>
+
+  <ion-item-divider>
+    <ion-label>
+      PRN Details
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item>
+    <ion-label class="required">* PRN Number</ion-label>
+    <ion-input type="text" name="PRNNumber" [(ngModel)]="PRNNumber" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label class="required">* PRN Comment</ion-label>
+    <ion-input type="text" name="PRNComment" [(ngModel)]="PRNComment" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item lines="none" style="margin: 20px 0;">
+
+    <img [src]="this.PRNUrl" (click)="this.auth.OpenImage(this.PRNUrl)" style="width: 100px; height: 100px;" />
+
+    <ion-icon name="camera" (click)="PresentPhotoOptions(3)" style="padding-left: 15px;"></ion-icon>
+    
+  </ion-item>
+
+  <div text-left style="margin: 30px 0; padding: 20px">
+
+    <ion-button (click)="Update()" type="button" shape="round" expand="full" style="--background: #002e70;">
+      Save
+      <ion-icon name="flame" slot="end"></ion-icon>
+    </ion-button>
+
+  </div>
+
+</ion-content>

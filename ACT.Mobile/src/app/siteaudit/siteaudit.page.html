@@ -72,7 +72,7 @@
         {{x.ClientName}}
       </ion-col>
       <ion-col class="ion-align-self-center">
-        {{this.auth.GetShortDate(x.AuditDate)}} @ {{this.auth.GetShortTime(x.AuditDate)}}
+        {{this.auth.GetShortDate(x.AuditDate, 'yyyy/MM/dd')}} @ {{this.auth.GetShortTime(x.AuditDate)}}
       </ion-col>
       <ion-col class="ion-align-self-center">
         {{x.RepName}}

@@ -14,6 +14,7 @@ using ACT.Core.Models.Custom;
 using ACT.Core.Models.Simple;
 using ACT.Core.Services;
 using ACT.Data.Models;
+using System.Web.Hosting;
 
 namespace ACT.UI.Controllers.api
 {
@@ -355,7 +356,124 @@ namespace ACT.UI.Controllers.api
             return outstandingReasons;
         }
 
+        [HttpGet]
+        public HttpResponseMessage OutstandingShipments( string email, string apikey )
+        {
+            using ( ClientLoadService service = new ClientLoadService() )
+            {
+                service.CurrentUser = service.GetUser( email );
 
+                CustomSearchModel csm = new CustomSearchModel();
+
+                PagingModel pm = new PagingModel() { SortBy = "cl.PCNNumber, cl.PRNNumber, cl.PODNumber" };
+
+                List<ClientLoadCustomModel> model = service.ListOutstandingShipments( pm, csm );
+
+                return Request.CreateResponse( HttpStatusCode.OK, model );
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage UpdateShipment( ClientLoadCustomModel model )
+        {
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            {
+                clservice.CurrentUser = clservice.GetUser( model.Email );
+
+                ClientLoad load = clservice.GetById( model.Id );
+
+                if ( load == null )
+                {
+                    return Request.CreateResponse( HttpStatusCode.OK, new ResponseModel() { Code = -1, Description = "Shipment could not be found" } );
+                }
+
+                load.PCNNumber = model.PCNNumber;
+                load.PODNumber = model.PODNumber;
+                load.PRNNumber = model.PRNNumber;
+
+                clservice.Update( load );
+
+                CustomSearchModel csm = new CustomSearchModel();
+
+                PagingModel pm = new PagingModel() { SortBy = "cl.PCNNumber, cl.PRNNumber, cl.PODNumber" };
+
+                List<ClientLoadCustomModel> loads = clservice.ListOutstandingShipments( pm, csm );
+
+                return Request.CreateResponse( HttpStatusCode.OK, new { OutstandingShipments = loads, Code = 1, Description = "Shipment updated" } );
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage UploadShipment( int id, string apikey, string objecttype, string comment, string email )
+        {
+            try
+            {
+                using ( ImageService iservice = new ImageService() )
+                using ( ClientLoadService saservice = new ClientLoadService() )
+                {
+                    saservice.CurrentUser = saservice.GetUser( email );
+
+                    ClientLoad load = saservice.GetById( id );
+
+                    if ( load == null )
+                    {
+                        return Request.CreateResponse( HttpStatusCode.OK, new ResponseModel() { Code = -1, Description = "Shipment could not be found" } );
+                    }
+
+                    HttpPostedFile file = HttpContext.Current.Request.Files.Count > 0 ? HttpContext.Current.Request.Files[ 0 ] : null;
+
+                    if ( file == null )
+                    {
+                        return Request.CreateResponse( HttpStatusCode.OK, new ResponseModel() { Code = -1, Description = "No file uploaded!" } );
+                    }
+
+                    // Create folder
+                    string path = HostingEnvironment.MapPath( $"~/{VariableExtension.SystemRules.ImagesLocation}/ClientLoads/{load.DeliveryNote?.Trim()}/" );
+
+                    string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+
+                    string ext = Path.GetExtension( file.FileName ),
+                           name = file.FileName.Replace( ext, "" );
+
+                    // Check if a logo already exists?
+                    Image img = iservice.Get( load.Id, objecttype, true );
+
+                    if ( img != null )
+                    {
+                        baseC.DeleteImage( img.Id );
+                    }
+
+                    if ( !Directory.Exists( path ) )
+                    {
+                        Directory.CreateDirectory( path );
+                    }
+
+                    Image image = new Image()
+                    {
+                        Name = name,
+                        ObjectId = load.Id,
+                        ObjectType = objecttype,
+                        Size = file.ContentLength,
+                        Description = comment,
+                        IsMain = true,
+                        Extension = ext,
+                        Location = $"ClientLoads/{load.DeliveryNote?.Trim()}/{now}-{file.FileName}"
+                    };
+
+                    iservice.Create( image );
+
+                    string fullpath = Path.Combine( path, $"{now}-{file.FileName}" );
+
+                    file.SaveAs( fullpath );
+
+                    return Request.CreateResponse( HttpStatusCode.OK, saservice.OldObject );
+                }
+            }
+            catch ( Exception ex )
+            {
+                return Request.CreateResponse( HttpStatusCode.OK, ex.Message.ToString() );
+            }
+        }
     }
 }
 

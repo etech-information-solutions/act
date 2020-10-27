@@ -28,13 +28,15 @@ export class UserService
   SiteAudits: any;
   Notification: any;
   Notifications: any;
-  OutstandingPallets: any;
   APIAuthentication: any;
+  OutstandingPallets: any;
+  OutstandingShipment: any;
+  OutstandingShipments: any;
   APIAuthenticationHeader: any;
 
   APIKey: any = "_12345testing_";
   APIUrl: any = "http://act.loc/";
-  //APIUrl: any = "https://www.testdirectrewards.co.za/";
+  //APIUrl: any = "https://www.testact.co.za/";
 
   Time: any = [];
 
@@ -66,6 +68,7 @@ export class UserService
 
   // 
   ExitApp: boolean = false;
+  RefreshShipments: boolean = false;
   RemoveSiteAuditConfirmed: boolean = false;
 
   SelfieUrl: string = "../../assets/imgs/user-profile.png";
@@ -434,6 +437,83 @@ export class UserService
     loading.dismiss();
 
     return this.OutstandingPallets;
+  }
+
+  SearchOutstandingShipments( query:string = "" )
+  {
+    var resp = [];
+
+    query = query.toLowerCase();
+
+    for ( let r of this.OutstandingShipments )
+    {
+      if ( r.ClientName.toLowerCase().includes( query ) ||
+           r.SiteName.toLowerCase().includes( query ) ||
+           r.SubSiteName.toLowerCase().includes( query ) ||
+           r.LoadNumber.toLowerCase().includes( query ) ||
+           r.AccountNumber.toLowerCase().includes( query ) ||
+           r.DeliveryNote.toLowerCase().includes( query ) ||
+           r.ReferenceNumber.toLowerCase().includes( query ) ||
+           r.ReceiverNumber.toLowerCase().includes( query ) ||
+           r.Equipment.toLowerCase().includes( query ) ||
+           r.PODNumber.toLowerCase().includes( query ) ||
+           r.PCNNumber.toLowerCase().includes( query ) ||
+           r.PRNNumber.toLowerCase().includes( query ) ||
+           r.ProvCode.toLowerCase().includes( query ) ||
+           r.DocketNumber.toLowerCase().includes( query ) ||
+           r.THAN.toLowerCase().includes( query )
+          )
+      {
+        resp.push( r );
+      }
+    }
+
+    return resp;
+  }
+
+  async GetOutstandingShipments( query:string = "" )
+  {
+    if ( this.OutstandingShipments != undefined && this.OutstandingShipments.length > 0 )
+    {
+      if ( query != "" )
+      {
+        return this.SearchOutstandingShipments( query );
+      }
+
+      return this.OutstandingShipments;
+    }
+
+    var loading = await this.ShowLoading( "Fetching report..." );
+
+    try
+    {
+      var url = `${this.APIUrl}/api/Pallet/OutstandingShipments?email=${this.CurrentUser.Email}&apikey=${this.APIKey}`;
+
+      this.OutstandingShipments = await this.http.get<iCommonModel>( url ).toPromise();
+
+      if ( query != "" )
+      {
+        return this.SearchOutstandingShipments( query );
+      }
+    }
+    catch( error )
+    {
+      loading.dismiss();
+
+      if ( this.OutstandingShipments == undefined )
+      {
+        this.OutstandingShipments = {};
+      }
+
+      this.OutstandingShipments.ResponseCode = -1;
+      this.OutstandingShipments.Description = JSON.stringify( error );
+
+      return [];
+    }
+
+    loading.dismiss();
+
+    return this.OutstandingShipments;
   }
 
   async LogOut() 
@@ -934,6 +1014,83 @@ export class UserService
     {
       
     }
+  }
+
+  async UpdateShipment( load: any, message: string = undefined ) 
+  {
+    var loading = await this.ShowLoading( message );
+
+    // API Call here
+    try
+    {
+      load = `${load}&apikey=${this.APIKey}&email=${this.CurrentUser.Email}`;
+
+      let httpOptions = 
+      {
+        headers: new HttpHeaders(
+        {
+          "Content-Type": "application/x-www-form-urlencoded"
+        })
+      };
+
+      this.ServerResult = await this.http.post<iCommonModel>( this.APIUrl + "/api/Pallet/UpdateShipment", load, httpOptions ).toPromise();
+
+      if ( this.ServerResult.Code == 1 )
+      {
+        this.OutstandingShipments = this.ServerResult.OutstandingShipments;
+      }
+    }
+    catch( error )
+    {
+      loading.dismiss();
+
+      this.ServerResult = { Code: -1, Message: JSON.stringify( error ) };
+
+      return;
+    }
+
+    loading.dismiss();
+  }
+
+  async UploadShipment( id: number, objectType: string, comment: string, fileurl: any, fileKey: string, fileName: string, mimeType: string, message: string = undefined )
+  {
+    var loading = await this.ShowLoading( message );
+
+    // API Call here
+    try
+    {
+      const fileTransfer: FileTransferObject = this.transfer.create();
+
+      let options: FileUploadOptions =
+      {
+        fileKey: fileKey,
+        fileName: fileName,
+        chunkedMode: false,
+        mimeType: mimeType,
+        params: {
+          id: id,
+          apikey: this.APIKey,
+          objecttype: objectType,
+          comment: comment,
+          email: this.CurrentUser.Email,
+        }
+      };
+
+      await fileTransfer.upload( fileurl, `${this.APIUrl}/api/Pallet/UploadShipment?id=${id}&apikey=${this.APIKey}&objecttype=${objectType}&comment=${comment}&email=${this.CurrentUser.Email}`, options ).then( ( data ) =>
+      {
+        this.ServerResult = data;
+
+      }, ( err ) =>
+      {
+        this.ServerResult = { Code: 1, Message: JSON.stringify( err ) };
+      });
+    }
+    catch( error )
+    {
+      this.ServerResult = { Code: -1, Message: JSON.stringify( error ) };
+    }
+
+    loading.dismiss();
   }
 
   DataURItoBlob( fileurl:any, mimeType: string )

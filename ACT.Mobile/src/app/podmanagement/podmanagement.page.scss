@@ -1,0 +1,50 @@
+ion-item * {
+    font-size: 13px !important;
+  }
+  
+.success-message {
+    color: #229c1c;
+    padding: 5px 10px;
+    background-color: #bef2bb;
+}
+
+.warn-message {
+    color: #EBA324;
+    padding: 5px 10px;
+    background-color: #FFE6BA;
+}
+
+.error-message {
+    color: #e80c4d;
+    padding: 5px 10px;
+    background-color: #ffeeee;
+}
+
+.orange {
+    color: #cd982e;
+}
+
+.purple {
+    color: #c3456b;
+}
+
+.unread > * {
+    font-weight: bold !important;
+}
+
+ion-item-divider ion-label {
+    padding: 10px 0;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
+ion-item-divider.ios ion-label {
+    padding: 20px 0;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+ion-item-divider ion-icon {
+    font-size: 24px;
+    padding-right: 10px;
+}

@@ -39,7 +39,9 @@ namespace ACT.Core.Models.Custom
         public string ARPMComments { get; set; }
         public string ProvCode { get; set; }
 
+        public int? ImageCount { get; set; }
         public int? DocumentCount { get; set; }
+        public List<Image> Images { get; set; }
         public List<Document> Documents { get; set; }
 
         public int? PostingType { get; set; }
@@ -60,5 +62,11 @@ namespace ACT.Core.Models.Custom
         public int? JournalCount { get; set; }
 
         public decimal? ChepNewQuantity { get; set; }
+
+
+        // Mobile API
+        public string Email { get; set; }
+
+        public string APIKey { get; set; }
     }
 }

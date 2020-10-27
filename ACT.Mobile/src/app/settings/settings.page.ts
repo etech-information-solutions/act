@@ -97,7 +97,7 @@ export class SettingsPage implements OnInit
     {
       this.SelfieLoaded = ( isSelfie ) ? false: this.SelfieLoaded;
 
-     this.ShowError( JSON.stringify( err ) );
+     this.auth.ShowError( JSON.stringify( err ) );
     });
   }
 
@@ -129,11 +129,11 @@ export class SettingsPage implements OnInit
       }
 
       // Notify agent
-      this.ShowMessage( "Hoooray...!!!", msg );
+      this.auth.ShowMessage( "Hoooray...!!!", msg );
     }
     else if ( this.auth.UpdatedUser != undefined  && this.auth.UpdatedUser.Message != "" )
     {
-      this.ShowMessage( "Error", this.auth.UpdatedUser.Message );
+      this.auth.ShowMessage( "Error", this.auth.UpdatedUser.Message );
     }
   }
 
@@ -176,7 +176,7 @@ export class SettingsPage implements OnInit
     // Required inputs
     if ( this.Name === undefined || this.Surname === undefined || this.Cell === undefined || this.Email === undefined )
     {
-      this.ShowError( "Please complete all required '*' inputs" );
+      this.auth.ShowError( "Please complete all required '*' inputs" );
 
       return false;
     }
@@ -184,7 +184,7 @@ export class SettingsPage implements OnInit
     // Checked TnC?
     if ( !this.AcceptTnC )
     {
-      this.ShowMessage( "Terms & Conditions", "One last critical thing, please Accept our T & C for signing up with us." );
+      this.auth.ShowMessage( "Terms & Conditions", "One last critical thing, please Accept our T & C for signing up with us." );
 
       return false;
     }
@@ -206,36 +206,11 @@ export class SettingsPage implements OnInit
     refresher.target.complete();
   }
 
-  async ShowError( text ) 
-  {
-    let alert = await this.alertCtrl.create(
-    {
-      header: "Error",
-      message: text,
-      buttons: ["OK"]
-    });
-
-    await alert.present();
-  }
-
   async ShowTnC()
   {
     var tnc = "Some sleak awesome Terms and Conditions you cannot help but accept.";
 
-    this.ShowMessage( "Terms and Conditions", tnc );
-  }
-
-
-  async ShowMessage( title:string, message:string ) 
-  {
-    let alert = await this.alertCtrl.create(
-    {
-      header: title,
-      message: message,
-      buttons: ["OK"]
-    });
-
-    await alert.present();
+    this.auth.ShowMessage( "Terms and Conditions", tnc );
   }
   
   async GoToPage( page:string )

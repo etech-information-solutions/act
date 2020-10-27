@@ -67,6 +67,10 @@ const routes: Routes = [
     path: 'addsiteaudit',
     loadChildren: () => import('./addsiteaudit/addsiteaudit.module').then( m => m.AddsiteauditPageModule)
   },
+  {
+    path: 'outstandingshipmentdetail',
+    loadChildren: () => import('./outstandingshipmentdetail/outstandingshipmentdetail.module').then( m => m.OutstandingshipmentdetailPageModule)
+  },
 ];
 
 @NgModule({
