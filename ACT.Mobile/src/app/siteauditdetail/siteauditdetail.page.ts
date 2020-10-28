@@ -85,9 +85,9 @@ export class SiteauditdetailPage implements OnInit
 
     this.PalletAuditor = this.auth.SiteAudit.PalletAuditor;
 
-    if ( this.auth.SiteAudit.PalletSignatureId > 0 )
+    if ( this.auth.SiteAudit.PalletAuditorSignatureId > 0 )
     {
-      this.PalletAuditorSignUrl = `${this.auth.APIUrl}Account/ViewImage?id=${this.auth.SiteAudit.PalletSignatureId}`;
+      this.PalletAuditorSignUrl = `${this.auth.APIUrl}Account/ViewImage?id=${this.auth.SiteAudit.PalletAuditorSignatureId}`;
     }
   }
 
