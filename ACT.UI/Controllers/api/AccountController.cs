@@ -451,11 +451,11 @@ namespace ACT.UI.Controllers.API
         }
 
         [HttpGet]
-        public SystemConfig GetRules( string email, string apiKey )
+        public SystemConfig GetRules( string apiKey )
         {
             using ( UserService uservice = new UserService() )
             {
-                uservice.CurrentUser = uservice.GetUser( email );
+                //uservice.CurrentUser = uservice.GetUser( email );
 
                 return uservice.SystemConfig;
             }

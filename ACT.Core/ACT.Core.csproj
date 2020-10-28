@@ -132,6 +132,7 @@
     <Compile Include="Interfaces\IPermission.cs" />
     <Compile Include="Interfaces\IRole.cs" />
     <Compile Include="Interfaces\IUser.cs" />
+    <Compile Include="Models\Custom\ClientCustomerCustomModel.cs" />
     <Compile Include="Models\Custom\EmailCustomModel.cs" />
     <Compile Include="Models\Custom\AddressCustomModel.cs" />
     <Compile Include="Models\Custom\AuditLogCustomModel.cs" />
@@ -203,6 +204,7 @@
     <Compile Include="Models\StringDropDownModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\ClientCustomerService.cs" />
     <Compile Include="Services\DeclineReasonService.cs" />
     <Compile Include="Services\UserTaskService.cs" />
     <Compile Include="Services\TaskService.cs" />

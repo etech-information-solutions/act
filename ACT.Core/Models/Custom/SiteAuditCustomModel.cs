@@ -26,12 +26,15 @@ namespace ACT.Core.Models.Custom
         public byte[] PalletAuditorSign { get; set; }
         public string DocumentLocation { get; set; }
         public int Status { get; set; }
+        public Nullable<int> CustomerSignatureId { get; set; }
+        public Nullable<int> RepSignatureId { get; set; }
+        public Nullable<int> PalletAuditorSignatureId { get; set; }
 
         public string PSPName { get; set; }
         public string SiteName { get; set; }
         public string ClientName { get; set; }
 
-        public int? ReportDocumentId { get; set; }
+        public int? ReportDocumentId { get; set; } 
 
 
         // Mobile API

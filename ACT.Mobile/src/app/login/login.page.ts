@@ -57,6 +57,7 @@ export class LoginPage implements OnInit
     }
 
     this.menuCtrl.enable( false );
+    this.auth.SetDefaults();
   }
 
   async ngOnInit()

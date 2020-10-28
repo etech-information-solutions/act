@@ -63,20 +63,32 @@ export class SiteauditdetailPage implements OnInit
     this.ClientId = this.auth.SiteAudit.ClientId;
 
     this.AuditDate = this.auth.GetISODateString( new Date( this.auth.SiteAudit.AuditDate ) );
-    
+
     this.Equipment = this.auth.SiteAudit.Equipment;
     this.PalletsOutstanding = this.auth.SiteAudit.PalletsOutstanding;
     this.PalletsCounted = this.auth.SiteAudit.PalletsCounted;
     this.WriteoffPallets = this.auth.SiteAudit.WriteoffPallets;
 
     this.CustomerName = this.auth.SiteAudit.CustomerName;
-    this.CustomerSignatureUrl = this.auth.SiteAudit.CustomerSignature;
+
+    if ( this.auth.SiteAudit.CustomerSignatureId > 0 )
+    {
+      this.CustomerSignatureUrl = `${this.auth.APIUrl}Account/ViewImage?id=${this.auth.SiteAudit.CustomerSignatureId}`;
+    }
 
     this.RepName = this.auth.SiteAudit.RepName;
-    this.RepSignatureUrl = this.auth.SiteAudit.RepSignature;
+
+    if ( this.auth.SiteAudit.RepSignatureId > 0 )
+    {
+      this.RepSignatureUrl = `${this.auth.APIUrl}Account/ViewImage?id=${this.auth.SiteAudit.RepSignatureId}`;
+    }
 
     this.PalletAuditor = this.auth.SiteAudit.PalletAuditor;
-    this.PalletAuditorSignUrl = this.auth.SiteAudit.PalletAuditorSign;
+
+    if ( this.auth.SiteAudit.PalletSignatureId > 0 )
+    {
+      this.PalletAuditorSignUrl = `${this.auth.APIUrl}Account/ViewImage?id=${this.auth.SiteAudit.PalletSignatureId}`;
+    }
   }
 
   ngAfterViewInit() 
@@ -86,31 +98,6 @@ export class SiteauditdetailPage implements OnInit
     this.CustomerSignaturePad = new SignaturePad( this.csignaturePad.nativeElement );
     this.RepSignaturePad = new SignaturePad( this.rsignaturePad.nativeElement );
     this.PalletAuditorSignPad = new SignaturePad( this.psignaturePad.nativeElement );
-
-    if ( this.CustomerSignatureUrl != null )
-    {
-      const blob = new Blob( [ this.CustomerSignatureUrl ], { type: "image/jpeg" } );
-      const urlCreator = window.URL || window.webkitURL;
-      var base64 = urlCreator.createObjectURL( blob );
-
-      this.CustomerSignaturePad.fromDataURL( base64 );
-    }
-    if ( this.RepSignatureUrl != null )
-    {
-      const blob = new Blob( [ this.RepSignatureUrl ], { type: "image/jpeg" } );
-      const urlCreator = window.URL || window.webkitURL;
-      var base64 = urlCreator.createObjectURL( blob );
-
-      this.RepSignaturePad.fromDataURL( base64 );
-    }
-    if ( this.PalletAuditorSignUrl != null )
-    {
-      const blob = new Blob( [ this.PalletAuditorSignUrl ], { type: "image/jpeg" } );
-      const urlCreator = window.URL || window.webkitURL;
-      var base64 = urlCreator.createObjectURL( blob );
-
-      this.PalletAuditorSignPad.fromDataURL( base64 );
-    }
   }
 
   ClearPad( sig: number )
@@ -118,14 +105,29 @@ export class SiteauditdetailPage implements OnInit
     if ( sig == 1 )
     {
       this.CustomerSignaturePad.clear();
+
+      if ( this.CustomerSignatureUrl != undefined )
+      {
+        this.CustomerSignatureUrl = undefined;
+      }
     }
     else if ( sig == 2 )
     {
       this.RepSignaturePad.clear();
+
+      if ( this.RepSignatureUrl != undefined )
+      {
+        this.RepSignatureUrl = undefined;
+      }
     }
     else if ( sig == 3 )
     {
       this.PalletAuditorSignPad.clear();
+
+      if ( this.PalletAuditorSignUrl != undefined )
+      {
+        this.PalletAuditorSignUrl = undefined;
+      }
     }
   }
   
@@ -138,31 +140,29 @@ export class SiteauditdetailPage implements OnInit
     
     var audit = this.Construct();
 
-    var resp = await this.auth.UpdateSiteAudit( audit, "Updating your Site Audit..." );
+    await this.auth.UpdateSiteAudit( audit, "Updating your Site Audit..." );
 
-    if ( typeof( resp.Code ) != undefined && resp.Code  == -1 )
+    if ( this.auth.ServerResult != undefined && this.auth.ServerResult.Code  == -1 )
     {
-      this.auth.ShowError( resp.Message );
+      this.auth.ShowError( this.auth.ServerResult.Message );
       
       return;
     }
 
-    var i = this.auth.SiteAudits.findIndex( p => p.Id == this.auth.SiteAudit.Id );
-
-    this.auth.SiteAudits[ i ] = resp;
-
     if ( !this.CustomerSignaturePad.isEmpty() )
     {
-      await this.auth.UploadSignature( this.auth.SiteAudit.Id, 1, this.CustomerSignaturePad.toDataURL( "image/jpeg" ), "file", "siteaudit-customer-signature.jpg", "image/jpeg", "Uploading Customer Signature.." );
+      await this.auth.UploadSignature( this.auth.SiteAudit.Id, "CustomerSignature", this.CustomerSignaturePad.toDataURL( "image/png" ), "file", "siteaudit-customer-signature.png", "image/png", "Uploading Customer Signature.." );
     }
     if ( !this.RepSignaturePad.isEmpty() )
     {
-      await this.auth.UploadSignature( this.auth.SiteAudit.Id, 2, this.RepSignaturePad.toDataURL( "image/jpeg" ), "file", "siteaudit-rep-signature.jpg", "image/jpeg", "Uploading Sales Rep Signature.." );
+      await this.auth.UploadSignature( this.auth.SiteAudit.Id, "RepSignature", this.RepSignaturePad.toDataURL( "image/png" ), "file", "siteaudit-rep-signature.png", "image/png", "Uploading Sales Rep Signature.." );
     }
     if ( !this.PalletAuditorSignPad.isEmpty() )
     {
-      await this.auth.UploadSignature( this.auth.SiteAudit.Id, 3, this.PalletAuditorSignPad.toDataURL( "image/jpeg" ), "file", "siteaudit-pallet-auditor-signature.jpg", "image/jpeg", "Uploading Pallet Auditor Signature.." );
+      await this.auth.UploadSignature( this.auth.SiteAudit.Id, "PalletAuditorSignature", this.PalletAuditorSignPad.toDataURL( "image/png" ), "file", "siteaudit-pallet-auditor-signature.png", "image/png", "Uploading Pallet Auditor Signature.." );
     }
+
+    this.auth.RefreshSiteAudits = true;
 
     this.auth.GoToPage( "siteaudit", true );
   }

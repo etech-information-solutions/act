@@ -35,8 +35,8 @@ export class UserService
   APIAuthenticationHeader: any;
 
   APIKey: any = "_12345testing_";
-  APIUrl: any = "http://act.loc/";
-  //APIUrl: any = "https://www.testact.co.za/";
+  //APIUrl: any = "http://act.loc/";
+  APIUrl: any = "http://www.testact.co.za/";
 
   Time: any = [];
 
@@ -69,6 +69,7 @@ export class UserService
   // 
   ExitApp: boolean = false;
   RefreshShipments: boolean = false;
+  RefreshSiteAudits: boolean = false;
   RemoveSiteAuditConfirmed: boolean = false;
 
   SelfieUrl: string = "../../assets/imgs/user-profile.png";
@@ -114,13 +115,15 @@ export class UserService
   async SetDefaults() 
   {
     await this.GetUser();
-    await this.SetPSPs();
-    await this.SetSites();
     await this.SetRules();
-    await this.SetClients();
     await this.SetDeviceUser();
     await this.SetAppDetails();
 
+    await this.SetSelfieUrl();
+  }
+
+  async SetSelfieUrl()
+  {
     if ( this.DeviceUser != undefined && this.DeviceUser.SelfieUrl != undefined )
     {
       this.SelfieUrl = this.APIUrl + this.DeviceUser.SelfieUrl;
@@ -518,9 +521,10 @@ export class UserService
 
   async LogOut() 
   {
+    this.CurrentUser = null;  
+
     await this.storage.remove( "CurrentUser" ).then( () =>
     {
-      this.CurrentUser = null;  
     });
   }
 
@@ -577,14 +581,9 @@ export class UserService
 
   async SetRules()
   {
-    if ( this.Rules != undefined )
-    {
-      return;
-    }
-
     try
     {
-      var url = `${this.APIUrl}/api/Account/GetRules?email=${this.CurrentUser.Email}&apikey=${this.APIKey}`;
+      var url = `${this.APIUrl}/api/Account/GetRules?apikey=${this.APIKey}`;
       this.Rules = await this.http.get<iSystemRulesModel>( url ).toPromise();
 
       await this.storage.set( "Rules", this.Rules );
@@ -597,11 +596,6 @@ export class UserService
 
   async SetPSPs()
   {
-    if ( this.PSPs != undefined )
-    {
-      return;
-    }
-
     try
     {
       var url = `${this.APIUrl}/api/Account/GetPSPs?email=${this.CurrentUser.Email}&apikey=${this.APIKey}`;
@@ -617,11 +611,6 @@ export class UserService
 
   async SetSites()
   {
-    if ( this.Sites != undefined )
-    {
-      return;
-    }
-
     try
     {
       var url = `${this.APIUrl}/api/Account/GetSites?email=${this.CurrentUser.Email}&apikey=${this.APIKey}`;
@@ -637,11 +626,6 @@ export class UserService
 
   async SetClients()
   {
-    if ( this.Clients != undefined )
-    {
-      return;
-    }
-
     try
     {
       var url = `${this.APIUrl}/api/Account/GetClients?email=${this.CurrentUser.Email}&apikey=${this.APIKey}`;
@@ -729,7 +713,9 @@ export class UserService
 
       if ( this.UpdatedUser.Code == 1 )
       {
-        this.CurrentUser = this.UpdatedUser;
+        this.CurrentUser = this.DeviceUser = this.UpdatedUser;
+
+        await this.SetSelfieUrl();
       }
     }
     catch( error )
@@ -762,17 +748,20 @@ export class UserService
       };
 
       // Update site audit
-      this.SiteAudit = await this.http.post<iCommonModel>( this.APIUrl + "/api/Pallet/UpdateSiteAudit", audit, httpOptions ).toPromise();
+      this.ServerResult = await this.http.post<iCommonModel>( this.APIUrl + "/api/Pallet/UpdateSiteAudit", audit, httpOptions ).toPromise();
 
       loading.dismiss();
 
-      return this.SiteAudit;
+      if ( this.ServerResult.Code == 1 )
+      {
+        this.SiteAudits = this.ServerResult.SiteAudits;
+      }
     }
     catch( error )
     {
       loading.dismiss();
 
-      return { Code: -1, Message: JSON.stringify( error ) };
+      this.ServerResult = { Code: -1, Message: JSON.stringify( error ) };
     }
   }
 
@@ -794,21 +783,21 @@ export class UserService
       };
 
       // Update site audit
-      this.SiteAudit = await this.http.post<iCommonModel>( this.APIUrl + "/api/Pallet/CreateSiteAudit", audit, httpOptions ).toPromise();
+      var resp = await this.http.post<iCommonModel>( this.APIUrl + "/api/Pallet/CreateSiteAudit", audit, httpOptions ).toPromise();
 
       loading.dismiss();
 
-      return this.SiteAudit;
+      return resp;
     }
     catch( error )
     {
       loading.dismiss();
 
-      return { Code: -1, Message: JSON.stringify( error ) };
+      return { Id: -1, Code: -1, Message: JSON.stringify( error ) };
     }
   }
 
-  async UploadSignature( id: string, type: number, fileurl: any, fileKey: string, fileName: string, mimeType: string, message: string = undefined )
+  async UploadSignature( id: string, type: string, fileurl: any, fileKey: string, fileName: string, mimeType: string, message: string = undefined )
   {
     var loading = await this.ShowLoading( message );
 
@@ -1260,7 +1249,7 @@ export class UserService
       {
         this.callNumber.callNumber( this.Rules.ContactNumber, true )
         .then(res => console.log('Launched dialer!', res))
-        .catch(err => console.log('Error launching dialer', err));
+        .catch(err => this.ShowError('Error launching dialer' + JSON.stringify( err )));
       }
     });
 
@@ -1432,4 +1421,6 @@ export interface iPalletModel
 export interface iCommonModel
 {
   Id: any;
+  Code: any;
+  Message: any;
 }
