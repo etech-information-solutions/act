@@ -18,6 +18,16 @@
 
     Dictionary<int, string> pSPOptions = Model.PSPOptions;
 
+    bool showServiceRequiredSection = true;
+
+    if (user.RoleType == RoleType.PSP && pSPOptions.Count() == 1)
+    {
+        showServiceRequiredSection = false;
+        Model.ServiceType = ServiceType.HaveCompany;
+        Model.PSP = user.PSPs.First();
+        Model.PSPId = user.PSPs.First().Id;
+    }
+
     if ( !pSPOptions.NullableAny() )
     {
         pSPOptions = new Dictionary<int, string>();
@@ -101,33 +111,36 @@
                     @Html.ValidationMessageFor( model => model.Status )
                 </div>
 
+                <div class="@(showServiceRequiredSection ? "block" : "none")">
+
                 <div class="editor-label" style="margin: 0 0 10px 0;">
                     @Html.LabelFor( model => model.ServiceType )
                 </div>
 
-                <div class="editor-field">
-                    @foreach ( int k in Enum.GetValues( typeof( ServiceType ) ) )
-                    {
-                        if ( k < 3 )
+                    <div class="editor-field">
+                        @foreach ( int k in Enum.GetValues( typeof( ServiceType ) ) )
                         {
-                            continue;
+                            if ( k < 3 )
+                            {
+                                continue;
+                            }
+
+                            ServiceType st = ( ( ServiceType ) k );
+
+                            string desc = st.GetDisplayText();
+
+                            string sel = ( st == Model.ServiceType ) ? "checked=checked" : "";
+
+                            <label class="block" for="ServiceType-@k">
+
+                                <input id="ServiceType-@k" name="ServiceType" type="radio" value="@k" @sel data-service-type="1" data-target="#psp-list" />
+
+                                @desc
+
+                            </label>
+                            <div></div>
                         }
-
-                        ServiceType st = ( ( ServiceType ) k );
-
-                        string desc = st.GetDisplayText();
-
-                        string sel = ( st == Model.ServiceType ) ? "checked=checked" : "";
-
-                        <label class="block" for="ServiceType-@k">
-
-                            <input id="ServiceType-@k" name="ServiceType" type="radio" value="@k" @sel data-service-type="1" data-target="#psp-list" />
-
-                            @desc
-
-                        </label>
-                        <div></div>
-                    }
+                    </div>
                 </div>
 
                 <div id="psp-list" class="@(Model.ServiceType == ServiceType.HaveCompany ? "block" : "none")" style="margin-top: 20px;">
