@@ -49,7 +49,11 @@ namespace ACT.Core.Services
 
             query = $"SELECT c.Id AS [TKey], c.CompanyName AS [TValue] FROM [dbo].[Client] c WHERE (1=1)";
 
-            if ( !CurrentUser.IsAdmin )
+            if (CurrentUser.Roles.Any(r => r.Type == RoleType.PSP.GetIntValue() ))
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM PSPUser[pu] RIGHT JOIN PSPClient[pc] on pc.PSPId = pu.PSPId WHERE pu.UserId = 25 AND pc.ClientId = c.Id)";
+            }
+            else if (!CurrentUser.IsAdmin)
             {
                 query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
             }
