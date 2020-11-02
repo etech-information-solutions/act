@@ -355,7 +355,7 @@ namespace ACT.Core.Services
             {
                 foreach ( SiteCustomModel item in model.Where( p => p.ClientCount > 0 ) )
                 {
-                    item.Clients = context.ClientSites.Where( cs => cs.SiteId == item.Id ).Select( s => s.Client.CompanyName ).ToList();
+                    item.Clients = context.ClientSites.Where( cs => cs.SiteId == item.Id ).Select( s => s.ClientCustomer.CustomerName ).ToList();
                 }
             }
 
@@ -376,7 +376,7 @@ namespace ACT.Core.Services
             siteList = ( from c in context.ClientSites
                          join e in context.Sites
                          on c.SiteId equals e.Id
-                         where c.ClientId == clientId
+                         where c.ClientCustomerId == clientId
                          select e ).ToList();
 
             return siteList;
@@ -388,7 +388,7 @@ namespace ACT.Core.Services
             siteList = ( from c in context.ClientSites
                          join e in context.Sites
                          on c.SiteId equals e.Id
-                         where c.ClientId == clientId
+                         where c.ClientCustomerId == clientId
                          where c.SiteId == siteId
                          select e ).ToList();
 
@@ -401,7 +401,7 @@ namespace ACT.Core.Services
             clientId = ( from c in context.ClientSites
                          where c.SiteId == siteId
                          where c.Status == ( int ) Status.Active
-                         select c.ClientId ).FirstOrDefault();
+                         select c.ClientCustomerId ).FirstOrDefault();
 
 
             return clientId;
@@ -413,7 +413,7 @@ namespace ACT.Core.Services
             siteList = ( from c in context.ClientSites
                          join e in context.Sites
                          on c.SiteId equals e.Id
-                         where c.ClientId == clientId
+                         where c.ClientCustomerId == clientId
                          where e.SiteId == siteId
                          select e ).ToList();
 
@@ -427,7 +427,7 @@ namespace ACT.Core.Services
             siteList = ( from s in context.Sites
                          join e in context.ClientSites
                          on s.Id equals e.SiteId
-                         where e.ClientId == clientId
+                         where e.ClientCustomerId == clientId
                          select s ).ToList();
             return siteList;
         }
@@ -441,7 +441,7 @@ namespace ACT.Core.Services
             siteList = ( from c in context.ClientSites
                          join e in context.Sites
                          on c.SiteId equals e.Id
-                         where c.ClientId == clientId
+                         where c.ClientCustomerId == clientId
                          where e.SiteId == null
                          where !exclList.Contains( c.SiteId )
                          select e ).ToList();

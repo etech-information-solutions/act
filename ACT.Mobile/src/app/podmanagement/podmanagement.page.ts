@@ -36,8 +36,13 @@ export class PodmanagementPage implements OnInit
     if ( this.auth.RefreshShipments )
     {
       this.auth.RefreshShipments = false;
+
+      this.Skip = 0;
+      this.OutstandingShipments = [];
       
-      window.location.reload();
+      await this.GetOutstandingShipments();
+      
+      //window.location.reload();
     }
   }
 

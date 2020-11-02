@@ -213,15 +213,18 @@ namespace ACT.UI.Controllers.api
 
                 saservice.Update( audit );
 
-                return Request.CreateResponse( HttpStatusCode.OK, saservice.OldObject );
+                List<SiteAuditCustomModel> siteAudits = SiteAudits( model.Email, model.APIKey );
+
+                return Request.CreateResponse( HttpStatusCode.OK, new { SiteAudits = siteAudits, Code = 1, Description = "Site Audit updated" } );
             }
         }
 
         [HttpPost]
-        public HttpResponseMessage UploadSignature( int id, int type, string email, string apikey )
+        public HttpResponseMessage UploadSignature( int id, string type, string email, string apikey )
         {
             try
             {
+                using ( ImageService iservice = new ImageService() )
                 using ( SiteAuditService saservice = new SiteAuditService() )
                 {
                     saservice.CurrentUser = saservice.GetUser( email );
@@ -240,21 +243,56 @@ namespace ACT.UI.Controllers.api
                         return Request.CreateResponse( HttpStatusCode.OK, new ResponseModel() { Code = -1, Description = "No file uploaded!" } );
                     }
 
-                    BinaryReader br = new BinaryReader( file.InputStream );
+                    // Create folder
+                    string path = HostingEnvironment.MapPath( $"~/{VariableExtension.SystemRules.ImagesLocation}/SiteAudits/{audit.Id}/" );
 
-                    byte[] bytes = br.ReadBytes( ( int ) file.ContentLength );
+                    string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
 
-                    if ( type == 1 )
+                    string ext = Path.GetExtension( file.FileName ),
+                           name = file.FileName.Replace( ext, "" );
+
+                    // Check if a logo already exists?
+                    Image img = iservice.Get( audit.Id, type, true );
+
+                    if ( img != null )
                     {
-                        audit.CustomerSignature = bytes;
+                        baseC.DeleteImage( img.Id );
                     }
-                    else if ( type == 2 )
+
+                    if ( !Directory.Exists( path ) )
                     {
-                        audit.RepSignature = bytes;
+                        Directory.CreateDirectory( path );
                     }
-                    else if ( type == 3 )
+
+                    Image image = new Image()
                     {
-                        audit.PalletAuditorSign = bytes;
+                        Name = name,
+                        IsMain = true,
+                        Extension = ext,
+                        ObjectType = type,
+                        ObjectId = audit.Id,
+                        Description = type,
+                        Size = file.ContentLength,
+                        Location = $"SiteAudits/{audit.Id}/{now}-{file.FileName}"
+                    };
+
+                    image = iservice.Create( image );
+
+                    string fullpath = Path.Combine( path, $"{now}-{file.FileName}" );
+
+                    file.SaveAs( fullpath );
+
+                    if ( type == "CustomerSignature" )
+                    {
+                        audit.CustomerSignatureId = image.Id;
+                    }
+                    else if ( type == "RepSignature" )
+                    {
+                        audit.RepSignatureId = image.Id;
+                    }
+                    else if ( type == "PalletAuditorSignature" )
+                    {
+                        audit.PalletAuditorSignatureId = image.Id;
                     }
 
                     saservice.Update( audit );

@@ -66,7 +66,7 @@
             </th>
             @if ( yearDiff > 0 )
             {
-                for ( int i = 1; i <= yearDiff; i++ )
+                for ( int i = DateTime.Now.Year; i < yearDiff; i++ )
                 {
                     int y = DateTime.Now.AddYears( -i ).Year;
 
@@ -122,7 +122,7 @@
                             </td>
                             @if ( yearDiff > 0 )
                             {
-                                for ( int i = 1; i <= yearDiff; i++ )
+                                for ( int i = DateTime.Now.Year; i < yearDiff; i++ )
                                 {
                                     int y = DateTime.Now.AddYears( -i ).Year;
 
@@ -177,7 +177,7 @@
 
                     @if ( yearDiff > 0 )
                     {
-                        for ( int i = 1; i <= yearDiff; i++ )
+                        for ( int i = DateTime.Now.Year; i < yearDiff; i++ )
                         {
                             int y = DateTime.Now.AddYears( -i ).Year;
 
@@ -227,7 +227,7 @@
 
                         @if ( yearDiff > 0 )
                         {
-                            for ( int i = 1; i <= yearDiff; i++ )
+                            for ( int i = DateTime.Now.Year; i < yearDiff; i++ )
                             {
                                 int y = DateTime.Now.AddYears( -i ).Year;
 
@@ -258,7 +258,7 @@
 
                             @if ( yearDiff > 0 )
                             {
-                                for ( int i = 1; i <= yearDiff; i++ )
+                                for ( int i = DateTime.Now.Year; i < yearDiff; i++ )
                                 {
                                     <td style="border-left: 0 none;"></td>
                                 }

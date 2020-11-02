@@ -70,17 +70,17 @@ export class OutstandingshipmentdetailPage implements OnInit
         if ( d.ObjectType == "PCNNumber" )
         {
           this.PCNComment = d.Description;
-          this.PCNUrl = this.auth.APIUrl + "/ViewImage?id=" + d.Id;
+          this.PCNUrl = this.auth.APIUrl + "Account/ViewImage?id=" + d.Id;
         }
         else if ( d.ObjectType == "PODNumber" )
         {
           this.PODComment = d.Description;
-          this.PODUrl = this.auth.APIUrl + "/ViewImage?id=" + d.Id;
+          this.PODUrl = this.auth.APIUrl + "Account/ViewImage?id=" + d.Id;
         }
         else if ( d.ObjectType == "PRNNumber" )
         {
           this.PRNComment = d.Description;
-          this.PRNUrl = this.auth.APIUrl + "/ViewImage?id=" + d.Id;
+          this.PRNUrl = this.auth.APIUrl + "Account/ViewImage?id=" + d.Id;
         }
       });
     }
@@ -181,7 +181,7 @@ export class OutstandingshipmentdetailPage implements OnInit
       // Upload PCN!
       if ( this.PCNLoaded )
       {
-        await this.auth.UploadShipment( this.auth.OutstandingShipment.Id, "PCNNumber", this.PCNComment, this.PCNUrl, "file", "pod.jpg", "image/jpeg", "Uploading your PCN..." );
+        await this.auth.UploadShipment( this.auth.OutstandingShipment.Id, "PCNNumber", this.PCNComment, this.PCNUrl, "file", "pcn.jpg", "image/jpeg", "Uploading your PCN..." );
       }
       // Upload POD!
       if ( this.PODLoaded )
@@ -191,7 +191,7 @@ export class OutstandingshipmentdetailPage implements OnInit
       // Upload PRN!
       if ( this.PRNLoaded )
       {
-        await this.auth.UploadShipment( this.auth.OutstandingShipment.Id, "PRNNumber", this.PRNComment, this.PRNUrl, "file", "pod.jpg", "image/jpeg", "Uploading your PRN..." );
+        await this.auth.UploadShipment( this.auth.OutstandingShipment.Id, "PRNNumber", this.PRNComment, this.PRNUrl, "file", "prn.jpg", "image/jpeg", "Uploading your PRN..." );
       }
 
       this.auth.RefreshShipments = true;

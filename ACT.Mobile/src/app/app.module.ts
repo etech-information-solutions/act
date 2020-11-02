@@ -30,6 +30,8 @@ import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
 import { PhotoViewer } from '@ionic-native/photo-viewer/ngx';
 import { PhotoLibrary } from '@ionic-native/photo-library/ngx';
 import { CallNumber } from '@ionic-native/call-number/ngx';
+import { ContactactComponent } from './contactact/contactact.component';
+import { ConfirmdeletesiteauditComponent } from './confirmdeletesiteaudit/confirmdeletesiteaudit.component';
 
 @NgModule({
   declarations: [
@@ -38,12 +40,16 @@ import { CallNumber } from '@ionic-native/call-number/ngx';
     ResetpinconfirmComponent,
     CreatepinPage,
     ExitappconfirmComponent,
+    ContactactComponent,
+    ConfirmdeletesiteauditComponent
   ],
   entryComponents: [
     WelcomeComponent,
     ResetpinconfirmComponent,
     CreatepinPage,
     ExitappconfirmComponent,
+    ContactactComponent,
+    ConfirmdeletesiteauditComponent
   ],
   imports: [
     BrowserModule,

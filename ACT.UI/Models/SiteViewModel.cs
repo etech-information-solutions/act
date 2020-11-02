@@ -87,7 +87,7 @@ namespace ACT.UI.Models
 
         public bool EditMode { get; set; }
 
-        public List<Client> Clients { get; set; }
+        public List<ClientCustomer> Clients { get; set; }
 
         public AddressViewModel Address { get; set; }
 
@@ -117,7 +117,7 @@ namespace ACT.UI.Models
             {
                 if ( !EditMode ) return null;
 
-                using ( ClientService cservice = new ClientService() )
+                using ( ClientCustomerService cservice = new ClientCustomerService() )
                 {
                     return cservice.List( true );
                 }

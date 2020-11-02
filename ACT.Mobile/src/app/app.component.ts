@@ -51,7 +51,7 @@ export class AppComponent implements OnInit
     }
   ];
 
-  constructor( private platform: Platform, private splashScreen: SplashScreen, private statusBar: StatusBar, private auth: UserService )
+  constructor( private platform: Platform, private splashScreen: SplashScreen, private statusBar: StatusBar, public auth: UserService )
   {
     this.initializeApp();
   }

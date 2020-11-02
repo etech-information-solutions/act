@@ -36,6 +36,7 @@ namespace ACT.Data.Models
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
         public virtual DbSet<ClientBudget> ClientBudgets { get; set; }
+        public virtual DbSet<ClientCustomer> ClientCustomers { get; set; }
         public virtual DbSet<ClientGroup> ClientGroups { get; set; }
         public virtual DbSet<ClientInvoice> ClientInvoices { get; set; }
         public virtual DbSet<ClientKPI> ClientKPIs { get; set; }
@@ -46,6 +47,7 @@ namespace ACT.Data.Models
         public virtual DbSet<ClientUser> ClientUsers { get; set; }
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Contact> Contacts { get; set; }
+        public virtual DbSet<Country> Countries { get; set; }
         public virtual DbSet<CountryProvince> CountryProvinces { get; set; }
         public virtual DbSet<DeclineReason> DeclineReasons { get; set; }
         public virtual DbSet<DeliveryNote> DeliveryNotes { get; set; }
@@ -71,12 +73,14 @@ namespace ACT.Data.Models
         public virtual DbSet<Region> Regions { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Site> Sites { get; set; }
+        public virtual DbSet<SiteAudit> SiteAudits { get; set; }
         public virtual DbSet<SiteBilling> SiteBillings { get; set; }
         public virtual DbSet<SiteBudget> SiteBudgets { get; set; }
         public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
         public virtual DbSet<Task> Tasks { get; set; }
         public virtual DbSet<Token> Tokens { get; set; }
         public virtual DbSet<Transporter> Transporters { get; set; }
+        public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserBroadcast> UserBroadcasts { get; set; }
         public virtual DbSet<UserDocument> UserDocuments { get; set; }
         public virtual DbSet<UserNotification> UserNotifications { get; set; }
@@ -84,7 +88,5 @@ namespace ACT.Data.Models
         public virtual DbSet<UserTask> UserTasks { get; set; }
         public virtual DbSet<Vehicle> Vehicles { get; set; }
         public virtual DbSet<PSPPeriod> PSPPeriods { get; set; }
-        public virtual DbSet<User> Users { get; set; }
-        public virtual DbSet<SiteAudit> SiteAudits { get; set; }
     }
 }

@@ -28,12 +28,30 @@ export class SiteauditPage implements OnInit
 
   async ngOnInit()
   {
+    await this.auth.SetPSPs();
+    await this.auth.SetSites();
+    await this.auth.SetClients();
     await this.GetSiteAudits();
   }
 
   ngAfterViewInit() 
   {
     this.auth.ContentPage = this.content;
+  }
+
+  async ionViewWillEnter()
+  {
+    if ( this.auth.RefreshSiteAudits )
+    {
+      this.auth.RefreshShipments = false;
+
+      this.Skip = 0;
+      this.SiteAudits = [];
+      
+      await this.GetSiteAudits();
+      
+      //window.location.reload();
+    }
   }
 
   async GetSiteAudits()

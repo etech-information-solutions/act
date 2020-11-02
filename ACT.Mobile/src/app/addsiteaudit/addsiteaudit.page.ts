@@ -101,15 +101,15 @@ export class AddsiteauditPage implements OnInit
 
     if ( !this.CustomerSignaturePad.isEmpty() )
     {
-      await this.auth.UploadSignature( resp.Id, 1, this.CustomerSignaturePad.toDataURL( "image/jpeg" ), "file", "siteaudit-customer-signature.jpg", "image/jpeg", "Uploading Customer Signature.." );
+      await this.auth.UploadSignature( resp.Id, "CustomerSignature", this.CustomerSignaturePad.toDataURL( "image/png" ), "file", "siteaudit-customer-signature.png", "image/png", "Uploading Customer Signature.." );
     }
     if ( !this.RepSignaturePad.isEmpty() )
     {
-      await this.auth.UploadSignature( resp.Id, 2, this.RepSignaturePad.toDataURL( "image/jpeg" ), "file", "siteaudit-rep-signature.jpg", "image/jpeg", "Uploading Sales Rep Signature.." );
+      await this.auth.UploadSignature( resp.Id, "RepSignature", this.RepSignaturePad.toDataURL( "image/png" ), "file", "siteaudit-rep-signature.png", "image/png", "Uploading Sales Rep Signature.." );
     }
     if ( !this.PalletAuditorSignPad.isEmpty() )
     {
-      await this.auth.UploadSignature( resp.Id, 3, this.PalletAuditorSignPad.toDataURL( "image/jpeg" ), "file", "siteaudit-pallet-auditor-signature.jpg", "image/jpeg", "Uploading Pallet Auditor Signature.." );
+      await this.auth.UploadSignature( resp.Id, "PalletAuditorSignature", this.PalletAuditorSignPad.toDataURL( "image/png" ), "file", "siteaudit-pallet-auditor-signature.png", "image/png", "Uploading Pallet Auditor Signature.." );
     }
 
     this.auth.GoToPage( "siteaudit", true );

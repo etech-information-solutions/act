@@ -750,18 +750,13 @@ namespace ACT.Core.Services
         /// <returns></returns>
         public virtual bool Delete( T item )
         {
-            using ( TransactionScope scope = new TransactionScope() )
+            if ( !context.ChangeTracker.Entries<T>().Any( e => e.Entity == item ) )
             {
-                if ( !context.ChangeTracker.Entries<T>().Any( e => e.Entity == item ) )
-                {
-                    context.Set<T>().Attach( item );
-                }
-
-                context.Set<T>().Remove( item );
-                context.SaveChanges();
-
-                scope.Complete();
+                context.Set<T>().Attach( item );
             }
+
+            context.Set<T>().Remove( item );
+            context.SaveChanges();
 
             using ( AuditLogService service = new AuditLogService() )
             {

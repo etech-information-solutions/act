@@ -1880,7 +1880,7 @@ namespace ACT.UI.Controllers
             SiteViewModel model = new SiteViewModel()
             {
                 EditMode = true,
-                Clients = new List<Client>(),
+                Clients = new List<ClientCustomer>(),
                 SiteBudgets = new List<SiteBudget>(),
                 Address = new AddressViewModel()
             };
@@ -1982,14 +1982,14 @@ namespace ACT.UI.Controllers
 
                 if ( model.Clients.NullableAny( c => c.Id > 0 ) )
                 {
-                    foreach ( Client c in model.Clients.Where( c => c.Id > 0 ) )
+                    foreach ( ClientCustomer c in model.Clients.Where( c => c.Id > 0 ) )
                     {
                         if ( c.Id <= 0 ) continue;
 
                         ClientSite csSite = new ClientSite()
                         {
-                            ClientId = c.Id,
                             SiteId = site.Id,
+                            ClientCustomerId = c.Id,
                             Status = ( int ) model.Status,
                             AccountingCode = site.AccountCode,
                         };
@@ -2084,7 +2084,7 @@ namespace ACT.UI.Controllers
                     SiteType = ( site.SiteType.HasValue ? ( SiteType ) site.SiteType : SiteType.All ),
 
 
-                    Clients = new List<Client>(),
+                    Clients = new List<ClientCustomer>(),
                     SiteBudgets = new List<SiteBudget>(),
                 };
 
@@ -2094,9 +2094,9 @@ namespace ACT.UI.Controllers
 
                 if ( site.ClientSites.NullableAny() )
                 {
-                    foreach ( int cid in site.ClientSites.Select( s => s.ClientId ) )
+                    foreach ( int cid in site.ClientSites.Select( s => s.ClientCustomerId ) )
                     {
-                        model.Clients.Add( new Client()
+                        model.Clients.Add( new ClientCustomer()
                         {
                             Id = cid
                         } );
@@ -2235,7 +2235,7 @@ namespace ACT.UI.Controllers
 
                 if ( model.Clients.NullableAny( c => c.Id > 0 ) )
                 {
-                    foreach ( Client c in model.Clients.Where( c => c.Id > 0 ) )
+                    foreach ( ClientCustomer c in model.Clients.Where( c => c.Id > 0 ) )
                     {
                         if ( c.Id <= 0 ) continue;
 
@@ -2252,8 +2252,8 @@ namespace ACT.UI.Controllers
                         {
                             cs = new ClientSite()
                             {
-                                ClientId = c.Id,
                                 SiteId = site.Id,
+                                ClientCustomerId = c.Id,
                                 Status = ( int ) model.Status,
                                 AccountingCode = site.AccountCode,
                             };
@@ -3504,7 +3504,7 @@ namespace ACT.UI.Controllers
 
                             ClientSite csSite = new ClientSite()
                             {
-                                ClientId = clientID,
+                                ClientCustomerId = clientID,
                                 SiteId = site.Id,
                                 AccountingCode = site.AccountCode,
                                 Status = ( int ) Status.Active
@@ -3695,7 +3695,7 @@ namespace ACT.UI.Controllers
                             #region Add ClientSite
                             ClientSite csSite = new ClientSite()
                             {
-                                ClientId = clientID,
+                                ClientCustomerId = clientID,
                                 SiteId = site.Id,
                                 AccountingCode = site.AccountCode,
                                 Status = ( int ) Status.Active

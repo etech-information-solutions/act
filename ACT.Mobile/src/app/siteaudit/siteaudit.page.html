@@ -48,9 +48,6 @@
         <b style="color: #002e70 !important;">Site</b>
       </ion-col>
       <ion-col>
-        <b style="color: #002e70 !important;">PSP</b>
-      </ion-col>
-      <ion-col>
         <b style="color: #002e70 !important;">Customer</b>
       </ion-col>
       <ion-col>
@@ -66,13 +63,10 @@
         {{x.SiteName}}
       </ion-col>
       <ion-col class="ion-align-self-center">
-        {{x.PSPName}}
-      </ion-col>
-      <ion-col class="ion-align-self-center">
         {{x.ClientName}}
       </ion-col>
       <ion-col class="ion-align-self-center">
-        {{this.auth.GetShortDate(x.AuditDate, 'yyyy/MM/dd')}} @ {{this.auth.GetShortTime(x.AuditDate)}}
+        {{this.auth.GetShortDate(x.AuditDate, 'yyyy/MM/dd')}}
       </ion-col>
       <ion-col class="ion-align-self-center">
         {{x.RepName}}

@@ -17,12 +17,12 @@ namespace ACT.Core.Services
         /// <summary>
         /// Gets a Client site using the specified Client Id and Site Id
         /// </summary>
-        /// <param name="clientId"></param>
+        /// <param name="clientCustomerId"></param>
         /// <param name="siteId"></param>
         /// <returns></returns>
-        public ClientSite GetBySiteId( int clientId, int siteId )
+        public ClientSite GetBySiteId( int clientCustomerId, int siteId )
         {
-            return context.ClientSites.FirstOrDefault( cs => cs.SiteId == siteId && cs.ClientId == clientId );
+            return context.ClientSites.FirstOrDefault( cs => cs.SiteId == siteId && cs.ClientCustomerId == clientCustomerId );
         }
 
 
@@ -48,7 +48,7 @@ namespace ACT.Core.Services
 
             if ( clientId > 0 )
             {
-                query = $"{query} AND cs.ClientId=@clientid";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientCustomer] cc WHERE cc.ClientId=@clientid)";
             }
 
             model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();

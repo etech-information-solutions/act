@@ -14,10 +14,6 @@
 
 
 <ion-content [fullscreen]="true" (ionScroll)="this.auth.OnScroll($event)" [scrollEvents]="true">
-
-  <ion-refresher (ionRefresh)="Refresh($event)" slot="fixed">
-    <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
   
   <!-- fab placed to the top end -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="this.auth.ShowScroll" (click)="this.auth.ScrollToTop();">
@@ -92,7 +88,7 @@
     </ion-row>
     <ion-row>
       <ion-col size="11" style="background-color: #f6fbff;">
-        <canvas #CustomerSignature height="100" style="touch-action: none;"></canvas>
+        <canvas #CustomerSignature height="200" style="touch-action: none;"></canvas>
       </ion-col>
       <ion-col size="1">
         <ion-icon name="trash-outline" (click)="ClearPad(1)"></ion-icon>
@@ -122,7 +118,7 @@
     </ion-row>
     <ion-row>
       <ion-col size="11" style="background-color: #f6fbff;">
-        <canvas #RepSignature height="100" style="touch-action: none;"></canvas>
+        <canvas #RepSignature height="200" style="touch-action: none;"></canvas>
       </ion-col>
       <ion-col size="1">
         <ion-icon name="trash-outline" (click)="ClearPad(2)"></ion-icon>
@@ -152,7 +148,7 @@
     </ion-row>
     <ion-row>
       <ion-col size="11" style="background-color: #f6fbff;">
-        <canvas #PalletAuditorSign height="100" style="touch-action: none;"></canvas>
+        <canvas #PalletAuditorSign height="200" style="touch-action: none;"></canvas>
       </ion-col>
       <ion-col size="1">
         <ion-icon name="trash-outline" (click)="ClearPad(3)"></ion-icon>
