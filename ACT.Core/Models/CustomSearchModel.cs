@@ -350,13 +350,15 @@ namespace ACT.Core.Models
 
         #region Model Options
 
-        public List<SimpleUserModel> UserOptions
+        public Dictionary<int, string> UserOptions
         {
             get
             {
                 using ( UserService service = new UserService() )
                 {
-                    return service.List( true );
+                    RoleType role = service.CurrentUser.RoleType;
+                    role = role == RoleType.PSP ? role : RoleType.All;
+                    return service.List(true, role );
                 }
             }
         }
