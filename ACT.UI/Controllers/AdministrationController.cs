@@ -3362,7 +3362,7 @@ namespace ACT.UI.Controllers
         {
             Transporter site;
             //int pspId = Session[ "UserPSP" ];
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
+            //int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
 
 
 

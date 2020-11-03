@@ -2000,16 +2000,18 @@
                     .unbind( "click" )
                     .bind( "click", function ()
                     {
-                        target.animate(
-                            {
-                                "width": "0",
-                                "height": "0",
-                                "opacity": "0",
-                                "filter": "alpha(opacity=0)"
-                            }, 700, function ()
-                        {
-                            remove.remove();
-                        } );
+                        if (target.length > 0){
+
+                            target.animate(
+                                {
+                                    "width": "0",
+                                    "height": "0",
+                                    "opacity": "0",
+                                    "filter": "alpha(opacity=0)"
+                                }, 700, function () {
+                                remove.remove();
+                            });
+                        } else remove.remove();
 
                         return false;
                     } );
