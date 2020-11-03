@@ -203,19 +203,18 @@ namespace ACT.Core.Services
             // Limit to only show Disputes for logged in user
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $@"{query} AND EXISTS(SELECT
+                query = $@"{query} AND EXISTS (SELECT
                                                 1
                                               FROM
                                                 [dbo].[PSPUser] pu
                                               WHERE
                                                 (pu.UserId=@userid) AND
                                                 (b.[PSPId]=pu.[PSPId])
-                                                )
                                              ) ";
             }
             else if ( CurrentUser.RoleType == RoleType.Client )
             {
-                query = $@"{query} AND EXISTS(SELECT
+                query = $@"{query} AND EXISTS (SELECT
                                                 1
                                               FROM
                                                 [dbo].[ClientUser] cu 
