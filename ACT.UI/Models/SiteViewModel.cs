@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web;
 
 using ACT.Core.Enums;
 using ACT.Core.Services;
@@ -92,6 +93,9 @@ namespace ACT.UI.Models
         public AddressViewModel Address { get; set; }
 
         public List<SiteBudget> SiteBudgets { get; set; }
+
+        [Display( Name = "Import Sites" )]
+        public HttpPostedFileBase SiteImportFile { get; set; }
 
         #endregion
 

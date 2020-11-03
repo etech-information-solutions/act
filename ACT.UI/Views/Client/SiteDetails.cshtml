@@ -232,10 +232,10 @@
             @if ( Model.ClientSites.NullableAny() )
             {
                 <ul class="list">
-                    @foreach ( Client c in Model.ClientSites.Select( s => s.Client ) )
+                    @foreach ( ClientCustomer c in Model.ClientSites.Select( s => s.ClientCustomer ) )
                     {
                         <li>
-                            @c.CompanyName
+                            @c.CustomerName
                         </li>
                     }
                 </ul>

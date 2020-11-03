@@ -1,0 +1,55 @@
+﻿@model SiteViewModel
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.UI.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Import Sites";
+
+    UserModel user = User.Get();
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "ImportSite", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#managesites", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content("~/images/edit.png")" />
+            <span>Import Sites</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        <div class="left" style="width: 45%; margin-right: 4%;">
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.SiteImportFile )
+            </div>
+            <div class="editor-field">
+                @Html.FileUploadFor( model => model.SiteImportFile, new { @class = "input", @required = "required", @placeholder = "Select Sites Import File" } )
+                @Html.ValidationMessageFor( model => model.SiteImportFile )
+            </div>
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+        <p style="margin-bottom: 0;">
+            <input id="save-btn" type="submit" value="Import" />
+
+            <span style="padding: 0 5px;">/</span>
+
+            <a data-refresh="1" data-target="#managesites">Cancel</a>
+        </p>
+
+    </div>
+}
