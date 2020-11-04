@@ -14,6 +14,8 @@ using System.Web.Mvc;
 using System.Web;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using ExcelDataReader;
+using System.Data;
 
 namespace ACT.UI.Controllers
 {
@@ -2427,6 +2429,49 @@ namespace ACT.UI.Controllers
             }
         }
 
+        // GET: Client/AddSite
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportSite()
+        {
+            SiteViewModel model = new SiteViewModel();
+
+            return View( model );
+        }
+
+        // POST: Client/AddSite
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportSite( SiteViewModel model )
+        {
+            if ( model.SiteImportFile == null )
+            {
+                Notify( "Please select a file to upload and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( SiteService sservice = new SiteService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            using ( IExcelDataReader reader = ExcelReaderFactory.CreateReader( model.SiteImportFile.InputStream ) )
+            {
+                // DataSet - The result of each spreadsheet will be created in the result.Tables
+                DataSet result = reader.AsDataSet();
+
+                int rowNo = 0,
+                    skipped = 0,
+                    processed = 0;
+
+                while ( rowNo < result.Tables[ 1 ].Rows.Count )
+                {
+
+                }
+            }
+
+            return View( model );
+        }
+
         #endregion
 
 
@@ -3471,7 +3516,7 @@ namespace ACT.UI.Controllers
                             {
                                 site.SiteId = SiteID;
                             }
-                            
+
                             site = sservice.Create( site );
 
                             #endregion
