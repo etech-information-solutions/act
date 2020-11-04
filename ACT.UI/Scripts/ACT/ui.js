@@ -1389,7 +1389,7 @@
                         html = clone.html().replace( /\[0]/g, "[" + total + "]" ).replace( /\-0-/g, "-" + total + "-" );
                         clone.html( html );
 
-                        //clone.find( '.del' ).remove();
+                        clone.find( '.del' ).remove();
                         clone.find( '.slick-counter' ).html( '' );
                         clone.find( '.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea' ).val( "" );
 
