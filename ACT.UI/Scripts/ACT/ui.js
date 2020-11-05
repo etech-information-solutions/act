@@ -1,4 +1,5 @@
-﻿( function ()
+﻿
+( function ()
 {
     ACT.UI = {
 
@@ -110,6 +111,7 @@
             this.DataPalletUse( $( '*[data-pallet-use="1"]' ) );
             this.DataServiceType( $( '*[data-service-type="1"]' ) );
             this.DataBudgetTotal( $( '*[data-budget-total="1"]' ) );
+            this.DataBudgetSum($('*[data-budget-sum="1"]'));
 
             // Dashboard / Graphs
             this.DataGSSite( $( '*[data-gs-site="1"]' ) );
@@ -2000,16 +2002,18 @@
                     .unbind( "click" )
                     .bind( "click", function ()
                     {
-                        target.animate(
-                            {
-                                "width": "0",
-                                "height": "0",
-                                "opacity": "0",
-                                "filter": "alpha(opacity=0)"
-                            }, 700, function ()
-                        {
-                            remove.remove();
-                        } );
+                        if (target.length > 0){
+
+                            target.animate(
+                                {
+                                    "width": "0",
+                                    "height": "0",
+                                    "opacity": "0",
+                                    "filter": "alpha(opacity=0)"
+                                }, 700, function () {
+                                remove.remove();
+                            });
+                        } else remove.remove();
 
                         return false;
                     } );
@@ -3855,6 +3859,28 @@
                         } );
                     } );
             } );
+        },
+
+        DataBudgetSum: function (sender) {
+            sender.each(function () {
+                var i = $(this);
+
+                // <td>    // <tr>
+                var target = i.parent().parent().find(i.attr("data-target"))
+                var source = i.parent().parent().find(i.attr("data-source"))
+                i
+                    .unbind("change")
+                    .bind("change", function () {
+                        let sum = 0
+                        source.each(function (i, t) {
+                            sum += parseInt(t.value)
+                        });
+
+                        if (sum > 0)
+                            target.val(sum)
+
+                    });
+            });
         },
 
 

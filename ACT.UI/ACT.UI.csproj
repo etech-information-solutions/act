@@ -518,7 +518,6 @@
     <Content Include="Views\Client\_ManageSites.cshtml" />
     <Content Include="Views\Client\_LinkProducts.cshtml" />
     <Content Include="Views\Client\_AwaitingActivation.cshtml" />
-    <Content Include="Views\Administration\_ManageTransporters.cshtml" />
     <Content Include="Views\Client\_Subsites.cshtml" />
     <Content Include="Views\Client\EditClient.cshtml" />
     <Content Include="Views\Client\AddSite.cshtml" />
@@ -535,9 +534,6 @@
     <Content Include="Views\Client\SiteDetails.cshtml" />
     <Content Include="Views\Client\AddGroup.cshtml" />
     <Content Include="Views\Client\EditGroup.cshtml" />
-    <Content Include="Views\Administration\AddTransporter.cshtml" />
-    <Content Include="Views\Administration\EditTransporter.cshtml" />
-    <Content Include="Views\Administration\TransporterDetails.cshtml" />
     <Content Include="Views\Shared\_ClientsCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ManageSitesCustomSearch.cshtml" />
     <Content Include="Views\Shared\_LinkProductsCustomSearch.cshtml" />
@@ -644,6 +640,10 @@
     <Content Include="Views\Administration\_PSPBudgets.cshtml" />
     <Content Include="Views\Client\_SiteBudgets.cshtml" />
     <Content Include="Views\Client\ImportSite.cshtml" />
+    <Content Include="Views\Shared\_ManageTransporters.cshtml" />
+    <Content Include="Views\Shared\AddTransporter.cshtml" />
+    <Content Include="Views\Shared\EditTransporter.cshtml" />
+    <Content Include="Views\Shared\TransporterDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

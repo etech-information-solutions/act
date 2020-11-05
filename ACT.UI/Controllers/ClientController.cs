@@ -3979,6 +3979,220 @@ namespace ACT.UI.Controllers
 
 
 
+        #region Manage Transporters
+
+        // GET: Client/AddTransporter
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddTransporter()
+        {
+            TransporterViewModel model = new TransporterViewModel() { EditMode = true };
+            return View(model);
+        }
+
+
+        // POST: Client/Transporter
+        [HttpPost]
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddTransporter(TransporterViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    Notify("Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                using (TransporterService siteService = new TransporterService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    //#region Validation
+                    //if (!string.IsNullOrEmpty(model.RegistrationNumber) && siteService.ExistByName(model.RegistrationNumber.Trim()))
+                    //{
+                    //    // Bank already exist!
+                    //    Notify($"Sorry, a Site with the Account number \"{model.AccountCode}\" already exists!", NotificationType.Error);
+
+                    //    return View(model);
+                    //}
+                    //#endregion
+                    #region Create Transporter
+                    Transporter site = new Transporter()
+                    {
+                        Name = model.Name,
+                        TradingName = model.TradingName,
+                        RegistrationNumber = model.RegistrationNumber,
+                        Email = model.Email,
+                        ContactNumber = model.ContactNumber,
+                        Status = (int)Status.Active
+                    };
+                    site = siteService.Create(site);
+                    #endregion
+
+                    scope.Complete();
+                }
+
+                Notify("The Transporter was successfully created.", NotificationType.Success);
+                return RedirectToAction("ManageTransporters");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+
+
+        // GET: Client/EditTransporter/5
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditTransporter(int id)
+        {
+            Transporter site;
+            //int pspId = Session[ "UserPSP" ];
+            //int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
+
+
+
+            using (TransporterService service = new TransporterService())
+            using (AddressService aservice = new AddressService())
+            {
+                site = service.GetById(id);
+
+                if (site == null)
+                {
+                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                    return PartialView("_AccessDenied");
+                }
+
+                Address address = aservice.Get(site.Id, "Site");
+
+
+                bool unverified = (site.Status == (int)PSPClientStatus.Unverified);
+
+                TransporterViewModel model = new TransporterViewModel()
+                {
+                    Id = site.Id,
+                    Name = site.Name,
+                    TradingName = site.TradingName,
+                    RegistrationNumber = site.RegistrationNumber,
+                    Email = site.Email,
+                    ContactNumber = site.ContactNumber,
+                    // Status = (int)Status.Active
+                    Status = (int)site.Status,
+                    EditMode = true
+                };
+                return View(model);
+            }
+        }
+
+        // POST: Client/EditTransporter/5
+        [HttpPost]
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditTransporter(TransporterViewModel model, PagingModel pm, bool isstructure = false)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    Notify("Sorry, the selected Transporter was not updated. Please correct all errors and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                Transporter site;
+
+                using (TransporterService service = new TransporterService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    site = service.GetById(model.Id);
+
+
+                    #region Validations
+
+                    //if (!string.IsNullOrEmpty(model.AccountCode) && service.ExistByAccountCode(model.AccountCode.Trim()))
+                    //{
+                    //    // Role already exist!
+                    //    Notify($"Sorry, a Site with the Account Code \"{model.AccountCode} ({model.AccountCode})\" already exists!", NotificationType.Error);
+
+                    //    return View(model);
+                    //}
+
+                    #endregion
+                    #region Update Transporter
+
+                    // Update Transporter
+                    site.Id = model.Id;
+                    site.Name = model.Name;
+                    site.RegistrationNumber = model.RegistrationNumber;
+                    site.Email = model.Email;
+                    site.ContactNumber = model.ContactNumber;
+                    site.TradingName = model.TradingName;
+                    site.Status = (int)model.Status;
+
+                    service.Update(site);
+
+                    #endregion
+
+
+
+
+                    scope.Complete();
+                }
+
+                Notify("The selected Transporter details were successfully updated.", NotificationType.Success);
+
+                return RedirectToAction("ManageTransporters");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+        // POST: Client/DeleteTransporter/5
+        [HttpPost]
+        [Requires(PermissionTo.Delete)]
+        public ActionResult DeleteTransporter(SiteViewModel model)
+        {
+            Transporter site;
+            try
+            {
+
+                using (TransporterService service = new TransporterService())
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    site = service.GetById(model.Id);
+
+                    if (site == null)
+                    {
+                        Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                        return PartialView("_AccessDenied");
+                    }
+
+                    site.Status = (((Status)site.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;
+
+                    service.Update(site);
+                    scope.Complete();
+
+                }
+                Notify("The selected Transporter was successfully updated.", NotificationType.Success);
+                return RedirectToAction("ManageSites");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = ex.Message;
+                return View();
+            }
+        }
+
+        #endregion
+
+
+
         #region Partial Views
 
         //
@@ -4151,6 +4365,36 @@ namespace ACT.UI.Controllers
 
 
             return PartialView( "_SubSites" );
+        }
+
+        // GET: /Client/ManageTransporters
+        public ActionResult ManageTransporters(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        {
+
+            ViewBag.ViewName = "ManageTransporters";
+            if (givecsm)
+            {
+                ViewBag.ViewName = "ManageTransporters";
+
+                return PartialView("_ManageTransportersCustomSearch", new CustomSearchModel("ManageTransporters"));
+            }
+            int total = 0;
+
+            List<Transporter> model = new List<Transporter>();
+            //int pspId = Session[ "UserPSP" ];
+            //int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
+            using (TransporterService service = new TransporterService())
+            {
+                pm.Sort = pm.Sort ?? "DESC";
+                pm.SortBy = pm.SortBy ?? "CreatedOn";
+
+                model = service.List(pm, csm);
+                total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total(pm, csm);
+            }
+
+            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+
+            return PartialView("_ManageTransporters", paging);
         }
 
         #endregion
