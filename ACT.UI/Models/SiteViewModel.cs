@@ -17,6 +17,9 @@ namespace ACT.UI.Models
         [Display( Name = "Main Site" )]
         public int? SiteId { get; set; }
 
+        [Display( Name = "Client" )]
+        public int? ClientId { get; set; }
+
         [Required]
         [Display( Name = "Region" )]
         public int? RegionId { get; set; }
@@ -116,6 +119,19 @@ namespace ACT.UI.Models
         }
 
         public Dictionary<int, string> ClientOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+
+                using ( ClientService cservice = new ClientService() )
+                {
+                    return cservice.List( true );
+                }
+            }
+        }
+
+        public Dictionary<int, string> ClientCustomerOptions
         {
             get
             {
