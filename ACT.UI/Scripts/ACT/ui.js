@@ -1365,7 +1365,15 @@
                     {
                         var papa = target.parent();
 
-                        clone = papa.find( ".add-more-row:first" ).clone();
+                        clone = papa.find(".add-more-row:first").clone();
+
+                        let newId
+                        let newElementId = clone.attr('id').replace(/\d+/g, (m, k) => {
+                            newId = parseInt(m) + 1
+                            return newId
+                        })
+                        clone.attr('id', newElementId )
+
                         var inputs = clone.find( '.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea' );
 
                         inputs.each( function ()
@@ -1386,10 +1394,14 @@
 
                         total = papa.find( ".add-more-row" ).length;
 
-                        html = clone.html().replace( /\[0]/g, "[" + total + "]" ).replace( /\-0-/g, "-" + total + "-" );
+                        html = clone.html().replace( /\[0]/g, "[" + total + "]" ).replace( /\-0/g, "-" + total  );
                         clone.html( html );
 
-                        clone.find( '.del' ).remove();
+                        let del = clone.find('.del')
+                        del.attr('data-target', '#' + newElementId)
+                        del.attr('href', '#')
+                        del.removeClass ('none')
+                        
                         clone.find( '.slick-counter' ).html( '' );
                         clone.find( '.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea' ).val( "" );
 
@@ -1397,15 +1409,15 @@
 
                         clone.insertAfter( papa.find( ".add-more-row:last" ) );
 
-                        clone.find( 'a[data-add-one-more="1"]' ).fadeOut( 1200, function ()
+                        clone.find( 'a[data-add-one-more="1"]' ).fadeOut( 600, function ()
                         {
                             $( this ).remove();
                         } );
 
-                        papa.find( 'a[data-add-one-more="1"]' ).fadeOut( 1200, function ()
+                        papa.find( 'a[data-add-one-more="1"]' ).fadeOut( 600, function ()
                         {
                             var f = clone.find( "td:first" ).children( ":first" );
-                            $( this ).insertBefore( f ).fadeIn( 1200 );
+                            $( this ).insertBefore( f ).fadeIn( 600 );
                         } );
                     }
                     else
@@ -1966,7 +1978,18 @@
 
         DeleteFix: function ( sender, target, refresh )
         {
-            var url = sender.attr( "href" );
+            var url = sender.attr("href");
+            if (url === "#") {
+                let parent = target.parent();
+                
+                let clone = parent.find('a[data-add-one-more="1"]').clone()
+                target.remove()
+                row = parent.find(".add-more-row:last")
+                let f = row.find("td:first").children(":first");
+                clone.insertBefore(f).fadeIn(600);
+                ACT.Init.Start();
+                return false
+            }
 
             var columns = $( 'table.datatable-numberpaging tbody tr:nth-child(1) td' ).length;
             var row = '<tr class="edit ' + target.attr( 'class' ) + '"><td colspan="' + columns + '"><span></span></td></tr>';
