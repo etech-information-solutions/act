@@ -2452,7 +2452,6 @@ namespace ACT.UI.Controllers
 
             using ( SiteService sservice = new SiteService() )
             using ( AddressService aservice = new AddressService() )
-            using ( TransactionScope scope = new TransactionScope() )
             using ( ClientSiteService csservice = new ClientSiteService() )
             using ( IExcelDataReader reader = ExcelReaderFactory.CreateReader( model.SiteImportFile.InputStream ) )
             {
@@ -2465,7 +2464,35 @@ namespace ACT.UI.Controllers
 
                 while ( rowNo < result.Tables[ 1 ].Rows.Count )
                 {
+                    using ( TransactionScope scope = new TransactionScope() )
+                    {
+                        string xCord = result.Tables[ 1 ].Rows[ rowNo ][ 10 ]?.ToString(),
+                           yCord = result.Tables[ 1 ].Rows[ rowNo ][ 11 ]?.ToString();
 
+                        /*Site s = sservice.GetByXYCoordinates( model.ClientId, xCord, yCord );
+
+                        if ( s == null )
+                        {
+                            s = new Site()
+                            {
+
+                            };
+
+                            s = sservice.Create( s );
+                        }
+                        else
+                        {
+                            s = sservice.Update( s );
+                        }*/
+
+
+
+                        rowNo++;
+                        processed++;
+
+                        scope.Complete();
+
+                    }
                 }
             }
 

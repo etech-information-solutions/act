@@ -186,12 +186,12 @@
         </div>
         <div class="editor-field" style="max-height: 341px; overflow-y: auto;">
 
-            @if ( Model.ClientOptions.NullableAny() )
+            @if ( Model.ClientCustomerOptions.NullableAny() )
             {
                 int c = 0;
 
                 <ul class="list">
-                    @foreach ( KeyValuePair<int, string> item in Model.ClientOptions )
+                    @foreach ( KeyValuePair<int, string> item in Model.ClientCustomerOptions )
                     {
                         string readOnly = !user.IsAdmin ? "readonly=readonly" : "";
                         string chk = Model.Clients.Any( i => i.Id == item.Key ) || !user.IsAdmin ? "checked=checked" : "";
