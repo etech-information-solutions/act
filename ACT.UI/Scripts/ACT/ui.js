@@ -1363,12 +1363,12 @@
 
                     if ( target.is( "tr" ) )
                     {
-                        var papa = target.parent();
+                        let parent = target.parent();
 
-                        clone = papa.find(".add-more-row:first").clone();
+                        clone = parent.find(".add-more-row:first").clone();
 
                         let newId
-                        let newElementId = clone.attr('id').replace(/\d+/g, (m, k) => {
+                        let newElementId = parent.find(".add-more-row:last").attr('id').replace(/\d+/g, (m, k) => {
                             newId = parseInt(m) + 1
                             return newId
                         })
@@ -1379,7 +1379,7 @@
                         inputs.each( function ()
                         {
                             $( this ).val( "" );
-
+                            $(this).attr("value", "")
                             if ( $( this ).is( "select" ) )
                             {
                                 $( this ).find( "option" ).removeAttr( "selected" );
@@ -1392,29 +1392,29 @@
                         clone.find( '[data-rb="1"]' ).text( '-/-' );
                         clone.find( '[data-pr-amount="1"]' ).css( 'width', '88%' );
 
-                        total = papa.find( ".add-more-row" ).length;
+                        total = parent.find( ".add-more-row" ).length;
 
                         html = clone.html().replace( /\[0]/g, "[" + total + "]" ).replace( /\-0/g, "-" + total  );
                         clone.html( html );
 
                         let del = clone.find('.del')
                         del.attr('data-target', '#' + newElementId)
-                        del.attr('href', '#')
+                        del.attr('href', 'javascript:;')
                         del.removeClass ('none')
                         
                         clone.find( '.slick-counter' ).html( '' );
                         clone.find( '.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea' ).val( "" );
-
+                        clone.attr("unsaved", "1")
                         ACT.UI.RecreatePlugins( clone );
 
-                        clone.insertAfter( papa.find( ".add-more-row:last" ) );
-
+                        clone.insertAfter( parent.find( ".add-more-row:last" ) );
+                        clone.find('.input:first').focus()
                         clone.find( 'a[data-add-one-more="1"]' ).fadeOut( 600, function ()
                         {
                             $( this ).remove();
                         } );
 
-                        papa.find( 'a[data-add-one-more="1"]' ).fadeOut( 600, function ()
+                        parent.find( 'a[data-add-one-more="1"]' ).fadeOut( 600, function ()
                         {
                             var f = clone.find( "td:first" ).children( ":first" );
                             $( this ).insertBefore( f ).fadeIn( 600 );
@@ -1979,16 +1979,37 @@
         DeleteFix: function ( sender, target, refresh )
         {
             var url = sender.attr("href");
-            if (url === "#") {
-                let parent = target.parent();
-                
+            let parent = target.parent();
+            if (target.attr("unsaved") == "1") {
+
+                // clone add more button
                 let clone = parent.find('a[data-add-one-more="1"]').clone()
+
+                //remove line
                 target.remove()
+
+                siblings = parent.find(".add-more-row");
+
+
+                //Update all input names for forms to work
+                siblings.each((i, _sibling) => {
+                    sibling = $(_sibling)
+                    sibling.find('.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea').each((i, input) => {
+                        $(input).attr("value", input.value)
+                    })
+                    html = sibling.html().replace(/\[\d+]/g, "[" + i + "]")
+                    sibling.html(html)
+                })
+
+                // insert cloned button on last line
                 row = parent.find(".add-more-row:last")
                 let f = row.find("td:first").children(":first");
                 clone.insertBefore(f).fadeIn(600);
-                ACT.Init.Start();
+                ACT.Init.Start(true);
                 return false
+            }
+            else {
+                //save unsaved dom elements to memory
             }
 
             var columns = $( 'table.datatable-numberpaging tbody tr:nth-child(1) td' ).length;
@@ -3877,7 +3898,8 @@
 
                         target.each( function ()
                         {
-                            $( this ).val( shares );
+                            $(this).val(shares);
+                            $(this).attr("value",shares);
                             ACT.UI.DataHighlightFields( $( this ).parent() );
                         } );
                     } );
@@ -3901,6 +3923,8 @@
 
                         if (sum > 0)
                             target.val(sum)
+                            target.attr("value", sum)
+
 
                     });
             });
