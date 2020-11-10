@@ -22,7 +22,89 @@ namespace ACT.Core.Services
         /// <param name="pm"></param> 
         /// <param name="csm"></param> 
         /// <returns></returns>
-        public List<TransporterCustomModel> ListCSM( PagingModel pm, CustomSearchModel csm )
+        public int Total1( PagingModel pm, CustomSearchModel csm )
+        {
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
+            {
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
+            }
+
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+            };
+
+            #endregion
+
+            string query = string.Format( @"SELECT t.* FROM [dbo].[Transporter] t" );
+
+            // WHERE
+
+            #region WHERE
+
+            query = $"{query} WHERE (1=1)";
+
+            #endregion
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (t.CreatedOn >= @csmFromDate AND t.CreatedOn <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (t.CreatedOn>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (t.CreatedOn<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
+            {
+                query = string.Format( @"{0} AND (v.TradingName LIKE '%{1}%' OR
+                                                  v.Name LIKE '%{1}%' OR
+                                                  v.Email LIKE '%{1}%' OR
+                                                  v.ContactNumber LIKE '%{1}%' OR
+                                                  v.RegistrationNumber LIKE '%{1}%'
+                                                  ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            CountModel model = context.Database.SqlQuery<CountModel>( query.Trim(), parameters.ToArray() ).FirstOrDefault();
+
+            return model.Total;
+        }
+
+        /// <summary>
+        /// Gets a list of Campaign Purchases using the specified params
+        /// </summary>
+        /// <param name="pm"></param> 
+        /// <param name="csm"></param> 
+        /// <returns></returns>
+        public List<TransporterCustomModel> List1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
@@ -46,9 +128,11 @@ namespace ACT.Core.Services
             #endregion
 
             string query = string.Format( @"SELECT
-	                                         v.*
-                                           FROM
-	                                         [dbo].[Transporter] v" );
+                                               t.*,
+                                               (SELECT COUNT(1) FROM [dbo].[Contact] c WHERE c.ObjectType='Transporter' AND c.ObjectId=t.Id) AS ContactCount,
+                                               (SELECT COUNT(1) FROM [dbo].[Vehicle] v WHERE v.ObjectType='Transporter' AND v.ObjectId=t.Id) AS VehicleCount
+                                            FROM
+                                               [dbo].[Transporter] t" );
 
             // WHERE
 
@@ -64,17 +148,17 @@ namespace ACT.Core.Services
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (v.CreatedOn >= @csmFromDate AND v.CreatedOn <= @csmToDate) ";
+                query = $"{query} AND (t.CreatedOn >= @csmFromDate AND t.CreatedOn <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (v.CreatedOn>=@csmFromDate) ";
+                    query = $"{query} AND (t.CreatedOn>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (v.CreatedOn<=@csmToDate) ";
+                    query = $"{query} AND (t.CreatedOn<=@csmToDate) ";
                 }
             }
 
@@ -86,7 +170,12 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (LOWER(REPLACE(v.TradingName, ' ', '')) LIKE '%{1}%' OR LOWER(REPLACE(v.Name, ' ', '')) LIKE '%{1}%' OR LOWER(REPLACE(v.RegistrationNumber, ' ', '')) LIKE '%{1}%') ", query, csm.Query.Trim().ToLower().Replace( " ", "" ) );
+                query = string.Format( @"{0} AND (v.TradingName LIKE '%{1}%' OR
+                                                  v.Name LIKE '%{1}%' OR
+                                                  v.Email LIKE '%{1}%' OR
+                                                  v.ContactNumber LIKE '%{1}%' OR
+                                                  v.RegistrationNumber LIKE '%{1}%'
+                                                  ) ", query, csm.Query.Trim() );
             }
 
             #endregion
@@ -99,7 +188,24 @@ namespace ACT.Core.Services
 
             query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
-            return context.Database.SqlQuery<TransporterCustomModel>( query.Trim(), parameters.ToArray() ).ToList();
+            List<TransporterCustomModel> model = context.Database.SqlQuery<TransporterCustomModel>( query.Trim(), parameters.ToArray() ).ToList();
+
+            if ( model.Any( t => t.ContactCount > 0 ) )
+            {
+                foreach ( TransporterCustomModel item in model.Where( t => t.ContactCount > 0 ) )
+                {
+                    item.Contacts = context.Contacts.Where( c => c.ObjectId == item.Id && c.ObjectType == "Transporter" ).ToList();
+                }
+            }
+            if ( model.Any( t => t.VehicleCount > 0 ) )
+            {
+                foreach ( TransporterCustomModel item in model.Where( t => t.VehicleCount > 0 ) )
+                {
+                    item.Vehicles = context.Vehicles.Where( c => c.ObjectId == item.Id && c.ObjectType == "Transporter" ).ToList();
+                }
+            }
+
+            return model;
         }
 
         /// <summary>

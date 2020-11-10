@@ -16,7 +16,6 @@
         <EntityTypeShape EntityType="ACTModel.Client" Width="1.5" PointX="6.75" PointY="23.75" />
         <EntityTypeShape EntityType="ACTModel.ClientAuthorisation" Width="1.5" PointX="21.75" PointY="55.125" />
         <EntityTypeShape EntityType="ACTModel.ClientBudget" Width="1.5" PointX="9" PointY="29" />
-        <EntityTypeShape EntityType="ACTModel.ClientCustomer" Width="1.5" PointX="11.25" PointY="59.75" />
         <EntityTypeShape EntityType="ACTModel.ClientGroup" Width="1.5" PointX="12" PointY="21.5" />
         <EntityTypeShape EntityType="ACTModel.ClientInvoice" Width="1.5" PointX="24" PointY="55.5" />
         <EntityTypeShape EntityType="ACTModel.ClientKPI" Width="1.5" PointX="9" PointY="23.875" />
@@ -89,7 +88,6 @@
         <AssociationConnector Association="ACTModel.FK_UserTasks_Clients" />
         <AssociationConnector Association="ACTModel.FK_ClientAuthorisation_Transporter" />
         <AssociationConnector Association="ACTModel.FK_ClientAuthorisations_ClientSites" />
-        <AssociationConnector Association="ACTModel.FK_ClientSite_ClientCustomer" />
         <AssociationConnector Association="ACTModel.FK_ClientGroups_Groups" />
         <AssociationConnector Association="ACTModel.FK_ClientInvoices_ClientLoads" />
         <AssociationConnector Association="ACTModel.FK_ClientInvoices_Invoices" />
@@ -138,7 +136,9 @@
         <AssociationConnector Association="ACTModel.FK_UserNotification_User" />
         <AssociationConnector Association="ACTModel.FK_UserRoles_Users" />
         <AssociationConnector Association="ACTModel.FK_UserTask_User" />
+        <EntityTypeShape EntityType="ACTModel.ClientCustomer" Width="1.5" PointX="9" PointY="61" />
         <AssociationConnector Association="ACTModel.FK_ClientCustomer_Client" />
+        <AssociationConnector Association="ACTModel.FK_ClientSite_ClientCustomer" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -508,6 +508,9 @@ namespace ACT.Core.Services
                 new[] { itemParameter }
                 );
 
+            context.Configuration.LazyLoadingEnabled = true;
+            context.Configuration.ProxyCreationEnabled = true;
+
             T item = context.Set<T>().Where( whereExpression ).FirstOrDefault();
 
             using ( ACTEntities db = new ACTEntities() )

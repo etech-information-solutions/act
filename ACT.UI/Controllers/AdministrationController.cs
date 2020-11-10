@@ -3391,8 +3391,7 @@ namespace ACT.UI.Controllers
                     RegistrationNumber = site.RegistrationNumber,
                     Email = site.Email,
                     ContactNumber = site.ContactNumber,
-                    // Status = (int)Status.Active
-                    Status = ( int ) site.Status,
+                    Status = ( Status ) site.Status,
                     EditMode = true
                 };
                 return View( model );

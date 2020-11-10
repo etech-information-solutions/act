@@ -1,0 +1,91 @@
+﻿@model  ACT.Data.Models.Transporter
+
+@using ACT.Core.Enums;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Transporter Details";
+}
+
+
+<div id="item-details" class="item-details" style="width: auto;">
+
+    @if (ViewBag.IncludeLayout == null)
+    {
+        <h2>
+            <img alt="" src="@Url.Content( "~/images/info.png" )" />
+            <span>Transporter Details</span>
+        </h2>
+    }
+
+        <div class="left" style="width: 45%; margin-right: 1%;">
+
+            <div class="display-label">
+                Name
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.Name)
+            </div>
+
+            <div class="display-label">
+                Trading Name
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.TradingName)
+            </div>
+            <div class="display-label">
+                Registration Number
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.RegistrationNumber)
+            </div>
+        </div>
+
+        <div class="left" style="width: 45%;">
+            <div class="display-label">
+                Email
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.RegistrationNumber)
+            </div>
+            <div class="display-label">
+                Contact Number
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.ContactNumber)
+            </div>
+            <div class="display-label">
+                Status
+            </div>
+            <div class="display-field">
+                @(( ( Status ) Model.Status ).GetDisplayText())
+            </div>
+
+        </div>
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+    @if (ViewBag.IncludeLayout == null)
+    {
+        <p>
+            @Html.ActionLink("Edit", "EditTransporter", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" })
+
+            @if (ViewBag.IncludeLayout == null)
+            {
+                <span style="padding: 0 5px;">/</span>
+                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
+            }
+        </p>
+    }
+
+    @if (ViewBag.IncludeLayout != null)
+    {
+        <div class="back-to-list">
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+
+</div>

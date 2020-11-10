@@ -1,4 +1,8 @@
 
+using System.Collections.Generic;
+
+using ACT.Data.Models;
+
 namespace ACT.Core.Models.Custom
 {
     public partial class TransporterCustomModel
@@ -13,5 +17,13 @@ namespace ACT.Core.Models.Custom
         public string TradingName { get; set; }
         public string RegistrationNumber { get; set; }
         public int Status { get; set; }
+
+        public int ContactCount { get; set; }
+
+        public int VehicleCount { get; set; }
+
+        public List<Contact> Contacts { get; set; }
+
+        public List<Vehicle> Vehicles { get; set; }
     }
 }

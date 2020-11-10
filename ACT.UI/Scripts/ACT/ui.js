@@ -111,7 +111,7 @@
             this.DataPalletUse( $( '*[data-pallet-use="1"]' ) );
             this.DataServiceType( $( '*[data-service-type="1"]' ) );
             this.DataBudgetTotal( $( '*[data-budget-total="1"]' ) );
-            this.DataBudgetSum($('*[data-budget-sum="1"]'));
+            this.DataBudgetSum( $( '*[data-budget-sum="1"]' ) );
 
             // Dashboard / Graphs
             this.DataGSSite( $( '*[data-gs-site="1"]' ) );
@@ -128,6 +128,9 @@
             // Disputes
             this.DataDisputeStatus( $( '*[data-dispute-status="1"]' ) );
             this.DataDisputeChepLoad( $( '*[data-dispute-chepload="1"]' ) );
+
+            // Client Management
+            this.DataLinkProduct( $( '*[data-link-product="1"]' ) );
 
             if ( window.location.search !== "" && !$( "tr.edit" ).length && $( ".dataTable" ).length && !ACT.UI.PageViewIdProcessed )
             {
@@ -2002,7 +2005,8 @@
                     .unbind( "click" )
                     .bind( "click", function ()
                     {
-                        if (target.length > 0){
+                        if ( target.length > 0 )
+                        {
 
                             target.animate(
                                 {
@@ -2010,9 +2014,10 @@
                                     "height": "0",
                                     "opacity": "0",
                                     "filter": "alpha(opacity=0)"
-                                }, 700, function () {
+                                }, 700, function ()
+                            {
                                 remove.remove();
-                            });
+                            } );
                         } else remove.remove();
 
                         return false;
@@ -3837,7 +3842,7 @@
             {
                 var i = $( this );
 
-                             // <td>    // <tr>
+                // <td>    // <tr>
                 var target = i.parent().parent().find( i.attr( "data-target" ) );
 
                 i
@@ -3861,26 +3866,30 @@
             } );
         },
 
-        DataBudgetSum: function (sender) {
-            sender.each(function () {
-                var i = $(this);
+        DataBudgetSum: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
 
                 // <td>    // <tr>
-                var target = i.parent().parent().find(i.attr("data-target"))
-                var source = i.parent().parent().find(i.attr("data-source"))
+                var target = i.parent().parent().find( i.attr( "data-target" ) )
+                var source = i.parent().parent().find( i.attr( "data-source" ) )
                 i
-                    .unbind("change")
-                    .bind("change", function () {
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
                         let sum = 0
-                        source.each(function (i, t) {
-                            sum += parseInt(t.value)
-                        });
+                        source.each( function ( i, t )
+                        {
+                            sum += parseInt( t.value )
+                        } );
 
-                        if (sum > 0)
-                            target.val(sum)
+                        if ( sum > 0 )
+                            target.val( sum )
 
-                    });
-            });
+                    } );
+            } );
         },
 
 
@@ -4573,6 +4582,65 @@
                         }
                     } );
             } );
+        },
+
+        DataLinkProduct: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() == "" )
+                        {
+                            target.find( 'select:visible' ).val( "" );
+                            target.find( 'input[type="text"]:visible' )
+                                  .add( 'input[name="ActiveDate"]:visible' )
+                                  .add( "#Description" )
+                                  .val( "" );
+
+                            return;
+                        }
+
+                        var d = { id: $( this ).val() };
+
+                        $.ajax( {
+                            url: siteurl + "/GetProduct?id=" + $( this ).val(),
+                            type: "POST",
+                            data: JSON.stringify( d ),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            error: function ( e )
+                            {
+
+                            },
+                            success: function ( p )
+                            {
+                                if ( p.Id > 0 )
+                                {
+                                    $( "#LostRate:visible" ).val( p.LostRate );
+                                    $( "#HireRate:visible" ).val( p.HireRate );
+                                    $( "#IssueRate:visible" ).val( p.IssueRate );
+                                    $( "#Description:visible" ).val( p.Description );
+                                    $( 'input[name="ActiveDate"]:visible' ).val( p.CreatedOn );
+                                }
+                                else
+                                {
+                                    target.find( 'select:visible' ).val( "" );
+                                    target.find( 'input[type="text"]:visible' )
+                                          .add( 'input[name="ActiveDate"]:visible' )
+                                          .add( "#Description" )
+                                          .val( "" );
+                                }
+                            }
+                        } );
+                    } );
+            } )
         }
     };
 } )();

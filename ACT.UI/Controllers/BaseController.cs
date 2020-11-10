@@ -1062,6 +1062,43 @@ namespace ACT.UI.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets a product using the specified bankId and returns a JSON representation. More fields can be added when need be
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public JsonResult GetProduct( int id = 0 )
+        {
+            using ( ProductService service = new ProductService() )
+            {
+                Product p = service.GetById( id );
+
+                if ( p == null )
+                {
+                    return new JsonResult()
+                    {
+                        Data = new { Id = 0 }
+                    };
+                }
+
+                List<ProductPrice> prices = p.ProductPrices.ToList();
+
+                return new JsonResult()
+                {
+                    Data = new
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Description = p.Description,
+                        CreatedOn = p.CreatedOn.ToString( "yyyy/MM/dd" ),
+                        LostRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Lost && pp.Status == ( int ) Status.Active ).Rate,
+                        IssueRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Issue && pp.Status == ( int ) Status.Active ).Rate,
+                        HireRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Hire && pp.Status == ( int ) Status.Active ).Rate,
+                    }
+                };
+            }
+        }
+
         #endregion
 
 

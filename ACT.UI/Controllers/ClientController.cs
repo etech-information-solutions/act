@@ -144,14 +144,15 @@ namespace ACT.UI.Controllers
 
                 case "linkproducts":
 
-                    #region linkproducts
+                    #region Link Products
+
                     csv = string.Format( "Id, ClientId, Company Name, ProductId, Product Name, Product Description, Active Date, HireRate, LostRate, IssueRate, PassonRate, PassonDays, Status {0}", Environment.NewLine );
 
                     List<ClientProductCustomModel> product = new List<ClientProductCustomModel>();
 
                     using ( ClientProductService service = new ClientProductService() )
                     {
-                        product = service.ListCSM( pm, csm );
+                        product = service.List1( pm, csm );
                     }
 
                     if ( product != null && product.Any() )
@@ -162,12 +163,12 @@ namespace ACT.UI.Controllers
                                                 csv,
                                                 item.Id,
                                                 item.ClientId,
-                                                item.CompanyName,
+                                                item.ClientName,
                                                 item.ProductId,
-                                                item.Name,
+                                                item.ProductName,
                                                 item.ProductDescription,
                                                 item.ActiveDate,
-                                                item.HireRate,
+                                                item.Rate,
                                                 item.LostRate,
                                                 item.IssueRate,
                                                 item.PassonRate,
@@ -2334,8 +2335,8 @@ namespace ACT.UI.Controllers
                     {
                         address = new Address()
                         {
+                            ObjectType = "Site",
                             ObjectId = model.Id,
-                            ObjectType = "Client",
                             Town = model.Address.Town,
                             Latitude = model.Latitude,
                             Longitude = model.Longitude,
@@ -2433,7 +2434,7 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Create )]
         public ActionResult ImportSite()
         {
-            SiteViewModel model = new SiteViewModel();
+            SiteViewModel model = new SiteViewModel() { EditMode = true };
 
             return View( model );
         }
@@ -2450,435 +2451,308 @@ namespace ACT.UI.Controllers
                 return View( model );
             }
 
+            int rowNo = 0,
+                skipped = 0,
+                processed = 0;
+
             using ( SiteService sservice = new SiteService() )
+            using ( RegionService rservice = new RegionService() )
             using ( AddressService aservice = new AddressService() )
             using ( ClientSiteService csservice = new ClientSiteService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
             using ( IExcelDataReader reader = ExcelReaderFactory.CreateReader( model.SiteImportFile.InputStream ) )
             {
                 // DataSet - The result of each spreadsheet will be created in the result.Tables
                 DataSet result = reader.AsDataSet();
 
-                int rowNo = 0,
-                    skipped = 0,
-                    processed = 0;
-
                 while ( rowNo < result.Tables[ 1 ].Rows.Count )
                 {
-                    using ( TransactionScope scope = new TransactionScope() )
+                    if ( rowNo < 2 )
                     {
-                        string xCord = result.Tables[ 1 ].Rows[ rowNo ][ 10 ]?.ToString(),
-                           yCord = result.Tables[ 1 ].Rows[ rowNo ][ 11 ]?.ToString();
-
-                        /*Site s = sservice.GetByXYCoordinates( model.ClientId, xCord, yCord );
-
-                        if ( s == null )
-                        {
-                            s = new Site()
-                            {
-
-                            };
-
-                            s = sservice.Create( s );
-                        }
-                        else
-                        {
-                            s = sservice.Update( s );
-                        }*/
-
-
-
                         rowNo++;
-                        processed++;
 
-                        scope.Complete();
-
+                        continue;
                     }
-                }
-            }
 
-            return View( model );
-        }
-
-        #endregion
-
-
-
-        #region Sub Sites
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetSiteListForClient( string clientId )
-        {
-            if ( clientId != null && clientId != "" )
-            {
-                Session[ "ClientId" ] = clientId;
-                List<Site> sites = null;
-
-                //int pspId = Session[ "UserPSP" ];
-                //int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-                string sessSiteId = ( Session[ "SiteId" ] != null ? Session[ "SiteId" ].ToString() : null );
-                int siteId = ( !string.IsNullOrEmpty( sessSiteId ) ? int.Parse( sessSiteId ) : 0 );
-
-                using ( SiteService service = new SiteService() )
-                using ( ClientSiteService cservice = new ClientSiteService() )
-                {
-                    if ( siteId > 0 )
-                        sites = service.GetSitesByClients( int.Parse( clientId ), siteId );
-                    else
-                        sites = service.GetSitesByClients( int.Parse( clientId ) );
-
-                }
-                //var jsonList = JsonConvert.SerializeObject(sites);
-                //return Json(sites, JsonRequestBehavior.AllowGet);
-                var data = JsonConvert.SerializeObject( sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore } );
-                return Json( new { data = data }, JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetSitesForClientSiteIncluded( string clientId, string siteId )
-        {
-            if ( clientId != null && clientId != "" )
-            {
-                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-                int currentClientId = ( !string.IsNullOrEmpty( clientId ) ? int.Parse( clientId ) : ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 ) );
-
-                Session[ "ClientId" ] = clientId;
-                string sessSiteId = ( Session[ "SiteId" ] != null ? Session[ "SiteId" ].ToString() : null );
-                int currentSiteId = ( !string.IsNullOrEmpty( siteId ) ? int.Parse( siteId ) : ( !string.IsNullOrEmpty( sessSiteId ) ? int.Parse( sessSiteId ) : 0 ) );
-                Session[ "SiteId" ] = currentSiteId;
-                List<Site> sites = null;
-                //int pspId = Session[ "UserPSP" ];
-                // int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-
-                using ( SiteService service = new SiteService() )
-                {
-
-                    sites = service.GetSitesByClientsIncluded( currentClientId, currentSiteId ); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
-
-                }
-                //var jsonList = JsonConvert.SerializeObject(sites);
-                var data = JsonConvert.SerializeObject( sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore } );
-                return Json( new { data = data }, JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetSitesForClientSiteExcluded( string clientId, string siteId )
-        {
-            if ( !string.IsNullOrEmpty( clientId ) && !string.IsNullOrEmpty( siteId ) )
-            {
-                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-                int currentClientId = ( !string.IsNullOrEmpty( clientId ) ? int.Parse( clientId ) : ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 ) );
-
-                Session[ "ClientId" ] = clientId;
-                string sessSiteId = ( Session[ "SiteId" ] != null ? Session[ "SiteId" ].ToString() : null );
-                int currentSiteId = ( !string.IsNullOrEmpty( siteId ) ? int.Parse( siteId ) : ( !string.IsNullOrEmpty( sessSiteId ) ? int.Parse( sessSiteId ) : 0 ) );
-                Session[ "SiteId" ] = currentSiteId;
-                List<Site> sites = null;
-                //int pspId = Session[ "UserPSP" ];
-                //int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-
-                using ( SiteService service = new SiteService() )
-                {
-
-                    sites = service.GetSitesByClientsExcluded( currentClientId, currentSiteId ); //GetClientsByPSPIncludedGroup(pspId, int.Parse(groupId));
-
-                }
-                //return Json(sites, JsonRequestBehavior.AllowGet);
-                var data = JsonConvert.SerializeObject( sites, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore } );
-                return Json( new { data = data }, JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetSiteDetailsForMain( string siteId )
-        {
-            if ( siteId != null && siteId != "" )
-            {
-                //Session["ClientId"] = clientId;
-                // Session["SiteId"] = siteId;
-                Site site = null;
-                using ( SiteService service = new SiteService() )
-                {
-                    site = service.GetById( int.Parse( siteId ) );
-                }
-                //return Json(site, JsonRequestBehavior.AllowGet);
-                var data = JsonConvert.SerializeObject( site, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore } );
-                return Json( new { data = data }, JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetSiteForClientSiteExcluded( string mainSiteId, string movedSiteId, string clientId )
-        {
-            if ( !string.IsNullOrEmpty( mainSiteId ) && !string.IsNullOrEmpty( movedSiteId ) && !string.IsNullOrEmpty( clientId ) )
-            {
-                //Session["ClientId"] = clientId;
-                Session[ "SiteId" ] = mainSiteId;
-                //using (GroupService service = new GroupService())
-                //using (ClientSiteService clientservice = new ClientSiteService())
-                using ( SiteService sservice = new SiteService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    Site currentSite = sservice.GetById( int.Parse( movedSiteId ) );
-                    currentSite.SiteId = null;
-                    sservice.Update( currentSite );
-
-                    //ClientSite site = new ClientSite()
-                    //{
-                    //    Site
-                    //    ClientId = int.Parse(clientId),
-                    //    Status = (int)Status.Active
-                    //};
-                    //clientgroupservice.Create(group);
-
-                    scope.Complete();
-                }
-
-
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "False", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetSiteForClientSiteIncluded( string mainSiteId, string movedSiteId, string clientId )
-        {
-            if ( !string.IsNullOrEmpty( mainSiteId ) && !string.IsNullOrEmpty( movedSiteId ) && !string.IsNullOrEmpty( clientId ) )
-            {
-                //Session["ClientId"] = clientId;
-                Session[ "SiteId" ] = mainSiteId;
-                //using (GroupService service = new GroupService())
-                //using (ClientSiteService clientservice = new ClientSiteService())
-                using ( SiteService sservice = new SiteService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    Site currentSite = sservice.GetById( int.Parse( movedSiteId ) );
-                    currentSite.SiteId = int.Parse( mainSiteId );
-                    sservice.Update( currentSite );
-
-                    //ClientSite site = new ClientSite()
-                    //{
-                    //    Site
-                    //    ClientId = int.Parse(clientId),
-                    //    Status = (int)Status.Active
-                    //};
-                    //clientgroupservice.Create(group);
-
-                    scope.Complete();
-                }
-
-
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "False", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-
-
-        #endregion
-
-
-
-        #region Products
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult LinkClientToProduct( string client, string product )
-        {
-            if ( !string.IsNullOrEmpty( client ) && !string.IsNullOrEmpty( product ) )
-            {
-                int clientId, productId = 0;
-                int.TryParse( client, out clientId );
-                int.TryParse( product, out productId );
-
-                if ( clientId > 0 )
-                {
-                    Session[ "ClientId" ] = clientId; //set client to session for the client context after reload of screen
-                    using ( ProductService service = new ProductService() )
-                    using ( ClientProductService cpservice = new ClientProductService() )
-                    using ( TransactionScope scope = new TransactionScope() )
+                    try
                     {
-
-                        ProductCustomModel pcm = service.ListCSM( new PagingModel(), new CustomSearchModel() ).FirstOrDefault( p => p.Id == productId );//get the list and then pick one out based on the productId passed in                        
-                        if ( pcm != null )
+                        using ( TransactionScope scope = new TransactionScope() )
                         {
-                            List<ProductPrice> prices = new List<ProductPrice>();
-                            decimal hrate = 0;
-                            int? hrateunit = 0;
-                            decimal irate = 0;
-                            int? irateunit = 0;
-                            decimal lrate = 0;
-                            int? lrateunit = 0;
-                            decimal pocost = 0;
-                            int pocostunit = 0;
-                            //get the individual prices to copy over
-                            using ( ProductPriceService aservice = new ProductPriceService() )
+                            string siteNumber = result.Tables[ 1 ].Rows[ rowNo ][ 2 ]?.ToString()?.Trim(),
+                                   customerNumber = result.Tables[ 1 ].Rows[ rowNo ][ 3 ]?.ToString()?.Trim(),
+                                   customerName = result.Tables[ 1 ].Rows[ rowNo ][ 4 ]?.ToString()?.Trim(),
+                                   siteName = result.Tables[ 1 ].Rows[ rowNo ][ 5 ]?.ToString()?.Trim(),
+                                   addressLine1 = result.Tables[ 1 ].Rows[ rowNo ][ 6 ]?.ToString()?.Trim(),
+                                   addressLine2 = result.Tables[ 1 ].Rows[ rowNo ][ 7 ]?.ToString()?.Trim(),
+                                   town = result.Tables[ 1 ].Rows[ rowNo ][ 8 ]?.ToString()?.Trim(),
+                                   xCord = result.Tables[ 1 ].Rows[ rowNo ][ 9 ]?.ToString()?.Trim(),
+                                   yCord = result.Tables[ 1 ].Rows[ rowNo ][ 10 ]?.ToString()?.Trim(),
+                                   kamContact = result.Tables[ 1 ].Rows[ rowNo ][ 13 ]?.ToString()?.Trim(),
+                                   managerContact = result.Tables[ 1 ].Rows[ rowNo ][ 14 ]?.ToString()?.Trim(),
+                                   liquorLicenseNumber = result.Tables[ 1 ].Rows[ rowNo ][ 17 ]?.ToString()?.Trim(),
+                                   kamName = result.Tables[ 1 ].Rows[ rowNo ][ 19 ]?.ToString()?.Trim(),
+                                   region = result.Tables[ 1 ].Rows[ rowNo ][ 20 ]?.ToString()?.Trim(),
+                                   province = result.Tables[ 1 ].Rows[ rowNo ][ 21 ]?.ToString()?.Trim(),
+                                   salesManager = result.Tables[ 1 ].Rows[ rowNo ][ 23 ]?.ToString()?.Trim(),
+                                   salesRepCluster = result.Tables[ 1 ].Rows[ rowNo ][ 24 ]?.ToString()?.Trim(),
+                                   salesRep = result.Tables[ 1 ].Rows[ rowNo ][ 25 ]?.ToString()?.Trim();
+
+                            if ( string.IsNullOrEmpty( siteName ) || string.IsNullOrEmpty( customerName ) || string.IsNullOrEmpty( customerNumber ) )
                             {
-                                prices = aservice.ListByColumnWhere( "ProductId", productId );
-                                if ( prices != null )
-                                {
-                                    foreach ( ProductPrice price in prices )
-                                    {
-                                        switch ( price.Type )
-                                        {
-                                            case ( int ) ProductPriceType.Hire:
-                                                hrate = price.Rate;
-                                                hrateunit = price.RateUnit;
-                                                break;
-                                            case ( int ) ProductPriceType.Issue:
-                                                irate = price.Rate;
-                                                irateunit = price.RateUnit;
-                                                break;
-                                            case ( int ) ProductPriceType.Lost:
-                                                lrate = price.Rate;
-                                                lrateunit = price.RateUnit;
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                    }
-                                }
+                                rowNo++;
+                                skipped++;
+
+                                continue;
                             }
 
-                            ClientProduct testcp = cpservice.GetByColumnsWhere( "ProductId", productId, "ClientId", clientId );
-                            if ( testcp == null )
+                            Region r = rservice.Search( region, province );
+
+                            #region Site
+
+                            Site s = sservice.GetByXYCoordinates( xCord, yCord );
+
+                            if ( s == null )
                             {
-                                //set the client product up
-                                ClientProduct cg = new ClientProduct()
+                                // Create new site
+
+                                s = new Site()
                                 {
-                                    ClientId = clientId,
-                                    ProductId = productId,
-                                    ActiveDate = DateTime.Now,
-                                    ProductDescription = pcm.Description,
-                                    Rate = hrate,
-                                    IssueRate = irate,
-                                    LostRate = lrate,
-                                    PassonDays = 0, //to be edited by client
-                                    PassonRate = pocost,
-                                    Status = ( int ) Status.Active
+                                    XCord = xCord,
+                                    YCord = yCord,
+                                    Name = siteName,
+                                    RegionId = r?.Id,
+                                    Depot = siteNumber,
+                                    Description = siteName,
+                                    AccountCode = siteNumber,
+                                    ContactName = salesManager,
+                                    ContactNo = managerContact,
+                                    DepotManager = salesManager,
+                                    FinanceContact = salesManager,
+                                    Status = ( int ) Status.Active,
+                                    ReceivingContact = salesManager,
+                                    FinanceContactNo = managerContact,
+                                    ReceivingContactNo = managerContact,
+                                    DepotManagerContact = managerContact,
+                                    Address = $"{addressLine1}\n {addressLine2}\n {town}",
                                 };
-                                cpservice.Create( cg ); //save the clientproduct
+
+                                s = sservice.Create( s );
                             }
-                        }
-                        scope.Complete();
-                    }
-                }
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        //
-        // POST || GET: /Client/LinkProducts
-        public ActionResult LinkProducts( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
-        {
-            if ( givecsm )
-            {
-                ViewBag.ViewName = "Products";
-
-                return PartialView( "_LinkProductsCustomSearch", new CustomSearchModel( "LinkProducts" ) );
-            }
-
-            int total = 0;
-
-            List<ProductCustomModel> model = new List<ProductCustomModel>();
-            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
-            //int pspId = Session[ "UserPSP" ];
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-
-
-            //rebuild the whole object from clientproduct to product custom to fit in the same grid
-            if ( clientId > 0 )
-            { //if its client specific pull it from the ClientProduct table instead and show whats relevant
-                using ( ClientProductService cpservice = new ClientProductService() )
-                using ( ClientService clientService = new ClientService() )
-                {
-                    csm.ClientId = clientId;
-                    csm.Status = Status.Active;
-
-                    //List<ProductCustomModel> cpmodel
-                    List<ClientProductCustomModel> clientProducts = cpservice.ListCSM( pm, csm );
-
-                    if ( clientProducts != null )
-                    {
-                        foreach ( ClientProductCustomModel item in clientProducts )
-                        {
-                            ProductCustomModel prod = new ProductCustomModel()
+                            else if ( s != null && s?.Name?.Trim().ToLower() == siteName?.Trim().ToLower() )
                             {
-                                Name = item.Name,
-                                Description = item.ProductDescription,
-                                Id = item.Id,
-                                Status = item.Status,
-                                ProductPriceCount = item.ProductPriceCount,
-                                DocumentCount = item.DocumentCount,
-                                Documents = item.Documents
-                            };
-                            model.Add( prod );
+                                // Same site, update
+
+                                s.XCord = xCord;
+                                s.YCord = yCord;
+                                s.Name = siteName;
+                                s.Depot = siteNumber;
+                                s.Description = siteName;
+                                s.AccountCode = siteNumber;
+                                s.ContactName = salesManager;
+                                s.ContactNo = managerContact;
+                                s.DepotManager = salesManager;
+                                s.FinanceContact = salesManager;
+                                s.Status = ( int ) Status.Active;
+                                s.ReceivingContact = salesManager;
+                                s.FinanceContactNo = managerContact;
+                                s.ReceivingContactNo = managerContact;
+                                s.DepotManagerContact = managerContact;
+                                s.Address = $"{addressLine1}\n {addressLine2}\n {town}";
+                                s.RegionId = ( r?.Id ?? s.RegionId );
+
+                                s = sservice.Update( s );
+                            }
+                            else if ( s != null && s?.Name?.Trim().ToLower() != siteName?.Trim().ToLower() )
+                            {
+                                // Create new site, as a Sub-site
+
+                                s = new Site()
+                                {
+                                    SiteId = s.Id,
+                                    XCord = xCord,
+                                    YCord = yCord,
+                                    Name = siteName,
+                                    RegionId = r?.Id,
+                                    Depot = siteNumber,
+                                    Description = siteName,
+                                    AccountCode = siteNumber,
+                                    ContactName = salesManager,
+                                    ContactNo = managerContact,
+                                    DepotManager = salesManager,
+                                    FinanceContact = salesManager,
+                                    Status = ( int ) Status.Active,
+                                    ReceivingContact = salesManager,
+                                    FinanceContactNo = managerContact,
+                                    ReceivingContactNo = managerContact,
+                                    DepotManagerContact = managerContact,
+                                    Address = $"{addressLine1}\n {addressLine2}\n {town}",
+                                };
+
+                                s = sservice.Create( s );
+                            }
+
+                            if ( s == null )
+                            {
+                                rowNo++;
+                                skipped++;
+
+                                continue;
+                            }
+
+                            #endregion
+
+                            #region Client Customer
+
+                            ClientCustomer cc = ccservice.GetByNumber( model.ClientId, customerNumber );
+
+                            if ( cc == null )
+                            {
+                                cc = new ClientCustomer()
+                                {
+                                    CustomerTown = town,
+                                    ClientId = model.ClientId,
+                                    CustomerName = customerName,
+                                    Status = ( int ) Status.Active,
+                                    CustomerNumber = customerNumber,
+                                    CustomerAddress1 = addressLine1,
+                                    CustomerAddress2 = addressLine2,
+                                    CustomerContact = managerContact,
+                                };
+
+                                cc = ccservice.Create( cc );
+                            }
+                            else
+                            {
+                                cc.CustomerTown = town;
+                                cc.CustomerName = customerName;
+                                cc.Status = ( int ) Status.Active;
+                                cc.CustomerNumber = customerNumber;
+                                cc.CustomerAddress1 = addressLine1;
+                                cc.CustomerAddress2 = addressLine2;
+                                cc.CustomerContact = managerContact;
+
+                                cc = ccservice.Update( cc );
+                            }
+
+                            #endregion
+
+                            #region Client Site
+
+                            ClientSite cs = csservice.GetBySiteId( cc.Id, s.Id );
+
+                            if ( cs == null )
+                            {
+                                cs = new ClientSite()
+                                {
+                                    SiteId = s.Id,
+                                    KAMName = kamName,
+                                    KAMContact = kamContact,
+                                    ClientCustomerId = cc.Id,
+                                    ClientSalesRep = salesRep,
+                                    AccountingCode = siteNumber,
+                                    Status = ( int ) Status.Active,
+                                    ClientSalesManager = salesManager,
+                                    ClientManagerContact = managerContact,
+                                    ClientCustomerNumber = customerNumber,
+                                    ClientSalesRepContact = managerContact,
+                                    LiquorLicenceNumber = liquorLicenseNumber,
+                                };
+
+                                csservice.Create( cs );
+                            }
+                            else
+                            {
+                                cs.SiteId = s.Id;
+                                cs.KAMName = kamName;
+                                cs.KAMContact = kamContact;
+                                cs.ClientCustomerId = cc.Id;
+                                cs.ClientSalesRep = salesRep;
+                                cs.AccountingCode = siteNumber;
+                                cs.Status = ( int ) Status.Active;
+                                cs.ClientSalesManager = salesManager;
+                                cs.ClientManagerContact = managerContact;
+                                cs.ClientCustomerNumber = customerNumber;
+                                cs.ClientSalesRepContact = managerContact;
+                                cs.LiquorLicenceNumber = liquorLicenseNumber;
+
+                                csservice.Update( cs );
+                            }
+
+                            #endregion
+
+                            #region Site Address
+
+                            if ( !Enum.TryParse( province?.Trim().Replace( " ", "" ), out Province prov ) )
+                            {
+                                prov = Province.All;
+                            }
+
+                            Address a = aservice.Get( s.Id, "Site" );
+
+                            if ( a == null )
+                            {
+                                a = new Address()
+                                {
+                                    Town = town,
+                                    ObjectId = s.Id,
+                                    Latitude = yCord,
+                                    Longitude = xCord,
+                                    PostalCode = town,
+                                    ObjectType = "Site",
+                                    Province = ( int ) prov,
+                                    Addressline1 = addressLine1,
+                                    Addressline2 = addressLine2,
+                                    Status = ( int ) Status.Active,
+                                    Type = ( int ) AddressType.Postal,
+                                };
+
+                                aservice.Create( a );
+                            }
+                            else
+                            {
+                                a.Town = town;
+                                a.Latitude = yCord;
+                                a.Longitude = xCord;
+                                a.PostalCode = town;
+                                a.Province = ( int ) prov;
+                                a.Addressline1 = addressLine1;
+                                a.Addressline2 = addressLine2;
+                                a.Type = ( int ) AddressType.Postal;
+
+                                aservice.Update( a );
+                            }
+
+                            #endregion
+
+                            rowNo++;
+                            processed++;
+
+                            scope.Complete();
                         }
                     }
-                    clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { Status = Status.Active, ClientId = clientId } );
-                }
-            }
-            else
-            {
-                using ( ProductService service = new ProductService() )
-                using ( ClientService clientService = new ClientService() )
-                {
-                    model = service.ListCSM( pm, csm );
-                    total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
-                    clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { Status = Status.Active, ClientId = clientId } );
+                    catch ( Exception ex )
+                    {
+                        rowNo++;
+
+                    }
                 }
             }
 
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+            Notify( $"{processed} sites were successfully uploaded, {skipped} were skipped.", NotificationType.Success );
 
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            } );
-            ViewBag.ClientList = clientDDL;
-
-            return PartialView( "_LinkProducts", paging );
+            return ManageSites( new PagingModel(), new CustomSearchModel() );
         }
 
+        #endregion
+
+
+
+        #region Client Products
 
         //
         // GET: /Client/ProductDetails/5
         public ActionResult ProductDetails( int id, bool layout = true )
         {
-            using ( ProductService pservice = new ProductService() )
             using ( ClientProductService cpservice = new ClientProductService() )
             using ( DocumentService dservice = new DocumentService() )
             {
@@ -2896,7 +2770,7 @@ namespace ACT.UI.Controllers
                     ViewBag.IncludeLayout = true;
                 }
 
-                List<Document> documents = dservice.List( model.Id, "Product" );
+                List<Document> documents = dservice.List( model.ProductId, "Product" );
 
                 if ( documents != null )
                 {
@@ -2908,266 +2782,101 @@ namespace ACT.UI.Controllers
         }
 
         //
-        //// GET: /Client/AddProduct/5
-        //[Requires(PermissionTo.Create)]
-        //public ActionResult AddProduct()
-        //{
-        //    ProductViewModel model = new ProductViewModel() { EditMode = true, ProductPrices = new List<ProductPriceViewModel>() };
+        // GET: /Client/LinkProduct
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddProduct()
+        {
+            ProductViewModel model = new ProductViewModel() { LinkMode = true };
 
-        //    foreach (int item in Enum.GetValues(typeof(ProductPriceType)))
-        //    {
-        //        ProductPriceType type = (ProductPriceType)item;
-
-        //        model.ProductPrices.Add(new ProductPriceViewModel()
-        //        {
-        //            Type = type,
-        //            Status = Status.Active
-        //        });
-        //    }
-
-        //    return View(model);
-        //}
+            return View( model );
+        }
 
         //
-        // POST: /Client/AddProduct/5
-        //[HttpPost]
-        //[Requires(PermissionTo.Create)]
-        //public ActionResult AddProduct(ProductViewModel model)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        Notify("Sorry, the Product was not created. Please correct all errors and try again.", NotificationType.Error);
+        // POST: /Client/LinkProduct
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddProduct( ProductViewModel model )
+        {
+            using ( ClientService cservice = new ClientService() )
+            using ( ClientProductService cpservice = new ClientProductService() )
+            {
+                Client c = cservice.GetById( model.ClientId );
 
-        //        return View(model);
-        //    }
+                if ( c == null )
+                {
+                    Notify( "Sorry, the selected Client was not found. Please select a valid client and try again.", NotificationType.Error );
 
-        //    ClientProduct product = new ClientProduct();
+                    return View( model );
+                }
 
-        //    using (ProductService pservice = new ProductService())
-        //    using (TransactionScope scope = new TransactionScope())
-        //    using (DocumentService dservice = new DocumentService())
-        //    using (ClientProductService pcservice = new ClientProductService())
-        //    using (ProductPriceService ppservice = new ProductPriceService())
-        //    {
-        //        #region Validations
+                if ( !c.PSPClients.Any() )
+                {
+                    Notify( "Sorry, the selected Client is not linked to any PSP. Please select a valid client and try again or contact us for further assistance.", NotificationType.Error );
 
-        //        if (pservice.Exist(model.Name))
-        //        {
-        //            // Product already exist!
-        //            Notify($"Sorry, a Product with the Name \"{model.Name}\" already exists!", NotificationType.Error);
+                    return View( model );
+                }
 
-        //            return View(model);
-        //        }
+                ClientProduct cp = new ClientProduct()
+                {
+                    Rate = model.HireRate,
+                    LostRate = model.LostRate,
+                    ClientId = model.ClientId,
+                    ProductId = model.ProductId,
+                    Equipment = model.Equipment,
+                    IssueRate = model.IssueRate,
+                    PassonDays = model.PassonDays,
+                    PassonRate = model.PassonRate,
+                    Status = ( int ) model.Status,
+                    ActiveDate = model.ActiveDate,
+                    RateType = ( int ) model.RateType,
+                    AccountingCode = model.AccountingCode,
+                    ProductDescription = model.Description,
+                    PSPId = c.PSPClients.FirstOrDefault().PSPId,
+                };
 
-        //        #endregion
+                cpservice.Create( cp );
 
-        //        #region Product
+                Notify( "The selected Product was successfully linked to the selected client.", NotificationType.Success );
 
-        //        //product.Name = model.Name;
-        //        product.Status = (int)model.Status;
-        //        product.ProductDescription = model.Description;
-
-        //        decimal hrate = 0;
-        //        int? hrateunit = 0;
-        //        decimal irate = 0;
-        //        int? irateunit = 0;
-        //        decimal lrate = 0;
-        //        int? lrateunit = 0;
-        //        decimal pocost = 0;
-        //        int pocostunit = 0;
-
-        //        //if (model.ProductPrices.NullableAny())
-        //        //{
-        //        //    foreach (ProductPriceViewModel price in model.ProductPrices)
-        //        //    {
-        //        //        ProductPrice pp = new ProductPrice()
-        //        //        {
-        //        //            ProductId = product.Id,
-        //        //            Rate = price.Rate ?? 0,
-        //        //            Type = (int)price.Type,
-        //        //            RateUnit = price.RateUnit,
-        //        //            FromDate = price.StartDate,
-        //        //            Status = (int)price.Status,
-        //        //        };
-
-        //        //       // ppservice.Create(pp);
-        //        //    }
-        //        //}
-        //        #endregion
-
-        //        #region Product Prices
-
-        //        if (model.ProductPrices.NullableAny())
-        //        {
-        //            foreach (ProductPriceViewModel price in model.ProductPrices)
-        //            {
-        //                    switch (price.Type)
-        //                    {
-        //                        case (int)ProductPriceType.Hire:
-        //                            hrate = price.Rate;
-        //                            hrateunit = price.RateUnit;
-        //                            break;
-        //                        case (int)ProductPriceType.Issue:
-        //                            irate = price.Rate;
-        //                            irateunit = price.RateUnit;
-        //                            break;
-        //                        case (int)ProductPriceType.Lost:
-        //                            lrate = price.Rate;
-        //                            lrateunit = price.RateUnit;
-        //                            break;
-        //                        default:
-        //                            break;
-
-        //                }
-        //                                product = pcservice.Create(product);
-        //                //ProductPrice pp = new ProductPrice()
-        //                //{
-        //                //    ProductId = product.Id,
-        //                //    Rate = price.Rate ?? 0,
-        //                //    Type = (int)price.Type,
-        //                //    RateUnit = price.RateUnit,
-        //                //    FromDate = price.StartDate,
-        //                //    Status = (int)price.Status,
-        //                //};
-
-        //                //ppservice.Create(pp);
-        //            }
-        //        }
-
-        //        #endregion
-
-        //        //gathered all the info as needed, now create
-        //        product = pcservice.Create(product);
-
-        //        #region Product to Client
-        //        //string sessClientId = (Session["ClientId"] != null ? Session["ClientId"].ToString() : null);
-        //        //int clientID = (!string.IsNullOrEmpty(sessClientId) ? int.Parse(sessClientId) : 0);
-        //        //ClientProduct clientproduct = new ClientProduct()
-        //        //{
-        //        //    ClientId = clientID,
-        //        //    ProductId = product.Id,
-        //        //    ProductDescription = product.Description,
-        //        //    ActiveDate = product.CreatedOn,
-        //        //    HireRate = 0,
-        //        //    LostRate = 0,
-        //        //    IssueRate = 0,
-        //        //    PassonRate = 0,
-        //        //    PassonDays = 0,
-        //        //    Status = product.Status,
-
-        //        //};
-        //        //pcservice.Create(clientproduct);
-        //        #endregion
-
-        //        #region Any Files
-
-        //        if (model.File != null)
-        //        {
-        //            // Create folder
-        //            string path = Server.MapPath($"~/{VariableExtension.SystemRules.DocumentsLocation}/Product/{model.Name.Trim().Replace("/", "_").Replace("\\", "_")}/");
-
-        //            if (!Directory.Exists(path))
-        //            {
-        //                Directory.CreateDirectory(path);
-        //            }
-
-        //            string now = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-        //            Document doc = new Document()
-        //            {
-        //                ObjectId = product.Id,
-        //                ObjectType = "Product",
-        //                Name = model.File.Name,
-        //                Category = model.File.Name,
-        //                Status = (int)Status.Active,
-        //                Title = model.File.File.FileName,
-        //                Size = model.File.File.ContentLength,
-        //                Description = model.File.Description,
-        //                Type = Path.GetExtension(model.File.File.FileName),
-        //                Location = $"Product/{model.Name.Trim().Replace("/", "_").Replace("\\", "_")}/{now}-{model.File.File.FileName}"
-        //            };
-
-        //            dservice.Create(doc);
-
-        //            string fullpath = Path.Combine(path, $"{now}-{model.File.File.FileName}");
-        //            model.File.File.SaveAs(fullpath);
-        //        }
-
-        //        #endregion
-
-        //        scope.Complete();
-
-        //        Notify("The Product was successfully created.", NotificationType.Success);
-        //    }
-
-        //    return RedirectToAction("LinkProducts");
-        //}
+                return LinkProducts( new PagingModel(), new CustomSearchModel() );
+            }
+        }
 
         //
         // GET: /Client/EditProduct/5
         [Requires( PermissionTo.Edit )]
         public ActionResult EditProduct( int id )
         {
-            using ( DocumentService dservice = new DocumentService() )
-            using ( ProductService pservice = new ProductService() )
+            using ( ClientProductService pservice = new ClientProductService() )
             {
-                Product product = pservice.GetById( id );
+                ClientProduct cp = pservice.GetById( id );
 
-                if ( product == null )
+                if ( cp == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
                     return PartialView( "_AccessDenied" );
                 }
 
-                List<Document> documents = dservice.List( product.Id, "Product" );
-
                 ProductViewModel model = new ProductViewModel()
                 {
-                    Id = product.Id,
-                    EditMode = true,
-                    Name = product.Name,
-                    Description = product.Description,
-                    Status = ( Status ) product.Status,
-                    File = new FileViewModel()
-                    {
-                        Name = documents?.FirstOrDefault()?.Name,
-                        Id = documents?.FirstOrDefault()?.Id ?? 0,
-                        Extension = documents?.FirstOrDefault()?.Type,
-                        Description = documents?.FirstOrDefault()?.Description,
-                    },
-                    ProductPrices = new List<ProductPriceViewModel>(),
+                    Id = cp.Id,
+                    LinkMode = true,
+                    HireRate = cp.Rate,
+                    Name = cp.Product.Name,
+                    ClientId = cp.ClientId,
+                    LostRate = cp.LostRate,
+                    Equipment = cp.Equipment,
+                    ProductId = cp.ProductId,
+                    IssueRate = cp.IssueRate,
+                    ActiveDate = cp.ActiveDate,
+                    PassonRate = cp.PassonRate,
+                    PassonDays = cp.PassonDays,
+                    Status = ( Status ) cp.Status,
+                    AccountingCode = cp.AccountingCode,
+                    RateType = ( RateType ) cp.RateType,
+                    Description = cp.ProductDescription,
                 };
-
-                foreach ( ProductPrice p in product.ProductPrices )
-                {
-                    model.ProductPrices.Add( new ProductPriceViewModel()
-                    {
-                        Id = p.Id,
-                        Rate = p.Rate,
-                        RateUnit = p.RateUnit,
-                        StartDate = p.FromDate,
-                        ProductId = p.ProductId,
-                        Status = ( Status ) p.Status,
-                        Type = ( ProductPriceType ) p.Type
-                    } );
-                }
-
-                if ( model.ProductPrices.Count < 3 )
-                {
-                    foreach ( int item in Enum.GetValues( typeof( ProductPriceType ) ) )
-                    {
-                        ProductPriceType type = ( ProductPriceType ) item;
-
-                        if ( model.ProductPrices.Any( p => p.Type == type ) ) continue;
-
-                        model.ProductPrices.Add( new ProductPriceViewModel()
-                        {
-                            Type = type,
-                            Status = Status.Active
-                        } );
-                    }
-                }
 
                 return View( model );
             }
@@ -3179,142 +2888,43 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Edit )]
         public ActionResult EditProduct( ProductViewModel model )
         {
-            if ( !ModelState.IsValid )
-            {
-                Notify( "Sorry, the selected Product was not updated. Please correct all errors and try again.", NotificationType.Error );
-
-                return View( model );
-            }
-
-            using ( ProductService pservice = new ProductService() )
-            using ( TransactionScope scope = new TransactionScope() )
-            using ( DocumentService dservice = new DocumentService() )
             using ( ClientProductService cpservice = new ClientProductService() )
-            using ( ProductPriceService ppservice = new ProductPriceService() )
             {
-                ClientProduct product = cpservice.GetById( model.Id );
+                ClientProduct cp = cpservice.GetById( model.Id );
 
                 #region Validations
 
-                if ( product == null )
+                if ( cp == null )
                 {
-                    Notify( "Sorry, that Product does not exist! Please try again.", NotificationType.Error );
+                    Notify( "Sorry, that Client Product does not exist! Please try again.", NotificationType.Error );
 
                     return View( model );
                 }
-
-                //if (product.Name != model.Name && pservice.Exist(model.Name))
-                //{
-                //    // Product already exist!
-                //    Notify($"Sorry, a Product with the Name \"{model.Name}\" already exists!", NotificationType.Error);
-
-                //    return View(model);
-                //}
 
                 #endregion
 
                 #region Product
 
-                //product.Name = model.Name;
-                product.Status = ( int ) model.Status;
-                product.ProductDescription = model.Description;
-                #endregion
-
-                #region Product Prices
-
-                decimal? hrate = 0;
-                decimal? irate = 0;
-                decimal? lrate = 0;
-                decimal? pocost = 0;
-
-
-                if ( model.ProductPrices.NullableAny() )
-                {
-                    foreach ( ProductPriceViewModel price in model.ProductPrices )
-                    {
-                        switch ( price.Type )
-                        {
-                            case ProductPriceType.Hire:
-                                hrate = price.Rate;
-                                //hrateunit = price.RateUnit;
-                                break;
-                            case ProductPriceType.Issue:
-                                irate = price.Rate;
-                                //irateunit = price.RateUnit;
-                                break;
-                            case ProductPriceType.Lost:
-                                lrate = price.Rate;
-                                // lrateunit = price.RateUnit;
-                                break;
-                            default:
-                                break;
-
-                        }
-                    }
-                    //product.PassonRate = model.PassonRate;
-                    //product.PassonDays = model.PassonDays;
-                    product.Rate = hrate;
-                    product.IssueRate = irate;
-                    product.LostRate = lrate;
-                }
+                cp.Rate = model.HireRate;
+                cp.LostRate = model.LostRate;
+                cp.Equipment = model.Equipment;
+                cp.IssueRate = model.IssueRate;
+                cp.PassonDays = model.PassonDays;
+                cp.PassonRate = model.PassonRate;
+                cp.Status = ( int ) model.Status;
+                cp.ActiveDate = model.ActiveDate;
+                cp.RateType = ( int ) model.RateType;
+                cp.AccountingCode = model.AccountingCode;
+                cp.ProductDescription = model.Description;
 
                 #endregion
 
-                //gathered all the info now update the entry
-                product = cpservice.Update( product );
+                cpservice.Update( cp );
 
-                #region Any Files
-
-                if ( model.File.File != null )
-                {
-                    // Create folder
-                    string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/Product/{model.Name.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/" );
-
-                    if ( !Directory.Exists( path ) )
-                    {
-                        Directory.CreateDirectory( path );
-                    }
-
-                    string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
-
-                    Document doc = dservice.GetById( model.File.Id );
-
-                    if ( doc != null )
-                    {
-                        // Disable this file...
-                        doc.Status = ( int ) Status.Inactive;
-
-                        dservice.Update( doc );
-                    }
-
-                    doc = new Document()
-                    {
-                        ObjectId = product.Id,
-                        ObjectType = "Product",
-                        Name = model.File.Name,
-                        Category = model.File.Name,
-                        Status = ( int ) Status.Active,
-                        Title = model.File.File.FileName,
-                        Size = model.File.File.ContentLength,
-                        Description = model.File.Description,
-                        Type = Path.GetExtension( model.File.File.FileName ),
-                        Location = $"Product/{model.Name.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/{now}-{model.File.File.FileName}"
-                    };
-
-                    dservice.Create( doc );
-
-                    string fullpath = Path.Combine( path, $"{now}-{model.File.File.FileName}" );
-                    model.File.File.SaveAs( fullpath );
-                }
-
-                #endregion
-
-                scope.Complete();
-
-                Notify( "The selected Product's details were successfully updated.", NotificationType.Success );
+                Notify( "The selected Client Product's details were successfully updated.", NotificationType.Success );
             }
 
-            return RedirectToAction( "LinkProducts" );
+            return LinkProducts( new PagingModel(), new CustomSearchModel() );
         }
 
         //
@@ -3323,292 +2933,32 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Delete )]
         public ActionResult DeleteProduct( ProductViewModel model )
         {
-            Product product;
-
-            using ( ProductService service = new ProductService() )
+            using ( ClientProductService service = new ClientProductService() )
             {
-                product = service.GetById( model.Id );
+                ClientProduct cp = service.GetById( model.Id );
 
-                if ( product == null )
+                if ( cp == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
                     return PartialView( "_AccessDenied" );
                 }
 
-                product.Status = ( ( ( Status ) product.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+                cp.Status = ( ( ( Status ) cp.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
 
-                service.Update( product );
+                service.Update( cp );
 
-                Notify( "The selected Product was successfully updated.", NotificationType.Success );
+                Notify( "The selected Client Product was successfully updated.", NotificationType.Success );
             }
 
-            return RedirectToAction( "LinkProducts" );
+            return LinkProducts( new PagingModel(), new CustomSearchModel() );
         }
 
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetProductsForClient( string clientId )
-        {
-            if ( !string.IsNullOrEmpty( clientId ) )
-            {
-                Session[ "ClientId" ] = clientId;//wroite to session to use for adds and updates
-                List<ProductCustomModel> products = null;
-                //int pspId = Session[ "UserPSP" ];
-                //int pspId = (CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0);
-
-                using ( ProductService service = new ProductService() )
-                {
-                    products = service.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = int.Parse( clientId ), Status = Status.Active } );
-                }
-                //ProductPrice price = new ProductPrice();
-
-                //using (ProductPriceService aservice = new ProductPriceService())
-                //{
-                //    foreach (ProductCustomModel prod in products)
-                //    {
-                //        string hrate = "";
-                //        string irate = "";
-                //        string lrate = "";
-                //        string pocost = "";
-                //        price = aservice.Get(prod.Id);
-                //        if (price != null)
-                //        {
-                //            hrate = price.RateUnit.ToString() + ' ' + price.Rate.ToString();
-                //            irate = price.RateUnit.ToString() + ' ' + price.Rate.ToString();
-                //            lrate = price.RateUnit.ToString() + ' ' + price.Rate.ToString();
-                //            pocost = price.RateUnit.ToString() + ' ' + price.Rate.ToString();
-
-                //        }
-
-                //        Status status = (Status)prod.Status;
-                //        String active = status.Equals(Status.Active) ? "active" : "inactive";
-                //        String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
-
-
-                //    }
-                //}
-
-
-                //var jsonList = JsonConvert.SerializeObject(sites);
-                return Json( products, JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        #endregion    
+        #endregion
 
 
 
         #region General
-
-        [HttpPost]
-        // GET: /Client/ImportSites
-        public ActionResult ImportSites( HttpPostedFileBase postedFile )
-        {
-            if ( postedFile != null )
-            {
-                string fileExtension = Path.GetExtension( postedFile.FileName );
-
-                //Validate uploaded file and return error.
-                if ( fileExtension != ".csv" )
-                {
-                    ViewBag.Message = "Please select the csv file with .csv extension";
-                    return View();
-                }
-
-                try
-                {
-                    string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-                    int clientID = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-                    //for subsites to load tehse sites under a main site
-                    string sessSiteId = ( Session[ "SiteId" ] != null ? Session[ "SiteId" ].ToString() : null );
-                    int SiteID = ( !string.IsNullOrEmpty( sessSiteId ) ? int.Parse( sessSiteId ) : 0 );
-
-                    using ( SiteService sservice = new SiteService() )
-                    using ( AddressService aservice = new AddressService() )
-                    using ( TransactionScope scope = new TransactionScope() )
-                    using ( ClientSiteService csservice = new ClientSiteService() )
-                    using ( StreamReader sreader = new StreamReader( postedFile.InputStream ) )
-                    {
-                        //First line is header. If header is not passed in csv then we can neglect the below line.
-                        string[] headers = sreader.ReadLine().Split( ',' );
-
-                        //Loop through the records
-
-                        while ( !sreader.EndOfStream )
-                        {
-                            string[] rows = sreader.ReadLine().Split( ',' );
-
-                            int siteType = 1;
-
-                            string strLatY = rows[ 3 ].ToString();
-                            decimal latitudeY = 0;
-                            try
-                            {
-                                decimal.TryParse( rows[ 3 ].ToString(), out latitudeY );
-                                latitudeY = decimal.Round( latitudeY, 4 );
-                                strLatY = ( latitudeY != 0 ? latitudeY.ToString() : strLatY );
-                            }
-                            catch ( Exception ex )
-                            {
-                                ViewBag.Message = string.Concat( rows[ 3 ].ToString(), " ", ex.Message );
-                            }
-                            string strLngX = rows[ 2 ].ToString();
-                            decimal longitudeX = 0;
-                            try
-                            {
-                                decimal.TryParse( rows[ 2 ].ToString(), out longitudeX );
-                                longitudeX = decimal.Round( longitudeX, 4 );
-                                strLngX = ( longitudeX != 0 ? longitudeX.ToString() : strLngX );
-                            }
-                            catch ( Exception ex )
-                            {
-                                ViewBag.Message = string.Concat( rows[ 3 ].ToString(), " ", ex.Message );
-                            }
-
-                            Site existingSite = sservice.ExistByXYCoords( strLngX, strLatY );
-
-                            #region Validation
-
-                            if ( !string.IsNullOrEmpty( strLngX ) && existingSite != null )
-                            {
-                                //Notify($"Sorry, a Site with the same X Y Coordinates already exists \"{model.XCord}\" already exists!", NotificationType.Error);
-                                //return View(model);
-
-                                //rather than pass back to view, we will create the new site as a subsite of the existing site. 
-                                //Get the existing site first
-                                existingSite = sservice.GetByColumnsWhere( "XCord", strLngX, "YCord", strLatY );
-                                SiteID = existingSite.Id;//This is the existing site retrieved by mapping same X and Y coord, read that into the model.SiteId which makes the new site a child site
-                                siteType = 2;//Mark teh site as a subsite by default
-                            }
-
-                            int regionId = 0;
-
-                            if ( !string.IsNullOrEmpty( rows[ 16 ].ToString() ) )
-                            {
-                                regionId = int.Parse( rows[ 16 ].ToString() );
-                            }
-
-                            int provinceId = 0;
-
-                            string provinceName = "";
-
-                            if ( !string.IsNullOrEmpty( rows[ 8 ].ToString() ) )
-                            {
-                                int.TryParse( rows[ 8 ].ToString(), out provinceId );
-
-                                try
-                                {
-                                    if ( provinceId > 0 )
-                                    {
-                                        provinceName = ( ( Province ) provinceId ).GetDisplayText();
-                                    }
-                                }
-                                catch ( Exception ex )
-                                {
-                                    ViewBag.Message = string.Concat( rows[ 8 ].ToString(), " ", ex.Message );
-                                }
-                            }
-
-                            #region Create Site
-
-                            Site site = new Site()
-                            {
-                                Name = rows[ 0 ].ToString(),
-                                Description = rows[ 1 ].ToString(),
-                                XCord = strLngX,
-                                YCord = strLatY,
-                                Address = rows[ 4 ].ToString() + " " + rows[ 5 ].ToString() + " " + rows[ 6 ].ToString() + " " + rows[ 7 ].ToString() + " " + provinceName,
-                                PostalCode = rows[ 7 ].ToString(),
-                                ContactName = rows[ 10 ].ToString(),
-                                ContactNo = rows[ 9 ].ToString(),
-                                PlanningPoint = rows[ 11 ].ToString(),
-                                SiteType = siteType,
-                                AccountCode = rows[ 13 ].ToString(),
-                                Depot = rows[ 14 ].ToString(),
-                                SiteCodeChep = rows[ 15 ].ToString(),
-                                Status = ( int ) Status.Pending,
-                                RegionId = regionId,
-                                FinanceContact = rows[ 17 ].ToString(),
-                                FinanceContactNo = rows[ 18 ].ToString(),
-                                ReceivingContact = rows[ 19 ].ToString(),
-                                ReceivingContactNo = rows[ 20 ].ToString(),
-                            };
-
-                            //For Subsites
-                            if ( SiteID > 0 )
-                            {
-                                site.SiteId = SiteID;
-                            }
-
-                            site = sservice.Create( site );
-
-                            #endregion
-
-                            #region Create Address (s)
-
-                            if ( !string.IsNullOrEmpty( rows[ 3 ].ToString() ) )
-                            {
-                                Address address = new Address()
-                                {
-                                    ObjectId = site.Id,
-                                    ObjectType = "Site",
-                                    Town = rows[ 6 ].ToString(),
-                                    Status = ( int ) Status.Active,
-                                    PostalCode = rows[ 7 ].ToString(),
-                                    Type = ( int ) AddressType.Postal,
-                                    Addressline1 = rows[ 4 ].ToString(),
-                                    Addressline2 = rows[ 5 ].ToString(),
-                                    Province = provinceId,
-                                };
-
-                                aservice.Create( address );
-                            }
-
-                            #endregion
-
-                            //tie Client in Session to New Site
-
-                            #region Add Client Site
-
-                            ClientSite csSite = new ClientSite()
-                            {
-                                ClientCustomerId = clientID,
-                                SiteId = site.Id,
-                                AccountingCode = site.AccountCode,
-                                Status = ( int ) Status.Active
-                            };
-
-                            csservice.Create( csSite );
-
-                            #endregion
-
-                        }
-
-                        #endregion
-
-                        scope.Complete();
-                    }
-
-                }
-                catch ( Exception ex )
-                {
-                    ViewBag.Message = ex.Message;
-                }
-                finally
-                {
-
-                }
-            }
-            else
-            {
-
-            }
-            return RedirectToAction( "ManageSites", "Client" );
-        }
 
         [HttpPost]
         // GET: /Client/ImportSites
@@ -3801,211 +3151,32 @@ namespace ACT.UI.Controllers
 
 
 
-        #region Budgets
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetClientBudgets( string clientId )
-        {
-            if ( clientId != null && clientId != "" )
-            {
-                List<ClientBudget> load = null;
-
-                using ( ClientBudgetService bservice = new ClientBudgetService() )
-                {
-                    load = bservice.ListByColumnWhere( "ClientId", int.Parse( clientId ) );
-                    return Json( load, JsonRequestBehavior.AllowGet );
-                }
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetClientBudget( string Id, string ClientId, string BudgetYear,
-            string January, string February, string March, string April, string May,
-            string June, string July, string August, string September, string October,
-            string November, string December )
-        {
-            if ( Id != null )
-            {
-                using ( ClientBudgetService bservice = new ClientBudgetService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    //Collection of budgets or singular?
-                    if ( int.Parse( Id ) > 0 )
-                    {
-                        ClientBudget budget = bservice.GetById( int.Parse( Id ) );
-
-                        budget.ClientId = int.Parse( ClientId );
-                        budget.BudgetYear = int.Parse( BudgetYear );
-                        budget.January = decimal.Parse( January );
-                        budget.February = decimal.Parse( February );
-                        budget.March = decimal.Parse( March );
-                        budget.April = decimal.Parse( April );
-                        budget.May = decimal.Parse( May );
-                        budget.June = decimal.Parse( June );
-                        budget.July = decimal.Parse( July );
-                        budget.August = decimal.Parse( August );
-                        budget.September = decimal.Parse( September );
-                        budget.October = decimal.Parse( October );
-                        budget.November = decimal.Parse( November );
-                        budget.December = decimal.Parse( December );
-                        budget.Status = ( int ) Status.Active;
-
-                        bservice.Update( budget );
-                    }
-                    else
-                    {
-                        ClientBudget budget = new ClientBudget();
-                        budget.ClientId = int.Parse( ClientId );
-                        budget.BudgetYear = int.Parse( BudgetYear );
-                        budget.January = decimal.Parse( January );
-                        budget.February = decimal.Parse( February );
-                        budget.March = decimal.Parse( March );
-                        budget.April = decimal.Parse( April );
-                        budget.May = decimal.Parse( May );
-                        budget.June = decimal.Parse( June );
-                        budget.July = decimal.Parse( July );
-                        budget.August = decimal.Parse( August );
-                        budget.September = decimal.Parse( September );
-                        budget.October = decimal.Parse( October );
-                        budget.November = decimal.Parse( November );
-                        budget.December = decimal.Parse( December );
-                        budget.Status = ( int ) Status.Active;
-
-                        bservice.Create( budget );
-                    }
-                    scope.Complete();
-                }
-
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetSiteBudgetList( string siteId )
-        {
-            if ( siteId != null && siteId != "" )
-            {
-                List<SiteBudget> load = null;
-
-                using ( SiteBudgetService bservice = new SiteBudgetService() )
-                {
-                    load = bservice.ListByColumnWhere( "SiteId", int.Parse( siteId ) );
-                    return Json( load, JsonRequestBehavior.AllowGet );
-                }
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetSiteBudget( string Id, string SiteId, string BudgetYear,
-            string January, string February, string March, string April, string May,
-            string June, string July, string August, string September, string October,
-            string November, string December )
-        {
-            if ( Id != null )
-            {
-                using ( SiteBudgetService bservice = new SiteBudgetService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    //Collection of budgets or singular?
-                    if ( int.Parse( Id ) > 0 )
-                    {
-                        SiteBudget budget = bservice.GetById( int.Parse( Id ) );
-
-                        budget.SiteId = int.Parse( SiteId );
-                        budget.BudgetYear = int.Parse( BudgetYear );
-                        budget.January = decimal.Parse( January );
-                        budget.February = decimal.Parse( February );
-                        budget.March = decimal.Parse( March );
-                        budget.April = decimal.Parse( April );
-                        budget.May = decimal.Parse( May );
-                        budget.June = decimal.Parse( June );
-                        budget.July = decimal.Parse( July );
-                        budget.August = decimal.Parse( August );
-                        budget.September = decimal.Parse( September );
-                        budget.October = decimal.Parse( October );
-                        budget.November = decimal.Parse( November );
-                        budget.December = decimal.Parse( December );
-                        budget.Status = ( int ) Status.Active;
-
-                        bservice.Update( budget );
-                    }
-                    else
-                    {
-                        SiteBudget budget = new SiteBudget();
-                        budget.SiteId = int.Parse( SiteId );
-                        budget.BudgetYear = int.Parse( BudgetYear );
-                        budget.January = decimal.Parse( January );
-                        budget.February = decimal.Parse( February );
-                        budget.March = decimal.Parse( March );
-                        budget.April = decimal.Parse( April );
-                        budget.May = decimal.Parse( May );
-                        budget.June = decimal.Parse( June );
-                        budget.July = decimal.Parse( July );
-                        budget.August = decimal.Parse( August );
-                        budget.September = decimal.Parse( September );
-                        budget.October = decimal.Parse( October );
-                        budget.November = decimal.Parse( November );
-                        budget.December = decimal.Parse( December );
-                        budget.Status = ( int ) Status.Active;
-
-                        bservice.Create( budget );
-                    }
-                    scope.Complete();
-                }
-
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-
-
-
-        #endregion
-
-
-
         #region Manage Transporters
 
         // GET: Client/AddTransporter
-        [Requires(PermissionTo.Create)]
+        [Requires( PermissionTo.Create )]
         public ActionResult AddTransporter()
         {
             TransporterViewModel model = new TransporterViewModel() { EditMode = true };
-            return View(model);
+            return View( model );
         }
-
 
         // POST: Client/Transporter
         [HttpPost]
-        [Requires(PermissionTo.Create)]
-        public ActionResult AddTransporter(TransporterViewModel model)
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddTransporter( TransporterViewModel model )
         {
             try
             {
-                if (!ModelState.IsValid)
+                if ( !ModelState.IsValid )
                 {
-                    Notify("Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error);
+                    Notify( "Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error );
 
-                    return View(model);
+                    return View( model );
                 }
 
-                using (TransporterService siteService = new TransporterService())
-                using (TransactionScope scope = new TransactionScope())
+                using ( TransporterService siteService = new TransporterService() )
+                using ( TransactionScope scope = new TransactionScope() )
                 {
                     //#region Validation
                     //if (!string.IsNullOrEmpty(model.RegistrationNumber) && siteService.ExistByName(model.RegistrationNumber.Trim()))
@@ -4024,89 +3195,82 @@ namespace ACT.UI.Controllers
                         RegistrationNumber = model.RegistrationNumber,
                         Email = model.Email,
                         ContactNumber = model.ContactNumber,
-                        Status = (int)Status.Active
+                        Status = ( int ) Status.Active
                     };
-                    site = siteService.Create(site);
+                    site = siteService.Create( site );
                     #endregion
 
                     scope.Complete();
                 }
 
-                Notify("The Transporter was successfully created.", NotificationType.Success);
-                return RedirectToAction("ManageTransporters");
+                Notify( "The Transporter was successfully created.", NotificationType.Success );
+                return RedirectToAction( "ManageTransporters" );
             }
-            catch (Exception ex)
+            catch ( Exception ex )
             {
                 ViewBag.Message = ex.Message;
                 return View();
             }
         }
 
-
-
         // GET: Client/EditTransporter/5
-        [Requires(PermissionTo.Edit)]
-        public ActionResult EditTransporter(int id)
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditTransporter( int id )
         {
-            Transporter site;
-            //int pspId = Session[ "UserPSP" ];
-            //int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-
-
-
-            using (TransporterService service = new TransporterService())
-            using (AddressService aservice = new AddressService())
+            using ( ContactService cservice = new ContactService() )
+            using ( VehicleService vservice = new VehicleService() )
+            using ( TransporterService tservice = new TransporterService() )
             {
-                site = service.GetById(id);
+                Transporter t = tservice.GetById( id );
 
-                if (site == null)
+                if ( t == null )
                 {
-                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
-                    return PartialView("_AccessDenied");
+                    return PartialView( "_AccessDenied" );
                 }
 
-                Address address = aservice.Get(site.Id, "Site");
-
-
-                bool unverified = (site.Status == (int)PSPClientStatus.Unverified);
+                List<Contact> contacts = cservice.List( t.Id, "Transporter" );
+                List<Vehicle> vehicles = vservice.List( t.Id, "Transporter" );
 
                 TransporterViewModel model = new TransporterViewModel()
                 {
-                    Id = site.Id,
-                    Name = site.Name,
-                    TradingName = site.TradingName,
-                    RegistrationNumber = site.RegistrationNumber,
-                    Email = site.Email,
-                    ContactNumber = site.ContactNumber,
-                    // Status = (int)Status.Active
-                    Status = (int)site.Status,
-                    EditMode = true
+                    Id = t.Id,
+                    Name = t.Name,
+                    Email = t.Email,
+                    EditMode = true,
+                    Contacts = contacts,
+                    Vehicles = vehicles,
+                    TradingName = t.TradingName,
+                    Status = ( Status ) t.Status,
+                    ContactNumber = t.ContactNumber,
+                    RegistrationNumber = t.RegistrationNumber,
                 };
-                return View(model);
+
+                return View( model );
             }
         }
 
         // POST: Client/EditTransporter/5
         [HttpPost]
-        [Requires(PermissionTo.Edit)]
-        public ActionResult EditTransporter(TransporterViewModel model, PagingModel pm, bool isstructure = false)
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditTransporter( TransporterViewModel model )
         {
             try
             {
-                if (!ModelState.IsValid)
+                if ( !ModelState.IsValid )
                 {
-                    Notify("Sorry, the selected Transporter was not updated. Please correct all errors and try again.", NotificationType.Error);
+                    Notify( "Sorry, the selected Transporter was not updated. Please correct all errors and try again.", NotificationType.Error );
 
-                    return View(model);
+                    return View( model );
                 }
 
                 Transporter site;
 
-                using (TransporterService service = new TransporterService())
-                using (TransactionScope scope = new TransactionScope())
+                using ( TransporterService service = new TransporterService() )
+                using ( TransactionScope scope = new TransactionScope() )
                 {
-                    site = service.GetById(model.Id);
+                    site = service.GetById( model.Id );
 
 
                     #region Validations
@@ -4129,9 +3293,9 @@ namespace ACT.UI.Controllers
                     site.Email = model.Email;
                     site.ContactNumber = model.ContactNumber;
                     site.TradingName = model.TradingName;
-                    site.Status = (int)model.Status;
+                    site.Status = ( int ) model.Status;
 
-                    service.Update(site);
+                    service.Update( site );
 
                     #endregion
 
@@ -4141,11 +3305,11 @@ namespace ACT.UI.Controllers
                     scope.Complete();
                 }
 
-                Notify("The selected Transporter details were successfully updated.", NotificationType.Success);
+                Notify( "The selected Transporter details were successfully updated.", NotificationType.Success );
 
-                return RedirectToAction("ManageTransporters");
+                return RedirectToAction( "ManageTransporters" );
             }
-            catch (Exception ex)
+            catch ( Exception ex )
             {
                 ViewBag.Message = ex.Message;
                 return View();
@@ -4154,38 +3318,49 @@ namespace ACT.UI.Controllers
 
         // POST: Client/DeleteTransporter/5
         [HttpPost]
-        [Requires(PermissionTo.Delete)]
-        public ActionResult DeleteTransporter(SiteViewModel model)
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteTransporter( TransporterViewModel model )
         {
-            Transporter site;
-            try
+            using ( TransporterService service = new TransporterService() )
             {
+                Transporter t = service.GetById( model.Id );
 
-                using (TransporterService service = new TransporterService())
-                using (TransactionScope scope = new TransactionScope())
+                if ( t == null )
                 {
-                    site = service.GetById(model.Id);
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
-                    if (site == null)
-                    {
-                        Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
-
-                        return PartialView("_AccessDenied");
-                    }
-
-                    site.Status = (((Status)site.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;
-
-                    service.Update(site);
-                    scope.Complete();
-
+                    return PartialView( "_AccessDenied" );
                 }
-                Notify("The selected Transporter was successfully updated.", NotificationType.Success);
-                return RedirectToAction("ManageSites");
+
+                t.Status = ( ( ( Status ) t.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.Update( t );
+
+                Notify( "The selected Transporter was successfully updated.", NotificationType.Success );
+
+                return ManageTransporters( new PagingModel(), new CustomSearchModel() );
             }
-            catch (Exception ex)
+        }
+
+        // GET: Client/TransporterContacts/5
+        public ActionResult TransporterContacts( int id )
+        {
+            using ( ContactService cservice = new ContactService() )
             {
-                ViewBag.Message = ex.Message;
-                return View();
+                List<Contact> contacts = cservice.List( id, "Transporter" );
+
+                return PartialView( "_Contacts", contacts );
+            }
+        }
+
+        // GET: Client/TransporterVehicles/5
+        public ActionResult TransporterVehicles( int id )
+        {
+            using ( VehicleService vservice = new VehicleService() )
+            {
+                List<Vehicle> vehicles = vservice.List( id, "Transporter" );
+
+                return PartialView( "_Vehicles", vehicles );
             }
         }
 
@@ -4367,34 +3542,57 @@ namespace ACT.UI.Controllers
             return PartialView( "_SubSites" );
         }
 
-        // GET: /Client/ManageTransporters
-        public ActionResult ManageTransporters(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        //
+        // POST || GET: /Client/LinkProducts
+        public ActionResult LinkProducts( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-
-            ViewBag.ViewName = "ManageTransporters";
-            if (givecsm)
+            if ( givecsm )
             {
-                ViewBag.ViewName = "ManageTransporters";
+                ViewBag.ViewName = "LinkProducts";
 
-                return PartialView("_ManageTransportersCustomSearch", new CustomSearchModel("ManageTransporters"));
+                return PartialView( "_LinkProductsCustomSearch", new CustomSearchModel( "LinkProducts" ) );
             }
-            int total = 0;
 
-            List<Transporter> model = new List<Transporter>();
-            //int pspId = Session[ "UserPSP" ];
-            //int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            using (TransporterService service = new TransporterService())
+            using ( ClientProductService service = new ClientProductService() )
             {
                 pm.Sort = pm.Sort ?? "DESC";
                 pm.SortBy = pm.SortBy ?? "CreatedOn";
 
-                model = service.List(pm, csm);
-                total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total(pm, csm);
+                List<ClientProductCustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_LinkProducts", paging );
+            }
+        }
+
+        // GET: /Client/ManageTransporters
+        public ActionResult ManageTransporters( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            ViewBag.ViewName = "ManageTransporters";
+
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "ManageTransporters";
+
+                return PartialView( "_ManageTransportersCustomSearch", new CustomSearchModel() );
             }
 
-            PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+            using ( TransporterService service = new TransporterService() )
+            {
+                pm.Sort = pm.Sort ?? "DESC";
+                pm.SortBy = pm.SortBy ?? "CreatedOn";
 
-            return PartialView("_ManageTransporters", paging);
+                List<TransporterCustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_ManageTransporters", paging );
+            }
         }
 
         #endregion

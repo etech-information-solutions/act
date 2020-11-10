@@ -272,5 +272,10 @@ namespace ACT.Core.Services
         {
             return context.Regions.Any( r => r.Name.Trim() == name.Trim() && r.PSPId == pspId );
         }
+
+        public Region Search( string region, string province )
+        {
+            return context.Regions.FirstOrDefault( r => r.Name.Trim() == region.Trim() || r.Description == region.Trim() || r.Name.Trim() == province.Trim() || r.Description.Trim() == province.Trim() );
+        }
     }
 }

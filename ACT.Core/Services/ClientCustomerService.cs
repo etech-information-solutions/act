@@ -47,7 +47,7 @@ namespace ACT.Core.Services
 
             string query = string.Empty;
 
-            query = $"SELECT c.Id AS [TKey], c.[CustomerName] AS [TValue] FROM [dbo].[ClientCustomer] c WHERE (1=1)";
+            query = $"SELECT c.Id AS [TKey], c.[CustomerName] + ' ' + c.[CustomerNumber] AS [TValue] FROM [dbo].[ClientCustomer] c WHERE (1=1)";
 
             if ( !CurrentUser.IsAdmin )
             {
@@ -338,6 +338,17 @@ namespace ACT.Core.Services
             }
 
             return model;
+        }
+
+        /// <summary>
+        /// Gets a Client Customer using the customer number for the specified client
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="customerNumber"></param>
+        /// <returns></returns>
+        public ClientCustomer GetByNumber( int clientId, string customerNumber )
+        {
+            return context.ClientCustomers.FirstOrDefault( cc => cc.ClientId == clientId && cc.CustomerNumber.Trim() == customerNumber.Trim() );
         }
     }
 }

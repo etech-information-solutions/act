@@ -1,0 +1,90 @@
+﻿@model List<Contact>
+
+@using ACT.Data.Models
+
+<div class="grouped-area">
+
+    <p>
+        <strong>Contacts</strong>
+    </p>
+
+    <table id="contacts-table" class="da-table">
+
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Title</th>
+                <th>ID #</th>
+                <th>Cell</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @if ( Model.NullableAny() )
+            {
+                int count = 0;
+
+                foreach ( Contact b in Model )
+                {
+                    <tr id="row-line-@count" class="add-more-row">
+                        <td style="position: relative;">
+                            @if ( ( count + 1 ) == Model.Count )
+                            {
+                                <a data-add-one-more="1" data-target="#contacts-table #row-line-0" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                                    <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                                </a>
+                            }
+
+                            <input name="Contacts[@count].Id" type="hidden" value="@b.Id" />
+
+                            <input class="input" name="Contacts[@count].ContactName" placeholder="Contact Name" required="required" style="padding: 0 5px; width: 87%;" type="text" value="@b.ContactName">
+                        </td>
+                        <td>
+                            <input class="input" name="Contacts[@count].ContactTitle" placeholder="Contact Title" style="padding: 0 5px; width: 87%;" type="text" value="@b.ContactTitle">
+                        </td>
+                        <td>
+                            <input class="input" name="Contacts[@count].ContactIdNo" placeholder="Contact ID No." style="padding: 0 5px; width: 87%;" type="text" value="@b.ContactIdNo">
+                        </td>
+                        <td>
+                            <input class="input" name="Contacts[@count].ContactCell" placeholder="Contact Cell" style="padding: 0 5px; width: 87%;" type="text" value="@b.ContactCell">
+                        </td>
+                        <td>
+                            <input class="input" name="Contacts[@count].ContactEmail" placeholder="Contact Email" style="padding: 0 5px; width: 87%;" type="text" value="@b.ContactEmail">
+                        </td>
+                    </tr>
+
+                    count++;
+                }
+            }
+            else
+            {
+                <tr id="row-line-0" class="add-more-row">
+                    <td style="position: relative;">
+                        <a data-add-one-more="1" data-target="#contacts-table #row-line-0" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                            <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                        </a>
+
+                        <input class="input" name="Contacts[0].ContactName" placeholder="Contact Name" required="required" style="padding: 0 5px; width: 87%;" type="text" value="">
+                    </td>
+                    <td>
+                        <input class="input" name="Contacts[0].ContactTitle" placeholder="Contact Title" style="padding: 0 5px; width: 87%;" type="text" value="">
+                    </td>
+                    <td>
+                        <input class="input" name="Contacts[0].ContactIdNo" placeholder="Contact ID No." style="padding: 0 5px; width: 87%;" type="text" value="">
+                    </td>
+                    <td>
+                        <input class="input" name="Contacts[0].ContactCell" placeholder="Contact Cell" style="padding: 0 5px; width: 87%;" type="text" value="">
+                    </td>
+                    <td>
+                        <input class="input" name="Contacts[0].ContactEmail" placeholder="Contact Email" style="padding: 0 5px; width: 87%;" type="text" value="">
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

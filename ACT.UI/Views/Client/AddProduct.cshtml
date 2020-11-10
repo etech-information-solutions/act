@@ -1,7 +1,6 @@
 ﻿@model ProductViewModel
 
 @using ACT.UI.Models;
-@using ACT.Core.Enums;
 
 @{
     if ( ViewBag.IncludeLayout == null )
@@ -9,33 +8,49 @@
         Layout = null;
     }
 
-    ViewBag.Title = "Add Product";
+    ViewBag.Title = "Link Product";
 }
 
 
 @Html.Partial( "_Notification" )
 
-@using ( Html.BeginForm( "AddProduct", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#products", @class = "custom-validate", @style = "width: auto;" } ) )
+@using ( Html.BeginForm( "AddProduct", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#linkproducts", @class = "custom-validate", @style = "width: auto;" } ) )
 {
     <div id="edit-item">
 
         <h2 class="uppercase" style="width: auto;">
             <img alt="" src="@Url.Content( "~/images/add.png" )" />
-            <span>Add Product</span>
+            <span>Link Product</span>
         </h2>
 
         @Html.ValidationSummary( true )
 
         <div id="item-details" class="item-details" style="width: auto;">
 
-            <div class="left" style="width: 48%; margin-right: 4%;">
+            <div class="left" style="width: 30%; margin-right: 10%;">
 
                 <div class="edit-label">
-                    @Html.LabelFor( model => model.Name )
+                    @Html.LabelFor( model => model.Status )
                 </div>
                 <div class="edit-field">
-                    @Html.TextBoxFor( model => model.Name, new { @placeholder = "Enter Product Name" } )
-                    @Html.ValidationMessageFor( model => model.Name )
+                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.Status )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.ClientId )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.ClientId, model => Model.ClientOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @required = "required", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.ClientId )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.ProductId )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.ProductId, model => Model.ProductOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @required = "required", @data_link_product = "1", @data_target = "#product-details", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.ProductId )
                 </div>
 
                 <div class="edit-label">
@@ -46,122 +61,81 @@
                     @Html.ValidationMessageFor( model => model.Description )
                 </div>
 
-                <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.File )
-                </div>
-
-                <div class="editor-field" style="margin-bottom: 10px;">
-
-                    <input id="File.File" name="File.File" type="file" value="" data-val-file="1" class="input" />
-                    <input id="File.Name" name="File.Name" type="hidden" value="Product/Service Documentation" />
-                    <input id="File.Description" name="File.Description" class="input" type="hidden" value="Product/Service Documentation" />
-
-                    @Html.ValidationMessageFor( model => model.File )
-
-                </div>
-
                 <div class="edit-label">
-                    @Html.LabelFor( model => model.Status )
+                    @Html.LabelFor( model => model.ActiveDate )
                 </div>
                 <div class="edit-field">
-                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.Status )
+                    @Html.TextBoxFor( model => model.ActiveDate, new { @placeholder = "Select Product Active Date", @class = "date-picker", @readonly = "readonly" } )
+                    @Html.ValidationMessageFor( model => model.ActiveDate )
                 </div>
 
             </div>
 
-            <div class="left grouped-area" style="width: 44%;">
+            <div id="product-details" class="left grouped-area" style="width: 30%;">
 
-                <p>
-                    <strong style="color: #002e70; text-transform: uppercase;">Product Price Options</strong>
-                </p>
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.HireRate )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.HireRate, new { @placeholder = "Enter Product Hire Rate" } )
+                    @Html.ValidationMessageFor( model => model.HireRate )
+                </div>
 
-                @if ( Model.ProductPrices.NullableAny() )
-                {
-                    int i = 0;
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.LostRate )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.LostRate, new { @placeholder = "Enter Product Lost Rate" } )
+                    @Html.ValidationMessageFor( model => model.LostRate )
+                </div>
 
-                    <ul>
-                        @foreach ( ProductPriceViewModel p in Model.ProductPrices )
-                        {
-                            <li style="border-bottom: 1px dashed #ddd; margin-bottom: 20px; padding-bottom: 4px;">
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.IssueRate )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.IssueRate, new { @placeholder = "Enter Product Issue Rate" } )
+                    @Html.ValidationMessageFor( model => model.IssueRate )
+                </div>
 
-                                <div class="edit-label">
-                                    <label for="ProductPrices_@p.Type.GetIntValue()-Type">Option</label>
-                                </div>
-                                <div class="edit-field">
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.PassonRate )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.PassonRate, new { @placeholder = "Enter Product Passon Rate" } )
+                    @Html.ValidationMessageFor( model => model.PassonRate )
+                </div>
 
-                                    <select id="ProductPrices_@p.Type.GetIntValue()-Type" name="ProductPrices[@i].Type" class="chzn" style="width: 98%;">
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.PassonDays )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.PassonDays, new { @placeholder = "Enter Product Passon Days" } )
+                    @Html.ValidationMessageFor( model => model.PassonDays )
+                </div>
 
-                                        @foreach ( int t in Enum.GetValues( typeof( ProductPriceType ) ) )
-                                        {
-                                            ProductPriceType type = ( ProductPriceType ) t;
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Equipment )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Equipment, new { @placeholder = "Enter Product Equipment" } )
+                    @Html.ValidationMessageFor( model => model.Equipment )
+                </div>
 
-                                            string sel = type == p.Type ? "selected=selected" : "";
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.AccountingCode )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.AccountingCode, new { @placeholder = "Enter Product Accounting Code" } )
+                    @Html.ValidationMessageFor( model => model.AccountingCode )
+                </div>
 
-                                            <option value="@t" @sel>@type.GetDisplayText()</option>
-                                        }
-
-                                    </select>
-
-                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-Type" data-valmsg-replace="true"></span>
-                                </div>
-
-                                <div class="edit-label">
-                                    <label for="ProductPrices_@p.Type.GetIntValue()-Rate">Rate</label>
-                                </div>
-                                <div class="edit-field">
-                                    <input id="ProductPrices_@p.Type.GetIntValue()-Rate" name="ProductPrices[@i].Rate" type="text" placeholder="Enter price option Rate" />
-                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-Rate" data-valmsg-replace="true"></span>
-                                </div>
-
-                                <div class="edit-label">
-                                    <label for="ProductPrices_@p.Type.GetIntValue()-RateUnit">Rate Unit</label>
-                                </div>
-                                <div class="edit-field">
-                                    <input id="ProductPrices_@p.Type.GetIntValue()-RateUnit" name="ProductPrices[@i].RateUnit" type="text" placeholder="Enter price option Rate Unit" />
-                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-RateUnit" data-valmsg-replace="true"></span>
-                                </div>
-
-                                <div class="edit-label">
-                                    <label for="ProductPrices_@p.Type.GetIntValue()-StartDate">Start Date</label>
-                                </div>
-                                <div class="edit-field">
-                                    <input id="ProductPrices_@p.Type.GetIntValue()-StartDate" name="ProductPrices[@i].StartDate" type="text" class="date-picker" placeholder="Enter price option Start Date" />
-                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-StartDate" data-valmsg-replace="true"></span>
-                                </div>
-
-                                <div class="edit-label">
-                                    <label for="ProductPrices_@p.Type.GetIntValue()-Status">Status</label>
-                                </div>
-                                <div class="edit-field">
-
-                                    <select id="ProductPrices_@p.Type.GetIntValue()-Status" name="ProductPrices[@i].Status" class="chzn" style="width: 98%;">
-
-                                        @foreach ( int t in Enum.GetValues( typeof( Status ) ) )
-                                        {
-                                            Status status = ( Status ) t;
-
-                                            if ( status != Status.Active && status != Status.Inactive )
-                                            {
-                                                continue;
-                                            }
-
-                                            string sel = status == p.Status ? "selected=selected" : "";
-
-                                            <option value="@t" @sel>@status.GetDisplayText()</option>
-                                        }
-
-                                    </select>
-
-                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-Status" data-valmsg-replace="true"></span>
-                                </div>
-
-                            </li>
-
-                            i++;
-                        }
-                    </ul>
-                }
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.RateType )
+                </div>
+                <div class="edit-field">
+                    @Html.EnumDropDownFor( model => model.RateType, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.RateType )
+                </div>
 
             </div>
 
@@ -172,7 +146,7 @@
 
                 <span style="padding: 0 5px;">/</span>
 
-                <a data-refresh="1" data-target="#products">Cancel</a>
+                <a data-refresh="1" data-target="#linkproducts">Cancel</a>
             </p>
 
         </div>

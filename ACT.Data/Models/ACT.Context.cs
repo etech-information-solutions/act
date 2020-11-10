@@ -36,7 +36,6 @@ namespace ACT.Data.Models
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
         public virtual DbSet<ClientBudget> ClientBudgets { get; set; }
-        public virtual DbSet<ClientCustomer> ClientCustomers { get; set; }
         public virtual DbSet<ClientGroup> ClientGroups { get; set; }
         public virtual DbSet<ClientInvoice> ClientInvoices { get; set; }
         public virtual DbSet<ClientKPI> ClientKPIs { get; set; }
@@ -88,5 +87,6 @@ namespace ACT.Data.Models
         public virtual DbSet<UserTask> UserTasks { get; set; }
         public virtual DbSet<Vehicle> Vehicles { get; set; }
         public virtual DbSet<PSPPeriod> PSPPeriods { get; set; }
+        public virtual DbSet<ClientCustomer> ClientCustomers { get; set; }
     }
 }

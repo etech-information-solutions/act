@@ -231,5 +231,16 @@ namespace ACT.Core.Services
 
             return clientOptions;
         }
+
+        /// <summary>
+        /// Gets a list of contacts for the specified object
+        /// </summary>
+        /// <param name="objectId"></param>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
+        public List<Vehicle> List( int objectId, string objectType )
+        {
+            return context.Vehicles.Where( c => c.ObjectId == objectId && c.ObjectType == objectType ).ToList();
+        }
     }
 }

@@ -16,13 +16,14 @@ namespace ACT.Core.Services
         {
 
         }
+
         /// <summary>
-        /// Gets a list of PSPs matching the specified search params
+        /// Gets a total count of Client Products matching the specified search params
         /// </summary>
         /// <param name="pm"></param>
         /// <param name="csm"></param>
         /// <returns></returns>
-        public List<ClientProductCustomModel> ListCSM( PagingModel pm, CustomSearchModel csm )
+        public int Total1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
@@ -37,23 +38,22 @@ namespace ACT.Core.Services
             {
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmProductId", csm.ProductId ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
-                { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                //{ new SqlParameter( "clientid", clientId > 0 ? clientId : 0 ) },
             };
 
             #endregion
 
             string query = @"SELECT
-                                p.*, pr.*,
-                                (SELECT COUNT(1) FROM [dbo].[ProductPrice] pp WHERE pp.ProductId=p.Id) AS [ProductPriceCount],
-                                (SELECT COUNT(1) FROM [dbo].[Document] d WHERE p.Id=d.ObjectId AND d.ObjectType='Product') AS [DocumentCount],
-                                cc.*
+                                COUNT(cp.Id)
                              FROM
-                                [dbo].[ClientProduct] p LEFT JOIN [dbo].[Product] pr ON pr.Id = p.ProductId LEFT JOIN [dbo].[Client] cc ON cc.Id = p.ClientId";
+                                [dbo].[ClientProduct] cp
+                                INNER JOIN [dbo].[Product] p ON p.Id = cp.ProductId
+                                INNER JOIN [dbo].[Client] c ON c.Id = cp.ClientId";
 
             // WHERE
 
@@ -63,32 +63,32 @@ namespace ACT.Core.Services
 
             #endregion
 
-            #region WHERE IF CLIENT
-            if ( csm.ClientId > 0 )
-            {
-                query = $"{query} AND p.ClientId = @csmClientId ";
-            }
-
-            #endregion
-
-
             // Custom Search
 
             #region Custom Search
 
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND cp.ClientId=@csmClientId ";
+            }
+            if ( csm.ProductId > 0 )
+            {
+                query = $"{query} AND cp.ProductId=@csmProductId ";
+            }
+
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (p.CreatedOn >= @csmFromDate AND p.CreatedOn <= @csmToDate) ";
+                query = $"{query} AND (cp.CreatedOn >= @csmFromDate AND cp.CreatedOn <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (p.CreatedOn>=@csmFromDate) ";
+                    query = $"{query} AND (cp.CreatedOn>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (p.CreatedOn<=@csmToDate) ";
+                    query = $"{query} AND (cp.CreatedOn<=@csmToDate) ";
                 }
             }
 
@@ -100,8 +100,111 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (p.[Name] LIKE '%{1}%' OR
-                                                  p.[Description] LIKE '%{1}%'
+                query = string.Format( @"{0} AND (cp.[AccountingCode] LIKE '%{1}%' OR
+                                                  cp.[ProductDescription] LIKE '%{1}%' OR
+                                                  p.[Name] LIKE '%{1}%' OR
+                                                  p.[Description] LIKE '%{1}%' OR
+                                                  c.[CompanyName] LIKE '%{1}%'
+                                                 ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            CountModel model = context.Database.SqlQuery<CountModel>( query, parameters.ToArray() ).FirstOrDefault();
+
+            return model.Total;
+        }
+
+        /// <summary>
+        /// Gets a list of Client Products matching the specified search params
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public List<ClientProductCustomModel> List1( PagingModel pm, CustomSearchModel csm )
+        {
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
+            {
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
+            }
+
+            // Parameters 
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmProductId", csm.ProductId ) },
+                { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+            };
+
+            #endregion
+
+            string query = @"SELECT
+                                cp.*,
+                                p.[Name] AS [ProductName],
+                                c.[CompanyName] AS [ClientName]
+                             FROM
+                                [dbo].[ClientProduct] cp
+                                INNER JOIN [dbo].[Product] p ON p.Id = cp.ProductId
+                                INNER JOIN [dbo].[Client] c ON c.Id = cp.ClientId";
+
+            // WHERE
+
+            #region WHERE
+
+            query = $"{query} WHERE (1=1)";
+
+            #endregion
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND cp.ClientId = @csmClientId ";
+            }
+            if ( csm.ProductId > 0 )
+            {
+                query = $"{query} AND cp.ProductId=@csmProductId ";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (cp.CreatedOn >= @csmFromDate AND cp.CreatedOn <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (cp.CreatedOn>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (cp.CreatedOn<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
+            {
+                query = string.Format( @"{0} AND (cp.[AccountingCode] LIKE '%{1}%' OR
+                                                  cp.[ProductDescription] LIKE '%{1}%' OR
+                                                  p.[Name] LIKE '%{1}%' OR
+                                                  p.[Description] LIKE '%{1}%' OR
+                                                  c.[CompanyName] LIKE '%{1}%'
                                                  ) ", query, csm.Query.Trim() );
             }
 
@@ -109,28 +212,13 @@ namespace ACT.Core.Services
 
             // ORDER
 
-            query = $"{query} ORDER BY p.{pm.SortBy} {pm.Sort}";
+            query = $"{query} ORDER BY {pm.SortBy} {pm.Sort}";
 
             // SKIP, TAKE
 
             query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
-            List<ClientProductCustomModel> model = context.Database.SqlQuery<ClientProductCustomModel>( query, parameters.ToArray() ).ToList();
-
-            if ( model.NullableAny( p => p.DocumentCount > 0 ) )
-            {
-                using ( DocumentService dservice = new DocumentService() )
-                {
-                    foreach ( ClientProductCustomModel item in model.Where( p => p.DocumentCount > 0 ) )
-                    {
-                        item.Documents = dservice.List( item.Id, "Product" );
-                    }
-                }
-            }
-
-            return model;
+            return context.Database.SqlQuery<ClientProductCustomModel>( query, parameters.ToArray() ).ToList();
         }
-
-
     }
 }

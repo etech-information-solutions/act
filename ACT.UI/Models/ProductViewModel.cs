@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+
 using ACT.Core.Enums;
 using ACT.Core.Services;
 
@@ -11,6 +12,12 @@ namespace ACT.UI.Models
         #region Properties
 
         public int Id { get; set; }
+
+        [Display( Name = "Client" )]
+        public int ClientId { get; set; }
+
+        [Display( Name = "Product" )]
+        public int ProductId { get; set; }
 
         [Required]
         [Display( Name = "Name" )]
@@ -29,16 +36,72 @@ namespace ACT.UI.Models
         [Display( Name = "Select Product/Service Documentation" )]
         public FileViewModel File { get; set; }
 
+
+
+        [Display( Name = "Select Active Date" )]
+        public DateTime? ActiveDate { get; set; }
+
+        [Display( Name = "Hire Rate" )]
+        public decimal? HireRate { get; set; }
+
+        [Display( Name = "Lost Rate" )]
+        public decimal? LostRate { get; set; }
+
+        [Display( Name = "Issue Rate" )]
+        public decimal? IssueRate { get; set; }
+
+        [Display( Name = "Passon Rate" )]
+        public decimal? PassonRate { get; set; }
+
+        [Display( Name = "Passon Days" )]
+        public int? PassonDays { get; set; }
+
+        [Display( Name = "Equipment" )]
+        public string Equipment { get; set; }
+
+        [Display( Name = "Accounting Code" )]
+        public string AccountingCode { get; set; }
+
+        [Display( Name = "Rate Type" )]
+        public RateType RateType { get; set; }
+
         public List<ProductPriceViewModel> ProductPrices { get; set; }
 
         public bool EditMode { get; set; }
-        public bool ContextualMode { get; set; }
+
+        public bool LinkMode { get; set; }
 
         #endregion
 
 
 
         #region Model Options
+
+        public Dictionary<int, string> ClientOptions
+        {
+            get
+            {
+                if ( !LinkMode ) return new Dictionary<int, string>();
+
+                using ( ClientService cservice = new ClientService() )
+                {
+                    return cservice.List( true );
+                }
+            }
+        }
+
+        public Dictionary<int, string> ProductOptions
+        {
+            get
+            {
+                if ( !LinkMode ) return new Dictionary<int, string>();
+
+                using ( ProductService pservice = new ProductService() )
+                {
+                    return pservice.List( true );
+                }
+            }
+        }
 
         #endregion
     }

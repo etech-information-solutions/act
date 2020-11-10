@@ -46,7 +46,7 @@
             Region
         </div>
         <div class="display-field">
-            @Model.Region.Description
+            @( Model.Region?.Description )
         </div>
 
         <div class="display-label">
@@ -226,7 +226,7 @@
         <div class="grouped-area" style="max-height: 170px; overflow-y: auto;">
 
             <p>
-                <strong class="uppercase">Clients (@Model.ClientSites.NullableCount())</strong>
+                <strong class="uppercase">Customers (@Model.ClientSites.NullableCount())</strong>
             </p>
 
             @if ( Model.ClientSites.NullableAny() )

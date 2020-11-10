@@ -2,6 +2,7 @@
 namespace ACT.Core.Enums
 {
     using Attributes;
+
     [StringEnum]
     public enum ProductPriceType
     {

@@ -17,14 +17,6 @@ namespace ACT.Core.Services
 
         }
 
-        public override Product GetById( int id )
-        {
-            context.Configuration.LazyLoadingEnabled = true;
-            context.Configuration.ProxyCreationEnabled = true;
-
-            return base.GetById( id );
-        }
-
         public int Total1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )

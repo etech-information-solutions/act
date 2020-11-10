@@ -150,6 +150,7 @@
                     </div>
                     <div class="editor-field">
                         @Html.DropDownListFor( model => model.PSPId, model => pSPOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @data_psp_reg = "1", @data_target = "#other-psp-name", @style = "width: 98%;" } )
+                        @Html.ValidationMessageFor( model => model.PSPId )
                     </div>
 
                     <div id="other-psp-name" class="@(Model.PSPId == -1 ? "block" : "none")" style="margin-top: 20px;">

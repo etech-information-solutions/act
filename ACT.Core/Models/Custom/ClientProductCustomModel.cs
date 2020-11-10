@@ -15,15 +15,18 @@ namespace ACT.Core.Models.Custom
         public string ModifiedBy { get; set; }
         public string ProductDescription { get; set; }
         public Nullable<System.DateTime> ActiveDate { get; set; }
-        public Nullable<decimal> HireRate { get; set; }
+        public Nullable<decimal> Rate { get; set; }
         public Nullable<decimal> LostRate { get; set; }
         public Nullable<decimal> IssueRate { get; set; }
         public Nullable<decimal> PassonRate { get; set; }
         public Nullable<int> PassonDays { get; set; }
+        public Nullable<int> RateType { get; set; }
+        public string Equipment { get; set; }
+        public string AccountingCode { get; set; }
         public int Status { get; set; }
     
-        public string Name { get; set; }
-        public string CompanyName { get; set; }
+        public string ProductName { get; set; }
+        public string ClientName { get; set; }
         public int? ProductPriceCount { get; set; }
 
         public int? DocumentCount { get; set; }

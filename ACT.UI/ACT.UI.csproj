@@ -640,10 +640,16 @@
     <Content Include="Views\Administration\_PSPBudgets.cshtml" />
     <Content Include="Views\Client\_SiteBudgets.cshtml" />
     <Content Include="Views\Client\ImportSite.cshtml" />
-    <Content Include="Views\Shared\_ManageTransporters.cshtml" />
-    <Content Include="Views\Shared\AddTransporter.cshtml" />
-    <Content Include="Views\Shared\EditTransporter.cshtml" />
-    <Content Include="Views\Shared\TransporterDetails.cshtml" />
+    <Content Include="Views\Client\_ManageTransporters.cshtml" />
+    <Content Include="Views\Client\AddTransporter.cshtml" />
+    <Content Include="Views\Client\EditTransporter.cshtml" />
+    <Content Include="Views\Client\TransporterDetails.cshtml" />
+    <Content Include="Views\Administration\_ManageTransporters.cshtml" />
+    <Content Include="Views\Shared\_Vehicles.cshtml" />
+    <Content Include="Views\Shared\_Contacts.cshtml" />
+    <Content Include="Views\Administration\AddTransporter.cshtml" />
+    <Content Include="Views\Administration\TransporterDetails.cshtml" />
+    <Content Include="Views\Administration\EditTransporter.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

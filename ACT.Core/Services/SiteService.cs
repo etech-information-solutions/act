@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+
 using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Core.Models.Custom;
@@ -201,14 +202,6 @@ namespace ACT.Core.Services
             }
 
             #endregion
-
-            // ORDER
-
-            query = $"{query} ORDER BY {pm.SortBy} {pm.Sort}";
-
-            // SKIP, TAKE
-
-            query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
             CountModel model = context.Database.SqlQuery<CountModel>( query, parameters.ToArray() ).FirstOrDefault();
 
@@ -420,7 +413,7 @@ namespace ACT.Core.Services
 
             return siteList;
         }
-        
+
         public List<Site> GetSitesByClientIncluded( int clientId )
         {
             List<Site> siteList;
@@ -468,6 +461,11 @@ namespace ACT.Core.Services
         public bool ExistByNameRegion( string name, int? regionId )
         {
             return context.Sites.Any( s => s.Name.Trim().ToLower() == name.Trim().ToLower() && s.RegionId == regionId );
+        }
+
+        public Site GetByXYCoordinates( string xCord, string yCord )
+        {
+            return context.Sites.FirstOrDefault( s => s.XCord == xCord && s.YCord == yCord );
         }
     }
 }

@@ -21,15 +21,21 @@ namespace ACT.Data.Models
         }
     
         public int Id { get; set; }
+        public int ClientId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
-        public string Modifiedby { get; set; }
+        public string ModifiedBy { get; set; }
         public string CustomerName { get; set; }
+        public string CustomerNumber { get; set; }
+        public string CustomerAddress1 { get; set; }
+        public string CustomerAddress2 { get; set; }
+        public string CustomerTown { get; set; }
+        public string CustomerContact { get; set; }
+        public Nullable<int> CustomerUserId { get; set; }
         public int Status { get; set; }
-        public int ClientId { get; set; }
     
+        public virtual Client Client { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientSite> ClientSites { get; set; }
-        public virtual Client Client { get; set; }
     }
 }

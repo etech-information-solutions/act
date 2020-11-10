@@ -73,6 +73,7 @@
     <Compile Include="Attributes\ViewModelAttribute.cs" />
     <Compile Include="Attributes\ViewModelBindingAttribute.cs" />
     <Compile Include="Encryption\Encryption.cs" />
+    <Compile Include="Enums\RateType.cs" />
     <Compile Include="Enums\ActivityTypes.cs" />
     <Compile Include="Enums\CompanyType.cs" />
     <Compile Include="Enums\PostingType.cs" />

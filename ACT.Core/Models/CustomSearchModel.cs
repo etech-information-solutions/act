@@ -438,6 +438,7 @@ namespace ACT.Core.Models
 
 
                 case "PSPs":
+                case "LinkProducts":
 
                     using ( ClientService cservice = new ClientService() )
                     using ( ProductService pservice = new ProductService() )

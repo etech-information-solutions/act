@@ -10,8 +10,7 @@
 
 @{
     ViewBag.ShowExport = true;
-    //ViewBag.ShowCustom = true;
-    //ViewBag.ShowQuickStructure = true;
+    ViewBag.ShowCustom = true;
 
     ViewBag.ViewName = "LinkProducts";
 
@@ -19,217 +18,105 @@
 }
 
 
-@Html.Partial("_Notification")
+@Html.Partial( "_Notification" )
 
 
 @{
     Int32 count = Model.Start;
-    List<ProductCustomModel> items = (List<ProductCustomModel>)Model.Items;
-    string columnName = "Actions";
-    if (!ViewBag.ContextualMode)
-    {
-        columnName = "Select items to Link";
-    }
-
+    List<ClientProductCustomModel> items = ( List<ClientProductCustomModel> ) Model.Items;
 }
 
 
-@if (Model == null || !items.Any())
+@if ( Model == null || !items.Any() )
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
-        There are no Products available matching your search criteria.
+        There are no Client Products available matching your search criteria.
     </div>
 }
-@if (ViewBag.ContextualMode)
-{
-    <input type="hidden" id="context" name="context" value="1" />
-}
-else
-{
-    <input type="hidden" id="context" name="context" value="0" />
-}
-<p>
-    <table style="width:100%" border="0">
-        <tr>
-            <td style="width:3%">
-                <label for="file">Client:</label>
-            </td>
-            <td style="width:15%">
-                @*@if (ViewBag.ContextualMode)
-                    {
-                        @Html.DropDownList("ClientList")
-                    }
-                    else
-                    {
-                        @Html.DropDownList("ClientList", "All Clients")
-                    }*@
-                <select id="ClientListProducts" name="ClientListProducts" onchange="ClientListChanged()" class="chzn" style="width: 98%;">
-                    <!--  -->
-                    @*@Html.DropDownListFor(model => model.ClientId,
-                        new SelectList(ViewBag.ClientList, "Value", "Text"),
-                        "Please Select",
-                        new { @class = "form-control", @onchange= "ClientListChanged()" })*@
-                    @if (!ViewBag.ContextualMode)
-                    {
-                        <option value="0">All Clients</option>
 
-                    }
-                    @foreach (var item in ViewBag.ClientList)
-                    {
-                        <option value="@item.Value">@item.Text</option>
-                    }
-                </select>
-            </td>
-            <td style="width:15%">
-                @if (ViewBag.ContextualMode)
-                {
-                    <a href="#" id="Link" name="Link" class="Link" onclick="LinkClientToProducts()"><i class="fa fa-link"></i>&nbsp;&nbsp;Link Client to Products</a>
-                    @*@
-            Html.ActionLink("Add", "AddProduct", new { }, new { @class = "add", @rel = "tipsyS", @title = "Link Client to product?", @data_edit = "1", @data_id = 0, @data_target = "#linkproducts" })*@
-                }
-                else
-                {
-                    <a href="#" id="Link" name="Link" class="Link" style="display:none;" onclick="LinkClientToProducts()"><i class="fa fa-link"></i>&nbsp;&nbsp;Link Client to Products</a>
-                    @*@
-            Html.ActionLink("Add", "AddProduct", new { }, new { @class = "add", @rel = "tipsyS", @title = "Link Client to product?", @data_edit = "1", @data_id = 0, @data_target = "#linkproducts" })*@
-                }
-            </td>
-            <td style="width:15%">
-                @if (ViewBag.ContextualMode)
-                {
-                    <a href="#" id="Refresh" class="Refresh" name="Refresh" onclick="RefreshForClientData()"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Show Client Products</a>
-                }
-                else
-                {
-                    <a href="#" id="Refresh" class="Refresh" name="Refresh" style="display:none;" onclick="RefreshForClientData()"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Show Client Products</a>
-                }
-            </td>
-            <td style="width:32%">
-                &nbsp;
-            </td>
-            <td style="width:41%">
-                &nbsp;
-            </td>
-        </tr>
-    </table>
+<p>
+    @Html.ActionLink( "Add", "AddProduct", new { }, new { @class = "add", @rel = "tipsyS", @title = "Link a product to a client?", @data_edit = "1", @data_id = 0, @data_target = "#linkproducts" } )
+
     <span class="loader"></span>
 </p>
+
 <table id="products-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#products-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
-            <th data-name="Name" data-column="Name">
-                Product
+            <th data-name="Name" data-column="p.Name">
+                Name
             </th>
-            <th data-name="XCord" data-column="XCord">
-                Product Name
+            <th data-name="ProductDescription" data-column="cp.ProductDescription">
+                Description
             </th>
-            @*<th data-name="XCord" data-column="XCord">
-                    Product Prices
-                </th>*@
-            <th data-name="YCord" data-column="YCord">
+            <th data-name="HireRate" data-column="cp.HireRate">
                 Hire Rate
             </th>
-            <th data-name="Address" data-column="Address">
+            <th data-name="IssueRate" data-column="cp.IssueRate">
                 Issue Rate
             </th>
-            <th data-name="PostalCode" data-column="PostalCode">
+            <th data-name="LostRate" data-column="cp.LostRate">
                 Lost Rate
             </th>
-            <th data-name="ContactNo" data-column="ContactNo">
+            <th data-name="PassonRate" data-column="cp.PassonRate">
                 Pass-on Cost
             </th>
+            <th data-name="RateType" data-column="cp.RateType">
+                Rate Type
+            </th>
+            <th data-name="Status" data-column="cp.Status">
+                Status
+            </th>
             <th data-name="Actions">
-                @columnName
+                Actions
             </th>
         </tr>
     </thead>
 
     <tbody>
-        @if (Model != null && items != null && items.Count() > 0)
+        @if ( Model != null && items != null && items.Count() > 0 )
         {
-            foreach (var item in items)
+            foreach ( ClientProductCustomModel item in items )
             {
+                Status status = ( Status ) item.Status;
+                RateType rateType = ( RateType ) item.RateType;
 
-                List<ProductPrice> prices = new List<ProductPrice>();
-                string hrate = "";
-                string irate = "";
-                string lrate = "";
-                string pocost = "";
-                using (ProductPriceService aservice = new ProductPriceService())
-                {
-                    prices = aservice.ListByColumnWhere("ProductId", item.Id);
+                string active = status.Equals( Status.Active ) ? "active" : "inactive";
+                string enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
 
-                    if (prices != null)
-                    {
-                        foreach (ProductPrice price in prices)
-                        {
-                            switch (price.Type)
-                            {
-                                case (int)ProductPriceType.Hire:
-                                    hrate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
-                                    //hrate = price.Rate;
-                                    //hrateunit = price.RateUnit;
-                                    break;
-                                case (int)ProductPriceType.Issue:
-                                    irate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
-                                    //irate = price.Rate;
-                                    //irateunit = price.RateUnit;
-                                    break;
-                                case (int)ProductPriceType.Lost:
-                                    lrate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
-                                    //lrate = price.Rate;
-                                    //lrateunit = price.RateUnit;
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-
-                        //pocost = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
-
-                    }
-                }
-                Status status = (Status)item.Status;
-                String active = status.Equals(Status.Active) ? "active" : "inactive";
-                String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
-
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
                     <td>
-                        @item.Name
+                        @item.ProductName
                     </td>
                     <td>
-                        @item.Description
-                    </td>
-                    @*<td>
-                            @item.ProductPrices
-                        </td>*@
-                    <td>
-                        @hrate
+                        @item.ProductDescription
                     </td>
                     <td>
-                        @irate
+                        @( ( item.Rate ?? 0 ).ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ) )
                     </td>
                     <td>
-                        @lrate
+                        @( ( item.IssueRate ?? 0 ).ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ) )
                     </td>
                     <td>
-                        @pocost
+                        @( ( item.LostRate ?? 0 ).ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ) )
+                    </td>
+                    <td>
+                        @( ( item.PassonRate ?? 0 ).ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ) )
+                    </td>
+                    <td>
+                        @rateType.GetDisplayText()
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
                     </td>
                     <td width="15%">
 
-                        @if (ViewBag.ContextualMode)
-                        {
-                            @Html.ActionLink("Edit", "EditProduct", new { id = item.Id, returnView = "LinkProducts" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        @Html.ActionLink( "Details", "ProductDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
 
-                            @Html.ActionLink(enable, "DeleteProduct", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#linkproducts", @rel = "tipsyE", @title = enable + " this item?" })
+                        @Html.ActionLink( "Edit", "EditProduct", new { id = item.Id, returnView = "LinkProducts" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
 
-                            @Html.ActionLink("History", "HistoryDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
-                        }
-                        else
-                        {
-                            <input type="checkbox" id="@item.Id" name="productslist" class="prodlist" value="@item.Id" />
-                        }
+                        @Html.ActionLink( enable, "DeleteProduct", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#linkproducts", @rel = "tipsyE", @title = enable + " this item?" } )
 
                     </td>
 
@@ -242,168 +129,6 @@ else
 
 </table>
 
-@*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
-<script>
-    $(document).ready(function () {
-        var context = $("#context").val();
-        if (context == "0") {
-            hVisibility(false);
-        } else {
-            hVisibility(true);
-        }
+@*@Html.Partial( "_LinkProductCustomSearch", new ACT.Core.Models.CustomSearchModel( "LinkProduct" ) )*@
 
-        //$("#ClientList").change(function () {
-        //   // debugger;
-        //    var cId = parseInt($('option:selected', this).val());
-        //    if (cId > 0) {
-        //    $('#add').show();
-        //    $('#refresh').show();
-        ////        GetIncludedProducts(cId);
-        //    } else {
-        //        $('.add').hide();
-        //        $('#refresh').show();
-        //    }
-        //});
-    });
-    function hVisibility(bStatus) {
-        if (bStatus) {
-            $('#Link').show();
-            $('#Refresh').show();
-            $('.prodlist').show();//show all 
-        } else {
-            $('#Link').hide();
-            $('#Refresh').hide();
-            $('.prodlist').hide();
-        }
-    }
-
-    function ClientListChanged() {
-        debugger;
-        var cId = $('#ClientListProducts option:selected').val();
-        if (cId > 0) {
-            hVisibility(true);
-            //        GetIncludedProducts(cId);
-        } else {
-            hVisibility(false);
-        }
-    }
-
-    function RefreshForClientData() {
-        //pull client specific data over the product list, only available to admins. Client specific data will be contextual
-        var cId = $('#ClientListProducts option:selected').val();
-        //debugger;
-        //SetClient(cId);
-        $.ajax({
-            type: 'POST',
-            url: "SetClient",
-            data: { "ClientId": cId },
-            success: function (response) {
-                //window.location.href = 'Index#managesites';
-                location.reload();
-                // GetIncludedSites(cId);
-            }
-        });
-    }
-
-    function LinkClientToProducts() {
-        var cId = $('#ClientListProducts option:selected').val();
-        var cText = $('#ClientListProducts option:selected').text();
-        var r = confirm("Please confirm you wish to link " + cText + " to product(s)!");
-        if (r == true) {
-            var clicked = 0;
-            // debugger;
-            $(".prodlist").each(function () {
-                if ($(this).is(':checked')) {
-                    var id = $(this).attr("id");
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "LinkClientToProduct",
-                        data: { "client": cId, "product": id },
-                        success: function (response) {
-                            //do nothing at first
-                        }
-                    });
-                    clicked += 1;
-                }
-            });
-            if (clicked > 0) {
-                alert(clicked + ' Products Linked Successfully to ' + cText);
-                //refresh the pager and set the cutrrent client in context so that they can edit the amounts
-                // SetClient(cId);                
-                location.reload();
-                hVisibility(true);
-            } else {
-                alert("No Product Options were selected to link to the Client. Please select and try again.");
-            }
-        } else {
-            //do nothing, they cancelled
-        }
-    }
-
-    function SetClient(cId) {
-        //debugger;
-        $.ajax({
-            type: 'POST',
-            url: "SetClient",
-            data: { "ClientId": cId },
-            success: function (response) {
-                //window.location.href = 'Index#managesites';
-                //location.reload();
-                // GetIncludedSites(cId);
-            }
-        });
-    }
-
-//    function GetIncludedProducts(cId) {
-//        //debugger;
-//        var rowDiv = $("#products-table tbody");
-//        $.ajax({
-//            type: "GET",
-//            url: "GetProductsForClient",
-//            data: { clientId: cId },
-//            contentType: "application/json;charset=utf-8",
-//            dataType: "json",
-//            success: function (data) {
-//                // debugger;
-//                rowDiv.html('');
-//                var result = "";
-//                $.each(data, function (id, site) {
-//                    var actionStr = '<a class="info" data-details="1" data-id="' + site.Id + '" data-target=".tr-' + site.Id + '-item" href="/Client/SiteDetails/' + site.Id + '"> Details</a>' +
-//                        '<a class="edit" data-edit="1" data-id="' + site.Id + '" data-target=".tr-5-item" href = "/Client/EditSite/' + site.Id + '?returnView=ManageSites">Edit</a > ' +
-//                        '<a class="warn" data-delete="1" data-id="' + site.Id + '" data-refresh-target="#managesites" data-target="#tr-' + site.Id + '-item" href="/Client/DeleteSite/' + site.Id + '" rel="tipsyE" title="Disable this item?" > Disable</a > ';
-///*
-//                    result += '<tr id="tr-' + site.Id + '" class="tr-' + site.Id + '-item">' +
-//                        '<td style = "width: 15%;">' +
-//                        site.Region.Name +
-//                        '</td><td>' +
-//                        site.Name +
-//                        '</td><td>' +
-//                        site.XCord +
-//                        '</td><td> ' +
-//                        site.YCord +
-//                        '</td><td> ' +
-//                        site.Address +
-//                        '</td><td> ' +
-//                        site.PostalCode +
-//                        '</td><td> ' +
-//                        site.ContactNo +
-//                        ' </td><td> ' +
-//                        site.ContactName +
-//                        '</td><td> ' +
-//                        site.PlanningPoint +
-//                        '</td><td>' + actionStr + '</td></tr>';//<input type="radio" id="incl_item_id' + site.Id + '" name="incl_item" value="' + site.Id + '" />
-//                        */
-//                });
-//                rowDiv.html(result);
-
-//            },
-//            error: function (response) {
-
-//                alert('Error retrieving sites');
-//            }
-//        });
-
-//    }
-</script>
-@Html.Partial("_Paging")
+@Html.Partial( "_Paging" )

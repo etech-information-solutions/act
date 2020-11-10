@@ -1,4 +1,4 @@
-﻿@model Product
+﻿@model ClientProduct
 
 @using ACT.Core.Enums
 @using ACT.Data.Models;
@@ -18,7 +18,7 @@
 {
     <h2>
         <img alt="" src="@Url.Content( "~/images/info.png" )" />
-        <span>Product Details</span>
+        <span>Client Product Details</span>
     </h2>
 }
 
@@ -28,25 +28,11 @@
     {
         <h2>
             <img alt="" src="@Url.Content( "~/images/info.png" )" />
-            <span>Product Details</span>
+            <span>Client Product Details</span>
         </h2>
     }
 
     <div class="left" style="width: 48%; margin-right: 4%;">
-
-        <div class="display-label">
-            Name
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.Name )
-        </div>
-
-        <div class="display-label">
-            Description
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.Description )
-        </div>
 
         <div class="display-label">
             Status
@@ -55,16 +41,44 @@
             @(( ( Status ) Model.Status ).GetDisplayText())
         </div>
 
+        <div class="display-label">
+            Client
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Client.CompanyName )
+        </div>
+
+        <div class="display-label">
+            Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Product.Name )
+        </div>
+
+        <div class="display-label">
+            Description
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ProductDescription )
+        </div>
+
+        <div class="display-label">
+            Active Date
+        </div>
+        <div class="display-field">
+            @( Model.ActiveDate.Value.ToString( "yyyy/MM/dd" ) )
+        </div>
+
         @if ( documents != null && documents.Any() )
         {
             <div class="display-label">
-                Product/Service Documentation
+                Original Product/Service Documentation
             </div>
             <div class="display-field">
 
                 @foreach ( Document d in documents )
                 {
-                    <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
+                    <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )">
                         <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
 
                         @d.Name (@d.Type)
@@ -74,86 +88,65 @@
             </div>
         }
 
-        @*@if ( Model.PSPProducts.Any() )
-        {
-            <div class="grouped-area">
-
-                <p>
-                    <strong style="color: #002e70; text-transform: uppercase;">PSPs (@Model.PSPProducts.Count)</strong>
-                </p>
-
-                <ul class="list">
-                    @foreach ( PSPProduct p in Model.PSPProducts )
-                    {
-                        <li>
-                            <a data-quick-link="1" data-target="#psps" data-id="@p.PSPId">
-                                @p.PSP.CompanyName
-                            </a>
-                        </li>
-                    }
-                </ul>
-
-            </div>
-        }*@
-
     </div>
 
     <div class="left" style="width: 48%;">
 
-        <p style="margin-bottom: 5px;">
-            <strong style="color: #002e70; text-transform: uppercase;">Product Price Options (@Model.ProductPrices.Count)</strong>
-        </p>
+        <div class="display-label">
+            Hire Rate
+        </div>
+        <div class="display-field">
+            @( ( Model.Rate ?? 0 ).ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ) )
+        </div>
 
-        @if ( Model.ProductPrices.NullableAny() )
-        {
-            int i = 0;
+        <div class="display-label">
+            Lost Rate
+        </div>
+        <div class="display-field">
+            @( ( Model.LostRate ?? 0 ).ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ) )
+        </div>
 
-            <ul>
-                @foreach ( ProductPrice p in Model.ProductPrices )
-                {
-                    <li class="grouped-area">
+        <div class="display-label">
+            Issue Rate
+        </div>
+        <div class="display-field">
+            @( ( Model.IssueRate ?? 0 ).ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ) )
+        </div>
 
-                        <div class="display-label">
-                            <label>Option</label>
-                        </div>
-                        <div class="display-field">
-                            @(( ( ProductPriceType ) p.Type ).GetDisplayText())
-                        </div>
+        <div class="display-label">
+            Passon Rate
+        </div>
+        <div class="display-field">
+            @( ( Model.PassonRate ?? 0 ).ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ) )
+        </div>
 
-                        <div class="display-label">
-                            <label>Rate</label>
-                        </div>
-                        <div class="display-field">
-                            @Math.Round( p.Rate, 2 )
-                        </div>
+        <div class="display-label">
+            Passon Days
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.PassonDays )
+        </div>
 
-                        <div class="display-label">
-                            <label>Rate Unit</label>
-                        </div>
-                        <div class="display-field">
-                            @p.RateUnit
-                        </div>
+        <div class="display-label">
+            Equipment
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Equipment )
+        </div>
 
-                        <div class="display-label">
-                            <label>Start Date</label>
-                        </div>
-                        <div class="display-field">
-                            @(p.FromDate.HasValue ? p.FromDate.Value.ToString( "yyyy-MM-dd" ) : "-/-")
-                        </div>
+        <div class="display-label">
+            Accounting Code
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.AccountingCode )
+        </div>
 
-                        <div class="display-label">
-                            <label>Status</label>
-                        </div>
-                        <div class="display-field">
-                            @(( ( Status ) p.Status ).GetDisplayText())
-                        </div>
-
-                    </li>
-
-                    i++;
-                }
-            </ul>
-        }
+        <div class="display-label">
+            Rate Type
+        </div>
+        <div class="display-field">
+            @(( ( RateType ) Model.RateType ).GetDisplayText())
+        </div>
 
     </div>
 

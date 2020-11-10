@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+
 using ACT.Core.Enums;
 using ACT.Core.Services;
 using ACT.Data.Models;
@@ -11,32 +12,40 @@ namespace ACT.UI.Models
         #region Properties
 
         public int Id { get; set; }
-        public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModifiedOn { get; set; }
-        public string ModifiedBy { get; set; }
+
         [Required]
-        [Display(Name = "Name")]
-        [StringLength(500, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
+        [Display( Name = "Name" )]
+        [StringLength( 500, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string Name { get; set; }
+
+        [Display( Name = "Contact Number" )]
         public string ContactNumber { get; set; }
+
         [Required]
-        [Display(Name = "Email")]
-        [StringLength(100, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
+        [Display( Name = "Email" )]
+        [StringLength( 100, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string Email { get; set; }
+
         [Required]
-        [Display(Name = "Trading Name")]
-        [StringLength(100, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
+        [Display( Name = "Trading Name" )]
+        [StringLength( 100, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string TradingName { get; set; }
+
         [Required]
-        [Display(Name = "Registration Number")]
-        [StringLength(20, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1)]
+        [Display( Name = "Registration Number" )]
+        [StringLength( 20, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string RegistrationNumber { get; set; }
-        public int Status { get; set; }
 
-
+        [Display( Name = "Status" )]
+        public Status Status { get; set; }
 
         public bool EditMode { get; set; }
-        public bool ContextualMode { get; set; }
+
+        [Display( Name = "Contacts" )]
+        public List<Contact> Contacts { get; set; }
+
+        [Display( Name = "Vehicles" )]
+        public List<Vehicle> Vehicles { get; set; }
 
         #endregion
 
