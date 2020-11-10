@@ -111,7 +111,7 @@
             this.DataPalletUse( $( '*[data-pallet-use="1"]' ) );
             this.DataServiceType( $( '*[data-service-type="1"]' ) );
             this.DataBudgetTotal( $( '*[data-budget-total="1"]' ) );
-            this.DataBudgetSum( $( '*[data-budget-sum="1"]' ) );
+            this.DataBudgetSum($('*[data-budget-sum="1"]'));
 
             // Dashboard / Graphs
             this.DataGSSite( $( '*[data-gs-site="1"]' ) );
@@ -128,9 +128,6 @@
             // Disputes
             this.DataDisputeStatus( $( '*[data-dispute-status="1"]' ) );
             this.DataDisputeChepLoad( $( '*[data-dispute-chepload="1"]' ) );
-
-            // Client Management
-            this.DataLinkProduct( $( '*[data-link-product="1"]' ) );
 
             if ( window.location.search !== "" && !$( "tr.edit" ).length && $( ".dataTable" ).length && !ACT.UI.PageViewIdProcessed )
             {
@@ -1366,15 +1363,23 @@
 
                     if ( target.is( "tr" ) )
                     {
-                        var papa = target.parent();
+                        let parent = target.parent();
 
-                        clone = papa.find( ".add-more-row:first" ).clone();
+                        clone = parent.find(".add-more-row:first").clone();
+
+                        let newId
+                        let newElementId = parent.find(".add-more-row:last").attr('id').replace(/\d+/g, (m, k) => {
+                            newId = parseInt(m) + 1
+                            return newId
+                        })
+                        clone.attr('id', newElementId )
+
                         var inputs = clone.find( '.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea' );
 
                         inputs.each( function ()
                         {
                             $( this ).val( "" );
-
+                            $(this).attr("value", "")
                             if ( $( this ).is( "select" ) )
                             {
                                 $( this ).find( "option" ).removeAttr( "selected" );
@@ -1387,28 +1392,32 @@
                         clone.find( '[data-rb="1"]' ).text( '-/-' );
                         clone.find( '[data-pr-amount="1"]' ).css( 'width', '88%' );
 
-                        total = papa.find( ".add-more-row" ).length;
+                        total = parent.find( ".add-more-row" ).length;
 
-                        html = clone.html().replace( /\[0]/g, "[" + total + "]" ).replace( /\-0-/g, "-" + total + "-" );
+                        html = clone.html().replace( /\[0]/g, "[" + total + "]" ).replace( /\-0/g, "-" + total  );
                         clone.html( html );
 
-                        clone.find( '.del' ).remove();
+                        let del = clone.find('.del')
+                        del.attr('data-target', '#' + newElementId)
+                        del.attr('href', 'javascript:;')
+                        del.removeClass ('none')
+                        
                         clone.find( '.slick-counter' ).html( '' );
                         clone.find( '.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea' ).val( "" );
-
+                        clone.attr("unsaved", "1")
                         ACT.UI.RecreatePlugins( clone );
 
-                        clone.insertAfter( papa.find( ".add-more-row:last" ) );
-
-                        clone.find( 'a[data-add-one-more="1"]' ).fadeOut( 1200, function ()
+                        clone.insertAfter( parent.find( ".add-more-row:last" ) );
+                        clone.find('.input:first').focus()
+                        clone.find( 'a[data-add-one-more="1"]' ).fadeOut( 600, function ()
                         {
                             $( this ).remove();
                         } );
 
-                        papa.find( 'a[data-add-one-more="1"]' ).fadeOut( 1200, function ()
+                        parent.find( 'a[data-add-one-more="1"]' ).fadeOut( 600, function ()
                         {
                             var f = clone.find( "td:first" ).children( ":first" );
-                            $( this ).insertBefore( f ).fadeIn( 1200 );
+                            $( this ).insertBefore( f ).fadeIn( 600 );
                         } );
                     }
                     else
@@ -1969,7 +1978,39 @@
 
         DeleteFix: function ( sender, target, refresh )
         {
-            var url = sender.attr( "href" );
+            var url = sender.attr("href");
+            let parent = target.parent();
+            if (target.attr("unsaved") == "1") {
+
+                // clone add more button
+                let clone = parent.find('a[data-add-one-more="1"]').clone()
+
+                //remove line
+                target.remove()
+
+                siblings = parent.find(".add-more-row");
+
+
+                //Update all input names for forms to work
+                siblings.each((i, _sibling) => {
+                    sibling = $(_sibling)
+                    sibling.find('.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea').each((i, input) => {
+                        $(input).attr("value", input.value)
+                    })
+                    html = sibling.html().replace(/\[\d+]/g, "[" + i + "]")
+                    sibling.html(html)
+                })
+
+                // insert cloned button on last line
+                row = parent.find(".add-more-row:last")
+                let f = row.find("td:first").children(":first");
+                clone.insertBefore(f).fadeIn(600);
+                ACT.Init.Start(true);
+                return false
+            }
+            else {
+                //save unsaved dom elements to memory
+            }
 
             var columns = $( 'table.datatable-numberpaging tbody tr:nth-child(1) td' ).length;
             var row = '<tr class="edit ' + target.attr( 'class' ) + '"><td colspan="' + columns + '"><span></span></td></tr>';
@@ -2005,8 +2046,7 @@
                     .unbind( "click" )
                     .bind( "click", function ()
                     {
-                        if ( target.length > 0 )
-                        {
+                        if (target.length > 0){
 
                             target.animate(
                                 {
@@ -2014,10 +2054,9 @@
                                     "height": "0",
                                     "opacity": "0",
                                     "filter": "alpha(opacity=0)"
-                                }, 700, function ()
-                            {
+                                }, 700, function () {
                                 remove.remove();
-                            } );
+                            });
                         } else remove.remove();
 
                         return false;
@@ -3842,7 +3881,7 @@
             {
                 var i = $( this );
 
-                // <td>    // <tr>
+                             // <td>    // <tr>
                 var target = i.parent().parent().find( i.attr( "data-target" ) );
 
                 i
@@ -3859,37 +3898,36 @@
 
                         target.each( function ()
                         {
-                            $( this ).val( shares );
+                            $(this).val(shares);
+                            $(this).attr("value",shares);
                             ACT.UI.DataHighlightFields( $( this ).parent() );
                         } );
                     } );
             } );
         },
 
-        DataBudgetSum: function ( sender )
-        {
-            sender.each( function ()
-            {
-                var i = $( this );
+        DataBudgetSum: function (sender) {
+            sender.each(function () {
+                var i = $(this);
 
                 // <td>    // <tr>
-                var target = i.parent().parent().find( i.attr( "data-target" ) )
-                var source = i.parent().parent().find( i.attr( "data-source" ) )
+                var target = i.parent().parent().find(i.attr("data-target"))
+                var source = i.parent().parent().find(i.attr("data-source"))
                 i
-                    .unbind( "change" )
-                    .bind( "change", function ()
-                    {
+                    .unbind("change")
+                    .bind("change", function () {
                         let sum = 0
-                        source.each( function ( i, t )
-                        {
-                            sum += parseInt( t.value )
-                        } );
+                        source.each(function (i, t) {
+                            sum += parseInt(t.value)
+                        });
 
-                        if ( sum > 0 )
-                            target.val( sum )
+                        if (sum > 0)
+                            target.val(sum)
+                            target.attr("value", sum)
 
-                    } );
-            } );
+
+                    });
+            });
         },
 
 
@@ -4582,65 +4620,6 @@
                         }
                     } );
             } );
-        },
-
-        DataLinkProduct: function ( sender )
-        {
-            sender.each( function ()
-            {
-                var i = $( this );
-
-                var target = $( i.attr( "data-target" ) );
-
-                i
-                    .unbind( "change" )
-                    .bind( "change", function ()
-                    {
-                        if ( $( this ).val() == "" )
-                        {
-                            target.find( 'select:visible' ).val( "" );
-                            target.find( 'input[type="text"]:visible' )
-                                  .add( 'input[name="ActiveDate"]:visible' )
-                                  .add( "#Description" )
-                                  .val( "" );
-
-                            return;
-                        }
-
-                        var d = { id: $( this ).val() };
-
-                        $.ajax( {
-                            url: siteurl + "/GetProduct?id=" + $( this ).val(),
-                            type: "POST",
-                            data: JSON.stringify( d ),
-                            contentType: "application/json; charset=utf-8",
-                            dataType: "json",
-                            error: function ( e )
-                            {
-
-                            },
-                            success: function ( p )
-                            {
-                                if ( p.Id > 0 )
-                                {
-                                    $( "#LostRate:visible" ).val( p.LostRate );
-                                    $( "#HireRate:visible" ).val( p.HireRate );
-                                    $( "#IssueRate:visible" ).val( p.IssueRate );
-                                    $( "#Description:visible" ).val( p.Description );
-                                    $( 'input[name="ActiveDate"]:visible' ).val( p.CreatedOn );
-                                }
-                                else
-                                {
-                                    target.find( 'select:visible' ).val( "" );
-                                    target.find( 'input[type="text"]:visible' )
-                                          .add( 'input[name="ActiveDate"]:visible' )
-                                          .add( "#Description" )
-                                          .val( "" );
-                                }
-                            }
-                        } );
-                    } );
-            } )
         }
     };
 } )();
