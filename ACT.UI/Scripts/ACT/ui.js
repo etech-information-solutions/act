@@ -129,6 +129,9 @@
             this.DataDisputeStatus( $( '*[data-dispute-status="1"]' ) );
             this.DataDisputeChepLoad( $( '*[data-dispute-chepload="1"]' ) );
 
+            // Client Management
+            this.DataLinkProduct( $( '*[data-link-product="1"]' ) );
+
             if ( window.location.search !== "" && !$( "tr.edit" ).length && $( ".dataTable" ).length && !ACT.UI.PageViewIdProcessed )
             {
                 var viewid = false,
@@ -4620,6 +4623,65 @@
                         }
                     } );
             } );
+        },
+
+        DataLinkProduct: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() == "" )
+                        {
+                            target.find( 'select:visible' ).val( "" );
+                            target.find( 'input[type="text"]:visible' )
+                                .add( 'input[name="ActiveDate"]:visible' )
+                                .add( "#Description" )
+                                .val( "" );
+
+                            return;
+                        }
+
+                        var d = { id: $( this ).val() };
+
+                        $.ajax( {
+                            url: siteurl + "/GetProduct?id=" + $( this ).val(),
+                            type: "POST",
+                            data: JSON.stringify( d ),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            error: function ( e )
+                            {
+
+                            },
+                            success: function ( p )
+                            {
+                                if ( p.Id > 0 )
+                                {
+                                    $( "#LostRate:visible" ).val( p.LostRate );
+                                    $( "#HireRate:visible" ).val( p.HireRate );
+                                    $( "#IssueRate:visible" ).val( p.IssueRate );
+                                    $( "#Description:visible" ).val( p.Description );
+                                    $( 'input[name="ActiveDate"]:visible' ).val( p.CreatedOn );
+                                }
+                                else
+                                {
+                                    target.find( 'select:visible' ).val( "" );
+                                    target.find( 'input[type="text"]:visible' )
+                                        .add( 'input[name="ActiveDate"]:visible' )
+                                        .add( "#Description" )
+                                        .val( "" );
+                                }
+                            }
+                        } );
+                    } );
+            } )
         }
     };
 } )();
