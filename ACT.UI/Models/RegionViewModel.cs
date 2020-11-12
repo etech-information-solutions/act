@@ -16,6 +16,10 @@ namespace ACT.UI.Models
         [Display( Name = "PSP" )]
         public int PSPId { get; set; }
 
+        [Required]
+        [Display(Name = "Province")]
+        public int ProvinceId { get; set; }
+
         [Display( Name = "Regional Manager" )]
         public int? RegionManagerId { get; set; }
 
@@ -49,6 +53,19 @@ namespace ACT.UI.Models
                 using ( PSPService pservice = new PSPService() )
                 {
                     return pservice.List( true );
+                }
+            }
+        }
+
+        public Dictionary<int, string> ProvinceOptions
+        {
+            get
+            {
+                if (!EditMode) return null;
+
+                using (RegionService rservice = new RegionService())
+                {
+                    return rservice.ListProvinces();
                 }
             }
         }

@@ -517,7 +517,7 @@ namespace ACT.UI.Controllers
 
                                 Client noteClient = clientservice.GetById( model.ClientId );
                                 Address clientAddress = addservice.GetByColumnsWhere( "ObjectId", model.ClientId, "ObjectType", "Client" );
-                                string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ( ( Province ) clientAddress.Province ).GetDisplayText();
+                                string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ( (ProvinceEnum) clientAddress.Province ).GetDisplayText();
                                 //string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ((Province)model.BillingProvince).GetDisplayText();
                                 //string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ((Province)model.DeliveryProvince).GetDisplayText();
 
@@ -1177,9 +1177,9 @@ namespace ACT.UI.Controllers
                     BillingPostalCode = note.BililngPostalCode,
                     CustomerPostalCode = note.CustomerPostalCode,
                     DeliveryPostalCode = note.DeliveryPostalCode,
-                    BillingProvince = ( Province ) note.BillingProvince,
-                    CustomerProvince = ( Province ) note.CustomerProvince,
-                    DeliveryProvince = ( Province ) note.DeliveryProvince,
+                    BillingProvince = (ProvinceEnum) note.BillingProvince,
+                    CustomerProvince = (ProvinceEnum) note.CustomerProvince,
+                    DeliveryProvince = (ProvinceEnum) note.DeliveryProvince,
 
                     BillingAddress1 = bAddress.Length >= 1 ? bAddress[ 0 ] : string.Empty,
                     BillingAddress2 = bAddress.Length >= 2 ? bAddress[ 1 ] : string.Empty,
@@ -2617,7 +2617,7 @@ namespace ACT.UI.Controllers
 
                                             Client noteClient = clientservice.GetById( clientID );
                                             Address clientAddress = addservice.GetByColumnsWhere( "ObjectId", model.ClientId, "ObjectType", "Client" );
-                                            string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ( ( Province ) clientAddress.Province ).GetDisplayText();
+                                            string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ( (ProvinceEnum) clientAddress.Province ).GetDisplayText();
                                             //string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ((Province)model.BillingProvince).GetDisplayText();
                                             //string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ((Province)model.DeliveryProvince).GetDisplayText();
 

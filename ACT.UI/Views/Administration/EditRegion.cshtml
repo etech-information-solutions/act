@@ -47,6 +47,14 @@
                     @Html.ValidationMessageFor( model => model.Description )
                 </div>
 
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.ProvinceId)
+                </div>
+                <div class="edit-field">
+                    @Html.DropDownListFor(model => model.ProvinceId, model => Model.ProvinceOptions, r => r.Key, r => r.Value, true, new { @class = "chzn", @style = "width: 95%;" })
+                    @Html.ValidationMessageFor(model => model.RegionManagerId)
+                </div>
+
             </div>
 
             <div class="left" style="width: 48%;">

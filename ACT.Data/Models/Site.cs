@@ -55,6 +55,7 @@ namespace ACT.Data.Models
         public string FinanceEmail { get; set; }
         public string ReceivingEmail { get; set; }
         public string DepotManagerEmail { get; set; }
+        public string Town { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepAudit> ChepAudits { get; set; }

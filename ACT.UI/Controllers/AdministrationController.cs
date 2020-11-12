@@ -1544,7 +1544,7 @@ namespace ACT.UI.Controllers
                         PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
-                        Province = ( address != null ) ? ( Province ) address.Province : Province.All,
+                        Province = ( address != null ) ? ( ProvinceEnum ) address.Province : ProvinceEnum.All,
                         AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
                     },
                     User = new UserViewModel()
@@ -2800,6 +2800,7 @@ namespace ACT.UI.Controllers
                 Description = region.Description,
                 Status = ( Status ) region.Status,
                 RegionManagerId = region.RegionManagerId,
+                ProvinceId=region.ProvinceId
             };
 
             return View( model );

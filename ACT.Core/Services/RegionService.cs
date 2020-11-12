@@ -24,6 +24,27 @@ namespace ACT.Core.Services
             return base.GetById( id );
         }
 
+        public Dictionary<int, string> ListProvinces()
+        {
+            Dictionary<int, string> pspOptions = new Dictionary<int, string>();
+            List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
+
+            string query = "select Id as [TKey], Name as [TValue] from [dbo].[Province]";
+            model = context.Database.SqlQuery<IntStringKeyValueModel>(query).ToList();
+            if (model != null && model.Any())
+            {
+                foreach (var k in model)
+                {
+                    if (pspOptions.Keys.Any(x => x == k.TKey))
+                        continue;
+
+                    pspOptions.Add(k.TKey, (k.TValue ?? "").Trim());
+                }
+            }
+
+            return pspOptions;
+        }
+
         public int Total1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
@@ -137,6 +158,7 @@ namespace ACT.Core.Services
             {
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmProvinceId", csm.ProvinceId) },
                 { new SqlParameter( "csmPSPId", csm.PSPId ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
@@ -148,11 +170,13 @@ namespace ACT.Core.Services
 
             string query = @"SELECT
                                 r.*,
+                                pv.Name as [ProvinceName],
                                 p.CompanyName AS [PSPName],
                                 u.Email AS [RegionManagerEmail],
                                 u.Name + ' ' + u.Surname AS [RegionManagerName]
                              FROM
                                 [dbo].[Region] r
+                                INNER JOIN [dbo].[Province] pv on pv.Id = r.ProvinceId
                                 INNER JOIN [dbo].[PSP] p ON p.Id=r.PSPId
                                 LEFT OUTER JOIN [dbo].[User] u ON u.Id=r.RegionManagerId";
 
@@ -177,6 +201,11 @@ namespace ACT.Core.Services
             if ( csm.PSPId != 0 )
             {
                 query = $"{query} AND r.PSPId=@csmPSPId ";
+            }
+
+            if (csm.ProvinceId != 0 )
+            {
+                query = $"{query} AND pv.id=@csmProvinceId ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
