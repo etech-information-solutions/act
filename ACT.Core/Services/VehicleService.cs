@@ -242,5 +242,16 @@ namespace ACT.Core.Services
         {
             return context.Vehicles.Where( c => c.ObjectId == objectId && c.ObjectType == objectType ).ToList();
         }
+
+        /// <summary>
+        /// Gets a vehicle using the specified VIN and Object Type
+        /// </summary>
+        /// <param name="vin"></param>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
+        public Vehicle Get( string vin, string objectType )
+        {
+            return context.Vehicles.FirstOrDefault( v => v.VINNumber.Trim() == vin.Trim() && v.ObjectType == objectType );
+        }
     }
 }

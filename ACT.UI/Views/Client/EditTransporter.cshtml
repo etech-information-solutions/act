@@ -69,6 +69,14 @@
                 @Html.ValidationMessageFor( model => model.ContactNumber )
             </div>
 
+            <div class="edit-label">
+                @Html.LabelFor( model => model.Status )
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.Status )
+            </div>
+
         </div>
 
         <div class="left" style="width: 73%;">

@@ -3153,11 +3153,47 @@ namespace ACT.UI.Controllers
 
         #region Manage Transporters
 
+        //
+        // GET: /Client/TransporterDetails/5
+        public ActionResult TransporterDetails( int id, bool layout = true )
+        {
+            using ( ContactService cservice = new ContactService() )
+            using ( VehicleService vservice = new VehicleService() )
+            using ( TransporterService tservice = new TransporterService() )
+            {
+                Transporter model = tservice.GetById( id );
+
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return RedirectToAction( "Index" );
+                }
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                ViewBag.Contacts = cservice.List( model.Id, "Transporter" );
+
+                ViewBag.Vehicles = vservice.List( model.Id, "Transporter" );
+
+                return View( model );
+            }
+        }
+
         // GET: Client/AddTransporter
         [Requires( PermissionTo.Create )]
         public ActionResult AddTransporter()
         {
-            TransporterViewModel model = new TransporterViewModel() { EditMode = true };
+            TransporterViewModel model = new TransporterViewModel()
+            {
+                EditMode = true,
+                Contacts = new List<Contact>(),
+                Vehicles = new List<Vehicle>()
+            };
+
             return View( model );
         }
 
@@ -3166,51 +3202,117 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Create )]
         public ActionResult AddTransporter( TransporterViewModel model )
         {
-            try
+            if ( !ModelState.IsValid )
             {
-                if ( !ModelState.IsValid )
+                Notify( "Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( ContactService cservice = new ContactService() )
+            using ( VehicleService vservice = new VehicleService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( TransporterService tservice = new TransporterService() )
+            {
+                #region Validation
+
+                if ( !string.IsNullOrEmpty( model.RegistrationNumber ) && tservice.ExistByRegistrationNumber( model.RegistrationNumber.Trim() ) )
                 {
-                    Notify( "Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error );
+                    // Transporter already exist!
+                    Notify( $"Sorry, a Transporter with the Registration Number \"{model.RegistrationNumber}\" already exists!", NotificationType.Error );
 
                     return View( model );
                 }
 
-                using ( TransporterService siteService = new TransporterService() )
-                using ( TransactionScope scope = new TransactionScope() )
+                #endregion
+
+                #region Transporter
+
+                Transporter t = new Transporter()
                 {
-                    //#region Validation
-                    //if (!string.IsNullOrEmpty(model.RegistrationNumber) && siteService.ExistByName(model.RegistrationNumber.Trim()))
-                    //{
-                    //    // Bank already exist!
-                    //    Notify($"Sorry, a Site with the Account number \"{model.AccountCode}\" already exists!", NotificationType.Error);
+                    Name = model.Name,
+                    Email = model.Email,
+                    Status = ( int ) Status.Active,
+                    TradingName = model.TradingName,
+                    ContactNumber = model.ContactNumber,
+                    RegistrationNumber = model.RegistrationNumber,
+                };
 
-                    //    return View(model);
-                    //}
-                    //#endregion
-                    #region Create Transporter
-                    Transporter site = new Transporter()
+                t = tservice.Create( t );
+
+                #endregion
+
+                #region Contacts
+
+                if ( model.Contacts.NullableAny( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                {
+                    foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
                     {
-                        Name = model.Name,
-                        TradingName = model.TradingName,
-                        RegistrationNumber = model.RegistrationNumber,
-                        Email = model.Email,
-                        ContactNumber = model.ContactNumber,
-                        Status = ( int ) Status.Active
-                    };
-                    site = siteService.Create( site );
-                    #endregion
+                        Contact c = cservice.Get( mc.ContactIdNo, "Transporter" );
 
-                    scope.Complete();
+                        if ( c != null )
+                        {
+                            continue;
+                        }
+
+                        c = new Contact()
+                        {
+                            ObjectId = t.Id,
+                            ObjectType = "Transporter",
+                            ContactCell = mc.ContactCell,
+                            ContactIdNo = mc.ContactIdNo,
+                            ContactName = mc.ContactName,
+                            Status = ( int ) model.Status,
+                            ContactEmail = mc.ContactEmail,
+                            ContactTitle = mc.ContactTitle,
+                        };
+
+                        cservice.Create( c );
+                    }
                 }
 
-                Notify( "The Transporter was successfully created.", NotificationType.Success );
-                return RedirectToAction( "ManageTransporters" );
+                #endregion
+
+                #region Vehicles
+
+                if ( model.Vehicles.NullableAny( c => !string.IsNullOrWhiteSpace( c.VINNumber ) ) )
+                {
+                    foreach ( Vehicle mv in model.Vehicles.Where( c => !string.IsNullOrWhiteSpace( c.VINNumber ) ) )
+                    {
+                        Vehicle v = vservice.Get( mv.VINNumber, "Transporter" );
+
+                        if ( v != null )
+                        {
+                            continue;
+                        }
+
+                        v = new Vehicle()
+                        {
+                            Make = mv.Make,
+                            Year = mv.Year,
+                            ObjectId = t.Id,
+                            Model = mv.Model,
+                            Type = ( int ) mv.Type,
+                            VINNumber = mv.VINNumber,
+                            ObjectType = "Transporter",
+                            Descriptoin = mv.Descriptoin,
+                            Status = ( int ) model.Status,
+                            Registration = mv.Registration,
+                            EngineNumber = mv.EngineNumber,
+                        };
+
+                        vservice.Create( v );
+                    }
+                }
+
+                #endregion
+
+                scope.Complete();
             }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
+
+            Notify( "The Transporter was successfully created.", NotificationType.Success );
+
+            return ManageTransporters( new PagingModel(), new CustomSearchModel() );
         }
 
         // GET: Client/EditTransporter/5
@@ -3256,64 +3358,139 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Edit )]
         public ActionResult EditTransporter( TransporterViewModel model )
         {
-            try
+            if ( !ModelState.IsValid )
             {
-                if ( !ModelState.IsValid )
+                Notify( "Sorry, the selected Transporter was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( ContactService cservice = new ContactService() )
+            using ( VehicleService vservice = new VehicleService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( TransporterService tservice = new TransporterService() )
+            {
+                Transporter t = tservice.GetById( model.Id );
+
+                #region Validations
+
+                if ( !string.IsNullOrEmpty( model.RegistrationNumber ) && model.RegistrationNumber.Trim().ToLower() != t.RegistrationNumber.Trim().ToLower() && tservice.ExistByRegistrationNumber( model.RegistrationNumber.Trim() ) )
                 {
-                    Notify( "Sorry, the selected Transporter was not updated. Please correct all errors and try again.", NotificationType.Error );
+                    // Role already exist!
+                    Notify( $"Sorry, a Transporter with the Company Registration Number \"{model.RegistrationNumber} ({model.RegistrationNumber})\" already exists!", NotificationType.Error );
 
                     return View( model );
                 }
 
-                Transporter site;
+                #endregion
 
-                using ( TransporterService service = new TransporterService() )
-                using ( TransactionScope scope = new TransactionScope() )
+                #region Transporter
+
+                // Update Transporter
+                t.Id = model.Id;
+                t.Name = model.Name;
+                t.Email = model.Email;
+                t.Status = ( int ) model.Status;
+                t.TradingName = model.TradingName;
+                t.ContactNumber = model.ContactNumber;
+                t.RegistrationNumber = model.RegistrationNumber;
+
+                tservice.Update( t );
+
+                #endregion
+
+                #region Contacts
+
+                if ( model.Contacts.NullableAny( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
                 {
-                    site = service.GetById( model.Id );
+                    foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                    {
+                        Contact c = cservice.GetById( mc.Id );
 
+                        if ( c == null )
+                        {
+                            c = new Contact()
+                            {
+                                ObjectId = t.Id,
+                                ObjectType = "Transporter",
+                                ContactCell = mc.ContactCell,
+                                ContactIdNo = mc.ContactIdNo,
+                                ContactName = mc.ContactName,
+                                Status = ( int ) model.Status,
+                                ContactEmail = mc.ContactEmail,
+                                ContactTitle = mc.ContactTitle,
+                            };
 
-                    #region Validations
+                            cservice.Create( c );
+                        }
+                        else
+                        {
+                            c.ContactCell = mc.ContactCell;
+                            c.ContactIdNo = mc.ContactIdNo;
+                            c.ContactName = mc.ContactName;
+                            c.Status = ( int ) model.Status;
+                            c.ContactEmail = mc.ContactEmail;
+                            c.ContactTitle = mc.ContactTitle;
 
-                    //if (!string.IsNullOrEmpty(model.AccountCode) && service.ExistByAccountCode(model.AccountCode.Trim()))
-                    //{
-                    //    // Role already exist!
-                    //    Notify($"Sorry, a Site with the Account Code \"{model.AccountCode} ({model.AccountCode})\" already exists!", NotificationType.Error);
-
-                    //    return View(model);
-                    //}
-
-                    #endregion
-                    #region Update Transporter
-
-                    // Update Transporter
-                    site.Id = model.Id;
-                    site.Name = model.Name;
-                    site.RegistrationNumber = model.RegistrationNumber;
-                    site.Email = model.Email;
-                    site.ContactNumber = model.ContactNumber;
-                    site.TradingName = model.TradingName;
-                    site.Status = ( int ) model.Status;
-
-                    service.Update( site );
-
-                    #endregion
-
-
-
-
-                    scope.Complete();
+                            cservice.Update( c );
+                        }
+                    }
                 }
 
-                Notify( "The selected Transporter details were successfully updated.", NotificationType.Success );
+                #endregion
 
-                return RedirectToAction( "ManageTransporters" );
+                #region Vehicles
+
+                if ( model.Vehicles.NullableAny( c => !string.IsNullOrWhiteSpace( c.VINNumber ) ) )
+                {
+                    foreach ( Vehicle mv in model.Vehicles.Where( c => !string.IsNullOrWhiteSpace( c.VINNumber ) ) )
+                    {
+                        Vehicle v = vservice.GetById( mv.Id );
+
+                        if ( v == null )
+                        {
+                            v = new Vehicle()
+                            {
+                                Make = mv.Make,
+                                Year = mv.Year,
+                                ObjectId = t.Id,
+                                Model = mv.Model,
+                                Type = ( int ) mv.Type,
+                                VINNumber = mv.VINNumber,
+                                ObjectType = "Transporter",
+                                Status = ( int ) model.Status,
+                                Registration = mv.Registration,
+                                EngineNumber = mv.EngineNumber,
+                                Descriptoin = $"{mv.Make} {mv.Model}",
+                            };
+
+                            vservice.Create( v );
+                        }
+                        else
+                        {
+                            v.Make = mv.Make;
+                            v.Year = mv.Year;
+                            v.Model = mv.Model;
+                            v.Type = ( int ) mv.Type;
+                            v.VINNumber = mv.VINNumber;
+                            v.Status = ( int ) model.Status;
+                            v.Registration = mv.Registration;
+                            v.EngineNumber = mv.EngineNumber;
+                            v.Descriptoin = $"{mv.Make} {mv.Model}";
+
+                            vservice.Update( v );
+                        }
+                    }
+                }
+
+                #endregion
+
+                scope.Complete();
             }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
+
+            Notify( "The selected Transporter details were successfully updated.", NotificationType.Success );
+
+            return ManageTransporters( new PagingModel(), new CustomSearchModel() );
         }
 
         // POST: Client/DeleteTransporter/5
@@ -3349,7 +3526,7 @@ namespace ACT.UI.Controllers
             {
                 List<Contact> contacts = cservice.List( id, "Transporter" );
 
-                return PartialView( "_Contacts", contacts );
+                return PartialView( "_ContactsView", contacts );
             }
         }
 
@@ -3360,7 +3537,7 @@ namespace ACT.UI.Controllers
             {
                 List<Vehicle> vehicles = vservice.List( id, "Transporter" );
 
-                return PartialView( "_Vehicles", vehicles );
+                return PartialView( "_VehiclesView", vehicles );
             }
         }
 

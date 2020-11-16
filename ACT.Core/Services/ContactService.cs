@@ -24,5 +24,16 @@ namespace ACT.Core.Services
         {
             return context.Contacts.Where( c => c.ObjectId == objectId && c.ObjectType == objectType ).ToList();
         }
+
+        /// <summary>
+        /// Gets a Contact using the specified contact Id Number and Object Type
+        /// </summary>
+        /// <param name="idNo"></param>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
+        public Contact Get( string idNo, string objectType )
+        {
+            return context.Contacts.FirstOrDefault( v => v.ContactIdNo.Trim() == idNo.Trim() && v.ObjectType == objectType );
+        }
     }
 }

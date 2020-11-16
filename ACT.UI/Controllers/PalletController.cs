@@ -97,65 +97,6 @@ namespace ACT.UI.Controllers
 
 
         #region Pallet PoolingAgentData
-        //
-        // GET: /Pallet/PoolingAgentData
-        public ActionResult PoolingAgentData( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
-        {
-            if ( givecsm )
-            {
-                ViewBag.ViewName = "PoolingAgentData";
-
-                return PartialView( "_PoolingAgentDataCustomSearch", new CustomSearchModel( "PoolingAgentData" ) );
-            }
-
-            ViewBag.ViewName = "PoolingAgentData";
-            //check if there are any viewbag messages from imports
-            string msg = ( Session[ "ImportMessage" ] != null ? Session[ "ImportMessage" ].ToString() : null );
-            if ( !string.IsNullOrEmpty( msg ) )
-            {
-                ViewBag.Message = msg;
-                Notify( msg, NotificationType.Success );
-
-                //clear the message for next time
-                Session[ "ImportMessage" ] = null;
-            }
-
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
-            //TODO
-            using ( ClientService clientService = new ClientService() )
-            {
-                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-            }
-
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            } );
-            ViewBag.ClientList = clientDDL;
-
-
-            int total = 0;
-            List<ChepLoadCustomModel> model = new List<ChepLoadCustomModel>();
-            using ( ChepLoadService service = new ChepLoadService() )
-            {
-                if ( clientId > 0 )
-                {
-                    csm.ClientId = clientId;
-                }
-
-                model = service.ListCSM( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total();
-            }
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
-
-            return PartialView( "_PoolingAgentData", paging );
-        }
 
         // GET: Pallet/AddPoolingAgentData
         [Requires( PermissionTo.Create )]
@@ -349,6 +290,7 @@ namespace ACT.UI.Controllers
                 return View();
             }
         }
+
         #endregion
 
         //-------------------------------------------------------------------------------------
@@ -2850,6 +2792,66 @@ namespace ACT.UI.Controllers
 
 
         #region Partial Views
+
+        //
+        // GET: /Pallet/PoolingAgentData
+        public ActionResult PoolingAgentData( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "PoolingAgentData";
+
+                return PartialView( "_PoolingAgentDataCustomSearch", new CustomSearchModel( "PoolingAgentData" ) );
+            }
+
+            ViewBag.ViewName = "PoolingAgentData";
+            //check if there are any viewbag messages from imports
+            string msg = ( Session[ "ImportMessage" ] != null ? Session[ "ImportMessage" ].ToString() : null );
+            if ( !string.IsNullOrEmpty( msg ) )
+            {
+                ViewBag.Message = msg;
+                Notify( msg, NotificationType.Success );
+
+                //clear the message for next time
+                Session[ "ImportMessage" ] = null;
+            }
+
+            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
+            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
+            //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
+            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
+            //TODO
+            using ( ClientService clientService = new ClientService() )
+            {
+                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+            }
+
+            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.CompanyName
+
+            } );
+            ViewBag.ClientList = clientDDL;
+
+
+            int total = 0;
+            List<ChepLoadCustomModel> model = new List<ChepLoadCustomModel>();
+            using ( ChepLoadService service = new ChepLoadService() )
+            {
+                if ( clientId > 0 )
+                {
+                    csm.ClientId = clientId;
+                }
+
+                model = service.ListCSM( pm, csm );
+                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total();
+            }
+            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+            return PartialView( "_PoolingAgentData", paging );
+        }
 
         //
         // POST || GET: /Pallet/DeliveryNotes

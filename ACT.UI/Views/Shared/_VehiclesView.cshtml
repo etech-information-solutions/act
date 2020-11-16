@@ -1,0 +1,76 @@
+﻿@model List<Vehicle>
+
+@using ACT.Core.Enums;
+@using ACT.Data.Models;
+
+<div class="grouped-area">
+
+    <p>
+        <strong>Vehicles (@Model.NullableCount())</strong>
+    </p>
+
+    <table id="vehicles-table" class="da-table">
+
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Make</th>
+                <th>Model</th>
+                <th>Year</th>
+                <th>Engine #</th>
+                <th>VIN #</th>
+                <th>Reg #</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @if ( Model.NullableAny() )
+            {
+                int count = 0;
+
+                foreach ( Vehicle b in Model )
+                {
+                    <tr>
+                        <td width="1%">
+                            @count
+                        </td>
+                        <td>
+                            @b.Make
+                        </td>
+                        <td>
+                            @b.Model
+                        </td>
+                        <td>
+                            @b.Year
+                        </td>
+                        <td>
+                            @b.EngineNumber
+                        </td>
+                        <td>
+                            @b.VINNumber
+                        </td>
+                        <td>
+                            @b.Registration
+                        </td>
+                        <td>
+                            @( ( ( VehicleType ) b.Type ).GetDisplayText() )
+                        </td>
+                    </tr>
+
+                    count++;
+                }
+            }
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+<p>
+    <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Close</a>
+</p>
