@@ -590,7 +590,7 @@ namespace ACT.UI.Controllers
                 ClientLoadViewModel model = new ClientLoadViewModel()
                 {
                     ClientId = load.ClientId,
-                    VehicleId = load.VehicleId,
+                    //VehicleId = load.VehicleId,
                     //TransporterId = (int)load.TransporterId,
                     LoadDate = load.LoadDate,
                     LoadNumber = load.LoadNumber,
