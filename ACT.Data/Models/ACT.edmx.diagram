@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="e9564c2a9b2949ffa97edfafe5f410d3" Name="Diagram1" ZoomLevel="101">
+      <Diagram DiagramId="e9564c2a9b2949ffa97edfafe5f410d3" Name="Diagram1" ZoomLevel="109">
         <EntityTypeShape EntityType="ACTModel.Address" Width="1.5" PointX="5.75" PointY="0.75" />
         <EntityTypeShape EntityType="ACTModel.AuditLog" Width="1.5" PointX="0.75" PointY="5.75" />
         <EntityTypeShape EntityType="ACTModel.Bank" Width="1.5" PointX="0.75" PointY="1.375" />
@@ -139,6 +139,9 @@
         <EntityTypeShape EntityType="ACTModel.ClientCustomer" Width="1.5" PointX="9" PointY="61" />
         <AssociationConnector Association="ACTModel.FK_ClientCustomer_Client" />
         <AssociationConnector Association="ACTModel.FK_ClientSite_ClientCustomer" />
+        <EntityTypeShape EntityType="ACTModel.Province" Width="1.5" PointX="5.375" PointY="11" />
+        <EntityTypeShape EntityType="ACTModel.sysdiagram" Width="1.5" PointX="11.375" PointY="5.75" />
+        <AssociationConnector Association="ACTModel.FK_Region_Province" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

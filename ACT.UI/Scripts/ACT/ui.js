@@ -3924,10 +3924,10 @@
                         });
 
                         if (sum > 0)
+                        {
                             target.val(sum)
                             target.attr("value", sum)
-
-
+                        }
                     });
             });
         },

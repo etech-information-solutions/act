@@ -25,7 +25,7 @@ namespace ACT.Data.Models
     
         public int Id { get; set; }
         public int ClientId { get; set; }
-        public int VehicleId { get; set; }
+        public Nullable<int> VehicleId { get; set; }
         public Nullable<int> ClientSiteId { get; set; }
         public Nullable<int> OutstandingReasonId { get; set; }
         public System.DateTime CreatedOn { get; set; }

@@ -88,5 +88,7 @@ namespace ACT.Data.Models
         public virtual DbSet<Vehicle> Vehicles { get; set; }
         public virtual DbSet<PSPPeriod> PSPPeriods { get; set; }
         public virtual DbSet<ClientCustomer> ClientCustomers { get; set; }
+        public virtual DbSet<Province> Provinces { get; set; }
+        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
     }
 }

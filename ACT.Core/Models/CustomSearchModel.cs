@@ -175,7 +175,16 @@ namespace ACT.Core.Models
         /// Can be used to indicate Province
         /// </summary>
         [Display( Name = "Province" )]
-        public Province Province
+        public ProvinceEnum Province
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// Can be used to indicate Province
+        /// </summary>
+        [Display(Name = "Province")]
+        public int ProvinceId
         {
             get; set;
         }
@@ -385,6 +394,8 @@ namespace ACT.Core.Models
 
         public Dictionary<int, string> PSPOptions { get; set; }
 
+        public Dictionary<int, string> ProvinceOptions { get; set; }
+
         public Dictionary<int, string> PSPProductOptions { get; set; }
 
         public Dictionary<int, string> RegionOptions { get; set; }
@@ -455,6 +466,7 @@ namespace ACT.Core.Models
                     using ( RegionService cservice = new RegionService() )
                     {
                         RegionOptions = cservice.List( true );
+                        ProvinceOptions = cservice.ListProvinces();
                     }
 
                     break;
@@ -580,7 +592,7 @@ namespace ACT.Core.Models
         private void SetDefaults()
         {
             this.Status = Status.All;
-            this.Province = Province.All;
+            this.Province = ProvinceEnum.All;
             this.RoleType = RoleType.All;
             this.ClientStatus = Status.Active;
             this.DocumentType = DocumentType.All;

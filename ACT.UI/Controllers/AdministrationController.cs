@@ -196,32 +196,33 @@ namespace ACT.UI.Controllers
 
                     csv = string.Format( "Date Created, Name, Status, Role, Email, Cell {0}", Environment.NewLine );
 
-                    List<User> userModel = new List<User>();
+                    List<UserCustomModel> userModel = new List<UserCustomModel>();
 
                     using ( UserService uservice = new UserService() )
                     {
-                        userModel = uservice.List( pm, csm );
+                        userModel = uservice.ListCSM( pm, csm );
 
                         if ( userModel != null && userModel.Any() )
                         {
-                            foreach ( User item in userModel )
+                            foreach ( UserCustomModel item in userModel )
                             {
                                 Status status = ( Status ) item.Status;
 
                                 Role role = new Role() { Name = "~/~", Type = -1 };
 
-                                if ( item.UserRoles.Any() )
-                                {
-                                    role = item.UserRoles.FirstOrDefault().Role;
-                                }
+                                
+                                //if ( item.UserRoles.Any() )
+                                //{
+                                //    role = item.UserRoles.FirstOrDefault().Role;
+                                //}
 
-                                RoleType roleType = ( RoleType ) role.Type;
+                                //RoleType roleType = ( RoleType ) role.Type;
 
                                 csv = string.Format( "{0} {1},{2},{3},{4},{5},{6} {7}", csv,
                                                     item.CreatedOn.ToString( "yyyy/MM/dd" ),
                                                     item.Name + " " + item.Surname,
                                                     status.GetDisplayText(),
-                                                    roleType.GetDisplayText(),
+                                                    item.RoleName,
                                                     item.Email,
                                                     item.Cell,
                                                     Environment.NewLine );
@@ -1544,7 +1545,7 @@ namespace ACT.UI.Controllers
                         PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
-                        Province = ( address != null ) ? ( Province ) address.Province : Province.All,
+                        Province = ( address != null ) ? ( ProvinceEnum ) address.Province : ProvinceEnum.All,
                         AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
                     },
                     User = new UserViewModel()
@@ -2800,6 +2801,7 @@ namespace ACT.UI.Controllers
                 Description = region.Description,
                 Status = ( Status ) region.Status,
                 RegionManagerId = region.RegionManagerId,
+                ProvinceId=region.ProvinceId
             };
 
             return View( model );
