@@ -203,7 +203,7 @@ namespace ACT.UI.Controllers
         // POST: Pallet/EditPoolingAgentData/5
         [HttpPost]
         [Requires( PermissionTo.Edit )]
-        public ActionResult EditPoolingAgentData( ChepLoadViewModel model, PagingModel pm, bool isstructure = false )
+        public ActionResult EditPoolingAgentData( ChepLoadViewModel model )
         {
             try
             {
