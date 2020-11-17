@@ -112,21 +112,21 @@
             Address
         </div>
         <div class="display-field">
-            @( $"{Model.CustomerAddress?.Replace( "~", "," )}, {Model.CustomerPostalCode}, {( ( Province ) Model.CustomerProvince ).GetDisplayText()}" )
+            @( $"{Model.CustomerAddress?.Replace( "~", "," )}, {Model.CustomerPostalCode}, {( (ProvinceEnum) Model.CustomerProvince ).GetDisplayText()}" )
         </div>
 
         <div class="display-label">
             Delivery Address
         </div>
         <div class="display-field">
-            @( $"{Model.DeliveryAddress?.Replace( "~", "," )}, {Model.DeliveryPostalCode}, {( ( Province ) Model.DeliveryProvince ).GetDisplayText()}" )
+            @( $"{Model.DeliveryAddress?.Replace( "~", "," )}, {Model.DeliveryPostalCode}, {( (ProvinceEnum) Model.DeliveryProvince ).GetDisplayText()}" )
         </div>
 
         <div class="display-label">
             Billing Address
         </div>
         <div class="display-field">
-            @( $"{Model.BillingAddress?.Replace( "~", "," )}, {Model.BililngPostalCode}, {( ( Province ) Model.BillingProvince ).GetDisplayText()}" )
+            @( $"{Model.BillingAddress?.Replace( "~", "," )}, {Model.BililngPostalCode}, {( (ProvinceEnum) Model.BillingProvince ).GetDisplayText()}" )
         </div>
 
     </div>
