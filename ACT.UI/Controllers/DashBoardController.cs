@@ -11,7 +11,7 @@ using ACT.UI.Mvc;
 
 namespace ACT.UI.Controllers
 {
-    [Requires( PermissionTo.View, PermissionContext.Administration )]
+    [Requires( PermissionTo.View, PermissionContext.DashBoard )]
     public class DashBoardController : BaseController
     {
         // GET: DashBoard

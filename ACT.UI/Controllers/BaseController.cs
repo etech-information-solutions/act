@@ -180,47 +180,34 @@ namespace ACT.UI.Controllers
                     {
                         case "DashBoard":
 
-                            filterContext.Result = RedirectToAction( "Index", "Campaign" );
-
-                            break;
-
-                        case "Campaign":
-
-                            filterContext.Result = RedirectToAction( "Index", "Dinner" );
-
-                            break;
-
-                        case "Dinner":
-
-                            filterContext.Result = RedirectToAction( "Index", "TradingPartner" );
-
-                            break;
-
-                        case "TradingPartner":
-
-                            filterContext.Result = RedirectToAction( "Index", "Member" );
-
-                            break;
-
-                        case "Member":
-
                             filterContext.Result = RedirectToAction( "Index", "Client" );
 
                             break;
 
                         case "Client":
 
-                            filterContext.Result = RedirectToAction( "Index", "Reward" );
+                            filterContext.Result = RedirectToAction( "Index", "ClientReporting" );
 
                             break;
 
-                        case "Reward":
+                        case "ClientReporting":
+
+                            filterContext.Result = RedirectToAction( "Index", "Pallet" );
+
+                            break;
+
+                        case "Pallet":
 
                             filterContext.Result = RedirectToAction( "Index", "Administration" );
 
                             break;
 
-                        case "Report":
+                        case "Administration":
+
+                            filterContext.Result = RedirectToAction("Index", "Finance");
+
+                            break;
+
                         default:
 
                             Notifications.Add( new NotificationModel() { Message = "Please note, you were signed out from your previous session due to time-out", Type = NotificationType.Error } );
