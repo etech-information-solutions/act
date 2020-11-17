@@ -15,8 +15,8 @@
 
     UserModel user = User.Get();
 
-    int pspRoleId = Model.RoleOptions.FirstOrDefault( r => r.Type == ( int ) RoleType.PSP )?.Id ?? 0,
-        clientRoleId = Model.RoleOptions.FirstOrDefault( r => r.Type == ( int ) RoleType.Client )?.Id ?? 0;
+    List<int> pspRoleIds = Model.RoleOptions.Where(r => r.Type == (int)RoleType.PSP).Select(role => role.Id).ToList();
+    int clientRoleId = Model.RoleOptions.FirstOrDefault( r => r.Type == ( int ) RoleType.Client )?.Id ?? 0;
 
     List<Role> roleOptions = Model.RoleOptions;
 
@@ -83,7 +83,7 @@
                     @Html.LabelFor( model => model.RoleId )
                 </div>
                 <div class="edit-field">
-                    @Html.DropDownListFor( model => model.RoleId, model => roleOptions, role => role.Id, role => role.Name + " (user)", true, new { @class = "chzn", data_role = "1", data_psp = "#psp-options", data_psp_role_id = pspRoleId, data_client_role_id = clientRoleId, data_client = "#client-options", @style = "width: 98%;" } )
+                    @Html.DropDownListFor( model => model.RoleId, model => roleOptions, role => role.Id, role => role.Name + " (user)", true, new { @class = "chzn", data_role = "1", data_psp = "#psp-options", data_psp_role_ids = Json.Encode(pspRoleIds), data_client_role_id = clientRoleId, data_client = "#client-options", @style = "width: 98%;" } )
                     @Html.ValidationMessageFor( model => model.RoleId )
                 </div>
 

@@ -4012,14 +4012,14 @@
                 var pspOptions = $( i.attr( "data-psp" ) );
                 var clientOptions = $( i.attr( "data-client" ) );
 
-                var pspRoleId = i.attr( "data-psp-role-id" );
+                var pspRoleIds = JSON.parse(i.attr( "data-psp-role-ids" ));
                 var clienntRoleId = i.attr( "data-client-role-id" );
 
                 i
                     .unbind( "change" )
                     .bind( "change", function ()
                     {
-                        if ( pspRoleId === $( this ).val() )
+                        if ( pspRoleIds.find( id => id == $( this ).val() ))
                         {
                             clientOptions.css( "display", "none" );
                             pspOptions.show( 1000 );
