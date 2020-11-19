@@ -220,8 +220,7 @@
                         } );
                     } );
 
-                if ( clicked === "0" )
-                {
+                if ( clicked === "0" ) {
                     i.click();
                 }
             } );

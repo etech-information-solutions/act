@@ -240,5 +240,15 @@ namespace ACT.Core.Services
 
             return clientOptions;
         }
+
+        /// <summary>
+        /// Checks if a transporter with the specified Registration Number already exists
+        /// </summary>
+        /// <param name="registrationNumber"></param>
+        /// <returns></returns>
+        public bool ExistByRegistrationNumber( string registrationNumber )
+        {
+            return context.Transporters.Any( t => t.RegistrationNumber.Trim() == registrationNumber.Trim() );
+        }
     }
 }

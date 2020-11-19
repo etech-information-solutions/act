@@ -650,6 +650,8 @@
     <Content Include="Views\Administration\AddTransporter.cshtml" />
     <Content Include="Views\Administration\TransporterDetails.cshtml" />
     <Content Include="Views\Administration\EditTransporter.cshtml" />
+    <Content Include="Views\Shared\_VehiclesView.cshtml" />
+    <Content Include="Views\Shared\_ContactsView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
