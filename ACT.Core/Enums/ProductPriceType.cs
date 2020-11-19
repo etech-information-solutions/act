@@ -12,7 +12,14 @@ namespace ACT.Core.Enums
         [StringEnumDisplayText( "Issue" )]
         Issue = 1,
 
-        [StringEnumDisplayText( "Lost Pallets" )]
+        [StringEnumDisplayText( "Compensation Fee" )]
         Lost = 2,
+
+        [StringEnumDisplayText("Recovery Fee")]
+        Recovery = 3,
+
+        [StringEnumDisplayText("Transport Fee")]
+        Transport = 4
+
     }
 }

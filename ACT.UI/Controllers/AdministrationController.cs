@@ -3087,18 +3087,34 @@ namespace ACT.UI.Controllers
                     ProductPrices = new List<ProductPriceViewModel>(),
                 };
 
-                foreach ( ProductPrice p in product.ProductPrices )
+                foreach (int item in Enum.GetValues(typeof(ProductPriceType)))
                 {
-                    model.ProductPrices.Add( new ProductPriceViewModel()
+                    ProductPriceType type = (ProductPriceType)item;
+
+                    ProductPrice existingPrice = product.ProductPrices.FirstOrDefault(p => p.Type == item);
+
+                    
+                    if (existingPrice != null)
                     {
-                        Id = p.Id,
-                        Rate = p.Rate,
-                        RateUnit = p.RateUnit,
-                        StartDate = p.FromDate,
-                        ProductId = p.ProductId,
-                        Status = ( Status ) p.Status,
-                        Type = ( ProductPriceType ) p.Type
-                    } );
+                        model.ProductPrices.Add(new ProductPriceViewModel()
+                        {
+                            Id = existingPrice.Id,
+                            Rate = existingPrice.Rate,
+                            RateUnit = existingPrice.RateUnit,
+                            StartDate = existingPrice.FromDate,
+                            ProductId = existingPrice.ProductId,
+                            Status = (Status)existingPrice.Status,
+                            Type = (ProductPriceType)existingPrice.Type
+                        });
+                    }
+                    else
+                    {
+                        model.ProductPrices.Add(new ProductPriceViewModel()
+                        {
+                            Type = type,
+                            Status = Status.Inactive
+                        });
+                    }
                 }
 
                 if ( model.ProductPrices.Count < 3 )
