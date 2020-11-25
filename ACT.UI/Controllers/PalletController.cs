@@ -1950,15 +1950,6 @@ namespace ACT.UI.Controllers
 
         //-------------------------------------------------------------------------------------
 
-
-        #region General
-
-
-        #endregion
-
-
-        //-------------------------------------------------------------------------------------
-
         #region APIs
 
         [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]

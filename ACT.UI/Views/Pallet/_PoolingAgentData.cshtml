@@ -1,11 +1,8 @@
 ﻿@model PagingExtension
 
-@using ACT.Data.Models;
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
 @using ACT.Core.Models.Custom;
-@using ACT.Core.Services;
-@using ACT.UI.Models;
 
 @{
     ViewBag.ShowExport = true;
@@ -15,77 +12,28 @@
 }
 
 
-@Html.Partial("_Notification")
+@Html.Partial( "_Notification" )
 
 
 @{
     UserModel user = User.Get();
 
     Int32 count = Model.Start;
-    List<ChepLoadCustomModel> items = (List<ChepLoadCustomModel>)Model.Items;
-
-    //PADService cservice = new PADService();
-
-
+    List<ChepLoadCustomModel> items = ( List<ChepLoadCustomModel> ) Model.Items;
 }
 
 
-@if (Model == null || !items.Any())
+@if ( Model == null || !items.Any() )
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
         There are no Pooling Agent Load Entries available matching your search criteria.
     </div>
 }
-@if (ViewBag.ContextualMode)
-{
-    <input type="hidden" id="context" name="context" value="1" />
-}
-else
-{
-    <input type="hidden" id="context" name="context" value="0" />
-}
-@using (Html.BeginForm("ImportChepLoad", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#poolingagentdata", @class = "custom-validate", @style = "width: auto;", id = "importpoolingagent" }))
-{
-    <p>
-        <table style="width:100%" border="0">
-            <tr>
-                <td style="width:3%">
-                    <label for="file">Client:</label>
-                </td>
-                <td style="width:15%">
-                    @if (ViewBag.ContextualMode)
-                    {
-                        @Html.DropDownList("ClientList")
-                    }
-                    else
-                    {
-                        @Html.DropDownList("ClientList", "All Clients")
-                    }
-                </td>
-                <td style="width:2%">
-                    @Html.ActionLink("Add", "AddPoolingAgentData", new { }, new { @class = "add postedFileadata", @rel = "tipsyS", @title = "Add Manual Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" })
-                </td>
-                <td style="width:5%">
-                    &nbsp;
-                </td>
-                <td style="width:3%">
-                    <label for="file" class="importlabel postedFileadata">Browse:</label>
-                </td>
-                <td style="width:55%">
-                    <input type="file" id="postedFile" name="postedFile" class="form-control postedFileadata" accept=".csv" />
-                </td>
-                <td style="width:10%">
-                    <input type="submit" value="Import" class="importbutton postedFileadata" />
-                </td>
-                <td style="width:7%">
-                    <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "poolingagentdatatemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
-                </td>
-            </tr>
-        </table>
-        <span class="loader"></span>
-    </p>
-}
 
+<p>
+    @Html.ActionLink( "Add", "AddPoolingAgentData", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add Manual Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" } )
+    <span class="loader"></span>
+</p>
 
 <table id="PADlist-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#PADlist-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
@@ -126,9 +74,6 @@ else
             <th>
                 Qty
             </th>
-            @*<th>
-                    Del Note
-                </th>*@
             <th data-name="Actions">
                 Actions
             </th>
@@ -136,14 +81,14 @@ else
     </thead>
 
     <tbody>
-        @if (Model != null && items != null && items.Count() > 0)
+        @if ( Model != null && items != null && items.Count() > 0 )
         {
-            foreach (var item in items)
+            foreach ( var item in items )
             {
-                ReconciliationStatus status = (ReconciliationStatus)item.Status;
+                ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
 
-                String active = status.Equals(Status.Active) ? "active" : "inactive";
-                String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+                string active = status.Equals( Status.Active ) ? "active" : "inactive";
+                string enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
 
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
@@ -151,41 +96,45 @@ else
                     <td width="1%">
                         @status
                     </td>
-                    <td style="width: 15%;">
+                    <td >
                         Chep
-                        @*@item.ClientDescription*@
                     </td>
-                    <td style="width: 15%;">
+                    <td >
                         @item.LoadDate
                     </td>
-                    <td style="width: 15%;">
+                    <td >
                         @item.EffectiveDate
                     </td>
-                    <td style="width: 15%;">
+                    <td >
                         @item.DeliveryNote
                     </td>
-                    <td style="width: 15%;">
+                    <td >
                         @item.AccountNumber
                     </td>
-                    <td style="width: 15%;">
+                    <td >
                         @item.Equipment
                     </td>
-                    <td style="width: 15%;">
+                    <td >
                         @item.DocketNumber
                     </td>
-                    <td style="width: 15%;"></td>
-                    <td style="width: 15%;"></td>
-                    <td style="width: 15%;"></td>
+                    <td>
 
-                    <td style="width: 15%;">@item.OriginalQuantity</td>
-                    @*<td style="width: 15%;"></td>*@
-                    <td width="15%">
-                        <a href="#doc" rel="modal:open" onclick="loadDocs(@item.Id)"><i class="fa fa-file-text-o"></i></a>
-                        @Html.ActionLink(" ", "EditPoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                    </td>
+                    <td>
 
-                        @Html.ActionLink(" ", "DeletePoolingAgentData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?" })
+                    </td>
+                    <td>
+
                     </td>
 
+                    <td>
+                        @item.OriginalQuantity
+                    </td>
+                    <td width="15%">
+                        @Html.ActionLink( "Edit", "EditPoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( enable, "DeletePoolingAgentData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?" } )
+                    </td>
 
                 </tr>
 
@@ -195,169 +144,6 @@ else
     </tbody>
 
 </table>
-<div id="doc" class="modal">
-    <p>
-        <strong class="">Documents</strong>
-    </p>
-    <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i> Add</a>
-    <input type="hidden" id="docitem" name="docitem" value="0" />
-    @*<div id="docslisttable" />*@
-    <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
-        <thead>
-            <tr>
-                <th>
-                    Document Title
-                </th>
-                <th>
-                    Type
-                </th>
-                <th>
-                    Date
-                </th>
-                <th>Actions</th>
-            </tr>
-        </thead>
 
-        <tbody></tbody>
-    </table>
-    <div id="documentsdiv">
-    </div>
-    <span id="uploaded_file"></span>
+@Html.Partial( "_Paging" )
 
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-</div>
-@Html.Partial("_Paging")
-
-<script>
-                $(document).ready(function () {
-                    var context = $("#context").val();
-                    if (context == "0") {
-                        $('.postedFileadata').hide();
-                        //$('.add').hide();
-                        //$('.importlabel').hide();
-                        //$('.importbutton').hide();
-                        //$('#postedFile').hide();
-                    }
-
-                    $("#ClientList").change(function () {
-                        //debugger;
-                        var cId = parseInt($('option:selected', this).val());
-                        SetClient(cId);
-                        if (cId > 0) {
-                            $('.postedFileadata').show();
-                            //$('.add').show();
-                            //$('.importlabel').show();
-                            //$('.importbutton').show();
-                            //$('#postedFile').show();
-                        } else {
-                            $('.postedFileadata').hide();
-                            //$('.add').hide();
-                            //$('.importlabel').hide();
-                            //$('.importbutton').hide();
-                            //$('#postedFile').hide();
-                        }
-
-                        //$.ajax({
-                        //    type: 'POST',
-                        //    url: "SetClient",
-                        //    data: { "ClientId": id },
-                        //    success: function (response) {
-                        //        window.location.href = 'Index#managesites';
-                        //        location.reload();
-                        //    }
-                        //});
-
-                    });
-
-                    //populateDocs(cId, "Client");
-
-                    $(document).on('change', '#companyfile', function () {
-                        var cId = $('#docitem').val();
-                        var name = document.getElementById("companyfile").files[0].name;
-                        var form_data = new FormData();
-                        var ext = name.split('.').pop().toLowerCase();
-                        if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx', 'csv']) == -1) {
-                            alert("Invalid File");
-                        }
-                        var oFReader = new FileReader();
-                        oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
-                        var f = document.getElementById("companyfile").files[0];
-                        var fsize = f.size || f.fileSize;
-                        if (fsize > 2000000) {
-                            alert("File Size is too large");
-                        }
-                        else {
-                            form_data.append("file", document.getElementById('companyfile').files[0]);
-                            form_data.append("clientId", $("#Id").val());
-                            $.ajax({
-                                url: "Upload?id=" + cId + "&utype=ChepLoad&uname=Agent",
-                                method: "POST",
-                                data: form_data,
-                                contentType: false,
-                                cache: false,
-                                processData: false,
-                                beforeSend: function () {
-                                    $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
-                                },
-                                success: function (data) {
-                                    //$('#uploaded_file').html(data);
-                                    populateDocs(cId, "ChepLoad");
-                                    $('#uploaded_file').html("<label class='text-success'></label>");
-                                }
-                            });
-                        }
-                    });
-
-                });
-
-            function AddDocRow() {
-                var rowDiv = $("#doctable-table tbody");
-                var tabledata = '<tr><td colspan="4"><input id="companyfile" name="companyfile" type="file" value="" data-val-file="1" class="input" /></td></tr>';
-                rowDiv.append(tabledata);
-
-            }
-
-            function loadDocs(itemId) {
-                populateDocs(itemId, "ChepLoad")
-            }
-
-            function removeFile(fileId,itemId) {
-                $.ajax({
-                    type: 'POST',
-                    url: '@Url.Action("RemoveFile", "Pallet")',
-                    data: { "FileId": fileId },
-                    success: function (response) {
-                        debugger;
-                        populateDocs(itemId, "ChepLoad");
-                    }
-                });
-            }
-
-            function SetClient(cId) {
-                $("#ClientId").val(cId);
-                $.ajax({
-                    type: 'POST',
-                    url: '@Url.Action("SetClient", "Pallet")',
-                    data: { "ClientId": cId },
-                    success: function (response) {
-                        location.reload();
-                    }
-                });
-            }
-            function populateDocs(id, doctype) {
-                $("#docitem").val(id); //docslisttable
-                $("#doctable-table tbody").html('');//clear the div
-                $.ajax({
-
-                    url: '@Url.Action("ListFilesTable", "Pallet")',
-                    type: "GET",
-                    dataType: "html",
-                    data: { objId: id, objType:doctype },
-                    success: function (data) {
-                        $('#doctable-table tbody').html(data); //reload the div
-                    },
-                });
-            }
-
-
-</script>
