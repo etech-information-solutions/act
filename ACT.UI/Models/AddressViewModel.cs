@@ -34,7 +34,7 @@ namespace ACT.UI.Models
 
         [Required]
         [Display( Name = "Select Province" )]
-        public ProvinceEnum Province { get; set; }
+        public Province Province { get; set; }
 
         [Required]
         [Display( Name = "Address Type" )]

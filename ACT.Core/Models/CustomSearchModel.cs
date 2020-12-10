@@ -175,7 +175,7 @@ namespace ACT.Core.Models
         /// Can be used to indicate Province
         /// </summary>
         [Display( Name = "Province" )]
-        public ProvinceEnum Province
+        public Province Province
         {
             get; set;
         }
@@ -592,7 +592,7 @@ namespace ACT.Core.Models
         private void SetDefaults()
         {
             this.Status = Status.All;
-            this.Province = ProvinceEnum.All;
+            this.Province = Province.All;
             this.RoleType = RoleType.All;
             this.ClientStatus = Status.Active;
             this.DocumentType = DocumentType.All;

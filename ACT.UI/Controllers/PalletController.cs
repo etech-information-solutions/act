@@ -128,7 +128,7 @@ namespace ACT.UI.Controllers
                     #region Create ClientLoadCustomModel
                     ChepLoad clientload = new ChepLoad()
                     {
-                        LoadDate = model.LoadDate,
+                        /*LoadDate = model.LoadDate,
                         EffectiveDate = model.EffectiveDate,
                         NotifyDate = model.NotifyDate,
                         AccountNumber = model.AccountNumber,
@@ -139,7 +139,7 @@ namespace ACT.UI.Controllers
                         Equipment = model.Equipment,
                         OriginalQuantity = model.OriginalQuantity,
                         NewQuantity = model.NewQuantity,
-                        Status = ( int ) Status.Active,
+                        Status = ( int ) Status.Active,*/
                         CreatedOn = DateTime.Now,
                         ModfiedOn = DateTime.Now,
                         ModifiedBy = CurrentUser.Email
@@ -181,18 +181,18 @@ namespace ACT.UI.Controllers
 
                 ChepLoadViewModel model = new ChepLoadViewModel()
                 {
-                    LoadDate = load.LoadDate,
-                    EffectiveDate = load.EffectiveDate,
-                    NotifyDate = load.NotifyDate,
-                    AccountNumber = load.AccountNumber,
-                    ClientDescription = load.ClientDescription,
-                    DeliveryNote = load.DeliveryNote,
-                    ReferenceNumber = load.ReferenceNumber,
-                    ReceiverNumber = load.ReceiverNumber,
-                    Equipment = load.Equipment,
-                    OriginalQuantity = load.OriginalQuantity,
-                    NewQuantity = load.NewQuantity,
-                    Status = ( int ) load.Status,
+                    //LoadDate = load.LoadDate,
+                    //EffectiveDate = load.EffectiveDate,
+                    //NotifyDate = load.NotifyDate,
+                    //AccountNumber = load.AccountNumber,
+                    //ClientDescription = load.ClientDescription,
+                    //DeliveryNote = load.DeliveryNote,
+                    //ReferenceNumber = load.ReferenceNumber,
+                    //ReceiverNumber = load.ReceiverNumber,
+                    //Equipment = load.Equipment,
+                    //OriginalQuantity = load.OriginalQuantity,
+                    //NewQuantity = load.NewQuantity,
+                    //Status = ( int ) load.Status,
                     //DocumentCount = (int)load.DocumentCount,
                     // DocsList = ""
                 };
@@ -222,18 +222,18 @@ namespace ACT.UI.Controllers
                     load = service.GetById( model.Id );
 
                     #region Update Chep Load
-                    load.LoadDate = model.LoadDate;
-                    load.EffectiveDate = model.EffectiveDate;
-                    load.NotifyDate = model.NotifyDate;
-                    load.AccountNumber = model.AccountNumber;
-                    load.ClientDescription = model.ClientDescription;
-                    load.DeliveryNote = model.DeliveryNote;
-                    load.ReferenceNumber = model.ReferenceNumber;
-                    load.ReceiverNumber = model.ReceiverNumber;
-                    load.Equipment = model.Equipment;
-                    load.OriginalQuantity = model.OriginalQuantity;
-                    load.NewQuantity = model.NewQuantity;
-                    load.Status = ( int ) model.Status;
+                    //load.LoadDate = model.LoadDate;
+                    //load.EffectiveDate = model.EffectiveDate;
+                    //load.NotifyDate = model.NotifyDate;
+                    //load.AccountNumber = model.AccountNumber;
+                    //load.ClientDescription = model.ClientDescription;
+                    //load.DeliveryNote = model.DeliveryNote;
+                    //load.ReferenceNumber = model.ReferenceNumber;
+                    //load.ReceiverNumber = model.ReceiverNumber;
+                    //load.Equipment = model.Equipment;
+                    //load.OriginalQuantity = model.OriginalQuantity;
+                    //load.NewQuantity = model.NewQuantity;
+                    //load.Status = ( int ) model.Status;
                     load.ModfiedOn = DateTime.Now;
                     load.ModifiedBy = CurrentUser.Email;
                     service.Update( load );
@@ -276,7 +276,7 @@ namespace ACT.UI.Controllers
                         return PartialView( "_AccessDenied" );
                     }
 
-                    activeLoad.Status = ( ( ( Status ) activeLoad.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+                    //activeLoad.Status = ( ( ( Status ) activeLoad.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
                     service.Update( activeLoad );
                     scope.Complete();
 
@@ -296,6 +296,7 @@ namespace ACT.UI.Controllers
         //-------------------------------------------------------------------------------------
 
         #region Pallet ClientData
+
         //
         // GET: /Pallet/ClientData
         public ActionResult ClientData( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
@@ -420,7 +421,7 @@ namespace ACT.UI.Controllers
                         ClientLoad clientload = new ClientLoad()
                         {
                             ClientId = ( model.ClientId > 0 ? model.ClientId : clientId ),
-                            VehicleId = model.VehicleId,
+                            //VehicleId = model.VehicleId,
                             // TransporterId = model.TransporterId,
                             LoadDate = model.LoadDate,//DateTimeExtensions.formatImportDate(model.LoadDate),
                             LoadNumber = model.LoadNumber,
@@ -459,7 +460,7 @@ namespace ACT.UI.Controllers
 
                                 Client noteClient = clientservice.GetById( model.ClientId );
                                 Address clientAddress = addservice.GetByColumnsWhere( "ObjectId", model.ClientId, "ObjectType", "Client" );
-                                string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ( (ProvinceEnum) clientAddress.Province ).GetDisplayText();
+                                string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ( (Province) clientAddress.Province ).GetDisplayText();
                                 //string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ((Province)model.BillingProvince).GetDisplayText();
                                 //string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ((Province)model.DeliveryProvince).GetDisplayText();
 
@@ -668,7 +669,7 @@ namespace ACT.UI.Controllers
                     // Update Group
                     //group.Id = model.Id;
                     load.ClientId = model.ClientId;
-                    load.VehicleId = model.VehicleId;
+                    //load.VehicleId = model.VehicleId;
                     //   load.TransporterId = model.TransporterId;
                     load.LoadDate = model.LoadDate;// DateTimeExtensions.formatImportDate(model.LoadDate);
                     load.LoadNumber = model.LoadNumber;
@@ -748,11 +749,13 @@ namespace ACT.UI.Controllers
                 return View();
             }
         }
+
         #endregion
 
         //-------------------------------------------------------------------------------------
 
-        #region Pallet ReconcileLoads
+        #region Pallet Reconcile Loads
+
         //
         // GET: /Pallet/ReconcileLoads
         public ActionResult ReconcileLoads( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
@@ -825,7 +828,7 @@ namespace ACT.UI.Controllers
             using ( ChepLoadService chepService = new ChepLoadService() )
             {
 
-                load = chepService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = ( int ) clientId, Status = ( int ) ReconciliationStatus.Unreconciled, ReconciliationStatus = ( int ) ReconciliationStatus.Unreconciled } ); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                load = chepService.List1( new PagingModel(), new CustomSearchModel() { ClientId = ( int ) clientId, Status = ( int ) ReconciliationStatus.Unreconciled, ReconciliationStatus = ( int ) ReconciliationStatus.Unreconciled } ); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
 
             }
 
@@ -838,11 +841,13 @@ namespace ACT.UI.Controllers
                 return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
+
         #endregion
 
         //-------------------------------------------------------------------------------------
 
-        #region Pallet ReconcileInvoice
+        #region Pallet Reconcile Invoice
+
         //
         // GET: /Pallet/ReconcileInvoice
         public ActionResult ReconcileInvoice( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
@@ -879,11 +884,13 @@ namespace ACT.UI.Controllers
 
             return PartialView( "_ReconcileInvoice", paging );
         }
+
         #endregion
 
         //-------------------------------------------------------------------------------------
 
         #region Pallet Exceptions
+
         //
         // GET: /Pallet/Exceptions
         public ActionResult Exceptions( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
@@ -920,6 +927,7 @@ namespace ACT.UI.Controllers
 
             return PartialView( "_Exceptions", paging );
         }
+
         #endregion
 
         //-------------------------------------------------------------------------------------
@@ -1119,9 +1127,9 @@ namespace ACT.UI.Controllers
                     BillingPostalCode = note.BililngPostalCode,
                     CustomerPostalCode = note.CustomerPostalCode,
                     DeliveryPostalCode = note.DeliveryPostalCode,
-                    BillingProvince = (ProvinceEnum) note.BillingProvince,
-                    CustomerProvince = (ProvinceEnum) note.CustomerProvince,
-                    DeliveryProvince = (ProvinceEnum) note.DeliveryProvince,
+                    BillingProvince = (Province) note.BillingProvince,
+                    CustomerProvince = (Province) note.CustomerProvince,
+                    DeliveryProvince = (Province) note.DeliveryProvince,
 
                     BillingAddress1 = bAddress.Length >= 1 ? bAddress[ 0 ] : string.Empty,
                     BillingAddress2 = bAddress.Length >= 2 ? bAddress[ 1 ] : string.Empty,
@@ -1995,7 +2003,7 @@ namespace ACT.UI.Controllers
                     //Run Validation first to ensure everything checks out to allow reconcilliation
 
                     //set up all agent items and update
-                    agent.Status = ( int ) ReconciliationStatus.Reconciled;
+                    agent.BalanceStatus = ( int ) ReconciliationStatus.Reconciled;
                     client.Status = ( int ) ReconciliationStatus.Reconciled;
                     agentclient.Status = ( int ) ReconciliationStatus.Reconciled;
                     agentclient.ChepLoadsId = agent.Id;
@@ -2017,12 +2025,12 @@ namespace ACT.UI.Controllers
             }
         }
 
-
         #endregion
 
         #region Journals Tasks and Comments
 
         #region Comments
+
         public JsonResult RemoveComment( int? id = null, string ctype = null )
         {
             int commId = ( id != null ? ( int ) id : 0 );
@@ -2046,6 +2054,7 @@ namespace ACT.UI.Controllers
             }
 
         }
+
         public JsonResult AddComment( int? id = null, string utype = null, string details = null )
         {
 
@@ -2090,9 +2099,11 @@ namespace ACT.UI.Controllers
                 return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
+
         #endregion
 
         #region Tasks
+
         public JsonResult RemoveTask( int? id = null, string ctype = null )
         {
             int tskId = ( id != null ? ( int ) id : 0 );
@@ -2116,6 +2127,7 @@ namespace ACT.UI.Controllers
             }
 
         }
+
         public JsonResult AddTask( int clientId, int agentLoadId, int clientLoadId, string name, string description )
         {
 
@@ -2209,9 +2221,11 @@ namespace ACT.UI.Controllers
                 return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
+
         #endregion
 
         #region Tasks
+
         public JsonResult RemoveJournal( int? id = null, string ctype = null )
         {
             int tskId = ( id != null ? ( int ) id : 0 );
@@ -2235,6 +2249,7 @@ namespace ACT.UI.Controllers
             }
 
         }
+
         public JsonResult AddJournal( int clientLoadId, int siteAuditId, int documentId, string description, string qty, int isIn, string refnumber )
         {
 
@@ -2291,14 +2306,13 @@ namespace ACT.UI.Controllers
                 return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
             }
         }
+
         #endregion
 
 
         #endregion
 
         #region Uploads and Imports
-
-
 
         [HttpPost]
         // POSt: /Client/ImportChepLoad
@@ -2340,7 +2354,7 @@ namespace ACT.UI.Controllers
 
                                 if ( !string.IsNullOrEmpty( rows[ 0 ] ) )
                                 {
-                                    model.LoadDate = ( !string.IsNullOrEmpty( rows[ 0 ] ) ? DateTimeHelper.formatImportDate( rows[ 0 ] ) : DateTime.Now );
+                                    /*model.LoadDate = ( !string.IsNullOrEmpty( rows[ 0 ] ) ? DateTimeHelper.formatImportDate( rows[ 0 ] ) : DateTime.Now );
                                     model.EffectiveDate = ( !string.IsNullOrEmpty( rows[ 0 ] ) ? DateTimeHelper.formatImportDate( rows[ 1 ] ) : DateTime.Now );
                                     model.NotifyDate = ( !string.IsNullOrEmpty( rows[ 0 ] ) ? DateTimeHelper.formatImportDate( rows[ 2 ] ) : DateTime.Now );
                                     model.DocketNumber = rows[ 3 ];
@@ -2357,7 +2371,7 @@ namespace ACT.UI.Controllers
                                     service.Create( model );
                                     importMessage += " Trading Partner: " + model.ClientDescription + " created at Id " + model.Id + "<br>";
                                     Notify( "The PSP Configuration details were successfully updated.", NotificationType.Success );
-                                    cntCreated++;
+                                    cntCreated++;*/
                                 }
                             }
                             catch ( Exception ex )
@@ -2391,7 +2405,6 @@ namespace ACT.UI.Controllers
             Session[ "ImportMessage" ] = importMessage;
             return RedirectToAction( "PoolingAgentData", "Pallet" );
         }
-
 
         [HttpPost]
         // GET: /Client/ImportClientLoad
@@ -2550,7 +2563,7 @@ namespace ACT.UI.Controllers
 
                                             Client noteClient = clientservice.GetById( clientID );
                                             Address clientAddress = addservice.GetByColumnsWhere( "ObjectId", model.ClientId, "ObjectType", "Client" );
-                                            string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ( (ProvinceEnum) clientAddress.Province ).GetDisplayText();
+                                            string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ( (Province) clientAddress.Province ).GetDisplayText();
                                             //string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ((Province)model.BillingProvince).GetDisplayText();
                                             //string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ((Province)model.DeliveryProvince).GetDisplayText();
 
@@ -2682,7 +2695,6 @@ namespace ACT.UI.Controllers
             return RedirectToAction( "ClientData", "Pallet" );
         }
 
-
         //
         // Returns a general list of all active clients allowed in the current context to be selected from
         [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
@@ -2777,7 +2789,6 @@ namespace ACT.UI.Controllers
             }
         }
 
-
         #endregion
 
 
@@ -2788,60 +2799,22 @@ namespace ACT.UI.Controllers
         // GET: /Pallet/PoolingAgentData
         public ActionResult PoolingAgentData( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-            if ( givecsm )
-            {
-                ViewBag.ViewName = "PoolingAgentData";
-
-                return PartialView( "_PoolingAgentDataCustomSearch", new CustomSearchModel( "PoolingAgentData" ) );
-            }
-
-            ViewBag.ViewName = "PoolingAgentData";
-            //check if there are any viewbag messages from imports
-            string msg = ( Session[ "ImportMessage" ] != null ? Session[ "ImportMessage" ].ToString() : null );
-            if ( !string.IsNullOrEmpty( msg ) )
-            {
-                ViewBag.Message = msg;
-                Notify( msg, NotificationType.Success );
-
-                //clear the message for next time
-                Session[ "ImportMessage" ] = null;
-            }
-
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
-            //TODO
-            using ( ClientService clientService = new ClientService() )
-            {
-                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-            }
-
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            } );
-            ViewBag.ClientList = clientDDL;
-
-
-            int total = 0;
-            List<ChepLoadCustomModel> model = new List<ChepLoadCustomModel>();
             using ( ChepLoadService service = new ChepLoadService() )
             {
-                if ( clientId > 0 )
+                if ( givecsm )
                 {
-                    csm.ClientId = clientId;
+                    ViewBag.ViewName = "PoolingAgentData";
+
+                    return PartialView( "_PoolingAgentDataCustomSearch", new CustomSearchModel( "PoolingAgentData" ) );
                 }
 
-                model = service.ListCSM( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total();
-            }
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+                List<ChepLoadCustomModel> model = service.List1( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total();
 
-            return PartialView( "_PoolingAgentData", paging );
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_PoolingAgentData", paging );
+            }
         }
 
         //

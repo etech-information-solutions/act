@@ -120,7 +120,7 @@ namespace ACT.UI.Controllers
                                                     address?.Addressline1,
                                                     address?.Addressline2,
                                                     address?.Town,
-                                                    ( address != null ? ( (ProvinceEnum) address.Province ).GetDisplayText() : string.Empty ),
+                                                    ( address != null ? ( (Province) address.Province ).GetDisplayText() : string.Empty ),
                                                     item.PostalCode,
                                                     item.ContactName,
                                                     item.ContactNo,
@@ -576,7 +576,7 @@ namespace ACT.UI.Controllers
                         PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
-                        Province = ( address != null ) ? (ProvinceEnum) address.Province : ProvinceEnum.All,
+                        Province = ( address != null ) ? (Province) address.Province : Province.All,
                         AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
                     },
 
@@ -1040,7 +1040,7 @@ namespace ACT.UI.Controllers
                         PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
-                        Province = ( address != null ) ? (ProvinceEnum) address.Province : ProvinceEnum.All,
+                        Province = ( address != null ) ? (Province) address.Province : Province.All,
                         AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
                     },
 
@@ -2149,7 +2149,7 @@ namespace ACT.UI.Controllers
                         PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
-                        Province = ( address != null ) ? (ProvinceEnum) address.Province : ProvinceEnum.All,
+                        Province = ( address != null ) ? (Province) address.Province : Province.All,
                         Longitude = address.Longitude,
                         Latitude = address.Latitude,
                     };
@@ -2682,9 +2682,9 @@ namespace ACT.UI.Controllers
 
                             #region Site Address
 
-                            if ( !Enum.TryParse( province?.Trim().Replace( " ", "" ), out ProvinceEnum prov ) )
+                            if ( !Enum.TryParse( province?.Trim().Replace( " ", "" ), out Province prov ) )
                             {
-                                prov = ProvinceEnum.All;
+                                prov = Province.All;
                             }
 
                             Address a = aservice.Get( s.Id, "Site" );
@@ -3053,7 +3053,7 @@ namespace ACT.UI.Controllers
                                 {
                                     if ( provinceId > 0 )
                                     {
-                                        provinceName = ( (ProvinceEnum) provinceId ).GetDisplayText();
+                                        provinceName = ( (Province) provinceId ).GetDisplayText();
                                     }
                                 }
                                 catch ( Exception ex )

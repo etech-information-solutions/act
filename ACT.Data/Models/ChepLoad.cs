@@ -14,48 +14,39 @@ namespace ACT.Data.Models
     
     public partial class ChepLoad
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public ChepLoad()
-        {
-            this.ChepClients = new HashSet<ChepClient>();
-            this.Disputes = new HashSet<Dispute>();
-            this.Tasks = new HashSet<Task>();
-        }
-    
         public int Id { get; set; }
-        public Nullable<int> SiteId { get; set; }
+        public int ClientId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModfiedOn { get; set; }
         public string ModifiedBy { get; set; }
-        public Nullable<System.DateTime> LoadDate { get; set; }
-        public Nullable<System.DateTime> NotifyDate { get; set; }
-        public Nullable<System.DateTime> EffectiveDate { get; set; }
-        public Nullable<int> PostingType { get; set; }
-        public string AccountNumber { get; set; }
-        public string ClientDescription { get; set; }
-        public string DeliveryNote { get; set; }
-        public string ReferenceNumber { get; set; }
-        public string ReceiverNumber { get; set; }
-        public string Equipment { get; set; }
-        public Nullable<decimal> OriginalQuantity { get; set; }
-        public Nullable<decimal> NewQuantity { get; set; }
+        public string ChepStatus { get; set; }
+        public string TransactionType { get; set; }
         public string DocketNumber { get; set; }
+        public string OriginalDocketNumber { get; set; }
+        public string UMI { get; set; }
+        public string LocationId { get; set; }
+        public string Location { get; set; }
+        public string OtherPartyId { get; set; }
+        public string OtherParty { get; set; }
+        public string OtherPartyCountry { get; set; }
+        public string EquipmentCode { get; set; }
+        public string Equipment { get; set; }
+        public Nullable<int> Quantity { get; set; }
+        public string Ref { get; set; }
+        public string OtherRef { get; set; }
+        public string BatchRef { get; set; }
+        public Nullable<System.DateTime> ShipmentDate { get; set; }
+        public Nullable<System.DateTime> DeliveryDate { get; set; }
+        public Nullable<System.DateTime> EffectiveDate { get; set; }
+        public Nullable<System.DateTime> CreateDate { get; set; }
+        public string CreatedBy { get; set; }
+        public string InvoiceNumber { get; set; }
+        public string Reason { get; set; }
+        public string DataSource { get; set; }
+        public Nullable<int> BalanceStatus { get; set; }
         public int Status { get; set; }
-        public Nullable<int> InputInd { get; set; }
-        public string OrderNo { get; set; }
-        public string THAN { get; set; }
-        public string ShipmentNo { get; set; }
-        public string IssueNote { get; set; }
-        public string ChepCreatedBy { get; set; }
-        public Nullable<System.DateTime> ChepCreateOn { get; set; }
-        public string ReturnNote { get; set; }
+        public int PostingType { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ChepClient> ChepClients { get; set; }
-        public virtual Site Site { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Dispute> Disputes { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Task> Tasks { get; set; }
+        public virtual Client Client { get; set; }
     }
 }

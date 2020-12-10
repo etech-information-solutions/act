@@ -25,7 +25,7 @@ namespace ACT.Data.Models
     
         public int Id { get; set; }
         public int ClientId { get; set; }
-        public Nullable<int> VehicleId { get; set; }
+        public int VehicleId { get; set; }
         public Nullable<int> ClientSiteId { get; set; }
         public Nullable<int> OutstandingReasonId { get; set; }
         public System.DateTime CreatedOn { get; set; }
@@ -53,6 +53,14 @@ namespace ACT.Data.Models
         public string THAN { get; set; }
         public Nullable<decimal> ReturnQty { get; set; }
         public Nullable<decimal> OutstandingQty { get; set; }
+        public Nullable<decimal> DebriefQty { get; set; }
+        public Nullable<decimal> AdminMovement { get; set; }
+        public Nullable<int> TransporterLiable { get; set; }
+        public string ChepInvoiceNo { get; set; }
+        public string ChepCompensationNo { get; set; }
+        public Nullable<int> InvoiceStatus { get; set; }
+        public Nullable<int> PODStatus { get; set; }
+        public Nullable<int> OrderStatus { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }

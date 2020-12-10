@@ -32,6 +32,11 @@
 
 <p>
     @Html.ActionLink( "Add", "AddPoolingAgentData", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add Manual Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" } )
+
+    <span style="padding: 0 5px;">|</span>
+
+    @Html.ActionLink( "Import", "ImportPoolingAgentData", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" } )
+
     <span class="loader"></span>
 </p>
 
@@ -39,40 +44,34 @@
     <thead>
         <tr>
             <th>
-                Status
+                #
             </th>
             <th>
-                Pooling Agent
+                Imported/Created
             </th>
             <th>
-                Load Data
+                Created
             </th>
             <th>
-                Eff Date
+                Client
             </th>
             <th>
-                Del Note
+                Posting Type
             </th>
             <th>
-                Cust #
+                Docket #
             </th>
             <th>
-                Product
+                Ref #
             </th>
             <th>
-                Shipment No
+                Equipment
             </th>
             <th>
-                Issue note
+                Invoice #
             </th>
             <th>
-                PCN
-            </th>
-            <th>
-                THAN
-            </th>
-            <th>
-                Qty
+                Balance Status
             </th>
             <th data-name="Actions">
                 Actions
@@ -85,55 +84,60 @@
         {
             foreach ( var item in items )
             {
-                ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
+                Status status = ( Status ) item.Status;
+                PostingType postingType = ( PostingType ) item.PostingType;
 
-                string active = status.Equals( Status.Active ) ? "active" : "inactive";
-                string enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+                string active = status == Status.Active ? "active" : "inactive";
+                string enable = status == Status.Active ? "Disable" : "Enable";
 
-
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
                     <td width="1%">
-                        @status
+                        @item.CreatedOn.ToString( "yyyy-MM-dd @ HH:mm tt" )
                     </td>
-                    <td >
-                        Chep
+                    <td>
+                        On @item.CreateDate by @item.CreatedBy
                     </td>
-                    <td >
-                        @item.LoadDate
+                    <td>
+                        @item.ClientName
                     </td>
-                    <td >
-                        @item.EffectiveDate
+                    <td>
+                        @postingType.GetDisplayText()
                     </td>
-                    <td >
-                        @item.DeliveryNote
-                    </td>
-                    <td >
-                        @item.AccountNumber
-                    </td>
-                    <td >
-                        @item.Equipment
-                    </td>
-                    <td >
+                    <td>
                         @item.DocketNumber
                     </td>
                     <td>
-
+                        @item.Ref
                     </td>
                     <td>
-
+                        @item.Equipment
                     </td>
                     <td>
-
+                        @item.InvoiceNumber
                     </td>
-
                     <td>
-                        @item.OriginalQuantity
+                        @item.BalanceStatus
                     </td>
-                    <td width="15%">
-                        @Html.ActionLink( "Edit", "EditPoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                    <td width="10%">
 
-                        @Html.ActionLink( enable, "DeletePoolingAgentData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?" } )
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                            @Html.ActionLink( "Details", "PoolingAgentDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                            @Html.ActionLink( "Edit", "EditPoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item", @style = "margin-right: 0;" } )
+
+                        </div>
+
+                        @if ( postingType == PostingType.Manual )
+                        {
+                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                                @Html.ActionLink( enable, "DeletePoolingAgentData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?", @style = "margin-left: 0;" } )
+
+                            </div>
+                        }
+
                     </td>
 
                 </tr>

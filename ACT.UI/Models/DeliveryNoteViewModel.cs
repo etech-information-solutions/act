@@ -45,7 +45,7 @@ namespace ACT.UI.Models
         public string CustomerPostalCode { get; set; }
 
         [Display( Name = "Province" )]
-        public ProvinceEnum CustomerProvince { get; set; }
+        public Province CustomerProvince { get; set; }
 
         [Display( Name = "Contact Number" )]
         public string ContactNumber { get; set; }
@@ -66,7 +66,7 @@ namespace ACT.UI.Models
         public string DeliveryPostalCode { get; set; }
 
         [Display( Name = "Province" )]
-        public ProvinceEnum DeliveryProvince { get; set; }
+        public Province DeliveryProvince { get; set; }
 
 
         [Display( Name = "Billing Address" )]
@@ -84,7 +84,7 @@ namespace ACT.UI.Models
         public string BillingPostalCode { get; set; }
 
         [Display( Name = "Province" )]
-        public ProvinceEnum BillingProvince { get; set; }
+        public Province BillingProvince { get; set; }
 
 
         [Display( Name = "Invoice Number" )]

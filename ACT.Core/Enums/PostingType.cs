@@ -5,21 +5,18 @@ namespace ACT.Core.Enums
 
     [StringEnum]
     public enum PostingType
-                                        
     {
         [UiIgnoreEnumValue]
         [StringEnumDisplayText( "Other" )]
         Other = 0,
-         
-        [StringEnumDisplayText("Email")]
+
+        [StringEnumDisplayText( "Email" )]
         Email = 1,
 
-        [StringEnumDisplayText("Import")]
+        [StringEnumDisplayText( "Import" )]
         Import = 2,
 
-        [StringEnumDisplayText("Manual")]
+        [StringEnumDisplayText( "Manual" )]
         Manual = 3,
-        //[StringEnumDisplayText("Transfer Customer to Customer - Out" )]
-        //TransferCustomerCustomerOur = 1,
     }
 }

@@ -210,7 +210,7 @@ namespace ACT.UI.Controllers
 
                                 Role role = new Role() { Name = "~/~", Type = -1 };
 
-                                
+
                                 //if ( item.UserRoles.Any() )
                                 //{
                                 //    role = item.UserRoles.FirstOrDefault().Role;
@@ -1545,7 +1545,7 @@ namespace ACT.UI.Controllers
                         PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
-                        Province = ( address != null ) ? ( ProvinceEnum ) address.Province : ProvinceEnum.All,
+                        Province = ( address != null ) ? ( Province ) address.Province : Province.All,
                         AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
                     },
                     User = new UserViewModel()
@@ -2801,7 +2801,7 @@ namespace ACT.UI.Controllers
                 Description = region.Description,
                 Status = ( Status ) region.Status,
                 RegionManagerId = region.RegionManagerId,
-                ProvinceId=region.ProvinceId
+                //ProvinceId = region.ProvinceId
             };
 
             return View( model );
@@ -3087,33 +3087,33 @@ namespace ACT.UI.Controllers
                     ProductPrices = new List<ProductPriceViewModel>(),
                 };
 
-                foreach (int item in Enum.GetValues(typeof(ProductPriceType)))
+                foreach ( int item in Enum.GetValues( typeof( ProductPriceType ) ) )
                 {
-                    ProductPriceType type = (ProductPriceType)item;
+                    ProductPriceType type = ( ProductPriceType ) item;
 
-                    ProductPrice existingPrice = product.ProductPrices.FirstOrDefault(p => p.Type == item);
+                    ProductPrice existingPrice = product.ProductPrices.FirstOrDefault( p => p.Type == item );
 
-                    
-                    if (existingPrice != null)
+
+                    if ( existingPrice != null )
                     {
-                        model.ProductPrices.Add(new ProductPriceViewModel()
+                        model.ProductPrices.Add( new ProductPriceViewModel()
                         {
                             Id = existingPrice.Id,
                             Rate = existingPrice.Rate,
                             RateUnit = existingPrice.RateUnit,
                             StartDate = existingPrice.FromDate,
                             ProductId = existingPrice.ProductId,
-                            Status = (Status)existingPrice.Status,
-                            Type = (ProductPriceType)existingPrice.Type
-                        });
+                            Status = ( Status ) existingPrice.Status,
+                            Type = ( ProductPriceType ) existingPrice.Type
+                        } );
                     }
                     else
                     {
-                        model.ProductPrices.Add(new ProductPriceViewModel()
+                        model.ProductPrices.Add( new ProductPriceViewModel()
                         {
                             Type = type,
                             Status = Status.Inactive
-                        });
+                        } );
                     }
                 }
 

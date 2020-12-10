@@ -10,10 +10,12 @@
 <div class="ap-tabs">
 
     <ul>
-
-        <li data-hot-spot="1" data-c="Pallet" data-t="PoolingAgentData">
-            <a data-ap-tab="1" data-target="#poolingagentdata" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PoolingAgentData">Pooling Agent Data</a>
-        </li>
+        @if ( user.IsAdmin || user.IsPSPAdmin )
+        {
+            <li data-hot-spot="1" data-c="Pallet" data-t="PoolingAgentData">
+                <a data-ap-tab="1" data-target="#poolingagentdata" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PoolingAgentData">Pooling Agent Data</a>
+            </li>
+        }
         <li data-hot-spot="1" data-c="Pallet" data-t="ClientData">
             <a data-ap-tab="1" data-target="#clientdata" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientData">Client Data</a>
         </li>
@@ -43,7 +45,10 @@
 
     <div id="tab-data" class="tab-data">
 
-        <div id="poolingagentdata" class="da-tab none" data-load-url="PoolingAgentData"> </div>
+        @if ( user.IsAdmin || user.IsPSPAdmin )
+        {
+            <div id="poolingagentdata" class="da-tab none" data-load-url="PoolingAgentData"> </div>
+        }
 
         <div id="clientdata" class="da-tab none" data-load-url="ClientData"> </div>
 

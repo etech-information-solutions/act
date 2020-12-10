@@ -33,7 +33,6 @@ namespace ACT.Data.Models
         public Nullable<int> Action { get; set; }
         public int Status { get; set; }
     
-        public virtual ChepLoad ChepLoad { get; set; }
         public virtual Client Client { get; set; }
         public virtual ClientLoad ClientLoad { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

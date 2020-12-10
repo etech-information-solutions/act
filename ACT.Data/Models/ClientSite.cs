@@ -46,11 +46,11 @@ namespace ACT.Data.Models
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
+        public virtual ClientCustomer ClientCustomer { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads { get; set; }
         public virtual Site Site { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<DeliveryNote> DeliveryNotes { get; set; }
-        public virtual ClientCustomer ClientCustomer { get; set; }
     }
 }

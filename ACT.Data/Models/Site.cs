@@ -18,7 +18,6 @@ namespace ACT.Data.Models
         public Site()
         {
             this.ChepAudits = new HashSet<ChepAudit>();
-            this.ChepLoads = new HashSet<ChepLoad>();
             this.ClientSites = new HashSet<ClientSite>();
             this.SiteAudits = new HashSet<SiteAudit>();
             this.SiteBillings = new HashSet<SiteBilling>();
@@ -55,12 +54,9 @@ namespace ACT.Data.Models
         public string FinanceEmail { get; set; }
         public string ReceivingEmail { get; set; }
         public string DepotManagerEmail { get; set; }
-        public string Town { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepAudit> ChepAudits { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ChepLoad> ChepLoads { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientSite> ClientSites { get; set; }
         public virtual Region Region { get; set; }

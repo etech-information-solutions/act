@@ -4,7 +4,7 @@ namespace ACT.Core.Enums
     using Attributes;
 
     [StringEnum]
-    public enum ProvinceEnum
+    public enum Province
     {
         [UiIgnoreEnumValue]
         [StringEnumDisplayText( "All" )]
