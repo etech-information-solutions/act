@@ -5,20 +5,20 @@ ACT.Init = {
 
     NotificationTimeout: [],
 
-    Start: function (restartPlugin)
+    Start: function ( restartPlugin )
     {
-        $(".tipsy").remove();
+        $( ".tipsy" ).remove();
         ACT.Loader.Hide();
 
-        $(".notification").stop().slideDown(700, function ()
+        $( ".notification" ).stop().slideDown( 700, function ()
         {
-            $('html, body').animate({ scrollTop: $(this).prTop() - 20 }, 'slow', function () { });
-        });
+            $( 'html, body' ).animate( { scrollTop: $( this ).prTop() - 20 }, 'slow', function () { } );
+        } );
 
-        clearTimeout(this.NotificationTimeout);
-        this.NotificationTimeout = setTimeout(function ()
+        clearTimeout( this.NotificationTimeout );
+        this.NotificationTimeout = setTimeout( function ()
         {
-            $(".notification").stop().animate({
+            $( ".notification" ).stop().animate( {
                 "width": "0",
                 "height": "0",
                 "opacity": "0",
@@ -26,12 +26,12 @@ ACT.Init = {
                 "filter": "alpha(opacity=0)"
             }, 1200, function ()
             {
-                $(this).remove();
-            });
+                $( this ).remove();
+            } );
 
-        }, "120000");
+        }, "120000" );
 
-        if (!this.PluginLoaded || restartPlugin)
+        if ( !this.PluginLoaded || restartPlugin )
         {
             this.PluginInit();
         }
@@ -41,20 +41,20 @@ ACT.Init = {
         ACT.UI.Start();
         ACT.Validation.Start();
 
-        if ($("#edit-item").length)
+        if ( $( "#edit-item" ).length )
         {
-            this.AppendPaging($("#edit-item"));
+            this.AppendPaging( $( "#edit-item" ) );
         }
     },
 
-    AppendPaging: function (sender, t)
+    AppendPaging: function ( sender, t )
     {
-        if (!t)
+        if ( !t )
         {
-            t = $(".da-tab:visible").attr("id");
+            t = $( ".da-tab:visible" ).attr( "id" );
         }
 
-        if (!ACT.UI[t])
+        if ( !ACT.UI[t] )
         {
             ACT.UI[t] = [];
         }
@@ -69,73 +69,73 @@ ACT.Init = {
         //    }
         //}
 
-        if (!$('input[name="skip"]').length)
+        if ( !$( 'input[name="skip"]' ).length )
         {
-            sender.append('<input type="hidden" name="skip" value="' + (ACT.UI[t].PageSkip || ACT.UI.PageSkip) + '" />');
+            sender.append( '<input type="hidden" name="skip" value="' + ( ACT.UI[t].PageSkip || ACT.UI.PageSkip ) + '" />' );
         }
         else
         {
-            $('input[name="skip"]').val((ACT.UI[t].PageSkip || ACT.UI.PageSkip));
+            $( 'input[name="skip"]' ).val( ( ACT.UI[t].PageSkip || ACT.UI.PageSkip ) );
         }
 
-        if (!$('input[name="page"]').length)
+        if ( !$( 'input[name="page"]' ).length )
         {
-            sender.append('<input type="hidden" name="page" value="' + (ACT.UI[t].PageNumber || ACT.UI.PageNumber) + '" />');
+            sender.append( '<input type="hidden" name="page" value="' + ( ACT.UI[t].PageNumber || ACT.UI.PageNumber ) + '" />' );
         }
         else
         {
-            $('input[name="page"]').val((ACT.UI[t].PageNumber || ACT.UI.PageNumber));
+            $( 'input[name="page"]' ).val( ( ACT.UI[t].PageNumber || ACT.UI.PageNumber ) );
         }
 
-        if (!$('input[name="take"]').length)
+        if ( !$( 'input[name="take"]' ).length )
         {
-            sender.append('<input type="hidden" name="take" value="' + (ACT.UI[t].PageLength || ACT.UI.PageLength) + '" />');
+            sender.append( '<input type="hidden" name="take" value="' + ( ACT.UI[t].PageLength || ACT.UI.PageLength ) + '" />' );
         }
         else
         {
-            $('input[name="take"]').val((ACT.UI[t].PageLength || ACT.UI.PageLength));
+            $( 'input[name="take"]' ).val( ( ACT.UI[t].PageLength || ACT.UI.PageLength ) );
         }
 
-        if (!$('input[name="query"]').length)
+        if ( !$( 'input[name="query"]' ).length )
         {
-            sender.append('<input type="hidden" name="query" value="' + (ACT.UI[t].PageSearch || ACT.UI.PageSearch) + '" />');
+            sender.append( '<input type="hidden" name="query" value="' + ( ACT.UI[t].PageSearch || ACT.UI.PageSearch ) + '" />' );
         }
         else
         {
-            $('input[name="query"]').val((ACT.UI[t].PageSearch || ACT.UI.PageSearch));
+            $( 'input[name="query"]' ).val( ( ACT.UI[t].PageSearch || ACT.UI.PageSearch ) );
         }
     },
 
-    PluginInit: function (target)
+    PluginInit: function ( target )
     {
-        target = target || $("body");
+        target = target || $( "body" );
 
         // Tool tips
-        target.find('a[rel="tipsy"], a[rel="tipsyS"]').tipsy({ fade: true, gravity: 's' });
+        target.find( 'a[rel="tipsy"], a[rel="tipsyS"]' ).tipsy( { fade: true, gravity: 's' } );
 
-        target.find('a[rel="tipsyN"]').tipsy({ fade: true, gravity: 'n' });
+        target.find( 'a[rel="tipsyN"]' ).tipsy( { fade: true, gravity: 'n' } );
 
-        target.find('a[rel="tipsyW"]').tipsy({ fade: true, gravity: 'w' });
+        target.find( 'a[rel="tipsyW"]' ).tipsy( { fade: true, gravity: 'w' } );
 
-        target.find('a[rel="tipsyE"]').tipsy({ fade: true, gravity: 'e' });
+        target.find( 'a[rel="tipsyE"]' ).tipsy( { fade: true, gravity: 'e' } );
 
 
         // Date picker
-        target.find('.timepicker, .time-picker').timepicker({ timeFormat: 'HH:mm:ss' });
+        target.find( '.timepicker, .time-picker' ).timepicker( { timeFormat: 'HH:mm:ss' } );
         //target.find('.datepicker, .date-picker').datepicker({ inline: true, dateFormat: "dd-mm-yy" });
-        target.find('.datetimepicker, .date-time-picker').datetimepicker({ ampm: true, dateFormat: "yy/mm/dd" });
+        target.find( '.datetimepicker, .date-time-picker' ).datetimepicker( { ampm: true, dateFormat: "yy/mm/dd" } );
 
-        target.find('.datepicker, .date-picker').each(function (i)
+        target.find( '.datepicker, .date-picker' ).each( function ( i )
         {
-            var d = $(this);
+            var d = $( this );
 
-            if (d.hasClass("hasDatepicker")) return;
+            if ( d.hasClass( "hasDatepicker" ) ) return;
 
-            d.attr("id", d.attr("id") + "_" + i);
+            d.attr( "id", d.attr( "id" ) + "_" + i );
 
-            var year = (new Date()).getFullYear();
+            var year = ( new Date() ).getFullYear();
 
-            d.datepicker({
+            d.datepicker( {
                 inline: true,
                 changeMonth: true,
                 changeYear: true,
@@ -145,32 +145,32 @@ ACT.Init = {
                 {
                     ACT.Sticky.Close = false;
 
-                    setTimeout("ACT.Sticky.Close = true;", "100");
+                    setTimeout( "ACT.Sticky.Close = true;", "100" );
                 }
-            });
+            } );
 
-            $(document).on('click', '#ui-datepicker-div', function ()
+            $( document ).on( 'click', '#ui-datepicker-div', function ()
             {
                 ACT.Sticky.Close = false;
 
-                setTimeout("ACT.Sticky.Close = true;", "100");
-            });
-        });
+                setTimeout( "ACT.Sticky.Close = true;", "100" );
+            } );
+        } );
 
-        $.validator.methods.date = function (value, element)
+        $.validator.methods.date = function ( value, element )
         {
-            return this.optional(element) || $.datepicker.parseDate('yy/mm/dd', value);
+            return this.optional( element ) || $.datepicker.parseDate( 'yy/mm/dd', value );
         };
 
-        target.find("table.datatable-numberpaging").each(function ()
+        target.find( "table.datatable-numberpaging" ).each( function ()
         {
-            var i = $(this);
+            var i = $( this );
 
-            if (i.hasClass("dataTable")) return true;
+            if ( i.hasClass( "dataTable" ) ) return true;
 
-            if (i.find("tbody tr td").length > 1)
+            if ( i.find( "tbody tr td" ).length > 1 )
             {
-                i.dataTable({
+                i.dataTable( {
                     bSort: false,
                     bPaginate: false,
                     iDisplayLength: 50,
@@ -189,17 +189,17 @@ ACT.Init = {
                     {
                         ACT.UI.Start();
                     }
-                });
+                } );
             }
-        });
+        } );
 
-        target.find("table.da-table").each(function ()
+        target.find( "table.da-table" ).each( function ()
         {
-            var i = $(this);
+            var i = $( this );
 
-            if (i.hasClass("dataTable")) return true;
+            if ( i.hasClass( "dataTable" ) || i.hasClass( "small" ) ) return true;
 
-            i.dataTable({
+            i.dataTable( {
                 bSort: false,
                 bPaginate: false,
                 iDisplayLength: 50,
@@ -218,15 +218,15 @@ ACT.Init = {
                 {
                     ACT.UI.Start();
                 }
-            });
-        });
+            } );
+        } );
 
-        if ($.fn.select2)
+        if ( $.fn.select2 )
         {
-            target.find("select.chzn").select2();
+            target.find( "select.chzn" ).select2();
         }
 
-        $('a[rel="fancybox"]').fancybox({
+        $( 'a[rel="fancybox"]' ).fancybox( {
             'type': "image",
             'opacity': true,
             'overlayShow': true,
@@ -235,7 +235,16 @@ ACT.Init = {
             'transitionOut': 'fade',
             'overlayOpacity': '0.8',
             'titlePosition': 'inside'
-        });
+        } );
+
+        $( ".draggable" ).draggable();
+        $( ".droppable" ).droppable( {
+            hoverClass: "drop-hover",
+            drop: function ( event, ui )
+            {
+                alert( "dropped!" );
+            }
+        } );
     }
 };
 
@@ -245,7 +254,7 @@ ACT.Init = {
 
 
 
-$(function ()
+$( function ()
 {
-    ACT.Init.Start(true);
-});
+    ACT.Init.Start( true );
+} );

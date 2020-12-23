@@ -250,5 +250,10 @@ namespace ACT.Core.Services
         {
             return context.Transporters.Any( t => t.RegistrationNumber.Trim() == registrationNumber.Trim() );
         }
+
+        public Transporter GetByName( string name )
+        {
+            return context.Transporters.FirstOrDefault( t => t.Name.ToLower().Trim() == name.ToLower().Trim() );
+        }
     }
 }

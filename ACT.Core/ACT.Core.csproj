@@ -207,6 +207,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ClientCustomerService.cs" />
     <Compile Include="Services\DeclineReasonService.cs" />
+    <Compile Include="Services\OutstandingReasonService .cs" />
     <Compile Include="Services\UserTaskService.cs" />
     <Compile Include="Services\TaskService.cs" />
     <Compile Include="Services\UserNotificationService.cs" />

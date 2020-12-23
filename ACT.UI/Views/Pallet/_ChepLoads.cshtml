@@ -1,0 +1,80 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Models.Custom;
+
+@{
+    Int32 count = Model.Start;
+    List<ChepLoadCustomModel> items = ( List<ChepLoadCustomModel> ) Model.Items;
+}
+
+<table id="pool-table" class="da-table small fixed-headerx" data-fixed-header-target="#pooling-agent-loads" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="Agent">
+                Agent
+            </th>
+            <th data-name="ShipmentDate">
+                Load Date
+            </th>
+            <th data-name="Equipment">
+                Product
+            </th>
+            <th data-name="DocketNumber">
+                Docket #
+            </th>
+            <th data-name="Quantity">
+                Qty
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items.NullableAny() )
+        {
+            foreach ( var item in items )
+            {
+                <tr id="tr-@item.Id-row" class="recon-draggable" data-cid="@item.Id" data-qty="@item.Quantity" data-product="@item.Equipment" data-docket="@item.DocketNumber" data-parent="#chep-loads">
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        Chep
+                    </td>
+                    <td>
+                        @(item.ShipmentDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @item.Equipment
+                    </td>
+                    <td>
+                        @item.DocketNumber
+                    </td>
+                    <td>
+                        @item.Quantity
+                    </td>
+                    <td width="15%">
+                    </td>
+                </tr>
+
+                count++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6">
+                    There are no records to display
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_TinyPaging" )

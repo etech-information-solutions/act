@@ -81,6 +81,8 @@
             this.DataFormSubit( $( '*[data-form-submit="1"]' ) );
             this.DataCancelItem( $( '*[data-cancel-item="1"]' ) );
             this.DataApproveDeclinePSP( $( '*[data-approve-decline-psp="1"]' ) );
+            this.DataReconcileLoadsSearch( $( '*[data-reconcile-loads-search="1"]' ) );
+            this.DataReconcileLoadsDragDrop( $( '.recon-draggable' ), $( '.recon-droppable' ) );
 
 
             // Table Quick Links Operations
@@ -111,7 +113,7 @@
             this.DataPalletUse( $( '*[data-pallet-use="1"]' ) );
             this.DataServiceType( $( '*[data-service-type="1"]' ) );
             this.DataBudgetTotal( $( '*[data-budget-total="1"]' ) );
-            this.DataBudgetSum($('*[data-budget-sum="1"]'));
+            this.DataBudgetSum( $( '*[data-budget-sum="1"]' ) );
 
             // Dashboard / Graphs
             this.DataGSSite( $( '*[data-gs-site="1"]' ) );
@@ -220,7 +222,8 @@
                         } );
                     } );
 
-                if ( clicked === "0" ) {
+                if ( clicked === "0" )
+                {
                     i.click();
                 }
             } );
@@ -1367,21 +1370,22 @@
                     {
                         let parent = target.parent();
 
-                        clone = parent.find(".add-more-row:first").clone();
+                        clone = parent.find( ".add-more-row:first" ).clone();
 
                         let newId
-                        let newElementId = parent.find(".add-more-row:last").attr('id').replace(/\d+/g, (m, k) => {
-                            newId = parseInt(m) + 1
+                        let newElementId = parent.find( ".add-more-row:last" ).attr( 'id' ).replace( /\d+/g, ( m, k ) =>
+                        {
+                            newId = parseInt( m ) + 1
                             return newId
-                        })
-                        clone.attr('id', newElementId )
+                        } )
+                        clone.attr( 'id', newElementId )
 
                         var inputs = clone.find( '.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea' );
 
                         inputs.each( function ()
                         {
                             $( this ).val( "" );
-                            $(this).attr("value", "")
+                            $( this ).attr( "value", "" )
                             if ( $( this ).is( "select" ) )
                             {
                                 $( this ).find( "option" ).removeAttr( "selected" );
@@ -1396,21 +1400,21 @@
 
                         total = parent.find( ".add-more-row" ).length;
 
-                        html = clone.html().replace( /\[0]/g, "[" + total + "]" ).replace( /\-0/g, "-" + total  );
+                        html = clone.html().replace( /\[0]/g, "[" + total + "]" ).replace( /\-0/g, "-" + total );
                         clone.html( html );
 
-                        let del = clone.find('.del')
-                        del.attr('data-target', '#' + newElementId)
-                        del.attr('href', 'javascript:;')
-                        del.removeClass ('none')
-                        
+                        let del = clone.find( '.del' )
+                        del.attr( 'data-target', '#' + newElementId )
+                        del.attr( 'href', 'javascript:;' )
+                        del.removeClass( 'none' )
+
                         clone.find( '.slick-counter' ).html( '' );
                         clone.find( '.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea' ).val( "" );
-                        clone.attr("unsaved", "1")
+                        clone.attr( "unsaved", "1" )
                         ACT.UI.RecreatePlugins( clone );
 
                         clone.insertAfter( parent.find( ".add-more-row:last" ) );
-                        clone.find('.input:first').focus()
+                        clone.find( '.input:first' ).focus()
                         clone.find( 'a[data-add-one-more="1"]' ).fadeOut( 600, function ()
                         {
                             $( this ).remove();
@@ -1630,6 +1634,13 @@
 
         GetCustomSearchParams: function ( t )
         {
+            if ( t === "" ) return {};
+
+            if ( !ACT.UI[t] )
+            {
+                ACT.UI[t] = [];
+            }
+
             // Params
             var params = {
                 Skip: ACT.UI[t].PageSkip || ACT.UI.PageSkip || 0,
@@ -1640,6 +1651,7 @@
                 UserId: ACT.UI[t].PageUserId || ACT.UI.PageUserId || 0,
                 Status: ACT.UI[t].PageStatus || ACT.UI.PageStatus || -1,
                 PSPClientStatus: ACT.UI[t].PagePSPClientStatus || ACT.UI.PagePSPClientStatus || -1,
+                ReconciliationStatus: ACT.UI[t].PageReconciliationStatus || ACT.UI.PageReconciliationStatus || -1,
                 SiteId: ACT.UI[t].PageSiteId || ACT.UI.PageSiteId || 0,
                 ClientId: ACT.UI[t].PageClientId || ACT.UI.PageClientId || 0,
                 RegionId: ACT.UI[t].PageRegionId || ACT.UI.PageRegionId || 0,
@@ -1647,6 +1659,8 @@
                 TransporterId: ACT.UI[t].PageTransporterId || ACT.UI.PageTransporterId || 0,
                 PSPProductId: ACT.UI[t].PageProductId || ACT.UI.PagePSPProductId || 0,
                 CampaignId: ACT.UI[t].PageCampaignId || ACT.UI.PageCampaignId || 0,
+                VehicleId: ACT.UI[t].PageVehicleId || ACT.UI.PageVehicleId || 0,
+                OutstandingReasonId: ACT.UI[t].PageOutstandingReasonId || ACT.UI.PageOutstandingReasonId || 0,
                 SelectedItems: ACT.UI[t].SelectedItems || ACT.UI.SelectedItems || [],
                 FromDate: ACT.UI[t].PageFromDate || ACT.UI.PageFromDate || "",
                 ToDate: ACT.UI[t].PageToDate || ACT.UI.PageToDate || "",
@@ -1692,7 +1706,10 @@
             ACT.UI[t].PagePSPProductId = ACT.UI.PagePSPProductId = 0;
             ACT.UI[t].PageCampaignId = ACT.UI.PageCampaignId = 0;
             ACT.UI[t].PageTransporterId = ACT.UI.PageTransporterId = 0;
+            ACT.UI[t].PageVehicleId = ACT.UI.PageVehicleId = 0;
+            ACT.UI[t].PageOutstandingReasonId = ACT.UI.PageOutstandingReasonId = 0;
             ACT.UI[t].PagePSPClientStatus = ACT.UI.PagePSPClientStatus = -1;
+            ACT.UI[t].PageReconciliationStatus = ACT.UI.PageReconciliationStatus = -1;
             ACT.UI[t].SelectedItems = ACT.UI.SelectedItems = [];
             ACT.UI[t].PageFromDate = ACT.UI.PageFromDate = "";
             ACT.UI[t].PageToDate = ACT.UI.PageToDate = "";
@@ -1980,37 +1997,41 @@
 
         DeleteFix: function ( sender, target, refresh )
         {
-            var url = sender.attr("href");
+            var url = sender.attr( "href" );
             let parent = target.parent();
-            if (target.attr("unsaved") == "1") {
+            if ( target.attr( "unsaved" ) == "1" )
+            {
 
                 // clone add more button
-                let clone = parent.find('a[data-add-one-more="1"]').clone()
+                let clone = parent.find( 'a[data-add-one-more="1"]' ).clone()
 
                 //remove line
                 target.remove()
 
-                siblings = parent.find(".add-more-row");
+                siblings = parent.find( ".add-more-row" );
 
 
                 //Update all input names for forms to work
-                siblings.each((i, _sibling) => {
-                    sibling = $(_sibling)
-                    sibling.find('.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea').each((i, input) => {
-                        $(input).attr("value", input.value)
-                    })
-                    html = sibling.html().replace(/\[\d+]/g, "[" + i + "]")
-                    sibling.html(html)
-                })
+                siblings.each( ( i, _sibling ) =>
+                {
+                    sibling = $( _sibling )
+                    sibling.find( '.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea' ).each( ( i, input ) =>
+                    {
+                        $( input ).attr( "value", input.value )
+                    } )
+                    html = sibling.html().replace( /\[\d+]/g, "[" + i + "]" )
+                    sibling.html( html )
+                } )
 
                 // insert cloned button on last line
-                row = parent.find(".add-more-row:last")
-                let f = row.find("td:first").children(":first");
-                clone.insertBefore(f).fadeIn(600);
-                ACT.Init.Start(true);
+                row = parent.find( ".add-more-row:last" )
+                let f = row.find( "td:first" ).children( ":first" );
+                clone.insertBefore( f ).fadeIn( 600 );
+                ACT.Init.Start( true );
                 return false
             }
-            else {
+            else
+            {
                 //save unsaved dom elements to memory
             }
 
@@ -2048,7 +2069,8 @@
                     .unbind( "click" )
                     .bind( "click", function ()
                     {
-                        if (target.length > 0){
+                        if ( target.length > 0 )
+                        {
 
                             target.animate(
                                 {
@@ -2056,9 +2078,10 @@
                                     "height": "0",
                                     "opacity": "0",
                                     "filter": "alpha(opacity=0)"
-                                }, 700, function () {
+                                }, 700, function ()
+                            {
                                 remove.remove();
-                            });
+                            } );
                         } else remove.remove();
 
                         return false;
@@ -2878,12 +2901,33 @@
 
                     sender.find( 'select#CampaignId' ).val( ACT.UI[t].PageCampaignId );
                 }
+                if ( ACT.UI[t].PageVehicleId && ACT.UI[t].PageVehicleId !== 0 )
+                {
+                    h += "Vehicle: <b>" + sender.find( 'select#VehicleId:first option[value="' + ACT.UI[t].PageVehicleId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Vehicle: <a style='color: #69f95a;'>" + sender.find( 'select#VehicleId:first option[value="' + ACT.UI[t].PageVehicleId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#VehicleId' ).val( ACT.UI[t].PageVehicleId );
+                }
+                if ( ACT.UI[t].PageOutstandingReasonId && ACT.UI[t].PageOutstandingReasonId !== 0 )
+                {
+                    h += "Outstanding Reason: <b>" + sender.find( 'select#OutstandingReasonId:first option[value="' + ACT.UI[t].PageOutstandingReasonId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Outstanding Reason: <a style='color: #69f95a;'>" + sender.find( 'select#OutstandingReasonId:first option[value="' + ACT.UI[t].PageOutstandingReasonId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#OutstandingReasonId' ).val( ACT.UI[t].PageOutstandingReasonId );
+                }
                 if ( ACT.UI[t].PageStatus && ACT.UI[t].PageStatus !== -1 )
                 {
                     h += "Status: <b>" + sender.find( 'select#Status:first option[value="' + ACT.UI[t].PageStatus + '"]' ).text() + "</b>~";
                     q += " <b class='italic'>[ Status: <a style='color: #69f95a;'>" + sender.find( 'select#Status:first option[value="' + ACT.UI[t].PageStatus + '"]' ).text() + "</a> ]</b> ";
 
                     sender.find( 'select#Status' ).val( ACT.UI[t].PageStatus );
+                }
+                if ( ACT.UI[t].PageReconciliationStatus && ACT.UI[t].PageReconciliationStatus !== -1 )
+                {
+                    h += "Reconciliation Status: <b>" + sender.find( 'select#ReconciliationStatus:first option[value="' + ACT.UI[t].PageReconciliationStatus + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Reconciliation Status: <a style='color: #69f95a;'>" + sender.find( 'select#ReconciliationStatus:first option[value="' + ACT.UI[t].PageReconciliationStatus + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#ReconciliationStatus' ).val( ACT.UI[t].PageReconciliationStatus );
                 }
                 if ( ACT.UI[t].PagePSPClientStatus && ACT.UI[t].PagePSPClientStatus !== -1 )
                 {
@@ -3883,7 +3927,7 @@
             {
                 var i = $( this );
 
-                             // <td>    // <tr>
+                // <td>    // <tr>
                 var target = i.parent().parent().find( i.attr( "data-target" ) );
 
                 i
@@ -3900,36 +3944,40 @@
 
                         target.each( function ()
                         {
-                            $(this).val(shares);
-                            $(this).attr("value",shares);
+                            $( this ).val( shares );
+                            $( this ).attr( "value", shares );
                             ACT.UI.DataHighlightFields( $( this ).parent() );
                         } );
                     } );
             } );
         },
 
-        DataBudgetSum: function (sender) {
-            sender.each(function () {
-                var i = $(this);
+        DataBudgetSum: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
 
                 // <td>    // <tr>
-                var target = i.parent().parent().find(i.attr("data-target"))
-                var source = i.parent().parent().find(i.attr("data-source"))
+                var target = i.parent().parent().find( i.attr( "data-target" ) )
+                var source = i.parent().parent().find( i.attr( "data-source" ) )
                 i
-                    .unbind("change")
-                    .bind("change", function () {
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
                         let sum = 0
-                        source.each(function (i, t) {
-                            sum += parseInt(t.value)
-                        });
-
-                        if (sum > 0)
+                        source.each( function ( i, t )
                         {
-                            target.val(sum)
-                            target.attr("value", sum)
+                            sum += parseInt( t.value )
+                        } );
+
+                        if ( sum > 0 )
+                        {
+                            target.val( sum )
+                            target.attr( "value", sum )
                         }
-                    });
-            });
+                    } );
+            } );
         },
 
 
@@ -4012,14 +4060,14 @@
                 var pspOptions = $( i.attr( "data-psp" ) );
                 var clientOptions = $( i.attr( "data-client" ) );
 
-                var pspRoleIds = JSON.parse(i.attr( "data-psp-role-ids" ));
+                var pspRoleIds = JSON.parse( i.attr( "data-psp-role-ids" ) );
                 var clienntRoleId = i.attr( "data-client-role-id" );
 
                 i
                     .unbind( "change" )
                     .bind( "change", function ()
                     {
-                        if ( pspRoleIds.find( id => id == $( this ).val() ))
+                        if ( pspRoleIds.find( id => id == $( this ).val() ) )
                         {
                             clientOptions.css( "display", "none" );
                             pspOptions.show( 1000 );
@@ -4681,6 +4729,153 @@
                         } );
                     } );
             } )
+        },
+
+        DataReconcileLoadsDragDrop: function ( draggable, droppable )
+        {
+            draggable.draggable();
+            droppable.droppable( {
+                hoverClass: "drop-hover",
+                drop: function ( event, ui )
+                {
+                    var dragId = ui.draggable.attr( "data-cid" );
+                    var dragDocket = ui.draggable.attr( "data-docket" );
+                    var dragProduct = ui.draggable.attr( "data-product" );
+                    var dragParent = $( ui.draggable.attr( "data-parent" ) );
+                    var dragQty = parseFloat( ui.draggable.attr( "data-qty" ) );
+
+                    var dropId = $( this ).attr( "data-cid" );
+                    var dropProduct = $( this ).attr( "data-product" );
+                    var dropLoad = $( this ).attr( "data-load-number" );
+                    var dropParent = $( ui.draggable.attr( "data-parent" ) );
+                    var dropQty = parseFloat( $( this ).attr( "data-qty" ) );
+
+                    var msg = "";
+
+                    msg += "<p>Are you sure you would like to reconcile a Pooling Agent Load with <b>Docket # " + dragDocket + "</b> with a Client Load with <b>Load # " + dropLoad + "</b>?</p>";
+
+                    if ( dragQty != dropQty )
+                    {
+                        msg += "<p><img src='" + siteurl + "/Images/warn.png' style='max-height: 20px;' /> <b>Please Note:</b> The quantities for the loads you are about to reconcile are not the same!</p>";
+                    }
+
+                    msg += "<p>This process is permanent and cannot be reversed!</p>";
+                    msg += "<p style='border-top: 1px solid #fff; padding-top: 10px; margin: 10px 0 0 0; text-align: center;'>";
+                    msg += "    <input id='btnYes' type='button' value='YES!' class='btn-yes' />";
+                    msg += "    <span style='padding: 0 5px;'>/</span>";
+                    msg += "    <input id='btnNo' type='button' value='No..' class='btn-no' />";
+                    msg += "</p>";
+
+                    var close = $( ACT.Modal.Container ).find( '#modalClose' );
+
+                    close.css( "display", "none" );
+
+                    ACT.Modal.Open( msg, "Reconcile Loads", false );
+
+                    setTimeout( function ()
+                    {
+                        var btnNo = $( ACT.Modal.Container ).find( '#btnNo' );
+                        var btnYes = $( ACT.Modal.Container ).find( '#btnYes' );
+
+                        btnYes
+                            .unbind( "click" )
+                            .bind( "click", function ()
+                            {
+                                ACT.Loader.Show( btnYes.parent().find( "span" ), true );
+
+                                $( "<div/>" ).load( siteurl + "/ReconcileLoad", { chid: dragId, clid: dropId, product: dragProduct }, function ( d )
+                                {
+                                    var i = $( this );
+
+                                    $( ACT.Modal.Container ).find( '#modal-body' ).html( i.html() );
+
+                                    if ( i.find( ".message-success" ) )
+                                    {
+                                        ACT.UI.DataSearchChepLoads( dragParent );
+                                        ACT.UI.DataSearchClientLoads( dropParent );
+
+                                        close.css( "display", "block" );
+                                    }
+                                    else
+                                    {
+                                        ui.draggable.css( { "left": 0, "top": 0 } );
+
+                                        ACT.Loader.Hide();
+                                    }
+                                } );
+                            } );
+
+                        btnNo
+                            .unbind( "click" )
+                            .bind( "click", function ()
+                            {
+                                ui.draggable.css( { "left": 0, "top": 0 } );
+
+                                ACT.Modal.Close();
+                            } );
+
+                    }, '1000' );
+                }
+            } );
+        },
+
+        DataSearchChepLoads: function ( target )
+        {
+            var q = target.find( "Query" ).val();
+            var update = target.find( ".list-data" );
+
+            var params = ACT.UI.GetCustomSearchParams( window.location.hash.replace( "#", "" ) );
+
+            params.Query = q;
+
+            ACT.Loader.Show( update.find( "#loader" ), true );
+
+            update.load( siteurl + "/ChepLoads", params, function ()
+            {
+                ACT.Loader.Hide();
+            } );
+        },
+
+        DataSearchClientLoads: function ( target )
+        {
+            var q = target.find( "Query" ).val();
+            var update = target.find( ".list-data" );
+
+            var params = ACT.UI.GetCustomSearchParams( window.location.hash.replace( "#", "" ) );
+
+            params.Query = q;
+
+            ACT.Loader.Show( update.find( "#loader" ), true );
+
+            update.load( siteurl + "/ChepLoads", params, function ()
+            {
+                ACT.Loader.Hide();
+            } );
+        },
+
+        DataReconcileLoadsSearch: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                var chepLoads = $( i.attr( "data-chep-loads" ) );
+                var clientLoads = $( i.attr( "data-client-loads" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        ACT.UI[i.attr( "data-target" ).replace( "#", "" )].ToDate = target.find( "#ToDate" ).val();
+                        ACT.UI[i.attr( "data-target" ).replace( "#", "" )].ClientId = target.find( "#ClientId" ).val();
+                        ACT.UI[i.attr( "data-target" ).replace( "#", "" )].FromDate = target.find( "#FromDate" ).val();
+
+                        ACT.UI.DataSearchChepLoads( chepLoads );
+                        ACT.UI.DataSearchClientLoads( clientLoads );
+                    } );
+            } );
         }
     };
 } )();

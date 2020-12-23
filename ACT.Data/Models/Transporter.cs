@@ -18,6 +18,7 @@ namespace ACT.Data.Models
         public Transporter()
         {
             this.ClientAuthorisations = new HashSet<ClientAuthorisation>();
+            this.ClientLoads = new HashSet<ClientLoad>();
         }
     
         public int Id { get; set; }
@@ -33,5 +34,7 @@ namespace ACT.Data.Models
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoad> ClientLoads { get; set; }
     }
 }

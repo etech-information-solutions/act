@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+
 using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Core.Models.Custom;
@@ -15,19 +16,6 @@ namespace ACT.Core.Services
         public ClientLoadService()
         {
 
-        }
-
-        /// <summary>
-        /// Gets a ClientLoad using the specified Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public override ClientLoad GetById( int id )
-        {
-            context.Configuration.LazyLoadingEnabled = true;
-            context.Configuration.ProxyCreationEnabled = true;
-
-            return base.GetById( id );
         }
 
         /// <summary>
@@ -64,6 +52,10 @@ namespace ACT.Core.Services
                 { new SqlParameter( "take", pm.Take ) },
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmVehicleId", csm.VehicleId ) },
+                { new SqlParameter( "csmTransporterId", csm.TransporterId ) },
+                { new SqlParameter( "csmOutstandingReasonId", csm.OutstandingReasonId ) },
+                { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
@@ -75,11 +67,14 @@ namespace ACT.Core.Services
             string query = @"SELECT
                                 COUNT(cl.Id) AS [Total]
                              FROM
-                                [dbo].[ClientLoad] cl
-                                INNER JOIN [dbo].[ChepClient] cc ON cl.[Id]=cc.[ClientLoadsId]
-                                INNER JOIN [dbo].[ChepLoad] cl1 ON cl1.[Id]=cc.[ChepLoadsId]
-                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=cl.[ClientSiteId]
-                                LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]";
+                                 [dbo].[ClientLoad] cl
+                                 INNER JOIN [dbo].[Client] c ON c.[Id]=cl.[ClientId]
+                                 LEFT OUTER JOIN [dbo].[ChepClient] cc ON cl.[Id]=cc.[ClientLoadsId]
+                                 LEFT OUTER JOIN [dbo].[ChepLoad] ch ON ch.[Id]=cc.[ChepLoadsId]
+                                 LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=cl.[ClientSiteId]
+                                 LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
+                                 LEFT OUTER JOIN [dbo].[Site] s1 ON s.[Id]=s1.[SiteId]
+                                 LEFT OUTER JOIN [dbo].[OutstandingReason] otr ON otr.[Id]=cl.[OutstandingReasonId]";
 
             // WHERE
 
@@ -110,20 +105,36 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (cl.ClientId=@csmClientId)";
             }
+            if ( csm.VehicleId > 0 )
+            {
+                query = $"{query} AND (cl.VehicleId=@csmVehicleId)";
+            }
+            if ( csm.TransporterId > 0 )
+            {
+                query = $"{query} AND (cl.TransporterId=@csmTransporterId)";
+            }
+            if ( csm.OutstandingReasonId > 0 )
+            {
+                query = $"{query} AND (cl.OutstandingReasonId=@csmOutstandingReasonId)";
+            }
+            if ( csm.ReconciliationStatus != ReconciliationStatus.All )
+            {
+                query = $"{query} AND (cl.Status=@csmReconciliationStatus)";
+            }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (cl.CreatedOn >= @csmFromDate AND cl.CreatedOn <= @csmToDate) ";
+                query = $"{query} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (cl.CreatedOn>=@csmFromDate) ";
+                    query = $"{query} AND (cl.LoadDate>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (cl.CreatedOn<=@csmToDate) ";
+                    query = $"{query} AND (cl.LoadDate<=@csmToDate) ";
                 }
             }
 
@@ -135,7 +146,7 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (cl.[DocketNumber] LIKE '%{1}%' OR
+                query = string.Format( @"{0} AND (cl.[ARPMComments] LIKE '%{1}%' OR
                                                   cl.[ReferenceNumber] LIKE '%{1}%' OR
                                                   cl.[DeliveryNote] LIKE '%{1}%' OR
                                                   cl.[ClientDescription] LIKE '%{1}%' OR
@@ -146,7 +157,9 @@ namespace ACT.Core.Services
                                                   cl.[PODNumber] LIKE '%{1}%' OR
                                                   cl.[PCNNumber] LIKE '%{1}%' OR
                                                   cl.[PRNNumber] LIKE '%{1}%' OR
-                                                  s.[Description] LIKE '%{1}%'
+                                                  s.[Description] LIKE '%{1}%' OR
+                                                  c.[CompanyName] LIKE '%{1}%' OR
+                                                  otr.[Description] LIKE '%{1}%'
                                                  ) ", query, csm.Query.Trim() );
             }
 
@@ -164,7 +177,7 @@ namespace ACT.Core.Services
         /// <param name="pm"></param>
         /// <param name="csm"></param>
         /// <returns></returns>
-        public List<ClientLoadCustomModel> ListCSM( PagingModel pm, CustomSearchModel csm )
+        public List<ClientLoadCustomModel> List1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
@@ -179,13 +192,16 @@ namespace ACT.Core.Services
             {
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmVehicleId", csm.VehicleId ) },
+                { new SqlParameter( "csmTransporterId", csm.TransporterId ) },
+                { new SqlParameter( "csmOutstandingReasonId", csm.OutstandingReasonId ) },
+                { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmSiteId", csm.SiteId ) },
-                { new SqlParameter( "csmClientId", csm.ClientId ) },
-                { new SqlParameter( "csmReconciliation", ( int ) csm.ReconciliationStatus ) },
             };
 
             #endregion
@@ -227,15 +243,14 @@ namespace ACT.Core.Services
                             c.CompanyName AS [ClientName],
                             s1.Description AS [SubSiteName],
                             otr.[Description] AS [OutstandingReason],
-                            ch.[NewQuantity] AS [ChepNewQuantity],
                             (SELECT COUNT(1) FROM [dbo].[Task] t WHERE cl.Id=t.ClientLoadId) AS [TaskCount],
                             (SELECT COUNT(1) FROM [dbo].[Journal] j WHERE cl.Id=j.ClientLoadId) AS [JournalCount],
                             (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ClientLoad') AS [DocumentCount]
                           FROM
                             [dbo].[ClientLoad] cl
-                            INNER JOIN [dbo].[ChepClient] cc ON cl.[Id]=cc.[ClientLoadsId]
-                            INNER JOIN [dbo].[ChepLoad] ch ON ch.[Id]=cc.[ChepLoadsId]
                             INNER JOIN [dbo].[Client] c ON c.[Id]=cl.[ClientId]
+                            LEFT OUTER JOIN [dbo].[ChepClient] cc ON cl.[Id]=cc.[ClientLoadsId]
+                            LEFT OUTER JOIN [dbo].[ChepLoad] ch ON ch.[Id]=cc.[ChepLoadsId]
                             LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=cl.[ClientSiteId]
                             LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
                             LEFT OUTER JOIN [dbo].[Site] s1 ON s.[Id]=s1.[SiteId]
@@ -271,53 +286,38 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (cl.ClientId=@csmClientId)";
             }
+            if ( csm.VehicleId > 0 )
+            {
+                query = $"{query} AND (cl.VehicleId=@csmVehicleId)";
+            }
+            if ( csm.TransporterId > 0 )
+            {
+                query = $"{query} AND (cl.TransporterId=@csmTransporterId)";
+            }
+            if ( csm.OutstandingReasonId > 0 )
+            {
+                query = $"{query} AND (cl.OutstandingReasonId=@csmOutstandingReasonId)";
+            }
+            if ( csm.ReconciliationStatus != ReconciliationStatus.All )
+            {
+                query = $"{query} AND (cl.Status=@csmReconciliationStatus)";
+            }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (cl.CreatedOn >= @csmFromDate AND cl.CreatedOn <= @csmToDate) ";
+                query = $"{query} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (cl.CreatedOn>=@csmFromDate) ";
+                    query = $"{query} AND (cl.LoadDate>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (cl.CreatedOn<=@csmToDate) ";
+                    query = $"{query} AND (cl.LoadDate<=@csmToDate) ";
                 }
             }
-
-            if ( csm.ReconciliationStatus != ReconciliationStatus.Unreconcilable )
-            {
-                query = $"{query} AND (cl.Status=@csmReconciliation)";
-            }
-
-
-            if ( !string.IsNullOrEmpty( csm.ReferenceNumber ) )
-            {
-                query = string.Format( @"{0} AND (cl.LoadNumber LIKE '%{1}%' OR cl.ReceiverNumber LIKE '%{1}%' OR cl.AccountNumber LIKE '%{1}%' )", query, csm.ReferenceNumber );
-            }
-            if ( !string.IsNullOrEmpty( csm.ReferenceNumberOther ) )
-            {
-                query = string.Format( @"{0} AND (cl.LoadNumber LIKE '%{1}%' OR cl.ReceiverNumber LIKE '%{1}%' OR cl.AccountNumber LIKE '%{1}%' OR cl.ReferenceNumber LIKE '%{1}%' OR cl.DeliveryNote LIKE '%{1}%' OR cl.PODNumber LIKE '%{1}%' OR cl.PCNNumber LIKE '%{1}%' OR cl.PRNNumber LIKE '%{1}%')", query, csm.ReferenceNumberOther );
-            }
-
-            if ( !string.IsNullOrEmpty( csm.Description ) )
-            {
-                query = string.Format( @"{0} AND (cl.Equipment LIKE '%{1}%' OR cl.ClientDescription LIKE '%{1}%' )", query, csm.Description );
-            }
-
-            if ( !string.IsNullOrEmpty( csm.Name ) )
-            {
-                query = string.Format( @"{0} AND (cl.ClientDescription LIKE '%{1}%' )", query, csm.Description );
-            }
-
-            if ( csm.FilterDate.HasValue )
-            {
-                query = string.Format( @"{0} AND (cl.LoadDate >= @{1}) ", query, csm.FilterDate );
-            }
-
 
             #endregion
 
@@ -338,7 +338,9 @@ namespace ACT.Core.Services
                                                   cl.[PODNumber] LIKE '%{1}%' OR
                                                   cl.[PCNNumber] LIKE '%{1}%' OR
                                                   cl.[PRNNumber] LIKE '%{1}%' OR
-                                                  s.[Description] LIKE '%{1}%'
+                                                  s.[Description] LIKE '%{1}%' OR
+                                                  c.[CompanyName] LIKE '%{1}%' OR
+                                                  otr.[Description] LIKE '%{1}%'
                                                  ) ", query, csm.Query.Trim() );
             }
 
@@ -366,35 +368,6 @@ namespace ACT.Core.Services
             }
 
             return model;
-        }
-
-        public bool ReconcileClientAgentLoad( List<ClientLoad> clientLoad, List<ChepLoad> agentLoad )
-        {
-            if ( clientLoad != null && agentLoad != null )
-            {
-                //iterate through clientload items and attempt to  match the agent loads on teh following: 
-                /*
-                * Agent:
-                6.	If data is uploaded that already exists on the unreconciled  then update the records
-                7.	If changes come through for reconciled items then unreconciled all records on both Chep and Client
-                8.	Allow user to import pallet providers data and immediately run the batch reconciliation – on DeliveryNote Number, order number and sum of qty’s must be 0 for reconciled - 
-
-                13.	Add the vehicle registration number to the load schedule
-                14.	Import from Chep all deliveries for customers and depots, Use Delivery note and order number as the main keys  keep exceptions when loads that are not reconciled because the keys are incorrect.
-
-                Client:
-                4.	Check if the PCN number exists, if it does not exist import anyway
-                5.	If a PCN number exists, then check if the PCN number exists on the chep table if it does and the qty’s are the same then input the data on the clientLoad table and mark both tables and set status as  reconciled.
-                6.	If a PCN number exists, then check if the PCN number exists on the chep table if it does and if the quantities are not the same input the data on the clientLoad table and mark both tables set status as  PCN Found
-                7.	A PCN number can only be loaded once for the client (indicate if it already exists and allow the user to indicate that this is a split load) and once for chep
-
-                 */
-                foreach ( var cLoad in clientLoad )
-                {
-
-                }
-            }
-            return true;
         }
 
         /// <summary>
@@ -426,7 +399,7 @@ namespace ACT.Core.Services
             #region Query
 
             string query = @"SELECT
-	                            SUM(ch.[NewQuantity] - cl.[NewQuantity]) AS [Sum]
+	                            SUM(ch.[Quantity] - cl.[NewQuantity]) AS [Sum]
                              FROM 
 	                            [dbo].[ClientLoad] cl,
 	                            [dbo].[ChepClient] cc,
@@ -456,7 +429,7 @@ namespace ACT.Core.Services
 
             #region Custom Search
 
-            if ( csm.ReconciliationStatus != ReconciliationStatus.Unreconcilable )
+            if ( csm.ReconciliationStatus != ReconciliationStatus.All )
             {
                 query = $"{query} AND (cl.[Status]=@csmReconciliationStatus) ";
             }
@@ -1050,7 +1023,7 @@ namespace ACT.Core.Services
                 }
             }
 
-            if ( csm.ReconciliationStatus != ReconciliationStatus.Unreconcilable )
+            if ( csm.ReconciliationStatus != ReconciliationStatus.All )
             {
                 query = $"{query} AND (cl.Status=@csmReconciliation)";
             }
@@ -1095,6 +1068,16 @@ namespace ACT.Core.Services
             }
 
             return model;
+        }
+
+        /// <summary>
+        /// Gets a Client Load by UID
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public ClientLoad GetByUID( string uid )
+        {
+            return context.ClientLoads.FirstOrDefault( cl => cl.UID == uid );
         }
     }
 }

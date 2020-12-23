@@ -40,38 +40,35 @@
     <span class="loader"></span>
 </p>
 
-<table id="PADlist-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#PADlist-table_wrapper" data-starting-point=".ap-tabs ul">
+<table id="pad-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#pad-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
-            <th>
+            <th data-name="Count">
                 #
             </th>
-            <th>
+            <th data-name="CreatedOn" data-column="cl.CreatedOn">
                 Imported/Created
             </th>
-            <th>
+            <th data-name="CreateDate" data-column="cl.CreateDate">
                 Created
             </th>
-            <th>
+            <th data-name="CompanyName" data-column="c.CompanyName">
                 Client
             </th>
-            <th>
-                Posting Type
-            </th>
-            <th>
+            <th data-name="DocketNumber" data-column="cl.DocketNumber">
                 Docket #
             </th>
-            <th>
+            <th data-name="Ref" data-column="cl.Ref">
                 Ref #
             </th>
-            <th>
+            <th data-name="Equipment" data-column="cl.Equipment">
                 Equipment
             </th>
-            <th>
+            <th data-name="InvoiceNumber" data-column="cl.InvoiceNumber">
                 Invoice #
             </th>
-            <th>
-                Balance Status
+            <th data-name="PostingType" data-column="cl.PostingType">
+                Posting Type
             </th>
             <th data-name="Actions">
                 Actions
@@ -93,16 +90,16 @@
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
                     <td width="1%">
+                        @count
+                    </td>
+                    <td>
                         @item.CreatedOn.ToString( "yyyy-MM-dd @ HH:mm tt" )
                     </td>
                     <td>
-                        On @item.CreateDate by @item.CreatedBy
+                        On @(item.CreateDate?.ToString( "yyyy-MM-dd" ) ) <br /> by @item.CreatedBy
                     </td>
                     <td>
                         @item.ClientName
-                    </td>
-                    <td>
-                        @postingType.GetDisplayText()
                     </td>
                     <td>
                         @item.DocketNumber
@@ -117,7 +114,7 @@
                         @item.InvoiceNumber
                     </td>
                     <td>
-                        @item.BalanceStatus
+                        @postingType.GetDisplayText()
                     </td>
                     <td width="10%">
 

@@ -17,19 +17,6 @@ namespace ACT.Core.Services
         }
 
         /// <summary>
-        /// Gets a client using the specified Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public override Client GetById( int id )
-        {
-            context.Configuration.LazyLoadingEnabled = true;
-            context.Configuration.ProxyCreationEnabled = true;
-
-            return base.GetById( id );
-        }
-
-        /// <summary>
         /// Gets a list of clients
         /// </summary>
         /// <param name="v"></param>

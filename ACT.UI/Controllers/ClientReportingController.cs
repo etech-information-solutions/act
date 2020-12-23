@@ -165,7 +165,7 @@ namespace ACT.UI.Controllers
 
                     using ( ClientLoadService dservice = new ClientLoadService() )
                     {
-                        List<ClientLoadCustomModel> clientload = dservice.ListCSM( pm, csm );
+                        List<ClientLoadCustomModel> clientload = dservice.List1( pm, csm );
 
                         if ( clientload != null && clientload.Any() )
                         {
@@ -175,7 +175,7 @@ namespace ACT.UI.Controllers
                                                     csv,
                                                     item.LoadDate,
                                                     item.EffectiveDate,
-                                                    item.NotifyeDate,
+                                                    item.NotifyDate,
                                                     item.DocketNumber,
                                                     item.PostingType,
                                                     item.ClientDescription,
@@ -203,7 +203,7 @@ namespace ACT.UI.Controllers
                     {
                         csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
 
-                        List<ClientLoadCustomModel> clientload = dservice.ListCSM( pm, csm );
+                        List<ClientLoadCustomModel> clientload = dservice.List1( pm, csm );
 
                         if ( clientload != null && clientload.Any() )
                         {
@@ -735,7 +735,7 @@ namespace ACT.UI.Controllers
                 pm.SortBy = "cl.ClientId";
                 csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
 
-                List<ClientLoadCustomModel> model = service.ListCSM( pm, csm );
+                List<ClientLoadCustomModel> model = service.List1( pm, csm );
 
                 int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
 
@@ -767,7 +767,7 @@ namespace ACT.UI.Controllers
                     csm.ToDate = DateTime.Now;
                 }
 
-                List<ClientLoadCustomModel> model = service.ListCSM( pm, csm );
+                List<ClientLoadCustomModel> model = service.List1( pm, csm );
 
                 int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
 
@@ -792,7 +792,7 @@ namespace ACT.UI.Controllers
 
                 csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
 
-                List<ClientLoadCustomModel> model = service.ListCSM( pm, csm );
+                List<ClientLoadCustomModel> model = service.List1( pm, csm );
 
                 int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
 

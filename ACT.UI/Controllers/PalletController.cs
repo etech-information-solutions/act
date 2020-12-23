@@ -18,6 +18,8 @@ using ACT.Core.Helpers;
 using iTextSharp.text.pdf;
 using iTextSharp.tool.xml;
 using ACT.Mailer;
+using Microsoft.VisualBasic.FileIO;
+using System.Globalization;
 
 namespace ACT.UI.Controllers
 {
@@ -96,15 +98,38 @@ namespace ACT.UI.Controllers
 
 
 
-        #region Pallet PoolingAgentData
+        #region Pooling Agent Data
+
+        //
+        // GET: /Pallet/PoolingAgentDataDetails/5
+        public ActionResult PoolingAgentDataDetails( int id, bool layout = true )
+        {
+            using ( ChepLoadService clservice = new ChepLoadService() )
+            {
+                ChepLoad model = clservice.GetById( id );
+
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                return View( model );
+            }
+        }
 
         // GET: Pallet/AddPoolingAgentData
         [Requires( PermissionTo.Create )]
         public ActionResult AddPoolingAgentData()
         {
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            ChepLoadViewModel model = new ChepLoadViewModel();
-            model.PostingType = 3;
+            ChepLoadViewModel model = new ChepLoadViewModel() { EditMode = true };
+
             return View( model );
         }
 
@@ -113,64 +138,66 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Create )]
         public ActionResult AddPoolingAgentData( ChepLoadViewModel model )
         {
-            try
+            if ( !ModelState.IsValid )
             {
-                if ( !ModelState.IsValid )
-                {
-                    Notify( "Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error );
+                Notify( "Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error );
 
-                    return View( model );
-                }
-
-                using ( ChepLoadService gService = new ChepLoadService() )
-                using ( TransactionScope scope = new TransactionScope() )
-                {
-                    #region Create ClientLoadCustomModel
-                    ChepLoad clientload = new ChepLoad()
-                    {
-                        /*LoadDate = model.LoadDate,
-                        EffectiveDate = model.EffectiveDate,
-                        NotifyDate = model.NotifyDate,
-                        AccountNumber = model.AccountNumber,
-                        ClientDescription = model.ClientDescription,
-                        DeliveryNote = model.DeliveryNote,
-                        ReferenceNumber = model.ReferenceNumber,
-                        ReceiverNumber = model.ReceiverNumber,
-                        Equipment = model.Equipment,
-                        OriginalQuantity = model.OriginalQuantity,
-                        NewQuantity = model.NewQuantity,
-                        Status = ( int ) Status.Active,*/
-                        CreatedOn = DateTime.Now,
-                        ModfiedOn = DateTime.Now,
-                        ModifiedBy = CurrentUser.Email
-                    };
-                    gService.Create( clientload );
-                    #endregion
-
-                    scope.Complete();
-                }
-
-                Notify( "The item was successfully created.", NotificationType.Success );
-                return RedirectToAction( "AgentPoolingData" );
+                return View( model );
             }
-            catch ( Exception ex )
+
+            using ( ChepLoadService clservice = new ChepLoadService() )
             {
-                ViewBag.Message = ex.Message;
-                return View();
+                #region Create Chep Load
+
+                ChepLoad clientload = new ChepLoad()
+                {
+                    UMI = model.UMI,
+                    Reason = model.Reason,
+                    Ref = model.Reference,
+                    ClientId = model.ClientId,
+                    BatchRef = model.BatchRef,
+                    Location = model.Location,
+                    OtherRef = model.OtherRef,
+                    Quantity = model.Quantity,
+                    CreatedBy = model.CreatedBy,
+                    Equipment = model.Equipment,
+                    ChepStatus = model.ChepStatus,
+                    CreateDate = model.CreateDate,
+                    LocationId = model.LocationId,
+                    OtherParty = model.OtherParty,
+                    DataSource = model.DataSource,
+                    Status = ( int ) Status.Active,
+                    OtherPartyId = model.OtherPartyId,
+                    ShipmentDate = model.ShipmentDate,
+                    DeliveryDate = model.DeliveryDate,
+                    DocketNumber = model.DocketNumber,
+                    BalanceStatus = model.BalanceStatus,
+                    EffectiveDate = model.EffectiveDate,
+                    EquipmentCode = model.EquipmentCode,
+                    InvoiceNumber = model.InvoiceNumber,
+                    PostingType = ( int ) model.PostingType,
+                    TransactionType = model.TransactionType,
+                    OtherPartyCountry = model.OtherPartyCountry,
+                    OriginalDocketNumber = model.OriginalDocketNumber,
+                };
+
+                clservice.Create( clientload );
+
+                #endregion
             }
+
+            Notify( "The item was successfully created.", NotificationType.Success );
+
+            return PoolingAgentData( new PagingModel(), new CustomSearchModel() );
         }
-
 
         // GET: Pallet/EditPoolingAgentData/5
         [Requires( PermissionTo.Edit )]
         public ActionResult EditPoolingAgentData( int id )
         {
-            ChepLoad load;
-
             using ( ChepLoadService service = new ChepLoadService() )
             {
-                load = service.GetById( id );
-
+                ChepLoad load = service.GetById( id );
 
                 if ( load == null )
                 {
@@ -181,21 +208,37 @@ namespace ACT.UI.Controllers
 
                 ChepLoadViewModel model = new ChepLoadViewModel()
                 {
-                    //LoadDate = load.LoadDate,
-                    //EffectiveDate = load.EffectiveDate,
-                    //NotifyDate = load.NotifyDate,
-                    //AccountNumber = load.AccountNumber,
-                    //ClientDescription = load.ClientDescription,
-                    //DeliveryNote = load.DeliveryNote,
-                    //ReferenceNumber = load.ReferenceNumber,
-                    //ReceiverNumber = load.ReceiverNumber,
-                    //Equipment = load.Equipment,
-                    //OriginalQuantity = load.OriginalQuantity,
-                    //NewQuantity = load.NewQuantity,
-                    //Status = ( int ) load.Status,
-                    //DocumentCount = (int)load.DocumentCount,
-                    // DocsList = ""
+                    Id = load.Id,
+                    UMI = load.UMI,
+                    EditMode = true,
+                    Reason = load.Reason,
+                    Reference = load.Ref,
+                    ClientId = load.ClientId,
+                    BatchRef = load.BatchRef,
+                    Location = load.Location,
+                    OtherRef = load.OtherRef,
+                    Quantity = load.Quantity,
+                    CreatedBy = load.CreatedBy,
+                    Equipment = load.Equipment,
+                    ChepStatus = load.ChepStatus,
+                    CreateDate = load.CreateDate,
+                    LocationId = load.LocationId,
+                    OtherParty = load.OtherParty,
+                    DataSource = load.DataSource,
+                    OtherPartyId = load.OtherPartyId,
+                    ShipmentDate = load.ShipmentDate,
+                    DeliveryDate = load.DeliveryDate,
+                    DocketNumber = load.DocketNumber,
+                    BalanceStatus = load.BalanceStatus,
+                    EffectiveDate = load.EffectiveDate,
+                    EquipmentCode = load.EquipmentCode,
+                    InvoiceNumber = load.InvoiceNumber,
+                    TransactionType = load.TransactionType,
+                    OtherPartyCountry = load.OtherPartyCountry,
+                    PostingType = ( PostingType ) load.PostingType,
+                    OriginalDocketNumber = load.OriginalDocketNumber,
                 };
+
                 return View( model );
             }
         }
@@ -205,54 +248,201 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Edit )]
         public ActionResult EditPoolingAgentData( ChepLoadViewModel model )
         {
-            try
+            if ( !ModelState.IsValid )
             {
-                if ( !ModelState.IsValid )
+                Notify( "Sorry, the selected item was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( ChepLoadService service = new ChepLoadService() )
+            {
+                ChepLoad load = service.GetById( model.Id );
+
+                if ( load == null )
                 {
-                    Notify( "Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error );
+                    Notify( "Sorry, that item does not exist! Please specify a valid item Id and try again.", NotificationType.Error );
 
                     return View( model );
                 }
 
-                ChepLoad load;
+                #region Update Chep Load
 
-                using ( ChepLoadService service = new ChepLoadService() )
-                using ( TransactionScope scope = new TransactionScope() )
+                if ( CurrentUser.IsAdmin )
                 {
-                    load = service.GetById( model.Id );
-
-                    #region Update Chep Load
-                    //load.LoadDate = model.LoadDate;
-                    //load.EffectiveDate = model.EffectiveDate;
-                    //load.NotifyDate = model.NotifyDate;
-                    //load.AccountNumber = model.AccountNumber;
-                    //load.ClientDescription = model.ClientDescription;
-                    //load.DeliveryNote = model.DeliveryNote;
-                    //load.ReferenceNumber = model.ReferenceNumber;
-                    //load.ReceiverNumber = model.ReceiverNumber;
-                    //load.Equipment = model.Equipment;
-                    //load.OriginalQuantity = model.OriginalQuantity;
-                    //load.NewQuantity = model.NewQuantity;
-                    //load.Status = ( int ) model.Status;
-                    load.ModfiedOn = DateTime.Now;
-                    load.ModifiedBy = CurrentUser.Email;
-                    service.Update( load );
-
-                    #endregion
-
-
-                    scope.Complete();
+                    load.ClientId = model.ClientId;
                 }
 
-                Notify( "The selected Item details were successfully updated.", NotificationType.Success );
+                load.UMI = model.UMI;
+                load.Reason = model.Reason;
+                load.Ref = model.Reference;
+                load.BatchRef = model.BatchRef;
+                load.Location = model.Location;
+                load.OtherRef = model.OtherRef;
+                load.Quantity = model.Quantity;
+                load.CreatedBy = model.CreatedBy;
+                load.Equipment = model.Equipment;
+                load.ChepStatus = model.ChepStatus;
+                load.CreateDate = model.CreateDate;
+                load.LocationId = model.LocationId;
+                load.OtherParty = model.OtherParty;
+                load.DataSource = model.DataSource;
+                load.OtherPartyId = model.OtherPartyId;
+                load.ShipmentDate = model.ShipmentDate;
+                load.DeliveryDate = model.DeliveryDate;
+                load.DocketNumber = model.DocketNumber;
+                load.BalanceStatus = model.BalanceStatus;
+                load.EffectiveDate = model.EffectiveDate;
+                load.EquipmentCode = model.EquipmentCode;
+                load.InvoiceNumber = model.InvoiceNumber;
+                load.TransactionType = model.TransactionType;
+                load.OtherPartyCountry = model.OtherPartyCountry;
+                load.OriginalDocketNumber = model.OriginalDocketNumber;
 
-                return RedirectToAction( "ClientData" );
+                service.Update( load );
+
+                #endregion
             }
-            catch ( Exception ex )
+
+            Notify( "The selected Item details were successfully updated.", NotificationType.Success );
+
+            return PoolingAgentData( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // GET: Client/AddSite
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportPoolingAgentData()
+        {
+            ChepLoadViewModel model = new ChepLoadViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        // POST: Client/AddSite
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportPoolingAgentData( ChepLoadViewModel model )
+        {
+            if ( model.File == null )
             {
-                ViewBag.Message = ex.Message;
-                return View();
+                Notify( "Please select a file to upload and try again.", NotificationType.Error );
+
+                return View( model );
             }
+
+            int count = 0,
+                errors = 0,
+                skipped = 0,
+                created = 0,
+                updated = 0;
+
+            string cQuery, uQuery;
+
+            using ( ChepLoadService clservice = new ChepLoadService() )
+            using ( TextFieldParser parser = new TextFieldParser( model.File.InputStream ) )
+            {
+                parser.Delimiters = new string[] { "," };
+
+                while ( true )
+                {
+                    string[] load = parser.ReadFields();
+
+                    if ( load == null )
+                    {
+                        break;
+                    }
+
+                    cQuery = uQuery = string.Empty;
+
+                    count++;
+
+                    if ( load.NullableCount() < 2 )
+                    {
+                        skipped++;
+
+                        continue;
+                    }
+
+                    load = load.ToSQLSafe();
+
+                    ChepLoad l = clservice.Get( model.ClientId, load[ 3 ], load[ 2 ] );
+
+                    if ( l == null )
+                    {
+                        #region Create Chep Load
+
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[ChepLoad] ([ClientId],[CreatedOn],[ModfiedOn],[ModifiedBy],[ChepStatus],[TransactionType],[DocketNumber],[OriginalDocketNumber],[UMI],[LocationId],[Location],[OtherPartyId],[OtherParty],[OtherPartyCountry],[EquipmentCode],[Equipment],[Quantity],[Ref],[OtherRef],[BatchRef],[ShipmentDate],[DeliveryDate],[EffectiveDate],[CreateDate],[CreatedBy],[InvoiceNumber],[Reason],[DataSource],[BalanceStatus],[Status],[PostingType]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}','{load[ 13 ]}','{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}','{load[ 17 ]}','{load[ 18 ]}','{load[ 19 ]}','{load[ 20 ]}','{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) ReconciliationStatus.Unreconciled},{( int ) Status.Active},{( int ) PostingType.Import}) ";
+
+                        #endregion
+
+                        try
+                        {
+                            clservice.Query( cQuery );
+
+                            created++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+                        }
+                    }
+                    else
+                    {
+                        #region Update ChepLoad
+
+                        uQuery = $@"{uQuery} UPDATE [dbo].[ChepLoad] SET
+                                                    [ModifiedOn]='{DateTime.Now}',
+                                                    [ModifiedBy]='{CurrentUser.Email}',
+                                                    [ChepStatus]='{load[ 0 ]}',
+                                                    [TransactionType]='{load[ 2 ]}',
+                                                    [OriginalDocketNumber]='{load[ 4 ]}',
+                                                    [UMI]='{load[ 5 ]}',
+                                                    [LocationId]='{load[ 6 ]}',
+                                                    [Location]='{load[ 7 ]}',
+                                                    [OtherPartyId]='{load[ 8 ]}',
+                                                    [OtherParty]='{load[ 9 ]}',
+                                                    [OtherPartyCountry]='{load[ 10 ]}',
+                                                    [EquipmentCode]='{load[ 11 ]}',
+                                                    [Equipment]='{load[ 12 ]}',
+                                                    [Quantity]='{load[ 13 ]}',
+                                                    [Ref]='{load[ 14 ]}',
+                                                    [OtherRef]='{load[ 15 ]}',
+                                                    [BatchRef]='{load[ 16 ]}',
+                                                    [ShipmentDate]='{load[ 17 ]}',
+                                                    [DeliveryDate]='{load[ 18 ]}',
+                                                    [EffectiveDate]='{load[ 19 ]}',
+                                                    [CreateDate]='{load[ 20 ]}',
+                                                    [CreatedBy]='{load[ 21 ]}',
+                                                    [InvoiceNumber]='{load[ 22 ]}',
+                                                    [Reason]='{load[ 23 ]}',
+                                                    [DataSource]='{load[ 24 ]}',
+                                                    [Status]={( int ) Status.Active}
+                                                WHERE
+                                                    [Id]={l.Id}";
+
+                        #endregion
+
+                        try
+                        {
+                            clservice.Query( uQuery );
+
+                            updated++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+                        }
+                    }
+                }
+
+                cQuery = string.Empty;
+                uQuery = string.Empty;
+            }
+
+            Notify( $"{created} loads were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.", NotificationType.Success );
+
+            return PoolingAgentData( new PagingModel(), new CustomSearchModel() );
         }
 
         // POST: Pallet/DeletePoolingAgentData/5
@@ -260,34 +450,24 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Delete )]
         public ActionResult DeletePoolingAgentData( ChepLoadViewModel model )
         {
-            ChepLoad activeLoad;
-            try
+            using ( ChepLoadService service = new ChepLoadService() )
             {
+                ChepLoad load = service.GetById( model.Id );
 
-                using ( ChepLoadService service = new ChepLoadService() )
-                using ( TransactionScope scope = new TransactionScope() )
+                if ( load == null )
                 {
-                    activeLoad = service.GetById( model.Id );
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
-                    if ( activeLoad == null )
-                    {
-                        Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                        return PartialView( "_AccessDenied" );
-                    }
-
-                    //activeLoad.Status = ( ( ( Status ) activeLoad.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
-                    service.Update( activeLoad );
-                    scope.Complete();
-
+                    return PartialView( "_AccessDenied" );
                 }
+
+                load.Status = ( ( ( Status ) load.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.Update( load );
+
                 Notify( "The selected item was successfully updated.", NotificationType.Success );
-                return RedirectToAction( "PoolingAgentData" );
-            }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
+
+                return PoolingAgentData( new PagingModel(), new CustomSearchModel() );
             }
         }
 
@@ -295,87 +475,38 @@ namespace ACT.UI.Controllers
 
         //-------------------------------------------------------------------------------------
 
-        #region Pallet ClientData
+        #region Client Data
 
         //
-        // GET: /Pallet/ClientData
-        public ActionResult ClientData( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        // GET: /Pallet/ClientDataDetails/5
+        public ActionResult ClientDataDetails( int id, bool layout = true )
         {
-            if ( givecsm )
+            using ( ClientLoadService clservice = new ClientLoadService() )
             {
-                ViewBag.ViewName = "ClientData";
+                ClientLoad model = clservice.GetById( id );
 
-                return PartialView( "_ClientDataCustomSearch", new CustomSearchModel( "ClientData" ) );
-            }
-            ViewBag.ViewName = "ClientData";
-            //check if there are any viewbag messages from imports
-            string msg = ( Session[ "ImportMessage" ] != null ? Session[ "ImportMessage" ].ToString() : null );
-            if ( !string.IsNullOrEmpty( msg ) )
-            {
-                ViewBag.Message = msg;
-                Notify( msg, NotificationType.Success );
-
-                //clear the message for next time
-                Session[ "ImportMessage" ] = null;
-            }
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            //model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
-            //TODO
-            using ( ClientService clientService = new ClientService() )
-            {
-                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-            }
-
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
-
-            } );
-            ViewBag.ClientList = clientDDL;
-
-            int total = 0;
-            List<ClientLoadCustomModel> model = new List<ClientLoadCustomModel>();
-            using ( ClientLoadService service = new ClientLoadService() )
-            {
-                if ( clientId > 0 )
+                if ( model == null )
                 {
-                    csm.ClientId = clientId;
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
                 }
 
-                model = service.ListCSM( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total();
-            }
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
 
-            return PartialView( "_ClientData", paging );
+                return View( model );
+            }
         }
 
         // GET: Pallet/AddClientLoad
         [Requires( PermissionTo.Create )]
         public ActionResult AddClientData()
         {
-            ClientLoadViewModel model = new ClientLoadViewModel();
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
+            ClientLoadViewModel model = new ClientLoadViewModel() { EditMode = true };
 
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            List<Transporter> transporterOptions = new List<Transporter>();
-            using ( TransporterService rservice = new TransporterService() )
-            {
-                transporterOptions = rservice.List();
-            }
-            IEnumerable<SelectListItem> transporterOptionsDDL = transporterOptions.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.TradingName
-
-            } );
-            ViewBag.TransporterOptions = transporterOptionsDDL;
             return View( model );
         }
 
@@ -384,202 +515,152 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Create )]
         public ActionResult AddClientData( ClientLoadViewModel model )
         {
-            try
+            if ( !ModelState.IsValid )
             {
-                if ( !ModelState.IsValid )
-                {
-                    Notify( "Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error );
+                Notify( "Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error );
 
-                    return View( model );
-                }
-                string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-                int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-                ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-                List<Transporter> transporterOptions = new List<Transporter>();
-                using ( TransporterService rservice = new TransporterService() )
-                {
-                    transporterOptions = rservice.List();
-                }
-                IEnumerable<SelectListItem> transporterOptionsDDL = transporterOptions.Select( c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.TradingName
-
-                } );
-                ViewBag.TransporterOptions = transporterOptionsDDL;
-
-                if ( clientId > 0 || model.ClientId > 0 )
-                {
-                    using ( ClientLoadService gService = new ClientLoadService() )
-                    using ( DeliveryNoteService service = new DeliveryNoteService() )
-                    using ( DeliveryNoteLineService lineservice = new DeliveryNoteLineService() )
-                    using ( AddressService addservice = new AddressService() )
-                    using ( ClientService clientservice = new ClientService() )
-                    using ( TransactionScope scope = new TransactionScope() )
-                    {
-                        #region Create ClientLoadCustomModel
-                        ClientLoad clientload = new ClientLoad()
-                        {
-                            ClientId = ( model.ClientId > 0 ? model.ClientId : clientId ),
-                            //VehicleId = model.VehicleId,
-                            // TransporterId = model.TransporterId,
-                            LoadDate = model.LoadDate,//DateTimeExtensions.formatImportDate(model.LoadDate),
-                            LoadNumber = model.LoadNumber,
-                            EffectiveDate = model.EffectiveDate,//DateTimeExtensions.formatImportDate(model.EffectiveDate),
-                            NotifyDate = model.NotifyDate,//DateTimeExtensions.formatImportDate(model.NotifyeDate),
-                            AccountNumber = model.AccountNumber,
-                            ClientDescription = model.ClientDescription,
-                            DeliveryNote = model.DeliveryNote,
-                            ReferenceNumber = model.ReferenceNumber,
-                            ReceiverNumber = model.ReceiverNumber,
-                            Equipment = model.Equipment,
-                            OriginalQuantity = model.OriginalQuantity,
-                            NewQuantity = model.NewQuantity,
-                            ReturnQty = model.ReturnQty,
-                            OutstandingQty = ( model.OriginalQuantity - model.ReturnQty ), //double check this
-                            //ReconcileDate = model.ReconcileDate,
-                            //ReconcileInvoice = model.ReconcileInvoice,
-                            PODNumber = model.PODNumber,
-                            PCNNumber = model.PCNNumber,
-                            PRNNumber = model.PRNNumber,
-                            //ARPMComments = model.ARPMComments,
-                            //ProvCode = model.ProvCode,
-                            Status = ( int ) Status.Active,
-                            CreatedOn = DateTime.Now,
-                            ModifiedOn = DateTime.Now,
-                            ModifiedBy = CurrentUser.Email
-                        };
-                        gService.Create( clientload );
-                        #endregion
-
-                        #region Create DeliveryNote for new ClientLoad
-                        if ( clientload.Id > 0 )
-                            try
-                            {
-                                DeliveryNote delnote = new DeliveryNote();
-
-                                Client noteClient = clientservice.GetById( model.ClientId );
-                                Address clientAddress = addservice.GetByColumnsWhere( "ObjectId", model.ClientId, "ObjectType", "Client" );
-                                string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ( (Province) clientAddress.Province ).GetDisplayText();
-                                //string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ((Province)model.BillingProvince).GetDisplayText();
-                                //string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ((Province)model.DeliveryProvince).GetDisplayText();
-
-                                if ( model.Id > 0 )
-                                {
-                                    try
-                                    {
-                                        delnote.ClientId = model.ClientId;
-                                        //Create
-                                        delnote.InvoiceNumber = model.DeliveryNote;
-                                        delnote.CustomerName = noteClient.CompanyName;
-                                        delnote.EmailAddress = noteClient.Email;
-                                        delnote.OrderNumber = model.ReferenceNumber;
-                                        delnote.OrderDate = model.LoadDate;
-                                        //delnote.ContactNumber = model.ContactNumber;
-                                        delnote.Reference306 = model.LoadNumber;
-                                        delnote.Status = ( int ) Status.Active;
-
-                                        delnote.CustomerAddress = customerAddress;
-                                        delnote.CustomerPostalCode = clientAddress.PostalCode;
-                                        delnote.CustomerProvince = clientAddress.Province;
-
-                                        //dont have the below to create
-                                        //delnote.DeliveryAddress = deliveryAddress;
-                                        //delnote.DeliveryPostalCode = model.DeliveryPostalCode;
-                                        //delnote.DeliveryProvince = model.DeliveryProvince;
-
-                                        //delnote.BillingAddress = billingAddress;
-                                        //delnote.BililngPostalCode = model.BillingPostalCode;
-                                        //delnote.BillingProvince = model.BillingProvince;
-
-                                        //Create Client Invoice Address
-                                        service.Create( delnote );
-
-                                        //Create Invoice Customer Address
-                                        Address invoiceCustomerAddress = new Address()
-                                        {
-                                            ObjectId = delnote.Id,
-                                            ObjectType = "InvoiceCustomer",
-                                            Town = clientAddress.Town,
-                                            Status = ( int ) Status.Active,
-                                            PostalCode = clientAddress.PostalCode,
-                                            Type = 1,
-                                            Addressline1 = clientAddress.Addressline1,
-                                            Addressline2 = clientAddress.Addressline2,
-                                            Province = ( int ) clientAddress.Province,
-                                            //Province = (int)mappedProvinceVal,
-                                        };
-                                        addservice.Create( invoiceCustomerAddress );
-
-
-                                    }
-                                    catch ( Exception ex )
-                                    {
-                                        ViewBag.Message = ex.Message;
-                                        //  return View();
-                                        return PartialView( "_GenerateDeliveryNote", model );
-                                    }
-
-                                }
-                                #endregion
-                                #region Save DeliveryNoteLine
-                                try
-                                {
-                                    DeliveryNoteLine noteline = new DeliveryNoteLine();
-
-                                    noteline.DeliveryNoteId = delnote.Id;//deliveryNoteId;
-                                    noteline.Delivered = model.NewQuantity;
-                                    noteline.Product = "Delivery Note";
-                                    noteline.ProductDescription = "Delivery Note";
-                                    noteline.OrderQuantity = model.OriginalQuantity;
-                                    noteline.ModifiedOn = DateTime.Now;
-                                    noteline.CreatedOn = DateTime.Now;
-                                    noteline.Status = ( int ) Status.Active;
-
-                                    lineservice.Create( noteline );
-                                }
-                                catch ( Exception ex )
-                                {
-                                    ViewBag.Message = ex.Message;
-                                }
-
-                                #endregion
-                            }
-                            catch ( Exception ex )
-                            {
-                                ViewBag.Message = ex.Message;
-                            }
-
-                        scope.Complete();
-                    }
-
-                    Notify( "The item was successfully created.", NotificationType.Success );
-                    return RedirectToAction( "ClientData" );
-                }
-                else
-                {
-                    ViewBag.Message = "No Client Accounted for";
-                    return View();
-                }
+                return View( model );
             }
-            catch ( Exception ex )
+
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( DeliveryNoteService dnservice = new DeliveryNoteService() )
+            using ( DeliveryNoteLineService dnlservice = new DeliveryNoteLineService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( ClientService cservice = new ClientService() )
+            using ( TransactionScope scope = new TransactionScope() )
             {
-                ViewBag.Message = ex.Message;
-                return View();
+                #region Create Client Load
+
+                ClientLoad load = new ClientLoad()
+                {
+                    THAN = model.THAN,
+                    ClientId = model.ClientId,
+                    LoadDate = model.LoadDate,
+                    Equipment = model.Equipment,
+                    ReturnQty = model.ReturnQty,
+                    PODNumber = model.PODNumber,
+                    PCNNumber = model.PCNNumber,
+                    PRNNumber = model.PRNNumber,
+                    VehicleId = model.VehicleId,
+                    DebriefQty = model.DebriefQty,
+                    LoadNumber = model.LoadNumber,
+                    NotifyDate = model.NotifyDate,
+                    Status = ( int ) model.Status,
+                    NewQuantity = model.NewQuantity,
+                    DeliveryNote = model.DeliveryNote,
+                    ClientSiteId = model.ClientSiteId,
+                    ReconcileDate = model.ReconcileDate,
+                    TransporterId = model.TransporterId,
+                    AccountNumber = model.AccountNumber,
+                    EffectiveDate = model.EffectiveDate,
+                    ChepInvoiceNo = model.ChepInvoiceNo,
+                    AdminMovement = model.AdminMovement,
+                    ReceiverNumber = model.ReceiverNumber,
+                    OutstandingQty = model.OutstandingQty,
+                    ReferenceNumber = model.ReferenceNumber,
+                    OriginalQuantity = model.OriginalQuantity,
+                    ClientDescription = model.ClientDescription,
+                    ChepCompensationNo = model.ChepCompensationNo,
+                    OutstandingReasonId = model.OutstandingReasonId,
+                    ReconcileInvoice = model.ReconcileInvoice.GetBoolValue(),
+                };
+
+                load = clservice.Create( load );
+
+                #endregion
+
+                Address address = aservice.Get( model.ClientId, "Client" );
+
+                string customerAddress = $"{address?.Addressline1} {address?.Addressline2} {address?.Town} {address?.PostalCode}";
+
+                #region Create Delivery Note
+
+                Client client = cservice.GetById( model.ClientId );
+
+                DeliveryNote deliveryNote = new DeliveryNote()
+                {
+                    ClientId = model.ClientId,
+                    ClientSiteId = model.ClientSiteId,
+
+                    OrderDate = model.LoadDate,
+                    EmailAddress = client.Email,
+                    Status = ( int ) Status.Active,
+                    Reference306 = model.LoadNumber,
+                    CustomerName = client.CompanyName,
+                    InvoiceNumber = model.DeliveryNote,
+                    OrderNumber = model.ReferenceNumber,
+                    ContactNumber = model.ReceiverNumber,
+
+                    CustomerAddress = customerAddress,
+                    CustomerProvince = address?.Province,
+                    CustomerPostalCode = address?.PostalCode,
+
+                    DeliveryAddress = customerAddress,
+                    DeliveryProvince = address?.Province,
+                    DeliveryPostalCode = address?.PostalCode,
+
+                    BillingAddress = customerAddress,
+                    BillingProvince = address?.Province,
+                    BililngPostalCode = address?.PostalCode,
+                };
+
+                deliveryNote = dnservice.Create( deliveryNote );
+
+                #endregion
+
+                #region Delivery Note Line
+
+                DeliveryNoteLine dnl = new DeliveryNoteLine
+                {
+                    Returned = 0,
+                    Product = model.Equipment,
+                    DeliveryNoteId = deliveryNote.Id,
+                    Equipment = model.Equipment,
+                    Delivered = model.NewQuantity,
+                    Status = ( int ) Status.Active,
+                    ProductDescription = model.Equipment,
+                    OrderQuantity = model.OriginalQuantity,
+                };
+
+                dnlservice.Create( dnl );
+
+                #endregion
+
+                #region Delivery Note Address
+
+                // Create Invoice Customer Address
+                Address invoiceCustomerAddress = new Address()
+                {
+                    Type = 1,
+                    Town = address?.Town,
+                    ObjectId = deliveryNote.Id,
+                    ObjectType = "DeliveryNote",
+                    Status = ( int ) Status.Active,
+                    PostalCode = address?.PostalCode,
+                    Addressline1 = address?.Addressline1,
+                    Addressline2 = address?.Addressline2,
+                    Province = ( int ) address?.Province,
+                };
+
+                aservice.Create( invoiceCustomerAddress );
+
+                #endregion
+
+                scope.Complete();
             }
+
+            Notify( "The item was successfully created.", NotificationType.Success );
+
+            return ClientData( new PagingModel(), new CustomSearchModel() );
         }
-
 
         // GET: Pallet/EditClientData/5
         [Requires( PermissionTo.Edit )]
         public ActionResult EditClientData( int id )
         {
-            ClientLoad load;
-
             using ( ClientLoadService service = new ClientLoadService() )
             {
-                load = service.GetById( id );
-
+                ClientLoad load = service.GetById( id );
 
                 if ( load == null )
                 {
@@ -590,134 +671,351 @@ namespace ACT.UI.Controllers
 
                 ClientLoadViewModel model = new ClientLoadViewModel()
                 {
-                    ClientId = load.ClientId,
-                    //VehicleId = load.VehicleId,
-                    //TransporterId = (int)load.TransporterId,
+                    Id = load.Id,
+                    EditMode = true,
+                    THAN = load.THAN,
                     LoadDate = load.LoadDate,
-                    LoadNumber = load.LoadNumber,
-                    EffectiveDate = load.EffectiveDate,
-                    NotifyDate = load.NotifyDate,
-                    AccountNumber = load.AccountNumber,
-                    ClientDescription = load.ClientDescription,
-                    DeliveryNote = load.DeliveryNote,
-                    ReferenceNumber = load.ReferenceNumber,
-                    ReceiverNumber = load.ReceiverNumber,
+                    ClientId = load.ClientId,
+                    VehicleId = load.VehicleId,
                     Equipment = load.Equipment,
-                    OriginalQuantity = load.OriginalQuantity,
-                    NewQuantity = load.NewQuantity,
                     ReturnQty = load.ReturnQty,
-                    ReconcileDate = load.ReconcileDate,
-                    ReconcileInvoice = load.ReconcileInvoice,
                     PODNumber = load.PODNumber,
                     PCNNumber = load.PCNNumber,
                     PRNNumber = load.PRNNumber,
-                    Status = ( int ) load.Status
-                    // DocumentCount = (int)load.DocumentCount,
-                    // DocsList = ""
+                    DebriefQty = load.DebriefQty,
+                    LoadNumber = load.LoadNumber,
+                    NotifyDate = load.NotifyDate,
+                    NewQuantity = load.NewQuantity,
+                    DeliveryNote = load.DeliveryNote,
+                    ClientSiteId = load.ClientSiteId,
+                    TransporterId = load.TransporterId,
+                    ReconcileDate = load.ReconcileDate,
+                    AccountNumber = load.AccountNumber,
+                    EffectiveDate = load.EffectiveDate,
+                    AdminMovement = load.AdminMovement,
+                    ChepInvoiceNo = load.ChepInvoiceNo,
+                    OutstandingQty = load.OutstandingQty,
+                    ReceiverNumber = load.ReceiverNumber,
+                    ReferenceNumber = load.ReferenceNumber,
+                    OriginalQuantity = load.OriginalQuantity,
+                    ClientDescription = load.ClientDescription,
+                    ChepCompensationNo = load.ChepCompensationNo,
+                    Status = ( ReconciliationStatus ) load.Status,
+                    OutstandingReasonId = load.OutstandingReasonId,
+                    ReconcileInvoice = load.ReconcileInvoice == true ? YesNo.Yes : YesNo.No,
                 };
-                List<Transporter> transporterOptions = new List<Transporter>();
-                using ( TransporterService rservice = new TransporterService() )
-                {
-                    transporterOptions = rservice.List();
-                }
-                IEnumerable<SelectListItem> transporterOptionsDDL = transporterOptions.Select( c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.TradingName
 
-                } );
-                ViewBag.TransporterOptions = transporterOptionsDDL;
-                List<Vehicle> vehicleOptions = new List<Vehicle>();
-                using ( VehicleService vservice = new VehicleService() )
-                {
-                    vehicleOptions = vservice.ListByColumnsWhere( "ObjectId", model.ClientId, "Object", "Client" );
-                }
-                IEnumerable<SelectListItem> vehicleOptionsDDL = vehicleOptions.Select( c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.Registration
-
-                } );
-                ViewBag.VehicleOptions = vehicleOptionsDDL;
-                return View( "EditClientData", model );
+                return View( model );
             }
         }
 
         // POST: Pallet/EditClientData/5
         [HttpPost]
         [Requires( PermissionTo.Edit )]
-        public ActionResult EditClientData( ClientLoadViewModel model, PagingModel pm, bool isstructure = false )
+        public ActionResult EditClientData( ClientLoadViewModel model )
         {
-            try
+            if ( !ModelState.IsValid )
             {
-                if ( !ModelState.IsValid )
-                {
-                    Notify( "Sorry, the selected Group was not updated. Please correct all errors and try again.", NotificationType.Error );
+                Notify( "Sorry, the selected Client Load was not updated. Please correct all errors and try again.", NotificationType.Error );
 
-                    return View( model );
+                return View( model );
+            }
+
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( DeliveryNoteLineService dnlservice = new DeliveryNoteLineService() )
+            {
+                ClientLoad load = clservice.GetById( model.Id );
+
+                if ( load == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
                 }
 
-                ClientLoad load;
+                bool updateDeliveryNote = load.NewQuantity != model.NewQuantity || load.OriginalQuantity != model.OriginalQuantity;
 
-                using ( ClientLoadService service = new ClientLoadService() )
-                using ( TransactionScope scope = new TransactionScope() )
+                #region Update Client Load
+
+                load.THAN = model.THAN;
+                load.ClientId = model.ClientId;
+                load.LoadDate = model.LoadDate;
+                load.Equipment = model.Equipment;
+                load.ReturnQty = model.ReturnQty;
+                load.PODNumber = model.PODNumber;
+                load.PCNNumber = model.PCNNumber;
+                load.PRNNumber = model.PRNNumber;
+                load.VehicleId = model.VehicleId;
+                load.DebriefQty = model.DebriefQty;
+                load.LoadNumber = model.LoadNumber;
+                load.NotifyDate = model.NotifyDate;
+                load.Status = ( int ) model.Status;
+                load.NewQuantity = model.NewQuantity;
+                load.DeliveryNote = model.DeliveryNote;
+                load.ClientSiteId = model.ClientSiteId;
+                load.ReconcileDate = model.ReconcileDate;
+                load.TransporterId = model.TransporterId;
+                load.AccountNumber = model.AccountNumber;
+                load.EffectiveDate = model.EffectiveDate;
+                load.ChepInvoiceNo = model.ChepInvoiceNo;
+                load.AdminMovement = model.AdminMovement;
+                load.ReceiverNumber = model.ReceiverNumber;
+                load.OutstandingQty = model.OutstandingQty;
+                load.ReferenceNumber = model.ReferenceNumber;
+                load.OriginalQuantity = model.OriginalQuantity;
+                load.ClientDescription = model.ClientDescription;
+                load.ChepCompensationNo = model.ChepCompensationNo;
+                load.OutstandingReasonId = model.OutstandingReasonId;
+                load.ReconcileInvoice = model.ReconcileInvoice.GetBoolValue();
+
+                clservice.Update( load );
+
+                #endregion
+
+                if ( updateDeliveryNote )
                 {
-                    load = service.GetById( model.Id );
+                    #region Update Delivery Note Lines
 
-                    #region Update Client Load
+                    List<DeliveryNoteLine> deliveryNoteLines = dnlservice.ListByLoadNumber( model.LoadNumber );
 
-                    // Update Group
-                    //group.Id = model.Id;
-                    load.ClientId = model.ClientId;
-                    //load.VehicleId = model.VehicleId;
-                    //   load.TransporterId = model.TransporterId;
-                    load.LoadDate = model.LoadDate;// DateTimeExtensions.formatImportDate(model.LoadDate);
-                    load.LoadNumber = model.LoadNumber;
-                    load.EffectiveDate = model.EffectiveDate;// DateTimeExtensions.formatImportDate(model.EffectiveDate);
-                    load.NotifyDate = model.NotifyDate;// DateTimeExtensions.formatImportDate(model.NotifyeDate);
-                    load.AccountNumber = model.AccountNumber;
-                    load.ClientDescription = model.ClientDescription;
-                    load.DeliveryNote = model.DeliveryNote;
-                    load.ReferenceNumber = model.ReferenceNumber;
-                    load.ReceiverNumber = model.ReceiverNumber;
-                    load.Equipment = model.Equipment;
-                    load.OriginalQuantity = model.OriginalQuantity;
-                    load.NewQuantity = model.NewQuantity;
-                    load.ReturnQty = model.ReturnQty;
-                    load.ReconcileDate = model.ReconcileDate;
-                    load.ReconcileInvoice = model.ReconcileInvoice;
-                    load.PODNumber = model.PODNumber;
-                    load.PCNNumber = model.PCNNumber;
-                    load.PRNNumber = model.PRNNumber;
-                    //load.ARPMComments = model.ARPMComments;
-                    //load.ProvCode = model.ProvCode;
-                    load.Status = ( int ) model.Status;
-                    load.ModifiedBy = CurrentUser.Email;
-                    load.ModifiedOn = DateTime.Now;
+                    if ( deliveryNoteLines.NullableAny() )
+                    {
+                        foreach ( DeliveryNoteLine dnl in deliveryNoteLines )
+                        {
+                            dnl.Product = model.Equipment;
+                            dnl.Equipment = model.Equipment;
+                            dnl.Delivered = model.NewQuantity;
+                            dnl.ProductDescription = model.Equipment;
+                            dnl.OrderQuantity = model.OriginalQuantity;
 
-                    service.Update( load );
+                            dnlservice.Update( dnl );
+                        }
+                    }
+
+                    #endregion
+                }
+            }
+
+            Notify( "The selected Client Load details were successfully updated.", NotificationType.Success );
+
+            return ClientData( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // GET: Pallet/ImportClientData
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportClientData()
+        {
+            ClientLoadViewModel model = new ClientLoadViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        // POST: Pallet/ImportClientData
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportClientData( ClientLoadViewModel model )
+        {
+            if ( model.File == null )
+            {
+                Notify( "Please select a file to upload and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            int count = 0,
+                errors = 0,
+                skipped = 0,
+                created = 0,
+                updated = 0;
+
+            string cQuery, uQuery;
+
+            using ( VehicleService vservice = new VehicleService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( TransporterService tservice = new TransporterService() )
+            using ( TextFieldParser parser = new TextFieldParser( model.File.InputStream ) )
+            {
+                parser.Delimiters = new string[] { "," };
+
+                while ( true )
+                {
+                    string[] load = parser.ReadFields();
+
+                    if ( load == null )
+                    {
+                        break;
+                    }
+
+                    cQuery = uQuery = string.Empty;
+
+                    count++;
+
+                    if ( load.NullableCount() < 2 )
+                    {
+                        skipped++;
+
+                        continue;
+                    }
+
+                    load = load.ToSQLSafe();
+
+                    string[] podPieces = load[ 11 ].Split( ';' );
+
+                    int podStatus = podPieces.Count() > 0 ? 1 : 0;
+
+                    string pod = podPieces.Count() > 0 ? podPieces[ 0 ] : string.Empty,
+                           pcn = podPieces.Count() > 1 ? podPieces[ 1 ] : string.Empty,
+                           prn = load[ 20 ],
+                           reg = load[ 13 ];
+
+                    int.TryParse( load[ 16 ], out int qty );
+
+                    int? returnQty = !string.IsNullOrWhiteSpace( load[ 20 ] ) ? qty : 0;
+
+                    ReconciliationStatus status = ReconciliationStatus.Unreconciled;
+
+                    string uid = clservice.GetSha1Md5String( $"{model.ClientId}{load[ 0 ]}{load[ 2 ]}" );
+
+                    if ( uid.Length > 150 )
+                    {
+                        uid = uid.Substring( 0, 150 );
+                    }
+
+                    if ( !DateTime.TryParse( load[ 3 ], out DateTime loadDate ) )
+                    {
+                        DateTime.TryParseExact( load[ 3 ], "yyyy-MM-dd h:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime loadDate1 );
+
+                        loadDate = loadDate1;
+                    }
+
+                    if ( !DateTime.TryParse( load[ 3 ], out DateTime deliveryDate ) )
+                    {
+                        DateTime.TryParseExact( load[ 3 ], "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime deliveryDate1 );
+
+                        deliveryDate = deliveryDate1;
+                    }
+
+                    ClientLoad l = clservice.GetByUID( uid );
+
+                    #region Transporter
+
+                    Transporter t = tservice.GetByName( load[ 15 ] );
+
+                    if ( t == null )
+                    {
+                        t = new Transporter()
+                        {
+                            Name = load[ 15 ],
+                            TradingName = load[ 15 ],
+                            RegistrationNumber = load[ 14 ],
+                            Status = ( int ) Status.Active,
+                        };
+
+                        t = tservice.Create( t );
+                    }
 
                     #endregion
 
+                    #region Vehicle
 
-                    scope.Complete();
+                    Vehicle v = vservice.GetByRegistrationNumber( reg, "Transporter" );
+
+                    if ( v == null )
+                    {
+                        v = new Vehicle()
+                        {
+                            ObjectId = t.Id,
+                            Descriptoin = reg,
+                            Registration = reg,
+                            ObjectType = "Transporter",
+                            Status = ( int ) Status.Active,
+                            Type = ( int ) VehicleType.Pickup,
+                        };
+
+                        v = vservice.Create( v );
+                    }
+
+                    #endregion
+
+                    if ( l == null )
+                    {
+                        #region Create Client Load
+
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[ClientLoad]([ClientId],[VehicleId],[TransporterId],[CreatedOn],[ModifiedOn],[ModifiedBy],[LoadNumber],[LoadDate],[EffectiveDate],[NotifyDate],[AccountNumber],[ClientDescription],[DeliveryNote],[ReferenceNumber],[ReceiverNumber],[OriginalQuantity],[NewQuantity],[PODNumber],[PCNNumber],[PRNNumber],[Status],[PostingType],[THAN],[ReturnQty],[PODStatus],[UID]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},{v.Id},{t.Id},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 2 ]}','{loadDate}','{deliveryDate}','{deliveryDate}','{load[ 5 ]}','{load[ 6 ]}','{load[ 12 ]}','{load[ 10 ]}','{load[ 12 ]}',{qty},{qty},'{pod}','{pcn}','{prn}',{( int ) status},{( int ) PostingType.Import},'{load[ 17 ]}',{returnQty},{podStatus},'{uid}') ";
+
+                        #endregion
+
+                        try
+                        {
+                            clservice.Query( cQuery );
+
+                            created++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+                        }
+                    }
+                    else
+                    {
+                        #region Update Client Load
+
+                        uQuery = $@"{uQuery} UPDATE [dbo].[ClientLoad] SET
+                                                    [ModifiedOn]='{DateTime.Now}',
+                                                    [ModifiedBy]='{CurrentUser.Email}',
+                                                    [VehicleId]={v.Id},
+                                                    [TransporterId]={t.Id},
+                                                    [LoadNumber]='{load[ 2 ]}',
+                                                    [LoadDate]='{loadDate}',
+                                                    [EffectiveDate]='{deliveryDate}',
+                                                    [NotifyDate]='{deliveryDate}',
+                                                    [AccountNumber]='{load[ 5 ]}',
+                                                    [ClientDescription]='{load[ 6 ]}',
+                                                    [DeliveryNote]='{load[ 12 ]}',
+                                                    [ReferenceNumber]='{load[ 10 ]}',
+                                                    [ReceiverNumber]='{load[ 12 ]}',
+                                                    [OriginalQuantity]={qty},
+                                                    [NewQuantity]={qty},
+                                                    [PODNumber]='{pod}',
+                                                    [PCNNumber]='{pcn}',
+                                                    [PRNNumber]='{prn}',
+                                                    [Status]={( int ) status},
+                                                    [THAN]='{load[ 17 ]}',
+                                                    [ReturnQty]={returnQty},
+                                                    [PODStatus]={podStatus},
+                                                    [UID]={( int ) Status.Active}
+                                                WHERE
+                                                    [Id]={l.Id}";
+
+                        #endregion
+
+                        try
+                        {
+                            clservice.Query( uQuery );
+
+                            updated++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+                        }
+                    }
                 }
 
-                Notify( "The selected Item details were successfully updated.", NotificationType.Success );
+                cQuery = string.Empty;
+                uQuery = string.Empty;
+            }
 
-                return RedirectToAction( "ClientData" );
-            }
-            catch ( Exception ex )
-            {
-                ViewBag.Message = ex.Message;
-                return View();
-            }
+            Notify( $"{created} loads were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.", NotificationType.Success );
+
+            return ClientData( new PagingModel(), new CustomSearchModel() );
         }
 
         // POST: Pallet/DeleteClientData/5
         [HttpPost]
         [Requires( PermissionTo.Delete )]
-        public ActionResult DeleteClientData( ClientLoadCustomModel model )
+        public ActionResult DeleteClientData( ClientLoadViewModel model )
         {
             ClientLoad activeLoad;
             try
@@ -754,99 +1052,113 @@ namespace ACT.UI.Controllers
 
         //-------------------------------------------------------------------------------------
 
-        #region Pallet Reconcile Loads
+        #region Reconcile Loads
+
+        //
+        // GET: /Pallet/ChepLoads
+        public ActionResult ChepLoads( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( ChepLoadService chservice = new ChepLoadService() )
+            {
+                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
+
+                pm.Sort = "ASC";
+
+                pm.SortBy = "cl.[ShipmentDate]";
+
+                List<ChepLoadCustomModel> chModel = chservice.List1( pm, csm );
+                int chTotal = ( chModel.Count < pm.Take && pm.Skip == 0 ) ? chModel.Count : chservice.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( chModel, chTotal, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_ChepLoads", paging );
+            }
+        }
+
+        //
+        // GET: /Pallet/ClientLoads
+        public ActionResult ClientLoads( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( ClientLoadService chservice = new ClientLoadService() )
+            {
+                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
+
+                pm.Sort = "ASC";
+
+                pm.SortBy = "cl.[LoadDate]";
+
+                List<ClientLoadCustomModel> model = chservice.List1( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : chservice.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "ClientLoads", paging );
+            }
+        }
 
         //
         // GET: /Pallet/ReconcileLoads
-        public ActionResult ReconcileLoads( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        public ActionResult ReconcileLoad( int chid, int clid, string product )
         {
-            if ( givecsm )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( ChepLoadService chservice = new ChepLoadService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( ChepClientService ccservice = new ChepClientService() )
             {
-                ViewBag.ViewName = "ReconcileLoads";
+                ChepLoad ch = chservice.GetById( chid );
 
-                return PartialView( "_ReconcileLoadsCustomSearch", new CustomSearchModel( "ReconcileLoads" ) );
-            }
-            ViewBag.ViewName = "ReconcileLoads";
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-            ViewBag.ClientId = clientId;
-            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
-            using ( ClientService clientService = new ClientService() )
-            {
-                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
-            }
+                if ( ch == null )
+                {
+                    Notify( "Sorry, the specified Pooling Agent Load could not be found. Please try again", NotificationType.Error );
 
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
+                    return PartialView( "_AccessDenied" );
+                }
 
-            } );
-            ViewBag.ClientList = clientDDL;
+                ClientLoad cl = clservice.GetById( clid );
 
-            return PartialView( "_ReconcileLoads" );
-        }
+                if ( cl == null )
+                {
+                    Notify( "Sorry, the specified Client Load could not be found. Please try again", NotificationType.Error );
 
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetUnreconciledClientLoads( int? clientId )
-        {
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            clientId = ( int ) ( clientId != null ? ( int ) clientId : !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+                    return PartialView( "_AccessDenied" );
+                }
 
-            List<ClientLoadCustomModel> load;
-            //int pspId = Session[ "UserPSP" ];
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
+                ChepClient cc = new ChepClient()
+                {
+                    ChepLoadsId = ch.Id,
+                    ClientLoadsId = cl.Id,
+                    Status = ( int ) ReconciliationStatus.Reconciled,
+                };
 
+                ccservice.Create( cc );
 
-            using ( ClientLoadService clientService = new ClientLoadService() )
-            {
+                ch.BalanceStatus = ( int ) ReconciliationStatus.Reconciled;
 
-                load = clientService.ListCSM( new PagingModel(), new CustomSearchModel() { ClientId = ( int ) clientId, Status = ( int ) ReconciliationStatus.Unreconciled, ReconciliationStatus = ( int ) ReconciliationStatus.Unreconciled } ); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
+                chservice.Update( ch );
 
-            }
-            if ( load != null )
-            {
-                return Json( load, JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
+                cl.Status = ( int ) ReconciliationStatus.Reconciled;
+                cl.OrderStatus = ( int ) ReconciliationStatus.Reconciled;
 
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetUnreconciledAgentLoads( int? clientId )
-        {
+                if ( string.IsNullOrWhiteSpace( cl.Equipment ) )
+                {
+                    cl.Equipment = product;
+                }
 
-            List<ChepLoadCustomModel> load;
-            //int pspId = Session[ "UserPSP" ];
-            int pspId = ( CurrentUser != null ? CurrentUser.PSPs.FirstOrDefault().Id : 0 );
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            clientId = ( int ) ( clientId != null ? ( int ) clientId : !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
+                clservice.Update( cl );
 
-            using ( ChepLoadService chepService = new ChepLoadService() )
-            {
+                scope.Complete();
 
-                load = chepService.List1( new PagingModel(), new CustomSearchModel() { ClientId = ( int ) clientId, Status = ( int ) ReconciliationStatus.Unreconciled, ReconciliationStatus = ( int ) ReconciliationStatus.Unreconciled } ); //(pspId, int.Parse(groupId), new CustomSearchModel() { ClientId = clientId, Status = Status.Active });
-
+                Notify( "The selected loads were successfully reconcilled.", NotificationType.Success );
             }
 
-            if ( load != null )
-            {
-                return Json( load, JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
+            return PartialView( "_Notification" );
         }
 
         #endregion
 
         //-------------------------------------------------------------------------------------
 
-        #region Pallet Reconcile Invoice
+        #region Reconcile Invoice
 
         //
         // GET: /Pallet/ReconcileInvoice
@@ -889,7 +1201,7 @@ namespace ACT.UI.Controllers
 
         //-------------------------------------------------------------------------------------
 
-        #region Pallet Exceptions
+        #region Exceptions
 
         //
         // GET: /Pallet/Exceptions
@@ -1127,9 +1439,9 @@ namespace ACT.UI.Controllers
                     BillingPostalCode = note.BililngPostalCode,
                     CustomerPostalCode = note.CustomerPostalCode,
                     DeliveryPostalCode = note.DeliveryPostalCode,
-                    BillingProvince = (Province) note.BillingProvince,
-                    CustomerProvince = (Province) note.CustomerProvince,
-                    DeliveryProvince = (Province) note.DeliveryProvince,
+                    BillingProvince = ( Province ) note.BillingProvince,
+                    CustomerProvince = ( Province ) note.CustomerProvince,
+                    DeliveryProvince = ( Province ) note.DeliveryProvince,
 
                     BillingAddress1 = bAddress.Length >= 1 ? bAddress[ 0 ] : string.Empty,
                     BillingAddress2 = bAddress.Length >= 2 ? bAddress[ 1 ] : string.Empty,
@@ -1549,7 +1861,7 @@ namespace ACT.UI.Controllers
                 if ( !model.ChepLoadId.HasValue )
                 {
                     // Attempt to locate ChepLoad using the specified DocketNumber
-                    ChepLoad cl = clservice.GetByDocketNumber( model.DocketNumber?.Trim() );
+                    ChepLoad cl = clservice.GetByDocketNumber( model.DocketNumber );
 
                     model.ChepLoadId = ( cl != null ) ? cl.Id : model.ChepLoadId;
                 }
@@ -1665,7 +1977,7 @@ namespace ACT.UI.Controllers
                 if ( !model.ChepLoadId.HasValue )
                 {
                     // Attempt to locate ChepLoad using the specified DocketNumber
-                    ChepLoad cl = clservice.GetByDocketNumber( model.DocketNumber?.Trim() );
+                    ChepLoad cl = clservice.GetByDocketNumber( model.DocketNumber );
 
                     model.ChepLoadId = ( cl != null ) ? cl.Id : model.ChepLoadId;
                 }
@@ -2563,7 +2875,7 @@ namespace ACT.UI.Controllers
 
                                             Client noteClient = clientservice.GetById( clientID );
                                             Address clientAddress = addservice.GetByColumnsWhere( "ObjectId", model.ClientId, "ObjectType", "Client" );
-                                            string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ( (Province) clientAddress.Province ).GetDisplayText();
+                                            string customerAddress = clientAddress.Addressline1 + ' ' + clientAddress.Addressline2 + ' ' + clientAddress.Town + ' ' + clientAddress.PostalCode + ' ' + ( ( Province ) clientAddress.Province ).GetDisplayText();
                                             //string billingAddress = model.BillingAddress + ' ' + model.BillingAddress2 + ' ' + model.BillingAddressTown + ' ' + model.BillingPostalCode + ' ' + ((Province)model.BillingProvince).GetDisplayText();
                                             //string deliveryAddress = model.DeliveryAddress + ' ' + model.DeliveryAddress2 + ' ' + model.DeliveryAddressTown + ' ' + model.DeliveryPostalCode + ' ' + ((Province)model.DeliveryProvince).GetDisplayText();
 
@@ -2628,16 +2940,17 @@ namespace ACT.UI.Controllers
                                             #region Save DeliveryNoteLine
                                             try
                                             {
-                                                DeliveryNoteLine noteline = new DeliveryNoteLine();
-
-                                                noteline.DeliveryNoteId = delnote.Id;//deliveryNoteId;
-                                                noteline.Delivered = model.NewQuantity;
-                                                noteline.Product = "Delivery Note";
-                                                noteline.ProductDescription = "Delivery Note";
-                                                noteline.OrderQuantity = model.OriginalQuantity;
-                                                noteline.ModifiedOn = DateTime.Now;
-                                                noteline.CreatedOn = DateTime.Now;
-                                                noteline.Status = ( int ) Status.Active;
+                                                DeliveryNoteLine noteline = new DeliveryNoteLine
+                                                {
+                                                    DeliveryNoteId = delnote.Id,//deliveryNoteId;
+                                                    Delivered = model.NewQuantity,
+                                                    Product = "Delivery Note",
+                                                    ProductDescription = "Delivery Note",
+                                                    OrderQuantity = model.OriginalQuantity,
+                                                    ModifiedOn = DateTime.Now,
+                                                    CreatedOn = DateTime.Now,
+                                                    Status = ( int ) Status.Active
+                                                };
 
                                                 lineservice.Create( noteline );
                                             }
@@ -2809,12 +3122,63 @@ namespace ACT.UI.Controllers
                 }
 
                 List<ChepLoadCustomModel> model = service.List1( pm, csm );
-                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total();
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
 
                 PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
                 return PartialView( "_PoolingAgentData", paging );
             }
+        }
+
+        //
+        // GET: /Pallet/ClientData
+        public ActionResult ClientData( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "ClientData";
+
+                return PartialView( "_ClientDataCustomSearch", new CustomSearchModel( "ClientData" ) );
+            }
+
+            using ( ClientLoadService service = new ClientLoadService() )
+            {
+                List<ClientLoadCustomModel> model = service.List1( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_ClientData", paging );
+            }
+        }
+
+        //
+        // GET: /Pallet/ReconcileLoads
+        public ActionResult ReconcileLoads( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( ChepLoadService chservice = new ChepLoadService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            {
+                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
+
+                pm.Sort = "ASC";
+
+                pm.SortBy = "cl.[ShipmentDate]";
+
+                List<ChepLoadCustomModel> chModel = chservice.List1( pm, csm );
+                int chTotal = ( chModel.Count < pm.Take && pm.Skip == 0 ) ? chModel.Count : chservice.Total1( pm, csm );
+
+                ViewBag.ChepLoads = PagingExtension.Create( chModel, chTotal, pm.Skip, pm.Take, pm.Page );
+
+                pm.SortBy = "cl.[LoadDate]";
+
+                List<ClientLoadCustomModel> clModel = clservice.List1( pm, csm );
+                int clTotal = ( clModel.Count < pm.Take && pm.Skip == 0 ) ? clModel.Count : clservice.Total1( pm, csm );
+
+                ViewBag.ClientLoads = PagingExtension.Create( clModel, clTotal, pm.Skip, pm.Take, pm.Page );
+            }
+
+            return PartialView( "_ReconcileLoads", new CustomSearchModel( "ReconcileLoads" ) );
         }
 
         //

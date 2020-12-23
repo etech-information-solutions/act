@@ -8,7 +8,7 @@ namespace ACT.Core.Enums
     {
         [UiIgnoreEnumValue]
         [StringEnumDisplayText( "Unreconcilable" )]
-        Unreconcilable = -1,
+        All = -1,
 
         [StringEnumDisplayText( "Unreconciled" )]
         Unreconciled = 0,
@@ -16,7 +16,7 @@ namespace ACT.Core.Enums
         [StringEnumDisplayText( "Reconciled" )]
         Reconciled = 1,
 
-        [StringEnumDisplayText("PCNFound")]
+        [StringEnumDisplayText( "PCN Found" )]
         PCNFound = 3,
     }
 }

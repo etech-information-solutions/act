@@ -56,7 +56,7 @@ namespace ACT.Core.Models
         {
             get; set;
         }
-
+     
         /// <summary>
         /// Can be used as a selected Transporter
         /// </summary>
@@ -125,6 +125,24 @@ namespace ACT.Core.Models
         /// </summary>
         [Display( Name = "PSP" )]
         public int PSPId { get; set; }
+
+        /// <summary>
+        /// Can be used for any entity requiring Vehicle filter
+        /// </summary>
+        [Display( Name = "Vehicle" )]
+        public int VehicleId { get; set; }
+
+        /// <summary>
+        /// Can be used for any entity requiring Client Site filter
+        /// </summary>
+        [Display( Name = "Client Site" )]
+        public int ClientSiteId { get; set; }
+
+        /// <summary>
+        /// Can be used for any entity requiring Outstanding Reason filter
+        /// </summary>
+        [Display( Name = "Outstanding Reason" )]
+        public int OutstandingReasonId { get; set; }
 
         /// <summary>
         /// Can be used for a Start date range
@@ -402,6 +420,12 @@ namespace ACT.Core.Models
 
         public Dictionary<int, string> TransporterOptions { get; set; }
 
+        public Dictionary<int, string> VehicleOptions { get; set; }
+
+        public Dictionary<int, string> ClientSiteOptions { get; set; }
+
+        public Dictionary<int, string> OutstandingReasonOptions { get; set; }
+
         public List<string> TableNameOptions
         {
             get
@@ -485,6 +509,8 @@ namespace ACT.Core.Models
 
 
                 case "ClientKPI":
+                case "ReconcileLoads":
+                case "PoolingAgentData":
 
                     using ( ClientService cservice = new ClientService() )
                     {
@@ -584,6 +610,24 @@ namespace ACT.Core.Models
                     }
 
                     break;
+
+
+                case "ClientData":
+
+                    using ( ClientService cservice = new ClientService() )
+                    using ( VehicleService vservice = new VehicleService() )
+                    //using ( ClientSiteService csservice = new ClientSiteService() )
+                    using ( TransporterService tservice = new TransporterService() )
+                    using ( OutstandingReasonService urservice = new OutstandingReasonService() )
+                    {
+                        ClientOptions = cservice.List( true );
+                        VehicleOptions = vservice.List( true );
+                        //ClientSiteOptions = csservice.List( true );
+                        TransporterOptions = tservice.List( true );
+                        OutstandingReasonOptions = urservice.List( true );
+                    }
+
+                    break;
             }
         }
 
@@ -599,7 +643,7 @@ namespace ACT.Core.Models
             this.ActivityType = ActivityTypes.All;
             this.InvoiceStatus = InvoiceStatus.All;
             this.PSPClientStatus = PSPClientStatus.All;
-            this.ReconciliationStatus = ReconciliationStatus.Unreconcilable;
+            this.ReconciliationStatus = ReconciliationStatus.All;
         }
     }
 }

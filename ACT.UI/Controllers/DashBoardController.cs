@@ -34,7 +34,7 @@ namespace ACT.UI.Controllers
 
                 if ( givedata )
                 {
-                    List<ClientLoadCustomModel> loads = service.ListCSM( new PagingModel() { Take = int.MaxValue }, csm );
+                    List<ClientLoadCustomModel> loads = service.List1( new PagingModel() { Take = int.MaxValue }, csm );
 
                     return PartialView( "_AgeOfOutstandingPalletsData", loads );
                 }
@@ -105,7 +105,7 @@ namespace ACT.UI.Controllers
                     csm.ToDate = toDate;
                     csm.FromDate = fromDate;
 
-                    List<ClientLoadCustomModel> loadsPerMonth = service.ListCSM( new PagingModel() { Take = int.MaxValue }, csm );
+                    List<ClientLoadCustomModel> loadsPerMonth = service.List1( new PagingModel() { Take = int.MaxValue }, csm );
 
                     return PartialView( "_LoadsPerMonthData", loadsPerMonth );
                 }
@@ -157,7 +157,7 @@ namespace ACT.UI.Controllers
             {
                 if ( givedata )
                 {
-                    List<ClientLoadCustomModel> numberOfPalletsManaged = service.ListCSM( new PagingModel() { Take = int.MaxValue }, csm );
+                    List<ClientLoadCustomModel> numberOfPalletsManaged = service.List1( new PagingModel() { Take = int.MaxValue }, csm );
 
                     return PartialView( "_NumberOfPalletsManagedData", numberOfPalletsManaged );
                 }

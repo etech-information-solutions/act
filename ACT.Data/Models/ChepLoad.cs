@@ -17,7 +17,7 @@ namespace ACT.Data.Models
         public int Id { get; set; }
         public int ClientId { get; set; }
         public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModfiedOn { get; set; }
+        public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public string ChepStatus { get; set; }
         public string TransactionType { get; set; }
@@ -31,7 +31,7 @@ namespace ACT.Data.Models
         public string OtherPartyCountry { get; set; }
         public string EquipmentCode { get; set; }
         public string Equipment { get; set; }
-        public Nullable<int> Quantity { get; set; }
+        public string Quantity { get; set; }
         public string Ref { get; set; }
         public string OtherRef { get; set; }
         public string BatchRef { get; set; }

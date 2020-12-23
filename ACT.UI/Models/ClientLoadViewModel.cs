@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web;
+
+using ACT.Core.Enums;
+using ACT.Core.Services;
+
 namespace ACT.UI.Models
 {
     public class ClientLoadViewModel
@@ -9,112 +14,196 @@ namespace ACT.UI.Models
 
         public int Id { get; set; }
 
+        [Required]
+        [Display( Name = "Client" )]
         public int ClientId { get; set; }
-        public int? VehicleId { get; set; }
-        //public int TransporterId { get; set; }
 
-        public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModifiedOn { get; set; }
-        public string ModifiedBy { get; set; }
+        [Required]
+        [Display( Name = "Vehicle" )]
+        public int? VehicleId { get; set; }
+
+        [Display( Name = "Client Site" )]
+        public int? ClientSiteId { get; set; }
+
+        [Display( Name = "Transporter" )]
+        public int? TransporterId { get; set; }
+
+        [Display( Name = "Outstanding Reason" )]
+        public int? OutstandingReasonId { get; set; }
+
+        [Display( Name = "Load Number" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string LoadNumber { get; set; }
+
         [Required]
-        [Display(Name = "Load Date")]
-        //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
-        public Nullable<System.DateTime> LoadDate { get; set; }
+        [Display( Name = "Load Date" )]
+        public DateTime? LoadDate { get; set; }
+
         [Required]
-        [Display(Name = "Effective Date")]
-        //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
-        public System.DateTime EffectiveDate { get; set; }
+        [Display( Name = "Effective Date" )]
+        public DateTime? EffectiveDate { get; set; }
+
         [Required]
-        [Display(Name = "Notify Date")]
-        //[StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
-        public Nullable<System.DateTime> NotifyDate { get; set; }
+        [Display( Name = "Notify Date" )]
+        public DateTime? NotifyDate { get; set; }
+
         [Required]
-        [Display(Name = "Account Number")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        [Display( Name = "Account Number" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string AccountNumber { get; set; }
 
         [Required]
-        [Display(Name = "Client Description")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        [Display( Name = "Client Description" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ClientDescription { get; set; }
 
         [Required]
-        [Display(Name = "Delivery Note")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        [Display( Name = "Delivery Note" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string DeliveryNote { get; set; }
 
         [Required]
-        [Display(Name = "Reference Number")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        [Display( Name = "Reference Number" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ReferenceNumber { get; set; }
 
         [Required]
-        [Display(Name = "Receiver Number")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        [Display( Name = "Receiver Number" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ReceiverNumber { get; set; }
 
-        [Display(Name = "Equipment")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        [Display( Name = "Equipment" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string Equipment { get; set; }
 
         [Required]
-        [Display(Name = "Original Quantity")]
-        [Range(-9999999, 9999999)]
-        public Nullable<decimal> OriginalQuantity { get; set; }
+        [Display( Name = "Original Quantity" )]
+        public decimal? OriginalQuantity { get; set; }
 
-        [Display(Name = "New Quantity")]
-        [Range(-9999999, 9999999)]
-        public Nullable<decimal> NewQuantity { get; set; }
-        public Nullable<int> ReconcileInvoice { get; set; }
-        public Nullable<System.DateTime> ReconcileDate { get; set; }
-        
-        [Display(Name = "POD Number")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        [Display( Name = "New Quantity" )]
+        public decimal? NewQuantity { get; set; }
+
+        [Display( Name = "Reconcile Invoice" )]
+        public YesNo ReconcileInvoice { get; set; }
+
+        [Display( Name = "Reconcile Date" )]
+        public DateTime? ReconcileDate { get; set; }
+
+        [Display( Name = "POD" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string PODNumber { get; set; }
-        
-        [Display(Name = "PCN Number")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+
+        [Display( Name = "PCN" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string PCNNumber { get; set; }
-        
-        [Display(Name = "PRN Number")]
-        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+
+        [Display( Name = "PRN" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string PRNNumber { get; set; }
 
-        public int Status { get; set; }
-        [Display(Name = "Return Quantity")]
-        [Range(-9999999, 9999999)]        
-        public Nullable<decimal> ReturnQty { get; set; }
-        //[Display(Name = "ARPM Comments")]
-        //[StringLength(150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
-        //public string ARPMComments { get; set; }
-        //[Display(Name = "Province Code")]
-        //[StringLength(30, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
-        //public string ProvCode { get; set; }
+        [Display( Name = "Reconciliation Status" )]
+        public ReconciliationStatus Status { get; set; }
 
-        public Nullable<int> InputInd { get; set; }
+        [Display( Name = "THAN" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string THAN { get; set; }
-        public Nullable<int> ClientSiteId { get; set; }
-        [Display(Name = "Outstanding Quantity")]
-        [Range(-9999999, 9999999)]
-        public Nullable<decimal> OutstandingQty { get; set; }
-        public Nullable<int> OutstandingReasonid { get; set; }
+
+        [Display( Name = "Return Quantity" )]
+        public decimal? ReturnQty { get; set; }
+
+        [Display( Name = "Outstanding Quantity" )]
+        public decimal? OutstandingQty { get; set; }
+
+        [Display( Name = "Debrief Quantity" )]
+        public decimal? DebriefQty { get; set; }
+
+        [Display( Name = "Admin Movement" )]
+        public decimal? AdminMovement { get; set; }
+
+        [Display( Name = "Chep Invoice #" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        public string ChepInvoiceNo { get; set; }
+
+        [Display( Name = "Chep Compensation #" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        public string ChepCompensationNo { get; set; }
 
 
-        [Display(Name = "Load Files")]
-        public ICollection<FileViewModel> Documents { get; set; }
-        public int? DocumentCount { get; set; }
-        //public List<Document> Documents { get; set; }
+
+        [Display( Name = "Import Loads" )]
+        public HttpPostedFileBase File { get; set; }
 
         public bool EditMode { get; set; }
-        public bool ContextualMode { get; set; }
-        public string DocsList { get; set; }
 
         #endregion
 
 
         #region Model Options
 
+        public Dictionary<int, string> ClientOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+
+                using ( ClientService service = new ClientService() )
+                {
+                    return service.List( true );
+                }
+            }
+        }
+
+        public Dictionary<int, string> VehicleOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+
+                using ( VehicleService service = new VehicleService() )
+                {
+                    return service.List( true );
+                }
+            }
+        }
+
+        public Dictionary<int, string> ClientSiteOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+
+                using ( ClientSiteService service = new ClientSiteService() )
+                {
+                    return service.List( true );
+                }
+            }
+        }
+
+        public Dictionary<int, string> TransporterOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+
+                using ( TransporterService service = new TransporterService() )
+                {
+                    return service.List( true );
+                }
+            }
+        }
+
+        public Dictionary<int, string> OutstandingReasonOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+
+                using ( OutstandingReasonService service = new OutstandingReasonService() )
+                {
+                    return service.List( true );
+                }
+            }
+        }
 
         #endregion
     }

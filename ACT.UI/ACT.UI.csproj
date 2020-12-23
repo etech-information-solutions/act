@@ -68,6 +68,7 @@
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="OpenPop, Version=2.0.6.1120, Culture=neutral, PublicKeyToken=6bdb97f144b7efc8, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenPop.NET.2.0.6.1120\lib\net40\OpenPop.dll</HintPath>
     </Reference>
@@ -652,6 +653,13 @@
     <Content Include="Views\Administration\EditTransporter.cshtml" />
     <Content Include="Views\Shared\_VehiclesView.cshtml" />
     <Content Include="Views\Shared\_ContactsView.cshtml" />
+    <Content Include="Views\Pallet\ImportPoolingAgentData.cshtml" />
+    <Content Include="Views\Pallet\PoolingAgentDataDetails.cshtml" />
+    <Content Include="Views\Pallet\ImportClientData.cshtml" />
+    <Content Include="Views\Pallet\ClientDataDetails.cshtml" />
+    <Content Include="Views\Pallet\_ChepLoads.cshtml" />
+    <Content Include="Views\Pallet\_ClientLoads.cshtml" />
+    <Content Include="Views\Pallet\_TinyPaging.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

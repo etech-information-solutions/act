@@ -1,11 +1,7 @@
 ﻿@model PagingExtension
 
-@using ACT.Data.Models;
 @using ACT.Core.Enums;
-@using ACT.Core.Models;
 @using ACT.Core.Models.Custom;
-@using ACT.Core.Services;
-@using ACT.UI.Models;
 
 @{
     ViewBag.ShowExport = true;
@@ -15,124 +11,72 @@
 }
 
 
-@Html.Partial("_Notification")
+@Html.Partial( "_Notification" )
 
 
 @{
-    UserModel user = User.Get();
-
     Int32 count = Model.Start;
-    List<ClientLoadCustomModel> items = (List<ClientLoadCustomModel>)Model.Items;
 
-    //CDService cservice = new CDService();
-
-
+    List<ClientLoadCustomModel> items = ( List<ClientLoadCustomModel> ) Model.Items;
 }
 
 
-@if (Model == null || !items.Any())
+@if ( Model == null || !items.Any() )
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
         There are no Client Load Entries available matching your search criteria.
     </div>
 }
-@if (ViewBag.ContextualMode)
-{
-    <input type="hidden" id="context" name="context" value="1" />
-}
-else
-{
-    <input type="hidden" id="context" name="context" value="0" />
-}
-@using (Html.BeginForm("ImportClientLoad", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "clientdata", @class = "custom-validate", @style = "width: auto;", id = "importclientdata" }))
-{
-    <p>
-        <table style="width:100%" border="0">
-            <tr>
-                <td style="width:3%">
-                    <label for="file">Client:</label>
-                </td>
-                <td style="width:15%">
-                    @if (ViewBag.ContextualMode)
-                    {
-                        @Html.DropDownList("ClientList")
-                    }
-                    else
-                    {
-                        @*@Html.DropDownList("ClientList", "All Clients")*@
-                        @Html.DropDownList("ClientList",
-                             new SelectList(ViewBag.ClientList, "Value", "Text"),
-                             "All Clients",
-                             new { @class = "form-control", @onchange= "ClientListChanged()" })
-                    }
-                </td>
-                <td style="width:2%">
-                    @Html.ActionLink("Add", "AddClientData", new { sourceview = "ClientData" }, new { @class = "add postedFilecdata", @rel = "tipsyS", @title = "Import Client Data?", @id= "addrowdata", @data_edit = "1", @data_id = 0, @data_target = "#clientdata" })
-                </td>
-                <td style="width:5%">
-                    &nbsp;
-                </td>
-                <td style="width:3%">
-                    <label for="file" class="importlabel postedFilecdata">Browse:</label>
-                </td>
-                <td style="width:55%">
-                    <input type="file" class="postedFilecdata form-control" id="postedFile" name="postedFile" accept=".csv" />
-                </td>
-                <td style="width:10%">
-                    <input type="submit" value="Import" class="importbutton postedFilecdata" />
-                </td>
-                <td style="width:7%">
-                    <a href="@(String.Format("{0}/{1}", Url.Content("~/Content/downloadtemplates"), "clientdatatemplate.csv"))" target="_blank" id="dlsitetemplate" name="dlsitetemplate" alt="Download CSV Template" tooltip="Download CSV Template"><i class="fa fa-file-excel-o"></i> Download CSV</a>
-                </td>
-            </tr>
-        </table>
-        <span class="loader"></span>
-    </p>
-}
 
+<p>
+    @Html.ActionLink( "Add", "AddClientData", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add Manual Client Data?", @data_edit = "1", @data_id = 0, @data_target = "#clientdata" } )
+
+    <span style="padding: 0 5px;">|</span>
+
+    @Html.ActionLink( "Import", "ImportClientData", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import Client Data?", @data_edit = "1", @data_id = 0, @data_target = "#clientdata" } )
+
+    <span class="loader"></span>
+</p>
 
 <table id="CDlist-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#CDlist-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
-            <th>
-                Status
+            <th data-name="Count">
+                #
             </th>
-            <th>
-                Pooling Agent
+            <th data-name="CreatedOn" data-column="cl.CreatedOn">
+                Imported/Created
             </th>
-            <th>
-                Load Date
+            <th data-name="Client" data-column="c.CompanyName">
+                Client
             </th>
-            <th>
-                Eff Date
+            <th data-name="LoadNumber" data-column="cl.LoadNumber">
+                Shipment #
             </th>
-            <th>
-                Del Note
+            <th data-name="DeliveryNote" data-column="cl.DeliveryNote">
+                Delivery Note
             </th>
-            <th>
-                Cust #
+            <th data-name="ReceiverNumber" data-column="cl.ReceiverNumber">
+                Receiver #
             </th>
-            <th>
-                Product
+            <th data-name="Equipment" data-column="cl.Equipment">
+                Equipment
             </th>
-            <th>
-                Shipment No
+            <th data-name="PODNumber" data-column="cl.PODNumber">
+                POD
             </th>
-            <th>
-                Issue note
-            </th>
-            <th>
+            <th data-name="PCNNumber" data-column="cl.PCNNumber">
                 PCN
             </th>
-            <th>
-                THAN
+            <th data-name="PRNNumber" data-column="cl.PRNNumber">
+                PRN
             </th>
-            <th>
+            <th data-name="OriginalQuantity" data-column="cl.OriginalQuantity">
                 Qty
             </th>
-            @*<th>
-                    Del Note
-                </th>*@
+            <th data-name="Status" data-column="cl.Status">
+                Status
+            </th>
             <th data-name="Actions">
                 Actions
             </th>
@@ -140,48 +84,59 @@ else
     </thead>
 
     <tbody>
-        @if (Model != null && items != null && items.Count() > 0)
+        @if ( Model != null && items != null && items.Count() > 0 )
         {
-            foreach (var item in items)
+            foreach ( var item in items )
             {
-                Status status = (Status)item.Status;
-
-                String active = status.Equals(Status.Active) ? "active" : "inactive";
-                String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+                ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
-                    <td width="8%">
-                        @status
+                    <td>
+                        @count
                     </td>
-                    <td style="width: 8%;">
-                        Chep
-                        @*@item.ClientDescription*@
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd @ HH:mm tt" )
                     </td>
-                    <td style="width: 8%;">
-                        @item.LoadDate
+                    <td>
+                        @item.ClientName
                     </td>
-                    <td style="width: 8%;">
-                        @item.EffectiveDate
+                    <td>
+                        @item.LoadNumber
                     </td>
-                    <td style="width: 8%;">
+                    <td>
                         @item.DeliveryNote
                     </td>
-                    <td style="width: 8%;">
+                    <td>
                         @item.ReceiverNumber
                     </td>
-                    <td style="width: 8%;">
+                    <td>
                         @item.Equipment
                     </td>
-                    <td style="width: 8%;">@item.LoadNumber</td>
-                    <td style="width: 8%;">@*Issue Note**@</td>
-                    <td style="width: 8%;">@item.PCNNumber</td>
-                    <td style="width: 8%;">@*THAN**@</td>
-                    <td style="width: 8%;">@item.OriginalQuantity</td>
-                    <td width="8%">
-                        <a href="#doc" rel="modal:open" onclick="loadDocs(@item.Id)"><i class="fa fa-file-text-o"></i></a>
-                        @Html.ActionLink("Edit", "EditClientData", new { id = item.Id, returnView = "ClientData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                    <td>
+                        @item.PODNumber
+                    </td>
+                    <td>
+                        @item.PCNNumber
+                    </td>
+                    <td>
+                        @item.PRNNumber
+                    </td>
+                    <td>
+                        @item.OriginalQuantity
+                    </td>
+                    <td>
+                        @status
+                    </td>
+                    <td width="10%">
 
-                        @Html.ActionLink(enable, "DeleteClientData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = enable + " this item?" })
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                            @Html.ActionLink( "Details", "ClientDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                            @Html.ActionLink( "Edit", "EditClientData", new { id = item.Id, returnView = "ClientData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        </div>
+
                     </td>
                 </tr>
                 count++;
@@ -190,178 +145,5 @@ else
     </tbody>
 
 </table>
-<div id="doc" class="modal">
-    <p>
-        <strong class="">Documents</strong>
-    </p>
-    <a id="adddocrow" href="#" onclick="AddDocRow();"><i class="fa fa-plus"></i> Add</a>
-    <input type="hidden" id="docitem" name="docitem" value="0" />
-    <table id="doctable-table" class="da-table datatable-numberpaging sort fixed-header table-hover" data-starting-point=".ap-tabs ul">
-        <thead>
-            <tr>
-                <th>
-                    Document Title
-                </th>
-                <th>
-                    Type
-                </th>
-                <th>
-                    Date
-                </th>
-                <th>Actions</th>
-            </tr>
-        </thead>
 
-        <tbody></tbody>
-    </table>
-    <div id="documentsdiv">
-    </div>
-    <span id="uploaded_file"></span>
-
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-</div>
-@Html.Partial("_Paging")
-<script>
-    $(document).ready(function () {
-        //var cId = parseInt($("#ClientListSiteManage").val());
-        var context = $("#context").val();
-        if (context == "0") {
-            $('.postedFilecdata').hide();
-        }
-
-            //$("#ClientList").change(function () {
-            //    //debugger;
-            //    var cId = parseInt($('option:selected', this).val());
-            //    SetClient(cId);
-            //    if (cId > 0) {
-            //        $('.postedFilecdata').show();
-            //        //$('.add').show();
-            //        //$('.importlabel').show();
-            //        //$('.importbutton').show();
-            //        //$('#postedFile').show();
-            //    } else {
-            //        $('.postedFilecdata').hide();
-            //        //$('.add').hide();
-            //        //$('.importlabel').hide();
-            //        //$('.importbutton').hide();
-            //        //$('#postedFile').hide();
-            //    }
-
-            //    //$.ajax({
-            //    //    type: 'POST',
-            //    //    url: "SetClient",
-            //    //    data: { "ClientId": id },
-            //    //    success: function (response) {
-            //    //        window.location.href = 'Index#managesites';
-            //    //        location.reload();
-            //    //    }
-            //    //});
-
-            //});
-
-            //populateDocs(cId, "Client");
-
-            $(document).on('change', '#companyfile', function () {
-                var cId = $('#docitem').val();
-                var name = document.getElementById("companyfile").files[0].name;
-                var form_data = new FormData();
-                var ext = name.split('.').pop().toLowerCase();
-                if (jQuery.inArray(ext, ['gif', 'png', 'jpg', 'jpeg', 'xls', 'pdf', 'xlsx', 'doc', 'docx', 'csv']) == -1) {
-                    alert("Invalid File");
-                }
-                var oFReader = new FileReader();
-                oFReader.readAsDataURL(document.getElementById("companyfile").files[0]);
-                var f = document.getElementById("companyfile").files[0];
-                var fsize = f.size || f.fileSize;
-                if (fsize > 2000000) {
-                    alert("File Size is too large");
-                }
-                else {
-                    form_data.append("file", document.getElementById('companyfile').files[0]);
-                    form_data.append("clientId", $("#Id").val());
-                    $.ajax({
-                        url: "Upload?id=" + cId + "&utype=ClientLoad&uname=Agent",
-                        method: "POST",
-                        data: form_data,
-                        contentType: false,
-                        cache: false,
-                        processData: false,
-                        beforeSend: function () {
-                            $('#uploaded_file').html("<label class='text-success'>File Uploading...</label>");
-                        },
-                        success: function (data) {
-                            //$('#uploaded_file').html(data);
-                            populateDocs(cId, "ClientLoad");
-                            $('#uploaded_file').html("<label class='text-success'></label>");
-                        }
-                    });
-                }
-            });
-
-        });
-
-    function ClientListChanged() {
-        var cId = $('#ClientList').val();
-        //var cId = parseInt($('option:selected', this).val());
-        SetClient(cId);
-        if (cId > 0) {
-            $('.postedFilecdata').show();
-        } else {
-            $('.postedFilecdata').hide();
-        }
-
-    }
-
-            function AddDocRow() {
-                var rowDiv = $("#doctable-table tbody");
-                var tabledata = '<tr><td colspan="4"><input id="companyfile" name="companyfile" type="file" value="" data-val-file="1" class="input" /></td></tr>';
-                rowDiv.append(tabledata);
-
-            }
-
-            function loadDocs(itemId) {
-                populateDocs(itemId, "ClientLoad")
-            }
-
-            function removeFile(fileId,itemId) {
-                $.ajax({
-                    type: 'POST',
-                    url: '@Url.Action("RemoveFile", "Pallet")',
-                    data: { "FileId": fileId },
-                    success: function (response) {
-                       // debugger;
-                        populateDocs(itemId, "ClientLoad");
-                    }
-                });
-            }
-
-            function SetClient(cId) {
-                $("#ClientId").val(cId);
-                $.ajax({
-                    type: 'POST',
-                    url: '@Url.Action("SetClient", "Pallet")',
-                    data: { "ClientId": cId },
-                    success: function (response) {
-                        location.reload();
-
-                    }
-                });
-            }
-            function populateDocs(id, doctype) {
-                $("#docitem").val(id); //docslisttable
-                $("#doctable-table tbody").html('');//clear the div
-                $.ajax({
-
-                    url: '@Url.Action("ListFilesTable", "Pallet")',
-                    type: "GET",
-                    dataType: "html",
-                    data: { objId: id, objType:doctype },
-                    success: function (data) {
-                      //  debugger;
-                        $('#doctable-table tbody').html(data); //reload the div
-                    },
-                });
-            }
-
-
-</script>
+@Html.Partial( "_Paging" )

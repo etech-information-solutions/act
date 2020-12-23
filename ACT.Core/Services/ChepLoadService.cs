@@ -76,24 +76,24 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (c.Id=@cmsClientId)";
             }
-            if ( csm.ReconciliationStatus != ReconciliationStatus.Unreconcilable )
+            if ( csm.ReconciliationStatus != ReconciliationStatus.All )
             {
                 query = $"{query} AND (cl.BalanceStatus=@csmReconciliationStatus)";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (cl.CreatedOn >= @csmFromDate AND cl.CreatedOn <= @csmToDate) ";
+                query = $"{query} AND (cl.ShipmentDate >= @csmFromDate AND cl.ShipmentDate <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (cl.CreatedOn >= @csmFromDate) ";
+                    query = $"{query} AND (cl.ShipmentDate >= @csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (cl.CreatedOn <= @csmToDate) ";
+                    query = $"{query} AND (cl.ShipmentDate <= @csmToDate) ";
                 }
             }
 
@@ -122,6 +122,8 @@ namespace ACT.Core.Services
                                                   cl.[BatchRef] LIKE '%{1}%' OR
                                                   cl.[InvoiceNumber] LIKE '%{1}%' OR
                                                   cl.[DataSource] LIKE '%{1}%' OR
+                                                  cl.[CreatedBy] LIKE '%{1}%' OR
+                                                  cl.[Quantity] LIKE '%{1}%' OR
                                                   c.[Email] LIKE '%{1}%' OR
                                                   c.[AdminEmail] LIKE '%{1}%' OR
                                                   c.[AdminPerson] LIKE '%{1}%' OR
@@ -132,14 +134,6 @@ namespace ACT.Core.Services
             }
 
             #endregion
-
-            // ORDER
-
-            query = $"{query} ORDER BY {pm.SortBy} {pm.Sort}";
-
-            // SKIP, TAKE
-
-            query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
             CountModel model = context.Database.SqlQuery<CountModel>( query, parameters.ToArray() ).FirstOrDefault();
 
@@ -207,24 +201,24 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (c.Id=@cmsClientId)";
             }
-            if ( csm.ReconciliationStatus != ReconciliationStatus.Unreconcilable )
+            if ( csm.ReconciliationStatus != ReconciliationStatus.All )
             {
                 query = $"{query} AND (cl.BalanceStatus=@csmReconciliationStatus)";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (cl.CreatedOn >= @csmFromDate AND cl.CreatedOn <= @csmToDate) ";
+                query = $"{query} AND (cl.ShipmentDate >= @csmFromDate AND cl.ShipmentDate <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (cl.CreatedOn >= @csmFromDate) ";
+                    query = $"{query} AND (cl.ShipmentDate >= @csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (cl.CreatedOn <= @csmToDate) ";
+                    query = $"{query} AND (cl.ShipmentDate <= @csmToDate) ";
                 }
             }
 
@@ -253,6 +247,8 @@ namespace ACT.Core.Services
                                                   cl.[BatchRef] LIKE '%{1}%' OR
                                                   cl.[InvoiceNumber] LIKE '%{1}%' OR
                                                   cl.[DataSource] LIKE '%{1}%' OR
+                                                  cl.[CreatedBy] LIKE '%{1}%' OR
+                                                  cl.[Quantity] LIKE '%{1}%' OR
                                                   c.[Email] LIKE '%{1}%' OR
                                                   c.[AdminEmail] LIKE '%{1}%' OR
                                                   c.[AdminPerson] LIKE '%{1}%' OR
@@ -266,7 +262,7 @@ namespace ACT.Core.Services
 
             // ORDER
 
-            query = $"{query} ORDER BY {pm.SortBy} {pm.Sort}";
+            query = $"{query} ORDER BY {( pm.SortBy.Contains( "." ) ? pm.SortBy : "cl." + pm.SortBy )} {pm.Sort}";
 
             // SKIP, TAKE
 
@@ -303,12 +299,12 @@ namespace ACT.Core.Services
 
             string query = string.Empty;
 
-            query = $"SELECT cl.[Id] AS [TKey], cl.[AccountNumber] + ' (Docket # ' + cl.[DocketNumber] + ')' AS [TValue] FROM [dbo].[ChepLoad] cl WHERE (1=1)";
+            query = $"SELECT cl.[Id] AS [TKey], cl.[Ref] + ' (Docket # ' + cl.[DocketNumber] + ')' AS [TValue] FROM [dbo].[ChepLoad] cl INNER JOIN [dbo].[Client] c ON c.Id=cl.ClientId WHERE (1=1)";
 
             // Limit to only show PSP for logged in user
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu WHERE u.Id=pu.UserId AND pu.PSPId IN({string.Join( ",", CurrentUser.PSPs.Select( s => s.Id ) )})) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=c.[Id] AND pu.[UserId]=@userid) ";
             }
 
             model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();
@@ -335,6 +331,18 @@ namespace ACT.Core.Services
         public ChepLoad GetByDocketNumber( string docketNumber )
         {
             return context.ChepLoads.FirstOrDefault( cl => cl.DocketNumber.Trim() == docketNumber );
+        }
+
+        /// <summary>
+        /// Gets a ChepLoad using the specified clientId, Transaction Type and docketNumber
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="docketNumber"></param>
+        /// <param name="transactionType"></param>
+        /// <returns></returns>
+        public ChepLoad Get( int clientId, string docketNumber, string transactionType )
+        {
+            return context.ChepLoads.FirstOrDefault( cl => cl.ClientId == clientId && cl.DocketNumber.Trim() == docketNumber.Trim() && cl.TransactionType.Trim() == transactionType.Trim() );
         }
     }
 }

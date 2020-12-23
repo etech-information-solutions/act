@@ -307,6 +307,21 @@ namespace System
             return ( "\"" + str + "\"" ).Trim();
         }
 
+        public static string[] ToSQLSafe( this string[] arr )
+        {
+            if ( !arr.NullableAny() )
+                return arr;
+
+            List<string> newarr = new List<string>();
+
+            foreach ( var item in arr )
+            {
+                newarr.Add( item?.Trim()?.Replace( "'", "''" ) );
+            }
+
+            return newarr.ToArray();
+        }
+
         /// <summary>
         /// Hides string characters except the Nth show
         /// </summary>

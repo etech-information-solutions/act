@@ -19,7 +19,6 @@
         <EntityTypeShape EntityType="ACTModel.ClientGroup" Width="1.5" PointX="6" PointY="41.375" />
         <EntityTypeShape EntityType="ACTModel.ClientInvoice" Width="1.5" PointX="18.75" PointY="37.375" />
         <EntityTypeShape EntityType="ACTModel.ClientKPI" Width="1.5" PointX="3" PointY="48.25" />
-        <EntityTypeShape EntityType="ACTModel.ClientLoad" Width="1.5" PointX="13.5" PointY="33.75" />
         <EntityTypeShape EntityType="ACTModel.ClientProduct" Width="1.5" PointX="6" PointY="31.125" />
         <EntityTypeShape EntityType="ACTModel.ClientProductMonthly" Width="1.5" PointX="8.25" PointY="30.375" />
         <EntityTypeShape EntityType="ACTModel.ClientSite" Width="1.5" PointX="8.25" PointY="36.5" />
@@ -70,13 +69,10 @@
         <AssociationConnector Association="ACTModel.FK_BankDetail_Bank" />
         <AssociationConnector Association="ACTModel.FK_UserBroadcasts_Broadcasts" />
         <AssociationConnector Association="ACTModel.FK_ChepAudit_Sites" />
-        <AssociationConnector Association="ACTModel.FK_ChepClient_ClientLoad" />
         <AssociationConnector Association="ACTModel.FK_ClientBudget_Clients" />
         <AssociationConnector Association="ACTModel.FK_ClientCustomer_Client" />
         <AssociationConnector Association="ACTModel.FK_ClientGroup_Client" />
         <AssociationConnector Association="ACTModel.FK_ClientKPIs_Clients" />
-        <AssociationConnector Association="ACTModel.FK_ClientLoads_ChepClients" />
-        <AssociationConnector Association="ACTModel.FK_ClientLoads_Clients" />
         <AssociationConnector Association="ACTModel.FK_ClientProducts_Clients" />
         <AssociationConnector Association="ACTModel.FK_ClientUsers_Clients" />
         <AssociationConnector Association="ACTModel.FK_DeliveryNote_Clients" />
@@ -87,13 +83,7 @@
         <AssociationConnector Association="ACTModel.FK_ClientAuthorisations_ClientSites" />
         <AssociationConnector Association="ACTModel.FK_ClientSite_ClientCustomer" />
         <AssociationConnector Association="ACTModel.FK_ClientGroups_Groups" />
-        <AssociationConnector Association="ACTModel.FK_ClientInvoices_ClientLoads" />
         <AssociationConnector Association="ACTModel.FK_ClientInvoices_Invoices" />
-        <AssociationConnector Association="ACTModel.FK_ClientLoad_ClientSite" />
-        <AssociationConnector Association="ACTModel.FK_ClientLoad_OutstandingReason" />
-        <AssociationConnector Association="ACTModel.FK_ClientLoads_Vehicle" />
-        <AssociationConnector Association="ACTModel.FK_Postings_ClientLoads" />
-        <AssociationConnector Association="ACTModel.FK_UserTasks_ClientLoads" />
         <AssociationConnector Association="ACTModel.FK_ClientProductMonthlys_ClientProducts" />
         <AssociationConnector Association="ACTModel.FK_ClientProducts_Products" />
         <AssociationConnector Association="ACTModel.FK_PSPClientProduct_PSP" />
@@ -134,9 +124,20 @@
         <AssociationConnector Association="ACTModel.FK_UserNotification_User" />
         <AssociationConnector Association="ACTModel.FK_UserRoles_Users" />
         <AssociationConnector Association="ACTModel.FK_UserTask_User" />
+        <EntityTypeShape EntityType="ACTModel.ClientLoad" Width="1.5" PointX="13.5" PointY="36.5" />
+        <AssociationConnector Association="ACTModel.FK_ChepClient_ClientLoad" />
+        <AssociationConnector Association="ACTModel.FK_ClientLoads_ChepClients" />
+        <AssociationConnector Association="ACTModel.FK_ClientLoads_Clients" />
+        <AssociationConnector Association="ACTModel.FK_ClientInvoices_ClientLoads" />
+        <AssociationConnector Association="ACTModel.FK_ClientLoad_ClientSite" />
+        <AssociationConnector Association="ACTModel.FK_ClientLoad_OutstandingReason" />
+        <AssociationConnector Association="ACTModel.FK_ClientLoad_Transporter" />
+        <AssociationConnector Association="ACTModel.FK_ClientLoads_Vehicle" />
+        <AssociationConnector Association="ACTModel.FK_Postings_ClientLoads" />
+        <AssociationConnector Association="ACTModel.FK_UserTasks_ClientLoads" />
         <EntityTypeShape EntityType="ACTModel.ChepLoad" Width="1.5" PointX="3" PointY="57.125" />
         <AssociationConnector Association="ACTModel.FK_ChepLoad_Client" />
-      </Diagram>
+        </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

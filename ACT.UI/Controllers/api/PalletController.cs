@@ -320,7 +320,7 @@ namespace ACT.UI.Controllers.api
 
                 PagingModel pm = new PagingModel() { SortBy = "c.CompanyName", Sort = "ASC" };
 
-                List<ClientLoadCustomModel> model = service.ListCSM( pm, csm );
+                List<ClientLoadCustomModel> model = service.List1( pm, csm );
 
                 if ( !model.NullableAny() )
                 {

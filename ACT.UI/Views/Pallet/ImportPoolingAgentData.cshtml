@@ -1,4 +1,4 @@
-﻿@model SiteViewModel
+﻿@model ChepLoadViewModel
 
 @using ACT.UI.Models;
 
@@ -8,19 +8,19 @@
         Layout = null;
     }
 
-    ViewBag.Title = "Import Sites";
+    ViewBag.Title = "Import Pooling Agent Data";
 }
 
 
 @Html.Partial( "_Notification" )
 
-@using ( Html.BeginForm( "ImportSite", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#managesites", @class = "custom-validate", @style = "width: auto;" } ) )
+@using ( Html.BeginForm( "ImportPoolingAgentData", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#poolingagentdata", @class = "custom-validate", @style = "width: auto;" } ) )
 {
     <div id="edit-item">
 
         <h2 class="uppercase" style="width: auto;">
             <img alt="" src="@Url.Content("~/images/edit.png")" />
-            <span>Import Sites</span>
+            <span>Import Pooling Agent Data</span>
         </h2>
 
         @Html.ValidationSummary( true )
@@ -36,11 +36,11 @@
             </div>
 
             <div class="editor-label">
-                @Html.LabelFor( model => model.SiteImportFile )
+                @Html.LabelFor( model => model.File )
             </div>
             <div class="editor-field">
-                @Html.FileUploadFor( model => model.SiteImportFile, new { @class = "input", @required = "required", @placeholder = "Select Sites Import File" } )
-                @Html.ValidationMessageFor( model => model.SiteImportFile )
+                @Html.FileUploadFor( model => model.File, new { @class = "input", @required = "required", @placeholder = "Select Import File" } )
+                @Html.ValidationMessageFor( model => model.File )
             </div>
 
         </div>
@@ -52,7 +52,7 @@
 
             <span style="padding: 0 5px;">/</span>
 
-            <a data-refresh="1" data-target="#managesites">Cancel</a>
+            <a data-refresh="1" data-target="#poolingagentdata">Cancel</a>
         </p>
 
     </div>

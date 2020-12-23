@@ -253,5 +253,16 @@ namespace ACT.Core.Services
         {
             return context.Vehicles.FirstOrDefault( v => v.VINNumber.Trim() == vin.Trim() && v.ObjectType == objectType );
         }
+
+        /// <summary>
+        /// Gets a vehicle using the specified Registration Number and Object Type
+        /// </summary>
+        /// <param name="reg"></param>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
+        public Vehicle GetByRegistrationNumber( string reg, string objectType )
+        {
+            return context.Vehicles.FirstOrDefault( v => v.Registration.Trim() == reg.Trim() && v.ObjectType == objectType );
+        }
     }
 }
