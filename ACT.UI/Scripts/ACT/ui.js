@@ -82,7 +82,9 @@
             this.DataCancelItem( $( '*[data-cancel-item="1"]' ) );
             this.DataApproveDeclinePSP( $( '*[data-approve-decline-psp="1"]' ) );
             this.DataReconcileLoadsSearch( $( '*[data-reconcile-loads-search="1"]' ) );
+            this.DataReconcileInvoicesSearch( $( '*[data-reconcile-invoices-search="1"]' ) );
             this.DataReconcileLoadsDragDrop( $( '.recon-draggable' ), $( '.recon-droppable' ) );
+            this.DataReconcileInvoicesDragDrop( $( '.invoice-draggable' ), $( '.invoice-droppable' ) );
 
 
             // Table Quick Links Operations
@@ -4886,6 +4888,165 @@
 
                         ACT.UI.DataSearchChepLoads( chepLoads );
                         ACT.UI.DataSearchClientLoads( clientLoads );
+                    } );
+            } );
+        },
+
+
+
+        DataReconcileInvoicesDragDrop: function ( draggable, droppable )
+        {
+            draggable.draggable();
+            droppable.droppable( {
+                hoverClass: "drop-hover",
+                drop: function ( event, ui )
+                {
+                    var dragId = ui.draggable.attr( "data-cid" );
+                    var dragLoad = ui.draggable.attr( "data-load-number" );
+                    var dragParent = $( ui.draggable.attr( "data-parent" ) );
+                    var dragQty = parseFloat( ui.draggable.attr( "data-qty" ) );
+
+                    var dropId = $( this ).attr( "data-cid" );
+                    var dropLoad = $( this ).attr( "data-load-number" );
+                    var dropParent = $( $( this ).attr( "data-parent" ) );
+                    var dropQty = parseFloat( $( this ).attr( "data-qty" ) );
+
+                    var msg = "";
+
+                    msg += "<p>Are you sure you would like to reconcile an Invoice with <b>Load # " + dragLoad + "</b> with a Client Load with <b>Load # " + dropLoad + "</b>?</p>";
+
+                    if ( dragQty != dropQty )
+                    {
+                        msg += "<p><img src='" + imgurl + "/Images/warn.png' style='max-height: 20px;' /> <b>Please Note:</b> The quantities for the loads you are about to reconcile are not the same!</p>";
+                    }
+
+                    msg += "<p>This process is permanent and cannot be reversed!</p>";
+                    msg += "<p style='border-top: 1px solid #fff; padding-top: 10px; margin: 15px 0; text-align: center;'>";
+                    msg += "    <input id='btnYes' type='button' value='YES!' class='btn-yes' />";
+                    msg += "    <span style='padding: 0 5px;'>/</span>";
+                    msg += "    <input id='btnNo' type='button' value='No..' class='btn-no' />";
+                    msg += "</p>";
+
+                    var close = $( ACT.Modal.Container ).find( '#modalClose' );
+
+                    close.css( "display", "none" );
+
+                    ACT.Modal.Open( msg, "Reconcile Invoice", false );
+
+                    setTimeout( function ()
+                    {
+                        var btnNo = $( ACT.Modal.Container ).find( '#btnNo' );
+                        var btnYes = $( ACT.Modal.Container ).find( '#btnYes' );
+
+                        btnYes
+                            .unbind( "click" )
+                            .bind( "click", function ()
+                            {
+                                ACT.Loader.Show( btnYes.parent().find( "span" ), true );
+
+                                $( "<div/>" ).load( siteurl + "/ReconcileInvoice", { iid: dragId, clid: dropId }, function ( d )
+                                {
+                                    var i = $( this );
+
+                                    $( ACT.Modal.Container ).find( '#modal-body' ).html( d );
+                                    $( ACT.Modal.Container ).find( '#modal-body .notification' ).slideDown( 900 );
+
+                                    if ( i.find( ".message-success" ) )
+                                    {
+                                        ACT.UI.DataSearchInvoices( dragParent );
+                                        ACT.UI.DataSearchInvoiceClientLoads( dropParent );
+
+                                        close.css( "display", "block" );
+                                    }
+                                    else
+                                    {
+                                        ui.draggable.css( { "left": 0, "top": 0 } );
+
+                                        ACT.Loader.Hide();
+                                    }
+                                } );
+                            } );
+
+                        btnNo
+                            .unbind( "click" )
+                            .bind( "click", function ()
+                            {
+                                ui.draggable.css( { "left": 0, "top": 0 } );
+
+                                ACT.Modal.Close();
+                            } );
+
+                    }, '1000' );
+                }
+            } );
+        },
+
+        DataSearchInvoices: function ( target )
+        {
+            var q = target.find( "#Query" ).val();
+            var update = target.find( ".list-data" );
+
+            var params = ACT.UI.GetCustomSearchParams( window.location.hash.replace( "#", "" ) );
+
+            params.Query = q;
+
+            ACT.Loader.Show( target.find( "#loader" ), true );
+
+            update.load( siteurl + "/Invoices", params, function ()
+            {
+                ACT.Loader.Hide();
+
+                ACT.Init.Start();
+            } );
+        },
+
+        DataSearchInvoiceClientLoads: function ( target )
+        {
+            var q = target.find( "#Query" ).val();
+            var update = target.find( ".list-data" );
+
+            var params = ACT.UI.GetCustomSearchParams( window.location.hash.replace( "#", "" ) );
+
+            params.Query = q;
+
+            ACT.Loader.Show( target.find( "#loader" ), true );
+
+            update.load( siteurl + "/InvoiceClientLoads", params, function ()
+            {
+                ACT.Loader.Hide();
+
+                ACT.Init.Start();
+            } );
+        },
+
+        DataReconcileInvoicesSearch: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                var invoices = $( i.attr( "data-invoices" ) );
+                var clientLoads = $( i.attr( "data-client-loads" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var hash = window.location.hash.replace( "#", "" );
+
+                        if ( !ACT.UI[hash] )
+                        {
+                            ACT.UI[hash] = [];
+                        }
+
+                        ACT.UI[hash].PageToDate = target.find( '[name="ToDate"]' ).val();
+                        ACT.UI[hash].PageClientId = target.find( '[name="ClientId"]' ).val();
+                        ACT.UI[hash].PageFromDate = target.find( '[name="FromDate"]' ).val();
+
+                        ACT.UI.DataSearchInvoices( invoices );
+                        ACT.UI.DataSearchInvoiceClientLoads( clientLoads );
                     } );
             } );
         }

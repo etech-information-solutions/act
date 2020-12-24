@@ -1401,7 +1401,7 @@ tr.duplicate-highlight td {
         }
 
 
-.draggable, .recon-draggable {
+.draggable, .recon-draggable, .invoice-draggable {
     z-index: 10;
 }
 

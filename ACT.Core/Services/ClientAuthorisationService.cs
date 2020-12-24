@@ -68,7 +68,8 @@ namespace ACT.Core.Services
                                 LEFT OUTER JOIN [dbo].[Transporter] t ON t.[Id]=ca.[TransporterId]
                                 LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=ca.[ClientSiteId]
                                 LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
-                                LEFT OUTER JOIN [dbo].[Client] c ON c.[Id]=cs.[ClientId]";
+                                LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cc.[Id]=cs.[ClientCustomerId]
+                                LEFT OUTER JOIN [dbo].[Client] c ON c.[Id]=cc.[ClientId]";
 
             // WHERE
 
@@ -188,7 +189,8 @@ namespace ACT.Core.Services
                             LEFT OUTER JOIN [dbo].[Transporter] t ON t.[Id]=ca.[TransporterId]
                             LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=ca.[ClientSiteId]
                             LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
-                            LEFT OUTER JOIN [dbo].[Client] c ON c.[Id]=cs.[ClientId]";
+                            LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cc.[Id]=cs.[ClientCustomerId]
+                            LEFT OUTER JOIN [dbo].[Client] c ON c.[Id]=cc.[ClientId]";
 
             // WHERE
 

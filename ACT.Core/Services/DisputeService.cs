@@ -218,7 +218,6 @@ namespace ACT.Core.Services
 
             string query = @"SELECT
 	                            d.*,
-	                            cl.AccountNumber AS [ChepLoadAccountNumber],
 	                            u1.Name + ' ' + u1.Surname AS [ActionUser],
 	                            u2.Name + ' ' + u2.Surname AS [ResolvedUser]
                              FROM

@@ -275,7 +275,7 @@
                         continue;
                     }
 
-                    string sel = ( province == Model.Address.Province ) ? "selected=selected" : string.Empty;
+                    string sel = ( Model.Address != null && province == Model.Address.Province ) ? "selected=selected" : string.Empty;
 
                     <option value="@p" @sel>@text</option>
                 }

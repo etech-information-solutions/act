@@ -555,7 +555,7 @@
     <Content Include="Views\Pallet\_ClientData.cshtml" />
     <Content Include="Views\Pallet\_Disputes.cshtml" />
     <Content Include="Views\Pallet\_Exceptions.cshtml" />
-    <Content Include="Views\Pallet\_ReconcileInvoice.cshtml" />
+    <Content Include="Views\Pallet\_ReconcileInvoices.cshtml" />
     <Content Include="Views\Pallet\_ReconcileLoads.cshtml" />
     <Content Include="Views\Finance\Index.cshtml" />
     <Content Include="Views\Generic\_ClientData.cshtml" />
@@ -668,6 +668,10 @@
     <Content Include="Views\Pallet\_ChepLoadDocuments.cshtml" />
     <Content Include="Views\Pallet\_InvoiceClientLoads.cshtml" />
     <Content Include="Views\Pallet\_Invoices.cshtml" />
+    <Content Include="Views\Pallet\AddInvoice.cshtml" />
+    <Content Include="Views\Pallet\ImportInvoice.cshtml" />
+    <Content Include="Views\Pallet\_InvoiceComments.cshtml" />
+    <Content Include="Views\Pallet\_InvoiceDocuments.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

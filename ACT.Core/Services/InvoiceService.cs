@@ -50,8 +50,7 @@ namespace ACT.Core.Services
             string query = @"SELECT
                                 COUNT(i.Id) AS [Total]
                              FROM
-                                 [dbo].[Invoice] i
-                                 LEFT OUTER JOIN [dbo].[ClientLoad] cl ON i.[LoadNumber]=cl.[LoadNumber]";
+                                 [dbo].[Invoice] i";
 
             // WHERE
 
@@ -61,11 +60,11 @@ namespace ACT.Core.Services
 
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc, [dbo].[ClientLoad] cl WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND cl.[LoadNumber]=i.[LoadNumber] AND pu.[UserId]=@userid) ";
             }
             else if ( CurrentUser.RoleType == RoleType.Client )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu, [dbo].[ClientLoad] cl WHERE cu.[ClientId]=cl.[ClientId] AND cl.[LoadNumber]=i.[LoadNumber] AND cu.[UserId]=@userid) ";
             }
 
             #endregion
@@ -143,8 +142,7 @@ namespace ACT.Core.Services
             string query = @"SELECT
                                 i.*
                              FROM
-                                 [dbo].[Invoice] i
-                                 LEFT OUTER JOIN [dbo].[ClientLoad] cl ON i.[LoadNumber]=cl.[LoadNumber]";
+                                 [dbo].[Invoice] i";
 
             // WHERE
 
@@ -154,11 +152,11 @@ namespace ACT.Core.Services
 
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc, [dbo].[ClientLoad] cl WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND cl.[LoadNumber]=i.[LoadNumber] AND pu.[UserId]=@userid) ";
             }
             else if ( CurrentUser.RoleType == RoleType.Client )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu, [dbo].[ClientLoad] cl WHERE cu.[ClientId]=cl.[ClientId] AND cl.[LoadNumber]=i.[LoadNumber] AND cu.[UserId]=@userid) ";
             }
 
             #endregion

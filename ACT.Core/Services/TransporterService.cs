@@ -45,7 +45,7 @@ namespace ACT.Core.Services
 
             #endregion
 
-            string query = string.Format( @"SELECT t.* FROM [dbo].[Transporter] t" );
+            string query = string.Format( @"SELECT COUNT(t.Id) AS [Total] FROM [dbo].[Transporter] t" );
 
             // WHERE
 
@@ -108,7 +108,7 @@ namespace ACT.Core.Services
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
-                csm.ToDate = csm.ToDate?.AddDays( 1 );
+                csm.ToDate = csm.ToDate?.AddDays( 1 ); 
             }
 
             // Parameters

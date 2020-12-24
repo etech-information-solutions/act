@@ -941,8 +941,8 @@ namespace ACT.UI.Controllers
                     {
                         #region Create Client Load
 
-                        cQuery = $" {cQuery} INSERT INTO [dbo].[ClientLoad]([ClientId],[VehicleId],[TransporterId],[CreatedOn],[ModifiedOn],[ModifiedBy],[LoadNumber],[LoadDate],[EffectiveDate],[NotifyDate],[AccountNumber],[ClientDescription],[DeliveryNote],[ReferenceNumber],[ReceiverNumber],[OriginalQuantity],[NewQuantity],[PODNumber],[PCNNumber],[PRNNumber],[Status],[PostingType],[THAN],[ReturnQty],[PODStatus],[UID]) ";
-                        cQuery = $" {cQuery} VALUES ({model.ClientId},{v.Id},{t.Id},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 2 ]}','{loadDate}','{deliveryDate}','{deliveryDate}','{load[ 5 ]}','{load[ 6 ]}','{load[ 12 ]}','{load[ 10 ]}','{load[ 12 ]}',{qty},{qty},'{pod}','{pcn}','{prn}',{( int ) status},{( int ) PostingType.Import},'{load[ 17 ]}',{returnQty},{podStatus},'{uid}') ";
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[ClientLoad]([ClientId],[VehicleId],[TransporterId],[CreatedOn],[ModifiedOn],[ModifiedBy],[LoadNumber],[LoadDate],[EffectiveDate],[NotifyDate],[AccountNumber],[ClientDescription],[DeliveryNote],[ReferenceNumber],[ReceiverNumber],[OriginalQuantity],[NewQuantity],[PODNumber],[PCNNumber],[PRNNumber],[Status],[PostingType],[THAN],[ReturnQty],[PODStatus],[InvoiceStatus],[UID]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},{v.Id},{t.Id},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 2 ]}','{loadDate}','{deliveryDate}','{deliveryDate}','{load[ 5 ]}','{load[ 6 ]}','{load[ 12 ]}','{load[ 10 ]}','{load[ 12 ]}',{qty},{qty},'{pod}','{pcn}','{prn}',{( int ) status},{( int ) PostingType.Import},'{load[ 17 ]}',{returnQty},{podStatus},0,'{uid}') ";
 
                         #endregion
 
@@ -1560,7 +1560,7 @@ namespace ACT.UI.Controllers
 
 
 
-        #region ClientLoadJournals
+        #region Client Load Journals
 
         //
         // GET: /Pallet/ClientLoadJournals
@@ -1782,7 +1782,7 @@ namespace ACT.UI.Controllers
 
         //-------------------------------------------------------------------------------------
 
-        #region Reconcile Invoice
+        #region Reconcile Invoices
 
         // GET: Pallet/AddInvoice
         [Requires( PermissionTo.Create )]
@@ -1811,7 +1811,7 @@ namespace ACT.UI.Controllers
             {
                 #region Create Invoice
 
-                Invoice invoice = new Invoice()
+                Invoice i = new Invoice()
                 {
                     Date = model.Date,
                     Number = model.Number,
@@ -1821,19 +1821,20 @@ namespace ACT.UI.Controllers
                     Status = ( int ) Status.Active,
                 };
 
-                invoice = iservice.Create( invoice );
+                i = iservice.Create( i );
 
                 #endregion
 
                 #region Client Load Invoice Recon?
 
-                List<ClientLoad> clientLoads = clservice.ListByColumnWhere( "LoadNumber", invoice.LoadNumber );
+                List<ClientLoad> clientLoads = clservice.ListByColumnWhere( "LoadNumber", i.LoadNumber );
 
                 if ( clientLoads.NullableAny() )
                 {
                     foreach ( ClientLoad item in clientLoads )
                     {
-                        item.ChepInvoiceNo = invoice.Number;
+                        item.ReconcileInvoice = true;
+                        item.ChepInvoiceNo = i.Number;
                         item.InvoiceStatus = ( int ) InvoiceStatus.Updated;
 
                         clservice.Update( item );
@@ -1841,7 +1842,7 @@ namespace ACT.UI.Controllers
                         ClientInvoice ci = new ClientInvoice()
                         {
                             ClientLoadId = item.Id,
-                            InvoiceId = invoice.Id,
+                            InvoiceId = i.Id,
                             Status = ( int ) Status.Active,
                         };
 
@@ -1854,22 +1855,22 @@ namespace ACT.UI.Controllers
 
             Notify( "The invoice was successfully created.", NotificationType.Success );
 
-            return Invoices( new PagingModel(), new CustomSearchModel() );
+            return ReconcileInvoices( new PagingModel(), new CustomSearchModel() );
         }
 
-        // GET: Pallet/ImportInvoice
+        // GET: Pallet/ImportInvoices
         [Requires( PermissionTo.Create )]
-        public ActionResult ImportInvoice()
+        public ActionResult ImportInvoices()
         {
             InvoiceViewModel model = new InvoiceViewModel() { EditMode = true };
 
             return View( model );
         }
 
-        // POST: Client/AddSite
+        // POST: Pallet/ImportInvoices
         [HttpPost]
         [Requires( PermissionTo.Create )]
-        public ActionResult ImportInvoice( InvoiceViewModel model )
+        public ActionResult ImportInvoices( InvoiceViewModel model )
         {
             if ( model.File == null )
             {
@@ -1972,9 +1973,59 @@ namespace ACT.UI.Controllers
 
             AutoReconcileInvoices();
 
-            Notify( $"{created} loads were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.", NotificationType.Success );
+            Notify( $"{created} invoices were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.", NotificationType.Success );
 
-            return PoolingAgentData( new PagingModel(), new CustomSearchModel() );
+            return ReconcileInvoices( new PagingModel(), new CustomSearchModel() );
+        }
+
+        //
+        // GET: /Pallet/ReconcileInvoice
+        public ActionResult ReconcileInvoice( int iid, int clid )
+        {
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( InvoiceService iservice = new InvoiceService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( ClientInvoiceService ciservice = new ClientInvoiceService() )
+            {
+                Invoice i = iservice.GetById( iid );
+
+                if ( i == null )
+                {
+                    Notify( "Sorry, the specified Invoice could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                ClientLoad cl = clservice.GetById( clid );
+
+                if ( cl == null )
+                {
+                    Notify( "Sorry, the specified Client Load could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                ClientInvoice ci = new ClientInvoice()
+                {
+                    InvoiceId = i.Id,
+                    ClientLoadId = clid,
+                    Status = ( int ) Status.Active,
+                };
+
+                ciservice.Create( ci );
+
+                cl.ReconcileInvoice = true;
+                cl.ChepInvoiceNo = i.Number;
+                cl.InvoiceStatus = ( int ) InvoiceStatus.Updated;
+
+                clservice.Update( cl );
+
+                scope.Complete();
+
+                Notify( "The selected loads were successfully reconcilled.", NotificationType.Success );
+            }
+
+            return PartialView( "_Notification" );
         }
 
         /// <summary>
@@ -1999,6 +2050,7 @@ namespace ACT.UI.Controllers
                     {
                         foreach ( ClientLoad item in clientLoads )
                         {
+                            item.ReconcileInvoice = true;
                             item.ChepInvoiceNo = i.Number;
                             item.InvoiceStatus = ( int ) InvoiceStatus.Updated;
 
@@ -2019,6 +2071,207 @@ namespace ACT.UI.Controllers
 
             return true;
         }
+
+
+
+        #region Invoice Comments
+
+        //
+        // GET: /Pallet/InvoiceComments
+        public ActionResult InvoiceComments( int id )
+        {
+            using ( CommentService cservice = new CommentService() )
+            {
+                List<Comment> comments = cservice.List( id, "Invoice" );
+
+                ViewBag.Id = id;
+
+                return PartialView( "_InvoiceComments", comments );
+            }
+        }
+
+        //
+        // GET: /Pallet/UpdateClientLoadComments
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult UpdateInvoiceComments( List<Comment> invoiceComments, int invoiceId )
+        {
+            if ( invoiceComments.NullableAny( f => !string.IsNullOrEmpty( f.Details ) ) )
+            {
+                using ( CommentService cservice = new CommentService() )
+                {
+                    foreach ( Comment item in invoiceComments.Where( f => !string.IsNullOrEmpty( f.Details ) ) )
+                    {
+                        Comment c = cservice.GetById( item.Id );
+
+                        if ( c == null )
+                        {
+                            c = new Comment()
+                            {
+                                ObjectId = invoiceId,
+                                ObjectType = "Invoice",
+                                Details = item.Details,
+                                Status = ( int ) Status.Active,
+                            };
+
+                            cservice.Create( c );
+                        }
+                        else
+                        {
+                            c.Details = item.Details;
+
+                            cservice.Update( c );
+                        }
+                    }
+                }
+            }
+
+            Notify( "The Invoice Comments were successfully updated...", NotificationType.Success );
+
+            return InvoiceComments( invoiceId );
+        }
+
+        //
+        // GET: /Pallet/DeleteInvoiceComment
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteInvoiceComment( int id )
+        {
+            int invoiceId;
+
+            using ( CommentService cservice = new CommentService() )
+            {
+                Comment c = cservice.GetById( id );
+
+                if ( c == null )
+                {
+                    Notify( "Sorry, the specified Client Load Comment could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                invoiceId = c.ObjectId;
+
+                cservice.Delete( c );
+
+                Notify( "The selected Invoice Comment was successfully deleted.", NotificationType.Success );
+            }
+
+            return InvoiceComments( invoiceId );
+        }
+
+        #endregion
+
+
+
+        #region Invoice Documents
+
+        //
+        // GET: /Pallet/InvoiceDocuments
+        public ActionResult InvoiceDocuments( int id )
+        {
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                List<Document> docs = dservice.List( id, "Invoice" );
+
+                ViewBag.Id = id;
+
+                return PartialView( "_InvoiceDocuments", docs );
+            }
+        }
+
+        //
+        // GET: /Pallet/UpdateInvoiceDocuments
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult UpdateInvoiceDocuments( List<DocumentsViewModel> invoiceDocuments, int invoiceId )
+        {
+            if ( invoiceDocuments.NullableAny( f => f.File != null ) )
+            {
+                using ( DocumentService dservice = new DocumentService() )
+                {
+                    foreach ( DocumentsViewModel item in invoiceDocuments.Where( f => f.File != null ) )
+                    {
+                        string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/Invoices/{invoiceId}/" );
+
+                        if ( !Directory.Exists( path ) )
+                        {
+                            Directory.CreateDirectory( path );
+                        }
+
+                        string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+
+                        Document d = new Document()
+                        {
+                            ObjectId = invoiceId,
+                            Category = "Invoice",
+                            ObjectType = "Invoice",
+                            Name = item.File.FileName,
+                            Title = item.File.FileName,
+                            Size = item.File.ContentLength,
+                            Status = ( int ) Status.Active,
+                            Description = "Invoice Document",
+                            Type = Path.GetExtension( item.File.FileName ),
+                            Location = $"Invoices/{invoiceId}/{now}-{item.File.FileName}"
+                        };
+
+                        dservice.Create( d );
+
+                        string fullpath = Path.Combine( path, $"{now}-{item.File.FileName}" );
+
+                        item.File.SaveAs( fullpath );
+                    }
+                }
+            }
+
+            Notify( "The Invoice Documents were successfully updated...", NotificationType.Success );
+
+            return InvoiceDocuments( invoiceId );
+        }
+
+        //
+        // GET: /Pallet/DeleteClientDocument
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteInvoiceDocument( int id )
+        {
+            int invoiceId;
+
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                Document doc = dservice.GetById( id );
+
+                if ( doc == null )
+                {
+                    Notify( "Sorry, the specified Invoice Document could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                invoiceId = doc.ObjectId.Value;
+
+                string path = Server.MapPath( string.Format( "{0}/{1}", VariableExtension.SystemRules.DocumentsLocation, doc.Location ) );
+                string folder = Path.GetDirectoryName( path );
+
+                if ( System.IO.File.Exists( path ) )
+                {
+                    @System.IO.File.Delete( path );
+                }
+
+                if ( Directory.Exists( folder ) && Directory.GetFiles( folder )?.Length <= 0 )
+                {
+                    Directory.Delete( folder );
+                }
+
+                dservice.Delete( doc );
+
+                Notify( "The selected Invoice Document was successfully deleted.", NotificationType.Success );
+            }
+
+            return InvoiceDocuments( invoiceId );
+        }
+
+        #endregion
 
 
 
@@ -4048,12 +4301,12 @@ namespace ACT.UI.Controllers
 
         //
         // GET: /Pallet/ReconcileInvoice
-        public ActionResult ReconcileInvoice( PagingModel pm, CustomSearchModel csm )
+        public ActionResult ReconcileInvoices( PagingModel pm, CustomSearchModel csm )
         {
             using ( InvoiceService iservice = new InvoiceService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
             {
-                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
+                csm.InvoiceStatus = InvoiceStatus.NA;
 
                 pm.Sort = "ASC";
 
@@ -4072,7 +4325,7 @@ namespace ACT.UI.Controllers
                 ViewBag.InvoiceClientLoads = PagingExtension.Create( clModel, clTotal, pm.Skip, pm.Take, pm.Page );
             }
 
-            return PartialView( "_ReconcileInvoice", new CustomSearchModel( "ReconcileInvoice" ) );
+            return PartialView( "_ReconcileInvoices", new CustomSearchModel( "ReconcileInvoice" ) );
         }
 
         //

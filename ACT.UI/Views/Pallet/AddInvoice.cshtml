@@ -1,0 +1,92 @@
+﻿@model InvoiceViewModel
+
+@using ACT.UI.Models;
+@using ACT.Core.Enums;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Add Invoice";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "AddInvoice", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#reconcileinvoice", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="" style="width: auto;">
+            <img alt="" src="@Url.Content( "~/images/add.png" )" />
+            <span>Add Invoice</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="left" style="width: 48%; margin-right: 3%;">
+
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.Number )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Number, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.Number )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Date )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Date, new { @class = "date-picker", @placeholder = "     /       /       " } )
+                    @Html.ValidationMessageFor( model => model.Date )
+                </div>
+
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.Quantity )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Quantity, new { @class = "input", @type = "number", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.Quantity )
+                </div>
+
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.Amount )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Amount, new { @class = "input", @type = "number", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.Amount )
+                </div>
+
+            </div>
+
+            <div class="right" style="width: 48%;">
+
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.LoadNumber )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.LoadNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.LoadNumber )
+                </div>
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-refresh="1" data-target="#reconcileinvoice">Cancel</a>
+            </p>
+
+        </div>
+
+    </div>
+}
