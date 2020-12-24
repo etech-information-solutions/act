@@ -1634,7 +1634,7 @@
 
         GetCustomSearchParams: function ( t )
         {
-            if ( t === "" ) return {};
+            if ( t === "" ) return [];
 
             if ( !ACT.UI[t] )
             {
@@ -4747,7 +4747,7 @@
                     var dropId = $( this ).attr( "data-cid" );
                     var dropProduct = $( this ).attr( "data-product" );
                     var dropLoad = $( this ).attr( "data-load-number" );
-                    var dropParent = $( ui.draggable.attr( "data-parent" ) );
+                    var dropParent = $( $( this ).attr( "data-parent" ) );
                     var dropQty = parseFloat( $( this ).attr( "data-qty" ) );
 
                     var msg = "";
@@ -4756,11 +4756,11 @@
 
                     if ( dragQty != dropQty )
                     {
-                        msg += "<p><img src='" + siteurl + "/Images/warn.png' style='max-height: 20px;' /> <b>Please Note:</b> The quantities for the loads you are about to reconcile are not the same!</p>";
+                        msg += "<p><img src='" + imgurl + "/Images/warn.png' style='max-height: 20px;' /> <b>Please Note:</b> The quantities for the loads you are about to reconcile are not the same!</p>";
                     }
 
                     msg += "<p>This process is permanent and cannot be reversed!</p>";
-                    msg += "<p style='border-top: 1px solid #fff; padding-top: 10px; margin: 10px 0 0 0; text-align: center;'>";
+                    msg += "<p style='border-top: 1px solid #fff; padding-top: 10px; margin: 15px 0; text-align: center;'>";
                     msg += "    <input id='btnYes' type='button' value='YES!' class='btn-yes' />";
                     msg += "    <span style='padding: 0 5px;'>/</span>";
                     msg += "    <input id='btnNo' type='button' value='No..' class='btn-no' />";
@@ -4787,7 +4787,8 @@
                                 {
                                     var i = $( this );
 
-                                    $( ACT.Modal.Container ).find( '#modal-body' ).html( i.html() );
+                                    $( ACT.Modal.Container ).find( '#modal-body' ).html( d );
+                                    $( ACT.Modal.Container ).find( '#modal-body .notification' ).slideDown( 900 );
 
                                     if ( i.find( ".message-success" ) )
                                     {
@@ -4821,35 +4822,39 @@
 
         DataSearchChepLoads: function ( target )
         {
-            var q = target.find( "Query" ).val();
+            var q = target.find( "#Query" ).val();
             var update = target.find( ".list-data" );
 
             var params = ACT.UI.GetCustomSearchParams( window.location.hash.replace( "#", "" ) );
 
             params.Query = q;
 
-            ACT.Loader.Show( update.find( "#loader" ), true );
+            ACT.Loader.Show( target.find( "#loader" ), true );
 
             update.load( siteurl + "/ChepLoads", params, function ()
             {
                 ACT.Loader.Hide();
+
+                ACT.Init.Start();
             } );
         },
 
         DataSearchClientLoads: function ( target )
         {
-            var q = target.find( "Query" ).val();
+            var q = target.find( "#Query" ).val();
             var update = target.find( ".list-data" );
 
             var params = ACT.UI.GetCustomSearchParams( window.location.hash.replace( "#", "" ) );
 
             params.Query = q;
 
-            ACT.Loader.Show( update.find( "#loader" ), true );
+            ACT.Loader.Show( target.find( "#loader" ), true );
 
-            update.load( siteurl + "/ChepLoads", params, function ()
+            update.load( siteurl + "/ClientLoads", params, function ()
             {
                 ACT.Loader.Hide();
+
+                ACT.Init.Start();
             } );
         },
 
@@ -4868,9 +4873,16 @@
                     .unbind( "click" )
                     .bind( "click", function ()
                     {
-                        ACT.UI[i.attr( "data-target" ).replace( "#", "" )].ToDate = target.find( "#ToDate" ).val();
-                        ACT.UI[i.attr( "data-target" ).replace( "#", "" )].ClientId = target.find( "#ClientId" ).val();
-                        ACT.UI[i.attr( "data-target" ).replace( "#", "" )].FromDate = target.find( "#FromDate" ).val();
+                        var hash = window.location.hash.replace( "#", "" );
+
+                        if ( !ACT.UI[hash] )
+                        {
+                            ACT.UI[hash] = [];
+                        }
+
+                        ACT.UI[hash].PageToDate = target.find( '[name="ToDate"]' ).val();
+                        ACT.UI[hash].PageClientId = target.find( '[name="ClientId"]' ).val();
+                        ACT.UI[hash].PageFromDate = target.find( '[name="FromDate"]' ).val();
 
                         ACT.UI.DataSearchChepLoads( chepLoads );
                         ACT.UI.DataSearchClientLoads( clientLoads );

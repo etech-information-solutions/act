@@ -103,7 +103,7 @@
                     @Model.InvoiceNumber
                 </td>
                 <td>
-                    @( $"{Model.CustomerAddress?.Replace( "~", "," )}, {Model.CustomerPostalCode}, {( (ProvinceEnum) Model.CustomerProvince ).GetDisplayText()}" )
+                    @( $"{Model.CustomerAddress?.Replace( "~", "," )}, {Model.CustomerPostalCode}, {( (Province) Model.CustomerProvince ).GetDisplayText()}" )
                 </td>
             </tr>
 
@@ -120,7 +120,7 @@
                     @( Model.Client?.CompanyName )
                 </td>
                 <td>
-                    @( $"{Model.DeliveryAddress?.Replace( "~", "," )}, {Model.DeliveryPostalCode}, {( (ProvinceEnum) Model.DeliveryProvince ).GetDisplayText()}" )
+                    @( $"{Model.DeliveryAddress?.Replace( "~", "," )}, {Model.DeliveryPostalCode}, {( (Province) Model.DeliveryProvince ).GetDisplayText()}" )
                 </td>
             </tr>
 
@@ -137,7 +137,7 @@
                     @( Model.ClientSite?.Site?.Description )
                 </td>
                 <td>
-                    @( $"{Model.BillingAddress?.Replace( "~", "," )}, {Model.BililngPostalCode}, {( (ProvinceEnum) Model.BillingProvince ).GetDisplayText()}" )
+                    @( $"{Model.BillingAddress?.Replace( "~", "," )}, {Model.BililngPostalCode}, {( (Province) Model.BillingProvince ).GetDisplayText()}" )
                 </td>
             </tr>
 

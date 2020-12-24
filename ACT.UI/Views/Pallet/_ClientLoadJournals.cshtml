@@ -1,0 +1,163 @@
+﻿@model List<JournalViewModel>
+
+@using ACT.UI.Models
+@using ACT.Core.Enums
+
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "UpdateClientLoadJournals", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#tr-edit > td", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div class="editor-label" style="margin-bottom: 10px;">
+
+        <p>
+            <strong class="uppercase">Client Load Journals (@Model.NullableCount())</strong>
+        </p>
+
+    </div>
+
+    <div class="editor-field">
+
+        <table id="client-journals-table" class="da-table small">
+
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>In/Out?</th>
+                    <th>THAN</th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if ( Model.NullableAny() )
+                {
+                    int count = 0;
+
+                    foreach ( JournalViewModel item in Model )
+                    {
+                        string inoutChecked = item.InOutInd == true ? "checked=checked" : string.Empty;
+
+                        <tr id="row-line-@count-client" class="add-more-row">
+                            <td style="position: relative;">
+                                @if ( ( count + 1 ) == Model.Count )
+                                {
+                                    <a data-add-one-more="1" data-target="#row-line-0-client" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                                        <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                                    </a>
+                                }
+
+                                <input name="ClientLoadJournals[@count].Id" type="hidden" value="@item.Id" />
+                                <input name="ClientLoadJournals[@count].ClientLoadId" type="hidden" value="@ViewBag.Id" />
+
+                                <input class="input" name="ClientLoadJournals[@count].PostingDescription" placeholder="Enter Description" required="required" style="padding: 0 5px; width: 87%;" type="text" value="@item.PostingDescription">
+                            
+                                <div style="background: #fff; margin: 10px 0 -7px 0; padding: 10px;">
+                                    <label>Select Journal File</label>
+                                    <input name="ClientLoadJournals[0].File" type="file" placeholder="Journal File" style="width: 87%;" />
+                                </div>
+                            </td>
+                            <td>
+                                <input class="input" name="ClientLoadJournals[@count].PostingQuantity" placeholder="Enter Qty" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@item.PostingQuantity">
+                            </td>
+                            <td>
+                                <input class="input" name="ClientLoadJournals[@count].InOutInd" style="padding: 0 5px; width: 87%;" type="checkbox" @inoutChecked value="@item.InOutInd">
+                            </td>
+                            <td>
+                                <input class="input" name="ClientLoadJournals[@count].THAN" placeholder="Enter THAN" style="padding: 0 5px; width: 87%;" type="text" value="@item.THAN">
+                            </td>
+                            <td>
+                                <select name="ClientLoadJournals[@count].JournalType" class="chzn" style="width: 98%;">
+                                    @foreach ( int e in Enum.GetValues( typeof( JournalType ) ) )
+                                    {
+                                        JournalType jt = ( JournalType ) e;
+
+                                        string sel = ( jt == item.JournalType ) ? "selected=selected" : string.Empty;
+
+                                        <option value="@e" @sel>@jt.GetDisplayText()</option>
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                @Html.ActionLink( " ", "DeleteClientLoadJournal", new { id = item.Id }, new { @class = "del", @data_delete = "1", @data_id = item.Id, @data_target = "#row-line-" + count, @data_refresh_target = "#tr-edit > td", @rel = "tipsyE", @title = "Remove this item?" } )
+
+                                @if ( item.Documents != null && item.Documents.Any( s => s.Status == ( Int32 ) Status.Active ) )
+                                {
+                                    <a class="docs" data-sticky-one="1" data-target="#journal-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Journal Documents">
+                                        &nbsp;
+                                    </a>
+                                    <div id="journal-@item.Id-docs" class="none">
+                                        <ul class="list">
+                                            @foreach ( var d in item.Documents.Where( s => s.Status == ( Int32 ) Status.Active ) )
+                                            {
+                                                <li style="line-height: 20px;">
+                                                    <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Pallet", new { @id = d.Id } )" target="_blank">
+                                                        @d.Name (@d.Type)
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+
+                        count++;
+                    }
+                }
+                else
+                {
+                    <tr id="row-line-0-client" class="add-more-row">
+                        <td style="position: relative;">
+                            <a data-add-one-more="1" data-target="#row-line-0-client" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                                <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                            </a>
+                            <input name="ClientLoadJournals[0].ClientLoadId" type="hidden" value="@ViewBag.Id" />
+                            <input class="input" name="ClientLoadJournals[0].PostingDescription" placeholder="Enter Description" required="required" style="padding: 0 5px; width: 87%;" type="text" value="" />
+
+                            <div style="background: #fff; margin: 10px 0 -7px 0; padding: 10px;">
+                                <label>Select Journal File</label>
+                                <input name="ClientLoadJournals[0].File" type="file" placeholder="Journal File" style="width: 87%;" />
+                            </div>
+                        </td>
+                        <td>
+                            <input class="input" name="ClientLoadJournals[0].PostingQuantity" placeholder="Enter Qty" required="required" style="padding: 0 5px; width: 87%;" type="number" value="" />
+                        </td>
+                        <td>
+                            <input class="input" name="ClientLoadJournals[0].InOutInd" style="padding: 0 5px; width: 87%;" type="checkbox" value="true" />
+                        </td>
+                        <td>
+                            <input class="input" name="ClientLoadJournals[0].THAN" placeholder="Enter THAN" style="padding: 0 5px; width: 87%;" type="text" value="" />
+                        </td>
+                        <td>
+                            <select name="ClientLoadJournals[0].JournalType" class="chzn" style="width: 98%;">
+                                @foreach ( int e in Enum.GetValues( typeof( JournalType ) ) )
+                                {
+                                    JournalType jt = ( JournalType ) e;
+
+                                    <option value="@e">@jt.GetDisplayText()</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px;">&nbsp;</div>
+
+        <p>
+            <input id="save-btn" type="submit" value="Save" />
+            <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+        </p>
+
+    </div>
+}

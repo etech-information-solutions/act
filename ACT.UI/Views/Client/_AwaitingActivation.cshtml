@@ -103,7 +103,7 @@
                     addr = aservice.Get(item.Id, "Client");
                     if (addr != null)
                     {
-                        province = ((ProvinceEnum)addr.Province).GetDisplayText();
+                        province = ((Province)addr.Province).GetDisplayText();
                         addressline1 = addr.Addressline1;
                         suburb = addr.Addressline2;
                         town = addr.Town;

@@ -30,10 +30,6 @@
             <label for="LoadDateTo">To:</label>
         </span>
 
-        @*<span style="width: 25%;">
-                <label for="Query">Search Text:</label>
-            </span>*@
-
     </div>
 
     <div id="rl-search-fields" class="dashboard-search">
@@ -43,16 +39,12 @@
         </span>
 
         <span>
-            @Html.TextBoxFor( model => model.ToDate, new { @class = "date-picker", @style = "width: 92%; height: 25px; position: relative; bottom: -6px;", @placeholder = "              /              /" } )
-        </span>
-
-        <span>
             @Html.TextBoxFor( model => model.FromDate, new { @class = "date-picker", @style = "width: 92%; height: 25px; position: relative; bottom: -6px;", @placeholder = "              /              /" } )
         </span>
 
-        @*<span style="width: 25%;">
-                @Html.TextBoxFor( model => model.Query, new { @class = "input", @style = "width: 92%; height: 25px; position: relative; bottom: -6px;", @placeholder = "Enter any search text..." } )
-            </span>*@
+        <span>
+            @Html.TextBoxFor( model => model.ToDate, new { @class = "date-picker", @style = "width: 92%; height: 25px; position: relative; bottom: -6px;", @placeholder = "              /              /" } )
+        </span>
 
     </div>
 
@@ -108,7 +100,7 @@
 
             @Html.TextBoxFor( model => model.Query, new { @class = "input", @style = "", @placeholder = "Enter any search text..." } )
 
-            <a onclick="ACT.UI.DataSearchChepLoads( $( '#client-loads' ) );" rel="tipsyE" title="Click to filter Client Loads..." data-cl-search="1" data-target="#client-loads-data" style="position: absolute; right: 2px; top: -2px; background: #012d71; padding: 7px 5px; border-bottom-left-radius: 4px;">
+            <a onclick="ACT.UI.DataSearchClientLoads( $( '#client-loads' ) );" rel="tipsyE" title="Click to filter Client Loads..." data-cl-search="1" data-target="#client-loads-data" style="position: absolute; right: 0px; top: -2px; background: #012d71; padding: 7px 5px; border-bottom-left-radius: 4px;">
                 <img alt="Search" src="@Url.Content( "~/Images/search.png" )" style="height: 20px;" />
             </a>
 

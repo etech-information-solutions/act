@@ -32,6 +32,7 @@ namespace ACT.Data.Models
         public virtual DbSet<Broadcast> Broadcasts { get; set; }
         public virtual DbSet<ChepAudit> ChepAudits { get; set; }
         public virtual DbSet<ChepClient> ChepClients { get; set; }
+        public virtual DbSet<ChepLoad> ChepLoads { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
         public virtual DbSet<ClientBudget> ClientBudgets { get; set; }
@@ -39,14 +40,13 @@ namespace ACT.Data.Models
         public virtual DbSet<ClientGroup> ClientGroups { get; set; }
         public virtual DbSet<ClientInvoice> ClientInvoices { get; set; }
         public virtual DbSet<ClientKPI> ClientKPIs { get; set; }
+        public virtual DbSet<ClientLoad> ClientLoads { get; set; }
         public virtual DbSet<ClientProduct> ClientProducts { get; set; }
         public virtual DbSet<ClientProductMonthly> ClientProductMonthlies { get; set; }
         public virtual DbSet<ClientSite> ClientSites { get; set; }
         public virtual DbSet<ClientUser> ClientUsers { get; set; }
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Contact> Contacts { get; set; }
-        public virtual DbSet<Country> Countries { get; set; }
-        public virtual DbSet<CountryProvince> CountryProvinces { get; set; }
         public virtual DbSet<DeclineReason> DeclineReasons { get; set; }
         public virtual DbSet<DeliveryNote> DeliveryNotes { get; set; }
         public virtual DbSet<DeliveryNoteLine> DeliveryNoteLines { get; set; }
@@ -56,7 +56,6 @@ namespace ACT.Data.Models
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<Image> Images { get; set; }
         public virtual DbSet<Invoice> Invoices { get; set; }
-        public virtual DbSet<Journal> Journals { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<OutstandingReason> OutstandingReasons { get; set; }
         public virtual DbSet<Product> Products { get; set; }
@@ -86,7 +85,6 @@ namespace ACT.Data.Models
         public virtual DbSet<UserTask> UserTasks { get; set; }
         public virtual DbSet<Vehicle> Vehicles { get; set; }
         public virtual DbSet<PSPPeriod> PSPPeriods { get; set; }
-        public virtual DbSet<ClientLoad> ClientLoads { get; set; }
-        public virtual DbSet<ChepLoad> ChepLoads { get; set; }
+        public virtual DbSet<Journal> Journals { get; set; }
     }
 }

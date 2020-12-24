@@ -23,5 +23,6 @@ namespace ACT.Data.Models
         public int Status { get; set; }
     
         public virtual ClientLoad ClientLoad { get; set; }
+        public virtual ChepLoad ChepLoad { get; set; }
     }
 }

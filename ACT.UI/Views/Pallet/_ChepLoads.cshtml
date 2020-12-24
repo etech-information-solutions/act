@@ -39,7 +39,7 @@
         {
             foreach ( var item in items )
             {
-                <tr id="tr-@item.Id-row" class="recon-draggable" data-cid="@item.Id" data-qty="@item.Quantity" data-product="@item.Equipment" data-docket="@item.DocketNumber" data-parent="#chep-loads">
+                <tr id="tr-@item.Id-item" class="chep-@item.Id-item recon-draggable" data-cid="@item.Id" data-qty="@item.Quantity" data-product="@item.Equipment" data-docket="@item.DocketNumber" data-parent="#chep-loads">
                     <td width="1%">
                         @count
                     </td>
@@ -58,7 +58,12 @@
                     <td>
                         @item.Quantity
                     </td>
-                    <td width="15%">
+                    <td>
+
+                        @Html.ActionLink( " ", "ChepLoadComments", new { id = item.Id }, new { @class = "chat", @rel = "tipsyS", @title = "View Comments", @data_details = "1", @data_id = item.Id, @data_target = ".chep-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( " ", "ChepLoadDocuments", new { id = item.Id }, new { @class = "docs", @rel = "tipsyS", @title = "View Documents", @data_details = "1", @data_id = item.Id, @data_target = ".chep-" + item.Id + "-item", @style = "margin-right: 0;" } )
+
                     </td>
                 </tr>
 
@@ -68,7 +73,7 @@
         else
         {
             <tr>
-                <td colspan="6">
+                <td colspan="7">
                     There are no records to display
                 </td>
             </tr>

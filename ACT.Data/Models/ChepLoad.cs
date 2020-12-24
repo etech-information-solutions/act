@@ -14,6 +14,14 @@ namespace ACT.Data.Models
     
     public partial class ChepLoad
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public ChepLoad()
+        {
+            this.ChepClients = new HashSet<ChepClient>();
+            this.Disputes = new HashSet<Dispute>();
+            this.Tasks = new HashSet<Task>();
+        }
+    
         public int Id { get; set; }
         public int ClientId { get; set; }
         public System.DateTime CreatedOn { get; set; }
@@ -47,6 +55,12 @@ namespace ACT.Data.Models
         public int Status { get; set; }
         public int PostingType { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChepClient> ChepClients { get; set; }
         public virtual Client Client { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Dispute> Disputes { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Task> Tasks { get; set; }
     }
 }

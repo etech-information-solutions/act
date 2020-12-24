@@ -1054,6 +1054,8 @@ namespace ACT.UI.Controllers
 
         #region Reconcile Loads
 
+
+
         //
         // GET: /Pallet/ChepLoads
         public ActionResult ChepLoads( PagingModel pm, CustomSearchModel csm )
@@ -1092,7 +1094,7 @@ namespace ACT.UI.Controllers
 
                 PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
-                return PartialView( "ClientLoads", paging );
+                return PartialView( "_ClientLoads", paging );
             }
         }
 
@@ -1154,47 +1156,910 @@ namespace ACT.UI.Controllers
             return PartialView( "_Notification" );
         }
 
+
+
+        #region Chep Load Documents
+
+        //
+        // GET: /Pallet/ChepLoadDocuments
+        public ActionResult ChepLoadDocuments( int id )
+        {
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                List<Document> docs = dservice.List( id, "ChepLoad" );
+
+                ViewBag.Id = id;
+
+                return PartialView( "_ChepLoadDocuments", docs );
+            }
+        }
+
+        //
+        // GET: /Pallet/UpdateChepLoadDocuments
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult UpdateChepLoadDocuments( List<DocumentsViewModel> chepLoadDocuments, int ChepLoadId )
+        {
+            if ( chepLoadDocuments.NullableAny( f => f.File != null ) )
+            {
+                using ( DocumentService dservice = new DocumentService() )
+                {
+                    foreach ( DocumentsViewModel item in chepLoadDocuments.Where( f => f.File != null ) )
+                    {
+                        string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/ChepLoads/{ChepLoadId}/" );
+
+                        if ( !Directory.Exists( path ) )
+                        {
+                            Directory.CreateDirectory( path );
+                        }
+
+                        string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+
+                        Document d = new Document()
+                        {
+                            ObjectId = ChepLoadId,
+                            Category = "ChepLoad",
+                            ObjectType = "ChepLoad",
+                            Description = "Chep Load Document",
+                            Name = item.File.FileName,
+                            Title = item.File.FileName,
+                            Size = item.File.ContentLength,
+                            Status = ( int ) Status.Active,
+                            Type = Path.GetExtension( item.File.FileName ),
+                            Location = $"ChepLoads/{ChepLoadId}/{now}-{item.File.FileName}"
+                        };
+
+                        dservice.Create( d );
+
+                        string fullpath = Path.Combine( path, $"{now}-{item.File.FileName}" );
+
+                        item.File.SaveAs( fullpath );
+                    }
+                }
+            }
+
+            Notify( "The Chep Load Documents were successfully updated...", NotificationType.Success );
+
+            return ChepLoadDocuments( ChepLoadId );
+        }
+
+        //
+        // GET: /Pallet/DeleteChepDocument
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteChepLoadDocument( int id )
+        {
+            int ChepLoadId;
+
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                Document doc = dservice.GetById( id );
+
+                if ( doc == null )
+                {
+                    Notify( "Sorry, the specified Chep Load Document could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                ChepLoadId = doc.ObjectId.Value;
+
+                string path = Server.MapPath( string.Format( "{0}/{1}", VariableExtension.SystemRules.DocumentsLocation, doc.Location ) );
+                string folder = Path.GetDirectoryName( path );
+
+                if ( System.IO.File.Exists( path ) )
+                {
+                    @System.IO.File.Delete( path );
+                }
+
+                if ( Directory.Exists( folder ) && Directory.GetFiles( folder )?.Length <= 0 )
+                {
+                    Directory.Delete( folder );
+                }
+
+                dservice.Delete( doc );
+
+                Notify( "The selected Chep Load Document was successfully deleted.", NotificationType.Success );
+            }
+
+            return ChepLoadDocuments( ChepLoadId );
+        }
+
+        #endregion
+
+
+
+        #region Chep Load Comments
+
+        //
+        // GET: /Pallet/ChepLoadComments
+        public ActionResult ChepLoadComments( int id )
+        {
+            using ( CommentService dservice = new CommentService() )
+            {
+                List<Comment> comments = dservice.List( id, "ChepLoad" );
+
+                ViewBag.Id = id;
+
+                return PartialView( "_ChepLoadComments", comments );
+            }
+        }
+
+        //
+        // GET: /Pallet/UpdateChepLoadComments
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult UpdateChepLoadComments( List<Comment> chepLoadComments, int chepLoadId )
+        {
+            if ( chepLoadComments.NullableAny( f => !string.IsNullOrEmpty( f.Details ) ) )
+            {
+                using ( CommentService cservice = new CommentService() )
+                {
+                    foreach ( Comment item in chepLoadComments.Where( f => !string.IsNullOrEmpty( f.Details ) ) )
+                    {
+                        Comment c = cservice.GetById( item.Id );
+
+                        if ( c == null )
+                        {
+                            c = new Comment()
+                            {
+                                ObjectId = chepLoadId,
+                                Details = item.Details,
+                                ObjectType = "ChepLoad",
+                                Status = ( int ) Status.Active,
+                            };
+
+                            cservice.Create( c );
+                        }
+                        else
+                        {
+                            c.Details = item.Details;
+
+                            cservice.Update( c );
+                        }
+                    }
+                }
+            }
+
+            Notify( "The Chep Load Comments were successfully updated...", NotificationType.Success );
+
+            return ChepLoadComments( chepLoadId );
+        }
+
+        //
+        // GET: /Pallet/DeleteChepComment
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteChepLoadComment( int id )
+        {
+            int chepLoadId;
+
+            using ( CommentService cservice = new CommentService() )
+            {
+                Comment c = cservice.GetById( id );
+
+                if ( c == null )
+                {
+                    Notify( "Sorry, the specified Chep Load Comment could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                chepLoadId = c.ObjectId;
+
+                cservice.Delete( c );
+
+                Notify( "The selected Chep Load Comment was successfully deleted.", NotificationType.Success );
+            }
+
+            return ChepLoadComments( chepLoadId );
+        }
+
+        #endregion
+
+
+
+        #region Client Load Documents
+
+        //
+        // GET: /Pallet/ClientLoadDocuments
+        public ActionResult ClientLoadDocuments( int id )
+        {
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                List<Document> docs = dservice.List( id, "ClientLoad" );
+
+                ViewBag.Id = id;
+
+                return PartialView( "_ClientLoadDocuments", docs );
+            }
+        }
+
+        //
+        // GET: /Pallet/UpdateClientLoadDocuments
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult UpdateClientLoadDocuments( List<DocumentsViewModel> clientLoadDocuments, int clientLoadId )
+        {
+            if ( clientLoadDocuments.NullableAny( f => f.File != null ) )
+            {
+                using ( DocumentService dservice = new DocumentService() )
+                {
+                    foreach ( DocumentsViewModel item in clientLoadDocuments.Where( f => f.File != null ) )
+                    {
+                        string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/ClientLoads/{clientLoadId}/" );
+
+                        if ( !Directory.Exists( path ) )
+                        {
+                            Directory.CreateDirectory( path );
+                        }
+
+                        string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+
+                        Document d = new Document()
+                        {
+                            ObjectId = clientLoadId,
+                            Category = "ClientLoad",
+                            ObjectType = "ClientLoad",
+                            Description = "Client Load Document",
+                            Name = item.File.FileName,
+                            Title = item.File.FileName,
+                            Size = item.File.ContentLength,
+                            Status = ( int ) Status.Active,
+                            Type = Path.GetExtension( item.File.FileName ),
+                            Location = $"ClientLoads/{clientLoadId}/{now}-{item.File.FileName}"
+                        };
+
+                        dservice.Create( d );
+
+                        string fullpath = Path.Combine( path, $"{now}-{item.File.FileName}" );
+
+                        item.File.SaveAs( fullpath );
+                    }
+                }
+            }
+
+            Notify( "The Client Load Documents were successfully updated...", NotificationType.Success );
+
+            return ClientLoadDocuments( clientLoadId );
+        }
+
+        //
+        // GET: /Pallet/DeleteClientDocument
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteClientLoadDocument( int id )
+        {
+            int clientLoadId;
+
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                Document doc = dservice.GetById( id );
+
+                if ( doc == null )
+                {
+                    Notify( "Sorry, the specified Client Load Document could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                clientLoadId = doc.ObjectId.Value;
+
+                string path = Server.MapPath( string.Format( "{0}/{1}", VariableExtension.SystemRules.DocumentsLocation, doc.Location ) );
+                string folder = Path.GetDirectoryName( path );
+
+                if ( System.IO.File.Exists( path ) )
+                {
+                    @System.IO.File.Delete( path );
+                }
+
+                if ( Directory.Exists( folder ) && Directory.GetFiles( folder )?.Length <= 0 )
+                {
+                    Directory.Delete( folder );
+                }
+
+                dservice.Delete( doc );
+
+                Notify( "The selected Client Load Document was successfully deleted.", NotificationType.Success );
+            }
+
+            return ClientLoadDocuments( clientLoadId );
+        }
+
+        #endregion
+
+
+
+        #region Client Load Comments
+
+        //
+        // GET: /Pallet/ClientLoadComments
+        public ActionResult ClientLoadComments( int id )
+        {
+            using ( CommentService cservice = new CommentService() )
+            {
+                List<Comment> comments = cservice.List( id, "ClientLoad" );
+
+                ViewBag.Id = id;
+
+                return PartialView( "_ClientLoadComments", comments );
+            }
+        }
+
+        //
+        // GET: /Pallet/UpdateClientLoadComments
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult UpdateClientLoadComments( List<Comment> clientLoadComments, int clientLoadId )
+        {
+            if ( clientLoadComments.NullableAny( f => !string.IsNullOrEmpty( f.Details ) ) )
+            {
+                using ( CommentService cservice = new CommentService() )
+                {
+                    foreach ( Comment item in clientLoadComments.Where( f => !string.IsNullOrEmpty( f.Details ) ) )
+                    {
+                        Comment c = cservice.GetById( item.Id );
+
+                        if ( c == null )
+                        {
+                            c = new Comment()
+                            {
+                                Details = item.Details,
+                                ObjectId = clientLoadId,
+                                ObjectType = "ClientLoad",
+                                Status = ( int ) Status.Active,
+                            };
+
+                            cservice.Create( c );
+                        }
+                        else
+                        {
+                            c.Details = item.Details;
+
+                            cservice.Update( c );
+                        }
+                    }
+                }
+            }
+
+            Notify( "The Client Load Comments were successfully updated...", NotificationType.Success );
+
+            return ClientLoadComments( clientLoadId );
+        }
+
+        //
+        // GET: /Pallet/DeleteClientComment
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteClientLoadComment( int id )
+        {
+            int clientLoadId;
+
+            using ( CommentService cservice = new CommentService() )
+            {
+                Comment c = cservice.GetById( id );
+
+                if ( c == null )
+                {
+                    Notify( "Sorry, the specified Client Load Comment could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                clientLoadId = c.ObjectId;
+
+                cservice.Delete( c );
+
+                Notify( "The selected Client Load Comment was successfully deleted.", NotificationType.Success );
+            }
+
+            return ClientLoadComments( clientLoadId );
+        }
+
+        #endregion
+
+
+
+        #region ClientLoadJournals
+
+        //
+        // GET: /Pallet/ClientLoadJournals
+        public ActionResult ClientLoadJournals( int id )
+        {
+            using ( JournalService jservice = new JournalService() )
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                List<Journal> journals = jservice.ListByClientLoad( id );
+
+                ViewBag.Id = id;
+
+                List<JournalViewModel> model = new List<JournalViewModel>();
+
+                foreach ( Journal item in journals )
+                {
+                    List<Document> docs = dservice.List( item.Id, "Journal" );
+
+                    model.Add( new JournalViewModel()
+                    {
+                        Id = item.Id,
+                        EditMode = true,
+                        THAN = item.THAN,
+                        Documents = docs,
+                        InOutInd = item.InOutInd,
+                        ClientLoadId = item.ClientLoadId,
+                        Status = ( Status ) item.Status,
+                        PostingQuantity = item.PostingQuantity,
+                        PostingDescription = item.PostingDescription,
+                        JournalType = ( JournalType ) item.JournalType,
+                    } );
+                }
+
+                return PartialView( "_ClientLoadJournals", model );
+            }
+        }
+
+        //
+        // GET: /Pallet/UpdateClientLoadJournals
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult UpdateClientLoadJournals( List<JournalViewModel> ClientLoadJournals )
+        {
+            int clientLoadId = ClientLoadJournals?.FirstOrDefault()?.ClientLoadId ?? 0;
+
+            using ( JournalService jservice = new JournalService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                foreach ( JournalViewModel item in ClientLoadJournals )
+                {
+                    Journal j = jservice.GetById( item.Id );
+
+                    if ( j == null )
+                    {
+                        #region Create Journal
+
+                        j = new Journal()
+                        {
+                            THAN = item.THAN,
+                            InOutInd = item.InOutInd,
+                            ClientLoadId = clientLoadId,
+                            Status = ( int ) Status.Active,
+                            JournalType = ( int ) item.JournalType,
+                            PostingQuantity = item.PostingQuantity,
+                            PostingDescription = item.PostingDescription,
+                        };
+
+                        jservice.Create( j );
+
+                        #endregion
+                    }
+                    else
+                    {
+                        #region Update Journal
+
+                        j.THAN = item.THAN;
+                        j.InOutInd = item.InOutInd;
+                        j.Status = ( int ) Status.Active;
+                        j.JournalType = ( int ) item.JournalType;
+                        j.PostingQuantity = item.PostingQuantity;
+                        j.PostingDescription = item.PostingDescription;
+
+                        jservice.Update( j );
+
+                        #endregion
+                    }
+
+                    #region Any Document Upload
+
+                    if ( item.File != null )
+                    {
+                        string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/Journals/{j.Id}/" );
+
+                        if ( !Directory.Exists( path ) )
+                        {
+                            Directory.CreateDirectory( path );
+                        }
+
+                        string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+
+                        Document d = dservice.Get( j.Id, "Journal", "Journal" );
+
+                        if ( d != null )
+                        {
+                            try
+                            {
+                                string p = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/{d.Location}" );
+
+                                if ( System.IO.File.Exists( p ) )
+                                {
+                                    System.IO.File.Delete( p );
+                                }
+                            }
+                            catch ( Exception ex )
+                            {
+
+                            }
+
+                            dservice.Delete( d );
+                        }
+
+                        d = new Document()
+                        {
+                            ObjectId = j.Id,
+                            Category = "Journal",
+                            ObjectType = "Journal",
+                            Description = "Journal",
+                            Name = item.File.FileName,
+                            Title = item.File.FileName,
+                            Size = item.File.ContentLength,
+                            Status = ( int ) Status.Active,
+                            Type = Path.GetExtension( item.File.FileName ),
+                            Location = $"Journals/{j.Id}/{now}-{item.File.FileName}"
+                        };
+
+                        dservice.Create( d );
+
+                        string fullpath = Path.Combine( path, $"{now}-{item.File.FileName}" );
+
+                        item.File.SaveAs( fullpath );
+                    }
+
+                    #endregion
+                }
+
+                scope.Complete();
+
+                Notify( "The Client Load Journals were successfully updated...", NotificationType.Success );
+            }
+
+            using ( JournalService jservice = new JournalService() )
+            {
+                List<Journal> journals = jservice.ListByClientLoad( clientLoadId );
+
+                ViewBag.Id = clientLoadId;
+
+                return PartialView( "_ClientLoadJournals", journals );
+            }
+        }
+
+        //
+        // GET: /Pallet/DeleteClientJournal
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteClientLoadJournal( int id )
+        {
+            using ( JournalService jservice = new JournalService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                Journal j = jservice.GetById( id );
+
+                if ( j == null )
+                {
+                    Notify( "Sorry, the specified Journal could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                jservice.Delete( j );
+
+                List<Document> docs = dservice.List( id, "Journal" );
+
+                if ( docs.NullableAny() )
+                {
+                    foreach ( Document doc in docs )
+                    {
+                        string path = Server.MapPath( string.Format( "{0}/{1}", VariableExtension.SystemRules.DocumentsLocation, doc.Location ) );
+                        string folder = Path.GetDirectoryName( path );
+
+                        if ( System.IO.File.Exists( path ) )
+                        {
+                            @System.IO.File.Delete( path );
+                        }
+
+                        if ( Directory.Exists( folder ) && Directory.GetFiles( folder )?.Length <= 0 )
+                        {
+                            Directory.Delete( folder );
+                        }
+
+                        dservice.Delete( doc );
+                    }
+                }
+
+                scope.Complete();
+
+                Notify( "The selected Client Load Journal was successfully deleted.", NotificationType.Success );
+            }
+
+            return ClientLoadJournals( id );
+        }
+
+        #endregion
+
+
+
         #endregion
 
         //-------------------------------------------------------------------------------------
 
         #region Reconcile Invoice
 
-        //
-        // GET: /Pallet/ReconcileInvoice
-        public ActionResult ReconcileInvoice( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        // GET: Pallet/AddInvoice
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddInvoice()
         {
-            if ( givecsm )
-            {
-                ViewBag.ViewName = "ReconcileInvoice";
+            InvoiceViewModel model = new InvoiceViewModel() { EditMode = true };
 
-                return PartialView( "_ReconcileInvoiceCustomSearch", new CustomSearchModel( "ReconcileInvoice" ) );
+            return View( model );
+        }
+
+        // POST: Pallet/AddInvoice
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddInvoice( InvoiceViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
             }
-            ViewBag.ViewName = "ReconcileInvoice";
-            string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-            int clientId = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-            ViewBag.ContextualMode = ( clientId > 0 ? true : false ); //Whether a client is specific or not and the View can know about it
-                                                                      // model.ContextualMode = (clientId > 0 ? true : false); //Whether a client is specific or not and the View can know about it
-            List<ClientCustomModel> clientList = new List<ClientCustomModel>();
-            //TODO
-            using ( ClientService clientService = new ClientService() )
+
+            using ( InvoiceService iservice = new InvoiceService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( ClientInvoiceService ciservice = new ClientInvoiceService() )
             {
-                clientList = clientService.List1( new PagingModel(), new CustomSearchModel() { ClientId = clientId, Status = Status.Active } );
+                #region Create Invoice
+
+                Invoice invoice = new Invoice()
+                {
+                    Date = model.Date,
+                    Number = model.Number,
+                    Amount = model.Amount,
+                    Quantity = model.Quantity,
+                    LoadNumber = model.LoadNumber,
+                    Status = ( int ) Status.Active,
+                };
+
+                invoice = iservice.Create( invoice );
+
+                #endregion
+
+                #region Client Load Invoice Recon?
+
+                List<ClientLoad> clientLoads = clservice.ListByColumnWhere( "LoadNumber", invoice.LoadNumber );
+
+                if ( clientLoads.NullableAny() )
+                {
+                    foreach ( ClientLoad item in clientLoads )
+                    {
+                        item.ChepInvoiceNo = invoice.Number;
+                        item.InvoiceStatus = ( int ) InvoiceStatus.Updated;
+
+                        clservice.Update( item );
+
+                        ClientInvoice ci = new ClientInvoice()
+                        {
+                            ClientLoadId = item.Id,
+                            InvoiceId = invoice.Id,
+                            Status = ( int ) Status.Active,
+                        };
+
+                        ciservice.Create( ci );
+                    }
+                }
+
+                #endregion
             }
 
-            IEnumerable<SelectListItem> clientDDL = clientList.Select( c => new SelectListItem
+            Notify( "The invoice was successfully created.", NotificationType.Success );
+
+            return Invoices( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // GET: Pallet/ImportInvoice
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportInvoice()
+        {
+            InvoiceViewModel model = new InvoiceViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        // POST: Client/AddSite
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportInvoice( InvoiceViewModel model )
+        {
+            if ( model.File == null )
             {
-                Value = c.Id.ToString(),
-                Text = c.CompanyName
+                Notify( "Please select a file to upload and try again.", NotificationType.Error );
 
-            } );
-            ViewBag.ClientList = clientDDL;
-            int total = 0;
+                return View( model );
+            }
 
-            List<Site> model = new List<Site>();
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+            int count = 0,
+                errors = 0,
+                skipped = 0,
+                created = 0,
+                updated = 0;
 
-            return PartialView( "_ReconcileInvoice", paging );
+            string cQuery, uQuery;
+
+            using ( InvoiceService iservice = new InvoiceService() )
+            using ( TextFieldParser parser = new TextFieldParser( model.File.InputStream ) )
+            {
+                parser.Delimiters = new string[] { "," };
+
+                while ( true )
+                {
+                    string[] inv = parser.ReadFields();
+
+                    if ( inv == null )
+                    {
+                        break;
+                    }
+
+                    cQuery = uQuery = string.Empty;
+
+                    count++;
+
+                    if ( inv.NullableCount() < 2 )
+                    {
+                        skipped++;
+
+                        continue;
+                    }
+
+                    inv = inv.ToSQLSafe();
+
+                    Invoice i = iservice.GetByInvoiceNumber( inv[ 0 ] );
+
+                    if ( i == null )
+                    {
+                        #region Create Invoice
+
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[Invoice] ([CreatedOn],[ModfiedOn],[ModifiedBy],[Number],[Date],[Quantity],[Amount],[LoadNumber],[Status]) ";
+                        cQuery = $" {cQuery} VALUES ('{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{inv[ 0 ]}','{inv[ 1 ]}',{inv[ 2 ]},{inv[ 3 ]},'{inv[ 4 ]}',{( int ) Status.Active}) ";
+
+                        #endregion
+
+                        try
+                        {
+                            iservice.Query( cQuery );
+
+                            created++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+                        }
+                    }
+                    else
+                    {
+                        #region Update Invoice
+
+                        uQuery = $@"{uQuery} UPDATE [dbo].[Invoice] SET
+                                                    [ModifiedOn]='{DateTime.Now}',
+                                                    [ModifiedBy]='{CurrentUser.Email}',
+                                                    [Number]='{inv[ 0 ]}',
+                                                    [Date]='{inv[ 1 ]}',
+                                                    [Quantity]={inv[ 2 ]},
+                                                    [Amount]={inv[ 3 ]},
+                                                    [LoadNumber]='{inv[ 4 ]}',
+                                                    [Status]={( int ) Status.Active}
+                                                WHERE
+                                                    [Id]={i.Id}";
+
+                        #endregion
+
+                        try
+                        {
+                            iservice.Query( uQuery );
+
+                            updated++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+                        }
+                    }
+                }
+
+                cQuery = string.Empty;
+                uQuery = string.Empty;
+            }
+
+            AutoReconcileInvoices();
+
+            Notify( $"{created} loads were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.", NotificationType.Success );
+
+            return PoolingAgentData( new PagingModel(), new CustomSearchModel() );
+        }
+
+        /// <summary>
+        /// Automatically reconciles all unreconcilled invoices
+        /// </summary>
+        /// <returns></returns>
+        private bool AutoReconcileInvoices()
+        {
+            using ( InvoiceService iservice = new InvoiceService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( ClientInvoiceService ciservice = new ClientInvoiceService() )
+            {
+                List<Invoice> invoices = iservice.ListUnReconciledInvoices();
+
+                if ( !invoices.NullableAny() ) return true;
+
+                foreach ( Invoice i in invoices )
+                {
+                    List<ClientLoad> clientLoads = clservice.ListByColumnWhere( "LoadNumber", i.LoadNumber );
+
+                    if ( clientLoads.NullableAny() )
+                    {
+                        foreach ( ClientLoad item in clientLoads )
+                        {
+                            item.ChepInvoiceNo = i.Number;
+                            item.InvoiceStatus = ( int ) InvoiceStatus.Updated;
+
+                            clservice.Update( item );
+
+                            ClientInvoice ci = new ClientInvoice()
+                            {
+                                InvoiceId = i.Id,
+                                ClientLoadId = item.Id,
+                                Status = ( int ) Status.Active,
+                            };
+
+                            ciservice.Create( ci );
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+
+
+        //
+        // GET: /Pallet/Invoices
+        public ActionResult Invoices( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( InvoiceService iservice = new InvoiceService() )
+            {
+                pm.Sort = "ASC";
+
+                pm.SortBy = "i.[Date]";
+
+                List<InvoiceCustomModel> chModel = iservice.List1( pm, csm );
+                int chTotal = ( chModel.Count < pm.Take && pm.Skip == 0 ) ? chModel.Count : iservice.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( chModel, chTotal, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_Invoices", paging );
+            }
+        }
+
+        //
+        // GET: /Pallet/InvoiceClientLoads
+        public ActionResult InvoiceClientLoads( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( ClientLoadService chservice = new ClientLoadService() )
+            {
+                csm.InvoiceStatus = InvoiceStatus.NA;
+
+                pm.Sort = "ASC";
+
+                pm.SortBy = "cl.[LoadDate]";
+
+                List<ClientLoadCustomModel> model = chservice.List1( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : chservice.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_InvoiceClientLoads", paging );
+            }
         }
 
         #endregion
@@ -2571,8 +3436,8 @@ namespace ACT.UI.Controllers
                 journal.ClientLoadId = ( int ) clientLoadId;
                 if ( siteAuditId > 0 )
                     journal.SiteAuditId = ( int ) siteAuditId;
-                if ( documentId > 0 )
-                    journal.DocumetId = ( int ) documentId;
+                //if ( documentId > 0 )
+                //    journal.DocumetId = ( int ) documentId;
 
                 journal.PostingDescription = description;
                 journal.InOutInd = ( ( int ) isIn == 0 ? false : true );
@@ -2586,7 +3451,7 @@ namespace ACT.UI.Controllers
                 }
                 journal.THAN = refnumber;
                 journal.Status = ( int ) Status.Active;
-                journal.JournalType = "ClientLoad";
+                //journal.JournalType = "ClientLoad";
 
                 using ( TransactionScope scope = new TransactionScope() )
                 using ( JournalService service = new JournalService() )
@@ -3179,6 +4044,35 @@ namespace ACT.UI.Controllers
             }
 
             return PartialView( "_ReconcileLoads", new CustomSearchModel( "ReconcileLoads" ) );
+        }
+
+        //
+        // GET: /Pallet/ReconcileInvoice
+        public ActionResult ReconcileInvoice( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( InvoiceService iservice = new InvoiceService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            {
+                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
+
+                pm.Sort = "ASC";
+
+                pm.SortBy = "i.[Date]";
+
+                List<InvoiceCustomModel> iModel = iservice.List1( pm, csm );
+                int iTotal = ( iModel.Count < pm.Take && pm.Skip == 0 ) ? iModel.Count : iservice.Total1( pm, csm );
+
+                ViewBag.Invoices = PagingExtension.Create( iModel, iTotal, pm.Skip, pm.Take, pm.Page );
+
+                pm.SortBy = "cl.[LoadDate]";
+
+                List<ClientLoadCustomModel> clModel = clservice.List1( pm, csm );
+                int clTotal = ( clModel.Count < pm.Take && pm.Skip == 0 ) ? clModel.Count : clservice.Total1( pm, csm );
+
+                ViewBag.InvoiceClientLoads = PagingExtension.Create( clModel, clTotal, pm.Skip, pm.Take, pm.Page );
+            }
+
+            return PartialView( "_ReconcileInvoice", new CustomSearchModel( "ReconcileInvoice" ) );
         }
 
         //

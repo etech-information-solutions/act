@@ -506,9 +506,9 @@
 
                         <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
                             <option value="">-- select</option>
-                            @foreach ( int p in Enum.GetValues( typeof(ProvinceEnum) ) )
+                            @foreach ( int p in Enum.GetValues( typeof(Province) ) )
                             {
-                                ProvinceEnum province = (ProvinceEnum) p;
+                                Province province = (Province) p;
 
                                 string text = province.GetDisplayText();
 

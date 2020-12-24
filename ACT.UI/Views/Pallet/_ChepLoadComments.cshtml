@@ -1,0 +1,87 @@
+﻿@model List<Comment>
+
+@using ACT.Data.Models
+@using ACT.Core.Enums
+
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "UpdateChepLoadComments", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#tr-edit > td", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div class="editor-label" style="margin-bottom: 10px;">
+
+        <p>
+            <strong class="uppercase">Chep Load Comments (@Model.NullableCount())</strong>
+        </p>
+
+    </div>
+
+    <div class="editor-field">
+
+        <table id="chep-comments-table" class="da-table small">
+
+            <thead>
+                <tr>
+                    <th>Your Comment</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if ( Model.NullableAny() )
+                {
+                    int count = 0;
+
+                    foreach ( Comment item in Model )
+                    {
+                        <tr id="row-line-@count-chep" class="add-more-row">
+                            <td style="position: relative;">
+                                @if ( ( count + 1 ) == Model.Count )
+                                {
+                                    <a data-add-one-more="1" data-target="#row-line-0-chep" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                                        <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                                    </a>
+                                }
+
+                                <input name="ChepLoadComments[@count].Id" type="hidden" value="@item.Id" />
+                                <input class="input" name="ChepLoadComments[@count].Details" placeholder="Enter your comment" required="required" style="padding: 0 5px; width: 87%;" type="text" value="@item.Details">
+                            </td>
+                            <td width="10%">
+                                @Html.ActionLink( "Remove", "DeleteChepLoadComment", new { id = item.Id }, new { @class = "del", @data_delete = "1", @data_id = item.Id, @data_target = "#row-line-" + count, @data_refresh_target = "#tr-edit > td", @rel = "tipsyE", @title = "Remove this item?" } )
+                            </td>
+                        </tr>
+
+                        count++;
+                    }
+                }
+                else
+                {
+                    <tr id="row-line-0-chep" class="add-more-row">
+                        <td style="position: relative;">
+                            <a data-add-one-more="1" data-target="#row-line-0-chep" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                                <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                            </a>
+
+                            <input class="input" name="ChepLoadComments[0].Details" placeholder="Enter your comment" required="required" style="padding: 0 5px; width: 87%;" type="text" value="" />
+                        </td>
+                        <td width="10%">
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px;">&nbsp;</div>
+
+        <p>
+            <input id="save-btn" type="submit" value="Save" />
+            <input name="ChepLoadId" type="hidden" value="@ViewBag.Id" />
+            <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+        </p>
+
+    </div>
+}

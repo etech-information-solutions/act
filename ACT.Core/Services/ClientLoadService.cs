@@ -54,6 +54,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmVehicleId", csm.VehicleId ) },
                 { new SqlParameter( "csmTransporterId", csm.TransporterId ) },
+                { new SqlParameter( "csmInvoiceStatus", ( int ) csm.InvoiceStatus ) },
                 { new SqlParameter( "csmOutstandingReasonId", csm.OutstandingReasonId ) },
                 { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
@@ -121,6 +122,10 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (cl.Status=@csmReconciliationStatus)";
             }
+            if ( csm.InvoiceStatus != InvoiceStatus.All )
+            {
+                query = $"{query} AND (cl.InvoiceStatus=@csmInvoiceStatus)";
+            }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
@@ -146,8 +151,7 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (cl.[ARPMComments] LIKE '%{1}%' OR
-                                                  cl.[ReferenceNumber] LIKE '%{1}%' OR
+                query = string.Format( @"{0} AND (cl.[ReferenceNumber] LIKE '%{1}%' OR
                                                   cl.[DeliveryNote] LIKE '%{1}%' OR
                                                   cl.[ClientDescription] LIKE '%{1}%' OR
                                                   cl.[Equipment] LIKE '%{1}%' OR
@@ -196,6 +200,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmVehicleId", csm.VehicleId ) },
                 { new SqlParameter( "csmTransporterId", csm.TransporterId ) },
+                { new SqlParameter( "csmInvoiceStatus", ( int ) csm.InvoiceStatus ) },
                 { new SqlParameter( "csmOutstandingReasonId", csm.OutstandingReasonId ) },
                 { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
@@ -302,6 +307,10 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (cl.Status=@csmReconciliationStatus)";
             }
+            if ( csm.InvoiceStatus != InvoiceStatus.All )
+            {
+                query = $"{query} AND (cl.InvoiceStatus=@csmInvoiceStatus)";
+            }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
@@ -327,8 +336,7 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (cl.[ARPMComments] LIKE '%{1}%' OR
-                                                  cl.[ReferenceNumber] LIKE '%{1}%' OR
+                query = string.Format( @"{0} AND (cl.[ReferenceNumber] LIKE '%{1}%' OR
                                                   cl.[DeliveryNote] LIKE '%{1}%' OR
                                                   cl.[ClientDescription] LIKE '%{1}%' OR
                                                   cl.[Equipment] LIKE '%{1}%' OR
@@ -1037,8 +1045,7 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (cl.[ARPMComments] LIKE '%{1}%' OR
-                                                  cl.[ReferenceNumber] LIKE '%{1}%' OR
+                query = string.Format( @"{0} AND (cl.[ReferenceNumber] LIKE '%{1}%' OR
                                                   cl.[DeliveryNote] LIKE '%{1}%' OR
                                                   cl.[ClientDescription] LIKE '%{1}%' OR
                                                   cl.[Equipment] LIKE '%{1}%' OR

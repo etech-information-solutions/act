@@ -187,6 +187,7 @@
     <Compile Include="Models\ClientKPIViewModel.cs" />
     <Compile Include="Models\DeliveryNoteLineViewModel.cs" />
     <Compile Include="Models\DisputeViewModel.cs" />
+    <Compile Include="Models\JournalViewModel.cs" />
     <Compile Include="Models\ObjectDocumentsViewModel.cs" />
     <Compile Include="Models\ImportFileModel.cs" />
     <Compile Include="Models\GroupViewModel.cs" />
@@ -660,6 +661,13 @@
     <Content Include="Views\Pallet\_ChepLoads.cshtml" />
     <Content Include="Views\Pallet\_ClientLoads.cshtml" />
     <Content Include="Views\Pallet\_TinyPaging.cshtml" />
+    <Content Include="Views\Pallet\_ClientLoadJournals.cshtml" />
+    <Content Include="Views\Pallet\_ClientLoadComments.cshtml" />
+    <Content Include="Views\Pallet\_ClientLoadDocuments.cshtml" />
+    <Content Include="Views\Pallet\_ChepLoadComments.cshtml" />
+    <Content Include="Views\Pallet\_ChepLoadDocuments.cshtml" />
+    <Content Include="Views\Pallet\_InvoiceClientLoads.cshtml" />
+    <Content Include="Views\Pallet\_Invoices.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

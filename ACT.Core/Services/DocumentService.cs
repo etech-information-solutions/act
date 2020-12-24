@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using ACT.Core.Enums;
 using ACT.Data.Models;
 
@@ -22,6 +23,17 @@ namespace ACT.Core.Services
         public List<Document> List( int objectId, string objectType )
         {
             return context.Documents.Where( d => d.ObjectId == objectId && d.ObjectType == objectType && d.Status == ( int ) Status.Active ).ToList();
+        }
+
+        /// <summary>
+        /// Gets a document using the specified objectId, objectType
+        /// </summary>
+        /// <param name="objectId"></param>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
+        public Document Get( int objectId, string objectType )
+        {
+            return context.Documents.FirstOrDefault( d => d.ObjectId == objectId && d.ObjectType == objectType && d.Status == ( int ) Status.Active );
         }
 
         /// <summary>

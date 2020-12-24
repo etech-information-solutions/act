@@ -135,12 +135,6 @@
     <Compile Include="Models\Contact.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Country.cs">
-      <DependentUpon>ACT.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\CountryProvince.cs">
-      <DependentUpon>ACT.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\DeclineReason.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>

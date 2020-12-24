@@ -510,6 +510,7 @@ namespace ACT.Core.Models
 
                 case "ClientKPI":
                 case "ReconcileLoads":
+                case "ReconcileInvoice":
                 case "PoolingAgentData":
 
                     using ( ClientService cservice = new ClientService() )

@@ -257,6 +257,24 @@ a.setting {
     background: url('../images/setting.png') no-repeat left bottom;
 }
 
+a.chat {
+    margin-left: 7px;
+    padding: 6px 0 0 20px;
+    background: url('../images/chat-on.png') no-repeat left bottom;
+}
+
+a.calendar {
+    margin-left: 7px;
+    padding: 6px 0 0 20px;
+    background: url('../images/calendar.png') no-repeat left bottom;
+}
+
+a.reports {
+    margin-left: 7px;
+    padding: 6px 0 0 20px;
+    background: url('../images/reports.png') no-repeat left bottom;
+}
+
 .labelClass label {
     display: inline;
 }
