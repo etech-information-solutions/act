@@ -47,6 +47,9 @@
             <th data-name="CreatedOn" data-column="cl.CreatedOn">
                 Imported/Created
             </th>
+            <th data-name="LoadDate" data-column="cl.LoadDate">
+                Load Date
+            </th>
             <th data-name="Client" data-column="c.CompanyName">
                 Client
             </th>
@@ -54,7 +57,7 @@
                 Shipment #
             </th>
             <th data-name="DeliveryNote" data-column="cl.DeliveryNote">
-                Delivery Note
+                Delivery #
             </th>
             <th data-name="ReceiverNumber" data-column="cl.ReceiverNumber">
                 Receiver #
@@ -96,6 +99,9 @@
                     </td>
                     <td>
                         @item.CreatedOn.ToString( "yyyy-MM-dd @ HH:mm tt" )
+                    </td>
+                    <td>
+                        @item.LoadDate.Value.ToString( "yyyy-MM-dd" )
                     </td>
                     <td>
                         @item.ClientName

@@ -1602,15 +1602,15 @@ namespace ACT.UI.Controllers
         // GET: /Pallet/UpdateClientLoadJournals
         [HttpPost]
         [Requires( PermissionTo.Create )]
-        public ActionResult UpdateClientLoadJournals( List<JournalViewModel> ClientLoadJournals )
+        public ActionResult UpdateClientLoadJournals( List<JournalViewModel> clientLoadJournals )
         {
-            int clientLoadId = ClientLoadJournals?.FirstOrDefault()?.ClientLoadId ?? 0;
+            int clientLoadId = clientLoadJournals?.FirstOrDefault()?.ClientLoadId ?? 0;
 
             using ( JournalService jservice = new JournalService() )
             using ( TransactionScope scope = new TransactionScope() )
             using ( DocumentService dservice = new DocumentService() )
             {
-                foreach ( JournalViewModel item in ClientLoadJournals )
+                foreach ( JournalViewModel item in clientLoadJournals )
                 {
                     Journal j = jservice.GetById( item.Id );
 
@@ -1712,14 +1712,7 @@ namespace ACT.UI.Controllers
                 Notify( "The Client Load Journals were successfully updated...", NotificationType.Success );
             }
 
-            using ( JournalService jservice = new JournalService() )
-            {
-                List<Journal> journals = jservice.ListByClientLoad( clientLoadId );
-
-                ViewBag.Id = clientLoadId;
-
-                return PartialView( "_ClientLoadJournals", journals );
-            }
+            return ClientLoadJournals( clientLoadId );
         }
 
         //
@@ -2026,50 +2019,6 @@ namespace ACT.UI.Controllers
             }
 
             return PartialView( "_Notification" );
-        }
-
-        /// <summary>
-        /// Automatically reconciles all unreconcilled invoices
-        /// </summary>
-        /// <returns></returns>
-        private bool AutoReconcileInvoices()
-        {
-            using ( InvoiceService iservice = new InvoiceService() )
-            using ( ClientLoadService clservice = new ClientLoadService() )
-            using ( ClientInvoiceService ciservice = new ClientInvoiceService() )
-            {
-                List<Invoice> invoices = iservice.ListUnReconciledInvoices();
-
-                if ( !invoices.NullableAny() ) return true;
-
-                foreach ( Invoice i in invoices )
-                {
-                    List<ClientLoad> clientLoads = clservice.ListByColumnWhere( "LoadNumber", i.LoadNumber );
-
-                    if ( clientLoads.NullableAny() )
-                    {
-                        foreach ( ClientLoad item in clientLoads )
-                        {
-                            item.ReconcileInvoice = true;
-                            item.ChepInvoiceNo = i.Number;
-                            item.InvoiceStatus = ( int ) InvoiceStatus.Updated;
-
-                            clservice.Update( item );
-
-                            ClientInvoice ci = new ClientInvoice()
-                            {
-                                InvoiceId = i.Id,
-                                ClientLoadId = item.Id,
-                                Status = ( int ) Status.Active,
-                            };
-
-                            ciservice.Create( ci );
-                        }
-                    }
-                }
-            }
-
-            return true;
         }
 
 

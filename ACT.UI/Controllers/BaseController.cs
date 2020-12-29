@@ -204,7 +204,7 @@ namespace ACT.UI.Controllers
 
                         case "Administration":
 
-                            filterContext.Result = RedirectToAction("Index", "Finance");
+                            filterContext.Result = RedirectToAction( "Index", "Finance" );
 
                             break;
 
@@ -1084,6 +1084,82 @@ namespace ACT.UI.Controllers
                     }
                 };
             }
+        }
+
+        public int AnalyseAutoReconcile( string type )
+        {
+            int total = 0;
+
+            if ( type == "loads" )
+            {
+                total = GetAutoReconcilliableLoadTotal();
+            }
+            else if ( type == "invoices" )
+            {
+                total = GetAutoReconcilliableInvoiceTotal();
+            }
+
+            return total;
+        }
+
+        public int GetAutoReconcilliableLoadTotal()
+        {
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            {
+                return clservice.GetAutoReconcilliableLoadTotal();
+            }
+        }
+
+        public int GetAutoReconcilliableInvoiceTotal()
+        {
+            using ( InvoiceService iservice = new InvoiceService() )
+            {
+                return iservice.GetAutoReconcilliableInvoiceTotal();
+            }
+        }
+
+        /// <summary>
+        /// Automatically reconciles all unreconcilled invoices
+        /// </summary>
+        /// <returns></returns>
+        public bool AutoReconcileInvoices()
+        {
+            using ( InvoiceService iservice = new InvoiceService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( ClientInvoiceService ciservice = new ClientInvoiceService() )
+            {
+                List<Invoice> invoices = iservice.ListUnReconciledInvoices();
+
+                if ( !invoices.NullableAny() ) return true;
+
+                foreach ( Invoice i in invoices )
+                {
+                    List<ClientLoad> clientLoads = clservice.ListByColumnWhere( "LoadNumber", i.LoadNumber );
+
+                    if ( clientLoads.NullableAny() )
+                    {
+                        foreach ( ClientLoad item in clientLoads )
+                        {
+                            item.ReconcileInvoice = true;
+                            item.ChepInvoiceNo = i.Number;
+                            item.InvoiceStatus = ( int ) InvoiceStatus.Updated;
+
+                            clservice.Update( item );
+
+                            ClientInvoice ci = new ClientInvoice()
+                            {
+                                InvoiceId = i.Id,
+                                ClientLoadId = item.Id,
+                                Status = ( int ) Status.Active,
+                            };
+
+                            ciservice.Create( ci );
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
 
         #endregion

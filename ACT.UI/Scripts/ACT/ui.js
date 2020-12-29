@@ -78,6 +78,7 @@
             this.DataDelete( $( '*[data-delete="1"]' ) );
             this.DataDetails( $( '*[data-details="1"]' ) );
             this.DataAuditLog( $( '*[data-audit-log="1"]' ) );
+            this.DataAutoRecon( $( '*[data-auto-recon="1"]' ) );
             this.DataFormSubit( $( '*[data-form-submit="1"]' ) );
             this.DataCancelItem( $( '*[data-cancel-item="1"]' ) );
             this.DataApproveDeclinePSP( $( '*[data-approve-decline-psp="1"]' ) );
@@ -5049,6 +5050,56 @@
                         ACT.UI.DataSearchInvoiceClientLoads( clientLoads );
                     } );
             } );
+        },
+
+        DataAutoRecon: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var type = i.attr( "data-type" );
+                var title = i.attr( "data-title" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var msg = "<p id='ar-msg'>Analysing " + type + " to reconcile...</p>";
+                        msg += ACT.Loader.Html;
+
+                        ACT.Modal.Open( msg, title, false );
+
+                        var close = $( ACT.Modal.Container ).find( '#modalClose' );
+
+                        close.css( "display", "none" );
+
+                        ACT.Loader.Show();
+
+                        $( "<div />" ).load( siteurl + "/AnalyseAutoReconcile", { type: type }, function ( d )
+                        {
+                            var msg = $( ACT.Modal.Container ).find( '#ar-msg' );
+
+                            if ( d.trim() != 0 )
+                            {
+                                msg.html( "Found " + d.trim() + " " + type + " that can automatically be reconcilled, please wait for this process to complete..." );
+
+
+                            }
+                            else
+                            {
+                                close.fadeIn( 900 );
+
+                                $( '.div-loader' ).css( { 'display': 'none' } );
+
+                                msg.html( "There are 0 " + type + " that can automatically be reconcilled at this stage." );
+
+                                ACT.Loader.Hide();
+                            }
+                        } );
+                    } );
+            } )
         }
+
     };
 } )();

@@ -5,7 +5,7 @@
 
         Image: '<img id="loader" class="apcloud-loader" src="' + imgurl + '/images/loader.gif" alt="" style="margin: 0 5px;" />',
 
-        Html: '<div class="apcloud-loader" style="text-align: center;"><img id="loader" class="apcloud-loader" src="' + imgurl + '/images/loader.gif" alt="" style="margin: 0 5px;" /></div>',
+        Html: '<div class="div-loader" style="text-align: center;"><img id="loader" class="apcloud-loader" src="' + imgurl + '/images/loader.gif" alt="" style="margin: 0 5px;" /></div>',
 
         Show: function ( sender, img )
         {
@@ -41,7 +41,7 @@
 
         Hide: function ()
         {
-            $( '.apcloud-loader' ).css( { 'display': 'none' } );
+            $( '.div-loader' ).css( { 'display': 'none' } );
 
             if ( ACT.Loader.Sender.length )
             {
@@ -50,7 +50,7 @@
                 ACT.Loader.Sender = '';
             }
 
-            $( '.apcloud-loader' ).remove();
+            $( '.div-loader' ).remove();
 
             $( 'select.chzn' ).chznreadonly( false );
             $( 'html, body' ).css( { 'cursor': 'default' } );

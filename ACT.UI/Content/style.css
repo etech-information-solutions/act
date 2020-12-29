@@ -1409,6 +1409,17 @@ tr.duplicate-highlight td {
     box-shadow: inset 0 0 10px #f8f15d;
 }
 
+.auto-recon {
+    color: #fff;
+    padding: 10px;
+    margin: 0 0 0 11%;
+    border-radius: 4px;
+    background: #012d71;
+    text-transform: uppercase;
+}
+
+
+
 footer {
     left: 0;
     bottom: 0;
