@@ -70,8 +70,7 @@ namespace ACT.UI.Models
         public string Equipment { get; set; }
 
         [Display( Name = "Quantity" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
-        public string Quantity { get; set; }
+        public int? Quantity { get; set; }
 
         [Display( Name = "Ref #" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]

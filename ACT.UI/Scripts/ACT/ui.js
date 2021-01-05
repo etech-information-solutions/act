@@ -5080,11 +5080,18 @@
                         {
                             var msg = $( ACT.Modal.Container ).find( '#ar-msg' );
 
-                            if ( d.trim() != 0 )
+                            if ( d.trim() != 0 && parseInt( d.trim() ) )
                             {
-                                msg.html( "Found " + d.trim() + " " + type + " that can automatically be reconcilled, please wait for this process to complete..." );
+                                msg.html( "Found " + parseInt( d.trim() ).money( 0 ) + " " + type + " that can automatically be reconcilled, please wait for the reconcilliation process to complete..." );
 
-
+                                if ( type == "loads" )
+                                {
+                                    ACT.UI.DataAutoReconcileLoads( close, msg );
+                                }
+                                else
+                                {
+                                    ACT.UI.DataAutoReconcileInvoices( close, msg );
+                                }
                             }
                             else
                             {
@@ -5099,6 +5106,38 @@
                         } );
                     } );
             } )
+        },
+
+        DataAutoReconcileLoads: function ( close, msg )
+        {
+            $( "<div />" ).load( siteurl + "/AutoReconcileLoads", {}, function ( d )
+            {
+                close.fadeIn( 900 );
+
+                $( '.div-loader' ).add( msg ).css( { 'display': 'none' } );
+
+                msg.parent( d );
+
+                $( ACT.Modal.Container ).find( '#modal-body .notification' ).slideDown( 900 );
+
+                ACT.Loader.Hide();
+            } );
+        },
+
+        DataAutoReconcileInvoices: function ( close, msg )
+        {
+            $( "<div />" ).load( siteurl + "/AutoReconcileInvoices", {}, function ( d )
+            {
+                close.fadeIn( 900 );
+
+                $( '.div-loader' ).add( msg ).css( { 'display': 'none' } );
+
+                msg.parent( d );
+
+                $( ACT.Modal.Container ).find( '#modal-body .notification' ).slideDown( 900 );
+
+                ACT.Loader.Hide();
+            } );
         }
 
     };

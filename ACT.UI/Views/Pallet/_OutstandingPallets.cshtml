@@ -8,7 +8,7 @@
     ViewBag.ShowExport = true;
     ViewBag.ShowCustom = true;
 
-    ViewBag.ViewName = "_PoolingAgentData";
+    ViewBag.ViewName = "_OutstandingPallets";
 }
 
 
@@ -26,21 +26,11 @@
 @if ( Model == null || !items.Any() )
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
-        There are no Pooling Agent Load Entries available matching your search criteria.
+        There are no Outstanding Pallets Entries available matching your search criteria.
     </div>
 }
 
-<p>
-    @*@Html.ActionLink( "Add", "AddPoolingAgentData", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add Manual Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" } )
-
-        <span style="padding: 0 5px;">|</span>*@
-
-    @Html.ActionLink( "Import", "ImportPoolingAgentData", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" } )
-
-    <span class="loader"></span>
-</p>
-
-<table id="pad-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#pad-table_wrapper" data-starting-point=".ap-tabs ul">
+<table id="OutstandingPallets-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#OutstandingPallets-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
             <th data-name="Count">
@@ -92,7 +82,7 @@
 
                 string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+                <tr id="tr-@item.Id-item-op" class="tr-@item.Id-item-op @active">
 
                     <td width="1%">
                         @count
@@ -135,18 +125,7 @@
 
                         </div>
 
-                        @Html.ActionLink( "Allocate", "AllocatePoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-
-                        @if ( postingType == PostingType.Manual )
-                        {
-                            @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
-
-                                    @Html.ActionLink( "Edit", "EditPoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item", @style = "margin-right: 0;" } )
-
-                                    @Html.ActionLink( enable, "DeletePoolingAgentData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?", @style = "margin-left: 0;" } )
-
-                                </div>*@
-                        }
+                        @Html.ActionLink( "Allocate", "AllocatePoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item-op" } )
 
                     </td>
 

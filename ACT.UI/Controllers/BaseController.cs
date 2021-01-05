@@ -1102,6 +1102,10 @@ namespace ACT.UI.Controllers
             return total;
         }
 
+        /// <summary>
+        /// Gets the total number of loads that can automatically be reconcilled
+        /// </summary>
+        /// <returns></returns>
         public int GetAutoReconcilliableLoadTotal()
         {
             using ( ClientLoadService clservice = new ClientLoadService() )
@@ -1110,6 +1114,64 @@ namespace ACT.UI.Controllers
             }
         }
 
+        /// <summary>
+        /// Auto reconciles Client/Chep loads with matching references
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult AutoReconcileLoads()
+        {
+            using ( ChepLoadService chservice = new ChepLoadService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            {
+                List<ClientLoad> loads = clservice.GetAutoReconcilliableLoads();
+
+                if ( !loads.NullableAny() ) return PartialView( "_Empty" );
+
+                string q = string.Empty;
+
+                foreach ( ClientLoad l in loads )
+                {
+                    q = $"UPDATE [dbo].[ClientLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id={l.Id};";
+
+                    clservice.Query( q );
+
+                    List<ChepLoadCustomModel> cheps = chservice.ListClientLoadMatch( l.ReceiverNumber?.Trim() );
+
+                    if ( !cheps.NullableAny() ) continue;
+
+                    int sum = cheps.Sum( s => s.Quantity ?? 0 );
+
+                    if ( sum == 0 )
+                    {
+                        // Complete recon
+                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) ReconciliationStatus.Reconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+
+                        chservice.Query( q );
+                    }
+                    else if ( sum > 0 )
+                    {
+                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) ReconciliationStatus.Unreconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+
+                        chservice.Query( q );
+                    }
+                    else if ( sum < 0 )
+                    {
+                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Unreconciled},[BalanceStatus]={( int ) ReconciliationStatus.Unreconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+
+                        chservice.Query( q );
+                    }
+                }
+
+                Notify( $"{loads.Count} loads were successfully reconcilled.", NotificationType.Success );
+            }
+
+            return PartialView( "_Notification" );
+        }
+
+        /// <summary>
+        /// Gets the total number of invoice that can automatically be reconcilled
+        /// </summary>
+        /// <returns></returns>
         public int GetAutoReconcilliableInvoiceTotal()
         {
             using ( InvoiceService iservice = new InvoiceService() )
@@ -1122,7 +1184,7 @@ namespace ACT.UI.Controllers
         /// Automatically reconciles all unreconcilled invoices
         /// </summary>
         /// <returns></returns>
-        public bool AutoReconcileInvoices()
+        public ActionResult AutoReconcileInvoices()
         {
             using ( InvoiceService iservice = new InvoiceService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
@@ -1130,7 +1192,7 @@ namespace ACT.UI.Controllers
             {
                 List<Invoice> invoices = iservice.ListUnReconciledInvoices();
 
-                if ( !invoices.NullableAny() ) return true;
+                if ( !invoices.NullableAny() ) return PartialView( "_Empty" );
 
                 foreach ( Invoice i in invoices )
                 {
@@ -1157,9 +1219,11 @@ namespace ACT.UI.Controllers
                         }
                     }
                 }
+
+                Notify( $"{invoices.Count} invoices were successfully reconcilled.", NotificationType.Success );
             }
 
-            return true;
+            return PartialView( "_Notification" );
         }
 
         #endregion

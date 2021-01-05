@@ -93,6 +93,9 @@
     <Compile Include="Models\ChepLoad.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ChepLoadChep.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Client.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>

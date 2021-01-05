@@ -219,5 +219,10 @@ namespace ACT.Core.Services
         {
             return context.Invoices.Where( i => context.ClientLoads.Any( cl => cl.LoadNumber.Trim() == i.LoadNumber.Trim() && cl.InvoiceStatus == ( int ) InvoiceStatus.NA ) ).ToList();
         }
+
+        public int GetAutoReconcilliableInvoiceTotal()
+        {
+            return context.Invoices.Count( i => context.ClientLoads.Any( cl => cl.LoadNumber.Trim() == i.LoadNumber.Trim() && cl.InvoiceStatus == ( int ) InvoiceStatus.NA ) );
+        }
     }
 }

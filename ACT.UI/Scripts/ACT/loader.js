@@ -3,7 +3,7 @@
     ACT.Loader = {
         Sender: '',
 
-        Image: '<img id="loader" class="apcloud-loader" src="' + imgurl + '/images/loader.gif" alt="" style="margin: 0 5px;" />',
+        Image: '<img id="loader" class="div-loader" src="' + imgurl + '/images/loader.gif" alt="" style="margin: 0 5px;" />',
 
         Html: '<div class="div-loader" style="text-align: center;"><img id="loader" class="apcloud-loader" src="' + imgurl + '/images/loader.gif" alt="" style="margin: 0 5px;" /></div>',
 

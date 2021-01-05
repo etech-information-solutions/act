@@ -367,12 +367,14 @@ namespace ACT.UI.Controllers
 
                     ChepLoad l = clservice.Get( model.ClientId, load[ 3 ], load[ 2 ] );
 
+                    int.TryParse( load[ 13 ].Trim(), out int qty );
+
                     if ( l == null )
                     {
                         #region Create Chep Load
 
                         cQuery = $" {cQuery} INSERT INTO [dbo].[ChepLoad] ([ClientId],[CreatedOn],[ModfiedOn],[ModifiedBy],[ChepStatus],[TransactionType],[DocketNumber],[OriginalDocketNumber],[UMI],[LocationId],[Location],[OtherPartyId],[OtherParty],[OtherPartyCountry],[EquipmentCode],[Equipment],[Quantity],[Ref],[OtherRef],[BatchRef],[ShipmentDate],[DeliveryDate],[EffectiveDate],[CreateDate],[CreatedBy],[InvoiceNumber],[Reason],[DataSource],[BalanceStatus],[Status],[PostingType]) ";
-                        cQuery = $" {cQuery} VALUES ({model.ClientId},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}','{load[ 13 ]}','{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}','{load[ 17 ]}','{load[ 18 ]}','{load[ 19 ]}','{load[ 20 ]}','{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) ReconciliationStatus.Unreconciled},{( int ) Status.Active},{( int ) PostingType.Import}) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}',{qty},'{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}','{load[ 17 ]}','{load[ 18 ]}','{load[ 19 ]}','{load[ 20 ]}','{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) ReconciliationStatus.Unreconciled},{( int ) ReconciliationStatus.Unreconciled},{( int ) PostingType.Import}) ";
 
                         #endregion
 
@@ -405,7 +407,7 @@ namespace ACT.UI.Controllers
                                                     [OtherPartyCountry]='{load[ 10 ]}',
                                                     [EquipmentCode]='{load[ 11 ]}',
                                                     [Equipment]='{load[ 12 ]}',
-                                                    [Quantity]='{load[ 13 ]}',
+                                                    [Quantity]={qty},
                                                     [Ref]='{load[ 14 ]}',
                                                     [OtherRef]='{load[ 15 ]}',
                                                     [BatchRef]='{load[ 16 ]}',
@@ -416,8 +418,7 @@ namespace ACT.UI.Controllers
                                                     [CreatedBy]='{load[ 21 ]}',
                                                     [InvoiceNumber]='{load[ 22 ]}',
                                                     [Reason]='{load[ 23 ]}',
-                                                    [DataSource]='{load[ 24 ]}',
-                                                    [Status]={( int ) Status.Active}
+                                                    [DataSource]='{load[ 24 ]}'
                                                 WHERE
                                                     [Id]={l.Id}";
 
@@ -470,6 +471,114 @@ namespace ACT.UI.Controllers
                 return PoolingAgentData( new PagingModel(), new CustomSearchModel() );
             }
         }
+
+        // GET: Pallet/AddPoolingAgentData
+        [Requires( PermissionTo.Create )]
+        public ActionResult AllocatePoolingAgentData( int id )
+        {
+            ChepLoadChepViewModel model = new ChepLoadChepViewModel() { ChepLoadId = id };
+
+            return PartialView( "_AllocatePoolingAgentData", model );
+        }
+
+        // POST: Pallet/AllocatePoolingAgentData
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AllocatePoolingAgentData( ChepLoadChepViewModel model, int chepLoadId )
+        {
+            if ( !model.ChepLoadAllocations.NullableAny() )
+            {
+                Notify( "Sorry, the items were not created. Please correct all errors and try again.", NotificationType.Error );
+
+                return PartialView( "_AllocatePoolingAgentData", model );
+            }
+
+            using ( ChepLoadService chservice = new ChepLoadService() )
+            using ( ChepLoadChepService clcservice = new ChepLoadChepService() )
+            {
+                List<ChepLoad> dLoads = new List<ChepLoad>();
+                List<ChepLoad> refLoads = chservice.ListByReference( model.ChepLoadAllocations.FirstOrDefault().Reference );
+
+                int rSum = refLoads.Sum( s => s.Quantity ?? 0 );
+                int aSum = model.ChepLoadAllocations.Sum( s => s.Quantity );
+
+                if ( ( aSum + rSum ) > 0 )
+                {
+                    Notify( "Sorry, the sum of the allocated quantities (positive) may not exceed the difference of the sum of quantities of a ref/otherref.", NotificationType.Error );
+
+                    return PartialView( "_AllocatePoolingAgentData", model );
+                }
+
+                foreach ( ChepLoadChepViewModel item in model.ChepLoadAllocations )
+                {
+                    dLoads.AddRange( chservice.ListByDocketNumber( item.DocketNumber ) );
+
+                    List<ChepLoad> loads = chservice.ListDocketNumberAndReference( item.DocketNumber, item.Reference );
+
+                    ChepLoadChep load = clcservice.GetById( item.Id );
+
+                    Status status = ( loads.NullableAny() ) ? Status.Active : Status.Inactive;
+
+                    if ( load == null )
+                    {
+                        #region Chep Load Chep
+
+                        load = new ChepLoadChep()
+                        {
+                            PCN = item.PCN,
+                            PRN = item.PRN,
+                            ChepLoadId = chepLoadId,
+                            Quantity = item.Quantity,
+                            Reference = item.Reference,
+                            DocketNumber = item.DocketNumber,
+                        };
+
+                        clcservice.Create( load );
+
+                        #endregion
+                    }
+                    else
+                    {
+                        #region Update Chep Load Chep
+
+                        load.PCN = item.PCN;
+                        load.PRN = item.PRN;
+                        load.Status = ( int ) status;
+                        load.ChepLoadId = chepLoadId;
+                        load.Quantity = item.Quantity;
+                        load.Reference = item.Reference;
+                        load.DocketNumber = item.DocketNumber;
+
+                        clcservice.Update( load );
+
+                        #endregion
+                    }
+                }
+
+                List<int> uIds = new List<int>();
+
+                uIds.AddRange( dLoads.Select( s => s.Id ) );
+                uIds.AddRange( refLoads.Select( s => s.Id ) );
+
+                if ( ( aSum - rSum ) == 0 && dLoads.Count == model.ChepLoadAllocations.Count && refLoads.NullableAny() )
+                {
+                    string q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) ReconciliationStatus.Reconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", uIds )});";
+
+                    chservice.Query( q );
+                }
+                else
+                {
+                    string q = $"UPDATE [dbo].[ChepLoad] SET [BalanceStatus]={( int ) ReconciliationStatus.Unreconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", uIds )});";
+
+                    chservice.Query( q );
+                }
+            }
+
+            Notify( "The items were successfully updated.", NotificationType.Success );
+
+            return AllocatePoolingAgentData( chepLoadId );
+        }
+
 
         #endregion
 
@@ -4275,6 +4384,31 @@ namespace ACT.UI.Controllers
             }
 
             return PartialView( "_ReconcileInvoices", new CustomSearchModel( "ReconcileInvoice" ) );
+        }
+
+        //
+        // GET: /Pallet/OutstandingPallets
+        public ActionResult OutstandingPallets( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            using ( ChepLoadService service = new ChepLoadService() )
+            {
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "OutstandingPallets";
+
+                    return PartialView( "_OutstandingPallets1CustomSearch", new CustomSearchModel( "OutstandingPallets" ) );
+                }
+
+                csm.BalanceStatus = BalanceStatus.NotBalanced;
+                csm.ReconciliationStatus = ReconciliationStatus.Reconciled;
+
+                List<ChepLoadCustomModel> model = service.List1( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_OutstandingPallets", paging );
+            }
         }
 
         //

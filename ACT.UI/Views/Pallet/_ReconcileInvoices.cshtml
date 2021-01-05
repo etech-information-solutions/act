@@ -55,11 +55,11 @@
 </div>
 
 <p style="padding: 10px 0; border-bottom: 1px solid #ddd;">
-    @Html.ActionLink( "Add", "AddInvoice", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new invoice?", @data_edit = "1", @data_id = 0, @data_target = "#reconcileinvoice" } )
+    @Html.ActionLink( "Add", "AddInvoice", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new invoice?", @data_edit = "1", @data_id = 0, @data_target = "#reconcileinvoices" } )
 
     <span style="padding: 0 5px;">|</span>
 
-    @Html.ActionLink( "Import", "ImportInvoices", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import new invoices?", @data_edit = "1", @data_id = 0, @data_target = "#reconcileinvoice" } )
+    @Html.ActionLink( "Import", "ImportInvoices", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import new invoices?", @data_edit = "1", @data_id = 0, @data_target = "#reconcileinvoices" } )
 
     <span class="loader"></span>
 </p>

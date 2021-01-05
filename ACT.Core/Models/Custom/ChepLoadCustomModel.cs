@@ -23,7 +23,7 @@ namespace ACT.Core.Models.Custom
         public string OtherPartyCountry { get; set; }
         public string EquipmentCode { get; set; }
         public string Equipment { get; set; }
-        public string Quantity { get; set; }
+        public int? Quantity { get; set; }
         public string Ref { get; set; }
         public string OtherRef { get; set; }
         public string BatchRef { get; set; }

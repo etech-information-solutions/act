@@ -17,7 +17,6 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Client()
         {
-            this.ChepLoads = new HashSet<ChepLoad>();
             this.ClientBudgets = new HashSet<ClientBudget>();
             this.ClientCustomers = new HashSet<ClientCustomer>();
             this.ClientGroups = new HashSet<ClientGroup>();
@@ -30,6 +29,7 @@ namespace ACT.Data.Models
             this.PSPClients = new HashSet<PSPClient>();
             this.SiteAudits = new HashSet<SiteAudit>();
             this.Tasks = new HashSet<Task>();
+            this.ChepLoads = new HashSet<ChepLoad>();
         }
     
         public int Id { get; set; }
@@ -60,8 +60,6 @@ namespace ACT.Data.Models
         public Nullable<int> NumberOfLostPallets { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ChepLoad> ChepLoads { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientBudget> ClientBudgets { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientCustomer> ClientCustomers { get; set; }
@@ -85,5 +83,7 @@ namespace ACT.Data.Models
         public virtual ICollection<SiteAudit> SiteAudits { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Tasks { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChepLoad> ChepLoads { get; set; }
     }
 }

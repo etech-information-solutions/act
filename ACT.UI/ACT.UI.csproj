@@ -164,6 +164,7 @@
     <Compile Include="Controllers\DashBoardController.cs" />
     <Compile Include="Models\AuthorisationCodeViewModel.cs" />
     <Compile Include="Models\ChepAuditViewModel.cs" />
+    <Compile Include="Models\ChepLoadChepViewModel.cs" />
     <Compile Include="Models\ClientLoadViewModel.cs" />
     <Compile Include="Models\ChepLoadViewModel.cs" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -669,9 +670,12 @@
     <Content Include="Views\Pallet\_InvoiceClientLoads.cshtml" />
     <Content Include="Views\Pallet\_Invoices.cshtml" />
     <Content Include="Views\Pallet\AddInvoice.cshtml" />
-    <Content Include="Views\Pallet\ImportInvoice.cshtml" />
+    <Content Include="Views\Pallet\ImportInvoices.cshtml" />
     <Content Include="Views\Pallet\_InvoiceComments.cshtml" />
     <Content Include="Views\Pallet\_InvoiceDocuments.cshtml" />
+    <Content Include="Views\Pallet\_AllocatePoolingAgentData.cshtml" />
+    <Content Include="Views\Pallet\_OutstandingPallets.cshtml" />
+    <Content Include="Views\Shared\_OutstandingPallets1CustomSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

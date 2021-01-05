@@ -20,6 +20,7 @@ namespace ACT.Data.Models
             this.ChepClients = new HashSet<ChepClient>();
             this.Disputes = new HashSet<Dispute>();
             this.Tasks = new HashSet<Task>();
+            this.ChepLoadCheps = new HashSet<ChepLoadChep>();
         }
     
         public int Id { get; set; }
@@ -39,7 +40,7 @@ namespace ACT.Data.Models
         public string OtherPartyCountry { get; set; }
         public string EquipmentCode { get; set; }
         public string Equipment { get; set; }
-        public string Quantity { get; set; }
+        public Nullable<int> Quantity { get; set; }
         public string Ref { get; set; }
         public string OtherRef { get; set; }
         public string BatchRef { get; set; }
@@ -62,5 +63,7 @@ namespace ACT.Data.Models
         public virtual ICollection<Dispute> Disputes { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Tasks { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChepLoadChep> ChepLoadCheps { get; set; }
     }
 }

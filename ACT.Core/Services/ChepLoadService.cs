@@ -40,6 +40,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "take", pm.Take ) },
                 { new SqlParameter( "cmsClientId", csm.ClientId ) },
                 { new SqlParameter( "csmStatus", ( int ) csm.Status ) },
+                { new SqlParameter( "csmBalanceStatus", ( int ) csm.BalanceStatus ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
@@ -76,9 +77,13 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (c.Id=@cmsClientId)";
             }
+            if ( csm.BalanceStatus != BalanceStatus.None )
+            {
+                query = $"{query} AND (cl.BalanceStatus=@csmBalanceStatus)";
+            }
             if ( csm.ReconciliationStatus != ReconciliationStatus.All )
             {
-                query = $"{query} AND (cl.BalanceStatus=@csmReconciliationStatus)";
+                query = $"{query} AND (cl.Status=@csmReconciliationStatus)";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -164,6 +169,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "cmsClientId", csm.ClientId ) },
                 { new SqlParameter( "csmStatus", ( int ) csm.Status ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmBalanceStatus", ( int ) csm.BalanceStatus ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
@@ -201,9 +207,13 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (c.Id=@cmsClientId)";
             }
+            if ( csm.BalanceStatus != BalanceStatus.None )
+            {
+                query = $"{query} AND (cl.BalanceStatus=@csmBalanceStatus)";
+            }
             if ( csm.ReconciliationStatus != ReconciliationStatus.All )
             {
-                query = $"{query} AND (cl.BalanceStatus=@csmReconciliationStatus)";
+                query = $"{query} AND (cl.Status=@csmReconciliationStatus)";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -342,7 +352,50 @@ namespace ACT.Core.Services
         /// <returns></returns>
         public ChepLoad Get( int clientId, string docketNumber, string transactionType )
         {
-            return context.ChepLoads.FirstOrDefault( cl => cl.ClientId == clientId && cl.DocketNumber.Trim() == docketNumber.Trim() && cl.TransactionType.Trim() == transactionType.Trim() );
+            return context.ChepLoads.FirstOrDefault( ch => ch.ClientId == clientId && ch.DocketNumber.Trim() == docketNumber.Trim() && ch.TransactionType.Trim() == transactionType.Trim() );
+        }
+
+        /// <summary>
+        /// Gets a list of Chep loads matching the client load receiver number
+        /// </summary>
+        /// <param name="receiverNumber"></param>
+        /// <returns></returns>
+        public List<ChepLoadCustomModel> ListClientLoadMatch( string receiverNumber )
+        {
+            string q = $"SELECT ch.Id, ch.Quantity FROM [dbo].[ChepLoad] ch WHERE RTRIM(LTRIM(ch.Ref))='{receiverNumber}' OR RTRIM(LTRIM(ch.OtherRef))='{receiverNumber}';";
+
+            return context.Database.SqlQuery<ChepLoadCustomModel>( q ).ToList();
+        }
+
+        /// <summary>
+        /// Gets a list of ChepLoads using the specified Ref #
+        /// </summary>
+        /// <param name="reference"></param>
+        /// <returns></returns>
+        public List<ChepLoad> ListByReference( string reference )
+        {
+            return context.ChepLoads.Where( ch => ch.Ref.Trim() == reference.Trim() || ch.OtherRef.Trim() == reference.Trim() ).ToList();
+        }
+
+        /// <summary>
+        /// Gets a list of ChepLoads using the specified docket #
+        /// </summary>
+        /// <param name="docketNumber"></param>
+        /// <returns></returns>
+        public List<ChepLoad> ListByDocketNumber( string docketNumber )
+        {
+            return context.ChepLoads.Where( ch => ch.DocketNumber.Trim() == docketNumber.Trim() ).ToList();
+        }
+
+        /// <summary>
+        /// Gets a list of ChepLoads using the specified Docket and Ref #
+        /// </summary>
+        /// <param name="docketNumber"></param>
+        /// <param name="reference"></param>
+        /// <returns></returns>
+        public List<ChepLoad> ListDocketNumberAndReference( string docketNumber, string reference )
+        {
+            return context.ChepLoads.Where( ch => ch.DocketNumber.Trim() == docketNumber.Trim() || ch.Ref.Trim() == reference.Trim() || ch.OtherRef.Trim() == reference.Trim() ).ToList();
         }
     }
 }

@@ -316,6 +316,13 @@ namespace ACT.Core.Models
             set;
         }
 
+        [Display( Name = "Balance Status" )]
+        public BalanceStatus BalanceStatus
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Can be used for a Filter date range
         /// </summary>
@@ -512,6 +519,7 @@ namespace ACT.Core.Models
                 case "ReconcileLoads":
                 case "ReconcileInvoice":
                 case "PoolingAgentData":
+                //case "OutstandingPallets":
 
                     using ( ClientService cservice = new ClientService() )
                     {
@@ -643,6 +651,7 @@ namespace ACT.Core.Models
             this.DocumentType = DocumentType.All;
             this.ActivityType = ActivityTypes.All;
             this.InvoiceStatus = InvoiceStatus.All;
+            this.BalanceStatus = BalanceStatus.None;
             this.PSPClientStatus = PSPClientStatus.All;
             this.ReconciliationStatus = ReconciliationStatus.All;
         }

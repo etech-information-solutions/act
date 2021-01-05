@@ -15,7 +15,7 @@
 
 @Html.Partial( "_Notification" )
 
-@using ( Html.BeginForm( "AddInvoice", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#reconcileinvoice", @class = "custom-validate", @style = "width: auto;" } ) )
+@using ( Html.BeginForm( "AddInvoice", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#reconcileinvoices", @class = "custom-validate", @style = "width: auto;" } ) )
 {
     <div id="edit-item">
 
@@ -83,7 +83,7 @@
 
                 <span style="padding: 0 5px;">/</span>
 
-                <a data-refresh="1" data-target="#reconcileinvoice">Cancel</a>
+                <a data-refresh="1" data-target="#reconcileinvoices">Cancel</a>
             </p>
 
         </div>

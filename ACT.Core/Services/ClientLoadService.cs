@@ -213,7 +213,7 @@ namespace ACT.Core.Services
 
             string query = @"";
 
-            if ( csm.ReconciliationStatus == ReconciliationStatus.Reconciled )
+            if ( true == false /*csm.ReconciliationStatus == ReconciliationStatus.Reconciled*/ )
             {
 
                 query = @"SELECT
@@ -1086,5 +1086,52 @@ namespace ACT.Core.Services
         {
             return context.ClientLoads.FirstOrDefault( cl => cl.UID == uid );
         }
+
+        /// <summary>
+        /// Gets the total number of loads that can automatically be reconcilled
+        /// </summary>
+        /// <returns></returns>
+        public int GetAutoReconcilliableLoadTotal()
+        {
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "ReconciliationStatus", ( object ) ( int ) ReconciliationStatus.Unreconciled ) },
+            };
+
+            string query = @"SELECT
+	                            COUNT(1) AS [Total]
+                             FROM 
+	                            ClientLoad cl 
+                             WHERE 
+	                            cl.[Status]=@ReconciliationStatus AND
+	                            EXISTS
+	                            (
+		                            SELECT
+			                            1
+		                            FROM
+			                            ChepLoad ch
+		                            WHERE
+			                            RTRIM(LTRIM(ch.[Ref]))=RTRIM(LTRIM(cl.[ReceiverNumber])) OR
+			                            RTRIM(LTRIM(ch.[OtherRef]))=RTRIM(LTRIM(cl.[ReceiverNumber]))
+	                            )";
+
+            context.Database.CommandTimeout = 3600;
+
+            CountModel model = context.Database.SqlQuery<CountModel>( query, parameters.ToArray() ).FirstOrDefault();
+
+            return model.Total;
+        }
+
+        /// <summary>
+        /// Gets a list of loads that can automatically be reconcilled
+        /// </summary>
+        /// <returns></returns>
+        public List<ClientLoad> GetAutoReconcilliableLoads()
+        {
+            context.Database.CommandTimeout = 3600;
+
+            return context.ClientLoads.Where( cl => cl.Status == ( int ) ReconciliationStatus.Unreconciled && context.ChepLoads.Any( ch => ch.Ref.Trim() == cl.ReceiverNumber.Trim() || ch.OtherRef.Trim() == cl.ReceiverNumber.Trim() ) ).ToList();
+        }
     }
 }
+

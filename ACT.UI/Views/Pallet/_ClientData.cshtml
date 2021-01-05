@@ -93,7 +93,9 @@
             {
                 ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+                string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
                     <td>
                         @count
                     </td>

@@ -1,0 +1,116 @@
+﻿@model  ChepLoadChepViewModel
+
+@using ACT.Data.Models;
+@using ACT.Core.Models.Custom;
+
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "AllocatePoolingAgentData", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#tr-edit > td", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div class="editor-label" style="margin-bottom: 10px;">
+
+        <p>
+            <strong class="uppercase">Chep Load Allocations (@Model.ChepLoadAllocationOptions.NullableCount())</strong>
+        </p>
+
+    </div>
+
+    <div class="editor-field">
+
+        <table id="chep-allocations-table" class="da-table small">
+
+            <thead>
+                <tr>
+                    <th>PCN</th>
+                    <th>PRN</th>
+                    <th>Docket #</th>
+                    <th>Ref #</th>
+                    <th>Quantity</th>
+                    @*<th>Actions</th>*@
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if ( Model.ChepLoadAllocationOptions.NullableAny() )
+                {
+                    int count = 0;
+
+                    foreach ( ChepLoadChep item in Model.ChepLoadAllocationOptions )
+                    {
+                        <tr id="row-line-@count-chep-option" class="add-more-row">
+                            <td style="position: relative;">
+                                @if ( ( count + 1 ) == Model.ChepLoadAllocationOptions.Count )
+                                {
+                                    <a data-add-one-more="1" data-target="#row-line-0-chep-option" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                                        <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                                    </a>
+                                }
+
+                                <input name="ChepLoadAllocations[@count].Id" type="hidden" value="@item.Id" />
+                                <input class="input" name="ChepLoadAllocations[@count].PCN" placeholder="Enter PCN" required="required" style="padding: 0 5px; width: 87%;" type="text" value="@item.PCN" />
+                            </td>
+                            <td>
+                                <input class="input" name="ChepLoadAllocations[@count].PRN" placeholder="Enter PRN" required="required" style="padding: 0 5px; width: 87%;" type="text" value="@item.PRN" />
+                            </td>
+                            <td>
+                                <input class="input" name="ChepLoadAllocations[@count].DocketNumber" placeholder="Enter Docket #" required="required" style="padding: 0 5px; width: 87%;" type="text" value="@item.DocketNumber" />
+                            </td>
+                            <td>
+                                <input class="input" name="ChepLoadAllocations[@count].Reference" placeholder="Enter Reference" required="required" style="padding: 0 5px; width: 87%;" type="text" value="@item.Reference" />
+                            </td>
+                            <td>
+                                <input class="input" name="ChepLoadAllocations[@count].Quantity" placeholder="Enter Quantity" required="required" style="padding: 0 5px; width: 87%;" type="text" value="@item.Quantity" />
+                            </td>
+                            @*<td width="5%">
+                                @Html.ActionLink( "Remove", "DeleteChepLoadAllocation", new { id = item.Id }, new { @class = "del", @data_delete = "1", @data_id = item.Id, @data_target = "#row-line-" + count, @data_refresh_target = "#tr-edit > td", @rel = "tipsyE", @title = "Remove this item?" } )
+                            </td>*@
+                        </tr>
+
+                        count++;
+                    }
+                }
+                else
+                {
+                    <tr id="row-line-0-chep-option" class="add-more-row">
+                        <td style="position: relative;">
+                            <a data-add-one-more="1" data-target="#row-line-0-chep-option" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                                <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                            </a>
+
+                            <input class="input" name="ChepLoadAllocations[0].PCN" placeholder="Enter PCN" required="required" style="padding: 0 5px; width: 87%;" type="text" value="" />
+                        </td>
+                        <td>
+                            <input class="input" name="ChepLoadAllocations[0].PRN" placeholder="Enter PRN" required="required" style="padding: 0 5px; width: 87%;" type="text" value="" />
+                        </td>
+                        <td>
+                            <input class="input" name="ChepLoadAllocations[0].DocketNumber" placeholder="Enter Docket #" required="required" style="padding: 0 5px; width: 87%;" type="text" value="" />
+                        </td>
+                        <td>
+                            <input class="input" name="ChepLoadAllocations[0].Reference" placeholder="Enter Reference" required="required" style="padding: 0 5px; width: 87%;" type="text" value="" />
+                        </td>
+                        <td>
+                            <input class="input" name="ChepLoadAllocations[0].Quantity" placeholder="Enter Quantity" required="required" style="padding: 0 5px; width: 87%;" type="text" value="" />
+                        </td>
+                        @*<td width="5%">
+                        </td>*@
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px;">&nbsp;</div>
+
+        <p>
+            <input id="save-btn" type="submit" value="Save" />
+            <input name="ChepLoadId" type="hidden" value="@Model.ChepLoadId" />
+            <span style="padding: 0 5px;">/</span>
+            <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+        </p>
+
+    </div>
+}
