@@ -1132,6 +1132,19 @@ namespace ACT.Core.Services
 
             return context.ClientLoads.Where( cl => cl.Status == ( int ) ReconciliationStatus.Unreconciled && context.ChepLoads.Any( ch => ch.Ref.Trim() == cl.ReceiverNumber.Trim() || ch.OtherRef.Trim() == cl.ReceiverNumber.Trim() ) ).ToList();
         }
+
+        /// <summary>
+        /// Gets a list of Client Loads using the specified ref or otherref
+        /// </summary>
+        /// <param name="reference"></param>
+        /// <param name="otherRef"></param>
+        /// <returns></returns>
+        public List<ClientLoad> ListByChepRefOtherRef( string reference, string otherRef )
+        {
+            context.Database.CommandTimeout = 3600;
+
+            return context.ClientLoads.Where( cl => cl.ReceiverNumber.Trim() == reference.Trim() || cl.ReceiverNumber == otherRef.Trim() ).ToList();
+        }
     }
 }
 

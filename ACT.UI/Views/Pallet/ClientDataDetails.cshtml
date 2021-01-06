@@ -10,6 +10,8 @@
     }
 
     ViewBag.Title = "Details";
+
+    List<ChepLoad> chepLoads = ViewBag.ChepLoads;
 }
 
 @if ( ViewBag.IncludeLayout != null )
@@ -253,16 +255,137 @@
 
     </div>
 
+    @if ( ViewBag.CanEdit == true )
+    {
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
+
+        <p>
+            <strong>Chep Loads (@chepLoads.NullableCount())</strong>
+        </p>
+
+        <table id="chep-loads-table" class="da-table small">
+
+            <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        Load Date
+                    </th>
+                    <th>
+                        Created
+                    </th>
+                    <th>
+                        Docket #
+                    </th>
+                    <th>
+                        Ref #
+                    </th>
+                    <th>
+                        Equipment
+                    </th>
+                    <th>
+                        Invoice #
+                    </th>
+                    <th>
+                        Transaction Type
+                    </th>
+                    <th>
+                        Qty
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                    <th >
+                        Balanced
+                    </th>
+                    <th>
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if ( chepLoads.NullableAny() )
+                {
+                    int count = 1;
+
+                    foreach ( ChepLoad item in chepLoads )
+                    {
+                        PostingType postingType = ( PostingType ) item.PostingType;
+                        BalanceStatus balanceStatus = ( BalanceStatus ) item.BalanceStatus;
+                        ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
+
+                        string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
+
+                        <tr id="tr-@item.Id-chep-load-item" class="tr-@item.Id-chep-load-item @active">
+
+                            <td width="1%">
+                                @count
+                            </td>
+                            <td>
+                                @item.EffectiveDate.Value.ToString( "yyyy-MM-dd" )
+                            </td>
+                            <td>
+                                On @(item.CreateDate?.ToString( "yyyy-MM-dd" ) ) <br /> by @item.CreatedBy
+                            </td>
+                            <td>
+                                @item.DocketNumber
+                            </td>
+                            <td>
+                                @item.Ref
+                            </td>
+                            <td>
+                                @item.Equipment
+                            </td>
+                            <td>
+                                @item.InvoiceNumber
+                            </td>
+                            <td>
+                                @item.TransactionType
+                            </td>
+                            <td>
+                                @item.Quantity
+                            </td>
+                            <td>
+                                @status.GetDisplayText()
+                            </td>
+                            <td>
+                                @balanceStatus.GetDisplayText()
+                            </td>
+                            <td width="5%">
+
+                                @Html.ActionLink( "Details", "PoolingAgentDataDetails", new { id = item.Id, CanEdit = false }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-chep-load-item" } )
+
+                            </td>
+
+                        </tr>
+
+                        count++;
+                    }
+                }
+
+            </tbody>
+
+        </table>
+    }
+
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
 
     @if ( ViewBag.IncludeLayout == null )
     {
         <p>
-            @Html.ActionLink( "Edit", "EditClientData", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
-
+            @if ( ViewBag.CanEdit == true )
+            {
+                <span>
+                    @Html.ActionLink( "Edit", "EditClientData", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+                </span>
+                <span style="padding: 0 5px;">/</span>
+            }
             @if ( ViewBag.IncludeLayout == null )
             {
-                <span style="padding: 0 5px;">/</span>
                 <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
             }
         </p>

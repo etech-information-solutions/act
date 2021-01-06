@@ -1144,19 +1144,19 @@ namespace ACT.UI.Controllers
                     if ( sum == 0 )
                     {
                         // Complete recon
-                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) ReconciliationStatus.Reconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) BalanceStatus.Balanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
 
                         chservice.Query( q );
                     }
                     else if ( sum > 0 )
                     {
-                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) ReconciliationStatus.Unreconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) BalanceStatus.NotBalanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
 
                         chservice.Query( q );
                     }
                     else if ( sum < 0 )
                     {
-                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Unreconciled},[BalanceStatus]={( int ) ReconciliationStatus.Unreconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Unreconciled},[BalanceStatus]={( int ) BalanceStatus.NotBalanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
 
                         chservice.Query( q );
                     }

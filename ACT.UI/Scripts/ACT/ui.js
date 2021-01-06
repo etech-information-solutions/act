@@ -1653,6 +1653,7 @@
                 SortBy: ACT.UI[t].PageSortBy || ACT.UI.PageSortBy || "Id",
                 UserId: ACT.UI[t].PageUserId || ACT.UI.PageUserId || 0,
                 Status: ACT.UI[t].PageStatus || ACT.UI.PageStatus || -1,
+                BalanceStatus: ACT.UI[t].PageBalanceStatus || ACT.UI.PageBalanceStatus || -1,
                 PSPClientStatus: ACT.UI[t].PagePSPClientStatus || ACT.UI.PagePSPClientStatus || -1,
                 ReconciliationStatus: ACT.UI[t].PageReconciliationStatus || ACT.UI.PageReconciliationStatus || -1,
                 SiteId: ACT.UI[t].PageSiteId || ACT.UI.PageSiteId || 0,
@@ -1711,6 +1712,7 @@
             ACT.UI[t].PageTransporterId = ACT.UI.PageTransporterId = 0;
             ACT.UI[t].PageVehicleId = ACT.UI.PageVehicleId = 0;
             ACT.UI[t].PageOutstandingReasonId = ACT.UI.PageOutstandingReasonId = 0;
+            ACT.UI[t].PageBalanceStatus = ACT.UI.PageBalanceStatus = -1;
             ACT.UI[t].PagePSPClientStatus = ACT.UI.PagePSPClientStatus = -1;
             ACT.UI[t].PageReconciliationStatus = ACT.UI.PageReconciliationStatus = -1;
             ACT.UI[t].SelectedItems = ACT.UI.SelectedItems = [];
@@ -2931,6 +2933,13 @@
                     q += " <b class='italic'>[ Reconciliation Status: <a style='color: #69f95a;'>" + sender.find( 'select#ReconciliationStatus:first option[value="' + ACT.UI[t].PageReconciliationStatus + '"]' ).text() + "</a> ]</b> ";
 
                     sender.find( 'select#ReconciliationStatus' ).val( ACT.UI[t].PageReconciliationStatus );
+                }
+                if ( ACT.UI[t].PageBalanceStatus && ACT.UI[t].PageBalanceStatus !== -1 )
+                {
+                    h += "Balance Status: <b>" + sender.find( 'select#BalanceStatus:first option[value="' + ACT.UI[t].PageBalanceStatus + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Balance Status: <a style='color: #69f95a;'>" + sender.find( 'select#BalanceStatus:first option[value="' + ACT.UI[t].PageBalanceStatus + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#BalanceStatus' ).val( ACT.UI[t].PageBalanceStatus );
                 }
                 if ( ACT.UI[t].PagePSPClientStatus && ACT.UI[t].PagePSPClientStatus !== -1 )
                 {

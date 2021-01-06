@@ -10,6 +10,8 @@
     }
 
     ViewBag.Title = "Details";
+
+    List<ClientLoad> clientLoads = ViewBag.ClientLoads;
 }
 
 @if ( ViewBag.IncludeLayout != null )
@@ -78,7 +80,7 @@
             Status
         </div>
         <div class="display-field">
-            @(( ( Status ) Model.Status ).GetDisplayText())
+            @(( ( ReconciliationStatus ) Model.Status ).GetDisplayText())
         </div>
 
         <div class="display-label">
@@ -92,7 +94,7 @@
             Balance Status
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.BalanceStatus )
+            @(( ( BalanceStatus ) Model.BalanceStatus ).GetDisplayText())
         </div>
 
         <div class="display-label">
@@ -245,16 +247,134 @@
 
     </div>
 
+    @if ( ViewBag.CanEdit == true )
+    {
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
+
+        <p>
+            <strong>Client Loads (@clientLoads.NullableCount())</strong>
+        </p>
+
+        <table id="client-loads-table" class="da-table small">
+
+            <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        Load Date
+                    </th>
+                    <th>
+                        Shipment #
+                    </th>
+                    <th>
+                        Delivery #
+                    </th>
+                    <th>
+                        Receiver #
+                    </th>
+                    <th>
+                        Equipment
+                    </th>
+                    <th>
+                        POD
+                    </th>
+                    <th>
+                        PCN
+                    </th>
+                    <th>
+                        PRN
+                    </th>
+                    <th>
+                        Qty
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                    <th>
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if ( clientLoads.NullableAny() )
+                {
+                    int count = 1;
+
+                    foreach ( ClientLoad item in clientLoads )
+                    {
+                        ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
+
+                        string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
+
+                        <tr id="tr-@item.Id-client-load-item" class="tr-@item.Id-client-load-item @active">
+                            <td>
+                                @count
+                            </td>
+                            <td>
+                                @item.LoadDate.Value.ToString( "yyyy-MM-dd" )
+                            </td>
+                            <td>
+                                @item.LoadNumber
+                            </td>
+                            <td>
+                                @item.DeliveryNote
+                            </td>
+                            <td>
+                                @item.ReceiverNumber
+                            </td>
+                            <td>
+                                @item.Equipment
+                            </td>
+                            <td>
+                                @item.PODNumber
+                            </td>
+                            <td>
+                                @item.PCNNumber
+                            </td>
+                            <td>
+                                @item.PRNNumber
+                            </td>
+                            <td>
+                                @item.OriginalQuantity
+                            </td>
+                            <td>
+                                @status
+                            </td>
+                            <td width="4%">
+
+                                @Html.ActionLink( "Details", "ClientDataDetails", new { id = item.Id, CanEdit = false }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-client-load-item" } )
+
+                            </td>
+                        </tr>
+
+                        count++;
+                    }
+                }
+
+            </tbody>
+
+        </table>
+    }
+
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
 
     @if ( ViewBag.IncludeLayout == null )
     {
         <p>
-            @Html.ActionLink( "Edit", "EditPoolingAgentData", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+            @if ( ViewBag.CanEdit == true )
+            {
+                <span>
+                    @Html.ActionLink( "Edit", "EditPoolingAgentData", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+                </span>
+                <span style="padding: 0 5px;">/</span>
+            }
 
             @if ( ViewBag.IncludeLayout == null )
             {
-                <span style="padding: 0 5px;">/</span>
                 <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
             }
         </p>

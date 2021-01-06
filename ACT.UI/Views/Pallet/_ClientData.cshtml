@@ -44,9 +44,6 @@
             <th data-name="Count">
                 #
             </th>
-            <th data-name="CreatedOn" data-column="cl.CreatedOn">
-                Imported/Created
-            </th>
             <th data-name="LoadDate" data-column="cl.LoadDate">
                 Load Date
             </th>
@@ -100,9 +97,6 @@
                         @count
                     </td>
                     <td>
-                        @item.CreatedOn.ToString( "yyyy-MM-dd @ HH:mm tt" )
-                    </td>
-                    <td>
                         @item.LoadDate.Value.ToString( "yyyy-MM-dd" )
                     </td>
                     <td>
@@ -132,7 +126,7 @@
                     <td>
                         @item.OriginalQuantity
                     </td>
-                    <td>
+                    <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
                         @status
                     </td>
                     <td width="10%">

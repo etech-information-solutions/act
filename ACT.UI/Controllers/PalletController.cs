@@ -102,11 +102,12 @@ namespace ACT.UI.Controllers
 
         //
         // GET: /Pallet/PoolingAgentDataDetails/5
-        public ActionResult PoolingAgentDataDetails( int id, bool layout = true )
+        public ActionResult PoolingAgentDataDetails( int id, bool layout = true, bool canEdit = true )
         {
-            using ( ChepLoadService clservice = new ChepLoadService() )
+            using ( ChepLoadService chservice = new ChepLoadService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
             {
-                ChepLoad model = clservice.GetById( id );
+                ChepLoad model = chservice.GetById( id );
 
                 if ( model == null )
                 {
@@ -119,6 +120,10 @@ namespace ACT.UI.Controllers
                 {
                     ViewBag.IncludeLayout = true;
                 }
+
+                ViewBag.CanEdit = canEdit;
+
+                ViewBag.ClientLoads = clservice.ListByChepRefOtherRef( model.Ref, model.OtherRef );
 
                 return View( model );
             }
@@ -588,8 +593,9 @@ namespace ACT.UI.Controllers
 
         //
         // GET: /Pallet/ClientDataDetails/5
-        public ActionResult ClientDataDetails( int id, bool layout = true )
+        public ActionResult ClientDataDetails( int id, bool layout = true, bool canEdit = true )
         {
+            using ( ChepLoadService chservice = new ChepLoadService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
             {
                 ClientLoad model = clservice.GetById( id );
@@ -605,6 +611,10 @@ namespace ACT.UI.Controllers
                 {
                     ViewBag.IncludeLayout = true;
                 }
+
+                ViewBag.CanEdit = canEdit;
+
+                ViewBag.ChepLoads = chservice.ListByReference( model.ReceiverNumber );
 
                 return View( model );
             }
