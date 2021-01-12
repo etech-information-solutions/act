@@ -18,8 +18,7 @@ namespace ACT.Data.Models
         public User()
         {
             this.ClientUsers = new HashSet<ClientUser>();
-            this.Disputes = new HashSet<Dispute>();
-            this.Disputes1 = new HashSet<Dispute>();
+            this.Comments = new HashSet<Comment>();
             this.PSPUsers = new HashSet<PSPUser>();
             this.Regions = new HashSet<Region>();
             this.Tokens = new HashSet<Token>();
@@ -28,6 +27,8 @@ namespace ACT.Data.Models
             this.UserNotifications = new HashSet<UserNotification>();
             this.UserRoles = new HashSet<UserRole>();
             this.UserTasks = new HashSet<UserTask>();
+            this.Disputes = new HashSet<Dispute>();
+            this.Disputes1 = new HashSet<Dispute>();
         }
     
         public int Id { get; set; }
@@ -48,9 +49,7 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientUser> ClientUsers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Dispute> Disputes { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Dispute> Disputes1 { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PSPUser> PSPUsers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
@@ -67,5 +66,9 @@ namespace ACT.Data.Models
         public virtual ICollection<UserRole> UserRoles { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserTask> UserTasks { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Dispute> Disputes { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Dispute> Disputes1 { get; set; }
     }
 }

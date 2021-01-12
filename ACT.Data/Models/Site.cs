@@ -18,6 +18,7 @@ namespace ACT.Data.Models
         public Site()
         {
             this.ChepAudits = new HashSet<ChepAudit>();
+            this.ChepLoadOlds = new HashSet<ChepLoadOld>();
             this.ClientSites = new HashSet<ClientSite>();
             this.SiteAudits = new HashSet<SiteAudit>();
             this.SiteBillings = new HashSet<SiteBilling>();
@@ -57,6 +58,8 @@ namespace ACT.Data.Models
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepAudit> ChepAudits { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChepLoadOld> ChepLoadOlds { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientSite> ClientSites { get; set; }
         public virtual Region Region { get; set; }

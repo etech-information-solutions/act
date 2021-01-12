@@ -5,6 +5,7 @@ using System.Web;
 
 using ACT.Core.Enums;
 using ACT.Core.Services;
+using ACT.Data.Models;
 
 namespace ACT.UI.Models
 {
@@ -17,6 +18,9 @@ namespace ACT.UI.Models
         [Required]
         [Display( Name = "Client" )]
         public int ClientId { get; set; }
+
+        [Display( Name = "Outstanding Reason" )]
+        public int? OutstandingReasonId { get; set; }
 
         [Display( Name = "Posting Type" )]
         public PostingType PostingType { get; set; }
@@ -120,6 +124,8 @@ namespace ACT.UI.Models
         [Display( Name = "Import Loads" )]
         public HttpPostedFileBase File { get; set; }
 
+        public List<Comment> ChepLoadComments { get; set; }
+
         #endregion
 
 
@@ -134,6 +140,19 @@ namespace ACT.UI.Models
                 using ( ClientService cservice = new ClientService() )
                 {
                     return cservice.List( true );
+                }
+            }
+        }
+
+        public Dictionary<int, string> OutstandingReasonOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+
+                using ( OutstandingReasonService orservice = new OutstandingReasonService() )
+                {
+                    return orservice.List( true );
                 }
             }
         }

@@ -395,6 +395,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmGroupId", ( int ) csm.GroupId ) },
                 { new SqlParameter( "csmRegionId", ( int ) csm.RegionId ) },
+                { new SqlParameter( "csmBalanceStatus", ( int ) csm.BalanceStatus ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
@@ -407,14 +408,11 @@ namespace ACT.Core.Services
             #region Query
 
             string query = @"SELECT
-	                            SUM(ch.[Quantity] - cl.[NewQuantity]) AS [Sum]
-                             FROM 
-	                            [dbo].[ClientLoad] cl,
-	                            [dbo].[ChepClient] cc,
+	                            COUNT(ch.Id) AS [Total]
+                             FROM
 	                            [dbo].[ChepLoad] ch
                              WHERE
-	                            (cl.[Id]=cc.[ClientLoadsId]) AND
-	                            (ch.[Id]=cc.[ChepLoadsId])";
+	                            (1=1)";
 
             #endregion
 
@@ -424,11 +422,11 @@ namespace ACT.Core.Services
 
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=ch.[ClientId] AND pu.[UserId]=@userid) ";
             }
             else if ( CurrentUser.RoleType == RoleType.Client )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=ch.[ClientId] AND cu.[UserId]=@userid) ";
             }
 
             #endregion
@@ -437,44 +435,49 @@ namespace ACT.Core.Services
 
             #region Custom Search
 
+            if ( csm.BalanceStatus != BalanceStatus.None )
+            {
+                query = $"{query} AND (ch.[BalanceStatus]=@csmBalanceStatus) ";
+            }
+
             if ( csm.ReconciliationStatus != ReconciliationStatus.All )
             {
-                query = $"{query} AND (cl.[Status]=@csmReconciliationStatus) ";
+                query = $"{query} AND (ch.[Status]=@csmReconciliationStatus) ";
             }
 
             if ( csm.ClientId > 0 )
             {
-                query = $"{query} AND (cl.ClientId=@csmClientId) ";
+                query = $"{query} AND (ch.[ClientId]=@csmClientId) ";
             }
 
             if ( csm.SiteId > 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=cl.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=ch.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
             }
 
             if ( csm.GroupId > 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientGroup] cg WHERE cg.[ClientId]=cl.[ClientId] AND cg.[GroupId]=@csmGroupId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientGroup] cg WHERE cg.[ClientId]=ch.[ClientId] AND cg.[GroupId]=@csmGroupId) ";
             }
 
             if ( csm.RegionId > 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=cl.[ClientId] AND s.[RegionId]=@csmRegionId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=ch.[ClientId] AND s.[RegionId]=@csmRegionId) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
+                query = $"{query} AND (ch.[EffectiveDate] >= @csmFromDate AND ch.[EffectiveDate] <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (cl.LoadDate>=@csmFromDate) ";
+                    query = $"{query} AND (ch.[EffectiveDate]>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (cl.LoadDate<=@csmToDate) ";
+                    query = $"{query} AND (ch.[EffectiveDate]<=@csmToDate) ";
                 }
             }
 
@@ -484,7 +487,7 @@ namespace ACT.Core.Services
 
             return new AgeOfOutstandingPallets()
             {
-                Oustanding = model?.Sum ?? 0,
+                Oustanding = model.Total,
             };
         }
 
@@ -825,6 +828,7 @@ namespace ACT.Core.Services
 
             List<object> parameters = new List<object>()
             {
+                { new SqlParameter( "csmBalanceStatus", ( int ) csm.BalanceStatus ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
@@ -836,17 +840,12 @@ namespace ACT.Core.Services
             string query = @"SELECT
 	                            c.[Id] AS [ClientId],
 	                            c.[CompanyName] AS [ClientName],
-	                            SUM(ch.[NewQuantity] - cl.[NewQuantity]) AS [Total]
+	                            COUNT(ch.[Id]) AS [Total]
                             FROM
-	                            [dbo].[ClientLoad] cl,
-	                            [dbo].[ChepClient] cc,
 	                            [dbo].[ChepLoad] ch,
 	                            [dbo].[Client] c
                             WHERE
-	                            (cl.[Id]=cc.[ClientLoadsId]) AND
-	                            (ch.[Id]=cc.[ChepLoadsId]) AND
-	                            (c.[Id]=cl.[ClientId]) AND
-	                            (cl.[Status]=0)";
+	                            (c.[Id]=ch.[ClientId])";
 
             // Custom Search
 
@@ -854,22 +853,32 @@ namespace ACT.Core.Services
 
             if ( csm.ClientId > 0 )
             {
-                query = $"{query} AND (cl.ClientId=@csmClientId) ";
+                query = $"{query} AND (ch.ClientId=@csmClientId) ";
+            }
+
+            if ( csm.BalanceStatus != BalanceStatus.None )
+            {
+                query = $"{query} AND (ch.[BalanceStatus]=@csmBalanceStatus) ";
+            }
+
+            if ( csm.ReconciliationStatus != ReconciliationStatus.All )
+            {
+                query = $"{query} AND (ch.[Status]=@csmReconciliationStatus) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
+                query = $"{query} AND (ch.EffectiveDate >= @csmFromDate AND ch.EffectiveDate <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (cl.LoadDate>=@csmFromDate) ";
+                    query = $"{query} AND (ch.EffectiveDate>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (cl.LoadDate<=@csmToDate) ";
+                    query = $"{query} AND (ch.EffectiveDate<=@csmToDate) ";
                 }
             }
 

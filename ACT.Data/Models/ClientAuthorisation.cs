@@ -15,8 +15,8 @@ namespace ACT.Data.Models
     public partial class ClientAuthorisation
     {
         public int Id { get; set; }
-        public int ClientSiteId { get; set; }
-        public int TransporterId { get; set; }
+        public Nullable<int> ClientSiteId { get; set; }
+        public Nullable<int> TransporterId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }

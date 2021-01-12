@@ -19,8 +19,8 @@ namespace ACT.Data.Models
         {
             this.ChepClients = new HashSet<ChepClient>();
             this.ClientInvoices = new HashSet<ClientInvoice>();
-            this.Tasks = new HashSet<Task>();
             this.Journals = new HashSet<Journal>();
+            this.Tasks = new HashSet<Task>();
         }
     
         public int Id { get; set; }
@@ -74,8 +74,8 @@ namespace ACT.Data.Models
         public virtual Transporter Transporter { get; set; }
         public virtual Vehicle Vehicle { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Task> Tasks { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Journal> Journals { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Task> Tasks { get; set; }
     }
 }

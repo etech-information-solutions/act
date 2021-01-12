@@ -24,6 +24,7 @@ namespace ACT.Data.Models
         public string DocketNumber { get; set; }
         public string Reference { get; set; }
         public int Quantity { get; set; }
+        public Nullable<System.DateTime> EffectiveDate { get; set; }
         public int Status { get; set; }
     
         public virtual ChepLoad ChepLoad { get; set; }

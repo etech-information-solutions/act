@@ -44,8 +44,8 @@ namespace ACT.Data.Models
         public Nullable<int> PalletAuditorSignatureId { get; set; }
     
         public virtual Client Client { get; set; }
-        public virtual Site Site { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Journal> Journals { get; set; }
+        public virtual Site Site { get; set; }
     }
 }

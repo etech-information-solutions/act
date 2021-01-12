@@ -130,6 +130,7 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="ClientId" Type="int" Nullable="false" />
+          <Property Name="OutstandingReasonId" Type="int" />
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
@@ -175,7 +176,39 @@
           <Property Name="DocketNumber" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="Reference" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="Quantity" Type="int" Nullable="false" />
+          <Property Name="EffectiveDate" Type="datetime" />
           <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ChepLoadOld">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SiteId" Type="int" />
+          <Property Name="CreatedOn" Type="datetime" Nullable="false" />
+          <Property Name="ModfiedOn" Type="datetime" Nullable="false" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
+          <Property Name="LoadDate" Type="datetime" />
+          <Property Name="NotifyDate" Type="datetime" />
+          <Property Name="EffectiveDate" Type="datetime" />
+          <Property Name="PostingType" Type="int" />
+          <Property Name="AccountNumber" Type="varchar" MaxLength="50" />
+          <Property Name="ClientDescription" Type="varchar" MaxLength="50" />
+          <Property Name="DeliveryNote" Type="varchar" MaxLength="50" />
+          <Property Name="ReferenceNumber" Type="varchar" MaxLength="50" />
+          <Property Name="ReceiverNumber" Type="varchar" MaxLength="50" />
+          <Property Name="Equipment" Type="varchar" MaxLength="50" />
+          <Property Name="OriginalQuantity" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="NewQuantity" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="DocketNumber" Type="varchar" MaxLength="50" />
+          <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="InputInd" Type="int" />
+          <Property Name="OrderNo" Type="varchar" MaxLength="50" />
+          <Property Name="THAN" Type="varchar" MaxLength="50" />
+          <Property Name="ShipmentNo" Type="varchar" MaxLength="50" />
+          <Property Name="IssueNote" Type="varchar" MaxLength="50" />
+          <Property Name="ChepCreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ChepCreateOn" Type="datetime" />
         </EntityType>
         <EntityType Name="Client">
           <Key>
@@ -213,12 +246,12 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ClientSiteId" Type="int" Nullable="false" />
-          <Property Name="TransporterId" Type="int" Nullable="false" />
+          <Property Name="ClientSiteId" Type="int" />
+          <Property Name="TransporterId" Type="int" />
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
-          <Property Name="DocketNumber" Type="nchar" MaxLength="10" />
+          <Property Name="DocketNumber" Type="varchar" MaxLength="50" />
           <Property Name="Code" Type="varchar" MaxLength="50" />
           <Property Name="LoadNumber" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="AuthorisationDate" Type="datetime" Nullable="false" />
@@ -446,6 +479,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
           <Property Name="ObjectId" Type="int" Nullable="false" />
           <Property Name="ObjectType" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
@@ -544,7 +578,7 @@
           <Property Name="DisputeEmail" Type="varchar" MaxLength="150" />
           <Property Name="TDNNumber" Type="varchar" MaxLength="50" />
           <Property Name="Reference" Type="varchar" MaxLength="50" />
-          <Property Name="Equipment" Type="char" MaxLength="10" />
+          <Property Name="Equipment" Type="varchar" MaxLength="50" />
           <Property Name="OtherParty" Type="varchar" MaxLength="200" />
           <Property Name="Sender" Type="varchar" MaxLength="50" />
           <Property Name="Receiver" Type="varchar" MaxLength="50" />
@@ -555,6 +589,19 @@
           <Property Name="ActionBy" Type="varchar" MaxLength="150" />
           <Property Name="Imported" Type="bit" Nullable="false" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="Location" Type="varchar" MaxLength="50" />
+          <Property Name="Action" Type="varchar" MaxLength="50" />
+          <Property Name="OriginalDocketNumber" Type="varchar" MaxLength="50" />
+          <Property Name="OtherReference" Type="varchar" MaxLength="50" />
+          <Property Name="EffectiveDate" Type="datetime" />
+          <Property Name="ShipDate" Type="datetime" />
+          <Property Name="DelilveryDate" Type="datetime" />
+          <Property Name="DaysLeft" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="CorrectionRequestDate" Type="datetime" />
+          <Property Name="TransactionType" Type="varchar" MaxLength="50" />
+          <Property Name="DisputeComment" Type="varchar" MaxLength="1000" />
+          <Property Name="DataSource" Type="varchar" MaxLength="50" />
+          <Property Name="HasDocket" Type="int" />
         </EntityType>
         <EntityType Name="Document">
           <Key>
@@ -1273,6 +1320,30 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ChepLoad_OutstandingReason">
+          <End Role="OutstandingReason" Type="Self.OutstandingReason" Multiplicity="0..1" />
+          <End Role="ChepLoad" Type="Self.ChepLoad" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutstandingReason">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ChepLoad">
+              <PropertyRef Name="OutstandingReasonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ChepLoad_Site">
+          <End Role="Site" Type="Self.Site" Multiplicity="0..1" />
+          <End Role="ChepLoadOld" Type="Self.ChepLoadOld" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Site">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ChepLoadOld">
+              <PropertyRef Name="SiteId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ChepLoadChep_ChepLoad">
           <End Role="ChepLoad" Type="Self.ChepLoad" Multiplicity="1" />
           <End Role="ChepLoadChep" Type="Self.ChepLoadChep" Multiplicity="*" />
@@ -1286,7 +1357,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_ClientAuthorisation_Transporter">
-          <End Role="Transporter" Type="Self.Transporter" Multiplicity="1" />
+          <End Role="Transporter" Type="Self.Transporter" Multiplicity="0..1" />
           <End Role="ClientAuthorisation" Type="Self.ClientAuthorisation" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Transporter">
@@ -1298,7 +1369,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_ClientAuthorisations_ClientSites">
-          <End Role="ClientSite" Type="Self.ClientSite" Multiplicity="1" />
+          <End Role="ClientSite" Type="Self.ClientSite" Multiplicity="0..1" />
           <End Role="ClientAuthorisation" Type="Self.ClientAuthorisation" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="ClientSite">
@@ -1545,6 +1616,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="ClientUser">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comment_User">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="Comment" Type="Self.Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Comment">
               <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
@@ -2089,6 +2172,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySet Name="ChepClient" EntityType="Self.ChepClient" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ChepLoad" EntityType="Self.ChepLoad" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ChepLoadChep" EntityType="Self.ChepLoadChep" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ChepLoadOld" EntityType="Self.ChepLoadOld" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Client" EntityType="Self.Client" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ClientAuthorisation" EntityType="Self.ClientAuthorisation" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ClientBudget" EntityType="Self.ClientBudget" Schema="dbo" store:Type="Tables" />
@@ -2206,6 +2290,14 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="Client" EntitySet="Client" />
             <End Role="ChepLoad" EntitySet="ChepLoad" />
           </AssociationSet>
+          <AssociationSet Name="FK_ChepLoad_OutstandingReason" Association="Self.FK_ChepLoad_OutstandingReason">
+            <End Role="OutstandingReason" EntitySet="OutstandingReason" />
+            <End Role="ChepLoad" EntitySet="ChepLoad" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ChepLoad_Site" Association="Self.FK_ChepLoad_Site">
+            <End Role="Site" EntitySet="Site" />
+            <End Role="ChepLoadOld" EntitySet="ChepLoadOld" />
+          </AssociationSet>
           <AssociationSet Name="FK_ChepLoadChep_ChepLoad" Association="Self.FK_ChepLoadChep_ChepLoad">
             <End Role="ChepLoad" EntitySet="ChepLoad" />
             <End Role="ChepLoadChep" EntitySet="ChepLoadChep" />
@@ -2297,6 +2389,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <AssociationSet Name="FK_ClientUsers_Users" Association="Self.FK_ClientUsers_Users">
             <End Role="User" EntitySet="User" />
             <End Role="ClientUser" EntitySet="ClientUser" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comment_User" Association="Self.FK_Comment_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Comment" EntitySet="Comment" />
           </AssociationSet>
           <AssociationSet Name="FK_DeliveryNote_Clients" Association="Self.FK_DeliveryNote_Clients">
             <End Role="Client" EntitySet="Client" />
@@ -2487,6 +2583,9 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySet Name="Broadcasts" EntityType="ACTModel.Broadcast" />
           <EntitySet Name="ChepAudits" EntityType="ACTModel.ChepAudit" />
           <EntitySet Name="ChepClients" EntityType="ACTModel.ChepClient" />
+          <EntitySet Name="ChepLoads" EntityType="ACTModel.ChepLoad" />
+          <EntitySet Name="ChepLoadCheps" EntityType="ACTModel.ChepLoadChep" />
+          <EntitySet Name="ChepLoadOlds" EntityType="ACTModel.ChepLoadOld" />
           <EntitySet Name="Clients" EntityType="ACTModel.Client" />
           <EntitySet Name="ClientAuthorisations" EntityType="ACTModel.ClientAuthorisation" />
           <EntitySet Name="ClientBudgets" EntityType="ACTModel.ClientBudget" />
@@ -2504,12 +2603,12 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySet Name="DeclineReasons" EntityType="ACTModel.DeclineReason" />
           <EntitySet Name="DeliveryNotes" EntityType="ACTModel.DeliveryNote" />
           <EntitySet Name="DeliveryNoteLines" EntityType="ACTModel.DeliveryNoteLine" />
-          <EntitySet Name="Disputes" EntityType="ACTModel.Dispute" />
           <EntitySet Name="Documents" EntityType="ACTModel.Document" />
           <EntitySet Name="EstimatedLoads" EntityType="ACTModel.EstimatedLoad" />
           <EntitySet Name="Groups" EntityType="ACTModel.Group" />
           <EntitySet Name="Images" EntityType="ACTModel.Image" />
           <EntitySet Name="Invoices" EntityType="ACTModel.Invoice" />
+          <EntitySet Name="Journals" EntityType="ACTModel.Journal" />
           <EntitySet Name="Notifications" EntityType="ACTModel.Notification" />
           <EntitySet Name="OutstandingReasons" EntityType="ACTModel.OutstandingReason" />
           <EntitySet Name="Products" EntityType="ACTModel.Product" />
@@ -2554,6 +2653,30 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <AssociationSet Name="FK_ChepClient_ClientLoad" Association="ACTModel.FK_ChepClient_ClientLoad">
             <End Role="ClientLoad" EntitySet="ClientLoads" />
             <End Role="ChepClient" EntitySet="ChepClients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ChepClients_ChepLoads" Association="ACTModel.FK_ChepClients_ChepLoads">
+            <End Role="ChepLoad" EntitySet="ChepLoads" />
+            <End Role="ChepClient" EntitySet="ChepClients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ChepLoad_Client" Association="ACTModel.FK_ChepLoad_Client">
+            <End Role="Client" EntitySet="Clients" />
+            <End Role="ChepLoad" EntitySet="ChepLoads" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ChepLoad_OutstandingReason" Association="ACTModel.FK_ChepLoad_OutstandingReason">
+            <End Role="OutstandingReason" EntitySet="OutstandingReasons" />
+            <End Role="ChepLoad" EntitySet="ChepLoads" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ChepLoadChep_ChepLoad" Association="ACTModel.FK_ChepLoadChep_ChepLoad">
+            <End Role="ChepLoad" EntitySet="ChepLoads" />
+            <End Role="ChepLoadChep" EntitySet="ChepLoadCheps" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserTasks_ChepLoads" Association="ACTModel.FK_UserTasks_ChepLoads">
+            <End Role="ChepLoad" EntitySet="ChepLoads" />
+            <End Role="Task" EntitySet="Tasks" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ChepLoad_Site" Association="ACTModel.FK_ChepLoad_Site">
+            <End Role="Site" EntitySet="Sites" />
+            <End Role="ChepLoadOld" EntitySet="ChepLoadOlds" />
           </AssociationSet>
           <AssociationSet Name="FK_ClientBudget_Clients" Association="ACTModel.FK_ClientBudget_Clients">
             <End Role="Client" EntitySet="Clients" />
@@ -2643,6 +2766,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="Vehicle" EntitySet="Vehicles" />
             <End Role="ClientLoad" EntitySet="ClientLoads" />
           </AssociationSet>
+          <AssociationSet Name="FK_Postings_ClientLoads" Association="ACTModel.FK_Postings_ClientLoads">
+            <End Role="ClientLoad" EntitySet="ClientLoads" />
+            <End Role="Journal" EntitySet="Journals" />
+          </AssociationSet>
           <AssociationSet Name="FK_UserTasks_ClientLoads" Association="ACTModel.FK_UserTasks_ClientLoads">
             <End Role="ClientLoad" EntitySet="ClientLoads" />
             <End Role="Task" EntitySet="Tasks" />
@@ -2671,25 +2798,21 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="User" EntitySet="Users" />
             <End Role="ClientUser" EntitySet="ClientUsers" />
           </AssociationSet>
+          <AssociationSet Name="FK_Comment_User" Association="ACTModel.FK_Comment_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Comment" EntitySet="Comments" />
+          </AssociationSet>
           <AssociationSet Name="FK_DeliveryNoteLines_DeliveryNote" Association="ACTModel.FK_DeliveryNoteLines_DeliveryNote">
             <End Role="DeliveryNote" EntitySet="DeliveryNotes" />
             <End Role="DeliveryNoteLine" EntitySet="DeliveryNoteLines" />
           </AssociationSet>
-          <AssociationSet Name="FK_Dispute_Product" Association="ACTModel.FK_Dispute_Product">
-            <End Role="Product" EntitySet="Products" />
-            <End Role="Dispute" EntitySet="Disputes" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Dispute_User" Association="ACTModel.FK_Dispute_User">
-            <End Role="User" EntitySet="Users" />
-            <End Role="Dispute" EntitySet="Disputes" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Dispute_User1" Association="ACTModel.FK_Dispute_User1">
-            <End Role="User" EntitySet="Users" />
-            <End Role="Dispute" EntitySet="Disputes" />
-          </AssociationSet>
           <AssociationSet Name="FK_UserDocument_Document" Association="ACTModel.FK_UserDocument_Document">
             <End Role="Document" EntitySet="Documents" />
             <End Role="UserDocument" EntitySet="UserDocuments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Journals_SiteAudit" Association="ACTModel.FK_Journals_SiteAudit">
+            <End Role="SiteAudit" EntitySet="SiteAudits" />
+            <End Role="Journal" EntitySet="Journals" />
           </AssociationSet>
           <AssociationSet Name="FK_UserNotification_Notification" Association="ACTModel.FK_UserNotification_Notification">
             <End Role="Notification" EntitySet="Notifications" />
@@ -2799,38 +2922,24 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="User" EntitySet="Users" />
             <End Role="UserTask" EntitySet="UserTasks" />
           </AssociationSet>
-          <EntitySet Name="Journals" EntityType="ACTModel.Journal" />
-          <AssociationSet Name="FK_Postings_ClientLoads" Association="ACTModel.FK_Postings_ClientLoads">
-            <End Role="ClientLoad" EntitySet="ClientLoads" />
-            <End Role="Journal" EntitySet="Journals" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Journals_SiteAudit" Association="ACTModel.FK_Journals_SiteAudit">
-            <End Role="SiteAudit" EntitySet="SiteAudits" />
-            <End Role="Journal" EntitySet="Journals" />
-          </AssociationSet>
-          <EntitySet Name="ChepLoads" EntityType="ACTModel.ChepLoad" />
-          <AssociationSet Name="FK_ChepClients_ChepLoads" Association="ACTModel.FK_ChepClients_ChepLoads">
-            <End Role="ChepLoad" EntitySet="ChepLoads" />
-            <End Role="ChepClient" EntitySet="ChepClients" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ChepLoad_Client" Association="ACTModel.FK_ChepLoad_Client">
-            <End Role="Client" EntitySet="Clients" />
-            <End Role="ChepLoad" EntitySet="ChepLoads" />
-          </AssociationSet>
+          <EntitySet Name="Disputes" EntityType="ACTModel.Dispute" />
           <AssociationSet Name="FK_Disputes_ChepLoads" Association="ACTModel.FK_Disputes_ChepLoads">
             <End Role="ChepLoad" EntitySet="ChepLoads" />
             <End Role="Dispute" EntitySet="Disputes" />
           </AssociationSet>
-          <AssociationSet Name="FK_UserTasks_ChepLoads" Association="ACTModel.FK_UserTasks_ChepLoads">
-            <End Role="ChepLoad" EntitySet="ChepLoads" />
-            <End Role="Task" EntitySet="Tasks" />
+          <AssociationSet Name="FK_Dispute_Product" Association="ACTModel.FK_Dispute_Product">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="Dispute" EntitySet="Disputes" />
           </AssociationSet>
-          <EntitySet Name="ChepLoadCheps" EntityType="ACTModel.ChepLoadChep" />
-          <AssociationSet Name="FK_ChepLoadChep_ChepLoad" Association="ACTModel.FK_ChepLoadChep_ChepLoad">
-            <End Role="ChepLoad" EntitySet="ChepLoads" />
-            <End Role="ChepLoadChep" EntitySet="ChepLoadCheps" />
+          <AssociationSet Name="FK_Dispute_User" Association="ACTModel.FK_Dispute_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Dispute" EntitySet="Disputes" />
           </AssociationSet>
-          </EntityContainer>
+          <AssociationSet Name="FK_Dispute_User1" Association="ACTModel.FK_Dispute_User1">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Dispute" EntitySet="Disputes" />
+          </AssociationSet>
+        </EntityContainer>
         <EntityType Name="Address">
           <Key>
             <PropertyRef Name="Id" />
@@ -2956,6 +3065,100 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="ClientLoad" Relationship="ACTModel.FK_ChepClient_ClientLoad" FromRole="ChepClient" ToRole="ClientLoad" />
           <NavigationProperty Name="ChepLoad" Relationship="ACTModel.FK_ChepClients_ChepLoads" FromRole="ChepClient" ToRole="ChepLoad" />
         </EntityType>
+        <EntityType Name="ChepLoad">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClientId" Type="Int32" Nullable="false" />
+          <Property Name="OutstandingReasonId" Type="Int32" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="ChepStatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="TransactionType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DocketNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OriginalDocketNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="UMI" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="LocationId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Location" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="OtherPartyId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OtherParty" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OtherPartyCountry" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="EquipmentCode" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
+          <Property Name="Equipment" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Quantity" Type="Int32" />
+          <Property Name="Ref" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OtherRef" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="BatchRef" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ShipmentDate" Type="DateTime" Precision="3" />
+          <Property Name="DeliveryDate" Type="DateTime" Precision="3" />
+          <Property Name="EffectiveDate" Type="DateTime" Precision="3" />
+          <Property Name="CreateDate" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="InvoiceNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Reason" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="DataSource" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
+          <Property Name="BalanceStatus" Type="Int32" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="PostingType" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ChepClients" Relationship="ACTModel.FK_ChepClients_ChepLoads" FromRole="ChepLoad" ToRole="ChepClient" />
+          <NavigationProperty Name="Client" Relationship="ACTModel.FK_ChepLoad_Client" FromRole="ChepLoad" ToRole="Client" />
+          <NavigationProperty Name="OutstandingReason" Relationship="ACTModel.FK_ChepLoad_OutstandingReason" FromRole="ChepLoad" ToRole="OutstandingReason" />
+          <NavigationProperty Name="ChepLoadCheps" Relationship="ACTModel.FK_ChepLoadChep_ChepLoad" FromRole="ChepLoad" ToRole="ChepLoadChep" />
+          <NavigationProperty Name="Tasks" Relationship="ACTModel.FK_UserTasks_ChepLoads" FromRole="ChepLoad" ToRole="Task" />
+          <NavigationProperty Name="Disputes" Relationship="ACTModel.FK_Disputes_ChepLoads" FromRole="ChepLoad" ToRole="Dispute" />
+        </EntityType>
+        <EntityType Name="ChepLoadChep">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ChepLoadId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="PCN" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="PRN" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="DocketNumber" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Reference" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Quantity" Type="Int32" Nullable="false" />
+          <Property Name="EffectiveDate" Type="DateTime" Precision="3" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ChepLoad" Relationship="ACTModel.FK_ChepLoadChep_ChepLoad" FromRole="ChepLoadChep" ToRole="ChepLoad" />
+        </EntityType>
+        <EntityType Name="ChepLoadOld">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SiteId" Type="Int32" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModfiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="LoadDate" Type="DateTime" Precision="3" />
+          <Property Name="NotifyDate" Type="DateTime" Precision="3" />
+          <Property Name="EffectiveDate" Type="DateTime" Precision="3" />
+          <Property Name="PostingType" Type="Int32" />
+          <Property Name="AccountNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ClientDescription" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DeliveryNote" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ReferenceNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ReceiverNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Equipment" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OriginalQuantity" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="NewQuantity" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="DocketNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="InputInd" Type="Int32" />
+          <Property Name="OrderNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="THAN" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ShipmentNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="IssueNote" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ChepCreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ChepCreateOn" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Site" Relationship="ACTModel.FK_ChepLoad_Site" FromRole="ChepLoadOld" ToRole="Site" />
+        </EntityType>
         <EntityType Name="Client">
           <Key>
             <PropertyRef Name="Id" />
@@ -2986,6 +3189,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="CompanyType" Type="Int32" />
           <Property Name="PSPName" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="NumberOfLostPallets" Type="Int32" />
+          <NavigationProperty Name="ChepLoads" Relationship="ACTModel.FK_ChepLoad_Client" FromRole="Client" ToRole="ChepLoad" />
           <NavigationProperty Name="ClientBudgets" Relationship="ACTModel.FK_ClientBudget_Clients" FromRole="Client" ToRole="ClientBudget" />
           <NavigationProperty Name="ClientCustomers" Relationship="ACTModel.FK_ClientCustomer_Client" FromRole="Client" ToRole="ClientCustomer" />
           <NavigationProperty Name="ClientGroups" Relationship="ACTModel.FK_ClientGroup_Client" FromRole="Client" ToRole="ClientGroup" />
@@ -2998,19 +3202,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="PSPClients" Relationship="ACTModel.FK_PSPClients_Clients" FromRole="Client" ToRole="PSPClient" />
           <NavigationProperty Name="SiteAudits" Relationship="ACTModel.FK_SiteAudit_Client" FromRole="Client" ToRole="SiteAudit" />
           <NavigationProperty Name="Tasks" Relationship="ACTModel.FK_UserTasks_Clients" FromRole="Client" ToRole="Task" />
-          <NavigationProperty Name="ChepLoads" Relationship="ACTModel.FK_ChepLoad_Client" FromRole="Client" ToRole="ChepLoad" />
         </EntityType>
         <EntityType Name="ClientAuthorisation">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ClientSiteId" Type="Int32" Nullable="false" />
-          <Property Name="TransporterId" Type="Int32" Nullable="false" />
+          <Property Name="ClientSiteId" Type="Int32" />
+          <Property Name="TransporterId" Type="Int32" />
           <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="DocketNumber" Type="String" MaxLength="10" FixedLength="true" Unicode="true" />
+          <Property Name="DocketNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="LoadNumber" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="AuthorisationDate" Type="DateTime" Nullable="false" Precision="3" />
@@ -3165,8 +3368,8 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="OutstandingReason" Relationship="ACTModel.FK_ClientLoad_OutstandingReason" FromRole="ClientLoad" ToRole="OutstandingReason" />
           <NavigationProperty Name="Transporter" Relationship="ACTModel.FK_ClientLoad_Transporter" FromRole="ClientLoad" ToRole="Transporter" />
           <NavigationProperty Name="Vehicle" Relationship="ACTModel.FK_ClientLoads_Vehicle" FromRole="ClientLoad" ToRole="Vehicle" />
-          <NavigationProperty Name="Tasks" Relationship="ACTModel.FK_UserTasks_ClientLoads" FromRole="ClientLoad" ToRole="Task" />
           <NavigationProperty Name="Journals" Relationship="ACTModel.FK_Postings_ClientLoads" FromRole="ClientLoad" ToRole="Journal" />
+          <NavigationProperty Name="Tasks" Relationship="ACTModel.FK_UserTasks_ClientLoads" FromRole="ClientLoad" ToRole="Task" />
         </EntityType>
         <EntityType Name="ClientProduct">
           <Key>
@@ -3270,6 +3473,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
           <Property Name="ObjectId" Type="Int32" Nullable="false" />
           <Property Name="ObjectType" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
@@ -3277,6 +3481,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="Details" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="User" Relationship="ACTModel.FK_Comment_User" FromRole="Comment" ToRole="User" />
         </EntityType>
         <EntityType Name="Contact">
           <Key>
@@ -3354,39 +3559,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Equipment" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="DeliveryNote" Relationship="ACTModel.FK_DeliveryNoteLines_DeliveryNote" FromRole="DeliveryNoteLine" ToRole="DeliveryNote" />
-        </EntityType>
-        <EntityType Name="Dispute">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ChepLoadId" Type="Int32" />
-          <Property Name="ActionedById" Type="Int32" />
-          <Property Name="ResolvedById" Type="Int32" />
-          <Property Name="ProductId" Type="Int32" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="DocketNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="DisputeReason" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="DisputeEmail" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="TDNNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Reference" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Equipment" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
-          <Property Name="OtherParty" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="Sender" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Receiver" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Declarer" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Product" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Quantity" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="ResolvedOn" Type="DateTime" Precision="3" />
-          <Property Name="ActionBy" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Imported" Type="Boolean" Nullable="false" />
-          <Property Name="Status" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Product1" Relationship="ACTModel.FK_Dispute_Product" FromRole="Dispute" ToRole="Product" />
-          <NavigationProperty Name="User" Relationship="ACTModel.FK_Dispute_User" FromRole="Dispute" ToRole="User" />
-          <NavigationProperty Name="User1" Relationship="ACTModel.FK_Dispute_User1" FromRole="Dispute" ToRole="User" />
-          <NavigationProperty Name="ChepLoad" Relationship="ACTModel.FK_Disputes_ChepLoads" FromRole="Dispute" ToRole="ChepLoad" />
         </EntityType>
         <EntityType Name="Document">
           <Key>
@@ -3482,6 +3654,25 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="ClientInvoices" Relationship="ACTModel.FK_ClientInvoices_Invoices" FromRole="Invoice" ToRole="ClientInvoice" />
         </EntityType>
+        <EntityType Name="Journal">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SiteAuditId" Type="Int32" />
+          <Property Name="ClientLoadId" Type="Int32" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="PostingDescription" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="PostingQuantity" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="InOutInd" Type="Boolean" />
+          <Property Name="THAN" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="JournalType" Type="Int32" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ClientLoad" Relationship="ACTModel.FK_Postings_ClientLoads" FromRole="Journal" ToRole="ClientLoad" />
+          <NavigationProperty Name="SiteAudit" Relationship="ACTModel.FK_Journals_SiteAudit" FromRole="Journal" ToRole="SiteAudit" />
+        </EntityType>
         <EntityType Name="Notification">
           <Key>
             <PropertyRef Name="Id" />
@@ -3503,6 +3694,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Description" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ChepLoads" Relationship="ACTModel.FK_ChepLoad_OutstandingReason" FromRole="OutstandingReason" ToRole="ChepLoad" />
           <NavigationProperty Name="ClientLoads" Relationship="ACTModel.FK_ClientLoad_OutstandingReason" FromRole="OutstandingReason" ToRole="ClientLoad" />
         </EntityType>
         <EntityType Name="Product">
@@ -3517,10 +3709,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Description" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="ClientProducts" Relationship="ACTModel.FK_ClientProducts_Products" FromRole="Product" ToRole="ClientProduct" />
-          <NavigationProperty Name="Disputes" Relationship="ACTModel.FK_Dispute_Product" FromRole="Product" ToRole="Dispute" />
           <NavigationProperty Name="ProductPrices" Relationship="ACTModel.FK_ProductPrices_Products" FromRole="Product" ToRole="ProductPrice" />
           <NavigationProperty Name="PSPProducts" Relationship="ACTModel.FK_PSPProduct_Product" FromRole="Product" ToRole="PSPProduct" />
           <NavigationProperty Name="SiteBillings" Relationship="ACTModel.FK_SiteBilling_Products" FromRole="Product" ToRole="SiteBilling" />
+          <NavigationProperty Name="Disputes" Relationship="ACTModel.FK_Dispute_Product" FromRole="Product" ToRole="Dispute" />
         </EntityType>
         <EntityType Name="ProductPrice">
           <Key>
@@ -3776,6 +3968,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="ReceivingEmail" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="DepotManagerEmail" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="ChepAudits" Relationship="ACTModel.FK_ChepAudit_Sites" FromRole="Site" ToRole="ChepAudit" />
+          <NavigationProperty Name="ChepLoadOlds" Relationship="ACTModel.FK_ChepLoad_Site" FromRole="Site" ToRole="ChepLoadOld" />
           <NavigationProperty Name="ClientSites" Relationship="ACTModel.FK_ClientSites_Sites" FromRole="Site" ToRole="ClientSite" />
           <NavigationProperty Name="Region" Relationship="ACTModel.FK_Sites_Regions" FromRole="Site" ToRole="Region" />
           <NavigationProperty Name="SiteAudits" Relationship="ACTModel.FK_Site_Audit_Sites" FromRole="Site" ToRole="SiteAudit" />
@@ -3811,8 +4004,8 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="RepSignatureId" Type="Int32" />
           <Property Name="PalletAuditorSignatureId" Type="Int32" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_SiteAudit_Client" FromRole="SiteAudit" ToRole="Client" />
-          <NavigationProperty Name="Site" Relationship="ACTModel.FK_Site_Audit_Sites" FromRole="SiteAudit" ToRole="Site" />
           <NavigationProperty Name="Journals" Relationship="ACTModel.FK_Journals_SiteAudit" FromRole="SiteAudit" ToRole="Journal" />
+          <NavigationProperty Name="Site" Relationship="ACTModel.FK_Site_Audit_Sites" FromRole="SiteAudit" ToRole="Site" />
         </EntityType>
         <EntityType Name="SiteBilling">
           <Key>
@@ -3907,10 +4100,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Date" Type="DateTime" Precision="3" />
           <Property Name="Action" Type="Int32" />
           <Property Name="Status" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ChepLoad" Relationship="ACTModel.FK_UserTasks_ChepLoads" FromRole="Task" ToRole="ChepLoad" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_UserTasks_Clients" FromRole="Task" ToRole="Client" />
           <NavigationProperty Name="ClientLoad" Relationship="ACTModel.FK_UserTasks_ClientLoads" FromRole="Task" ToRole="ClientLoad" />
           <NavigationProperty Name="UserTasks" Relationship="ACTModel.FK_UserTask_Task" FromRole="Task" ToRole="UserTask" />
-          <NavigationProperty Name="ChepLoad" Relationship="ACTModel.FK_UserTasks_ChepLoads" FromRole="Task" ToRole="ChepLoad" />
         </EntityType>
         <EntityType Name="Token">
           <Key>
@@ -3961,8 +4154,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="PasswordDate" Type="DateTime" Precision="3" />
           <Property Name="Pin" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="ClientUsers" Relationship="ACTModel.FK_ClientUsers_Users" FromRole="User" ToRole="ClientUser" />
-          <NavigationProperty Name="Disputes" Relationship="ACTModel.FK_Dispute_User" FromRole="User" ToRole="Dispute" />
-          <NavigationProperty Name="Disputes1" Relationship="ACTModel.FK_Dispute_User1" FromRole="User" ToRole="Dispute" />
+          <NavigationProperty Name="Comments" Relationship="ACTModel.FK_Comment_User" FromRole="User" ToRole="Comment" />
           <NavigationProperty Name="PSPUsers" Relationship="ACTModel.FK_PSPUser_User" FromRole="User" ToRole="PSPUser" />
           <NavigationProperty Name="Regions" Relationship="ACTModel.FK_Regions_Users" FromRole="User" ToRole="Region" />
           <NavigationProperty Name="Tokens" Relationship="ACTModel.FK_Token_User" FromRole="User" ToRole="Token" />
@@ -3971,6 +4163,8 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="UserNotifications" Relationship="ACTModel.FK_UserNotification_User" FromRole="User" ToRole="UserNotification" />
           <NavigationProperty Name="UserRoles" Relationship="ACTModel.FK_UserRoles_Users" FromRole="User" ToRole="UserRole" />
           <NavigationProperty Name="UserTasks" Relationship="ACTModel.FK_UserTask_User" FromRole="User" ToRole="UserTask" />
+          <NavigationProperty Name="Disputes" Relationship="ACTModel.FK_Dispute_User" FromRole="User" ToRole="Dispute" />
+          <NavigationProperty Name="Disputes1" Relationship="ACTModel.FK_Dispute_User1" FromRole="User" ToRole="Dispute" />
         </EntityType>
         <EntityType Name="UserBroadcast">
           <Key>
@@ -4151,6 +4345,78 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ChepClients_ChepLoads">
+          <End Type="ACTModel.ChepLoad" Role="ChepLoad" Multiplicity="1" />
+          <End Type="ACTModel.ChepClient" Role="ChepClient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ChepLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ChepClient">
+              <PropertyRef Name="ChepLoadsId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ChepLoad_Client">
+          <End Type="ACTModel.Client" Role="Client" Multiplicity="1" />
+          <End Type="ACTModel.ChepLoad" Role="ChepLoad" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Client">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ChepLoad">
+              <PropertyRef Name="ClientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ChepLoad_OutstandingReason">
+          <End Type="ACTModel.OutstandingReason" Role="OutstandingReason" Multiplicity="0..1" />
+          <End Type="ACTModel.ChepLoad" Role="ChepLoad" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="OutstandingReason">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ChepLoad">
+              <PropertyRef Name="OutstandingReasonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ChepLoadChep_ChepLoad">
+          <End Type="ACTModel.ChepLoad" Role="ChepLoad" Multiplicity="1" />
+          <End Type="ACTModel.ChepLoadChep" Role="ChepLoadChep" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ChepLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ChepLoadChep">
+              <PropertyRef Name="ChepLoadId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserTasks_ChepLoads">
+          <End Type="ACTModel.ChepLoad" Role="ChepLoad" Multiplicity="0..1" />
+          <End Type="ACTModel.Task" Role="Task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ChepLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Task">
+              <PropertyRef Name="ChepLoadId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ChepLoad_Site">
+          <End Type="ACTModel.Site" Role="Site" Multiplicity="0..1" />
+          <End Type="ACTModel.ChepLoadOld" Role="ChepLoadOld" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Site">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ChepLoadOld">
+              <PropertyRef Name="SiteId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ClientBudget_Clients">
           <End Type="ACTModel.Client" Role="Client" Multiplicity="1" />
           <End Type="ACTModel.ClientBudget" Role="ClientBudget" Multiplicity="*" />
@@ -4296,7 +4562,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_ClientAuthorisation_Transporter">
-          <End Type="ACTModel.Transporter" Role="Transporter" Multiplicity="1" />
+          <End Type="ACTModel.Transporter" Role="Transporter" Multiplicity="0..1" />
           <End Type="ACTModel.ClientAuthorisation" Role="ClientAuthorisation" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Transporter">
@@ -4308,7 +4574,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_ClientAuthorisations_ClientSites">
-          <End Type="ACTModel.ClientSite" Role="ClientSite" Multiplicity="1" />
+          <End Type="ACTModel.ClientSite" Role="ClientSite" Multiplicity="0..1" />
           <End Type="ACTModel.ClientAuthorisation" Role="ClientAuthorisation" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="ClientSite">
@@ -4415,6 +4681,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Postings_ClientLoads">
+          <End Type="ACTModel.ClientLoad" Role="ClientLoad" Multiplicity="0..1" />
+          <End Type="ACTModel.Journal" Role="Journal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Journal">
+              <PropertyRef Name="ClientLoadId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_UserTasks_ClientLoads">
           <End Type="ACTModel.ClientLoad" Role="ClientLoad" Multiplicity="0..1" />
           <End Type="ACTModel.Task" Role="Task" Multiplicity="*" />
@@ -4499,6 +4777,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Comment_User">
+          <End Type="ACTModel.User" Role="User" Multiplicity="1" />
+          <End Type="ACTModel.Comment" Role="Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Comment">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_DeliveryNoteLines_DeliveryNote">
           <End Type="ACTModel.DeliveryNote" Role="DeliveryNote" Multiplicity="1" />
           <End Type="ACTModel.DeliveryNoteLine" Role="DeliveryNoteLine" Multiplicity="*" />
@@ -4508,42 +4798,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="DeliveryNoteLine">
               <PropertyRef Name="DeliveryNoteId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Dispute_Product">
-          <End Type="ACTModel.Product" Role="Product" Multiplicity="0..1" />
-          <End Type="ACTModel.Dispute" Role="Dispute" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Product">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Dispute">
-              <PropertyRef Name="ProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Dispute_User">
-          <End Type="ACTModel.User" Role="User" Multiplicity="0..1" />
-          <End Type="ACTModel.Dispute" Role="Dispute" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Dispute">
-              <PropertyRef Name="ActionedById" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Dispute_User1">
-          <End Type="ACTModel.User" Role="User" Multiplicity="0..1" />
-          <End Type="ACTModel.Dispute" Role="Dispute" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Dispute">
-              <PropertyRef Name="ResolvedById" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4558,6 +4812,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="UserDocument">
               <PropertyRef Name="DocumentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Journals_SiteAudit">
+          <End Type="ACTModel.SiteAudit" Role="SiteAudit" Multiplicity="0..1" />
+          <End Type="ACTModel.Journal" Role="Journal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SiteAudit">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Journal">
+              <PropertyRef Name="SiteAuditId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4885,115 +5151,52 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="Journal">
+        <EntityType Name="Dispute">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="SiteAuditId" Type="Int32" />
-          <Property Name="ClientLoadId" Type="Int32" />
+          <Property Name="ChepLoadId" Type="Int32" />
+          <Property Name="ActionedById" Type="Int32" />
+          <Property Name="ResolvedById" Type="Int32" />
+          <Property Name="ProductId" Type="Int32" />
           <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="PostingDescription" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="PostingQuantity" Type="Decimal" Precision="18" Scale="0" />
-          <Property Name="InOutInd" Type="Boolean" />
-          <Property Name="THAN" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="JournalType" Type="Int32" />
-          <Property Name="Status" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="ClientLoad" Relationship="ACTModel.FK_Postings_ClientLoads" FromRole="Journal" ToRole="ClientLoad" />
-          <NavigationProperty Name="SiteAudit" Relationship="ACTModel.FK_Journals_SiteAudit" FromRole="Journal" ToRole="SiteAudit" />
-        </EntityType>
-        <Association Name="FK_Postings_ClientLoads">
-          <End Type="ACTModel.ClientLoad" Role="ClientLoad" Multiplicity="0..1" />
-          <End Type="ACTModel.Journal" Role="Journal" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ClientLoad">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Journal">
-              <PropertyRef Name="ClientLoadId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Journals_SiteAudit">
-          <End Type="ACTModel.SiteAudit" Role="SiteAudit" Multiplicity="0..1" />
-          <End Type="ACTModel.Journal" Role="Journal" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="SiteAudit">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Journal">
-              <PropertyRef Name="SiteAuditId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityType Name="ChepLoad">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ClientId" Type="Int32" Nullable="false" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="ChepStatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="TransactionType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="DocketNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="OriginalDocketNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="UMI" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="LocationId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Location" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="OtherPartyId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="OtherParty" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="OtherPartyCountry" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="EquipmentCode" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
+          <Property Name="DisputeReason" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="DisputeEmail" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="TDNNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Reference" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Equipment" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Quantity" Type="Int32" />
-          <Property Name="Ref" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="OtherRef" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="BatchRef" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ShipmentDate" Type="DateTime" Precision="3" />
-          <Property Name="DeliveryDate" Type="DateTime" Precision="3" />
-          <Property Name="EffectiveDate" Type="DateTime" Precision="3" />
-          <Property Name="CreateDate" Type="DateTime" Precision="3" />
-          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="InvoiceNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Reason" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="DataSource" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
-          <Property Name="BalanceStatus" Type="Int32" />
+          <Property Name="OtherParty" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Sender" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Receiver" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Declarer" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Product" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Quantity" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="ResolvedOn" Type="DateTime" Precision="3" />
+          <Property Name="ActionBy" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Imported" Type="Boolean" Nullable="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
-          <Property Name="PostingType" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="ChepClients" Relationship="ACTModel.FK_ChepClients_ChepLoads" FromRole="ChepLoad" ToRole="ChepClient" />
-          <NavigationProperty Name="Client" Relationship="ACTModel.FK_ChepLoad_Client" FromRole="ChepLoad" ToRole="Client" />
-          <NavigationProperty Name="Disputes" Relationship="ACTModel.FK_Disputes_ChepLoads" FromRole="ChepLoad" ToRole="Dispute" />
-          <NavigationProperty Name="Tasks" Relationship="ACTModel.FK_UserTasks_ChepLoads" FromRole="ChepLoad" ToRole="Task" />
-          <NavigationProperty Name="ChepLoadCheps" Relationship="ACTModel.FK_ChepLoadChep_ChepLoad" FromRole="ChepLoad" ToRole="ChepLoadChep" />
+          <Property Name="Location" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Action" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OriginalDocketNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OtherReference" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="EffectiveDate" Type="DateTime" Precision="3" />
+          <Property Name="ShipDate" Type="DateTime" Precision="3" />
+          <Property Name="DelilveryDate" Type="DateTime" Precision="3" />
+          <Property Name="DaysLeft" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="CorrectionRequestDate" Type="DateTime" Precision="3" />
+          <Property Name="TransactionType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DisputeComment" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="DataSource" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="HasDocket" Type="Int32" />
+          <NavigationProperty Name="ChepLoad" Relationship="ACTModel.FK_Disputes_ChepLoads" FromRole="Dispute" ToRole="ChepLoad" />
+          <NavigationProperty Name="Product1" Relationship="ACTModel.FK_Dispute_Product" FromRole="Dispute" ToRole="Product" />
+          <NavigationProperty Name="User" Relationship="ACTModel.FK_Dispute_User" FromRole="Dispute" ToRole="User" />
+          <NavigationProperty Name="User1" Relationship="ACTModel.FK_Dispute_User1" FromRole="Dispute" ToRole="User" />
         </EntityType>
-        <Association Name="FK_ChepClients_ChepLoads">
-          <End Type="ACTModel.ChepLoad" Role="ChepLoad" Multiplicity="1" />
-          <End Type="ACTModel.ChepClient" Role="ChepClient" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ChepLoad">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ChepClient">
-              <PropertyRef Name="ChepLoadsId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ChepLoad_Client">
-          <End Type="ACTModel.Client" Role="Client" Multiplicity="1" />
-          <End Type="ACTModel.ChepLoad" Role="ChepLoad" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Client">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ChepLoad">
-              <PropertyRef Name="ClientId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Disputes_ChepLoads">
           <End Type="ACTModel.ChepLoad" Role="ChepLoad" Multiplicity="0..1" />
           <End Type="ACTModel.Dispute" Role="Dispute" Multiplicity="*" />
@@ -5006,44 +5209,39 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_UserTasks_ChepLoads">
-          <End Type="ACTModel.ChepLoad" Role="ChepLoad" Multiplicity="0..1" />
-          <End Type="ACTModel.Task" Role="Task" Multiplicity="*" />
+        <Association Name="FK_Dispute_Product">
+          <End Type="ACTModel.Product" Role="Product" Multiplicity="0..1" />
+          <End Type="ACTModel.Dispute" Role="Dispute" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="ChepLoad">
+            <Principal Role="Product">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Task">
-              <PropertyRef Name="ChepLoadId" />
+            <Dependent Role="Dispute">
+              <PropertyRef Name="ProductId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="ChepLoadChep">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ChepLoadId" Type="Int32" Nullable="false" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="PCN" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="PRN" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="DocketNumber" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Reference" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Quantity" Type="Int32" Nullable="false" />
-          <Property Name="Status" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="ChepLoad" Relationship="ACTModel.FK_ChepLoadChep_ChepLoad" FromRole="ChepLoadChep" ToRole="ChepLoad" />
-        </EntityType>
-        <Association Name="FK_ChepLoadChep_ChepLoad">
-          <End Type="ACTModel.ChepLoad" Role="ChepLoad" Multiplicity="1" />
-          <End Type="ACTModel.ChepLoadChep" Role="ChepLoadChep" Multiplicity="*" />
+        <Association Name="FK_Dispute_User">
+          <End Type="ACTModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="ACTModel.Dispute" Role="Dispute" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="ChepLoad">
+            <Principal Role="User">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="ChepLoadChep">
-              <PropertyRef Name="ChepLoadId" />
+            <Dependent Role="Dispute">
+              <PropertyRef Name="ActionedById" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Dispute_User1">
+          <End Type="ACTModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="ACTModel.Dispute" Role="Dispute" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Dispute">
+              <PropertyRef Name="ResolvedById" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -5175,6 +5373,95 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="ClientLoadsId" ColumnName="ClientLoadsId" />
                 <ScalarProperty Name="ChepLoadsId" ColumnName="ChepLoadsId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ChepLoads">
+            <EntityTypeMapping TypeName="ACTModel.ChepLoad">
+              <MappingFragment StoreEntitySet="ChepLoad">
+                <ScalarProperty Name="PostingType" ColumnName="PostingType" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="BalanceStatus" ColumnName="BalanceStatus" />
+                <ScalarProperty Name="DataSource" ColumnName="DataSource" />
+                <ScalarProperty Name="Reason" ColumnName="Reason" />
+                <ScalarProperty Name="InvoiceNumber" ColumnName="InvoiceNumber" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
+                <ScalarProperty Name="EffectiveDate" ColumnName="EffectiveDate" />
+                <ScalarProperty Name="DeliveryDate" ColumnName="DeliveryDate" />
+                <ScalarProperty Name="ShipmentDate" ColumnName="ShipmentDate" />
+                <ScalarProperty Name="BatchRef" ColumnName="BatchRef" />
+                <ScalarProperty Name="OtherRef" ColumnName="OtherRef" />
+                <ScalarProperty Name="Ref" ColumnName="Ref" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="Equipment" ColumnName="Equipment" />
+                <ScalarProperty Name="EquipmentCode" ColumnName="EquipmentCode" />
+                <ScalarProperty Name="OtherPartyCountry" ColumnName="OtherPartyCountry" />
+                <ScalarProperty Name="OtherParty" ColumnName="OtherParty" />
+                <ScalarProperty Name="OtherPartyId" ColumnName="OtherPartyId" />
+                <ScalarProperty Name="Location" ColumnName="Location" />
+                <ScalarProperty Name="LocationId" ColumnName="LocationId" />
+                <ScalarProperty Name="UMI" ColumnName="UMI" />
+                <ScalarProperty Name="OriginalDocketNumber" ColumnName="OriginalDocketNumber" />
+                <ScalarProperty Name="DocketNumber" ColumnName="DocketNumber" />
+                <ScalarProperty Name="TransactionType" ColumnName="TransactionType" />
+                <ScalarProperty Name="ChepStatus" ColumnName="ChepStatus" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="OutstandingReasonId" ColumnName="OutstandingReasonId" />
+                <ScalarProperty Name="ClientId" ColumnName="ClientId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ChepLoadCheps">
+            <EntityTypeMapping TypeName="ACTModel.ChepLoadChep">
+              <MappingFragment StoreEntitySet="ChepLoadChep">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="EffectiveDate" ColumnName="EffectiveDate" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="Reference" ColumnName="Reference" />
+                <ScalarProperty Name="DocketNumber" ColumnName="DocketNumber" />
+                <ScalarProperty Name="PRN" ColumnName="PRN" />
+                <ScalarProperty Name="PCN" ColumnName="PCN" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ChepLoadId" ColumnName="ChepLoadId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ChepLoadOlds">
+            <EntityTypeMapping TypeName="ACTModel.ChepLoadOld">
+              <MappingFragment StoreEntitySet="ChepLoadOld">
+                <ScalarProperty Name="ChepCreateOn" ColumnName="ChepCreateOn" />
+                <ScalarProperty Name="ChepCreatedBy" ColumnName="ChepCreatedBy" />
+                <ScalarProperty Name="IssueNote" ColumnName="IssueNote" />
+                <ScalarProperty Name="ShipmentNo" ColumnName="ShipmentNo" />
+                <ScalarProperty Name="THAN" ColumnName="THAN" />
+                <ScalarProperty Name="OrderNo" ColumnName="OrderNo" />
+                <ScalarProperty Name="InputInd" ColumnName="InputInd" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="DocketNumber" ColumnName="DocketNumber" />
+                <ScalarProperty Name="NewQuantity" ColumnName="NewQuantity" />
+                <ScalarProperty Name="OriginalQuantity" ColumnName="OriginalQuantity" />
+                <ScalarProperty Name="Equipment" ColumnName="Equipment" />
+                <ScalarProperty Name="ReceiverNumber" ColumnName="ReceiverNumber" />
+                <ScalarProperty Name="ReferenceNumber" ColumnName="ReferenceNumber" />
+                <ScalarProperty Name="DeliveryNote" ColumnName="DeliveryNote" />
+                <ScalarProperty Name="ClientDescription" ColumnName="ClientDescription" />
+                <ScalarProperty Name="AccountNumber" ColumnName="AccountNumber" />
+                <ScalarProperty Name="PostingType" ColumnName="PostingType" />
+                <ScalarProperty Name="EffectiveDate" ColumnName="EffectiveDate" />
+                <ScalarProperty Name="NotifyDate" ColumnName="NotifyDate" />
+                <ScalarProperty Name="LoadDate" ColumnName="LoadDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModfiedOn" ColumnName="ModfiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="SiteId" ColumnName="SiteId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -5465,6 +5752,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="ObjectType" ColumnName="ObjectType" />
                 <ScalarProperty Name="ObjectId" ColumnName="ObjectId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -5542,36 +5830,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="DeliveryNoteId" ColumnName="DeliveryNoteId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Disputes">
-            <EntityTypeMapping TypeName="ACTModel.Dispute">
-              <MappingFragment StoreEntitySet="Dispute">
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="Imported" ColumnName="Imported" />
-                <ScalarProperty Name="ActionBy" ColumnName="ActionBy" />
-                <ScalarProperty Name="ResolvedOn" ColumnName="ResolvedOn" />
-                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
-                <ScalarProperty Name="Product" ColumnName="Product" />
-                <ScalarProperty Name="Declarer" ColumnName="Declarer" />
-                <ScalarProperty Name="Receiver" ColumnName="Receiver" />
-                <ScalarProperty Name="Sender" ColumnName="Sender" />
-                <ScalarProperty Name="OtherParty" ColumnName="OtherParty" />
-                <ScalarProperty Name="Equipment" ColumnName="Equipment" />
-                <ScalarProperty Name="Reference" ColumnName="Reference" />
-                <ScalarProperty Name="TDNNumber" ColumnName="TDNNumber" />
-                <ScalarProperty Name="DisputeEmail" ColumnName="DisputeEmail" />
-                <ScalarProperty Name="DisputeReason" ColumnName="DisputeReason" />
-                <ScalarProperty Name="DocketNumber" ColumnName="DocketNumber" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
-                <ScalarProperty Name="ResolvedById" ColumnName="ResolvedById" />
-                <ScalarProperty Name="ActionedById" ColumnName="ActionedById" />
-                <ScalarProperty Name="ChepLoadId" ColumnName="ChepLoadId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -5668,6 +5926,24 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
                 <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Journals">
+            <EntityTypeMapping TypeName="ACTModel.Journal">
+              <MappingFragment StoreEntitySet="Journal">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="JournalType" ColumnName="JournalType" />
+                <ScalarProperty Name="THAN" ColumnName="THAN" />
+                <ScalarProperty Name="InOutInd" ColumnName="InOutInd" />
+                <ScalarProperty Name="PostingQuantity" ColumnName="PostingQuantity" />
+                <ScalarProperty Name="PostingDescription" ColumnName="PostingDescription" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ClientLoadId" ColumnName="ClientLoadId" />
+                <ScalarProperty Name="SiteAuditId" ColumnName="SiteAuditId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -6247,74 +6523,44 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Journals">
-            <EntityTypeMapping TypeName="ACTModel.Journal">
-              <MappingFragment StoreEntitySet="Journal">
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="JournalType" ColumnName="JournalType" />
-                <ScalarProperty Name="THAN" ColumnName="THAN" />
-                <ScalarProperty Name="InOutInd" ColumnName="InOutInd" />
-                <ScalarProperty Name="PostingQuantity" ColumnName="PostingQuantity" />
-                <ScalarProperty Name="PostingDescription" ColumnName="PostingDescription" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="ClientLoadId" ColumnName="ClientLoadId" />
-                <ScalarProperty Name="SiteAuditId" ColumnName="SiteAuditId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ChepLoads">
-            <EntityTypeMapping TypeName="ACTModel.ChepLoad">
-              <MappingFragment StoreEntitySet="ChepLoad">
-                <ScalarProperty Name="PostingType" ColumnName="PostingType" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="BalanceStatus" ColumnName="BalanceStatus" />
+          <EntitySetMapping Name="Disputes">
+            <EntityTypeMapping TypeName="ACTModel.Dispute">
+              <MappingFragment StoreEntitySet="Dispute">
+                <ScalarProperty Name="HasDocket" ColumnName="HasDocket" />
                 <ScalarProperty Name="DataSource" ColumnName="DataSource" />
-                <ScalarProperty Name="Reason" ColumnName="Reason" />
-                <ScalarProperty Name="InvoiceNumber" ColumnName="InvoiceNumber" />
-                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
-                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
-                <ScalarProperty Name="EffectiveDate" ColumnName="EffectiveDate" />
-                <ScalarProperty Name="DeliveryDate" ColumnName="DeliveryDate" />
-                <ScalarProperty Name="ShipmentDate" ColumnName="ShipmentDate" />
-                <ScalarProperty Name="BatchRef" ColumnName="BatchRef" />
-                <ScalarProperty Name="OtherRef" ColumnName="OtherRef" />
-                <ScalarProperty Name="Ref" ColumnName="Ref" />
-                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
-                <ScalarProperty Name="Equipment" ColumnName="Equipment" />
-                <ScalarProperty Name="EquipmentCode" ColumnName="EquipmentCode" />
-                <ScalarProperty Name="OtherPartyCountry" ColumnName="OtherPartyCountry" />
-                <ScalarProperty Name="OtherParty" ColumnName="OtherParty" />
-                <ScalarProperty Name="OtherPartyId" ColumnName="OtherPartyId" />
-                <ScalarProperty Name="Location" ColumnName="Location" />
-                <ScalarProperty Name="LocationId" ColumnName="LocationId" />
-                <ScalarProperty Name="UMI" ColumnName="UMI" />
-                <ScalarProperty Name="OriginalDocketNumber" ColumnName="OriginalDocketNumber" />
-                <ScalarProperty Name="DocketNumber" ColumnName="DocketNumber" />
+                <ScalarProperty Name="DisputeComment" ColumnName="DisputeComment" />
                 <ScalarProperty Name="TransactionType" ColumnName="TransactionType" />
-                <ScalarProperty Name="ChepStatus" ColumnName="ChepStatus" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="ClientId" ColumnName="ClientId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ChepLoadCheps">
-            <EntityTypeMapping TypeName="ACTModel.ChepLoadChep">
-              <MappingFragment StoreEntitySet="ChepLoadChep">
+                <ScalarProperty Name="CorrectionRequestDate" ColumnName="CorrectionRequestDate" />
+                <ScalarProperty Name="DaysLeft" ColumnName="DaysLeft" />
+                <ScalarProperty Name="DelilveryDate" ColumnName="DelilveryDate" />
+                <ScalarProperty Name="ShipDate" ColumnName="ShipDate" />
+                <ScalarProperty Name="EffectiveDate" ColumnName="EffectiveDate" />
+                <ScalarProperty Name="OtherReference" ColumnName="OtherReference" />
+                <ScalarProperty Name="OriginalDocketNumber" ColumnName="OriginalDocketNumber" />
+                <ScalarProperty Name="Action" ColumnName="Action" />
+                <ScalarProperty Name="Location" ColumnName="Location" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Imported" ColumnName="Imported" />
+                <ScalarProperty Name="ActionBy" ColumnName="ActionBy" />
+                <ScalarProperty Name="ResolvedOn" ColumnName="ResolvedOn" />
                 <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="Product" ColumnName="Product" />
+                <ScalarProperty Name="Declarer" ColumnName="Declarer" />
+                <ScalarProperty Name="Receiver" ColumnName="Receiver" />
+                <ScalarProperty Name="Sender" ColumnName="Sender" />
+                <ScalarProperty Name="OtherParty" ColumnName="OtherParty" />
+                <ScalarProperty Name="Equipment" ColumnName="Equipment" />
                 <ScalarProperty Name="Reference" ColumnName="Reference" />
+                <ScalarProperty Name="TDNNumber" ColumnName="TDNNumber" />
+                <ScalarProperty Name="DisputeEmail" ColumnName="DisputeEmail" />
+                <ScalarProperty Name="DisputeReason" ColumnName="DisputeReason" />
                 <ScalarProperty Name="DocketNumber" ColumnName="DocketNumber" />
-                <ScalarProperty Name="PRN" ColumnName="PRN" />
-                <ScalarProperty Name="PCN" ColumnName="PCN" />
                 <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
                 <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+                <ScalarProperty Name="ResolvedById" ColumnName="ResolvedById" />
+                <ScalarProperty Name="ActionedById" ColumnName="ActionedById" />
                 <ScalarProperty Name="ChepLoadId" ColumnName="ChepLoadId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>

@@ -1,0 +1,130 @@
+﻿@model ChepLoadViewModel
+
+@using ACT.UI.Models;
+@using ACT.Data.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Edit Outstanding Pallet";
+
+    var user = User.Get();
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "EditOutstandingPallet", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#outstandingpallets", @class = "custom-validate", @style = "width: auto;", id = "editoutstandingpallets" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content( "~/images/edit.png" )" />
+            <span>Edit Outstanding Pallet</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        @Html.HiddenFor( model => model.Id )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="left" style="width: 31%; margin-right: 3%;">
+
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.OutstandingReasonId )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.OutstandingReasonId, model => Model.OutstandingReasonOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.OutstandingReasonId )
+                </div>
+
+                <div class="editor-label ">
+                    Comments (@Model.ChepLoadComments.NullableCount())
+                </div>
+                <div class="editor-field">
+
+                    <table id="chep-comments-table" class="da-table small">
+
+                        <thead>
+                            <tr>
+                                <th>Your Comment</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @if ( Model.ChepLoadComments.NullableAny() )
+                            {
+                                int count = 0;
+
+                                foreach ( Comment item in Model.ChepLoadComments )
+                                {
+                                    <tr id="row-line-@count-chep" class="add-more-row">
+                                        <td style="position: relative;">
+
+                                            @if ( ( count + 1 ) == Model.ChepLoadComments.Count )
+                                            {
+                                                <a data-add-one-more="1" data-target="#row-line-0-chep" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                                                    <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                                                </a>
+                                            }
+
+                                            @if ( user.Id == item.UserId )
+                                            {
+                                                <input name="ChepLoadComments[@count].Id" type="hidden" value="@item.Id" />
+
+                                                <input class="input" name="ChepLoadComments[@count].Details" placeholder="Enter your comment" required="required" style="padding: 0 5px; width: 87%;" type="text" value="@item.Details">
+                                            }
+                                            else
+                                            {
+                                                <span>
+                                                    @item.Details
+                                                </span>
+
+                                                <small class="block" style="font-size: 10px; text-align: right; font-style: italic;"> by @item.User.Name @item.User.Surname on @item.CreatedOn.ToString( "yyyy-MM-dd @HH:mm tt" )</small>
+                                                <div class="clear"></div>
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    count++;
+                                }
+                            }
+                            else
+                            {
+                                <tr id="row-line-0-chep" class="add-more-row">
+                                    <td style="position: relative;">
+                                        <a data-add-one-more="1" data-target="#row-line-0-chep" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                                            <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                                        </a>
+
+                                        <input class="input" name="ChepLoadComments[0].Details" placeholder="Enter your comment" required="required" style="padding: 0 5px; width: 87%;" type="text" value="" />
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+        <p>
+            <input id="save-btn" type="submit" value="Update" />
+            <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+        </p>
+
+    </div>
+}
+
+

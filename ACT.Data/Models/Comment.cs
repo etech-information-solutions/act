@@ -15,6 +15,7 @@ namespace ACT.Data.Models
     public partial class Comment
     {
         public int Id { get; set; }
+        public int UserId { get; set; }
         public int ObjectId { get; set; }
         public string ObjectType { get; set; }
         public System.DateTime CreatedOn { get; set; }
@@ -22,5 +23,7 @@ namespace ACT.Data.Models
         public string ModifiedBy { get; set; }
         public string Details { get; set; }
         public int Status { get; set; }
+    
+        public virtual User User { get; set; }
     }
 }

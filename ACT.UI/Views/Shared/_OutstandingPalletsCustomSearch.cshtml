@@ -24,15 +24,17 @@
                 </div>
                 <div class="editor-field">
                     @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.ClientId )
                 </div>
             </div>
 
             <div class="right" style="width: 48%;">
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.SiteId )
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.OutstandingReasonId )
                 </div>
                 <div class="editor-field">
-                    @Html.DropDownListFor( model => model.SiteId, model => model.SiteOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.DropDownListFor( model => model.OutstandingReasonId, model => Model.OutstandingReasonOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.OutstandingReasonId )
                 </div>
             </div>
 
@@ -45,6 +47,7 @@
                 </div>
                 <div class="editor-field">
                     @Html.TextBoxFor( model => model.FromDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " } )
+                    @Html.ValidationMessageFor( model => model.FromDate )
                 </div>
 
             </div>
@@ -56,6 +59,7 @@
                 </div>
                 <div class="editor-field">
                     @Html.TextBoxFor( model => model.ToDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " } )
+                    @Html.ValidationMessageFor( model => model.ToDate )
                 </div>
 
             </div>

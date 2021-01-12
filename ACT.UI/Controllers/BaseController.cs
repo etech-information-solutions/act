@@ -1123,49 +1123,84 @@ namespace ACT.UI.Controllers
             using ( ChepLoadService chservice = new ChepLoadService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
             {
-                List<ClientLoad> loads = clservice.GetAutoReconcilliableLoads();
+                int count = 0;
 
-                if ( !loads.NullableAny() ) return PartialView( "_Empty" );
+                #region Client & Chep Load
 
-                string q = string.Empty;
+                List<ClientLoad> clLoads = clservice.GetAutoReconcilliableLoads();
 
-                foreach ( ClientLoad l in loads )
+                if ( clLoads.NullableAny() )
                 {
-                    q = $"UPDATE [dbo].[ClientLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id={l.Id};";
+                    string q = string.Empty;
 
-                    clservice.Query( q );
-
-                    List<ChepLoadCustomModel> cheps = chservice.ListClientLoadMatch( l.ReceiverNumber?.Trim() );
-
-                    if ( !cheps.NullableAny() ) continue;
-
-                    int sum = cheps.Sum( s => s.Quantity ?? 0 );
-
-                    if ( sum == 0 )
+                    foreach ( ClientLoad l in clLoads )
                     {
-                        // Complete recon
-                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) BalanceStatus.Balanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+                        q = $"UPDATE [dbo].[ClientLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id={l.Id};";
 
-                        chservice.Query( q );
-                    }
-                    else if ( sum > 0 )
-                    {
-                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) BalanceStatus.NotBalanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+                        clservice.Query( q );
 
-                        chservice.Query( q );
-                    }
-                    else if ( sum < 0 )
-                    {
-                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Unreconciled},[BalanceStatus]={( int ) BalanceStatus.NotBalanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+                        List<ChepLoadCustomModel> cheps = chservice.ListClientLoadMatch( l.ReceiverNumber?.Trim() );
 
-                        chservice.Query( q );
+                        if ( !cheps.NullableAny() ) continue;
+
+                        int sum = cheps.Sum( s => s.Quantity ?? 0 );
+
+                        if ( sum == 0 )
+                        {
+                            // Complete recon
+                            q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) BalanceStatus.Balanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+
+                            chservice.Query( q );
+                        }
+                        else if ( sum > 0 )
+                        {
+                            q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) BalanceStatus.NotBalanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+
+                            chservice.Query( q );
+                        }
+                        else if ( sum < 0 )
+                        {
+                            q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Unreconciled},[BalanceStatus]={( int ) BalanceStatus.NotBalanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+
+                            chservice.Query( q );
+                        }
+
+                        count++;
                     }
                 }
 
-                Notify( $"{loads.Count} loads were successfully reconcilled.", NotificationType.Success );
+                #endregion
+
+                #region Chep Load Only
+
+                List<ChepLoad> chLoads = chservice.GetAutoReconcilliableLoads();
+
+                if ( chLoads.NullableAny() )
+                {
+                    foreach ( ChepLoad item in chLoads )
+                    {
+                        List<ChepLoad> chs = chservice.ListByReference( item.DocketNumber, true );
+
+                        if ( chs == null ) continue;
+
+                        if ( ( chs.Sum( s => s.Quantity ) + item.Quantity ) != 0 ) continue;
+
+                        chs.Add( item );
+
+                        string q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) BalanceStatus.Balanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", chs.Select( s => s.Id ) )});";
+
+                        chservice.Query( q );
+
+                        count++;
+                    }
+                }
+
+                #endregion
+
+                Notify( $"{count} loads were successfully reconcilled.", NotificationType.Success );
             }
 
-            return PartialView( "_Notification" );
+            return PartialView( "_Empty" );
         }
 
         /// <summary>
@@ -1178,6 +1213,107 @@ namespace ACT.UI.Controllers
             {
                 return iservice.GetAutoReconcilliableInvoiceTotal();
             }
+        }
+
+        /// <summary>
+        /// Gets a list of outstanding pallets
+        /// </summary>
+        /// <returns></returns>
+        public List<OutstandingPalletsModel> GetOutstandingPallets( PagingModel pm, CustomSearchModel csm, string email = "" )
+        {
+            using ( ChepLoadService chservice = new ChepLoadService() )
+            {
+                if ( !string.IsNullOrWhiteSpace( email ) || chservice.CurrentUser == null )
+                {
+                    chservice.CurrentUser = chservice.GetUser( email );
+                }
+
+                csm.BalanceStatus = BalanceStatus.NotBalanced;
+
+                List<OutstandingPalletsModel> resp = new List<OutstandingPalletsModel>();
+
+                pm.Skip = 0;
+                pm.Sort = "ASC";
+                pm.Take = int.MaxValue;
+                pm.SortBy = "c.CompanyName";
+
+                List<ChepLoadCustomModel> model = chservice.List1( pm, csm );
+
+                if ( !model.NullableAny() )
+                {
+                    return resp;
+                }
+
+                List<int?> clientIds = new List<int?>();
+
+                foreach ( ChepLoadCustomModel item in model )
+                {
+                    if ( clientIds.Any( c => c == item.ClientId ) ) continue;
+
+                    clientIds.Add( item.ClientId );
+
+                    OutstandingPalletsModel m = new OutstandingPalletsModel()
+                    {
+                        ClientLoad = item,
+                        OutstandingReasons = GetOutstandingReasons( item.ClientId, model ),
+                        GrandTotal = new OutstandingReasonModel()
+                        {
+                            Description = "Grand Total",
+                            To30Days = model.Count( c => c.ClientId == item.ClientId && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 30 ),
+                            To60Days = model.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 60 ) ),
+                            To90Days = model.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 90 ) ),
+                            To120Days = model.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 120 ) ),
+                            To183Days = model.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 183 ) ),
+                            To270Days = model.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 270 ) ),
+                            To365Days = model.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 365 ) ),
+                            GrandTotal = model.Count( c => c.ClientId == item.ClientId ),
+                        }
+                    };
+
+                    resp.Add( m );
+                }
+
+                return resp;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of outstanding reasons
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        public List<OutstandingReasonModel> GetOutstandingReasons( int clientId, List<ChepLoadCustomModel> items )
+        {
+            List<string> outstandingIds = new List<string>();
+
+            List<OutstandingReasonModel> outstandingReasons = new List<OutstandingReasonModel>();
+
+            foreach ( ChepLoadCustomModel item in items )
+            {
+                if ( item.ClientId != clientId ) continue;
+
+                if ( outstandingIds.Any( c => c == item.OutstandingReasonId + "-" + clientId ) ) continue;
+
+                outstandingIds.Add( item.OutstandingReasonId + "-" + clientId );
+
+                OutstandingReasonModel r = new OutstandingReasonModel()
+                {
+                    Description = item.OutstandingReason ?? "-N/A-",
+                    To30Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 30 ),
+                    To60Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 60 ) ),
+                    To90Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 90 ) ),
+                    To120Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 120 ) ),
+                    To183Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 183 ) ),
+                    To270Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 270 ) ),
+                    To365Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 365 ) ),
+                    GrandTotal = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId ),
+                };
+
+                outstandingReasons.Add( r );
+            }
+
+            return outstandingReasons;
         }
 
         /// <summary>
@@ -1223,7 +1359,7 @@ namespace ACT.UI.Controllers
                 Notify( $"{invoices.Count} invoices were successfully reconcilled.", NotificationType.Success );
             }
 
-            return PartialView( "_Notification" );
+            return PartialView( "_Empty" );
         }
 
         #endregion

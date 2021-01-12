@@ -12,7 +12,6 @@
 
         @using ( Ajax.BeginForm( action, new { }, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = action.ToLower(), OnBegin = "ACT.UI.BeginCustomSearch($('#sticky-one form'), true);", OnComplete = "ACT.UI.CompleteCustomSearch();" }, new { @style = "width: auto; padding: 0;" } ) )
         {
-
             <div class="left" style="width: 49%; margin-right: 1%;">
 
                 <div class="editor-label">
@@ -26,11 +25,12 @@
 
             <div class="right" style="width: 49%;">
 
-                <div class="editor-label">
-                    Reconciliation Status
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.OutstandingReasonId )
                 </div>
                 <div class="editor-field">
-                    @Html.EnumDropDownFor( model => model.ReconciliationStatus, false, true, new { @class = "chzn", @style = "width: 87%;" } )
+                    @Html.DropDownListFor( model => model.OutstandingReasonId, model => Model.OutstandingReasonOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.OutstandingReasonId )
                 </div>
 
             </div>

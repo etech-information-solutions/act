@@ -30,7 +30,7 @@ namespace ACT.UI.Controllers
         {
             using ( ClientLoadService service = new ClientLoadService() )
             {
-                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
+                csm.BalanceStatus = BalanceStatus.NotBalanced;
 
                 if ( givedata )
                 {
@@ -207,7 +207,7 @@ namespace ACT.UI.Controllers
                     csm.ToDate = toDate;
                     csm.FromDate = fromDate;
 
-                    List<ClientAuthorisationCustomModel> authCodes = aservice.List1( new PagingModel() { Take = int.MaxValue }, csm );
+                    List<ChepLoadCustomModel> authCodes = aservice.List1( new PagingModel() { Take = int.MaxValue }, csm );
 
                     return PartialView( "_AuthorisationCodesData", authCodes );
                 }

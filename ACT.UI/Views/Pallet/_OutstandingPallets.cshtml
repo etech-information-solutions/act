@@ -2,6 +2,7 @@
 
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
+@using ACT.Data.Models;
 @using ACT.Core.Models.Custom;
 
 @{
@@ -36,9 +37,6 @@
             <th data-name="Count">
                 #
             </th>
-            <th data-name="CreatedOn" data-column="cl.CreatedOn">
-                Imported/Created
-            </th>
             <th data-name="LoadDate" data-column="cl.LoadDate">
                 Load Date
             </th>
@@ -66,6 +64,15 @@
             <th data-name="Quantity" data-column="cl.Quantity">
                 Qty
             </th>
+            <th data-name="OutstandingReasonId" data-column="cl.OutstandingReasonId">
+                Outstanding Reason
+            </th>
+            <th data-name="Status" data-column="cl.Status">
+                Status
+            </th>
+            <th data-name="BalanceStatus" data-column="cl.BalanceStatus">
+                Balanced
+            </th>
             <th data-name="Actions">
                 Actions
             </th>
@@ -77,8 +84,9 @@
         {
             foreach ( var item in items )
             {
-                ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
                 PostingType postingType = ( PostingType ) item.PostingType;
+                ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
+                BalanceStatus balanceStatus = ( BalanceStatus ) item.BalanceStatus;
 
                 string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
 
@@ -86,9 +94,6 @@
 
                     <td width="1%">
                         @count
-                    </td>
-                    <td>
-                        @item.CreatedOn.ToString( "yyyy-MM-dd @ HH:mm tt" )
                     </td>
                     <td>
                         @item.EffectiveDate.Value.ToString( "yyyy-MM-dd" )
@@ -117,15 +122,58 @@
                     <td>
                         @item.Quantity
                     </td>
+                    <td width="15%">
+                        @item.OutstandingReason
+
+                        <div style="border-top: 1px dashed #7368e3; padding-top: 4px; margin-top: 10px;">
+
+                            @Html.ActionLink( "Edit", "EditOutstandingPallet", new { id = item.Id, returnView = "OutstandingPallets" }, new { @class = "edit", @rel = "tipsyS", @title = "Update outstanding reason?", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item-op" } )
+
+                            <a class="chat" data-sticky-one="1" data-target="#osp-@item.Id-comments" data-trigger="mouseover" data-arrow="center-right" data-title="Comments (@item.Comments.NullableCount())">
+                                Comments (@item.Comments.NullableCount())
+                            </a>
+                            <div id="osp-@item.Id-comments" class="none">
+
+                                <ul class="list">
+                                    @if ( item.Comments.NullableAny() )
+                                    {
+                                        foreach ( Comment c in item.Comments )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                @c.Details
+
+                                                <small class="block" style="font-size: 10px; text-align: right; font-style: italic;"> by @c.User.Name @c.User.Surname on @c.CreatedOn.ToString( "yyyy-MM-dd @HH:mm tt" )</small>
+                                                <div class="clear"></div>
+                                            </li>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <li>
+                                            No comments...
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+
+                        </div>
+
+                    </td>
+                    <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
+                        @status.GetDisplayText()
+                    </td>
+                    <td class="@(balanceStatus == BalanceStatus.Balanced ? "active" : "inactive")">
+                        @balanceStatus.GetDisplayText()
+                    </td>
                     <td width="5%">
 
                         <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
-                            @Html.ActionLink( "Details", "PoolingAgentDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            @Html.ActionLink( "Details", "PoolingAgentDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item-op" } )
 
                         </div>
 
-                        @Html.ActionLink( "Allocate", "AllocatePoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item-op" } )
+                        @Html.ActionLink( "Allocate", "AllocatePoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item-op", @style = "margin-left: 0;" } )
 
                     </td>
 
@@ -139,4 +187,3 @@
 </table>
 
 @Html.Partial( "_Paging" )
-

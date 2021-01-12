@@ -676,6 +676,7 @@
     <Content Include="Views\Pallet\_AllocatePoolingAgentData.cshtml" />
     <Content Include="Views\Pallet\_OutstandingPallets.cshtml" />
     <Content Include="Views\Shared\_OutstandingPallets1CustomSearch.cshtml" />
+    <Content Include="Views\Pallet\EditOutstandingPallet.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

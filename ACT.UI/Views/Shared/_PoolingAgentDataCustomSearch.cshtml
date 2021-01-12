@@ -12,12 +12,30 @@
 
         @using ( Ajax.BeginForm( action, new { }, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = action.ToLower(), OnBegin = "ACT.UI.BeginCustomSearch($('#sticky-one form'), true);", OnComplete = "ACT.UI.CompleteCustomSearch();" }, new { @style = "width: auto; padding: 0;" } ) )
         {
-            <div class="editor-label">
-                @Html.LabelFor( model => model.ClientId )
+            <div class="left" style="width: 49%; margin-right: 1%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.ClientId )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                </div>
+
             </div>
-            <div class="editor-field">
-                @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+
+            <div class="right" style="width: 49%;">
+
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.OutstandingReasonId )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.OutstandingReasonId, model => Model.OutstandingReasonOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.OutstandingReasonId )
+                </div>
+
             </div>
+
+            <div class="clear"></div>
 
             <div class="left" style="width: 49%; margin-right: 1%;">
 
@@ -25,7 +43,7 @@
                     @Html.LabelFor( model => model.BalanceStatus )
                 </div>
                 <div class="editor-field">
-                    @Html.EnumDropDownFor( model => model.BalanceStatus, false, true, new { @class = "chzn", @style = "width: 87%;" } )
+                    @Html.EnumDropDownFor( model => model.BalanceStatus, false, true, new { @class = "chzn", @style = "width: 98%;" } )
                 </div>
 
             </div>
@@ -36,7 +54,7 @@
                     Reconciliation Status
                 </div>
                 <div class="editor-field">
-                    @Html.EnumDropDownFor( model => model.ReconciliationStatus, false, true, new { @class = "chzn", @style = "width: 87%;" } )
+                    @Html.EnumDropDownFor( model => model.ReconciliationStatus, false, true, new { @class = "chzn", @style = "width: 98%;" } )
                 </div>
 
             </div>

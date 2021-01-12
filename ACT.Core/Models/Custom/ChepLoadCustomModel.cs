@@ -8,6 +8,7 @@ namespace ACT.Core.Models.Custom
     {
         public int Id { get; set; }
         public int ClientId { get; set; }
+        public int? OutstandingReasonId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -41,8 +42,15 @@ namespace ACT.Core.Models.Custom
 
         public virtual Client Client { get; set; }
         public int? DocumentCount { get; set; }
+        public int? CommentCount { get; set; }
+        public List<Comment> Comments { get; set; }
         public List<Document> Documents { get; set; }
 
         public string ClientName { get; set; }
+
+        public string OutstandingReason { get; set; }
+
+        public string AuthorisationCode { get; set; }
+        public string LoadNumber { get; set; }
     }
 }

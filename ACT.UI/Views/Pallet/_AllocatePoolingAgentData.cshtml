@@ -28,6 +28,7 @@
                     <th>Docket #</th>
                     <th>Ref #</th>
                     <th>Quantity</th>
+                    <th>Effective Date</th>
                     @*<th>Actions</th>*@
                 </tr>
             </thead>
@@ -64,9 +65,12 @@
                             <td>
                                 <input class="input" name="ChepLoadAllocations[@count].Quantity" placeholder="Enter Quantity" required="required" style="padding: 0 5px; width: 87%;" type="text" value="@item.Quantity" />
                             </td>
+                            <td>
+                                <input class="input date-picker" name="ChepLoadAllocations[@count].EffectiveDate" placeholder="Select Effective Date" required="required" style="padding: 0 5px; width: 87%;" type="text" value="@item.EffectiveDate" />
+                            </td>
                             @*<td width="5%">
-                                @Html.ActionLink( "Remove", "DeleteChepLoadAllocation", new { id = item.Id }, new { @class = "del", @data_delete = "1", @data_id = item.Id, @data_target = "#row-line-" + count, @data_refresh_target = "#tr-edit > td", @rel = "tipsyE", @title = "Remove this item?" } )
-                            </td>*@
+                                    @Html.ActionLink( "Remove", "DeleteChepLoadAllocation", new { id = item.Id }, new { @class = "del", @data_delete = "1", @data_id = item.Id, @data_target = "#row-line-" + count, @data_refresh_target = "#tr-edit > td", @rel = "tipsyE", @title = "Remove this item?" } )
+                                </td>*@
                         </tr>
 
                         count++;
@@ -94,8 +98,11 @@
                         <td>
                             <input class="input" name="ChepLoadAllocations[0].Quantity" placeholder="Enter Quantity" required="required" style="padding: 0 5px; width: 87%;" type="text" value="" />
                         </td>
+                        <td>
+                            <input class="input date-picker" name="ChepLoadAllocations[0].EffectiveDate" placeholder="Select Effective Date" required="required" style="padding: 0 5px; width: 87%;" type="text" value="" />
+                        </td>
                         @*<td width="5%">
-                        </td>*@
+                            </td>*@
                     </tr>
                 }
 

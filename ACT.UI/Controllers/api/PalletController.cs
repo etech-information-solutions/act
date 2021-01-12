@@ -26,7 +26,7 @@ namespace ACT.UI.Controllers.api
         [HttpGet]
         public List<SimpleOutstandingPallets> ListOutstandingPalletsPerClient( string email, string apikey )
         {
-            CustomSearchModel csm = new CustomSearchModel() { };
+            CustomSearchModel csm = new CustomSearchModel() { BalanceStatus = BalanceStatus.NotBalanced };
 
             List<SimpleOutstandingPallets> response = new List<SimpleOutstandingPallets>();
 
@@ -309,89 +309,9 @@ namespace ACT.UI.Controllers.api
         [HttpGet]
         public HttpResponseMessage OutstandingPallets( string email, string apikey )
         {
-            using ( ClientLoadService service = new ClientLoadService() )
-            {
-                service.CurrentUser = service.GetUser( email );
+            List<OutstandingPalletsModel> resp = baseC.GetOutstandingPallets( new PagingModel(), new CustomSearchModel(), email );
 
-                CustomSearchModel csm = new CustomSearchModel()
-                {
-                    ReconciliationStatus = ReconciliationStatus.Unreconciled
-                };
-
-                PagingModel pm = new PagingModel() { SortBy = "c.CompanyName", Sort = "ASC" };
-
-                List<ClientLoadCustomModel> model = service.List1( pm, csm );
-
-                if ( !model.NullableAny() )
-                {
-                    return Request.CreateResponse( HttpStatusCode.OK, model );
-                }
-
-                List<int?> clientIds = new List<int?>();
-                List<OutstandingPalletsModel> resp = new List<OutstandingPalletsModel>();
-
-                foreach ( ClientLoadCustomModel item in model )
-                {
-                    if ( clientIds.Any( c => c == item.ClientSiteId ) ) continue;
-
-                    clientIds.Add( item.ClientId );
-
-                    OutstandingPalletsModel m = new OutstandingPalletsModel()
-                    {
-                        ClientLoad = item,
-                        OutstandingReasons = GetOutstandingReasons( item.ClientId, model ),
-                        GrandTotal = new OutstandingReasonModel()
-                        {
-                            Description = "Grand Total",
-                            To30Days = model.Where( c => c.ClientId == item.ClientId && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 30 ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                            To60Days = model.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 60 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                            To90Days = model.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 90 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                            To120Days = model.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 120 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                            To183Days = model.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 183 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                            To270Days = model.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 270 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                            To365Days = model.Where( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 365 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                            GrandTotal = model.Where( c => c.ClientId == item.ClientId ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                        }
-                    };
-
-                    resp.Add( m );
-                }
-
-                return Request.CreateResponse( HttpStatusCode.OK, resp );
-            }
-        }
-
-        private List<OutstandingReasonModel> GetOutstandingReasons( int clientId, List<ClientLoadCustomModel> items )
-        {
-            List<string> outstandingIds = new List<string>();
-
-            List<OutstandingReasonModel> outstandingReasons = new List<OutstandingReasonModel>();
-
-            foreach ( ClientLoadCustomModel item in items )
-            {
-                if ( item.ClientId != clientId ) continue;
-
-                if ( outstandingIds.Any( c => c == item.OutstandingReasonId + "-" + clientId ) ) continue;
-
-                outstandingIds.Add( item.OutstandingReasonId + "-" + clientId );
-
-                OutstandingReasonModel r = new OutstandingReasonModel()
-                {
-                    Description = item.OutstandingReason,
-                    To30Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 30 ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                    To60Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 60 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                    To90Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 90 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                    To120Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 120 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                    To183Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 183 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                    To270Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 270 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                    To365Days = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( item.LoadDate ?? item.CreatedOn ) ).Days <= 365 ) ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                    GrandTotal = items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId ).Sum( s => s.ChepNewQuantity - s.NewQuantity ),
-                };
-
-                outstandingReasons.Add( r );
-            }
-
-            return outstandingReasons;
+            return Request.CreateResponse( HttpStatusCode.OK, resp );
         }
 
         [HttpGet]
@@ -513,34 +433,4 @@ namespace ACT.UI.Controllers.api
             }
         }
     }
-}
-
-public class OutstandingPalletsModel
-{
-    public ClientLoadCustomModel ClientLoad { get; set; }
-
-    public OutstandingReasonModel GrandTotal { get; set; }
-
-    public List<OutstandingReasonModel> OutstandingReasons { get; set; }
-}
-
-public class OutstandingReasonModel
-{
-    public string Description { get; set; }
-
-    public decimal? GrandTotal { get; set; }
-
-    public decimal? To30Days { get; set; }
-
-    public decimal? To60Days { get; set; }
-
-    public decimal? To90Days { get; set; }
-
-    public decimal? To120Days { get; set; }
-
-    public decimal? To183Days { get; set; }
-
-    public decimal? To270Days { get; set; }
-
-    public decimal? To365Days { get; set; }
 }

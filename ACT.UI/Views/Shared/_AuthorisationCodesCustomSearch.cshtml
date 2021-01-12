@@ -18,19 +18,12 @@
 
         @using ( Ajax.BeginForm( action, new { }, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = action.ToLower(), OnBegin = "ACT.UI.BeginCustomSearch($('#sticky-one form'), true);", OnComplete = "ACT.UI.CompleteCustomSearch();" }, new { @style = "width: auto; padding: 0;" } ) )
         {
-            <div class="editor-label">
-                @Html.LabelFor( model => model.ClientId )
-            </div>
-            <div class="editor-field">
-                @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-            </div>
-
             <div class="left" style="width: 48%;">
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.SiteId )
+                    @Html.LabelFor( model => model.ClientId )
                 </div>
                 <div class="editor-field">
-                    @Html.DropDownListFor( model => model.SiteId, model => model.SiteOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
                 </div>
             </div>
 

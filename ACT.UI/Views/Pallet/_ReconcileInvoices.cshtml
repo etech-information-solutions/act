@@ -6,9 +6,6 @@
     ViewBag.ViewName = "_ReconcileInvoice";
 }
 
-
-@Html.Partial( "_Notification" )
-
 <div class="graph-search grouped-area" style="margin-left: -10px; margin-right: -10px; margin-top: -10px; border: 0; border-bottom: 20px solid #f5f5f5; margin-bottom: 0;">
 
     <b class="title">
@@ -53,6 +50,8 @@
     </a>
 
 </div>
+
+@Html.Partial( "_Notification" )
 
 <p style="padding: 10px 0; border-bottom: 1px solid #ddd;">
     @Html.ActionLink( "Add", "AddInvoice", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new invoice?", @data_edit = "1", @data_id = 0, @data_target = "#reconcileinvoices" } )

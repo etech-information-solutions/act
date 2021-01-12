@@ -16,11 +16,11 @@ namespace ACT.UI.Models
 
         [Required]
         [Display( Name = "Client Site" )]
-        public int ClientSiteId { get; set; }
+        public int? ClientSiteId { get; set; }
 
         [Required]
         [Display( Name = "Transporter" )]
-        public int TransporterId { get; set; }
+        public int? TransporterId { get; set; }
 
         [Display( Name = "Code" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]

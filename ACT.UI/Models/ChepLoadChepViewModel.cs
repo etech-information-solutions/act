@@ -38,6 +38,9 @@ namespace ACT.Core.Models.Custom
         [Display( Name = "Quantity" )]
         public int Quantity { get; set; }
 
+        [Display( Name = "Effective Date" )]
+        public DateTime? EffectiveDate { get; set; }
+
         public List<ChepLoadChepViewModel> ChepLoadAllocations { get; set; }
 
         #endregion

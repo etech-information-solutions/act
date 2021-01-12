@@ -6,9 +6,6 @@
     ViewBag.ViewName = "_ReconcileLoad";
 }
 
-
-@Html.Partial( "_Notification" )
-
 <div class="graph-search grouped-area" style="margin-left: -10px; margin-right: -10px; margin-top: -10px; border: 0; border-bottom: 20px solid #f5f5f5; margin-bottom: 0;">
 
     <b class="title">
@@ -53,6 +50,8 @@
     </a>
 
 </div>
+
+@Html.Partial( "_Notification" )
 
 <p style="margin: 15px 0; font-weight: bold; position: relative;">
     <img alt="Tip" src="@Url.Content("~/Images/info.png")" style="margin-right: 5px;" />

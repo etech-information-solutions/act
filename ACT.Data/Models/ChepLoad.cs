@@ -18,13 +18,14 @@ namespace ACT.Data.Models
         public ChepLoad()
         {
             this.ChepClients = new HashSet<ChepClient>();
-            this.Disputes = new HashSet<Dispute>();
-            this.Tasks = new HashSet<Task>();
             this.ChepLoadCheps = new HashSet<ChepLoadChep>();
+            this.Tasks = new HashSet<Task>();
+            this.Disputes = new HashSet<Dispute>();
         }
     
         public int Id { get; set; }
         public int ClientId { get; set; }
+        public Nullable<int> OutstandingReasonId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -59,11 +60,12 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }
         public virtual Client Client { get; set; }
+        public virtual OutstandingReason OutstandingReason { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Dispute> Disputes { get; set; }
+        public virtual ICollection<ChepLoadChep> ChepLoadCheps { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Tasks { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ChepLoadChep> ChepLoadCheps { get; set; }
+        public virtual ICollection<Dispute> Disputes { get; set; }
     }
 }

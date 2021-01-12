@@ -38,10 +38,23 @@ namespace ACT.Data.Models
         public string ActionBy { get; set; }
         public bool Imported { get; set; }
         public int Status { get; set; }
+        public string Location { get; set; }
+        public string Action { get; set; }
+        public string OriginalDocketNumber { get; set; }
+        public string OtherReference { get; set; }
+        public Nullable<System.DateTime> EffectiveDate { get; set; }
+        public Nullable<System.DateTime> ShipDate { get; set; }
+        public Nullable<System.DateTime> DelilveryDate { get; set; }
+        public Nullable<decimal> DaysLeft { get; set; }
+        public Nullable<System.DateTime> CorrectionRequestDate { get; set; }
+        public string TransactionType { get; set; }
+        public string DisputeComment { get; set; }
+        public string DataSource { get; set; }
+        public Nullable<int> HasDocket { get; set; }
     
+        public virtual ChepLoad ChepLoad { get; set; }
         public virtual Product Product1 { get; set; }
         public virtual User User { get; set; }
         public virtual User User1 { get; set; }
-        public virtual ChepLoad ChepLoad { get; set; }
     }
 }

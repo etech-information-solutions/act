@@ -22,7 +22,7 @@ namespace ACT.Core.Services
         /// <returns></returns>
         public List<Comment> List( int objectId, string objectType )
         {
-            return context.Comments.Where( d => d.ObjectId == objectId && d.ObjectType == objectType && d.Status == ( int ) Status.Active ).ToList();
+            return context.Comments.Include( "User" ).Where( d => d.ObjectId == objectId && d.ObjectType == objectType && d.Status == ( int ) Status.Active ).ToList();
         }
     }
 }

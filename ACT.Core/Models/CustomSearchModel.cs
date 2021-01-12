@@ -56,7 +56,7 @@ namespace ACT.Core.Models
         {
             get; set;
         }
-     
+
         /// <summary>
         /// Can be used as a selected Transporter
         /// </summary>
@@ -201,7 +201,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// Can be used to indicate Province
         /// </summary>
-        [Display(Name = "Province")]
+        [Display( Name = "Province" )]
         public int ProvinceId
         {
             get; set;
@@ -392,7 +392,7 @@ namespace ACT.Core.Models
                 {
                     RoleType role = service.CurrentUser.RoleType;
                     role = role == RoleType.PSP ? role : RoleType.All;
-                    return service.List(true, role );
+                    return service.List( true, role );
                 }
             }
         }
@@ -518,8 +518,6 @@ namespace ACT.Core.Models
                 case "ClientKPI":
                 case "ReconcileLoads":
                 case "ReconcileInvoice":
-                case "PoolingAgentData":
-                //case "OutstandingPallets":
 
                     using ( ClientService cservice = new ClientService() )
                     {
@@ -532,7 +530,6 @@ namespace ACT.Core.Models
                 case "Disputes":
                 case "Exceptions":
                 case "DeliveryNotes":
-                case "OutstandingPallets":
 
                     using ( SiteService sservice = new SiteService() )
                     using ( ClientService cservice = new ClientService() )
@@ -633,6 +630,18 @@ namespace ACT.Core.Models
                         VehicleOptions = vservice.List( true );
                         //ClientSiteOptions = csservice.List( true );
                         TransporterOptions = tservice.List( true );
+                        OutstandingReasonOptions = urservice.List( true );
+                    }
+
+                    break;
+
+                case "PoolingAgentData":
+                case "OutstandingPallets":
+
+                    using ( ClientService cservice = new ClientService() )
+                    using ( OutstandingReasonService urservice = new OutstandingReasonService() )
+                    {
+                        ClientOptions = cservice.List( true );
                         OutstandingReasonOptions = urservice.List( true );
                     }
 

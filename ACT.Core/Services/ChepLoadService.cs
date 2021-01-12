@@ -42,6 +42,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmStatus", ( int ) csm.Status ) },
                 { new SqlParameter( "csmBalanceStatus", ( int ) csm.BalanceStatus ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmOutstandingReasonId", csm.OutstandingReasonId ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
@@ -54,13 +55,14 @@ namespace ACT.Core.Services
                                 COUNT(1) AS [Total]
                              FROM
                                 [dbo].[ChepLoad] cl
-                                INNER JOIN [dbo].[Client] c ON c.Id=cl.ClientId";
+                                INNER JOIN [dbo].[Client] c ON c.Id=cl.ClientId
+                                LEFT OUTER JOIN [dbo].[OutstandingReason] r ON r.Id=cl.OutstandingReasonId";
 
             // WHERE
 
             #region WHERE
 
-            query = $"{query} WHERE (1=1)";
+            query = $"{ query} WHERE (1=1)";
 
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
@@ -79,11 +81,16 @@ namespace ACT.Core.Services
             }
             if ( csm.BalanceStatus != BalanceStatus.None )
             {
+                query = $"{query} AND (cl.Quantity > 0)";
                 query = $"{query} AND (cl.BalanceStatus=@csmBalanceStatus)";
             }
             if ( csm.ReconciliationStatus != ReconciliationStatus.All )
             {
                 query = $"{query} AND (cl.Status=@csmReconciliationStatus)";
+            }
+            if ( csm.OutstandingReasonId > 0 )
+            {
+                query = $"{query} AND (cl.OutstandingReasonId=@csmOutstandingReasonId)";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -134,7 +141,8 @@ namespace ACT.Core.Services
                                                   c.[AdminPerson] LIKE '%{1}%' OR
                                                   c.[CompanyName] LIKE '%{1}%' OR
                                                   c.[ChepReference] LIKE '%{1}%' OR
-                                                  c.[CompanyRegistrationNumber] LIKE '%{1}%'
+                                                  c.[CompanyRegistrationNumber] LIKE '%{1}%' OR
+                                                  r.[Description] LIKE '%{1}%'
                                                  ) ", query, csm.Query.Trim() );
             }
 
@@ -170,6 +178,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmStatus", ( int ) csm.Status ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmBalanceStatus", ( int ) csm.BalanceStatus ) },
+                { new SqlParameter( "csmOutstandingReasonId", csm.OutstandingReasonId ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
@@ -180,11 +189,14 @@ namespace ACT.Core.Services
 
             string query = @"SELECT
                                 cl.*,
-                                c.CompanyName AS [ClientName],
-                                (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ChepLoad') AS [DocumentCount]
+                                c.[CompanyName] AS [ClientName],
+                                r.[Description] AS [OutstandingReason],
+                                (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ChepLoad') AS [DocumentCount],
+                                (SELECT COUNT(1) FROM [dbo].[Comment] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ChepLoad') AS [CommentCount]
                              FROM
                                 [dbo].[ChepLoad] cl
-                                INNER JOIN [dbo].[Client] c ON c.Id=cl.ClientId";
+                                INNER JOIN [dbo].[Client] c ON c.Id=cl.ClientId
+                                LEFT OUTER JOIN [dbo].[OutstandingReason] r ON r.Id=cl.OutstandingReasonId";
 
             // WHERE
 
@@ -209,11 +221,16 @@ namespace ACT.Core.Services
             }
             if ( csm.BalanceStatus != BalanceStatus.None )
             {
+                query = $"{query} AND (cl.Quantity > 0)";
                 query = $"{query} AND (cl.BalanceStatus=@csmBalanceStatus)";
             }
             if ( csm.ReconciliationStatus != ReconciliationStatus.All )
             {
                 query = $"{query} AND (cl.Status=@csmReconciliationStatus)";
+            }
+            if ( csm.OutstandingReasonId > 0 )
+            {
+                query = $"{query} AND (cl.OutstandingReasonId=@csmOutstandingReasonId)";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -264,7 +281,8 @@ namespace ACT.Core.Services
                                                   c.[AdminPerson] LIKE '%{1}%' OR
                                                   c.[CompanyName] LIKE '%{1}%' OR
                                                   c.[ChepReference] LIKE '%{1}%' OR
-                                                  c.[CompanyRegistrationNumber] LIKE '%{1}%'
+                                                  c.[CompanyRegistrationNumber] LIKE '%{1}%' OR
+                                                  r.[Description] LIKE '%{1}%'
                                                  ) ", query, csm.Query.Trim() );
             }
 
@@ -285,6 +303,14 @@ namespace ACT.Core.Services
                 foreach ( ChepLoadCustomModel item in model.Where( p => p.DocumentCount > 0 ) )
                 {
                     item.Documents = context.Documents.Where( d => d.ObjectId == item.Id && d.ObjectType == "ChepLoad" ).ToList();
+                }
+            }
+
+            if ( model.NullableAny( p => p.CommentCount > 0 ) )
+            {
+                foreach ( ChepLoadCustomModel item in model.Where( p => p.CommentCount > 0 ) )
+                {
+                    item.Comments = context.Comments.Include( "User" ).Where( d => d.ObjectId == item.Id && d.ObjectType == "ChepLoad" ).ToList();
                 }
             }
 
@@ -344,6 +370,27 @@ namespace ACT.Core.Services
         }
 
         /// <summary>
+        /// Gets a list of ChepLoads using the specified Ref #
+        /// </summary>
+        /// <param name="reference"></param>
+        /// <returns></returns>
+        public List<ChepLoad> ListByReference( string reference, bool specific )
+        {
+            return context.ChepLoads.Where( ch => ch.Ref.Trim() == reference.Trim() ).ToList();
+        }
+
+        /// <summary>
+        /// Gets a ChepLoad using the specified clientId and docketNumber
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="docketNumber"></param>
+        /// <returns></returns>
+        public ChepLoad Get( int clientId, string docketNumber )
+        {
+            return context.ChepLoads.FirstOrDefault( ch => ch.ClientId == clientId && ch.DocketNumber.Trim() == docketNumber.Trim() );
+        }
+
+        /// <summary>
         /// Gets a ChepLoad using the specified clientId, Transaction Type and docketNumber
         /// </summary>
         /// <param name="clientId"></param>
@@ -396,6 +443,15 @@ namespace ACT.Core.Services
         public List<ChepLoad> ListDocketNumberAndReference( string docketNumber, string reference )
         {
             return context.ChepLoads.Where( ch => ch.DocketNumber.Trim() == docketNumber.Trim() || ch.Ref.Trim() == reference.Trim() || ch.OtherRef.Trim() == reference.Trim() ).ToList();
+        }
+
+        /// <summary>
+        /// Gets a list of unreconcilled ChepLoads that can reconcile itself
+        /// </summary>
+        /// <returns></returns>
+        public List<ChepLoad> GetAutoReconcilliableLoads()
+        {
+            return context.ChepLoads.Where( ch => ch.Status == ( int ) ReconciliationStatus.Unreconciled && context.ChepLoads.Any( a => a.Ref.Trim() == ch.DocketNumber.Trim() ) ).ToList();
         }
     }
 }
