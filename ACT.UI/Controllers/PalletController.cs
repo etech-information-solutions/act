@@ -335,7 +335,8 @@ namespace ACT.UI.Controllers
                 return View( model );
             }
 
-            int count = 0,
+            int line = 0,
+                count = 0,
                 errors = 0,
                 skipped = 0,
                 created = 0,
@@ -357,6 +358,10 @@ namespace ACT.UI.Controllers
                         break;
                     }
 
+                    line++;
+
+                    if ( line == 1 ) continue;
+
                     cQuery = uQuery = string.Empty;
 
                     count++;
@@ -374,12 +379,81 @@ namespace ACT.UI.Controllers
 
                     int.TryParse( load[ 13 ].Trim(), out int qty );
 
+                    string shipmentDate1 = string.Empty,
+                           deliveryDate1 = string.Empty,
+                           effectiveDate1 = string.Empty,
+                           createDate1 = string.Empty;
+
+                    if ( !DateTime.TryParse( load[ 17 ], out DateTime shipmentDate ) )
+                    {
+                        if ( !DateTime.TryParseExact( load[ 17 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out shipmentDate ) )
+                        {
+                            shipmentDate1 = "NULL";
+                        }
+                        else
+                        {
+                            shipmentDate1 = $"'{shipmentDate}'";
+                        }
+                    }
+                    else
+                    {
+                        shipmentDate1 = $"'{shipmentDate}'";
+                    }
+
+                    if ( !DateTime.TryParse( load[ 18 ], out DateTime deliveryDate ) )
+                    {
+                        if ( !DateTime.TryParseExact( load[ 18 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out deliveryDate ) )
+                        {
+                            deliveryDate1 = "NULL";
+                        }
+                        else
+                        {
+                            deliveryDate1 = $"'{deliveryDate}'";
+                        }
+                    }
+                    else
+                    {
+                        deliveryDate1 = $"'{deliveryDate}'";
+                    }
+
+                    if ( !DateTime.TryParse( load[ 19 ], out DateTime effectiveDate ) )
+                    {
+                        if ( !DateTime.TryParseExact( load[ 19 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out effectiveDate ) )
+                        {
+                            effectiveDate1 = "NULL";
+                        }
+                        else
+                        {
+                            effectiveDate1 = $"'{effectiveDate}'";
+                        }
+                    }
+                    else
+                    {
+                        effectiveDate1 = $"'{effectiveDate}'";
+                    }
+
+                    if ( !DateTime.TryParse( load[ 20 ], out DateTime createDate ) )
+                    {
+                        if ( !DateTime.TryParseExact( load[ 20 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out createDate ) )
+                        {
+                            createDate1 = "NULL";
+                        }
+                        else
+                        {
+                            createDate1 = $"'{createDate}'";
+                        }
+                    }
+                    else
+                    {
+                        createDate1 = $"'{createDate}'";
+                    }
+
                     if ( l == null )
                     {
                         #region Create Chep Load
 
-                        cQuery = $" {cQuery} INSERT INTO [dbo].[ChepLoad] ([ClientId],[CreatedOn],[ModfiedOn],[ModifiedBy],[ChepStatus],[TransactionType],[DocketNumber],[OriginalDocketNumber],[UMI],[LocationId],[Location],[OtherPartyId],[OtherParty],[OtherPartyCountry],[EquipmentCode],[Equipment],[Quantity],[Ref],[OtherRef],[BatchRef],[ShipmentDate],[DeliveryDate],[EffectiveDate],[CreateDate],[CreatedBy],[InvoiceNumber],[Reason],[DataSource],[BalanceStatus],[Status],[PostingType]) ";
-                        cQuery = $" {cQuery} VALUES ({model.ClientId},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}',{qty},'{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}','{load[ 17 ]}','{load[ 18 ]}','{load[ 19 ]}','{load[ 20 ]}','{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) ReconciliationStatus.Unreconciled},{( int ) ReconciliationStatus.Unreconciled},{( int ) PostingType.Import}) ";
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[ChepLoad] ([ClientId],[CreatedOn],[ModifiedOn],[ModifiedBy],[ChepStatus],[TransactionType],[DocketNumber],[OriginalDocketNumber],[UMI],[LocationId],[Location],[OtherPartyId],[OtherParty],[OtherPartyCountry],[EquipmentCode],[Equipment],[Quantity],[Ref],[OtherRef],[BatchRef],[ShipmentDate],[DeliveryDate],[EffectiveDate],[CreateDate],[CreatedBy],[InvoiceNumber],[Reason],[DataSource],[BalanceStatus],[Status],[PostingType]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}',{qty},'{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}',{shipmentDate1},{deliveryDate1},{effectiveDate1},{createDate1},'{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) ReconciliationStatus.Unreconciled},{( int ) ReconciliationStatus.Unreconciled},{( int ) PostingType.Import}) ";
 
                         #endregion
 
@@ -416,10 +490,10 @@ namespace ACT.UI.Controllers
                                                     [Ref]='{load[ 14 ]}',
                                                     [OtherRef]='{load[ 15 ]}',
                                                     [BatchRef]='{load[ 16 ]}',
-                                                    [ShipmentDate]='{load[ 17 ]}',
-                                                    [DeliveryDate]='{load[ 18 ]}',
-                                                    [EffectiveDate]='{load[ 19 ]}',
-                                                    [CreateDate]='{load[ 20 ]}',
+                                                    [ShipmentDate]={shipmentDate1},
+                                                    [DeliveryDate]={deliveryDate1},
+                                                    [EffectiveDate]={effectiveDate1},
+                                                    [CreateDate]={createDate1},
                                                     [CreatedBy]='{load[ 21 ]}',
                                                     [InvoiceNumber]='{load[ 22 ]}',
                                                     [Reason]='{load[ 23 ]}',
@@ -446,7 +520,7 @@ namespace ACT.UI.Controllers
                 uQuery = string.Empty;
             }
 
-            AutoReconcileLoads();
+            //AutoReconcileLoads();
 
             Notify( $"{created} loads were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.", NotificationType.Success );
 
@@ -3100,6 +3174,7 @@ namespace ACT.UI.Controllers
             }
 
             using ( DisputeService dservice = new DisputeService() )
+            using ( ProductService pservice = new ProductService() )
             using ( ChepLoadService clservice = new ChepLoadService() )
             {
                 //if ( dservice.Exist( model.DocketNumber ) )
@@ -3110,12 +3185,20 @@ namespace ACT.UI.Controllers
                 //    return View( model );
                 //}
 
+                ChepLoad ch = null;
+                Product p = pservice.GetByName( model.Equipment?.Trim() );
+
                 if ( !model.ChepLoadId.HasValue )
                 {
                     // Attempt to locate ChepLoad using the specified DocketNumber
-                    ChepLoad cl = clservice.GetByDocketNumber( model.DocketNumber );
+                    ch = clservice.GetByDocketNumber( model.DocketNumber );
 
-                    model.ChepLoadId = ( cl != null ) ? cl.Id : model.ChepLoadId;
+                    if ( ch == null )
+                    {
+                        ch = clservice.GetByDocketNumber( model.OriginalDocketNumber );
+                    }
+
+                    model.ChepLoadId = ( ch != null ) ? ch.Id : model.ChepLoadId;
                 }
 
                 model.ActionById = ( !model.ActionById.HasValue ) ? CurrentUser.Id : model.ActionById;
@@ -3124,30 +3207,49 @@ namespace ACT.UI.Controllers
 
                 Dispute dispute = new Dispute()
                 {
+                    Imported = false,
+                    ProductId = p?.Id,
+                    Action = model.Action,
                     Sender = model.Sender,
-                    Product = model.Product,
+                    Product = model.Equipment,
+                    ActionBy = model.ActionBy,
                     Declarer = model.Declarer,
                     Quantity = model.Quantity,
                     Receiver = model.Receiver,
+                    DaysLeft = model.DaysLeft,
+                    Location = model.Location,
+                    ShipDate = model.ShipDate,
                     Equipment = model.Equipment,
                     TDNNumber = model.TDNNumber,
                     OtherParty = model.OtherParty,
                     Status = ( int ) model.Status,
                     ResolvedOn = model.ResolvedOn,
                     ChepLoadId = model.ChepLoadId,
+                    DataSource = model.DataSource,
+                    LocationId = model.LocationId,
                     Reference = model.DocketNumber,
                     ActionedById = model.ActionById,
                     DocketNumber = model.DocketNumber,
                     DisputeEmail = model.DisputeEmail,
                     ResolvedById = model.ResolvedById,
+                    HasDocket = ( ch != null ) ? 1 : 0,
                     DisputeReason = model.DisputeReason,
+                    DelilveryDate = model.DelilveryDate,
+                    EffectiveDate = model.EffectiveDate,
+                    EquipmentCode = model.EquipmentCode,
+                    DisputeComment = model.DisputeComment,
+                    OtherReference = model.OtherReference,
+                    TransactionType = model.TransactionType,
+                    OriginalDocketNumber = model.OriginalDocketNumber,
+                    CorrectionRequestDate = model.CorrectionRequestDate,
+                    CorrectionRequestNumber = model.CorrectionRequestNumber,
                 };
 
                 dservice.Create( dispute );
 
                 Notify( "The Dispute was successfully created.", NotificationType.Success );
 
-                return RedirectToAction( "Disputes" );
+                return Disputes( new PagingModel(), new CustomSearchModel() );
             }
         }
 
@@ -3172,7 +3274,6 @@ namespace ACT.UI.Controllers
                     Id = dispute.Id,
                     EditMode = true,
                     Sender = dispute.Sender,
-                    Product = dispute.Product,
                     Declarer = dispute.Declarer,
                     Receiver = dispute.Receiver,
                     TDNNumber = dispute.TDNNumber,
@@ -3187,6 +3288,24 @@ namespace ACT.UI.Controllers
                     DisputeEmail = dispute.DisputeEmail,
                     DisputeReason = dispute.DisputeReason,
                     Status = ( DisputeStatus ) dispute.Status,
+                    Action = dispute.Action,
+                    ActionBy = dispute.ActionBy,
+                    CorrectionRequestDate = dispute.CorrectionRequestDate,
+                    DataSource = dispute.DataSource,
+                    DaysLeft = ( int ) dispute.DaysLeft,
+                    DelilveryDate = dispute.DelilveryDate,
+                    DisputeComment = dispute.DisputeComment,
+                    EffectiveDate = dispute.EffectiveDate,
+                    Location = dispute.Location,
+                    OriginalDocketNumber = dispute.OriginalDocketNumber,
+                    OtherReference = dispute.OtherReference,
+                    Reference = dispute.Reference,
+                    ShipDate = dispute.ShipDate,
+                    TransactionType = dispute.TransactionType,
+                    LocationId = dispute.LocationId,
+                    EquipmentCode = dispute.EquipmentCode,
+                    CorrectionRequestNumber = dispute.CorrectionRequestNumber,
+
                 };
 
                 return View( model );
@@ -3200,6 +3319,7 @@ namespace ACT.UI.Controllers
         public ActionResult EditDispute( DisputeViewModel model )
         {
             using ( DisputeService service = new DisputeService() )
+            using ( ProductService pservice = new ProductService() )
             using ( ChepLoadService clservice = new ChepLoadService() )
             {
                 if ( !ModelState.IsValid )
@@ -3226,35 +3346,61 @@ namespace ACT.UI.Controllers
                 //    return View( model );
                 //}
 
+                ChepLoad ch = null;
+                Product p = pservice.GetByName( model.Equipment?.Trim() );
+
                 if ( !model.ChepLoadId.HasValue )
                 {
                     // Attempt to locate ChepLoad using the specified DocketNumber
-                    ChepLoad cl = clservice.GetByDocketNumber( model.DocketNumber );
+                    ch = clservice.GetByDocketNumber( model.DocketNumber );
 
-                    model.ChepLoadId = ( cl != null ) ? cl.Id : model.ChepLoadId;
+                    if ( ch == null )
+                    {
+                        ch = clservice.GetByDocketNumber( model.OriginalDocketNumber );
+                    }
+
+                    model.ChepLoadId = ( ch != null ) ? ch.Id : model.ChepLoadId;
                 }
 
                 model.ActionById = ( !model.ActionById.HasValue ) ? CurrentUser.Id : model.ActionById;
                 model.ResolvedOn = ( model.Status != DisputeStatus.Active && !model.ResolvedOn.HasValue ) ? DateTime.Now : model.ResolvedOn;
                 model.ResolvedById = ( model.Status != DisputeStatus.Active && !model.ResolvedById.HasValue ) ? CurrentUser.Id : model.ResolvedById;
 
+                dispute.ProductId = p?.Id;
+                dispute.Action = model.Action;
                 dispute.Sender = model.Sender;
-                dispute.Product = model.Product;
+                dispute.Product = model.Equipment;
+                dispute.ActionBy = model.ActionBy;
                 dispute.Declarer = model.Declarer;
                 dispute.Quantity = model.Quantity;
                 dispute.Receiver = model.Receiver;
+                dispute.DaysLeft = model.DaysLeft;
+                dispute.Location = model.Location;
+                dispute.ShipDate = model.ShipDate;
                 dispute.Equipment = model.Equipment;
                 dispute.TDNNumber = model.TDNNumber;
                 dispute.OtherParty = model.OtherParty;
                 dispute.Status = ( int ) model.Status;
                 dispute.ResolvedOn = model.ResolvedOn;
                 dispute.ChepLoadId = model.ChepLoadId;
+                dispute.DataSource = model.DataSource;
+                dispute.LocationId = model.LocationId;
                 dispute.Reference = model.DocketNumber;
                 dispute.ActionedById = model.ActionById;
                 dispute.DocketNumber = model.DocketNumber;
                 dispute.DisputeEmail = model.DisputeEmail;
                 dispute.ResolvedById = model.ResolvedById;
+                dispute.HasDocket = ( ch != null ) ? 1 : 0;
                 dispute.DisputeReason = model.DisputeReason;
+                dispute.EquipmentCode = model.EquipmentCode;
+                dispute.DelilveryDate = model.DelilveryDate;
+                dispute.EffectiveDate = model.EffectiveDate;
+                dispute.DisputeComment = model.DisputeComment;
+                dispute.OtherReference = model.OtherReference;
+                dispute.TransactionType = model.TransactionType;
+                dispute.OriginalDocketNumber = model.OriginalDocketNumber;
+                dispute.CorrectionRequestDate = model.CorrectionRequestDate;
+                dispute.CorrectionRequestNumber = model.CorrectionRequestNumber;
 
                 service.Update( dispute );
 
@@ -3300,6 +3446,246 @@ namespace ACT.UI.Controllers
 
                 return Disputes( new PagingModel(), new CustomSearchModel() );
             }
+        }
+
+        // GET: Client/ImportDispute
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportDisputes()
+        {
+            DisputeViewModel model = new DisputeViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        // POST: Client/ImportDispute
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportDisputes( DisputeViewModel model )
+        {
+            if ( model.File == null )
+            {
+                Notify( "Please select a file to upload and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            int line = 0,
+                count = 0,
+                errors = 0,
+                skipped = 0,
+                created = 0,
+                updated = 0;
+
+            string cQuery, uQuery;
+
+            using ( DisputeService dservice = new DisputeService() )
+            using ( ProductService pservice = new ProductService() )
+            using ( ChepLoadService chservice = new ChepLoadService() )
+            using ( TextFieldParser parser = new TextFieldParser( model.File.InputStream ) )
+            {
+                parser.Delimiters = new string[] { "," };
+
+                while ( true )
+                {
+                    string[] load = parser.ReadFields();
+
+                    if ( load == null )
+                    {
+                        break;
+                    }
+
+                    line++;
+
+                    if ( line == 1 ) continue;
+
+                    cQuery = uQuery = string.Empty;
+
+                    count++;
+
+                    if ( load.NullableCount() < 2 )
+                    {
+                        skipped++;
+
+                        continue;
+                    }
+
+                    load = load.ToSQLSafe();
+
+                    Dispute l = dservice.GetByDocketNumber( load[ 6 ] );
+
+                    string shipmentDate1 = string.Empty,
+                           deliveryDate1 = string.Empty,
+                           effectiveDate1 = string.Empty,
+                           correctionRequestDate1 = string.Empty;
+
+                    #region Dates
+
+                    if ( !DateTime.TryParse( load[ 10 ], out DateTime shipmentDate ) )
+                    {
+                        if ( !DateTime.TryParseExact( load[ 10 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out shipmentDate ) )
+                        {
+                            shipmentDate1 = "NULL";
+                        }
+                        else
+                        {
+                            shipmentDate1 = $"'{shipmentDate}'";
+                        }
+                    }
+                    else
+                    {
+                        shipmentDate1 = $"'{shipmentDate}'";
+                    }
+
+                    if ( !DateTime.TryParse( load[ 11 ], out DateTime deliveryDate ) )
+                    {
+                        if ( !DateTime.TryParseExact( load[ 11 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out deliveryDate ) )
+                        {
+                            deliveryDate1 = "NULL";
+                        }
+                        else
+                        {
+                            deliveryDate1 = $"'{deliveryDate}'";
+                        }
+                    }
+                    else
+                    {
+                        deliveryDate1 = $"'{deliveryDate}'";
+                    }
+
+                    if ( !DateTime.TryParse( load[ 9 ], out DateTime effectiveDate ) )
+                    {
+                        if ( !DateTime.TryParseExact( load[ 9 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out effectiveDate ) )
+                        {
+                            effectiveDate1 = "NULL";
+                        }
+                        else
+                        {
+                            effectiveDate1 = $"'{effectiveDate}'";
+                        }
+                    }
+                    else
+                    {
+                        effectiveDate1 = $"'{effectiveDate}'";
+                    }
+
+                    if ( !DateTime.TryParse( load[ 17 ], out DateTime correctionRequestDate ) )
+                    {
+                        if ( !DateTime.TryParseExact( load[ 17 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out correctionRequestDate ) )
+                        {
+                            correctionRequestDate1 = "NULL";
+                        }
+                        else
+                        {
+                            correctionRequestDate1 = $"'{correctionRequestDate}'";
+                        }
+                    }
+                    else
+                    {
+                        correctionRequestDate1 = $"'{correctionRequestDate}'";
+                    }
+
+                    #endregion
+
+                    ChepLoad ch = null;
+                    Product p = pservice.GetByName( load[ 13 ].Trim() );
+
+                    if ( !model.ChepLoadId.HasValue )
+                    {
+                        // Attempt to locate ChepLoad using the specified DocketNumber
+                        ch = chservice.GetByDocketNumber( load[ 6 ] );
+
+                        if ( ch == null )
+                        {
+                            ch = chservice.GetByDocketNumber( load[ 5 ] );
+                        }
+                    }
+
+                    int.TryParse( load[ 14 ].Trim(), out int qty );
+
+                    int hasDocket = ch != null ? 1 : 0;
+
+                    string chepLoadId = ch != null ? ch.Id + "" : "NULL";
+                    string productId = p != null ? p.Id + "" : "NULL";
+
+                    if ( l == null )
+                    {
+                        #region Create Dispute
+
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[Dispute] ([ChepLoadId],[ActionedById],[ProductId],[CreatedOn],[ModifiedOn],[ModifiedBy],[DocketNumber],[TDNNumber],[Reference],[EquipmentCode],[Equipment],[OtherParty],[Product],[Quantity],[ActionBy],[Imported],[Status],[LocationId],[Location],[Action],[OriginalDocketNumber],[OtherReference],[EffectiveDate],[ShipDate],[DelilveryDate],[DaysLeft],[CorrectionRequestNumber],[CorrectionRequestDate],[TransactionType],[DataSource],[HasDocket]) ";
+                        cQuery = $" {cQuery} VALUES ({chepLoadId},{CurrentUser.Id},{productId},{effectiveDate1},'{DateTime.Now}','{CurrentUser.Email}','{load[ 6 ]}','{load[ 24 ]}','{load[ 7 ]}','{load[ 12 ]}','{load[ 13 ]}','{load[ 4 ]}','{load[ 13 ]}',{qty},'{load[ 16 ]}',1,{( int ) Status.Active},'{load[ 18 ]}','{load[ 19 ]}','{load[ 2 ]}','{load[ 5 ]}','{load[ 8 ]}',{effectiveDate1},{shipmentDate1},{deliveryDate1},{load[ 0 ]},'{load[ 15 ]}',{correctionRequestDate1},'{load[ 20 ]}','{load[ 22 ]}',{hasDocket}) ";
+
+                        #endregion
+
+                        try
+                        {
+                            dservice.Query( cQuery );
+
+                            created++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+                        }
+                    }
+                    else
+                    {
+                        #region Update Dispute
+
+                        uQuery = $@"{uQuery} UPDATE [dbo].[Dispute] SET
+                                                    [ModifiedOn]='{DateTime.Now}',
+                                                    [ModifiedBy]='{CurrentUser.Email}',
+                                                    [ChepLoadId]={chepLoadId},
+                                                    [ActionedById]={CurrentUser.Id},
+                                                    [ProductId]={productId},
+                                                    [DocketNumber]='{load[ 6 ]}',
+                                                    [TDNNumber]='{load[ 24 ]}',
+                                                    [Reference]='{load[ 7 ]}',
+                                                    [EquipmentCode]='{load[ 12 ]}',
+                                                    [Equipment]='{load[ 13 ]}',
+                                                    [OtherParty]='{load[ 4 ]}',
+                                                    [Product]='{load[ 14 ]}',
+                                                    [Quantity]={qty},
+                                                    [ActionBy]='{load[ 16 ]}',
+                                                    [Imported]=1,
+                                                    [LocationId]='{load[ 18 ]}',
+                                                    [Location]='{load[ 19 ]}',
+                                                    [Action]='{load[ 2 ]}',
+                                                    [OriginalDocketNumber]='{load[ 5 ]}',
+                                                    [OtherReference]='{load[ 8 ]}',
+                                                    [ShipmentDate]={shipmentDate1},
+                                                    [DeliveryDate]={deliveryDate1},
+                                                    [EffectiveDate]={effectiveDate1},
+                                                    [DaysLeft]='{load[ 0 ]}',
+                                                    [CorrectionRequestNumber]='{load[ 15 ]}',
+                                                    [CorrectionRequestDate]={correctionRequestDate1},
+                                                    [TransactionType]='{load[ 20 ]}',
+                                                    [DataSource]='{load[ 22 ]}',
+                                                    [HasDocket]={hasDocket}
+                                                WHERE
+                                                    [Id]={l.Id}";
+
+                        #endregion
+
+                        try
+                        {
+                            dservice.Query( uQuery );
+
+                            updated++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+                        }
+                    }
+                }
+
+                cQuery = string.Empty;
+                uQuery = string.Empty;
+            }
+
+            Notify( $"{created} Disputes were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.", NotificationType.Success );
+
+            return Disputes( new PagingModel(), new CustomSearchModel() );
         }
 
         #endregion

@@ -105,7 +105,7 @@
                         On @(item.CreateDate?.ToString( "yyyy-MM-dd" ) ) <br /> by @item.CreatedBy
                     </td>
                     <td>
-                        @item.EffectiveDate.Value.ToString( "yyyy-MM-dd" )
+                        @(item.EffectiveDate?.ToString( "yyyy-MM-dd" ))
                     </td>
                     <td>
                         @item.ClientName

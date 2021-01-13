@@ -138,12 +138,12 @@
         <AssociationConnector Association="ACTModel.FK_UserNotification_User" />
         <AssociationConnector Association="ACTModel.FK_UserRoles_Users" />
         <AssociationConnector Association="ACTModel.FK_UserTask_User" />
-        <EntityTypeShape EntityType="ACTModel.Dispute" Width="1.5" PointX="14.25" PointY="61.125" />
+        <EntityTypeShape EntityType="ACTModel.Dispute" Width="1.5" PointX="14.25" PointY="60.875" />
         <AssociationConnector Association="ACTModel.FK_Disputes_ChepLoads" />
         <AssociationConnector Association="ACTModel.FK_Dispute_Product" />
         <AssociationConnector Association="ACTModel.FK_Dispute_User" />
         <AssociationConnector Association="ACTModel.FK_Dispute_User1" />
-      </Diagram>
+        </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

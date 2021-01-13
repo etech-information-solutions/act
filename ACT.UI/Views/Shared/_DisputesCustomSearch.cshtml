@@ -8,8 +8,8 @@
     -->
 
 @{
-    String vn = ( ( String ) ViewBag.ViewName ?? "" );
-    String action = vn.Replace( "_", "" );
+    string vn = ( ( string ) ViewBag.ViewName ?? "" );
+    string action = vn.Replace( "_", "" );
 }
 
 <div id="custom-search" class="custom-search">
@@ -18,22 +18,11 @@
 
         @using ( Ajax.BeginForm( action, new { }, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = action.ToLower(), OnBegin = "ACT.UI.BeginCustomSearch($('#sticky-one form'), true);", OnComplete = "ACT.UI.CompleteCustomSearch();" }, new { @style = "width: auto; padding: 0;" } ) )
         {
-            <div class="left" style="width: 48%;">
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.ClientId )
-                </div>
-                <div class="editor-field">
-                    @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-                </div>
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ClientId )
             </div>
-
-            <div class="right" style="width: 48%;">
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.SiteId )
-                </div>
-                <div class="editor-field">
-                    @Html.DropDownListFor( model => model.SiteId, model => model.SiteOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-                </div>
+            <div class="editor-field">
+                @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
             </div>
 
             <div class="clear"></div>

@@ -579,6 +579,7 @@
           <Property Name="TDNNumber" Type="varchar" MaxLength="50" />
           <Property Name="Reference" Type="varchar" MaxLength="50" />
           <Property Name="Equipment" Type="varchar" MaxLength="50" />
+          <Property Name="EquipmentCode" Type="varchar" MaxLength="50" />
           <Property Name="OtherParty" Type="varchar" MaxLength="200" />
           <Property Name="Sender" Type="varchar" MaxLength="50" />
           <Property Name="Receiver" Type="varchar" MaxLength="50" />
@@ -590,6 +591,7 @@
           <Property Name="Imported" Type="bit" Nullable="false" />
           <Property Name="Status" Type="int" Nullable="false" />
           <Property Name="Location" Type="varchar" MaxLength="50" />
+          <Property Name="LocationId" Type="varchar" MaxLength="50" />
           <Property Name="Action" Type="varchar" MaxLength="50" />
           <Property Name="OriginalDocketNumber" Type="varchar" MaxLength="50" />
           <Property Name="OtherReference" Type="varchar" MaxLength="50" />
@@ -597,6 +599,7 @@
           <Property Name="ShipDate" Type="datetime" />
           <Property Name="DelilveryDate" Type="datetime" />
           <Property Name="DaysLeft" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="CorrectionRequestNumber" Type="varchar" MaxLength="50" />
           <Property Name="CorrectionRequestDate" Type="datetime" />
           <Property Name="TransactionType" Type="varchar" MaxLength="50" />
           <Property Name="DisputeComment" Type="varchar" MaxLength="1000" />
@@ -2939,7 +2942,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="User" EntitySet="Users" />
             <End Role="Dispute" EntitySet="Disputes" />
           </AssociationSet>
-        </EntityContainer>
+          </EntityContainer>
         <EntityType Name="Address">
           <Key>
             <PropertyRef Name="Id" />
@@ -4165,7 +4168,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="UserTasks" Relationship="ACTModel.FK_UserTask_User" FromRole="User" ToRole="UserTask" />
           <NavigationProperty Name="Disputes" Relationship="ACTModel.FK_Dispute_User" FromRole="User" ToRole="Dispute" />
           <NavigationProperty Name="Disputes1" Relationship="ACTModel.FK_Dispute_User1" FromRole="User" ToRole="Dispute" />
-        </EntityType>
+          </EntityType>
         <EntityType Name="UserBroadcast">
           <Key>
             <PropertyRef Name="Id" />
@@ -5169,6 +5172,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="TDNNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Reference" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Equipment" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="EquipmentCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="OtherParty" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="Sender" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Receiver" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
@@ -5180,6 +5184,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Imported" Type="Boolean" Nullable="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
           <Property Name="Location" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="LocationId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Action" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="OriginalDocketNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="OtherReference" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
@@ -5187,6 +5192,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="ShipDate" Type="DateTime" Precision="3" />
           <Property Name="DelilveryDate" Type="DateTime" Precision="3" />
           <Property Name="DaysLeft" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="CorrectionRequestNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="CorrectionRequestDate" Type="DateTime" Precision="3" />
           <Property Name="TransactionType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="DisputeComment" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
@@ -6531,6 +6537,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="DisputeComment" ColumnName="DisputeComment" />
                 <ScalarProperty Name="TransactionType" ColumnName="TransactionType" />
                 <ScalarProperty Name="CorrectionRequestDate" ColumnName="CorrectionRequestDate" />
+                <ScalarProperty Name="CorrectionRequestNumber" ColumnName="CorrectionRequestNumber" />
                 <ScalarProperty Name="DaysLeft" ColumnName="DaysLeft" />
                 <ScalarProperty Name="DelilveryDate" ColumnName="DelilveryDate" />
                 <ScalarProperty Name="ShipDate" ColumnName="ShipDate" />
@@ -6538,6 +6545,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="OtherReference" ColumnName="OtherReference" />
                 <ScalarProperty Name="OriginalDocketNumber" ColumnName="OriginalDocketNumber" />
                 <ScalarProperty Name="Action" ColumnName="Action" />
+                <ScalarProperty Name="LocationId" ColumnName="LocationId" />
                 <ScalarProperty Name="Location" ColumnName="Location" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="Imported" ColumnName="Imported" />
@@ -6549,6 +6557,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="Receiver" ColumnName="Receiver" />
                 <ScalarProperty Name="Sender" ColumnName="Sender" />
                 <ScalarProperty Name="OtherParty" ColumnName="OtherParty" />
+                <ScalarProperty Name="EquipmentCode" ColumnName="EquipmentCode" />
                 <ScalarProperty Name="Equipment" ColumnName="Equipment" />
                 <ScalarProperty Name="Reference" ColumnName="Reference" />
                 <ScalarProperty Name="TDNNumber" ColumnName="TDNNumber" />

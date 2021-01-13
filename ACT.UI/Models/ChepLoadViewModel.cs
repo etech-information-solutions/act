@@ -119,12 +119,12 @@ namespace ACT.UI.Models
         [Display( Name = "Balance Status" )]
         public int? BalanceStatus { get; set; }
 
-        public bool EditMode { get; set; }
-
         [Display( Name = "Import Loads" )]
         public HttpPostedFileBase File { get; set; }
 
         public List<Comment> ChepLoadComments { get; set; }
+
+        public bool EditMode { get; set; }
 
         #endregion
 

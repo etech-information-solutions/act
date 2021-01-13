@@ -3621,7 +3621,7 @@ namespace ACT.UI.Controllers
 
             using ( ProductService service = new ProductService() )
             {
-                model = service.ListCSM( pm, csm );
+                model = service.List1( pm, csm );
                 total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
             }
 

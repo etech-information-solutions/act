@@ -96,7 +96,7 @@
                         @count
                     </td>
                     <td>
-                        @item.EffectiveDate.Value.ToString( "yyyy-MM-dd" )
+                        @(item.EffectiveDate?.ToString( "yyyy-MM-dd" ))
                     </td>
                     <td>
                         On @(item.CreateDate?.ToString( "yyyy-MM-dd" ) ) <br /> by @item.CreatedBy

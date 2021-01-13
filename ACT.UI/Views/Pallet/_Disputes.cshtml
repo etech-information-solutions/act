@@ -35,6 +35,11 @@
 
 <p>
     @Html.ActionLink( "Add", "AddDispute", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Dispute?", @data_edit = "1", @data_id = 0, @data_target = "#disputes" } )
+
+    <span style="padding: 0 5px;">|</span>
+
+    @Html.ActionLink( "Import", "ImportDisputes", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import Disputes?", @data_edit = "1", @data_id = 0, @data_target = "#disputes" } )
+
     <span class="loader"></span>
 </p>
 
@@ -44,11 +49,11 @@
             <th data-name="Count">
                 #
             </th>
-            <th data-name="CreatedOn" data-column="d.CreatedOn">
-                Date Raised
+            <th data-name="EffectiveDate" data-column="d.EffectiveDate">
+                Eff. Date
             </th>
-            <th data-name="AccountNumber" data-column="cl.AccountNumber">
-                Account
+            <th data-name="OriginalDocketNumber" data-column="d.OriginalDocketNumber">
+                Orig. Docket #
             </th>
             <th data-name="DocketNumber" data-column="d.DocketNumber">
                 Docket #
@@ -56,8 +61,8 @@
             <th data-name="Reference" data-column="d.Reference">
                 Ref #
             </th>
-            <th data-name="OtherParty" data-column="d.OtherParty">
-                Other Party
+            <th data-name="OtherReference" data-column="d.OtherReference">
+                Other Ref #
             </th>
             <th data-name="TDNNumber" data-column="d.TDNNumber">
                 TDN #
@@ -65,7 +70,7 @@
             <th data-name="Quantity" data-column="d.Quantity">
                 Quantity
             </th>
-            <th data-name="ActionUser" data-column="d.ActionUser">
+            <th data-name="ActionUser" data-column="d.ActionBy">
                 Action By
             </th>
             <th data-name="CreatedOn" data-column="d.Status">
@@ -102,7 +107,7 @@
                         </a>
                     </td>
                     <td>
-                        @item.ChepLoadAccountNumber
+                        @item.OriginalDocketNumber
                     </td>
                     <td>
                         @item.DocketNumber
@@ -111,7 +116,7 @@
                         @item.Reference
                     </td>
                     <td>
-                        @item.OtherParty
+                        @item.OtherReference
                     </td>
                     <td>
                         @item.TDNNumber
@@ -120,7 +125,7 @@
                         @item.Quantity
                     </td>
                     <td>
-                        @item.ActionUser
+                        @(item.ActionBy ?? item.ActionUser )
                     </td>
                     <td>
                         @status.GetDisplayText()

@@ -28,6 +28,7 @@ namespace ACT.Data.Models
         public string TDNNumber { get; set; }
         public string Reference { get; set; }
         public string Equipment { get; set; }
+        public string EquipmentCode { get; set; }
         public string OtherParty { get; set; }
         public string Sender { get; set; }
         public string Receiver { get; set; }
@@ -39,6 +40,7 @@ namespace ACT.Data.Models
         public bool Imported { get; set; }
         public int Status { get; set; }
         public string Location { get; set; }
+        public string LocationId { get; set; }
         public string Action { get; set; }
         public string OriginalDocketNumber { get; set; }
         public string OtherReference { get; set; }
@@ -46,6 +48,7 @@ namespace ACT.Data.Models
         public Nullable<System.DateTime> ShipDate { get; set; }
         public Nullable<System.DateTime> DelilveryDate { get; set; }
         public Nullable<decimal> DaysLeft { get; set; }
+        public string CorrectionRequestNumber { get; set; }
         public Nullable<System.DateTime> CorrectionRequestDate { get; set; }
         public string TransactionType { get; set; }
         public string DisputeComment { get; set; }

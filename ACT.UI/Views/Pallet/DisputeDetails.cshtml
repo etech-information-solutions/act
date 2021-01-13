@@ -30,34 +30,55 @@
         </h2>
     }
 
-    <div class="left" style="width: 48%; margin-right: 3%;">
+    <div class="left" style="width: 31%; margin-right: 3%;">
 
         <div class="display-label">
-            Docket Number
+            Days Left
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.DaysLeft )
+        </div>
+
+        <div class="display-label">
+            Docket #
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.DocketNumber )
         </div>
 
         <div class="display-label">
-            TDN Number
+            Original Docket #
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.OriginalDocketNumber )
+        </div>
+
+        <div class="display-label">
+            Ref #
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Reference )
+        </div>
+
+        <div class="display-label">
+            Other Ref #
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.OtherReference )
+        </div>
+
+        <div class="display-label">
+            TDN
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.TDNNumber )
         </div>
 
         <div class="display-label">
-            Equipment
+            Action
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Equipment )
-        </div>
-
-        <div class="display-label">
-            Product
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.Product )
+            @Html.DisplayFor( model => model.Action )
         </div>
 
         <div class="display-label">
@@ -91,9 +112,16 @@
             </div>
         }
 
+        <div class="display-label">
+            Docket Found?
+        </div>
+        <div class="display-field">
+            @(Model.HasDocket == 1 ? "Yes" : "NO")
+        </div>
+
     </div>
 
-    <div class="left" style="width: 48%;">
+    <div class="left" style="width: 31%; margin-right: 3%;">
 
         <div class="display-label">
             Dispute Reason
@@ -142,6 +170,94 @@
         </div>
         <div class="display-field">
             @( Math.Round( Model.Quantity ?? 0, 0 ) )
+        </div>
+
+        <div class="display-label">
+            Equipment
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Equipment )
+        </div>
+
+        <div class="display-label">
+            Equipment Code
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.EquipmentCode )
+        </div>
+
+        <div class="display-label">
+            Dispute Comment
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.DisputeComment )
+        </div>
+
+    </div>
+
+    <div class="left" style="width: 31%;">
+
+        <div class="display-label">
+            Location
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Location )
+        </div>
+
+        <div class="display-label">
+            Location ID
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.LocationId )
+        </div>
+
+        <div class="display-label">
+            Effective Date
+        </div>
+        <div class="display-field">
+            @( Model.EffectiveDate?.ToString( "yyyy-MM-dd" ) )
+        </div>
+
+        <div class="display-label">
+            Ship Date
+        </div>
+        <div class="display-field">
+            @( Model.ShipDate?.ToString( "yyyy-MM-dd" ) )
+        </div>
+
+        <div class="display-label">
+            Delilvery Date
+        </div>
+        <div class="display-field">
+            @( Model.DelilveryDate?.ToString( "yyyy-MM-dd" ) )
+        </div>
+
+        <div class="display-label">
+            Correction Request Date
+        </div>
+        <div class="display-field">
+            @( Model.CorrectionRequestDate?.ToString( "yyyy-MM-dd" ) )
+        </div>
+
+        <div class="display-label">
+            Correction Request #
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.CorrectionRequestNumber )
+        </div>
+
+        <div class="display-label">
+            Transaction Type
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.TransactionType )
+        </div>
+
+        <div class="display-label">
+            Data Source
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.DataSource )
         </div>
 
     </div>

@@ -99,7 +99,7 @@ namespace ACT.Core.Services
         /// <param name="pm"></param>
         /// <param name="csm"></param>
         /// <returns></returns>
-        public List<ProductCustomModel> ListCSM( PagingModel pm, CustomSearchModel csm )
+        public List<ProductCustomModel> List1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
@@ -250,6 +250,16 @@ namespace ACT.Core.Services
         public bool Exist( string name )
         {
             return context.Products.Any( p => p.Name.Trim() == name.Trim() );
+        }
+
+        /// <summary>
+        /// Gets a product using the specified name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Product GetByName( string name )
+        {
+            return context.Products.FirstOrDefault( p => p.Name.Trim() == name.Trim() );
         }
     }
 }
