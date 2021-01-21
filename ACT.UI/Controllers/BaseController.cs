@@ -489,6 +489,18 @@ namespace ACT.UI.Controllers
                         chepLoad.Id,
                         chepLoad.Equipment,
                         chepLoad.DocketNumber,
+                        chepLoad.OriginalDocketNumber,
+                        chepLoad.Ref,
+                        chepLoad.OtherRef,
+                        chepLoad.OtherParty,
+                        chepLoad.EquipmentCode,
+                        chepLoad.Location,
+                        chepLoad.LocationId,
+                        chepLoad.TransactionType,
+                        chepLoad.DataSource,
+                        EffectiveDate = chepLoad.EffectiveDate?.ToString( "yyyy/MM/dd" ),
+                        ShipmentDate = chepLoad.ShipmentDate?.ToString( "yyyy/MM/dd" ),
+                        DeliveryDate = chepLoad.DeliveryDate?.ToString( "yyyy/MM/dd" ),
                     }
                 };
             }
@@ -895,7 +907,7 @@ namespace ACT.UI.Controllers
                 int fileSize = file.ContentLength;
                 string fileName = file.FileName;
                 string mimeType = file.ContentType;
-                System.IO.Stream fileContent = file.InputStream;
+                Stream fileContent = file.InputStream;
                 //To save file, use SaveAs method
                 //file.SaveAs(Server.MapPath("~/") + fileName); //File will be saved in application root
 
@@ -1124,6 +1136,7 @@ namespace ACT.UI.Controllers
             using ( ClientLoadService clservice = new ClientLoadService() )
             {
                 int count = 0;
+                string q = string.Empty;
 
                 #region Client & Chep Load
 
@@ -1131,8 +1144,6 @@ namespace ACT.UI.Controllers
 
                 if ( clLoads.NullableAny() )
                 {
-                    string q = string.Empty;
-
                     foreach ( ClientLoad l in clLoads )
                     {
                         q = $"UPDATE [dbo].[ClientLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id={l.Id};";
@@ -1173,23 +1184,32 @@ namespace ACT.UI.Controllers
 
                 #region Chep Load Only
 
-                List<ChepLoad> chLoads = chservice.GetAutoReconcilliableLoads();
+                List<ChepLoadCustomModel> chs1 = new List<ChepLoadCustomModel>(),
+                                          removeCH = new List<ChepLoadCustomModel>();
+
+                List<ChepLoadCustomModel> chLoads = chservice.List1( new PagingModel() { Take = int.MaxValue }, new CustomSearchModel() { BalanceStatus = BalanceStatus.NotBalanced } );
 
                 if ( chLoads.NullableAny() )
                 {
-                    foreach ( ChepLoad item in chLoads )
+                    foreach ( ChepLoadCustomModel item in chLoads )
                     {
-                        List<ChepLoad> chs = chservice.ListByReference( item.DocketNumber, true );
+                        if ( removeCH.NullableAny( r => r.Id == item.Id ) ) continue;
 
-                        if ( chs == null ) continue;
+                        q = $"SELECT ch.[Id], ch.[Quantity] FROM [dbo].[ChepLoad] ch WHERE ch.[Id] != {item.Id} AND (LTRIM(RTRIM(ch.[Ref]))='{item.DocketNumber?.Trim()}' OR LTRIM(RTRIM(ch.[Ref]))='{item.Ref?.Trim()}' OR LTRIM(RTRIM(ch.[Ref]))='{item.OtherRef?.Trim()}' OR LTRIM(RTRIM(ch.[OtherRef]))='{item.OtherRef?.Trim()}');";
 
-                        if ( ( chs.Sum( s => s.Quantity ) + item.Quantity ) != 0 ) continue;
+                        chs1 = chservice.SqlQueryList<ChepLoadCustomModel>( q );
 
-                        chs.Add( item );
+                        if ( !chs1.NullableAny() ) continue;
 
-                        string q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) BalanceStatus.Balanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", chs.Select( s => s.Id ) )});";
+                        if ( ( chs1.Sum( s => s.Quantity ) + item.Quantity ) != 0 ) continue;
+
+                        chs1.Add( item );
+
+                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) BalanceStatus.Balanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", chs1.Select( s => s.Id ) )});";
 
                         chservice.Query( q );
+
+                        removeCH.AddRange( chLoads.Where( r => chs1.Select( s => s.Id ).Contains( r.Id ) ) );
 
                         count++;
                     }
@@ -1360,6 +1380,56 @@ namespace ACT.UI.Controllers
             }
 
             return PartialView( "_Empty" );
+        }
+
+        /// <summary>
+        /// Logs any errors in the specified params
+        /// </summary>
+        /// <param name="errors"></param>
+        /// <param name="r"></param>
+        /// <returns></returns>
+        public int LogImportErrors( List<string> errors, int r )
+        {
+            Document doc;
+
+            // Create folder
+            string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/Errors/{r}/" );
+
+            if ( !Directory.Exists( path ) )
+            {
+                Directory.CreateDirectory( path );
+            }
+
+            string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+
+            string fileName = $"{path}{now}-ImportPoolingAgentData-Errors.txt";
+
+            using ( StreamWriter sw = new StreamWriter( fileName, true ) )
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                foreach ( string e in errors )
+                {
+                    sw.WriteLine( e );
+                }
+
+                doc = new Document()
+                {
+                    Size = 0,
+                    Type = "txt",
+                    ObjectId = r,
+                    ObjectType = "Error",
+                    Status = ( int ) Status.Active,
+                    Name = "Import Pooling Agent Data Errors",
+                    Title = "Import Pooling Agent Data Errors",
+                    Category = "Import Pooling Agent Data Errors",
+                    Description = "Import Pooling Agent Data Errors",
+                    Location = $"Errors/{now}-ImportPoolingAgentData-Errors.txt",
+                };
+
+                doc = dservice.Create( doc );
+            }
+
+            return doc.Id;
         }
 
         #endregion

@@ -11,7 +11,7 @@ namespace ACT.UI.Models
         #region Properties
 
         public int Id { get; set; }
-        public Nullable<int> ClientId { get; set; }
+        public int? ClientId { get; set; }
         
         FileViewModel importFile { get; set; }
 

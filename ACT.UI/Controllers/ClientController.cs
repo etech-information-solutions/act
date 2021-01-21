@@ -3248,26 +3248,35 @@ namespace ACT.UI.Controllers
                 {
                     foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
                     {
-                        Contact c = cservice.Get( mc.ContactIdNo, "Transporter" );
+                        Contact c = cservice.Get( mc.ContactEmail, "Transporter" );
 
-                        if ( c != null )
+                        if ( c == null )
                         {
-                            continue;
+                            c = new Contact()
+                            {
+                                ObjectId = t.Id,
+                                JobTitle = mc.JobTitle,
+                                ObjectType = "Transporter",
+                                ContactCell = mc.ContactCell,
+                                ContactName = mc.ContactName,
+                                Status = ( int ) model.Status,
+                                ContactEmail = mc.ContactEmail,
+                                ContactTitle = mc.ContactTitle,
+                            };
+
+                            cservice.Create( c );
                         }
-
-                        c = new Contact()
+                        else
                         {
-                            ObjectId = t.Id,
-                            ObjectType = "Transporter",
-                            ContactCell = mc.ContactCell,
-                            ContactIdNo = mc.ContactIdNo,
-                            ContactName = mc.ContactName,
-                            Status = ( int ) model.Status,
-                            ContactEmail = mc.ContactEmail,
-                            ContactTitle = mc.ContactTitle,
-                        };
+                            c.JobTitle = mc.JobTitle;
+                            c.ContactCell = mc.ContactCell;
+                            c.ContactName = mc.ContactName;
+                            c.Status = ( int ) model.Status;
+                            c.ContactEmail = mc.ContactEmail;
+                            c.ContactTitle = mc.ContactTitle;
 
-                        cservice.Create( c );
+                            cservice.Update( c );
+                        }
                     }
                 }
 
@@ -3275,33 +3284,45 @@ namespace ACT.UI.Controllers
 
                 #region Vehicles
 
-                if ( model.Vehicles.NullableAny( c => !string.IsNullOrWhiteSpace( c.VINNumber ) ) )
+                if ( model.Vehicles.NullableAny( c => !string.IsNullOrWhiteSpace( c.Registration ) ) )
                 {
-                    foreach ( Vehicle mv in model.Vehicles.Where( c => !string.IsNullOrWhiteSpace( c.VINNumber ) ) )
+                    foreach ( Vehicle mv in model.Vehicles.Where( c => !string.IsNullOrWhiteSpace( c.Registration ) ) )
                     {
-                        Vehicle v = vservice.Get( mv.VINNumber, "Transporter" );
+                        Vehicle v = vservice.Get( mv.Registration, "Transporter" );
 
-                        if ( v != null )
+                        if ( v == null )
                         {
-                            continue;
+                            v = new Vehicle()
+                            {
+                                Make = mv.Make,
+                                //Year = mv.Year,
+                                ObjectId = t.Id,
+                                Model = mv.Model,
+                                Type = ( int ) mv.Type,
+                                //VINNumber = mv.VINNumber,
+                                ObjectType = "Transporter",
+                                Descriptoin = mv.Descriptoin,
+                                Status = ( int ) model.Status,
+                                Registration = mv.Registration,
+                                //EngineNumber = mv.EngineNumber,
+                            };
+
+                            vservice.Create( v );
                         }
-
-                        v = new Vehicle()
+                        else
                         {
-                            Make = mv.Make,
-                            Year = mv.Year,
-                            ObjectId = t.Id,
-                            Model = mv.Model,
-                            Type = ( int ) mv.Type,
-                            VINNumber = mv.VINNumber,
-                            ObjectType = "Transporter",
-                            Descriptoin = mv.Descriptoin,
-                            Status = ( int ) model.Status,
-                            Registration = mv.Registration,
-                            EngineNumber = mv.EngineNumber,
-                        };
+                            v.Make = mv.Make;
+                            //v.Year = mv.Year;
+                            v.Model = mv.Model;
+                            v.Type = ( int ) mv.Type;
+                            //v.VINNumber = mv.VINNumber;
+                            v.Descriptoin = mv.Descriptoin;
+                            v.Status = ( int ) model.Status;
+                            v.Registration = mv.Registration;
+                            //v.EngineNumber = mv.EngineNumber;
 
-                        vservice.Create( v );
+                            vservice.Update( v );
+                        }
                     }
                 }
 
@@ -3412,9 +3433,10 @@ namespace ACT.UI.Controllers
                             c = new Contact()
                             {
                                 ObjectId = t.Id,
+                                JobTitle = mc.JobTitle,
                                 ObjectType = "Transporter",
                                 ContactCell = mc.ContactCell,
-                                ContactIdNo = mc.ContactIdNo,
+                                //ContactIdNo = mc.ContactIdNo,
                                 ContactName = mc.ContactName,
                                 Status = ( int ) model.Status,
                                 ContactEmail = mc.ContactEmail,
@@ -3425,8 +3447,9 @@ namespace ACT.UI.Controllers
                         }
                         else
                         {
+                            c.JobTitle = mc.JobTitle;
                             c.ContactCell = mc.ContactCell;
-                            c.ContactIdNo = mc.ContactIdNo;
+                            //c.ContactIdNo = mc.ContactIdNo;
                             c.ContactName = mc.ContactName;
                             c.Status = ( int ) model.Status;
                             c.ContactEmail = mc.ContactEmail;
@@ -3441,9 +3464,9 @@ namespace ACT.UI.Controllers
 
                 #region Vehicles
 
-                if ( model.Vehicles.NullableAny( c => !string.IsNullOrWhiteSpace( c.VINNumber ) ) )
+                if ( model.Vehicles.NullableAny( c => !string.IsNullOrWhiteSpace( c.Registration ) ) )
                 {
-                    foreach ( Vehicle mv in model.Vehicles.Where( c => !string.IsNullOrWhiteSpace( c.VINNumber ) ) )
+                    foreach ( Vehicle mv in model.Vehicles.Where( c => !string.IsNullOrWhiteSpace( c.Registration ) ) )
                     {
                         Vehicle v = vservice.GetById( mv.Id );
 
@@ -3452,15 +3475,15 @@ namespace ACT.UI.Controllers
                             v = new Vehicle()
                             {
                                 Make = mv.Make,
-                                Year = mv.Year,
+                                //Year = mv.Year,
                                 ObjectId = t.Id,
                                 Model = mv.Model,
                                 Type = ( int ) mv.Type,
-                                VINNumber = mv.VINNumber,
+                                //VINNumber = mv.VINNumber,
                                 ObjectType = "Transporter",
                                 Status = ( int ) model.Status,
                                 Registration = mv.Registration,
-                                EngineNumber = mv.EngineNumber,
+                                //EngineNumber = mv.EngineNumber,
                                 Descriptoin = $"{mv.Make} {mv.Model}",
                             };
 
@@ -3469,13 +3492,13 @@ namespace ACT.UI.Controllers
                         else
                         {
                             v.Make = mv.Make;
-                            v.Year = mv.Year;
+                            //v.Year = mv.Year;
                             v.Model = mv.Model;
                             v.Type = ( int ) mv.Type;
-                            v.VINNumber = mv.VINNumber;
+                            //v.VINNumber = mv.VINNumber;
                             v.Status = ( int ) model.Status;
                             v.Registration = mv.Registration;
-                            v.EngineNumber = mv.EngineNumber;
+                            //v.EngineNumber = mv.EngineNumber;
                             v.Descriptoin = $"{mv.Make} {mv.Model}";
 
                             vservice.Update( v );

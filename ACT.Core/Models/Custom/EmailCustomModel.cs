@@ -14,7 +14,7 @@ namespace ACT.Core.Models.Custom
         public string From { get; set; }
         public string Subject { get; set; }
         public string Body { get; set; }
-        public System.DateTime DateSent { get; set; }
+        public DateTime DateSent { get; set; }
         public List<AttachmentCustomModel> Attachments { get; set; }
     }
     public partial class AttachmentCustomModel

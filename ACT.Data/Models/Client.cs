@@ -23,7 +23,6 @@ namespace ACT.Data.Models
             this.ClientGroups = new HashSet<ClientGroup>();
             this.ClientKPIs = new HashSet<ClientKPI>();
             this.ClientLoads = new HashSet<ClientLoad>();
-            this.ClientLoads1 = new HashSet<ClientLoad>();
             this.ClientProducts = new HashSet<ClientProduct>();
             this.ClientUsers = new HashSet<ClientUser>();
             this.DeliveryNotes = new HashSet<DeliveryNote>();
@@ -71,8 +70,6 @@ namespace ACT.Data.Models
         public virtual ICollection<ClientKPI> ClientKPIs { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientLoad> ClientLoads1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientProduct> ClientProducts { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

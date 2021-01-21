@@ -79,7 +79,7 @@ namespace ACT.UI.Controllers
                                                     item.Status,
                                                     item.Equipment,
                                                     item.Quantity,
-                                                    item.DisputeReason,
+                                                    item.DisputeReasonDetails,
                                                     Environment.NewLine );
                             }
                         }
@@ -340,11 +340,17 @@ namespace ACT.UI.Controllers
                 errors = 0,
                 skipped = 0,
                 created = 0,
-                updated = 0;
+                updated = 0,
+                errorDocId = 0;
 
             string cQuery, uQuery;
 
+            List<string> errs = new List<string>();
+
+            using ( SiteService sservice = new SiteService() )
             using ( ChepLoadService clservice = new ChepLoadService() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
             using ( TextFieldParser parser = new TextFieldParser( model.File.InputStream ) )
             {
                 parser.Delimiters = new string[] { "," };
@@ -383,6 +389,8 @@ namespace ACT.UI.Controllers
                            deliveryDate1 = string.Empty,
                            effectiveDate1 = string.Empty,
                            createDate1 = string.Empty;
+
+                    #region Dates
 
                     if ( !DateTime.TryParse( load[ 17 ], out DateTime shipmentDate ) )
                     {
@@ -448,12 +456,67 @@ namespace ACT.UI.Controllers
                         createDate1 = $"'{createDate}'";
                     }
 
+                    #endregion
+
+                    #region Client Site
+
+                    ClientSite cs = new ClientSite();
+                    Site site = sservice.GetBySiteCode( load[ 6 ].Trim() );
+
+                    if ( site == null )
+                    {
+                        site = new Site()
+                        {
+                            Name = load[ 7 ].Trim(),
+                            Description = load[ 7 ].Trim(),
+                            SiteCodeChep = load[ 6 ].Trim(),
+                            Status = ( int ) Status.Active,
+                        };
+
+                        site = sservice.Create( site );
+                    }
+
+                    if ( !site.ClientSites.NullableAny() )
+                    {
+                        ClientCustomer cc = ccservice.GetByClient( model.ClientId );
+
+                        if ( cc == null )
+                        {
+                            cc = new ClientCustomer()
+                            {
+                                ClientId = model.ClientId,
+                                Status = ( int ) Status.Active,
+                                CustomerName = load[ 7 ].Trim(),
+                                CustomerNumber = load[ 6 ].Trim(),
+                            };
+
+                            cc = ccservice.Create( cc );
+                        }
+
+                        cs = new ClientSite()
+                        {
+                            SiteId = site.Id,
+                            ClientCustomerId = cc.Id,
+                            Status = ( int ) Status.Active,
+                            AccountingCode = load[ 6 ].Trim(),
+                            ClientSiteCode = load[ 6 ].Trim(),
+                        };
+
+                        cs = csservice.Create( cs );
+                    }
+                    else
+                    {
+                        cs = site.ClientSites.FirstOrDefault();
+                    }
+
+                    #endregion
+
                     if ( l == null )
                     {
                         #region Create Chep Load
 
-                        cQuery = $" {cQuery} INSERT INTO [dbo].[ChepLoad] ([ClientId],[CreatedOn],[ModifiedOn],[ModifiedBy],[ChepStatus],[TransactionType],[DocketNumber],[OriginalDocketNumber],[UMI],[LocationId],[Location],[OtherPartyId],[OtherParty],[OtherPartyCountry],[EquipmentCode],[Equipment],[Quantity],[Ref],[OtherRef],[BatchRef],[ShipmentDate],[DeliveryDate],[EffectiveDate],[CreateDate],[CreatedBy],[InvoiceNumber],[Reason],[DataSource],[BalanceStatus],[Status],[PostingType]) ";
-                        cQuery = $" {cQuery} VALUES ({model.ClientId},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}',{qty},'{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}',{shipmentDate1},{deliveryDate1},{effectiveDate1},{createDate1},'{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) ReconciliationStatus.Unreconciled},{( int ) ReconciliationStatus.Unreconciled},{( int ) PostingType.Import}) ";
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[ChepLoad] ([ClientId],[ClientSiteId],[CreatedOn],[ModifiedOn],[ModifiedBy],[ChepStatus],[TransactionType],[DocketNumber],[OriginalDocketNumber],[UMI],[LocationId],[Location],[OtherPartyId],[OtherParty],[OtherPartyCountry],[EquipmentCode],[Equipment],[Quantity],[Ref],[OtherRef],[BatchRef],[ShipmentDate],[DeliveryDate],[EffectiveDate],[CreateDate],[CreatedBy],[InvoiceNumber],[Reason],[DataSource],[BalanceStatus],[Status],[PostingType]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},{cs.Id},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}',{qty},'{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}',{shipmentDate1},{deliveryDate1},{effectiveDate1},{createDate1},'{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) ReconciliationStatus.Unreconciled},{( int ) ReconciliationStatus.Unreconciled},{( int ) PostingType.Import}) ";
 
                         #endregion
 
@@ -466,6 +529,8 @@ namespace ACT.UI.Controllers
                         catch ( Exception ex )
                         {
                             errors++;
+
+                            errs.Add( ex.ToString() );
                         }
                     }
                     else
@@ -473,6 +538,7 @@ namespace ACT.UI.Controllers
                         #region Update ChepLoad
 
                         uQuery = $@"{uQuery} UPDATE [dbo].[ChepLoad] SET
+                                                    [ClientSiteId]={cs.Id},
                                                     [ModifiedOn]='{DateTime.Now}',
                                                     [ModifiedBy]='{CurrentUser.Email}',
                                                     [ChepStatus]='{load[ 0 ]}',
@@ -512,17 +578,31 @@ namespace ACT.UI.Controllers
                         catch ( Exception ex )
                         {
                             errors++;
+
+                            errs.Add( ex.ToString() );
                         }
                     }
                 }
 
                 cQuery = string.Empty;
                 uQuery = string.Empty;
+
+                if ( errs.NullableAny() )
+                {
+                    errorDocId = LogImportErrors( errs, model.ClientId );
+                }
             }
 
-            //AutoReconcileLoads();
+            AutoReconcileLoads();
 
-            Notify( $"{created} loads were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.", NotificationType.Success );
+            string resp = $"{created} loads were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.";
+
+            if ( errs.NullableAny() && errorDocId > 0 )
+            {
+                resp = $"{resp} <a href='/Pallet/ViewDocument/{errorDocId}' target='_blank'>Click here</a> to view the erros.";
+            }
+
+            Notify( resp, NotificationType.Success );
 
             return PoolingAgentData( new PagingModel(), new CustomSearchModel() );
         }
@@ -1018,17 +1098,24 @@ namespace ACT.UI.Controllers
                 return View( model );
             }
 
-            int count = 0,
+            int line = 0,
+                count = 0,
                 errors = 0,
                 skipped = 0,
                 created = 0,
-                updated = 0;
+                updated = 0,
+                errorDocId = 0;
 
             string cQuery, uQuery;
 
+            List<string> errs = new List<string>();
+
+            using ( SiteService sservice = new SiteService() )
             using ( VehicleService vservice = new VehicleService() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
             using ( TransporterService tservice = new TransporterService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
             using ( TextFieldParser parser = new TextFieldParser( model.File.InputStream ) )
             {
                 parser.Delimiters = new string[] { "," };
@@ -1041,6 +1128,10 @@ namespace ACT.UI.Controllers
                     {
                         break;
                     }
+
+                    line++;
+
+                    if ( line == 1 ) continue;
 
                     cQuery = uQuery = string.Empty;
 
@@ -1133,12 +1224,120 @@ namespace ACT.UI.Controllers
 
                     #endregion
 
+                    #region Client Site 1
+
+                    ClientSite cs1 = new ClientSite();
+                    Site site = sservice.GetBySiteCode( load[ 0 ].Trim() );
+
+                    if ( site == null )
+                    {
+                        site = new Site()
+                        {
+                            Name = load[ 1 ].Trim(),
+                            Description = load[ 1 ].Trim(),
+                            SiteCodeChep = load[ 0 ].Trim(),
+                            Status = ( int ) Status.Active,
+                        };
+
+                        site = sservice.Create( site );
+                    }
+
+                    if ( !site.ClientSites.NullableAny() )
+                    {
+                        ClientCustomer cc = ccservice.GetByClient( model.ClientId );
+
+                        if ( cc == null )
+                        {
+                            cc = new ClientCustomer()
+                            {
+                                ClientId = model.ClientId,
+                                Status = ( int ) Status.Active,
+                                CustomerName = load[ 6 ].Trim(),
+                                CustomerNumber = load[ 0 ].Trim(),
+                                CustomerTown = load[ 22 ].Trim(),
+                            };
+
+                            cc = ccservice.Create( cc );
+                        }
+
+                        cs1 = new ClientSite()
+                        {
+                            SiteId = site.Id,
+                            ClientCustomerId = cc.Id,
+                            Status = ( int ) Status.Active,
+                            AccountingCode = load[ 0 ].Trim(),
+                            ClientSiteCode = load[ 0 ].Trim(),
+                        };
+
+                        cs1 = csservice.Create( cs1 );
+                    }
+                    else
+                    {
+                        cs1 = site.ClientSites.FirstOrDefault();
+                    }
+
+                    #endregion
+
+                    #region Client Site 2
+
+                    ClientSite cs2 = new ClientSite();
+                    Site site2 = sservice.GetBySiteCode( load[ 5 ].Trim() );
+
+                    if ( site2 == null )
+                    {
+                        site2 = new Site()
+                        {
+                            Name = load[ 1 ].Trim(),
+                            Description = load[ 1 ].Trim(),
+                            SiteCodeChep = load[ 5 ].Trim(),
+                            Status = ( int ) Status.Active,
+                        };
+
+                        site2 = sservice.Create( site2 );
+                    }
+
+                    if ( !site2.ClientSites.NullableAny() )
+                    {
+                        ClientCustomer cc = ccservice.GetByClient( model.ClientId );
+
+                        if ( cc == null )
+                        {
+                            cc = new ClientCustomer()
+                            {
+                                ClientId = model.ClientId,
+                                Status = ( int ) Status.Active,
+                                CustomerName = load[ 6 ].Trim(),
+                                CustomerNumber = load[ 5 ].Trim(),
+                                CustomerTown = load[ 22 ].Trim(),
+                            };
+
+                            cc = ccservice.Create( cc );
+                        }
+
+                        cs2 = new ClientSite()
+                        {
+                            SiteId = site2.Id,
+                            ClientCustomerId = cc.Id,
+                            Status = ( int ) Status.Active,
+                            AccountingCode = load[ 5 ].Trim(),
+                            ClientSiteCode = load[ 5 ].Trim(),
+                        };
+
+                        cs2 = csservice.Create( cs2 );
+                    }
+                    else
+                    {
+                        cs2 = site2.ClientSites.FirstOrDefault();
+                    }
+
+                    #endregion
+
                     if ( l == null )
                     {
                         #region Create Client Load
 
-                        cQuery = $" {cQuery} INSERT INTO [dbo].[ClientLoad]([ClientId],[VehicleId],[TransporterId],[CreatedOn],[ModifiedOn],[ModifiedBy],[LoadNumber],[LoadDate],[EffectiveDate],[NotifyDate],[AccountNumber],[ClientDescription],[DeliveryNote],[ReferenceNumber],[ReceiverNumber],[OriginalQuantity],[NewQuantity],[PODNumber],[PCNNumber],[PRNNumber],[Status],[PostingType],[THAN],[ReturnQty],[PODStatus],[InvoiceStatus],[UID]) ";
-                        cQuery = $" {cQuery} VALUES ({model.ClientId},{v.Id},{t.Id},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 2 ]}','{loadDate}','{deliveryDate}','{deliveryDate}','{load[ 5 ]}','{load[ 6 ]}','{load[ 12 ]}','{load[ 10 ]}','{load[ 12 ]}',{qty},{qty},'{pod}','{pcn}','{prn}',{( int ) status},{( int ) PostingType.Import},'{load[ 17 ]}',{returnQty},{podStatus},0,'{uid}') ";
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[ClientLoad]([ClientId],[ClientSiteId],[ToClientSiteId],[VehicleId],[TransporterId],[CreatedOn],[ModifiedOn],[ModifiedBy],[LoadNumber],[LoadDate],[EffectiveDate],[NotifyDate],[AccountNumber],[ClientDescription],[DeliveryNote],[ReferenceNumber],[ReceiverNumber],[OriginalQuantity],[NewQuantity],[PODNumber],[PCNNumber],[PRNNumber],[Status],[PostingType],[THAN],[ReturnQty],[PODStatus],[InvoiceStatus],[UID]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},{cs1.Id},{cs2.Id},{v.Id},{t.Id},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 2 ]}','{loadDate}','{deliveryDate}','{deliveryDate}','{load[ 5 ]}','{load[ 6 ]}','{load[ 12 ]}','{load[ 10 ]}','{load[ 12 ]}',{qty},{qty},'{pod}','{pcn}','{prn}',{( int ) status},{( int ) PostingType.Import},'{load[ 17 ]}',{returnQty},{podStatus},0,'{uid}') ";
 
                         #endregion
 
@@ -1151,6 +1350,8 @@ namespace ACT.UI.Controllers
                         catch ( Exception ex )
                         {
                             errors++;
+
+                            errs.Add( ex.ToString() );
                         }
                     }
                     else
@@ -1161,6 +1362,8 @@ namespace ACT.UI.Controllers
                                                     [ModifiedOn]='{DateTime.Now}',
                                                     [ModifiedBy]='{CurrentUser.Email}',
                                                     [VehicleId]={v.Id},
+                                                    [ClientSiteId]={cs1.Id},
+                                                    [ToClientSiteId]={cs2.Id},
                                                     [TransporterId]={t.Id},
                                                     [LoadNumber]='{load[ 2 ]}',
                                                     [LoadDate]='{loadDate}',
@@ -1176,7 +1379,6 @@ namespace ACT.UI.Controllers
                                                     [PODNumber]='{pod}',
                                                     [PCNNumber]='{pcn}',
                                                     [PRNNumber]='{prn}',
-                                                    [Status]={( int ) status},
                                                     [THAN]='{load[ 17 ]}',
                                                     [ReturnQty]={returnQty},
                                                     [PODStatus]={podStatus},
@@ -1195,17 +1397,31 @@ namespace ACT.UI.Controllers
                         catch ( Exception ex )
                         {
                             errors++;
+
+                            errs.Add( ex.ToString() );
                         }
                     }
                 }
 
                 cQuery = string.Empty;
                 uQuery = string.Empty;
+
+                if ( errs.NullableAny() )
+                {
+                    errorDocId = LogImportErrors( errs, model.ClientId );
+                }
             }
 
             AutoReconcileLoads();
 
-            Notify( $"{created} loads were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.", NotificationType.Success );
+            string resp = $"{created} loads were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.";
+
+            if ( errs.NullableAny() && errorDocId > 0 )
+            {
+                resp = $"{resp} <a href='/Pallet/ViewDocument/{errorDocId}' target='_blank'>Click here</a> to view the erros.";
+            }
+
+            Notify( resp, NotificationType.Success );
 
             return ClientData( new PagingModel(), new CustomSearchModel() );
         }
@@ -3132,9 +3348,9 @@ namespace ACT.UI.Controllers
         {
             using ( DisputeService service = new DisputeService() )
             {
-                Dispute model = service.GetById( id );
+                Dispute dispute = service.GetById( id );
 
-                if ( model == null )
+                if ( dispute == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
@@ -3146,7 +3362,9 @@ namespace ACT.UI.Controllers
                     ViewBag.IncludeLayout = true;
                 }
 
-                return View( model );
+                dispute.DaysLeft = ( ( DisputeStatus ) dispute.Status == DisputeStatus.Active ) ? ( dispute.DaysLeft - ( DateTime.Now - dispute.CreatedOn ).Days ) : ( dispute.DaysLeft - ( DateTime.Now - dispute.ResolvedOn )?.Days );
+
+                return View( dispute );
             }
         }
 
@@ -3201,6 +3419,8 @@ namespace ACT.UI.Controllers
                     model.ChepLoadId = ( ch != null ) ? ch.Id : model.ChepLoadId;
                 }
 
+                model.DaysLeft = 0;
+
                 model.ActionById = ( !model.ActionById.HasValue ) ? CurrentUser.Id : model.ActionById;
                 model.ResolvedOn = ( model.Status != DisputeStatus.Active && !model.ResolvedOn.HasValue ) ? DateTime.Now : model.ResolvedOn;
                 model.ResolvedById = ( model.Status != DisputeStatus.Active && !model.ResolvedById.HasValue ) ? CurrentUser.Id : model.ResolvedById;
@@ -3210,12 +3430,12 @@ namespace ACT.UI.Controllers
                     Imported = false,
                     ProductId = p?.Id,
                     Action = model.Action,
-                    Sender = model.Sender,
+                    //Sender = model.Sender,
                     Product = model.Equipment,
                     ActionBy = model.ActionBy,
-                    Declarer = model.Declarer,
+                    Declarer = model.ActionBy,
                     Quantity = model.Quantity,
-                    Receiver = model.Receiver,
+                    //Receiver = model.Receiver,
                     DaysLeft = model.DaysLeft,
                     Location = model.Location,
                     ShipDate = model.ShipDate,
@@ -3233,13 +3453,13 @@ namespace ACT.UI.Controllers
                     DisputeEmail = model.DisputeEmail,
                     ResolvedById = model.ResolvedById,
                     HasDocket = ( ch != null ) ? 1 : 0,
-                    DisputeReason = model.DisputeReason,
-                    DelilveryDate = model.DelilveryDate,
+                    DelilveryDate = model.DeliveryDate,
                     EffectiveDate = model.EffectiveDate,
                     EquipmentCode = model.EquipmentCode,
                     DisputeComment = model.DisputeComment,
                     OtherReference = model.OtherReference,
                     TransactionType = model.TransactionType,
+                    DisputeReasonId = model.DisputeReasonId,
                     OriginalDocketNumber = model.OriginalDocketNumber,
                     CorrectionRequestDate = model.CorrectionRequestDate,
                     CorrectionRequestNumber = model.CorrectionRequestNumber,
@@ -3273,40 +3493,43 @@ namespace ACT.UI.Controllers
                 {
                     Id = dispute.Id,
                     EditMode = true,
-                    Sender = dispute.Sender,
-                    Declarer = dispute.Declarer,
-                    Receiver = dispute.Receiver,
+                    Action = dispute.Action,
+                    //Sender = dispute.Sender,
+                    ShipDate = dispute.ShipDate,
+                    Location = dispute.Location,
+                    ActionBy = dispute.ActionBy,
+                    Declarer = dispute.ActionBy,
+                    //Receiver = dispute.Receiver,
                     TDNNumber = dispute.TDNNumber,
                     Equipment = dispute.Equipment,
+                    Reference = dispute.Reference,
                     OtherParty = dispute.OtherParty,
                     ResolvedOn = dispute.ResolvedOn,
                     ChepLoadId = dispute.ChepLoadId,
+                    DataSource = dispute.DataSource,
+                    LocationId = dispute.LocationId,
                     ActionById = dispute.ActionedById,
                     DocketNumber = dispute.DocketNumber,
                     Quantity = ( int ) dispute.Quantity,
                     ResolvedById = dispute.ResolvedById,
                     DisputeEmail = dispute.DisputeEmail,
-                    DisputeReason = dispute.DisputeReason,
-                    Status = ( DisputeStatus ) dispute.Status,
-                    Action = dispute.Action,
-                    ActionBy = dispute.ActionBy,
-                    CorrectionRequestDate = dispute.CorrectionRequestDate,
-                    DataSource = dispute.DataSource,
                     DaysLeft = ( int ) dispute.DaysLeft,
-                    DelilveryDate = dispute.DelilveryDate,
-                    DisputeComment = dispute.DisputeComment,
+                    DeliveryDate = dispute.DelilveryDate,
                     EffectiveDate = dispute.EffectiveDate,
-                    Location = dispute.Location,
-                    OriginalDocketNumber = dispute.OriginalDocketNumber,
-                    OtherReference = dispute.OtherReference,
-                    Reference = dispute.Reference,
-                    ShipDate = dispute.ShipDate,
-                    TransactionType = dispute.TransactionType,
-                    LocationId = dispute.LocationId,
                     EquipmentCode = dispute.EquipmentCode,
+                    DisputeComment = dispute.DisputeComment,
+                    OtherReference = dispute.OtherReference,
+                    TransactionType = dispute.TransactionType,
+                    DisputeReasonId = dispute.DisputeReasonId,
+                    Status = ( DisputeStatus ) dispute.Status,
+                    OriginalDocketNumber = dispute.OriginalDocketNumber,
+                    CorrectionRequestDate = dispute.CorrectionRequestDate,
                     CorrectionRequestNumber = dispute.CorrectionRequestNumber,
-
                 };
+
+                model.DaysLeft = model.DaysLeft ?? 0;
+
+                model.DaysLeft = ( model.Status == DisputeStatus.Active ) ? ( model.DaysLeft - ( DateTime.Now - dispute.CreatedOn ).Days ) : ( model.DaysLeft - ( DateTime.Now - dispute.ResolvedOn )?.Days );
 
                 return View( model );
             }
@@ -3368,12 +3591,12 @@ namespace ACT.UI.Controllers
 
                 dispute.ProductId = p?.Id;
                 dispute.Action = model.Action;
-                dispute.Sender = model.Sender;
+                //dispute.Sender = model.Sender;
                 dispute.Product = model.Equipment;
                 dispute.ActionBy = model.ActionBy;
-                dispute.Declarer = model.Declarer;
+                dispute.Declarer = model.ActionBy;
                 dispute.Quantity = model.Quantity;
-                dispute.Receiver = model.Receiver;
+                //dispute.Receiver = model.Receiver;
                 dispute.DaysLeft = model.DaysLeft;
                 dispute.Location = model.Location;
                 dispute.ShipDate = model.ShipDate;
@@ -3390,17 +3613,19 @@ namespace ACT.UI.Controllers
                 dispute.DocketNumber = model.DocketNumber;
                 dispute.DisputeEmail = model.DisputeEmail;
                 dispute.ResolvedById = model.ResolvedById;
+                dispute.DelilveryDate = model.DeliveryDate;
                 dispute.HasDocket = ( ch != null ) ? 1 : 0;
-                dispute.DisputeReason = model.DisputeReason;
                 dispute.EquipmentCode = model.EquipmentCode;
-                dispute.DelilveryDate = model.DelilveryDate;
                 dispute.EffectiveDate = model.EffectiveDate;
                 dispute.DisputeComment = model.DisputeComment;
                 dispute.OtherReference = model.OtherReference;
                 dispute.TransactionType = model.TransactionType;
+                dispute.DisputeReasonId = model.DisputeReasonId;
                 dispute.OriginalDocketNumber = model.OriginalDocketNumber;
                 dispute.CorrectionRequestDate = model.CorrectionRequestDate;
                 dispute.CorrectionRequestNumber = model.CorrectionRequestNumber;
+
+                dispute.DaysLeft = ( model.Status == DisputeStatus.Active ) ? ( dispute.DaysLeft - ( DateTime.Now - dispute.CreatedOn ).Days ) : ( dispute.DaysLeft - ( DateTime.Now - dispute.ResolvedOn )?.Days );
 
                 service.Update( dispute );
 
@@ -3612,7 +3837,7 @@ namespace ACT.UI.Controllers
                         #region Create Dispute
 
                         cQuery = $" {cQuery} INSERT INTO [dbo].[Dispute] ([ChepLoadId],[ActionedById],[ProductId],[CreatedOn],[ModifiedOn],[ModifiedBy],[DocketNumber],[TDNNumber],[Reference],[EquipmentCode],[Equipment],[OtherParty],[Product],[Quantity],[ActionBy],[Imported],[Status],[LocationId],[Location],[Action],[OriginalDocketNumber],[OtherReference],[EffectiveDate],[ShipDate],[DelilveryDate],[DaysLeft],[CorrectionRequestNumber],[CorrectionRequestDate],[TransactionType],[DataSource],[HasDocket]) ";
-                        cQuery = $" {cQuery} VALUES ({chepLoadId},{CurrentUser.Id},{productId},{effectiveDate1},'{DateTime.Now}','{CurrentUser.Email}','{load[ 6 ]}','{load[ 24 ]}','{load[ 7 ]}','{load[ 12 ]}','{load[ 13 ]}','{load[ 4 ]}','{load[ 13 ]}',{qty},'{load[ 16 ]}',1,{( int ) Status.Active},'{load[ 18 ]}','{load[ 19 ]}','{load[ 2 ]}','{load[ 5 ]}','{load[ 8 ]}',{effectiveDate1},{shipmentDate1},{deliveryDate1},{load[ 0 ]},'{load[ 15 ]}',{correctionRequestDate1},'{load[ 20 ]}','{load[ 22 ]}',{hasDocket}) ";
+                        cQuery = $" {cQuery} VALUES ({chepLoadId},{CurrentUser.Id},{productId},{DateTime.Now},'{DateTime.Now}','{CurrentUser.Email}','{load[ 6 ]}','{load[ 24 ]}','{load[ 7 ]}','{load[ 12 ]}','{load[ 13 ]}','{load[ 4 ]}','{load[ 13 ]}',{qty},'{load[ 16 ]}',1,{( int ) Status.Active},'{load[ 18 ]}','{load[ 19 ]}','{load[ 2 ]}','{load[ 5 ]}','{load[ 8 ]}',{effectiveDate1},{shipmentDate1},{deliveryDate1},{load[ 0 ]},'{load[ 15 ]}',{correctionRequestDate1},'{load[ 20 ]}','{load[ 22 ]}',{hasDocket}) ";
 
                         #endregion
 
@@ -3927,6 +4152,7 @@ namespace ACT.UI.Controllers
                 ClientAuthorisation ca = new ClientAuthorisation()
                 {
                     Code = code,
+                    ChepLoadId = ch.Id,
                     Status = ( int ) Status.Active,
                     DocketNumber = ch.DocketNumber,
                     AuthorisationDate = DateTime.Now,
@@ -4065,6 +4291,7 @@ namespace ACT.UI.Controllers
                     return PartialView( "_OutstandingPallets1CustomSearch", new CustomSearchModel( "OutstandingPallets" ) );
                 }
 
+                csm.IsOP = true;
                 csm.BalanceStatus = BalanceStatus.NotBalanced;
                 csm.ReconciliationStatus = ReconciliationStatus.Reconciled;
 

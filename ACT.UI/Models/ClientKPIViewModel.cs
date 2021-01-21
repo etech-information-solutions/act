@@ -22,28 +22,28 @@ namespace ACT.UI.Models
         public string KPIDescription { get; set; }
 
         [Display( Name = "Disputes" )]
-        public Nullable<decimal> Disputes { get; set; }
+        public decimal? Disputes { get; set; }
 
         [Display( Name = "Outstanding Pallets" )]
-        public Nullable<decimal> OutstandingPallets { get; set; }
+        public decimal? OutstandingPallets { get; set; }
 
         [Display( Name = "Passons" )]
-        public Nullable<decimal> Passons { get; set; }
+        public decimal? Passons { get; set; }
 
         [Display( Name = "Monthly Cost" )]
-        public Nullable<decimal> MonthlyCost { get; set; }
+        public decimal? MonthlyCost { get; set; }
 
         [Display( Name = "Outstanding Days" )]
-        public Nullable<int> OutstandingDays { get; set; }
+        public int? OutstandingDays { get; set; }
 
         [Display( Name = "Resolve Days" )]
-        public Nullable<int> ResolveDays { get; set; }
+        public int? ResolveDays { get; set; }
 
         [Display( Name = "Weight" )]
-        public Nullable<decimal> Weight { get; set; }
+        public decimal? Weight { get; set; }
 
         [Display( Name = "Target Amount" )]
-        public Nullable<decimal> TargetAmount { get; set; }
+        public decimal? TargetAmount { get; set; }
 
         [Required]
         [Display( Name = "Target Period" )]

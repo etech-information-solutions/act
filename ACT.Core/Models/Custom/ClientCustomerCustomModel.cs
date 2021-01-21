@@ -9,8 +9,8 @@ namespace ACT.Core.Models.Custom
     {
         public int Id { get; set; }
         public int ClientId { get; set; }
-        public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModifiedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime ModifiedOn { get; set; }
         public string Modifiedby { get; set; }
         public string CustomerName { get; set; }
         public int Status { get; set; }

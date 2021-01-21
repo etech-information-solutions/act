@@ -1,6 +1,7 @@
 ﻿@model List<Contact>
 
-@using ACT.Data.Models
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
 
 <div class="grouped-area">
 
@@ -14,9 +15,9 @@
             <tr>
                 <th>Name</th>
                 <th>Title</th>
-                <th>ID #</th>
                 <th>Cell</th>
                 <th>Email</th>
+                <th>Job</th>
             </tr>
         </thead>
 
@@ -45,13 +46,28 @@
                             <input class="input" name="Contacts[@count].ContactTitle" placeholder="Contact Title" style="padding: 0 5px;" type="text" value="@b.ContactTitle">
                         </td>
                         <td>
-                            <input class="input" name="Contacts[@count].ContactIdNo" placeholder="Contact ID No." style="padding: 0 5px;" type="text" value="@b.ContactIdNo">
-                        </td>
-                        <td>
                             <input class="input" name="Contacts[@count].ContactCell" placeholder="Contact Cell" style="padding: 0 5px;" type="text" value="@b.ContactCell">
                         </td>
                         <td>
                             <input class="input" name="Contacts[@count].ContactEmail" placeholder="Contact Email" style="padding: 0 5px;" type="text" value="@b.ContactEmail">
+                        </td>
+                        <td>
+                            <select class="chzn" name="Contacts[@count].JobTitle" style="width: 98%;">
+                                <option value="">-- select</option>
+                                @foreach ( int j in Enum.GetValues( typeof( JobType ) ) )
+                                {
+                                    JobType jt = ( JobType ) j;
+
+                                    if ( jt == JobType.None )
+                                    {
+                                        continue;
+                                    }
+
+                                    string sel = ( b.JobTitle == j ) ? "selected=selected" : "";
+
+                                    <option value="@j" @sel>@jt.GetDisplayText()</option>
+                                }
+                            </select>
                         </td>
                     </tr>
 
@@ -72,13 +88,26 @@
                         <input class="input" name="Contacts[0].ContactTitle" placeholder="Contact Title" style="padding: 0 5px;" type="text" value="">
                     </td>
                     <td>
-                        <input class="input" name="Contacts[0].ContactIdNo" placeholder="Contact ID No." style="padding: 0 5px;" type="text" value="">
-                    </td>
-                    <td>
                         <input class="input" name="Contacts[0].ContactCell" placeholder="Contact Cell" style="padding: 0 5px;" type="text" value="">
                     </td>
                     <td>
                         <input class="input" name="Contacts[0].ContactEmail" placeholder="Contact Email" style="padding: 0 5px;" type="text" value="">
+                    </td>
+                    <td>
+                        <select class="chzn" name="Contacts[0].JobTitle" style="width: 98%;">
+                            <option value="">-- select</option>
+                            @foreach ( int j in Enum.GetValues( typeof( JobType ) ) )
+                            {
+                                JobType jt = ( JobType ) j;
+
+                                if ( jt == JobType.None )
+                                {
+                                    continue;
+                                }
+
+                                <option value="@j">@jt.GetDisplayText()</option>
+                            }
+                        </select>
                     </td>
                 </tr>
             }

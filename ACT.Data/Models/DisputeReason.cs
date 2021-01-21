@@ -12,20 +12,22 @@ namespace ACT.Data.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Contact
+    public partial class DisputeReason
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public DisputeReason()
+        {
+            this.Disputes = new HashSet<Dispute>();
+        }
+    
         public int Id { get; set; }
-        public int ObjectId { get; set; }
-        public string ObjectType { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
-        public string ContactName { get; set; }
-        public string ContactTitle { get; set; }
-        public string ContactIdNo { get; set; }
-        public string ContactCell { get; set; }
-        public string ContactEmail { get; set; }
-        public Nullable<int> JobTitle { get; set; }
+        public string Reason { get; set; }
         public int Status { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Dispute> Disputes { get; set; }
     }
 }

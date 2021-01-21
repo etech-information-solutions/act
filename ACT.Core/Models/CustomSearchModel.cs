@@ -145,6 +145,15 @@ namespace ACT.Core.Models
         public int OutstandingReasonId { get; set; }
 
         /// <summary>
+        /// Can be used as a selected Dispute Reason 
+        /// </summary>
+        [Display( Name = "Dispute Reason" )]
+        public int DisputeReasonId
+        {
+            get; set;
+        }
+
+        /// <summary>
         /// Can be used for a Start date range
         /// </summary>
         [Display( Name = "From Date" )]
@@ -323,6 +332,13 @@ namespace ACT.Core.Models
             set;
         }
 
+        [Display( Name = "Dispute Status" )]
+        public DisputeStatus DisputeStatus
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Can be used for a Filter date range
         /// </summary>
@@ -343,6 +359,11 @@ namespace ACT.Core.Models
         }
 
         public decimal? Amount { get; set; }
+
+        /// <summary>
+        /// Is Outstanding Pallets
+        /// </summary>
+        public bool IsOP { get; set; }
 
         [Display( Name = "Object Id" )]
         public int ObjectId
@@ -432,6 +453,8 @@ namespace ACT.Core.Models
         public Dictionary<int, string> ClientSiteOptions { get; set; }
 
         public Dictionary<int, string> OutstandingReasonOptions { get; set; }
+
+        public List<DisputeReason> DisputeReasonOptions { get; set; }
 
         public List<string> TableNameOptions
         {
@@ -533,9 +556,11 @@ namespace ACT.Core.Models
 
                     using ( SiteService sservice = new SiteService() )
                     using ( ClientService cservice = new ClientService() )
+                    using ( DisputeReasonService drervice = new DisputeReasonService() )
                     {
                         SiteOptions = sservice.List( true );
                         ClientOptions = cservice.List( true );
+                        DisputeReasonOptions = drervice.List();
                     }
 
                     break;
@@ -660,6 +685,7 @@ namespace ACT.Core.Models
             this.DocumentType = DocumentType.All;
             this.ActivityType = ActivityTypes.All;
             this.InvoiceStatus = InvoiceStatus.All;
+            this.DisputeStatus = DisputeStatus.All;
             this.BalanceStatus = BalanceStatus.None;
             this.PSPClientStatus = PSPClientStatus.All;
             this.ReconciliationStatus = ReconciliationStatus.All;

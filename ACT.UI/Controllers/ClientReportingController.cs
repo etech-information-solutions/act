@@ -74,7 +74,7 @@ namespace ACT.UI.Controllers
                                                     item.Status,
                                                     item.Equipment,
                                                     item.Quantity,
-                                                    item.DisputeReason,
+                                                    item.DisputeReasonDetails,
                                                     Environment.NewLine );
                             }
                         }

@@ -1,6 +1,7 @@
 ﻿@model List<Contact>
 
-@using ACT.Data.Models
+@using ACT.Core.Enums;
+@using ACT.Data.Models;
 
 <div class="grouped-area">
 
@@ -15,9 +16,9 @@
                 <th>#</th>
                 <th>Name</th>
                 <th>Title</th>
-                <th>ID #</th>
                 <th>Cell</th>
                 <th>Email</th>
+                <th>Job</th>
             </tr>
         </thead>
 
@@ -25,7 +26,7 @@
 
             @if ( Model.NullableAny() )
             {
-                int count = 0;
+                int count = 1;
 
                 foreach ( Contact b in Model )
                 {
@@ -40,13 +41,13 @@
                             @b.ContactTitle
                         </td>
                         <td>
-                            @b.ContactIdNo
-                        </td>
-                        <td>
                             @b.ContactCell
                         </td>
                         <td>
                             @b.ContactEmail
+                        </td>
+                        <td>
+                            @( b.JobTitle.HasValue ? ( ( JobType ) b.JobTitle ).GetDisplayText() : string.Empty )
                         </td>
                     </tr>
 

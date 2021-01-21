@@ -1151,6 +1151,8 @@ namespace ACT.Core.Services
         public List<ClientLoad> ListByChepRefOtherRef( string reference, string otherRef )
         {
             context.Database.CommandTimeout = 3600;
+            context.Configuration.LazyLoadingEnabled = true;
+            context.Configuration.ProxyCreationEnabled = true;
 
             return context.ClientLoads.Where( cl => cl.ReceiverNumber.Trim() == reference.Trim() || cl.ReceiverNumber == otherRef.Trim() ).ToList();
         }

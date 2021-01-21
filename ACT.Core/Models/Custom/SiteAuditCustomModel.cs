@@ -10,14 +10,14 @@ namespace ACT.Core.Models.Custom
         public int PSPId { get; set; }
         public int SiteId { get; set; }
         public int ClientId { get; set; }
-        public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModifiedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
-        public Nullable<System.DateTime> AuditDate { get; set; }
+        public DateTime? AuditDate { get; set; }
         public string Equipment { get; set; }
-        public Nullable<decimal> PalletsOutstanding { get; set; }
-        public Nullable<decimal> PalletsCounted { get; set; }
-        public Nullable<decimal> WriteoffPallets { get; set; }
+        public decimal? PalletsOutstanding { get; set; }
+        public decimal? PalletsCounted { get; set; }
+        public decimal? WriteoffPallets { get; set; }
         public string CustomerName { get; set; }
         public byte[] CustomerSignature { get; set; }
         public string RepName { get; set; }
@@ -26,9 +26,9 @@ namespace ACT.Core.Models.Custom
         public byte[] PalletAuditorSign { get; set; }
         public string DocumentLocation { get; set; }
         public int Status { get; set; }
-        public Nullable<int> CustomerSignatureId { get; set; }
-        public Nullable<int> RepSignatureId { get; set; }
-        public Nullable<int> PalletAuditorSignatureId { get; set; }
+        public int? CustomerSignatureId { get; set; }
+        public int? RepSignatureId { get; set; }
+        public int? PalletAuditorSignatureId { get; set; }
 
         public string PSPName { get; set; }
         public string SiteName { get; set; }

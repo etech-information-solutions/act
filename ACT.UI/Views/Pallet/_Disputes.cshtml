@@ -73,8 +73,11 @@
             <th data-name="ActionUser" data-column="d.ActionBy">
                 Action By
             </th>
-            <th data-name="CreatedOn" data-column="d.Status">
+            <th data-name="Status" data-column="d.Status">
                 Status
+            </th>
+            <th data-name="DisputeReasonDetails" data-column="dr.Reason">
+                Reason
             </th>
             <th data-name="Actions">
                 Actions
@@ -99,7 +102,7 @@
                         @count
                     </td>
                     <td>
-                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
+                        @( ( item.EffectiveDate ?? item.CreatedOn ).ToString( "yyyy-MM-dd" ) )
 
                         <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Dispute">
                             <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
@@ -134,6 +137,9 @@
                         {
                             <small class="block">By @item.ResolvedUser <i class="block">on @item.ResolvedOn.Value.ToString( "yyyy-MM-dd HH:mm" )</i></small>
                         }
+                    </td>
+                    <td>
+                        @item.DisputeReasonDetails
                     </td>
                     <td width="15%">
                         @Html.ActionLink( "Details", "DisputeDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )

@@ -374,6 +374,7 @@
     <Content Include="Images\warning.png" />
     <Content Include="Images\wireless-signal.png" />
     <Content Include="Scripts\ACT\act.js" />
+    <Content Include="Scripts\ACT\menu.js" />
     <Content Include="Scripts\ACT\shortcut.js" />
     <Content Include="Scripts\ACT\loader.js" />
     <Content Include="Scripts\ACT\modal.js" />
@@ -678,6 +679,9 @@
     <Content Include="Views\Shared\_OutstandingPallets1CustomSearch.cshtml" />
     <Content Include="Views\Pallet\EditOutstandingPallet.cshtml" />
     <Content Include="Views\Pallet\ImportDisputes.cshtml" />
+    <Content Include="Views\Pallet\PoolingAgentDataDetails - Copy.cshtml" />
+    <Content Include="Views\Pallet\EditClientData - Copy.cshtml" />
+    <Content Include="Views\Pallet\ClientDataDetails - Copy.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

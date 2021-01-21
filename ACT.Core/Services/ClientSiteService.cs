@@ -67,5 +67,15 @@ namespace ACT.Core.Services
 
             return clientOptions;
         }
+
+        /// <summary>
+        /// Gets a client site using the specified site code
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public ClientSite GetBySiteCode( string code )
+        {
+            return context.ClientSites.FirstOrDefault( s => s.ClientSiteCode.Trim() == code.Trim() );
+        }
     }
 }

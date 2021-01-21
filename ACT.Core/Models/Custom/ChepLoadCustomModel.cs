@@ -9,8 +9,8 @@ namespace ACT.Core.Models.Custom
         public int Id { get; set; }
         public int ClientId { get; set; }
         public int? OutstandingReasonId { get; set; }
-        public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModifiedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public string ChepStatus { get; set; }
         public string TransactionType { get; set; }
@@ -28,15 +28,15 @@ namespace ACT.Core.Models.Custom
         public string Ref { get; set; }
         public string OtherRef { get; set; }
         public string BatchRef { get; set; }
-        public Nullable<System.DateTime> ShipmentDate { get; set; }
-        public Nullable<System.DateTime> DeliveryDate { get; set; }
-        public Nullable<System.DateTime> EffectiveDate { get; set; }
-        public Nullable<System.DateTime> CreateDate { get; set; }
+        public DateTime? ShipmentDate { get; set; }
+        public DateTime? DeliveryDate { get; set; }
+        public DateTime? EffectiveDate { get; set; }
+        public DateTime? CreateDate { get; set; }
         public string CreatedBy { get; set; }
         public string InvoiceNumber { get; set; }
         public string Reason { get; set; }
         public string DataSource { get; set; }
-        public Nullable<int> BalanceStatus { get; set; }
+        public int? BalanceStatus { get; set; }
         public int Status { get; set; }
         public int PostingType { get; set; }
 

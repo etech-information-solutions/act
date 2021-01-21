@@ -1653,6 +1653,7 @@
                 SortBy: ACT.UI[t].PageSortBy || ACT.UI.PageSortBy || "Id",
                 UserId: ACT.UI[t].PageUserId || ACT.UI.PageUserId || 0,
                 Status: ACT.UI[t].PageStatus || ACT.UI.PageStatus || -1,
+                DisputeStatus: ACT.UI[t].PageDisputeStatus || ACT.UI.PageDisputeStatus || -1,
                 BalanceStatus: ACT.UI[t].PageBalanceStatus || ACT.UI.PageBalanceStatus || -1,
                 PSPClientStatus: ACT.UI[t].PagePSPClientStatus || ACT.UI.PagePSPClientStatus || -1,
                 ReconciliationStatus: ACT.UI[t].PageReconciliationStatus || ACT.UI.PageReconciliationStatus || -1,
@@ -1664,6 +1665,7 @@
                 PSPProductId: ACT.UI[t].PageProductId || ACT.UI.PagePSPProductId || 0,
                 CampaignId: ACT.UI[t].PageCampaignId || ACT.UI.PageCampaignId || 0,
                 VehicleId: ACT.UI[t].PageVehicleId || ACT.UI.PageVehicleId || 0,
+                DisputeReasonId: ACT.UI[t].PageDisputeReasonId || ACT.UI.PageDisputeReasonId || 0,
                 OutstandingReasonId: ACT.UI[t].PageOutstandingReasonId || ACT.UI.PageOutstandingReasonId || 0,
                 SelectedItems: ACT.UI[t].SelectedItems || ACT.UI.SelectedItems || [],
                 FromDate: ACT.UI[t].PageFromDate || ACT.UI.PageFromDate || "",
@@ -1711,7 +1713,9 @@
             ACT.UI[t].PageCampaignId = ACT.UI.PageCampaignId = 0;
             ACT.UI[t].PageTransporterId = ACT.UI.PageTransporterId = 0;
             ACT.UI[t].PageVehicleId = ACT.UI.PageVehicleId = 0;
+            ACT.UI[t].PageDisputeReasonId = ACT.UI.PageDisputeReasonId = 0;
             ACT.UI[t].PageOutstandingReasonId = ACT.UI.PageOutstandingReasonId = 0;
+            ACT.UI[t].PageDisputeStatus = ACT.UI.PageDisputeStatus = -1;
             ACT.UI[t].PageBalanceStatus = ACT.UI.PageBalanceStatus = -1;
             ACT.UI[t].PagePSPClientStatus = ACT.UI.PagePSPClientStatus = -1;
             ACT.UI[t].PageReconciliationStatus = ACT.UI.PageReconciliationStatus = -1;
@@ -2913,6 +2917,13 @@
 
                     sender.find( 'select#VehicleId' ).val( ACT.UI[t].PageVehicleId );
                 }
+                if ( ACT.UI[t].PageDisputeReasonId && ACT.UI[t].PageDisputeReasonId !== 0 )
+                {
+                    h += "Dispute Reason: <b>" + sender.find( 'select#DisputeReasonId:first option[value="' + ACT.UI[t].PageDisputeReasonId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Dispute Reason: <a style='color: #69f95a;'>" + sender.find( 'select#DisputeReasonId:first option[value="' + ACT.UI[t].PageDisputeReasonId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#DisputeReasonId' ).val( ACT.UI[t].PageDisputeReasonId );
+                }
                 if ( ACT.UI[t].PageOutstandingReasonId && ACT.UI[t].PageOutstandingReasonId !== 0 )
                 {
                     h += "Outstanding Reason: <b>" + sender.find( 'select#OutstandingReasonId:first option[value="' + ACT.UI[t].PageOutstandingReasonId + '"]' ).text() + "</b>~";
@@ -2940,6 +2951,13 @@
                     q += " <b class='italic'>[ Balance Status: <a style='color: #69f95a;'>" + sender.find( 'select#BalanceStatus:first option[value="' + ACT.UI[t].PageBalanceStatus + '"]' ).text() + "</a> ]</b> ";
 
                     sender.find( 'select#BalanceStatus' ).val( ACT.UI[t].PageBalanceStatus );
+                }
+                if ( ACT.UI[t].PageDisputeStatus && ACT.UI[t].PageDisputeStatus !== -1 )
+                {
+                    h += "Dispute Status: <b>" + sender.find( 'select#DisputeStatus:first option[value="' + ACT.UI[t].PageDisputeStatus + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Dispute Status: <a style='color: #69f95a;'>" + sender.find( 'select#DisputeStatus:first option[value="' + ACT.UI[t].PageDisputeStatus + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#DisputeStatus' ).val( ACT.UI[t].PageDisputeStatus );
                 }
                 if ( ACT.UI[t].PagePSPClientStatus && ACT.UI[t].PagePSPClientStatus !== -1 )
                 {
@@ -4668,7 +4686,21 @@
                                 success: function ( s )
                                 {
                                     $( "#Equipment" ).val( s.Equipment.trim() ).attr( "readonly", "readonly" );
+                                    $( "#EquipmentCode" ).val( s.EquipmentCode.trim() ).attr( "readonly", "readonly" );
                                     $( "#DocketNumber" ).val( s.DocketNumber.trim() ).attr( "readonly", "readonly" );
+                                    $( "#OriginalDocketNumber" ).val( s.OriginalDocketNumber.trim() ).attr( "readonly", "readonly" );
+                                    $( "#Reference" ).val( s.Ref.trim() ).attr( "readonly", "readonly" );
+                                    $( "#OtherReference" ).val( s.OtherRef.trim() ).attr( "readonly", "readonly" );
+                                    $( "#OtherParty" ).val( s.OtherParty.trim() ).attr( "readonly", "readonly" );
+                                    $( "#Location" ).val( s.Location.trim() ).attr( "readonly", "readonly" );
+                                    $( "#LocationId" ).val( s.LocationId.trim() ).attr( "readonly", "readonly" );
+
+                                    $( '[name="EffectiveDate"]' ).val( s.EffectiveDate ).attr( "readonly", "readonly" );
+                                    $( '[name="ShipDate"]' ).val( s.ShipmentDate ).attr( "readonly", "readonly" );
+                                    $( '[name="DeliveryDate"]' ).val( s.DeliveryDate ).attr( "readonly", "readonly" );
+
+                                    $( "#TransactionType" ).val( s.TransactionType.trim() ).attr( "readonly", "readonly" );
+                                    $( "#DataSource" ).val( s.DataSource.trim() ).attr( "readonly", "readonly" );
 
                                     ACT.UI.DataHighlightFields( target.parent() );
                                 }

@@ -126,6 +126,7 @@ toastr.options = {
 var ACT = {
     UI: {},
     Init: {},
+    Menu: {},
     Modal: {},
     Loader: {},
     Validation: {}

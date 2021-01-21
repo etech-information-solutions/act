@@ -38,6 +38,7 @@ namespace ACT.UI
 
             bundles.Add( new ScriptBundle( "~/bundles/ACT" ).Include(
                         "~/Scripts/ACT/act.js",
+                        "~/Scripts/ACT/menu.js",
                         "~/Scripts/ACT/ui.js",
                         "~/Scripts/ACT/modal.js",
                         "~/Scripts/ACT/loader.js",

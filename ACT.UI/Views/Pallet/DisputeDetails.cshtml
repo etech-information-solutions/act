@@ -85,7 +85,7 @@
             Action By
         </div>
         <div class="display-field">
-            @( $"{Model.User?.Name} {Model.User?.Surname}" )
+            @Html.DisplayFor( model => model.ActionBy )
         </div>
 
         <div class="display-label">
@@ -112,13 +112,6 @@
             </div>
         }
 
-        <div class="display-label">
-            Docket Found?
-        </div>
-        <div class="display-field">
-            @(Model.HasDocket == 1 ? "Yes" : "NO")
-        </div>
-
     </div>
 
     <div class="left" style="width: 31%; margin-right: 3%;">
@@ -127,7 +120,7 @@
             Dispute Reason
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.DisputeReason )
+            @Html.DisplayFor( model => model.DisputeReason.Reason )
         </div>
 
         <div class="display-label">
@@ -144,7 +137,7 @@
             @Html.DisplayFor( model => model.OtherParty )
         </div>
 
-        <div class="display-label">
+        @*<div class="display-label">
             Sender
         </div>
         <div class="display-field">
@@ -156,14 +149,14 @@
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.Receiver )
-        </div>
+        </div>*@
 
-        <div class="display-label">
+        @*<div class="display-label">
             Declarer
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.Declarer )
-        </div>
+        </div>*@
 
         <div class="display-label">
             Quantity
@@ -191,6 +184,20 @@
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.DisputeComment )
+        </div>
+
+        <div class="display-label">
+            Docket Found?
+        </div>
+        <div class="display-field">
+            @(Model.HasDocket == 1 ? "Yes" : "NO")
+        </div>
+
+        <div class="display-label">
+            Data Source
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.DataSource )
         </div>
 
     </div>
@@ -251,13 +258,6 @@
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.TransactionType )
-        </div>
-
-        <div class="display-label">
-            Data Source
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.DataSource )
         </div>
 
     </div>

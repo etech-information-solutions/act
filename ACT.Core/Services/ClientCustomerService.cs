@@ -350,5 +350,15 @@ namespace ACT.Core.Services
         {
             return context.ClientCustomers.FirstOrDefault( cc => cc.ClientId == clientId && cc.CustomerNumber.Trim() == customerNumber.Trim() );
         }
+
+        /// <summary>
+        /// Gets a client customer record using the specified client id
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <returns></returns>
+        public ClientCustomer GetByClient( int clientId )
+        {
+            return context.ClientCustomers.FirstOrDefault( cc => cc.ClientId == clientId );
+        }
     }
 }

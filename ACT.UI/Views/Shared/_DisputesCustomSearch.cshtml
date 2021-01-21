@@ -25,6 +25,28 @@
                 @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
             </div>
 
+            <div class="left" style="width: 49%; margin-right: 1%;">
+
+                <div class="editor-label">
+                    Status
+                </div>
+                <div class="editor-field">
+                    @Html.EnumDropDownFor( model => model.DisputeStatus, false, true, new { @class = "chzn", @style = "width: 98%;" } )
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 49%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.DisputeReasonId )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.DisputeReasonId, model => model.DisputeReasonOptions, c => c.Id, c => c.Reason, true, new { @class = "chzn", @style = "width: 98%;" } )
+                </div>
+
+            </div>
+
             <div class="clear"></div>
 
             <div class="left" style="width: 49%; margin-right: 1%;">

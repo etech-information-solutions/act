@@ -276,7 +276,7 @@ namespace ACT.Monitor.Monitors
                         ActionedById = user?.Id,
                         Status = ( int ) Status.Active,
                         DisputeEmail = string.Join( ";", message.From ),
-                        DisputeReason = disputeReason[ disputeReason.Length - 1 ],
+                        //DisputeReason = disputeReason[ disputeReason.Length - 1 ],
                         Sender = lines.FirstOrDefault( l => l.Contains( "sender:" ) ).Split( ':' )[ 1 ].Trim(),
                         Product = lines.FirstOrDefault( l => l.Contains( "product:" ) ).Split( ':' )[ 1 ].Trim(),
                         Declarer = lines.FirstOrDefault( l => l.Contains( "declarer:" ) ).Split( ':' )[ 1 ].Trim(),

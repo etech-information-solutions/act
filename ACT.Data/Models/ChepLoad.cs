@@ -19,12 +19,14 @@ namespace ACT.Data.Models
         {
             this.ChepClients = new HashSet<ChepClient>();
             this.ChepLoadCheps = new HashSet<ChepLoadChep>();
-            this.Tasks = new HashSet<Task>();
+            this.ClientAuthorisations = new HashSet<ClientAuthorisation>();
             this.Disputes = new HashSet<Dispute>();
+            this.Tasks = new HashSet<Task>();
         }
     
         public int Id { get; set; }
         public int ClientId { get; set; }
+        public Nullable<int> ClientSiteId { get; set; }
         public Nullable<int> OutstandingReasonId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
@@ -56,16 +58,20 @@ namespace ACT.Data.Models
         public Nullable<int> BalanceStatus { get; set; }
         public int Status { get; set; }
         public int PostingType { get; set; }
+        public Nullable<int> ExchangeInd { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }
         public virtual Client Client { get; set; }
+        public virtual ClientSite ClientSite { get; set; }
         public virtual OutstandingReason OutstandingReason { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepLoadChep> ChepLoadCheps { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Task> Tasks { get; set; }
+        public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Dispute> Disputes { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Task> Tasks { get; set; }
     }
 }

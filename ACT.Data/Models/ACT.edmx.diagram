@@ -6,82 +6,84 @@
     <edmx:Diagrams>
       <Diagram DiagramId="e9564c2a9b2949ffa97edfafe5f410d3" Name="Diagram1" ZoomLevel="109">
         <EntityTypeShape EntityType="ACTModel.Address" Width="1.5" PointX="5.75" PointY="0.75" />
-        <EntityTypeShape EntityType="ACTModel.AuditLog" Width="1.5" PointX="5.75" PointY="5.75" />
+        <EntityTypeShape EntityType="ACTModel.AuditLog" Width="1.5" PointX="0.75" PointY="5.75" />
         <EntityTypeShape EntityType="ACTModel.Bank" Width="1.5" PointX="0.75" PointY="1.375" />
         <EntityTypeShape EntityType="ACTModel.BankDetail" Width="1.5" PointX="3" PointY="1" />
-        <EntityTypeShape EntityType="ACTModel.Broadcast" Width="1.5" PointX="4.5" PointY="96.75" />
-        <EntityTypeShape EntityType="ACTModel.ChepAudit" Width="1.5" PointX="3" PointY="91" />
-        <EntityTypeShape EntityType="ACTModel.ChepClient" Width="1.5" PointX="11.25" PointY="40.875" />
-        <EntityTypeShape EntityType="ACTModel.ChepLoad" Width="1.5" PointX="9" PointY="38" />
-        <EntityTypeShape EntityType="ACTModel.ChepLoadChep" Width="1.5" PointX="11.25" PointY="48.875" />
-        <EntityTypeShape EntityType="ACTModel.ChepLoadOld" Width="1.5" PointX="3" PointY="11.75" />
-        <EntityTypeShape EntityType="ACTModel.Client" Width="1.5" PointX="0.75" PointY="38" />
-        <EntityTypeShape EntityType="ACTModel.ClientAuthorisation" Width="1.5" PointX="7.5" PointY="52.375" />
-        <EntityTypeShape EntityType="ACTModel.ClientBudget" Width="1.5" PointX="3" PointY="62.625" />
-        <EntityTypeShape EntityType="ACTModel.ClientCustomer" Width="1.5" PointX="3" PointY="45.125" />
-        <EntityTypeShape EntityType="ACTModel.ClientGroup" Width="1.5" PointX="6" PointY="36.875" />
-        <EntityTypeShape EntityType="ACTModel.ClientInvoice" Width="1.5" PointX="15.75" PointY="49.25" />
-        <EntityTypeShape EntityType="ACTModel.ClientKPI" Width="1.5" PointX="3" PointY="77.875" />
-        <EntityTypeShape EntityType="ACTModel.ClientLoad" Width="1.5" PointX="13.5" PointY="45.375" />
-        <EntityTypeShape EntityType="ACTModel.ClientProduct" Width="1.5" PointX="3" PointY="31.625" />
-        <EntityTypeShape EntityType="ACTModel.ClientProductMonthly" Width="1.5" PointX="5.25" PointY="30.875" />
-        <EntityTypeShape EntityType="ACTModel.ClientSite" Width="1.5" PointX="5.25" PointY="45.125" />
-        <EntityTypeShape EntityType="ACTModel.ClientUser" Width="1.5" PointX="8" PointY="47.875" />
-        <EntityTypeShape EntityType="ACTModel.Comment" Width="1.5" PointX="3.75" PointY="86.5" />
-        <EntityTypeShape EntityType="ACTModel.Contact" Width="1.5" PointX="7.75" PointY="0.75" />
-        <EntityTypeShape EntityType="ACTModel.DeclineReason" Width="1.5" PointX="7.75" PointY="5.75" />
-        <EntityTypeShape EntityType="ACTModel.DeliveryNote" Width="1.5" PointX="16.5" PointY="41.5" />
-        <EntityTypeShape EntityType="ACTModel.DeliveryNoteLine" Width="1.5" PointX="18.75" PointY="42.75" />
-        <EntityTypeShape EntityType="ACTModel.Document" Width="1.5" PointX="7.5" PointY="75.25" />
-        <EntityTypeShape EntityType="ACTModel.EstimatedLoad" Width="1.5" PointX="7.75" PointY="8.75" />
-        <EntityTypeShape EntityType="ACTModel.Group" Width="1.5" PointX="3.75" PointY="27" />
-        <EntityTypeShape EntityType="ACTModel.Image" Width="1.5" PointX="9.75" PointY="0.75" />
-        <EntityTypeShape EntityType="ACTModel.Invoice" Width="1.5" PointX="13.5" PointY="57" />
-        <EntityTypeShape EntityType="ACTModel.Journal" Width="1.5" PointX="18.75" PointY="47.25" />
-        <EntityTypeShape EntityType="ACTModel.Notification" Width="1.5" PointX="4.5" PointY="73.875" />
-        <EntityTypeShape EntityType="ACTModel.OutstandingReason" Width="1.5" PointX="6.75" PointY="27.25" />
-        <EntityTypeShape EntityType="ACTModel.Product" Width="1.5" PointX="0.75" PointY="47.625" />
-        <EntityTypeShape EntityType="ACTModel.ProductPrice" Width="1.5" PointX="3" PointY="7.625" />
-        <EntityTypeShape EntityType="ACTModel.PSP" Width="1.5" PointX="0.75" PointY="28.625" />
-        <EntityTypeShape EntityType="ACTModel.PSPBilling" Width="1.5" PointX="8" PointY="30.875" />
-        <EntityTypeShape EntityType="ACTModel.PSPBudget" Width="1.5" PointX="3" PointY="49.875" />
-        <EntityTypeShape EntityType="ACTModel.PSPClient" Width="1.5" PointX="6" PointY="40.75" />
-        <EntityTypeShape EntityType="ACTModel.PSPConfig" Width="1.5" PointX="3" PointY="19.375" />
-        <EntityTypeShape EntityType="ACTModel.PSPProduct" Width="1.5" PointX="11" PointY="27.75" />
-        <EntityTypeShape EntityType="ACTModel.PSPUser" Width="1.5" PointX="5.75" PointY="57.625" />
-        <EntityTypeShape EntityType="ACTModel.Region" Width="1.5" PointX="1.5" PointY="70.625" />
-        <EntityTypeShape EntityType="ACTModel.Role" Width="1.5" PointX="4.5" PointY="101.375" />
-        <EntityTypeShape EntityType="ACTModel.Site" Width="1.5" PointX="0.75" PointY="52.125" />
-        <EntityTypeShape EntityType="ACTModel.SiteAudit" Width="1.5" PointX="3" PointY="38.375" />
-        <EntityTypeShape EntityType="ACTModel.SiteBilling" Width="1.5" PointX="8" PointY="57.125" />
-        <EntityTypeShape EntityType="ACTModel.SiteBudget" Width="1.5" PointX="3" PointY="55.75" />
-        <EntityTypeShape EntityType="ACTModel.SystemConfig" Width="1.5" PointX="9.75" PointY="5.75" />
-        <EntityTypeShape EntityType="ACTModel.Task" Width="1.5" PointX="14.25" PointY="40.25" />
-        <EntityTypeShape EntityType="ACTModel.Token" Width="1.5" PointX="3.75" PointY="83.125" />
-        <EntityTypeShape EntityType="ACTModel.Transporter" Width="1.5" PointX="11.25" PointY="58.375" />
-        <EntityTypeShape EntityType="ACTModel.User" Width="1.5" PointX="1.5" PointY="83.25" />
-        <EntityTypeShape EntityType="ACTModel.UserBroadcast" Width="1.5" PointX="6.75" PointY="85.125" />
-        <EntityTypeShape EntityType="ACTModel.UserDocument" Width="1.5" PointX="9.75" PointY="85.125" />
-        <EntityTypeShape EntityType="ACTModel.UserNotification" Width="1.5" PointX="6.75" PointY="81" />
-        <EntityTypeShape EntityType="ACTModel.UserRole" Width="1.5" PointX="6.75" PointY="88.875" />
-        <EntityTypeShape EntityType="ACTModel.UserTask" Width="1.5" PointX="16.5" PointY="38" />
-        <EntityTypeShape EntityType="ACTModel.Vehicle" Width="1.5" PointX="11.25" PointY="53.5" />
-        <EntityTypeShape EntityType="ACTModel.PSPPeriod" Width="1.5" PointX="11.75" PointY="0.75" />
+        <EntityTypeShape EntityType="ACTModel.Broadcast" Width="1.5" PointX="0.75" PointY="57.125" />
+        <EntityTypeShape EntityType="ACTModel.ChepAudit" Width="1.5" PointX="7.5" PointY="59.125" />
+        <EntityTypeShape EntityType="ACTModel.ChepClient" Width="1.5" PointX="21" PointY="33.375" />
+        <EntityTypeShape EntityType="ACTModel.ChepLoad" Width="1.5" PointX="15.75" PointY="30.125" />
+        <EntityTypeShape EntityType="ACTModel.ChepLoadChep" Width="1.5" PointX="18" PointY="46" />
+        <EntityTypeShape EntityType="ACTModel.Client" Width="1.5" PointX="3" PointY="26.625" />
+        <EntityTypeShape EntityType="ACTModel.ClientAuthorisation" Width="1.5" PointX="18" PointY="32.75" />
+        <EntityTypeShape EntityType="ACTModel.ClientBudget" Width="1.5" PointX="5.25" PointY="73.875" />
+        <EntityTypeShape EntityType="ACTModel.ClientCustomer" Width="1.5" PointX="5.25" PointY="28.75" />
+        <EntityTypeShape EntityType="ACTModel.ClientGroup" Width="1.5" PointX="8.25" PointY="20.375" />
+        <EntityTypeShape EntityType="ACTModel.ClientInvoice" Width="1.5" PointX="21" PointY="29.375" />
+        <EntityTypeShape EntityType="ACTModel.ClientKPI" Width="1.5" PointX="5.25" PointY="18.25" />
+        <EntityTypeShape EntityType="ACTModel.ClientLoad" Width="1.5" PointX="12.75" PointY="29.125" />
+        <EntityTypeShape EntityType="ACTModel.ClientProduct" Width="1.5" PointX="7.5" PointY="24.625" />
+        <EntityTypeShape EntityType="ACTModel.ClientProductMonthly" Width="1.5" PointX="9.75" PointY="24.75" />
+        <EntityTypeShape EntityType="ACTModel.ClientSite" Width="1.5" PointX="7.5" PointY="31.5" />
+        <EntityTypeShape EntityType="ACTModel.ClientUser" Width="1.5" PointX="3" PointY="55.375" />
+        <EntityTypeShape EntityType="ACTModel.Comment" Width="1.5" PointX="3" PointY="94" />
+        <EntityTypeShape EntityType="ACTModel.Contact" Width="1.5" PointX="2.75" PointY="5.75" />
+        <EntityTypeShape EntityType="ACTModel.DeclineReason" Width="1.5" PointX="4.75" PointY="5.75" />
+        <EntityTypeShape EntityType="ACTModel.DeliveryNote" Width="1.5" PointX="9.75" PointY="30.75" />
+        <EntityTypeShape EntityType="ACTModel.DeliveryNoteLine" Width="1.5" PointX="12" PointY="24" />
+        <EntityTypeShape EntityType="ACTModel.Dispute" Width="1.5" PointX="9" PointY="47.875" />
+        <EntityTypeShape EntityType="ACTModel.DisputeReason" Width="1.5" PointX="6.75" PointY="70.5" />
+        <EntityTypeShape EntityType="ACTModel.Document" Width="1.5" PointX="0.75" PointY="61.75" />
+        <EntityTypeShape EntityType="ACTModel.EstimatedLoad" Width="1.5" PointX="7.75" PointY="0.75" />
+        <EntityTypeShape EntityType="ACTModel.Group" Width="1.5" PointX="6" PointY="14.5" />
+        <EntityTypeShape EntityType="ACTModel.Image" Width="1.5" PointX="4.75" PointY="8.75" />
+        <EntityTypeShape EntityType="ACTModel.Invoice" Width="1.5" PointX="18.75" PointY="23.125" />
+        <EntityTypeShape EntityType="ACTModel.Journal" Width="1.5" PointX="18" PointY="37.5" />
+        <EntityTypeShape EntityType="ACTModel.Notification" Width="1.5" PointX="3.75" PointY="59.375" />
+        <EntityTypeShape EntityType="ACTModel.OutstandingReason" Width="1.5" PointX="13.5" PointY="41.75" />
+        <EntityTypeShape EntityType="ACTModel.Product" Width="1.5" PointX="5.25" PointY="24.125" />
+        <EntityTypeShape EntityType="ACTModel.ProductPrice" Width="1.5" PointX="7.5" PointY="10.125" />
+        <EntityTypeShape EntityType="ACTModel.PSP" Width="1.5" PointX="0.75" PointY="41.125" />
+        <EntityTypeShape EntityType="ACTModel.PSPBilling" Width="1.5" PointX="22.75" PointY="37.375" />
+        <EntityTypeShape EntityType="ACTModel.PSPBudget" Width="1.5" PointX="3" PointY="67.875" />
+        <EntityTypeShape EntityType="ACTModel.PSPClient" Width="1.5" PointX="8.25" PointY="44" />
+        <EntityTypeShape EntityType="ACTModel.PSPConfig" Width="1.5" PointX="3" PointY="37.125" />
+        <EntityTypeShape EntityType="ACTModel.PSPProduct" Width="1.5" PointX="15.5" PointY="25.125" />
+        <EntityTypeShape EntityType="ACTModel.PSPUser" Width="1.5" PointX="6" PointY="55.375" />
+        <EntityTypeShape EntityType="ACTModel.Region" Width="1.5" PointX="3" PointY="44.125" />
+        <EntityTypeShape EntityType="ACTModel.Role" Width="1.5" PointX="3.75" PointY="62.875" />
+        <EntityTypeShape EntityType="ACTModel.Site" Width="1.5" PointX="5.25" PointY="36.5" />
+        <EntityTypeShape EntityType="ACTModel.SiteAudit" Width="1.5" PointX="10.5" PointY="37.875" />
+        <EntityTypeShape EntityType="ACTModel.SiteBilling" Width="1.5" PointX="7.5" PointY="38.875" />
+        <EntityTypeShape EntityType="ACTModel.SiteBudget" Width="1.5" PointX="7.5" PointY="64.125" />
+        <EntityTypeShape EntityType="ACTModel.SystemConfig" Width="1.5" PointX="9.75" PointY="0.75" />
+        <EntityTypeShape EntityType="ACTModel.Task" Width="1.5" PointX="18" PointY="27.75" />
+        <EntityTypeShape EntityType="ACTModel.Token" Width="1.5" PointX="3" PointY="90.75" />
+        <EntityTypeShape EntityType="ACTModel.Transporter" Width="1.5" PointX="10.5" PointY="19.625" />
+        <EntityTypeShape EntityType="ACTModel.User" Width="1.5" PointX="0.75" PointY="49.75" />
+        <EntityTypeShape EntityType="ACTModel.UserBroadcast" Width="1.5" PointX="3" PointY="48.625" />
+        <EntityTypeShape EntityType="ACTModel.UserDocument" Width="1.5" PointX="3" PointY="51.5" />
+        <EntityTypeShape EntityType="ACTModel.UserNotification" Width="1.5" PointX="6" PointY="47.5" />
+        <EntityTypeShape EntityType="ACTModel.UserRole" Width="1.5" PointX="6" PointY="51.375" />
+        <EntityTypeShape EntityType="ACTModel.UserTask" Width="1.5" PointX="20.25" PointY="40.5" />
+        <EntityTypeShape EntityType="ACTModel.Vehicle" Width="1.5" PointX="10.5" PointY="14.75" />
+        <EntityTypeShape EntityType="ACTModel.PSPPeriod" Width="1.5" PointX="0.75" PointY="10.75" />
         <AssociationConnector Association="ACTModel.FK_BankDetail_Bank" />
         <AssociationConnector Association="ACTModel.FK_UserBroadcasts_Broadcasts" />
         <AssociationConnector Association="ACTModel.FK_ChepAudit_Sites" />
         <AssociationConnector Association="ACTModel.FK_ChepClient_ClientLoad" />
         <AssociationConnector Association="ACTModel.FK_ChepClients_ChepLoads" />
         <AssociationConnector Association="ACTModel.FK_ChepLoad_Client" />
+        <AssociationConnector Association="ACTModel.FK_ChepLoad_ClientSite" />
         <AssociationConnector Association="ACTModel.FK_ChepLoad_OutstandingReason" />
         <AssociationConnector Association="ACTModel.FK_ChepLoadChep_ChepLoad" />
+        <AssociationConnector Association="ACTModel.FK_ClientAuthorisation_ChepLoad" />
+        <AssociationConnector Association="ACTModel.FK_Disputes_ChepLoads" />
         <AssociationConnector Association="ACTModel.FK_UserTasks_ChepLoads" />
-        <AssociationConnector Association="ACTModel.FK_ChepLoad_Site" />
         <AssociationConnector Association="ACTModel.FK_ClientBudget_Clients" />
         <AssociationConnector Association="ACTModel.FK_ClientCustomer_Client" />
         <AssociationConnector Association="ACTModel.FK_ClientGroup_Client" />
         <AssociationConnector Association="ACTModel.FK_ClientKPIs_Clients" />
-        <AssociationConnector Association="ACTModel.FK_ClientLoads_ChepClients" />
         <AssociationConnector Association="ACTModel.FK_ClientLoads_Clients" />
         <AssociationConnector Association="ACTModel.FK_ClientProducts_Clients" />
         <AssociationConnector Association="ACTModel.FK_ClientUsers_Clients" />
@@ -96,6 +98,7 @@
         <AssociationConnector Association="ACTModel.FK_ClientInvoices_ClientLoads" />
         <AssociationConnector Association="ACTModel.FK_ClientInvoices_Invoices" />
         <AssociationConnector Association="ACTModel.FK_ClientLoad_ClientSite" />
+        <AssociationConnector Association="ACTModel.FK_ClientLoad_ClientSite1" />
         <AssociationConnector Association="ACTModel.FK_ClientLoad_OutstandingReason" />
         <AssociationConnector Association="ACTModel.FK_ClientLoad_Transporter" />
         <AssociationConnector Association="ACTModel.FK_ClientLoads_Vehicle" />
@@ -109,6 +112,10 @@
         <AssociationConnector Association="ACTModel.FK_ClientUsers_Users" />
         <AssociationConnector Association="ACTModel.FK_Comment_User" />
         <AssociationConnector Association="ACTModel.FK_DeliveryNoteLines_DeliveryNote" />
+        <AssociationConnector Association="ACTModel.FK_Dispute_DisputeReason" />
+        <AssociationConnector Association="ACTModel.FK_Dispute_Product" />
+        <AssociationConnector Association="ACTModel.FK_Dispute_User" />
+        <AssociationConnector Association="ACTModel.FK_Dispute_User1" />
         <AssociationConnector Association="ACTModel.FK_UserDocument_Document" />
         <AssociationConnector Association="ACTModel.FK_Journals_SiteAudit" />
         <AssociationConnector Association="ACTModel.FK_UserNotification_Notification" />
@@ -138,12 +145,7 @@
         <AssociationConnector Association="ACTModel.FK_UserNotification_User" />
         <AssociationConnector Association="ACTModel.FK_UserRoles_Users" />
         <AssociationConnector Association="ACTModel.FK_UserTask_User" />
-        <EntityTypeShape EntityType="ACTModel.Dispute" Width="1.5" PointX="14.25" PointY="60.875" />
-        <AssociationConnector Association="ACTModel.FK_Disputes_ChepLoads" />
-        <AssociationConnector Association="ACTModel.FK_Dispute_Product" />
-        <AssociationConnector Association="ACTModel.FK_Dispute_User" />
-        <AssociationConnector Association="ACTModel.FK_Dispute_User1" />
-        </Diagram>
+      </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

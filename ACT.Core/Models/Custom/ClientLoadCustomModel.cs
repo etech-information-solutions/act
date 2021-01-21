@@ -12,6 +12,7 @@ namespace ACT.Core.Models.Custom
         public int? VehicleId { get; set; }
         public int? ClientSiteId { get; set; }
         public int? TransporterId { get; set; }
+        public int? ToClientSiteId { get; set; }
         public int? OutstandingReasonId { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime ModifiedOn { get; set; }
@@ -46,6 +47,9 @@ namespace ACT.Core.Models.Custom
         public int? PODStatus { get; set; }
         public int? OrderStatus { get; set; }
         public string UID { get; set; }
+        public decimal? TransporterLiableQty { get; set; }
+        public string ClientLoadComment { get; set; }
+        public string ClientLoadNotes { get; set; }
 
         public int? ImageCount { get; set; }
         public int? DocumentCount { get; set; }

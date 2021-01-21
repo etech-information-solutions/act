@@ -19,7 +19,7 @@ namespace ACT.UI.Models
         [Display( Name = "Chep Load" )]
         public int? ChepLoadId { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Action By" )]
         public int? ActionById { get; set; }
 
@@ -29,6 +29,10 @@ namespace ACT.UI.Models
         [Display( Name = "Resolved On" )]
         public DateTime? ResolvedOn { get; set; }
 
+        //[Required]
+        [Display( Name = "Dispute Reason" )]
+        public int? DisputeReasonId { get; set; }
+
         [Required]
         [Display( Name = "Docket #" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
@@ -37,11 +41,6 @@ namespace ACT.UI.Models
         [Display( Name = "Original Docket #" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string OriginalDocketNumber { get; set; }
-
-        [Required]
-        [Display( Name = "Dispute Reason" )]
-        [StringLength( 500, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
-        public string DisputeReason { get; set; }
 
         [Display( Name = "Dispute Email" )]
         [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
@@ -116,8 +115,8 @@ namespace ACT.UI.Models
         [Display( Name = "Ship Date" )]
         public DateTime? ShipDate { get; set; }
 
-        [Display( Name = "Delilvery Date" )]
-        public DateTime? DelilveryDate { get; set; }
+        [Display( Name = "Delivery Date" )]
+        public DateTime? DeliveryDate { get; set; }
 
         [Display( Name = "Days Left" )]
         public int? DaysLeft { get; set; }
@@ -172,6 +171,17 @@ namespace ACT.UI.Models
                 using ( UserService uservice = new UserService() )
                 {
                     return uservice.List( true, RoleType.Client );
+                }
+            }
+        }
+
+        public List<DisputeReason> DisputeReasonOptions
+        {
+            get
+            {
+                using ( DisputeReasonService drservice = new DisputeReasonService() )
+                {
+                    return drservice.List();
                 }
             }
         }

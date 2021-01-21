@@ -6,16 +6,16 @@ namespace ACT.Core.Models.Custom
     public partial class TaskCustomModel
     {
         public int Id { get; set; }
-        public Nullable<int> ClientId { get; set; }
-        public Nullable<int> ChepLoadId { get; set; }
-        public Nullable<int> ClientLoadId { get; set; }
-        public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModifiedOn { get; set; }
+        public int? ClientId { get; set; }
+        public int? ChepLoadId { get; set; }
+        public int? ClientLoadId { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public Nullable<System.DateTime> Date { get; set; }
-        public Nullable<int> Action { get; set; }
+        public DateTime? Date { get; set; }
+        public int? Action { get; set; }
         public int Status { get; set; }
     }
 }

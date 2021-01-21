@@ -16,9 +16,9 @@
                 <th>#</th>
                 <th>Make</th>
                 <th>Model</th>
-                <th>Year</th>
+                @*<th>Year</th>
                 <th>Engine #</th>
-                <th>VIN #</th>
+                <th>VIN #</th>*@
                 <th>Reg #</th>
                 <th>Type</th>
             </tr>
@@ -28,7 +28,7 @@
 
             @if ( Model.NullableAny() )
             {
-                int count = 0;
+                int count = 1;
 
                 foreach ( Vehicle b in Model )
                 {
@@ -42,7 +42,7 @@
                         <td>
                             @b.Model
                         </td>
-                        <td>
+                        @*<td>
                             @b.Year
                         </td>
                         <td>
@@ -50,7 +50,7 @@
                         </td>
                         <td>
                             @b.VINNumber
-                        </td>
+                        </td>*@
                         <td>
                             @b.Registration
                         </td>

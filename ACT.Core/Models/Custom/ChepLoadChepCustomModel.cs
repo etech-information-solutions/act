@@ -10,8 +10,8 @@ namespace ACT.Core.Models.Custom
     {
         public int Id { get; set; }
         public int ChepLoadId { get; set; }
-        public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModifiedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public string PCN { get; set; }
         public string PRN { get; set; }

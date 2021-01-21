@@ -12,7 +12,7 @@ namespace ACT.Core.Models.Custom
         public DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime StartDate { get; set; }
-        public Nullable<DateTime> EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public string Message { get; set; }
         public int Status { get; set; }
 

@@ -28,6 +28,7 @@ namespace ACT.Data.Models
         public Nullable<int> VehicleId { get; set; }
         public Nullable<int> ClientSiteId { get; set; }
         public Nullable<int> TransporterId { get; set; }
+        public Nullable<int> ToClientSiteId { get; set; }
         public Nullable<int> OutstandingReasonId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
@@ -62,14 +63,17 @@ namespace ACT.Data.Models
         public Nullable<int> PODStatus { get; set; }
         public Nullable<int> OrderStatus { get; set; }
         public string UID { get; set; }
+        public Nullable<decimal> TransporterLiableQty { get; set; }
+        public string ClientLoadComment { get; set; }
+        public string ClientLoadNotes { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }
         public virtual Client Client { get; set; }
-        public virtual Client Client1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientInvoice> ClientInvoices { get; set; }
         public virtual ClientSite ClientSite { get; set; }
+        public virtual ClientSite ClientSite1 { get; set; }
         public virtual OutstandingReason OutstandingReason { get; set; }
         public virtual Transporter Transporter { get; set; }
         public virtual Vehicle Vehicle { get; set; }

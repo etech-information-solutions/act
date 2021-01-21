@@ -363,31 +363,6 @@ namespace ACT.Core.Services
             return model;
         }
 
-        public List<Site> GetSitesByClients( int clientId )
-        {
-            List<Site> siteList;
-            siteList = ( from c in context.ClientSites
-                         join e in context.Sites
-                         on c.SiteId equals e.Id
-                         where c.ClientCustomerId == clientId
-                         select e ).ToList();
-
-            return siteList;
-        }
-
-        public List<Site> GetSitesByClients( int clientId, int siteId )
-        {
-            List<Site> siteList;
-            siteList = ( from c in context.ClientSites
-                         join e in context.Sites
-                         on c.SiteId equals e.Id
-                         where c.ClientCustomerId == clientId
-                         where c.SiteId == siteId
-                         select e ).ToList();
-
-            return siteList;
-        }
-
         public int GetClientBySite( int siteId )
         {
             int clientId;
@@ -398,48 +373,6 @@ namespace ACT.Core.Services
 
 
             return clientId;
-        }
-
-        public List<Site> GetSitesByClientsIncluded( int clientId, int siteId )
-        {
-            List<Site> siteList;
-            siteList = ( from c in context.ClientSites
-                         join e in context.Sites
-                         on c.SiteId equals e.Id
-                         where c.ClientCustomerId == clientId
-                         where e.SiteId == siteId
-                         select e ).ToList();
-
-
-            return siteList;
-        }
-
-        public List<Site> GetSitesByClientIncluded( int clientId )
-        {
-            List<Site> siteList;
-            siteList = ( from s in context.Sites
-                         join e in context.ClientSites
-                         on s.Id equals e.SiteId
-                         where e.ClientCustomerId == clientId
-                         select s ).ToList();
-            return siteList;
-        }
-
-        public List<Site> GetSitesByClientsExcluded( int clientId, int siteId )
-        {
-            List<Site> siteList;
-            List<int> exclList = new List<int>();
-            exclList.Add( siteId );
-
-            siteList = ( from c in context.ClientSites
-                         join e in context.Sites
-                         on c.SiteId equals e.Id
-                         where c.ClientCustomerId == clientId
-                         where e.SiteId == null
-                         where !exclList.Contains( c.SiteId )
-                         select e ).ToList();
-
-            return siteList;
         }
 
         /// <summary>
@@ -466,6 +399,16 @@ namespace ACT.Core.Services
         public Site GetByXYCoordinates( string xCord, string yCord )
         {
             return context.Sites.FirstOrDefault( s => s.XCord == xCord && s.YCord == yCord );
+        }
+
+        /// <summary>
+        /// Gets a site using the specified site code
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public Site GetBySiteCode( string code )
+        {
+            return context.Sites.Include( "ClientSites" ).FirstOrDefault( s => s.SiteCodeChep.Trim() == code.Trim() );
         }
     }
 }

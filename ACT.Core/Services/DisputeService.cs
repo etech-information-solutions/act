@@ -56,6 +56,8 @@ namespace ACT.Core.Services
                 { new SqlParameter( "take", pm.Take ) },
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmDisputeReasonId", csm.DisputeReasonId ) },
+                { new SqlParameter( "csmDisputeStatus", ( int ) csm.DisputeStatus ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
@@ -68,6 +70,7 @@ namespace ACT.Core.Services
 	                            COUNT(d.[Id]) AS [Total]
                              FROM
 	                            [dbo].[Dispute] d
+                                LEFT OUTER JOIN [dbo].[DisputeReason] dr ON dr.[Id]=d.[DisputeReasonId]
                                 LEFT OUTER JOIN [dbo].[ChepLoad] cl ON cl.[Id]=d.[ChepLoadId]
                                 LEFT OUTER JOIN [dbo].[User] u1 ON u1.[Id]=d.[ActionedById]
                                 LEFT OUTER JOIN [dbo].[User] u2 ON u2.[Id]=d.[ResolvedById]";
@@ -119,17 +122,25 @@ namespace ACT.Core.Services
 
             #region Custom Search
 
+            if ( csm.DisputeStatus != DisputeStatus.All )
+            {
+                query = $"{query} AND (d.Status=@csmDisputeStatus) ";
+            }
+            if ( csm.DisputeReasonId != 0 )
+            {
+                query = $"{query} AND (dr.Id=@csmDisputeReasonId) ";
+            }
             if ( csm.ClientId != 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientLoad] cl1, [dbo].[ChepClient] cc WHERE cl1.[Id]=cc.[ClientLoadsId] AND cc.[ChepLoadsId]=cl.[Id] AND cl1.[ClientId]=@csmClientId) ";
+                query = $"{query} AND (cl.[ClientId]=@csmClientId) ";
             }
             else if ( csm.ClientIds.NullableAny() )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientLoad] cl1, [dbo].[ChepClient] cc WHERE cl1.[Id]=cc.[ClientLoadsId] AND cc.[ChepLoadsId]=cl.[Id] AND cl1.[ClientId] IN({string.Join( ",", csm.ClientIds )})) ";
+                query = $"{query} AND (cl.[ClientId] IN({string.Join( ",", csm.ClientIds )})) ";
             }
             if ( csm.SiteId != 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs, [dbo].[ClientLoad] cl1, [dbo].[ChepClient] cc WHERE cl1.[Id]=cc.[ClientLoadsId] AND cs.[ClientId]=cl1.[ClientId] AND cc.[ChepLoadsId]=cl.[Id] AND cs.Id=@csmSiteId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[Id]=cl.[ClientSiteId] AND cs.SiteId=@csmSiteId) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -157,7 +168,6 @@ namespace ACT.Core.Services
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
                 query = string.Format( @"{0} AND (d.[DocketNumber] LIKE '%{1}%' OR
-                                                  d.[DisputeReason] LIKE '%{1}%' OR
                                                   d.[DisputeEmail] LIKE '%{1}%' OR
                                                   d.[TDNNumber] LIKE '%{1}%' OR
                                                   d.[Reference] LIKE '%{1}%' OR
@@ -174,7 +184,8 @@ namespace ACT.Core.Services
                                                   u2.[Name] LIKE '%{1}%' OR
                                                   u2.[Surname] LIKE '%{1}%' OR
                                                   u2.[Email] LIKE '%{1}%' OR
-                                                  u2.[Cell] LIKE '%{1}%'
+                                                  u2.[Cell] LIKE '%{1}%' OR
+                                                  dr.[Reason] LIKE '%{1}%'
                                              ) ", query, csm.Query.Trim() );
             }
 
@@ -208,6 +219,8 @@ namespace ACT.Core.Services
                 { new SqlParameter( "take", pm.Take ) },
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmDisputeReasonId", csm.DisputeReasonId ) },
+                { new SqlParameter( "csmDisputeStatus", ( int ) csm.DisputeStatus ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
@@ -218,10 +231,12 @@ namespace ACT.Core.Services
 
             string query = @"SELECT
 	                            d.*,
+	                            dr.Reason AS [DisputeReasonDetails],
 	                            u1.Name + ' ' + u1.Surname AS [ActionUser],
 	                            u2.Name + ' ' + u2.Surname AS [ResolvedUser]
                              FROM
 	                            [dbo].[Dispute] d
+                                LEFT OUTER JOIN [dbo].[DisputeReason] dr ON dr.[Id]=d.[DisputeReasonId]
                                 LEFT OUTER JOIN [dbo].[ChepLoad] cl ON cl.[Id]=d.[ChepLoadId]
                                 LEFT OUTER JOIN [dbo].[User] u1 ON u1.[Id]=d.[ActionedById]
                                 LEFT OUTER JOIN [dbo].[User] u2 ON u2.[Id]=d.[ResolvedById]";
@@ -273,17 +288,25 @@ namespace ACT.Core.Services
 
             #region Custom Search
 
+            if ( csm.DisputeStatus != DisputeStatus.All )
+            {
+                query = $"{query} AND (d.Status=@csmDisputeStatus) ";
+            }
+            if ( csm.DisputeReasonId != 0 )
+            {
+                query = $"{query} AND (dr.Id=@csmDisputeReasonId) ";
+            }
             if ( csm.ClientId != 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientLoad] cl1, [dbo].[ChepClient] cc WHERE cl1.[Id]=cc.[ClientLoadsId] AND cc.[ChepLoadsId]=cl.[Id] AND cl1.[ClientId]=@csmClientId) ";
+                query = $"{query} AND (cl.[ClientId]=@csmClientId) ";
             }
             else if ( csm.ClientIds.NullableAny() )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientLoad] cl1, [dbo].[ChepClient] cc WHERE cl1.[Id]=cc.[ClientLoadsId] AND cc.[ChepLoadsId]=cl.[Id] AND cl1.[ClientId] IN({string.Join( ",", csm.ClientIds )})) ";
+                query = $"{query} AND (cl.[ClientId] IN({string.Join( ",", csm.ClientIds )})) ";
             }
             if ( csm.SiteId != 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs, [dbo].[ClientLoad] cl1, [dbo].[ChepClient] cc WHERE cl1.[Id]=cc.[ClientLoadsId] AND cs.[ClientId]=cl1.[ClientId] AND cc.[ChepLoadsId]=cl.[Id] AND cs.Id=@csmSiteId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[Id]=cl.[ClientSiteId] AND cs.SiteId=@csmSiteId) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -311,7 +334,6 @@ namespace ACT.Core.Services
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
                 query = string.Format( @"{0} AND (d.[DocketNumber] LIKE '%{1}%' OR
-                                                  d.[DisputeReason] LIKE '%{1}%' OR
                                                   d.[DisputeEmail] LIKE '%{1}%' OR
                                                   d.[TDNNumber] LIKE '%{1}%' OR
                                                   d.[Reference] LIKE '%{1}%' OR
@@ -328,7 +350,8 @@ namespace ACT.Core.Services
                                                   u2.[Name] LIKE '%{1}%' OR
                                                   u2.[Surname] LIKE '%{1}%' OR
                                                   u2.[Email] LIKE '%{1}%' OR
-                                                  u2.[Cell] LIKE '%{1}%'
+                                                  u2.[Cell] LIKE '%{1}%' OR
+                                                  dr.[Reason] LIKE '%{1}%'
                                              ) ", query, csm.Query.Trim() );
             }
 

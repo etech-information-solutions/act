@@ -543,6 +543,15 @@ namespace ACT.Core.Services
         }
 
         /// <summary>
+        /// Gets a list of the entities available
+        /// </summary>
+        /// <returns></returns>
+        public virtual List<T> SqlQueryList<T>( string query)
+        {
+            return context.Database.SqlQuery<T>( query ).ToList();
+        }
+
+        /// <summary>
         /// Gets the maximum value in the generic T in the specified column
         /// </summary>
         /// <param name="column"></param>

@@ -75,13 +75,17 @@ namespace ACT.Core.Services
 
             #region Custom Search
 
+            if ( csm.IsOP )
+            {
+                query = $"{query} AND (cl.Quantity > 0)";
+                query = $"{query} AND (cl.Ref LIKE '5000%')";
+            }
             if ( csm.ClientId > 0 )
             {
                 query = $"{query} AND (c.Id=@cmsClientId)";
             }
             if ( csm.BalanceStatus != BalanceStatus.None )
             {
-                query = $"{query} AND (cl.Quantity > 0)";
                 query = $"{query} AND (cl.BalanceStatus=@csmBalanceStatus)";
             }
             if ( csm.ReconciliationStatus != ReconciliationStatus.All )
@@ -215,13 +219,17 @@ namespace ACT.Core.Services
 
             #region Custom Search
 
+            if ( csm.IsOP )
+            {
+                query = $"{query} AND (cl.Quantity > 0)";
+                query = $"{query} AND (cl.Ref LIKE '5000%')";
+            }
             if ( csm.ClientId > 0 )
             {
                 query = $"{query} AND (c.Id=@cmsClientId)";
             }
             if ( csm.BalanceStatus != BalanceStatus.None )
             {
-                query = $"{query} AND (cl.Quantity > 0)";
                 query = $"{query} AND (cl.BalanceStatus=@csmBalanceStatus)";
             }
             if ( csm.ReconciliationStatus != ReconciliationStatus.All )
@@ -443,15 +451,6 @@ namespace ACT.Core.Services
         public List<ChepLoad> ListDocketNumberAndReference( string docketNumber, string reference )
         {
             return context.ChepLoads.Where( ch => ch.DocketNumber.Trim() == docketNumber.Trim() || ch.Ref.Trim() == reference.Trim() || ch.OtherRef.Trim() == reference.Trim() ).ToList();
-        }
-
-        /// <summary>
-        /// Gets a list of unreconcilled ChepLoads that can reconcile itself
-        /// </summary>
-        /// <returns></returns>
-        public List<ChepLoad> GetAutoReconcilliableLoads()
-        {
-            return context.ChepLoads.Where( ch => ch.Status == ( int ) ReconciliationStatus.Unreconciled && context.ChepLoads.Any( a => a.Ref.Trim() == ch.DocketNumber.Trim() ) ).ToList();
         }
     }
 }

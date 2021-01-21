@@ -30,60 +30,98 @@
         </h2>
     }
 
-    <div class="left" style="width: 48%; margin-right: 4%;">
+    <div class="left" style="width: 31%; margin-right: 3%;">
 
         <div class="display-label">
-            Account Number
+            Days Left
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.ChepLoad.AccountNumber )
+            @Html.DisplayFor( model => model.DaysLeft )
         </div>
 
         <div class="display-label">
-            TDN Number
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.TDNNumber )
-        </div>
-
-        <div class="display-label">
-            Raised Date
-        </div>
-        <div class="display-field">
-            @Model.CreatedOn.ToString( "yyyy-MM-dd" )
-        </div>
-
-        <div class="display-label">
-            Docket Number
+            Docket #
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.DocketNumber )
         </div>
 
         <div class="display-label">
-            Reference
+            Original Docket #
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.OriginalDocketNumber )
+        </div>
+
+        <div class="display-label">
+            Ref #
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.Reference )
         </div>
 
         <div class="display-label">
-            Quantity
+            Other Ref #
         </div>
         <div class="display-field">
-            @Math.Round( Model.Quantity ?? 0, 0 ).ToString()
+            @Html.DisplayFor( model => model.OtherReference )
         </div>
 
         <div class="display-label">
-            Equipment
+            TDN
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Equipment )
+            @Html.DisplayFor( model => model.TDNNumber )
         </div>
+
+        <div class="display-label">
+            Action
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Action )
+        </div>
+
+        <div class="display-label">
+            Action By
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ActionBy )
+        </div>
+
+        <div class="display-label">
+            Status
+        </div>
+        <div class="display-field">
+            @(( ( DisputeStatus ) Model.Status ).GetDisplayText())
+        </div>
+
+        @if ( ( DisputeStatus ) Model.Status == DisputeStatus.Resolved || ( DisputeStatus ) Model.Status == DisputeStatus.Cancelled )
+        {
+            <div class="display-label">
+                @( ( ( DisputeStatus ) Model.Status ).GetDisplayText() ) By
+            </div>
+            <div class="display-field">
+                @( $"{Model.User1?.Name} {Model.User1?.Surname}" )
+            </div>
+
+            <div class="display-label">
+                @( ( ( DisputeStatus ) Model.Status ).GetDisplayText() ) On
+            </div>
+            <div class="display-field">
+                @( Model.ResolvedOn?.ToString( "yyyy-MM-dd @ HH:mm" ) )
+            </div>
+        }
 
     </div>
 
-    <div class="left" style="width: 48%;">
+    <div class="left" style="width: 31%; margin-right: 3%;">
+
+        <div class="display-label">
+            Dispute Reason
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.DisputeReason.Reason )
+        </div>
 
         <div class="display-label">
             Dispute Email
@@ -99,50 +137,129 @@
             @Html.DisplayFor( model => model.OtherParty )
         </div>
 
+        @*<div class="display-label">
+                Sender
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.Sender )
+            </div>
+
+            <div class="display-label">
+                Receiver
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.Receiver )
+            </div>*@
+
+        @*<div class="display-label">
+                Declarer
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.Declarer )
+            </div>*@
+
         <div class="display-label">
-            Sender
+            Quantity
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Sender )
+            @( Math.Round( Model.Quantity ?? 0, 0 ) )
         </div>
 
         <div class="display-label">
-            Receiver
+            Equipment
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Receiver )
+            @Html.DisplayFor( model => model.Equipment )
         </div>
 
         <div class="display-label">
-            Declarer
+            Equipment Code
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Declarer )
+            @Html.DisplayFor( model => model.EquipmentCode )
         </div>
 
         <div class="display-label">
-            Product
+            Dispute Comment
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Product )
+            @Html.DisplayFor( model => model.DisputeComment )
         </div>
 
         <div class="display-label">
-            Status
+            Docket Found?
         </div>
         <div class="display-field">
-            @(( ( DisputeStatus ) Model.DisputeStatus ).GetDisplayText())
+            @(Model.HasDocket == 1 ? "Yes" : "NO")
+        </div>
+
+        <div class="display-label">
+            Data Source
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.DataSource )
         </div>
 
     </div>
 
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+    <div class="left" style="width: 31%;">
 
-    <div class="display-label">
-        Dispute Reason
-    </div>
-    <div class="display-field">
-        @Html.DisplayFor( model => model.DisputeReason )
+        <div class="display-label">
+            Location
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Location )
+        </div>
+
+        <div class="display-label">
+            Location ID
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.LocationId )
+        </div>
+
+        <div class="display-label">
+            Effective Date
+        </div>
+        <div class="display-field">
+            @( Model.EffectiveDate?.ToString( "yyyy-MM-dd" ) )
+        </div>
+
+        <div class="display-label">
+            Ship Date
+        </div>
+        <div class="display-field">
+            @( Model.ShipDate?.ToString( "yyyy-MM-dd" ) )
+        </div>
+
+        <div class="display-label">
+            Delilvery Date
+        </div>
+        <div class="display-field">
+            @( Model.DelilveryDate?.ToString( "yyyy-MM-dd" ) )
+        </div>
+
+        <div class="display-label">
+            Correction Request Date
+        </div>
+        <div class="display-field">
+            @( Model.CorrectionRequestDate?.ToString( "yyyy-MM-dd" ) )
+        </div>
+
+        <div class="display-label">
+            Correction Request #
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.CorrectionRequestNumber )
+        </div>
+
+        <div class="display-label">
+            Transaction Type
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.TransactionType )
+        </div>
+
     </div>
 
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>

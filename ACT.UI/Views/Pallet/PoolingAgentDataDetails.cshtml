@@ -12,13 +12,15 @@
     ViewBag.Title = "Details";
 
     List<ClientLoad> clientLoads = ViewBag.ClientLoads;
+
+    ClientLoad cl = clientLoads?.FirstOrDefault();
 }
 
 @if ( ViewBag.IncludeLayout != null )
 {
     <h2>
         <img alt="" src="@Url.Content( "~/images/info.png" )" />
-        <span>Pooling Agent Data Details</span>
+        <span>Chep Load Details</span>
     </h2>
 }
 
@@ -28,80 +30,94 @@
     {
         <h2>
             <img alt="" src="@Url.Content( "~/images/info.png" )" />
-            <span>Pooling Agent Data Details</span>
+            <span>Chep Load Details</span>
         </h2>
     }
 
     <div class="left" style="width: 31%; margin-right: 3%;">
 
         <div class="display-label">
-            Client
+            Load/Shipment Number
         </div>
         <div class="display-field">
-            @( Model.Client?.CompanyName )
+            @( cl?.LoadNumber )
         </div>
 
         <div class="display-label">
-            Date Imported/Created
+            Load Date
         </div>
         <div class="display-field">
-            @( Model.CreatedOn.ToString( "yyyy-MM-dd" ) )
+            @( cl?.LoadDate?.ToString( "dd/MM/yyyy" ) )
         </div>
 
         <div class="display-label">
-            Chep Status
+            Client Site From
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.ChepStatus )
+            @( cl?.ClientSite?.Site?.Name )
         </div>
 
         <div class="display-label">
-            Transaction Type
+            Region From
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.TransactionType )
+            @( cl?.ClientSite?.Site?.Region?.Name )
         </div>
 
         <div class="display-label">
-            Docket Number
+            Client Site To
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.DocketNumber )
+            @( cl?.ClientSite1?.Site?.Name )
         </div>
 
         <div class="display-label">
-            Original Docket Number
+            Region To
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.OriginalDocketNumber )
+            @( cl?.ClientSite1?.Site?.Region?.Name )
         </div>
 
         <div class="display-label">
-            Status
+            Customer Group
         </div>
         <div class="display-field">
-            @(( ( ReconciliationStatus ) Model.Status ).GetDisplayText())
+            @( cl?.Client?.ClientGroups?.FirstOrDefault()?.Group?.Description )
         </div>
 
         <div class="display-label">
-            Posting Type
+            Delivery Note
         </div>
         <div class="display-field">
-            @(( ( PostingType ) Model.PostingType ).GetDisplayText())
+            @( cl?.DeliveryNote )
         </div>
 
         <div class="display-label">
-            Balance Status
+            Invoice Number
         </div>
         <div class="display-field">
-            @(( ( BalanceStatus ) Model.BalanceStatus ).GetDisplayText())
+            @( cl?.ChepInvoiceNo )
         </div>
 
         <div class="display-label">
-            Reason
+            Sales Order Number
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Reason )
+            @( cl?.ReferenceNumber )
+        </div>
+
+        <div class="display-label">
+            Primary/Second
+        </div>
+        <div class="display-field">
+            &nbsp;
+        </div>
+
+        <div class="display-label">
+            Depot STO Number
+        </div>
+        <div class="display-field">
+            &nbsp;
         </div>
 
     </div>
@@ -109,66 +125,80 @@
     <div class="left" style="width: 31%; margin-right: 3%;">
 
         <div class="display-label">
-            UMI
+            CHEP ACC NO/GLID
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.UMI )
+            @( Model.DocketNumber )
         </div>
 
         <div class="display-label">
-            Location Id
+            Delivery Date
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.LocationId )
+            @( Model.DeliveryDate )
         </div>
 
         <div class="display-label">
-            Location
+            Transporter Name
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Location )
+            @( cl?.Transporter?.Name )
         </div>
 
         <div class="display-label">
-            Other Party Id
+            Fleet Number
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.OtherPartyId )
+            &nbsp;
         </div>
 
         <div class="display-label">
-            Other Party
+            Vehicle Registration
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.OtherParty )
+            @( cl?.Vehicle?.Registration )
         </div>
 
         <div class="display-label">
-            Other Party Country
+            Debtors Code
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.OtherPartyCountry )
+            &nbsp;
         </div>
 
         <div class="display-label">
-            Equipment Code
+            Customer Account Number
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.EquipmentCode )
+            @( cl?.ClientSite1?.Site?.AccountCode )
         </div>
 
         <div class="display-label">
-            Equipment
+            Customer Order Number
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Equipment )
+            @( cl?.ReferenceNumber )
         </div>
 
         <div class="display-label">
-            Invoice Number
+            Other Reference
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.InvoiceNumber )
+            @( cl?.ReceiverNumber )
+        </div>
+
+        <div class="display-label">
+            Load Sheet Number
+        </div>
+        <div class="display-field">
+            &nbsp;
+        </div>
+
+        <div class="display-label">
+            GRV Number
+        </div>
+        <div class="display-field">
+            &nbsp;
         </div>
 
     </div>
@@ -176,188 +206,87 @@
     <div class="left" style="width: 31%;">
 
         <div class="display-label">
-            Quantity
+            ACT Control DOC No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Quantity )
+            &nbsp;
         </div>
 
         <div class="display-label">
-            Ref
+            CHEP Exchange DOC No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Ref )
+            @( Model.ExchangeInd == 1 ? Model.DocketNumber : string.Empty )
         </div>
 
         <div class="display-label">
-            Other Ref
+            CHEP Customer THAN DOC No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.OtherRef )
+            @( Model.TransactionType?.ToUpper()?.Trim() == "TRANSFER OUT" ? Model.DocketNumber : string.Empty )
         </div>
 
         <div class="display-label">
-            Batch Ref
+            Warehouse Transfer DOC No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.BatchRef )
+            @( Model.TransactionType?.ToUpper()?.Trim() == "TRANSFER IN" ? Model.DocketNumber : string.Empty )
         </div>
 
         <div class="display-label">
-            Shipment Date
+            Debrief Document No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.ShipmentDate )
+            &nbsp;
         </div>
 
         <div class="display-label">
-            Delivery Date
+            Pallet Return Slip No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.DeliveryDate )
+            @( Model.DocketNumber )
         </div>
 
         <div class="display-label">
-            Effective Date
+            Pallet Return Date
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.EffectiveDate )
+            @( Model.EffectiveDate?.ToString( "dd/MM/yyyy" ) )
         </div>
 
         <div class="display-label">
-            Create Date
+            Authorization Code
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.CreateDate )
+            @( Model.ClientAuthorisations?.FirstOrDefault()?.Code )
         </div>
 
         <div class="display-label">
-            Created By
+            Authorized By
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.CreatedBy )
+            @( Model.ClientAuthorisations?.FirstOrDefault()?.ModifiedBy )
         </div>
 
         <div class="display-label">
-            Data Source
+            CHEP Comp No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.DataSource )
+            @( cl?.ChepCompensationNo  )
+        </div>
+
+        <div class="display-label">
+            GRV Date
+        </div>
+        <div class="display-field">
+            &nbsp;
         </div>
 
     </div>
 
     @if ( ViewBag.CanEdit == true )
     {
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
 
-        <p>
-            <strong>Client Loads (@clientLoads.NullableCount())</strong>
-        </p>
-
-        <table id="client-loads-table" class="da-table small">
-
-            <thead>
-                <tr>
-                    <th>
-                        #
-                    </th>
-                    <th>
-                        Load Date
-                    </th>
-                    <th>
-                        Shipment #
-                    </th>
-                    <th>
-                        Delivery #
-                    </th>
-                    <th>
-                        Receiver #
-                    </th>
-                    <th>
-                        Equipment
-                    </th>
-                    <th>
-                        POD
-                    </th>
-                    <th>
-                        PCN
-                    </th>
-                    <th>
-                        PRN
-                    </th>
-                    <th>
-                        Qty
-                    </th>
-                    <th>
-                        Status
-                    </th>
-                    <th>
-                        Actions
-                    </th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                @if ( clientLoads.NullableAny() )
-                {
-                    int count = 1;
-
-                    foreach ( ClientLoad item in clientLoads )
-                    {
-                        ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
-
-                        string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
-
-                        <tr id="tr-@item.Id-client-load-item" class="tr-@item.Id-client-load-item @active">
-                            <td>
-                                @count
-                            </td>
-                            <td>
-                                @item.LoadDate.Value.ToString( "yyyy-MM-dd" )
-                            </td>
-                            <td>
-                                @item.LoadNumber
-                            </td>
-                            <td>
-                                @item.DeliveryNote
-                            </td>
-                            <td>
-                                @item.ReceiverNumber
-                            </td>
-                            <td>
-                                @item.Equipment
-                            </td>
-                            <td>
-                                @item.PODNumber
-                            </td>
-                            <td>
-                                @item.PCNNumber
-                            </td>
-                            <td>
-                                @item.PRNNumber
-                            </td>
-                            <td>
-                                @item.OriginalQuantity
-                            </td>
-                            <td>
-                                @status
-                            </td>
-                            <td width="4%">
-
-                                @Html.ActionLink( "Details", "ClientDataDetails", new { id = item.Id, CanEdit = false }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-client-load-item" } )
-
-                            </td>
-                        </tr>
-
-                        count++;
-                    }
-                }
-
-            </tbody>
-
-        </table>
     }
 
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>

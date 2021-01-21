@@ -15,9 +15,9 @@
             <tr>
                 <th>Make</th>
                 <th>Model</th>
-                <th>Year</th>
+                @*<th>Year</th>
                 <th>Engine #</th>
-                <th>VIN #</th>
+                <th>VIN #</th>*@
                 <th>Reg #</th>
                 <th>Type</th>
             </tr>
@@ -47,7 +47,7 @@
                         <td>
                             <input class="input" name="Vehicles[@count].Model" placeholder="Model" required="required" style="padding: 0 5px;" type="text" value="@b.Model">
                         </td>
-                        <td>
+                        @*<td>
                             <input class="input" name="Vehicles[@count].Year" placeholder="Year" required="required" style="padding: 0 5px;" type="number" value="@b.Year">
                         </td>
                         <td>
@@ -55,7 +55,7 @@
                         </td>
                         <td>
                             <input class="input" name="Vehicles[@count].VINNumber" placeholder="VIN #" required="required" style="padding: 0 5px;" type="text" value="@b.VINNumber">
-                        </td>
+                        </td>*@
                         <td>
                             <input class="input" name="Vehicles[@count].Registration" placeholder="Reg #" required="required" style="padding: 0 5px;" type="text" value="@b.Registration">
                         </td>
@@ -97,7 +97,7 @@
                     <td>
                         <input class="input" name="Vehicles[0].Model" placeholder="Model" style="padding: 0 5px;" type="text" value="">
                     </td>
-                    <td>
+                    @*<td>
                         <input class="input" name="Vehicles[0].Year" placeholder="Year" style="padding: 0 5px;" type="number" value="">
                     </td>
                     <td>
@@ -105,7 +105,7 @@
                     </td>
                     <td>
                         <input class="input" name="Vehicles[0].VINNumber" placeholder="VIN #" style="padding: 0 5px;" type="text" value="">
-                    </td>
+                    </td>*@
                     <td>
                         <input class="input" name="Vehicles[0].Registration" placeholder="Reg #" style="padding: 0 5px;" type="text" value="">
                     </td>

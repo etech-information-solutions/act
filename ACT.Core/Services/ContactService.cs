@@ -28,12 +28,12 @@ namespace ACT.Core.Services
         /// <summary>
         /// Gets a Contact using the specified contact Id Number and Object Type
         /// </summary>
-        /// <param name="idNo"></param>
+        /// <param name="email"></param>
         /// <param name="objectType"></param>
         /// <returns></returns>
-        public Contact Get( string idNo, string objectType )
+        public Contact Get( string email, string objectType )
         {
-            return context.Contacts.FirstOrDefault( v => v.ContactIdNo.Trim() == idNo.Trim() && v.ObjectType == objectType );
+            return context.Contacts.FirstOrDefault( v => v.ContactEmail.Trim() == email.Trim() && v.ObjectType == objectType );
         }
     }
 }
