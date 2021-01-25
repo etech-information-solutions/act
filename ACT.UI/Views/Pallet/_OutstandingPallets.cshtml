@@ -37,7 +37,7 @@
             <th data-name="Count">
                 #
             </th>
-            <th data-name="LoadDate" data-column="cl.LoadDate">
+            <th data-name="LoadDate" data-column="cl.ShipmentDate">
                 Load Date
             </th>
             <th data-name="CreateDate" data-column="cl.CreateDate">
@@ -96,7 +96,7 @@
                         @count
                     </td>
                     <td>
-                        @(item.EffectiveDate?.ToString( "yyyy-MM-dd" ))
+                        @(item.ShipmentDate?.ToString( "yyyy-MM-dd" ))
                     </td>
                     <td>
                         On @(item.CreateDate?.ToString( "yyyy-MM-dd" ) ) <br /> by @item.CreatedBy

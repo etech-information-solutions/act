@@ -8,9 +8,10 @@ namespace ACT.Core.Models.Custom
     {
         public int Id { get; set; }
         public int ClientId { get; set; }
-        public int? OutstandingReasonId { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime ModifiedOn { get; set; }
+        public Nullable<int> ClientSiteId { get; set; }
+        public Nullable<int> OutstandingReasonId { get; set; }
+        public System.DateTime CreatedOn { get; set; }
+        public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public string ChepStatus { get; set; }
         public string TransactionType { get; set; }
@@ -24,21 +25,22 @@ namespace ACT.Core.Models.Custom
         public string OtherPartyCountry { get; set; }
         public string EquipmentCode { get; set; }
         public string Equipment { get; set; }
-        public int? Quantity { get; set; }
+        public Nullable<int> Quantity { get; set; }
         public string Ref { get; set; }
         public string OtherRef { get; set; }
         public string BatchRef { get; set; }
-        public DateTime? ShipmentDate { get; set; }
-        public DateTime? DeliveryDate { get; set; }
-        public DateTime? EffectiveDate { get; set; }
-        public DateTime? CreateDate { get; set; }
+        public Nullable<System.DateTime> ShipmentDate { get; set; }
+        public Nullable<System.DateTime> DeliveryDate { get; set; }
+        public Nullable<System.DateTime> EffectiveDate { get; set; }
+        public Nullable<System.DateTime> CreateDate { get; set; }
         public string CreatedBy { get; set; }
         public string InvoiceNumber { get; set; }
         public string Reason { get; set; }
         public string DataSource { get; set; }
-        public int? BalanceStatus { get; set; }
+        public Nullable<int> BalanceStatus { get; set; }
         public int Status { get; set; }
         public int PostingType { get; set; }
+        public Nullable<int> ExchangeInd { get; set; }
 
         public virtual Client Client { get; set; }
         public int? DocumentCount { get; set; }
@@ -52,5 +54,10 @@ namespace ACT.Core.Models.Custom
 
         public string AuthorisationCode { get; set; }
         public string LoadNumber { get; set; }
+
+        // Reports
+
+        public string SiteName { get; set; }
+        public string RegionName { get; set; }
     }
 }

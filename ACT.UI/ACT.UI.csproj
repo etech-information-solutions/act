@@ -682,6 +682,8 @@
     <Content Include="Views\Pallet\PoolingAgentDataDetails - Copy.cshtml" />
     <Content Include="Views\Pallet\EditClientData - Copy.cshtml" />
     <Content Include="Views\Pallet\ClientDataDetails - Copy.cshtml" />
+    <Content Include="Views\ClientReporting\_TopOustandingCustomers.cshtml" />
+    <Content Include="Views\Shared\_TopOustandingCustomersCustomSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

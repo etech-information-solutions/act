@@ -54,13 +54,13 @@
                 Shipment #
             </th>
             <th data-name="DeliveryNote" data-column="cl.DeliveryNote">
-                Delivery #
+                Delivery Note
             </th>
             <th data-name="ReceiverNumber" data-column="cl.ReceiverNumber">
-                Receiver #
+                Invoice #
             </th>
-            <th data-name="Equipment" data-column="cl.Equipment">
-                Equipment
+            <th data-name="ReferenceNumber" data-column="cl.ReferenceNumber">
+                Ref
             </th>
             <th data-name="PODNumber" data-column="cl.PODNumber">
                 POD
@@ -106,22 +106,22 @@
                         @item.LoadNumber
                     </td>
                     <td>
-                        @item.DeliveryNote
+                        @Html.Raw( item.DeliveryNote?.Replace( ";", "<br/>" )?.Replace( ",", "<br/>" ) )
                     </td>
                     <td>
-                        @item.ReceiverNumber
+                        @Html.Raw( item.ReceiverNumber?.Replace( ";", "<br/>" )?.Replace( ",", "<br/>" ) )
                     </td>
                     <td>
-                        @item.Equipment
+                        @Html.Raw( item.ReferenceNumber?.Replace( ";", "<br/>" )?.Replace( ",", "<br/>" ) )
                     </td>
                     <td>
-                        @item.PODNumber
+                        @Html.Raw( item.PODNumber?.Replace( ";", "<br/>" )?.Replace( ",", "<br/>" ) )
                     </td>
                     <td>
-                        @item.PCNNumber
+                        @Html.Raw( item.PCNNumber?.Replace( ";", "<br/>" )?.Replace( ",", "<br/>" ) )
                     </td>
                     <td>
-                        @item.PRNNumber
+                        @Html.Raw( item.PRNNumber?.Replace( ";", "<br/>" )?.Replace( ",", "<br/>" ) )
                     </td>
                     <td>
                         @item.OriginalQuantity

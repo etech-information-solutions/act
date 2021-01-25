@@ -452,5 +452,79 @@ namespace ACT.Core.Services
         {
             return context.ChepLoads.Where( ch => ch.DocketNumber.Trim() == docketNumber.Trim() || ch.Ref.Trim() == reference.Trim() || ch.OtherRef.Trim() == reference.Trim() ).ToList();
         }
+
+        public List<ChepLoadCustomModel> ListTopOustandingCustomers( PagingModel pm, CustomSearchModel csm )
+        {
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmOutstandingReasonId", csm.OutstandingReasonId ) },
+                { new SqlParameter( "csmBalanceStatus", ( int ) csm.BalanceStatus ) },
+                { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
+            };
+
+            #endregion
+
+            string query = @"SELECT
+	                            cl.*,
+	                            c.[CompanyName] AS [ClientName],
+	                            o.[Description] AS [OutstandingReason],
+	                            r.[Description] AS [RegionName],
+	                            s.[Description] AS [SiteName]
+                             FROM
+	                            [dbo].[ChepLoad] cl
+	                            LEFT OUTER JOIN [dbo].[Client] c ON c.[Id]=cl.[ClientId]
+	                            LEFT OUTER JOIN [dbo].[OutstandingReason] o ON o.[Id]=cl.[OutstandingReasonId]
+	                            LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=cl.[ClientSiteId]
+	                            LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
+	                            LEFT OUTER JOIN [dbo].[Region] r ON r.[Id]=s.[RegionId]
+                              WHERE
+	                            cl.[Status]=@csmReconciliationStatus AND
+	                            cl.[BalanceStatus]=@csmBalanceStatus";
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND (cl.ClientId=@csmClientId) ";
+            }
+            if ( csm.OutstandingReasonId > 0 )
+            {
+                query = $"{query} AND (cl.OutstandingReasonId=@csmOutstandingReasonId) ";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (cl.LoadDate>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (cl.LoadDate<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            // ORDER BY
+            query = $@"{query} ORDER BY
+	                               cl.[ClientId] ASC ";
+
+            return context.Database.SqlQuery<ChepLoadCustomModel>( query, parameters.ToArray() ).ToList();
+        }
     }
 }

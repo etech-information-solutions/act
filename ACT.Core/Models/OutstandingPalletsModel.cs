@@ -9,15 +9,43 @@ namespace ACT.Core.Models
 {
     public class OutstandingPalletsModel
     {
+        public int Total { get; set; }
+
         public ChepLoadCustomModel ClientLoad { get; set; }
 
         public OutstandingReasonModel GrandTotal { get; set; }
+
+        public List<OutstandingRegionModel> Regions { get; set; }
+
+        public List<OutstandingReasonModel> OutstandingReasons { get; set; }
+    }
+
+    public class OutstandingRegionModel
+    {
+        public int? Id { get; set; }
+
+        public string Name { get; set; }
+
+        public int Total { get; set; }
+
+        public List<OutstandingSiteModel> Sites { get; set; }
+    }
+
+    public class OutstandingSiteModel
+    {
+        public int? Id { get; set; }
+
+        public string Name { get; set; }
+
+        public int Total { get; set; }
 
         public List<OutstandingReasonModel> OutstandingReasons { get; set; }
     }
 
     public class OutstandingReasonModel
     {
+        public int Total { get; set; }
+
         public string Description { get; set; }
 
         public decimal? GrandTotal { get; set; }

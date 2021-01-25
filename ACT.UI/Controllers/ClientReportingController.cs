@@ -724,21 +724,18 @@ namespace ACT.UI.Controllers
         // POST || GET: /ClientReporting/OutstandingPallets
         public ActionResult OutstandingPallets( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-            using ( ClientLoadService service = new ClientLoadService() )
+            if ( givecsm )
             {
-                if ( givecsm )
-                {
-                    ViewBag.ViewName = "OutstandingPallets";
+                ViewBag.ViewName = "OutstandingPallets";
 
-                    return PartialView( "_OutstandingPalletsCustomSearch", new CustomSearchModel( "OutstandingPallets" ) );
-                }
-
-                List<OutstandingPalletsModel> model = GetOutstandingPallets( pm, csm );
-
-                PagingExtension paging = PagingExtension.Create( model, model.Count, pm.Skip, pm.Take, pm.Page );
-
-                return PartialView( "_OutstandingPallets", paging );
+                return PartialView( "_OutstandingPalletsCustomSearch", new CustomSearchModel( "OutstandingPallets" ) );
             }
+
+            List<OutstandingPalletsModel> model = GetOutstandingPallets( pm, csm );
+
+            PagingExtension paging = PagingExtension.Create( model, model.Count, pm.Skip, pm.Take, pm.Page );
+
+            return PartialView( "_OutstandingPallets", paging );
         }
 
         //
@@ -771,6 +768,130 @@ namespace ACT.UI.Controllers
 
                 return PartialView( "_MovementReport", paging );
             }
+        }
+
+        //
+        // POST || GET: /ClientReporting/TopOustandingCustomers
+        public ActionResult TopOustandingCustomers( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            using ( ChepLoadService clservice = new ChepLoadService() )
+            {
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "TopOustandingCustomers";
+
+                    return PartialView( "_TopOustandingCustomersCustomSearch", new CustomSearchModel( "TopOustandingCustomers" ) );
+                }
+
+                pm.Take = int.MaxValue;
+                csm.BalanceStatus = BalanceStatus.NotBalanced;
+                csm.ReconciliationStatus = ReconciliationStatus.Reconciled;
+
+                List<ChepLoadCustomModel> loads = clservice.ListTopOustandingCustomers( pm, csm );
+
+                List<OutstandingPalletsModel> model = new List<OutstandingPalletsModel>();
+
+                if ( loads.NullableAny() )
+                {
+                    foreach ( ChepLoadCustomModel item in loads )
+                    {
+                        if ( model.NullableAny( m => m.ClientLoad.ClientId == item.ClientId ) ) continue;
+
+                        OutstandingPalletsModel o = new OutstandingPalletsModel()
+                        {
+                            ClientLoad = item,
+                            Total = loads.Count( l => l.ClientId == item.ClientId ),
+                            Regions = GetOutstandingRegions( loads.Where( l => l.ClientId == item.ClientId ).ToList() )
+                        };
+
+                        model.Add( o );
+                    }
+                }
+
+                PagingExtension paging = PagingExtension.Create( model, model.Count, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_TopOustandingCustomers", paging );
+            }
+        }
+
+        public List<OutstandingRegionModel> GetOutstandingRegions( List<ChepLoadCustomModel> loads )
+        {
+            List<OutstandingRegionModel> regions = new List<OutstandingRegionModel>();
+
+            if ( !loads.NullableAny() ) return regions;
+
+            List<string> regionIds = new List<string>();
+
+            foreach ( ChepLoadCustomModel item in loads )
+            {
+                if ( regionIds.NullableAny( r => r == item.RegionName ) ) continue;
+
+                regionIds.Add( item.RegionName );
+
+                OutstandingRegionModel reg = new OutstandingRegionModel()
+                {
+                    Name = item.RegionName,
+                    Total = loads.Count( l => l.RegionName == item.RegionName ),
+                    Sites = GetOutstandingSites( loads.Where( l => l.RegionName == item.RegionName ).ToList() ),
+                };
+
+                regions.Add( reg );
+            }
+
+            return regions;
+        }
+
+        public List<OutstandingSiteModel> GetOutstandingSites( List<ChepLoadCustomModel> loads )
+        {
+            List<OutstandingSiteModel> sites = new List<OutstandingSiteModel>();
+
+            if ( !loads.NullableAny() ) return sites;
+
+            List<int?> siteIds = new List<int?>();
+
+            foreach ( ChepLoadCustomModel item in loads )
+            {
+                if ( siteIds.NullableAny( r => r == item.ClientSiteId ) ) continue;
+
+                siteIds.Add( item.ClientSiteId );
+
+                OutstandingSiteModel s = new OutstandingSiteModel()
+                {
+                    Name = item.SiteName,
+                    Total = loads.Count( l => l.ClientSiteId == item.ClientSiteId ),
+                    OutstandingReasons = GetOutstandingReasons1( loads.Where( l => l.ClientSiteId == item.ClientSiteId ).ToList() ),
+                };
+
+                sites.Add( s );
+            }
+
+            return sites;
+        }
+
+        public List<OutstandingReasonModel> GetOutstandingReasons1( List<ChepLoadCustomModel> loads )
+        {
+            List<OutstandingReasonModel> outstandingReasons = new List<OutstandingReasonModel>();
+
+            if ( !loads.NullableAny() ) return outstandingReasons;
+
+            List<int?> outstandingReasonIds = new List<int?>();
+
+            foreach ( ChepLoadCustomModel item in loads )
+            {
+                if ( outstandingReasonIds.NullableAny( r => r == item.OutstandingReasonId ) ) continue;
+
+                outstandingReasonIds.Add( item.OutstandingReasonId );
+
+                OutstandingReasonModel s = new OutstandingReasonModel()
+                {
+                    Description = item.OutstandingReason,
+                    Total = loads.Count( l => l.OutstandingReasonId == item.OutstandingReasonId ),
+                };
+
+                outstandingReasons.Add( s );
+            }
+
+            return outstandingReasons;
         }
 
         //
