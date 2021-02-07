@@ -31,11 +31,11 @@
 }
 
 <p>
-    @*@Html.ActionLink( "Add", "AddPoolingAgentData", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add Manual Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" } )
+    @Html.ActionLink( "Import", "ImportPoolingAgentData", new { IsExchange = false }, new { @class = "csv", @rel = "tipsyS", @title = "Import Chep loads?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" } )
 
-        <span style="padding: 0 5px;">|</span>*@
+    <span style="padding: 0 5px;">|</span>
 
-    @Html.ActionLink( "Import", "ImportPoolingAgentData", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import Pooling Agent Data?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" } )
+    @Html.ActionLink( "Import Exchange Load", "ImportPoolingAgentData", new { IsExchange = true }, new { @class = "csv", @rel = "tipsyS", @title = "Import Exchange Loads?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" } )
 
     <span class="loader"></span>
 </p>

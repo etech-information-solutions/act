@@ -1,0 +1,171 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Data.Models;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_CollectionsReport";
+}
+
+
+@Html.Partial( "_Notification" )
+
+
+@{
+    UserModel user = User.Get();
+
+    Int32 count = Model.Start;
+    List<ChepLoadCustomModel> items = ( List<ChepLoadCustomModel> ) Model.Items;
+}
+
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Outstanding Pallets Entries available matching your search criteria.
+    </div>
+}
+
+<table id="CollectionsReport-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#CollectionsReport-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="LoadDate" data-column="cl.ShipmentDate">
+                Load Date
+            </th>
+            <th data-name="CreateDate" data-column="cl.CreateDate">
+                Created
+            </th>
+            <th data-name="CompanyName" data-column="c.CompanyName">
+                Client
+            </th>
+            <th data-name="TransporterName" data-column="t.Name">
+                Transporter
+            </th>
+            <th data-name="VehicleReg" data-column="v.Registration">
+                Vehicle
+            </th>
+            <th data-name="DocketNumber" data-column="cl.DocketNumber">
+                Docket #
+            </th>
+            <th data-name="Ref" data-column="cl.Ref">
+                Ref #
+            </th>
+            <th data-name="Equipment" data-column="cl.Equipment">
+                Equipment
+            </th>
+            <th data-name="InvoiceNumber" data-column="cl.InvoiceNumber">
+                Invoice #
+            </th>
+            <th data-name="TransactionType" data-column="cl.TransactionType">
+                Transaction Type
+            </th>
+            <th data-name="Quantity" data-column="cl.Quantity">
+                Qty
+            </th>
+            <th data-name="OutstandingReasonId" data-column="cl.OutstandingReasonId">
+                Outstanding Reason
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( ChepLoadCustomModel item in items )
+            {
+                ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
+
+                string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
+
+                <tr id="tr-@item.Id-item-op" class="tr-@item.Id-item-op @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @(item.ShipmentDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        On @(item.CreateDate?.ToString( "yyyy-MM-dd" ) ) <br /> by @item.CreatedBy
+                    </td>
+                    <td>
+                        @item.ClientName
+                    </td>
+                    <td>
+                        @item.TransporterName
+                    </td>
+                    <td>
+                        @item.VehicleRegistration
+                    </td>
+                    <td>
+                        @item.DocketNumber
+                    </td>
+                    <td>
+                        @item.Ref
+                    </td>
+                    <td>
+                        @item.Equipment
+                    </td>
+                    <td>
+                        @item.InvoiceNumber
+                    </td>
+                    <td>
+                        @item.TransactionType
+                    </td>
+                    <td>
+                        @item.Quantity
+                    </td>
+                    <td width="15%">
+                        @item.OutstandingReason
+
+                        <div style="border-top: 1px dashed #7368e3; padding-top: 4px; margin-top: 10px;">
+
+                            <a class="chat" data-sticky-one="1" data-target="#osp-@item.Id-comments" data-trigger="mouseover" data-arrow="center-right" data-title="Comments (@item.Comments.NullableCount())">
+                                Comments (@item.Comments.NullableCount())
+                            </a>
+                            <div id="osp-@item.Id-comments" class="none">
+
+                                <ul class="list">
+                                    @if ( item.Comments.NullableAny() )
+                                    {
+                                        foreach ( Comment c in item.Comments )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                @c.Details
+
+                                                <small class="block" style="font-size: 10px; text-align: right; font-style: italic;"> by @c.User.Name @c.User.Surname on @c.CreatedOn.ToString( "yyyy-MM-dd @HH:mm tt" )</small>
+                                                <div class="clear"></div>
+                                            </li>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <li>
+                                            No comments...
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )

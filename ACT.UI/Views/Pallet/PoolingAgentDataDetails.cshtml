@@ -216,7 +216,7 @@
             CHEP Exchange DOC No
         </div>
         <div class="display-field">
-            @( Model.ExchangeInd == 1 ? Model.DocketNumber : string.Empty )
+            @( Model.IsExchange ? Model.DocketNumber : string.Empty )
         </div>
 
         <div class="display-label">

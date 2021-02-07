@@ -365,6 +365,14 @@ namespace ACT.Core.Models
         /// </summary>
         public bool IsOP { get; set; }
 
+        public bool IsExchange { get; set; }
+
+        public bool IsPSPPickUp { get; set; }
+
+        public bool IsPODOutstanding { get; set; }
+
+        public bool IsTransporterLiable { get; set; }
+
         [Display( Name = "Object Id" )]
         public int ObjectId
         {
@@ -660,9 +668,11 @@ namespace ACT.Core.Models
 
                     break;
 
+                case "PODOutstanding":
                 case "PoolingAgentData":
                 case "OutstandingPallets":
                 case "TopOustandingCustomers":
+                case "TransporterLiableReport":
 
                     using ( ClientService cservice = new ClientService() )
                     using ( OutstandingReasonService urservice = new OutstandingReasonService() )

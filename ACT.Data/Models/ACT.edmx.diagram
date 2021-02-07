@@ -12,7 +12,6 @@
         <EntityTypeShape EntityType="ACTModel.Broadcast" Width="1.5" PointX="0.75" PointY="57.125" />
         <EntityTypeShape EntityType="ACTModel.ChepAudit" Width="1.5" PointX="7.5" PointY="59.125" />
         <EntityTypeShape EntityType="ACTModel.ChepClient" Width="1.5" PointX="21" PointY="33.375" />
-        <EntityTypeShape EntityType="ACTModel.ChepLoad" Width="1.5" PointX="15.75" PointY="30.125" />
         <EntityTypeShape EntityType="ACTModel.ChepLoadChep" Width="1.5" PointX="18" PointY="46" />
         <EntityTypeShape EntityType="ACTModel.Client" Width="1.5" PointX="3" PointY="26.625" />
         <EntityTypeShape EntityType="ACTModel.ClientAuthorisation" Width="1.5" PointX="18" PointY="32.75" />
@@ -40,7 +39,6 @@
         <EntityTypeShape EntityType="ACTModel.Invoice" Width="1.5" PointX="18.75" PointY="23.125" />
         <EntityTypeShape EntityType="ACTModel.Journal" Width="1.5" PointX="18" PointY="37.5" />
         <EntityTypeShape EntityType="ACTModel.Notification" Width="1.5" PointX="3.75" PointY="59.375" />
-        <EntityTypeShape EntityType="ACTModel.OutstandingReason" Width="1.5" PointX="13.5" PointY="41.75" />
         <EntityTypeShape EntityType="ACTModel.Product" Width="1.5" PointX="5.25" PointY="24.125" />
         <EntityTypeShape EntityType="ACTModel.ProductPrice" Width="1.5" PointX="7.5" PointY="10.125" />
         <EntityTypeShape EntityType="ACTModel.PSP" Width="1.5" PointX="0.75" PointY="41.125" />
@@ -72,14 +70,6 @@
         <AssociationConnector Association="ACTModel.FK_UserBroadcasts_Broadcasts" />
         <AssociationConnector Association="ACTModel.FK_ChepAudit_Sites" />
         <AssociationConnector Association="ACTModel.FK_ChepClient_ClientLoad" />
-        <AssociationConnector Association="ACTModel.FK_ChepClients_ChepLoads" />
-        <AssociationConnector Association="ACTModel.FK_ChepLoad_Client" />
-        <AssociationConnector Association="ACTModel.FK_ChepLoad_ClientSite" />
-        <AssociationConnector Association="ACTModel.FK_ChepLoad_OutstandingReason" />
-        <AssociationConnector Association="ACTModel.FK_ChepLoadChep_ChepLoad" />
-        <AssociationConnector Association="ACTModel.FK_ClientAuthorisation_ChepLoad" />
-        <AssociationConnector Association="ACTModel.FK_Disputes_ChepLoads" />
-        <AssociationConnector Association="ACTModel.FK_UserTasks_ChepLoads" />
         <AssociationConnector Association="ACTModel.FK_ClientBudget_Clients" />
         <AssociationConnector Association="ACTModel.FK_ClientCustomer_Client" />
         <AssociationConnector Association="ACTModel.FK_ClientGroup_Client" />
@@ -99,7 +89,6 @@
         <AssociationConnector Association="ACTModel.FK_ClientInvoices_Invoices" />
         <AssociationConnector Association="ACTModel.FK_ClientLoad_ClientSite" />
         <AssociationConnector Association="ACTModel.FK_ClientLoad_ClientSite1" />
-        <AssociationConnector Association="ACTModel.FK_ClientLoad_OutstandingReason" />
         <AssociationConnector Association="ACTModel.FK_ClientLoad_Transporter" />
         <AssociationConnector Association="ACTModel.FK_ClientLoads_Vehicle" />
         <AssociationConnector Association="ACTModel.FK_Postings_ClientLoads" />
@@ -145,6 +134,17 @@
         <AssociationConnector Association="ACTModel.FK_UserNotification_User" />
         <AssociationConnector Association="ACTModel.FK_UserRoles_Users" />
         <AssociationConnector Association="ACTModel.FK_UserTask_User" />
+        <EntityTypeShape EntityType="ACTModel.ChepLoad" Width="1.5" PointX="15.75" PointY="30.5" />
+        <EntityTypeShape EntityType="ACTModel.OutstandingReason" Width="1.5" PointX="13.5" PointY="41.25" />
+        <AssociationConnector Association="ACTModel.FK_ChepClients_ChepLoads" />
+        <AssociationConnector Association="ACTModel.FK_ChepLoad_Client" />
+        <AssociationConnector Association="ACTModel.FK_ChepLoad_ClientSite" />
+        <AssociationConnector Association="ACTModel.FK_ChepLoad_OutstandingReason" />
+        <AssociationConnector Association="ACTModel.FK_ChepLoadChep_ChepLoad" />
+        <AssociationConnector Association="ACTModel.FK_ClientAuthorisation_ChepLoad" />
+        <AssociationConnector Association="ACTModel.FK_Disputes_ChepLoads" />
+        <AssociationConnector Association="ACTModel.FK_UserTasks_ChepLoads" />
+        <AssociationConnector Association="ACTModel.FK_ClientLoad_OutstandingReason" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

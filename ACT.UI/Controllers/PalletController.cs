@@ -316,9 +316,9 @@ namespace ACT.UI.Controllers
 
         // GET: Client/AddSite
         [Requires( PermissionTo.Create )]
-        public ActionResult ImportPoolingAgentData()
+        public ActionResult ImportPoolingAgentData( bool isExchange = false )
         {
-            ChepLoadViewModel model = new ChepLoadViewModel() { EditMode = true };
+            ChepLoadViewModel model = new ChepLoadViewModel() { EditMode = true, IsExchange = isExchange };
 
             return View( model );
         }
@@ -389,6 +389,8 @@ namespace ACT.UI.Controllers
                            deliveryDate1 = string.Empty,
                            effectiveDate1 = string.Empty,
                            createDate1 = string.Empty;
+
+                    int isExchange = model.IsExchange ? 1 : 0;
 
                     #region Dates
 
@@ -515,8 +517,8 @@ namespace ACT.UI.Controllers
                     {
                         #region Create Chep Load
 
-                        cQuery = $" {cQuery} INSERT INTO [dbo].[ChepLoad] ([ClientId],[ClientSiteId],[CreatedOn],[ModifiedOn],[ModifiedBy],[ChepStatus],[TransactionType],[DocketNumber],[OriginalDocketNumber],[UMI],[LocationId],[Location],[OtherPartyId],[OtherParty],[OtherPartyCountry],[EquipmentCode],[Equipment],[Quantity],[Ref],[OtherRef],[BatchRef],[ShipmentDate],[DeliveryDate],[EffectiveDate],[CreateDate],[CreatedBy],[InvoiceNumber],[Reason],[DataSource],[BalanceStatus],[Status],[PostingType]) ";
-                        cQuery = $" {cQuery} VALUES ({model.ClientId},{cs.Id},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}',{qty},'{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}',{shipmentDate1},{deliveryDate1},{effectiveDate1},{createDate1},'{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) ReconciliationStatus.Unreconciled},{( int ) ReconciliationStatus.Unreconciled},{( int ) PostingType.Import}) ";
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[ChepLoad] ([ClientId],[ClientSiteId],[CreatedOn],[ModifiedOn],[ModifiedBy],[ChepStatus],[TransactionType],[DocketNumber],[OriginalDocketNumber],[UMI],[LocationId],[Location],[OtherPartyId],[OtherParty],[OtherPartyCountry],[EquipmentCode],[Equipment],[Quantity],[Ref],[OtherRef],[BatchRef],[ShipmentDate],[DeliveryDate],[EffectiveDate],[CreateDate],[CreatedBy],[InvoiceNumber],[Reason],[DataSource],[BalanceStatus],[Status],[PostingType], [IsExchange]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},{cs.Id},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}',{qty},'{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}',{shipmentDate1},{deliveryDate1},{effectiveDate1},{createDate1},'{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) ReconciliationStatus.Unreconciled},{( int ) ReconciliationStatus.Unreconciled},{( int ) PostingType.Import},{isExchange}) ";
 
                         #endregion
 
@@ -563,7 +565,8 @@ namespace ACT.UI.Controllers
                                                     [CreatedBy]='{load[ 21 ]}',
                                                     [InvoiceNumber]='{load[ 22 ]}',
                                                     [Reason]='{load[ 23 ]}',
-                                                    [DataSource]='{load[ 24 ]}'
+                                                    [DataSource]='{load[ 24 ]}',
+                                                    [IsExchange]='{isExchange}'
                                                 WHERE
                                                     [Id]={l.Id}";
 
@@ -2707,6 +2710,8 @@ namespace ACT.UI.Controllers
                     Id = load.Id,
                     EditMode = true,
                     OutstandingReasonId = load.OutstandingReasonId,
+                    IsPSPPickup = load.IsPSPPickup ? YesNo.Yes : YesNo.No,
+                    TransporterLiable = load.TransporterLiable ? YesNo.Yes : YesNo.No,
                 };
 
                 model.ChepLoadComments = cservice.List( id, "ChepLoad" );
@@ -2741,7 +2746,9 @@ namespace ACT.UI.Controllers
 
                 #region Update Chep Load
 
+                load.IsPSPPickup = model.IsPSPPickup.GetBoolValue();
                 load.OutstandingReasonId = model.OutstandingReasonId;
+                load.TransporterLiable = model.TransporterLiable.GetBoolValue();
 
                 chservice.Update( load );
 
@@ -4126,7 +4133,7 @@ namespace ACT.UI.Controllers
             }
         }
 
-        public ActionResult GenerateAuthorisationCode( int id )
+        public ActionResult GenerateAuthorisationCode( int id, PagingModel pm, CustomSearchModel csm )
         {
             using ( ChepLoadService chservice = new ChepLoadService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
@@ -4165,7 +4172,7 @@ namespace ACT.UI.Controllers
 
                 Notify( "The Authorisation Code was successfully created for the selected Chep Load.", NotificationType.Success );
 
-                return AuthorisationCodes( new PagingModel(), new CustomSearchModel() );
+                return AuthorisationCodes( pm, csm );
             }
         }
 

@@ -58,7 +58,9 @@ namespace ACT.Data.Models
         public Nullable<int> BalanceStatus { get; set; }
         public int Status { get; set; }
         public int PostingType { get; set; }
-        public Nullable<int> ExchangeInd { get; set; }
+        public bool IsExchange { get; set; }
+        public bool IsPSPPickup { get; set; }
+        public bool TransporterLiable { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }

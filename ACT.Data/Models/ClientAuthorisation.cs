@@ -27,8 +27,8 @@ namespace ACT.Data.Models
         public System.DateTime AuthorisationDate { get; set; }
         public int Status { get; set; }
     
-        public virtual ChepLoad ChepLoad { get; set; }
         public virtual Transporter Transporter { get; set; }
         public virtual ClientSite ClientSite { get; set; }
+        public virtual ChepLoad ChepLoad { get; set; }
     }
 }

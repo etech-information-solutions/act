@@ -24,6 +24,7 @@ namespace ACT.Data.Models
         public int Id { get; set; }
         public string Description { get; set; }
         public int Status { get; set; }
+        public bool IsPODOutstanding { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepLoad> ChepLoads { get; set; }

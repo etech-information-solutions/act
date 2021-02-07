@@ -130,7 +130,7 @@
                     <td width="5%">
                         @if ( string.IsNullOrEmpty( item.AuthorisationCode ) )
                         {
-                            @Html.ActionLink( "Generate", "GenerateAuthorisationCode", new { id = item.Id }, new { @class = "add", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#authorisationcodes", @rel = "tipsyE", @title = "Generate authorisation code this load?" } )
+                            @Html.ActionLink( "Generate", "GenerateAuthorisationCode", new { id = item.Id }, new { @class = "add append-search", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#authorisationcodes", @rel = "tipsyE", @title = "Generate authorisation code this load?" } )
                         }
                     </td>
 

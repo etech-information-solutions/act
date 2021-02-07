@@ -146,7 +146,7 @@ namespace ACT.Core.Services
 
             if ( csm.ClientId != 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE s.Id=cs.SiteId AND cs.ClientId=@csmClientId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs, [dbo].[ClientCustomer] cc WHERE s.Id=cs.SiteId AND cc.Id=cs.ClientCustomerId AND cc.ClientId=@csmClientId) ";
             }
             if ( csm.SiteId != 0 )
             {
@@ -277,7 +277,7 @@ namespace ACT.Core.Services
 
             if ( csm.ClientId != 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE s.Id=cs.SiteId AND cs.ClientId=@csmClientId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs, [dbo].[ClientCustomer] cc WHERE s.Id=cs.SiteId AND cc.Id=cs.ClientCustomerId AND cc.ClientId=@csmClientId) ";
             }
             if ( csm.SiteId != 0 )
             {

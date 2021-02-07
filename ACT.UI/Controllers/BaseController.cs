@@ -1432,6 +1432,137 @@ namespace ACT.UI.Controllers
             return doc.Id;
         }
 
+        /// <summary>
+        /// Gets a list of customers with outstanding pallets
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public List<OutstandingPalletsModel> GetOustandingCustomers( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( ChepLoadService clservice = new ChepLoadService() )
+            {
+                List<ChepLoadCustomModel> loads = clservice.ListTopOustandingCustomers( pm, csm );
+
+                List<OutstandingPalletsModel> model = new List<OutstandingPalletsModel>();
+
+                if ( loads.NullableAny() )
+                {
+                    foreach ( ChepLoadCustomModel item in loads )
+                    {
+                        if ( model.NullableAny( m => m.ClientLoad.ClientId == item.ClientId ) ) continue;
+
+                        OutstandingPalletsModel o = new OutstandingPalletsModel()
+                        {
+                            ClientLoad = item,
+                            Total = loads.Count( l => l.ClientId == item.ClientId ),
+                            Regions = GetOutstandingRegions( loads.Where( l => l.ClientId == item.ClientId ).ToList() )
+                        };
+
+                        model.Add( o );
+                    }
+                }
+
+
+                return model;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of regions with outstanding pallets
+        /// </summary>
+        /// <param name="loads"></param>
+        /// <returns></returns>
+        public List<OutstandingRegionModel> GetOutstandingRegions( List<ChepLoadCustomModel> loads )
+        {
+            List<OutstandingRegionModel> regions = new List<OutstandingRegionModel>();
+
+            if ( !loads.NullableAny() ) return regions;
+
+            List<string> regionIds = new List<string>();
+
+            foreach ( ChepLoadCustomModel item in loads )
+            {
+                if ( regionIds.NullableAny( r => r == item.RegionName ) ) continue;
+
+                regionIds.Add( item.RegionName );
+
+                OutstandingRegionModel reg = new OutstandingRegionModel()
+                {
+                    Name = item.RegionName,
+                    Total = loads.Count( l => l.RegionName == item.RegionName ),
+                    Sites = GetOutstandingSites( loads.Where( l => l.RegionName == item.RegionName ).ToList() ),
+                };
+
+                regions.Add( reg );
+            }
+
+            return regions;
+        }
+
+        /// <summary>
+        /// Gets a list of client sites with outstanding pallets
+        /// </summary>
+        /// <param name="loads"></param>
+        /// <returns></returns>
+        public List<OutstandingSiteModel> GetOutstandingSites( List<ChepLoadCustomModel> loads )
+        {
+            List<OutstandingSiteModel> sites = new List<OutstandingSiteModel>();
+
+            if ( !loads.NullableAny() ) return sites;
+
+            List<int?> siteIds = new List<int?>();
+
+            foreach ( ChepLoadCustomModel item in loads )
+            {
+                if ( siteIds.NullableAny( r => r == item.ClientSiteId ) ) continue;
+
+                siteIds.Add( item.ClientSiteId );
+
+                OutstandingSiteModel s = new OutstandingSiteModel()
+                {
+                    Name = item.SiteName,
+                    Total = loads.Count( l => l.ClientSiteId == item.ClientSiteId ),
+                    OutstandingReasons = GetOutstandingReasons1( loads.Where( l => l.ClientSiteId == item.ClientSiteId ).ToList() ),
+                };
+
+                sites.Add( s );
+            }
+
+            return sites;
+        }
+
+        /// <summary>
+        /// Gets a list of outstanding reasons with outstanding pallets
+        /// </summary>
+        /// <param name="loads"></param>
+        /// <returns></returns>
+        public List<OutstandingReasonModel> GetOutstandingReasons1( List<ChepLoadCustomModel> loads )
+        {
+            List<OutstandingReasonModel> outstandingReasons = new List<OutstandingReasonModel>();
+
+            if ( !loads.NullableAny() ) return outstandingReasons;
+
+            List<int?> outstandingReasonIds = new List<int?>();
+
+            foreach ( ChepLoadCustomModel item in loads )
+            {
+                if ( outstandingReasonIds.NullableAny( r => r == item.OutstandingReasonId ) ) continue;
+
+                outstandingReasonIds.Add( item.OutstandingReasonId );
+
+                OutstandingReasonModel s = new OutstandingReasonModel()
+                {
+                    Description = item.OutstandingReason,
+                    Total = loads.Count( l => l.OutstandingReasonId == item.OutstandingReasonId ),
+                };
+
+                outstandingReasons.Add( s );
+            }
+
+            return outstandingReasons;
+        }
+
         #endregion
 
 

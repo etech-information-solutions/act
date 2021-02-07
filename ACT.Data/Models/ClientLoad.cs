@@ -74,12 +74,12 @@ namespace ACT.Data.Models
         public virtual ICollection<ClientInvoice> ClientInvoices { get; set; }
         public virtual ClientSite ClientSite { get; set; }
         public virtual ClientSite ClientSite1 { get; set; }
-        public virtual OutstandingReason OutstandingReason { get; set; }
         public virtual Transporter Transporter { get; set; }
         public virtual Vehicle Vehicle { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Journal> Journals { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Tasks { get; set; }
+        public virtual OutstandingReason OutstandingReason { get; set; }
     }
 }

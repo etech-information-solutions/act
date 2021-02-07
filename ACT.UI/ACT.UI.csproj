@@ -173,7 +173,6 @@
     <Compile Include="Controllers\ClientController.cs" />
     <Compile Include="Controllers\EmailController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ControllerTemplate.cs" />
     <Compile Include="Controllers\FinanceController.cs" />
     <Compile Include="Controllers\PalletController.cs" />
     <Compile Include="Extensions\ControllerExtensions.cs" />
@@ -684,6 +683,11 @@
     <Content Include="Views\Pallet\ClientDataDetails - Copy.cshtml" />
     <Content Include="Views\ClientReporting\_TopOustandingCustomers.cshtml" />
     <Content Include="Views\Shared\_TopOustandingCustomersCustomSearch.cshtml" />
+    <Content Include="Views\ClientReporting\_PODOutstanding.cshtml" />
+    <Content Include="Views\ClientReporting\_TransporterLiableReport.cshtml" />
+    <Content Include="Views\ClientReporting\_DisputesResolved.cshtml" />
+    <Content Include="Views\ClientReporting\_CollectionsReport.cshtml" />
+    <Content Include="Views\ClientReporting\_AuthorisationStats.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

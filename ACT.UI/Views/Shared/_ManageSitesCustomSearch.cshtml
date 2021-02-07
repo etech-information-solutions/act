@@ -21,13 +21,6 @@
             <div class="left" style="width: 48%;">
 
                 <div class="editor-label">
-                    Site
-                </div>
-                <div class="editor-field">
-                    @Html.DropDownListFor( model => model.SiteId, model => model.SiteOptions, s => s.Key, s => s.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-                </div>
-
-                <div class="editor-label">
                     Client
                 </div>
                 <div class="editor-field">
@@ -36,7 +29,7 @@
 
             </div>
 
-            <div class="left" style="width: 49%;">
+            <div class="right" style="width: 49%;">
 
                 <div class="editor-label">
                     Region

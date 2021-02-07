@@ -122,9 +122,17 @@ namespace ACT.UI.Models
         [Display( Name = "Import Loads" )]
         public HttpPostedFileBase File { get; set; }
 
+        [Display( Name = "Is PSP Pickup?" )]
+        public YesNo IsPSPPickup { get; set; }
+
+        [Display( Name = "Is Transporter Liable?" )]
+        public YesNo TransporterLiable { get; set; }
+
         public List<Comment> ChepLoadComments { get; set; }
 
         public bool EditMode { get; set; }
+
+        public bool IsExchange { get; set; }
 
         #endregion
 

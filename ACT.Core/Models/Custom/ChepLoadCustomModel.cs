@@ -40,7 +40,9 @@ namespace ACT.Core.Models.Custom
         public Nullable<int> BalanceStatus { get; set; }
         public int Status { get; set; }
         public int PostingType { get; set; }
-        public Nullable<int> ExchangeInd { get; set; }
+        public bool IsExchange { get; set; }
+        public bool IsPSPPickup { get; set; }
+        public bool TransporterLiable { get; set; }
 
         public virtual Client Client { get; set; }
         public int? DocumentCount { get; set; }
@@ -54,6 +56,8 @@ namespace ACT.Core.Models.Custom
 
         public string AuthorisationCode { get; set; }
         public string LoadNumber { get; set; }
+        public string TransporterName { get; set; }
+        public string VehicleRegistration { get; set; }
 
         // Reports
 

@@ -4,8 +4,6 @@
 
 @{
     ViewBag.Title = "Client Reporting";
-
-    //UserModel user = User.Get();
 }
 
 
@@ -37,6 +35,10 @@
             <a data-ap-tab="1" data-target="#topoustandingcustomers" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="TopOustandingCustomers">Top Oustanding Customers</a>
         </li>
 
+        <li data-hot-spot="1" data-c="ClientReporting" data-t="PODOutstanding" class="none">
+            <a data-ap-tab="1" data-target="#podoutstanding" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PODOutstanding">POD Outstanding</a>
+        </li>
+
         <li data-hot-spot="1" data-c="ClientReporting" data-t="TransporterLiableReport" class="none">
             <a data-ap-tab="1" data-target="#transporterliablereport" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="TransporterLiableReport">Transporter Liable</a>
         </li>
@@ -45,11 +47,18 @@
             <a data-ap-tab="1" data-target="#disputesresolved" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="DisputesResolved">Disputes Resolved</a>
         </li>
 
-        <li data-hot-spot="1" data-c="ClientReporting" data-t="PODOutstanding" class="none">
-            <a data-ap-tab="1" data-target="#podoutstanding" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PODOutstanding">POD Outstanding</a>
+        <li data-hot-spot="1" data-c="ClientReporting" data-t="CollectionsReport" class="none">
+            <a data-ap-tab="1" data-target="#collectionsreport" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="CollectionsReport">Collections Report</a>
         </li>
 
-        @*<li data-hot-spot="1" data-c="ClientReporting" data-t="Exceptions" class="none">
+        <li data-hot-spot="1" data-c="ClientReporting" data-t="AuthorisationStats" class="none">
+            <a data-ap-tab="1" data-target="#authorisationstats" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="AuthorisationStats">Authorisation Stats</a>
+        </li>
+
+        @*<li data-hot-spot="1" data-c="ClientReporting" data-t="ReconciliationReport" class="none">
+            <a data-ap-tab="1" data-target="#reconciliationreport" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ReconciliationReport">Reconciliation Report</a>
+        </li>
+        <li data-hot-spot="1" data-c="ClientReporting" data-t="Exceptions" class="none">
             <a data-ap-tab="1" data-target="#exceptions" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Exceptions">Exceptions</a>
         </li>
 
@@ -76,11 +85,17 @@
 
         <div id="topoustandingcustomers" class="da-tab none" data-load-url="TopOustandingCustomers"> </div>
 
+        <div id="podoutstanding" class="da-tab none" data-load-url="PODOutstanding"> </div>
+
         <div id="transporterliablereport" class="da-tab none" data-load-url="TransporterLiableReport"> </div>
 
         <div id="disputesresolved" class="da-tab none" data-load-url="DisputesResolved"> </div>
 
-        <div id="podoutstanding" class="da-tab none" data-load-url="PODOutstanding"> </div>
+        <div id="collectionsreport" class="da-tab none" data-load-url="CollectionsReport"> </div>
+
+        <div id="authorisationstats" class="da-tab none" data-load-url="AuthorisationStats"> </div>
+
+        <div id="reconciliationreport" class="da-tab none" data-load-url="ReconciliationReport"> </div>
 
         <div id="exceptions" class="da-tab none" data-load-url="Exceptions"> </div>
 

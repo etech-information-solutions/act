@@ -32,7 +32,6 @@ namespace ACT.Data.Models
         public virtual DbSet<Broadcast> Broadcasts { get; set; }
         public virtual DbSet<ChepAudit> ChepAudits { get; set; }
         public virtual DbSet<ChepClient> ChepClients { get; set; }
-        public virtual DbSet<ChepLoad> ChepLoads { get; set; }
         public virtual DbSet<ChepLoadChep> ChepLoadCheps { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
@@ -60,7 +59,6 @@ namespace ACT.Data.Models
         public virtual DbSet<Invoice> Invoices { get; set; }
         public virtual DbSet<Journal> Journals { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
-        public virtual DbSet<OutstandingReason> OutstandingReasons { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<ProductPrice> ProductPrices { get; set; }
         public virtual DbSet<PSP> PSPs { get; set; }
@@ -88,5 +86,7 @@ namespace ACT.Data.Models
         public virtual DbSet<UserTask> UserTasks { get; set; }
         public virtual DbSet<Vehicle> Vehicles { get; set; }
         public virtual DbSet<PSPPeriod> PSPPeriods { get; set; }
+        public virtual DbSet<ChepLoad> ChepLoads { get; set; }
+        public virtual DbSet<OutstandingReason> OutstandingReasons { get; set; }
     }
 }

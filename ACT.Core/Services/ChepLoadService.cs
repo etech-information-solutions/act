@@ -58,6 +58,13 @@ namespace ACT.Core.Services
                                 INNER JOIN [dbo].[Client] c ON c.Id=cl.ClientId
                                 LEFT OUTER JOIN [dbo].[OutstandingReason] r ON r.Id=cl.OutstandingReasonId";
 
+            if ( csm.IsPODOutstanding )
+            {
+                query = $@"{query} LEFT OUTER JOIN [dbo].[ClientLoad] cl1 ON cl1.[Id]=(SELECT TOP 1 cl2.[Id] FROM [dbo].[ClientLoad] cl2 WHERE cl2.[ReceiverNumber]=cl.[Ref] OR cl2.[ReceiverNumber]=cl.[OtherRef])
+                                   LEFT OUTER JOIN [dbo].[Vehicle] v ON v.Id=cl1.[VehicleId]
+                                   LEFT OUTER JOIN [dbo].[Transporter] t ON t.Id=cl1.[TransporterId]";
+            }
+
             // WHERE
 
             #region WHERE
@@ -79,6 +86,18 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (cl.Quantity > 0)";
                 query = $"{query} AND (cl.Ref LIKE '5000%')";
+            }
+            if ( csm.IsPSPPickUp )
+            {
+                query = $"{query} AND (cl.IsPSPPickup=1)";
+            }
+            if ( csm.IsPODOutstanding )
+            {
+                query = $"{query} AND (r.IsPODOutstanding=1)";
+            }
+            if ( csm.IsTransporterLiable )
+            {
+                query = $"{query} AND (cl.TransporterLiable=1)";
             }
             if ( csm.ClientId > 0 )
             {
@@ -196,11 +215,25 @@ namespace ACT.Core.Services
                                 c.[CompanyName] AS [ClientName],
                                 r.[Description] AS [OutstandingReason],
                                 (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ChepLoad') AS [DocumentCount],
-                                (SELECT COUNT(1) FROM [dbo].[Comment] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ChepLoad') AS [CommentCount]
-                             FROM
+                                (SELECT COUNT(1) FROM [dbo].[Comment] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ChepLoad') AS [CommentCount]";
+
+            if ( csm.IsPODOutstanding )
+            {
+                query = $@"{query} ,t.[Name] AS [TransporterName],
+                                    v.[Registration] AS [VehicleRegistration]";
+            }
+
+            query = $@"{query} FROM
                                 [dbo].[ChepLoad] cl
                                 INNER JOIN [dbo].[Client] c ON c.Id=cl.ClientId
                                 LEFT OUTER JOIN [dbo].[OutstandingReason] r ON r.Id=cl.OutstandingReasonId";
+
+            if ( csm.IsPODOutstanding )
+            {
+                query = $@"{query} LEFT OUTER JOIN [dbo].[ClientLoad] cl1 ON cl1.[Id]=(SELECT TOP 1 cl2.[Id] FROM [dbo].[ClientLoad] cl2 WHERE cl2.[ReceiverNumber]=cl.[Ref] OR cl2.[ReceiverNumber]=cl.[OtherRef])
+                                   LEFT OUTER JOIN [dbo].[Vehicle] v ON v.Id=cl1.[VehicleId]
+                                   LEFT OUTER JOIN [dbo].[Transporter] t ON t.Id=cl1.[TransporterId]";
+            }
 
             // WHERE
 
@@ -223,6 +256,18 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (cl.Quantity > 0)";
                 query = $"{query} AND (cl.Ref LIKE '5000%')";
+            }
+            if ( csm.IsPSPPickUp )
+            {
+                query = $"{query} AND (cl.IsPSPPickup=1)";
+            }
+            if ( csm.IsPODOutstanding )
+            {
+                query = $"{query} AND (r.IsPODOutstanding=1)";
+            }
+            if ( csm.IsTransporterLiable )
+            {
+                query = $"{query} AND (cl.TransporterLiable=1)";
             }
             if ( csm.ClientId > 0 )
             {
@@ -324,7 +369,7 @@ namespace ACT.Core.Services
 
             return model;
         }
-
+        
 
         /// <summary>
         /// Gets a list of Chep Loads
