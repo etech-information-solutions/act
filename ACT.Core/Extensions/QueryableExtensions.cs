@@ -17,6 +17,15 @@ namespace System
                 parameter );
             return source.Select( selector );
         }
+        public static IQueryable<DateTime?> SelectDateTime<T>( this IQueryable<T> source, string propertyName )
+        {
+            var parameter = Expression.Parameter( typeof( T ), "x" );
+            var selector = Expression.Lambda<Func<T, DateTime?>>(
+                Expression.PropertyOrField( parameter, propertyName ),
+                parameter );
+
+            return source.Select( selector );
+        }
 
         public static IQueryable<int> SelectInt<T>( this IQueryable<T> source, string propertyName )
         {

@@ -556,11 +556,35 @@ namespace ACT.Core.Services
         /// </summary>
         /// <param name="column"></param>
         /// <returns></returns>
-        public virtual object Max( string column )
+        public virtual string MaxString( string column )
         {
             return context.Set<T>()
                           .SelectString( column )
                           .Max();
+        }
+
+        /// <summary>
+        /// Gets the minimum value in the generic T in the specified column
+        /// </summary>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        public virtual string MinString( string column )
+        {
+            return context.Set<T>()
+                          .SelectString( column )
+                          .Min();
+        }
+
+        /// <summary>
+        /// Gets the minimum value in the generic T in the specified column
+        /// </summary>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        public virtual DateTime? MinDateTime( string column )
+        {
+            return context.Set<T>()
+                          .SelectDateTime( column )
+                          .Min();
         }
 
         /// <summary>

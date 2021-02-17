@@ -1266,6 +1266,8 @@ namespace ACT.UI.Controllers
 
                 List<int?> clientIds = new List<int?>();
 
+                DateTime minYear = model.Min( m => m.ShipmentDate ) ?? DateTime.Now;
+
                 foreach ( ChepLoadCustomModel item in model )
                 {
                     if ( clientIds.Any( c => c == item.ClientId ) ) continue;
@@ -1275,18 +1277,20 @@ namespace ACT.UI.Controllers
                     OutstandingPalletsModel m = new OutstandingPalletsModel()
                     {
                         ClientLoad = item,
+                        MinYear = minYear,
                         OutstandingReasons = GetOutstandingReasons( item.ClientId, model ),
                         GrandTotal = new OutstandingReasonModel()
                         {
                             Description = "Grand Total",
-                            To30Days = model.Count( c => c.ClientId == item.ClientId && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 30 ),
-                            To60Days = model.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 60 ) ),
-                            To90Days = model.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 90 ) ),
-                            To120Days = model.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 120 ) ),
-                            To183Days = model.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 183 ) ),
-                            To270Days = model.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 270 ) ),
-                            To365Days = model.Count( c => c.ClientId == item.ClientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 365 ) ),
+                            To30Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -30 ).Date && c.ShipmentDate?.Date <= DateTime.Now.Date ) ),
+                            To60Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -60 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -31 ).Date ) ),
+                            To90Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -90 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -61 ).Date ) ),
+                            To120Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -120 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -91 ).Date ) ),
+                            To183Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -183 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -121 ).Date ) ),
+                            To270Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -270 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -184 ).Date ) ),
+                            To365Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -365 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -271 ).Date ) ),
                             GrandTotal = model.Count( c => c.ClientId == item.ClientId ),
+                            PreviousYears = GetGrandPreviousYears( item.ClientId, model ),
                         }
                     };
 
@@ -1295,6 +1299,48 @@ namespace ACT.UI.Controllers
 
                 return resp;
             }
+        }
+
+        /// <summary>
+        /// Gets outstanding previous years for the specified client
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public List<PreviousYear> GetGrandPreviousYears( int clientId, List<ChepLoadCustomModel> model )
+        {
+            List<PreviousYear> py = new List<PreviousYear>();
+
+            DateTime minYear = model.Min( m => m.ShipmentDate ) ?? DateTime.Now;
+
+            if ( minYear.Year == DateTime.Now.Year )
+            {
+                return py;
+            }
+
+            int minus1Year = DateTime.Now.AddYears( -1 ).Year;
+
+            py.Add( new PreviousYear()
+            {
+                Year = minus1Year,
+                Total = model.Count( c => c.ClientId == clientId && ( c.ShipmentDate?.Date >= new DateTime( DateTime.Now.AddYears( -1 ).Year, 1, 1 ) && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -366 ).Date ) )
+            } );
+
+            if ( minus1Year == minYear.Year )
+            {
+                return py;
+            }
+
+            for ( int i = ( minus1Year - 1 ); i >= minYear.Year; i-- )
+            {
+                py.Add( new PreviousYear()
+                {
+                    Year = i,
+                    Total = model.Count( c => c.ClientId == clientId && ( c.ShipmentDate?.Date >= new DateTime( i, 1, 1 ) && c.ShipmentDate?.Date <= new DateTime( i, 12, 31 ) ) )
+                } );
+            }
+
+            return py;
         }
 
         /// <summary>
@@ -1320,20 +1366,64 @@ namespace ACT.UI.Controllers
                 OutstandingReasonModel r = new OutstandingReasonModel()
                 {
                     Description = item.OutstandingReason ?? "-N/A-",
-                    To30Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 30 ),
-                    To60Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 31 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 60 ) ),
-                    To90Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 61 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 90 ) ),
-                    To120Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 91 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 120 ) ),
-                    To183Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 121 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 183 ) ),
-                    To270Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 184 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 270 ) ),
-                    To365Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days >= 271 && ( DateTime.Now - ( item.EffectiveDate ?? item.CreatedOn ) ).Days <= 365 ) ),
+                    To30Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -30 ).Date && c.ShipmentDate?.Date <= DateTime.Now.Date ) ),
+                    To60Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -60 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -31 ).Date ) ),
+                    To90Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -90 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -61 ).Date ) ),
+                    To120Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -120 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -91 ).Date ) ),
+                    To183Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -183 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -121 ).Date ) ),
+                    To270Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -270 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -184 ).Date ) ),
+                    To365Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -365 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -271 ).Date ) ),
                     GrandTotal = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId ),
+                    PreviousYears = GetOutstandingPreviousYears( clientId, item.OutstandingReasonId, items ),
                 };
 
                 outstandingReasons.Add( r );
             }
 
             return outstandingReasons;
+        }
+
+        /// <summary>
+        /// Gets outstanding previous years for the specified client and outstanding reason
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="outstandingReasonId"></param>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        private List<PreviousYear> GetOutstandingPreviousYears( int clientId, int? outstandingReasonId, List<ChepLoadCustomModel> items )
+        {
+            List<PreviousYear> py = new List<PreviousYear>();
+
+            DateTime minYear = items.Min( m => m.ShipmentDate ) ?? DateTime.Now;
+
+            if ( minYear.Year == DateTime.Now.Year )
+            {
+                return py;
+            }
+
+            int minus1Year = DateTime.Now.AddYears( -1 ).Year;
+
+            py.Add( new PreviousYear()
+            {
+                Year = minus1Year,
+                Total = items.Count( c => c.ClientId == clientId && c.OutstandingReasonId == outstandingReasonId && ( c.ShipmentDate?.Date >= new DateTime( DateTime.Now.AddYears( -1 ).Year, 1, 1 ) && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -366 ).Date ) )
+            } );
+
+            if ( minus1Year == minYear.Year )
+            {
+                return py;
+            }
+
+            for ( int i = ( minus1Year - 1 ); i >= minYear.Year; i-- )
+            {
+                py.Add( new PreviousYear()
+                {
+                    Year = i,
+                    Total = items.Count( c => c.ClientId == clientId && c.OutstandingReasonId == outstandingReasonId && ( c.ShipmentDate?.Date >= new DateTime( i, 1, 1 ) && c.ShipmentDate?.Date <= new DateTime( i, 12, 31 ) ) )
+                } );
+            }
+
+            return py;
         }
 
         /// <summary>

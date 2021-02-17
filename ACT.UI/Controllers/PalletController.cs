@@ -2850,7 +2850,7 @@ namespace ACT.UI.Controllers
             using ( DeliveryNoteService dnservice = new DeliveryNoteService() )
             using ( DeliveryNoteLineService dnlservice = new DeliveryNoteLineService() )
             {
-                string number = ( dnservice.Max( "InvoiceNumber" ) as string ) ?? "0";
+                string number = ( dnservice.MaxString( "InvoiceNumber" ) as string ) ?? "0";
 
                 int.TryParse( number.Trim().Replace( "DN", "" ), out int n );
 
@@ -3992,7 +3992,7 @@ namespace ACT.UI.Controllers
                     return View( model );
                 }
 
-                string number = ( caservice.Max( "Code" ) as string ) ?? "0";
+                string number = ( caservice.MaxString( "Code" ) as string ) ?? "0";
 
                 int.TryParse( number.Trim().Replace( "AC", "" ), out int n );
 
@@ -4150,7 +4150,7 @@ namespace ACT.UI.Controllers
 
                 List<ClientLoad> cl = clservice.ListByChepRefOtherRef( ch.Ref?.Trim(), ch.OtherRef?.Trim() );
 
-                string number = ( caservice.Max( "Code" ) as string ) ?? "0";
+                string number = ( caservice.MaxString( "Code" ) as string ) ?? "0";
 
                 int.TryParse( number.Trim().Replace( "AC", "" ), out int n );
 

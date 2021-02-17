@@ -27,7 +27,7 @@
             var bodyWidth = $( "body" ).outerWidth();
             var bodyHeight = $( "body" ).outerHeight();
 
-            if ( bodyHeight <= ( top + this.StickyOne.outerHeight() ) )
+            /*if ( bodyHeight <= ( top + this.StickyOne.outerHeight() ) )
             {
                 top = sender.offset().top - this.StickyOne.outerHeight();
 
@@ -36,7 +36,7 @@
             else
             {
                 this.StickyOne.removeClass( "t-position" );
-            }
+            }*/
 
             if ( arrow )
             {

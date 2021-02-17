@@ -1,5 +1,5 @@
 ﻿
-@model List<ClientAuthorisationCustomModel>
+@model List<ChepLoadCustomModel>
 
 @using ACT.Core.Enums;
 @using ACT.Core.Models.Custom;
@@ -24,25 +24,34 @@
                     #
                 </th>
                 <th>
-                    Date
-                </th>
-                <th>
-                    Code
+                    Load Date
                 </th>
                 <th>
                     Client
                 </th>
                 <th>
-                    Site
-                </th>
-                <th>
-                    Transporter
-                </th>
-                <th>
-                    Load #
-                </th>
-                <th>
                     Docket #
+                </th>
+                <th>
+                    Ref #
+                </th>
+                <th>
+                    Other Ref #
+                </th>
+                <th>
+                    Transaction Type
+                </th>
+                <th>
+                    Qty
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Balanced
+                </th>
+                <th>
+                    Code
                 </th>
             </tr>
         </thead>
@@ -54,30 +63,46 @@
 
                 foreach ( var item in Model )
                 {
-                    <tr>
+                    PostingType postingType = ( PostingType ) item.PostingType;
+                    BalanceStatus balanceStatus = ( BalanceStatus ) item.BalanceStatus;
+                    ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
+
+                    string active = ( status == ReconciliationStatus.Reconciled ) ? "active" : "inactive";
+
+                    <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
                         <td width="1%">
                             @count
                         </td>
                         <td>
-                            @item.AuthorisationDate.ToString( "yyyy-MM-dd @ HH:mm tt" )
-                        </td>
-                        <td>
-                            @item.Code
+                            @(item.EffectiveDate?.ToString( "yyyy-MM-dd" ))
                         </td>
                         <td>
                             @item.ClientName
                         </td>
                         <td>
-                            @item.SiteName
-                        </td>
-                        <td>
-                            @item.TransporterName
-                        </td>
-                        <td>
-                            @item.LoadNumber
-                        </td>
-                        <td>
                             @item.DocketNumber
+                        </td>
+                        <td>
+                            @item.Ref
+                        </td>
+                        <td>
+                            @item.OtherRef
+                        </td>
+                        <td>
+                            @item.TransactionType
+                        </td>
+                        <td>
+                            @item.Quantity
+                        </td>
+                        <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
+                            @status.GetDisplayText()
+                        </td>
+                        <td class="@(balanceStatus == BalanceStatus.Balanced ? "active" : "inactive")">
+                            @balanceStatus.GetDisplayText()
+                        </td>
+                        <td>
+                            @item.AuthorisationCode
                         </td>
 
                     </tr>

@@ -688,6 +688,8 @@
     <Content Include="Views\ClientReporting\_DisputesResolved.cshtml" />
     <Content Include="Views\ClientReporting\_CollectionsReport.cshtml" />
     <Content Include="Views\ClientReporting\_AuthorisationStats.cshtml" />
+    <Content Include="Views\DashBoard\_AgeOfOutstandingPODData.cshtml" />
+    <Content Include="Views\DashBoard\_AgeOfOutstandingPOD.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

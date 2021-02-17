@@ -11,6 +11,8 @@ namespace ACT.Core.Models
     {
         public int Total { get; set; }
 
+        public DateTime MinYear { get; set; }
+
         public ChepLoadCustomModel ClientLoad { get; set; }
 
         public OutstandingReasonModel GrandTotal { get; set; }
@@ -48,20 +50,29 @@ namespace ACT.Core.Models
 
         public string Description { get; set; }
 
-        public decimal? GrandTotal { get; set; }
+        public int GrandTotal { get; set; }
 
-        public decimal? To30Days { get; set; }
+        public int To30Days { get; set; }
 
-        public decimal? To60Days { get; set; }
+        public int To60Days { get; set; }
 
-        public decimal? To90Days { get; set; }
+        public int To90Days { get; set; }
 
-        public decimal? To120Days { get; set; }
+        public int To120Days { get; set; }
 
-        public decimal? To183Days { get; set; }
+        public int To183Days { get; set; }
 
-        public decimal? To270Days { get; set; }
+        public int To270Days { get; set; }
 
-        public decimal? To365Days { get; set; }
+        public int To365Days { get; set; }
+
+        public List<PreviousYear> PreviousYears { get; set; }
+    }
+
+    public class PreviousYear
+    {
+        public int Year { get; set; }
+
+        public int Total { get; set; }
     }
 }

@@ -4181,6 +4181,39 @@
             } );
         },
 
+        AgeOfOutstandingPOD: function ( sender, months )
+        {
+            Highcharts.chart( sender, {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Age Of Outstanding PODs'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.y:.0f}</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b style="color:{point.color};">{point.name}</b>: <span style="color:{point.color};">{point.y:.0f}</span>'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'NO. OF OUTSTANDING PODs',
+                    colorByPoint: true,
+                    data: months
+                }]
+            } );
+        },
+
         LoadsPerMonth: function ( sender, months, series )
         {
             Highcharts.chart( sender, {

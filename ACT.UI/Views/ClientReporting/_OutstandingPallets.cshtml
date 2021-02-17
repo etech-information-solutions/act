@@ -13,13 +13,10 @@
 @Html.Partial( "_Notification" )
 
 @{
-    Int32 count = Model.Start;
+    int count = Model.Start;
     List<OutstandingPalletsModel> items = ( List<OutstandingPalletsModel> ) Model.Items;
 
-
-    //int? oldestYear = items.OrderBy( o => o.LoadDate.Value.Year )?.FirstOrDefault()?.LoadDate?.Year;
-
-    //int yearDiff = DateTime.Now.Year - ( oldestYear ?? 0 );
+    DateTime minYear = items.Min( m => m.MinYear );
 }
 
 @if ( Model == null || !items.Any() )
@@ -63,17 +60,15 @@
             <th data-name="271-365">
                 271-365 Days
             </th>
-            @*@if ( yearDiff > 0 )
+            @if ( minYear.Year != DateTime.Now.Year )
+            {
+                for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
                 {
-                    for ( int i = DateTime.Now.Year; i < yearDiff; i++ )
-                    {
-                        int y = DateTime.Now.AddYears( -i ).Year;
-
-                        <th data-name="@y">
-                            @y
-                        </th>
-                    }
-                }*@
+                    <th data-name="@i">
+                        @i
+                    </th>
+                }
+            }
             <th data-name="GrandTotal">
                 Grand Total
             </th>
@@ -89,7 +84,7 @@
                     <td width="1%" style="background-color: #012d71; color: #fff;">
                         @count
                     </td>
-                    <td width="18%" style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                    <td width="15%" style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
                         @item.ClientLoad.ClientName
                     </td>
                     <td style="border-left: 0 none; background-color: #012d71;">
@@ -108,17 +103,16 @@
                     </td>
                     <td style="border-left: 0 none; background-color: #012d71;">
                     </td>
-                    @*@if ( yearDiff > 0 )
+
+                    @if ( minYear.Year != DateTime.Now.Year )
+                    {
+                        for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
                         {
-                            for ( int i = DateTime.Now.Year; i < yearDiff; i++ )
-                            {
-                                int y = DateTime.Now.AddYears( -i ).Year;
+                            <td style="border-left: 0 none; background-color: #012d71;"></td>
+                        }
+                    }
 
-                                <td style="border-left: 0 none; background-color: #012d71;"></td>
-                            }
-                        }*@
-
-                    <td style="border-left: 0 none; background-color: #012d71;">
+                    <td style="border-left: 1px solid #fff; background-color: #ca8b13;">
                     </td>
                 </tr>
 
@@ -154,19 +148,17 @@
                             @osr.To365Days
                         </td>
 
-                        @*@if ( yearDiff > 0 )
+                        @if ( minYear.Year != DateTime.Now.Year )
+                        {
+                            for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
                             {
-                                for ( int i = DateTime.Now.Year; i < yearDiff; i++ )
-                                {
-                                    int y = DateTime.Now.AddYears( -i ).Year;
+                                <td width="2%">
+                                    @( osr.PreviousYears?.FirstOrDefault( y => y.Year == i )?.Total )
+                                </td>
+                            }
+                        }
 
-                                    <td width="2%">
-                                        @items.Where( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == item.ClientId && ( item.LoadDate ?? item.CreatedOn ).Year == y ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
-                                    </td>
-                                }
-                            }*@
-
-                        <td width="8%" style="border-left: 0 none; background-color: #7cf0f0; color: #123cdf; font-weight: bold;">
+                        <td width="8%" style="border-left: 1px solid #fff; background-color: #ca8b13; color: #fff; font-weight: bold; text-align: center;">
                             @osr.GrandTotal
                         </td>
 
@@ -179,7 +171,7 @@
                     <td width="18%" style="border-left: 0 none; background-color: #012d71;">
                     </td>
                     <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
-                        Grand Total
+                        Total
                     </td>
                     <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
                         @item.GrandTotal.To30Days
@@ -203,60 +195,71 @@
                         @item.GrandTotal.To365Days
                     </td>
 
-                    @*@if ( yearDiff > 0 )
+                    @if ( minYear.Year != DateTime.Now.Year )
+                    {
+                        for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
                         {
-                            for ( int i = DateTime.Now.Year; i < yearDiff; i++ )
-                            {
-                                int y = DateTime.Now.AddYears( -i ).Year;
+                            <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                                @( item.GrandTotal?.PreviousYears?.FirstOrDefault( y => y.Year == i )?.Total )
+                            </td>
+                        }
+                    }
 
-                                <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
-                                    @items.Where( c => c.ClientId == item.ClientId && ( c.LoadDate ?? c.CreatedOn ).Year == y ).Sum( s => s.ChepNewQuantity - s.NewQuantity )
-                                </td>
-                            }
-                        }*@
-
-                    <td style="border-left: 0 none; background-color: #012d71; color: #fff; font-weight: bold;">
+                    <td style="border-left: 1px solid #fff; background-color: #ca8b13; color: #fff; font-weight: bold; text-align: center;">
                         @item.GrandTotal.GrandTotal
                     </td>
                 </tr>
 
-
-                @*if ( clientCount + 1 == items.Count( c => c.ClientId == item.ClientId ) )
-                    {
-                        if ( count != items.Count )
-                        {
-                            <tr>
-                            <td style="border-left: 0 none;">&nbsp;</td>
-                            <td style="border-left: 0 none;"></td>
-                            <td style="border-left: 0 none;"></td>
-                            <td style="border-left: 0 none;"></td>
-                            <td style="border-left: 0 none;"></td>
-                            <td style="border-left: 0 none;"></td>
-                            <td style="border-left: 0 none;"></td>
-                            <td style="border-left: 0 none;"></td>
-                            <td style="border-left: 0 none;"></td>
-                            <td style="border-left: 0 none;"></td>
-
-                            @if ( yearDiff > 0 )
-                                        {
-                                            for ( int i = DateTime.Now.Year; i < yearDiff; i++ )
-                                            {
-                                                <td style="border-left: 0 none;"></td>
-                                            }
-                                        }
-
-                                        <td style="border-left: 0 none;"></td>
-                                    </tr>
-                                }
-                            }*@
-
                 count++;
             }
+
+            <tr>
+                <td width="1%" style="background-color: #b12ef6;">
+                </td>
+                <td width="18%" style="border-left: 0 none; background-color: #b12ef6;">
+                </td>
+                <td style="border-left: 0 none; background-color: #b12ef6; color: #fff; font-weight: bold;">
+                    Grand Total
+                </td>
+                <td style="border-left: 0 none; background-color: #b12ef6; color: #fff; font-weight: bold;">
+                    @items.Sum( s => s.GrandTotal.To30Days )
+                </td>
+                <td style="border-left: 0 none; background-color: #b12ef6; color: #fff; font-weight: bold;">
+                    @items.Sum( s => s.GrandTotal.To60Days )
+                </td>
+                <td style="border-left: 0 none; background-color: #b12ef6; color: #fff; font-weight: bold;">
+                    @items.Sum( s => s.GrandTotal.To30Days )
+                </td>
+                <td style="border-left: 0 none; background-color: #b12ef6; color: #fff; font-weight: bold;">
+                    @items.Sum( s => s.GrandTotal.To120Days )
+                </td>
+                <td style="border-left: 0 none; background-color: #b12ef6; color: #fff; font-weight: bold;">
+                    @items.Sum( s => s.GrandTotal.To183Days )
+                </td>
+                <td style="border-left: 0 none; background-color: #b12ef6; color: #fff; font-weight: bold;">
+                    @items.Sum( s => s.GrandTotal.To270Days )
+                </td>
+                <td style="border-left: 0 none; background-color: #b12ef6; color: #fff; font-weight: bold;">
+                    @items.Sum( s => s.GrandTotal.To365Days )
+                </td>
+
+                @if ( minYear.Year != DateTime.Now.Year )
+                {
+                    for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
+                    {
+                        <td style="border-left: 0 none; background-color: #b12ef6; color: #fff; font-weight: bold;">
+                            @( items.SelectMany( m => m.GrandTotal?.PreviousYears?.Where( w => w.Year == i ) ).Sum( s => s.Total ) )
+                        </td>
+                    }
+                }
+
+                <td style="border-left: 1px solid #fff; background-color: #ff1e12; color: #fff; font-weight: bold; text-align: center;">
+                    @items.Sum( s => s.GrandTotal.GrandTotal )
+                </td>
+            </tr>
         }
     </tbody>
 
 </table>
-
-@*@Html.Partial( "_OutstandingPalletsCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
 
 @Html.Partial( "_Paging" )

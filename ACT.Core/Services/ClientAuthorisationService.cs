@@ -94,17 +94,17 @@ namespace ACT.Core.Services
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (cl.[EffectiveDate] >= @csmFromDate AND cl.[EffectiveDate] <= @csmToDate) ";
+                query = $"{query} AND (ca.[AuthorisationDate] >= @csmFromDate AND ca.[AuthorisationDate] <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (cl.[EffectiveDate]>=@csmFromDate) ";
+                    query = $"{query} AND (ca.[AuthorisationDate]>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (cl.[EffectiveDate]<=@csmToDate) ";
+                    query = $"{query} AND (ca.[AuthorisationDate]<=@csmToDate) ";
                 }
             }
 
@@ -231,20 +231,24 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (t.Id=@csmTransporterId)";
             }
+            if ( csm.HasAuthorisationCode )
+            {
+                query = $"{query} AND (ca.Id IS NOT NULL)";
+            }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (cl.[EffectiveDate] >= @csmFromDate AND cl.[EffectiveDate] <= @csmToDate) ";
+                query = $"{query} AND (ca.[AuthorisationDate] >= @csmFromDate AND ca.[AuthorisationDate] <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (cl.[EffectiveDate]>=@csmFromDate) ";
+                    query = $"{query} AND (ca.[AuthorisationDate]>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (cl.[EffectiveDate]<=@csmToDate) ";
+                    query = $"{query} AND (ca.[AuthorisationDate]<=@csmToDate) ";
                 }
             }
 

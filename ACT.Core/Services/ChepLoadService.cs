@@ -571,5 +571,123 @@ namespace ACT.Core.Services
 
             return context.Database.SqlQuery<ChepLoadCustomModel>( query, parameters.ToArray() ).ToList();
         }
+
+        /// <summary>
+        /// Gets the age of outstanding pallets for the specified From-To date as well as other applicable search params
+        /// </summary>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public AgeOfOutstandingPallets AgeOfOutstandingPallets( CustomSearchModel csm )
+        {
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmGroupId", ( int ) csm.GroupId ) },
+                { new SqlParameter( "csmRegionId", ( int ) csm.RegionId ) },
+                { new SqlParameter( "csmBalanceStatus", ( int ) csm.BalanceStatus ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
+            };
+
+            #endregion
+
+
+            #region Query
+
+            string query = @"SELECT
+	                            COUNT(ch.Id) AS [Total]
+                             FROM
+	                            [dbo].[ChepLoad] ch
+                                LEFT OUTER JOIN [dbo].[OutstandingReason] r ON r.Id=ch.OutstandingReasonId
+                             WHERE
+	                            (1=1)";
+
+            #endregion
+
+            // WHERE
+
+            #region WHERE
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=ch.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=ch.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
+            // CUSTOM SEARCH
+
+            #region Custom Search
+
+            if ( csm.BalanceStatus != BalanceStatus.None )
+            {
+                query = $"{query} AND (ch.[BalanceStatus]=@csmBalanceStatus) ";
+            }
+
+            if ( csm.ReconciliationStatus != ReconciliationStatus.All )
+            {
+                query = $"{query} AND (ch.[Status]=@csmReconciliationStatus) ";
+            }
+            if ( csm.IsPODOutstanding )
+            {
+                query = $"{query} AND (r.IsPODOutstanding=1)";
+            }
+
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND (ch.[ClientId]=@csmClientId) ";
+            }
+
+            if ( csm.SiteId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=ch.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
+            }
+
+            if ( csm.GroupId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientGroup] cg WHERE cg.[ClientId]=ch.[ClientId] AND cg.[GroupId]=@csmGroupId) ";
+            }
+
+            if ( csm.RegionId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=ch.[ClientId] AND s.[RegionId]=@csmRegionId) ";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (ch.[ShipmentDate] >= @csmFromDate AND ch.[ShipmentDate] <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (ch.[ShipmentDate]>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (ch.[ShipmentDate]<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            CountModel model = context.Database.SqlQuery<CountModel>( query, parameters.ToArray() ).FirstOrDefault();
+
+            return new AgeOfOutstandingPallets()
+            {
+                Oustanding = model.Total,
+            };
+        }
     }
 }

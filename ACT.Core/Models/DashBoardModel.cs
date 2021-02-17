@@ -21,6 +21,8 @@ namespace ACT.Core.Models
 
     public class LoadsPerMonth
     {
+        public int MonthYear { get; set; }
+
         public int MonthNumber { get; set; }
 
         public string MonthName { get; set; }
@@ -41,10 +43,13 @@ namespace ACT.Core.Models
         public int Loads { get; set; }
 
         public int Codes { get; set; }
+        public int MonthYear { get; set; }
     }
 
     public class NumberOfPalletsManaged
     {
+        public int MonthYear { get; set; }
+
         public int MonthNumber { get; set; }
 
         public string MonthName { get; set; }
@@ -63,5 +68,6 @@ namespace ACT.Core.Models
         public string MonthName { get; set; }
 
         public int Total { get; set; }
+        public int MonthYear { get; set; }
     }
 }

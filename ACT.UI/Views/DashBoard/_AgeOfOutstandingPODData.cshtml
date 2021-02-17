@@ -27,13 +27,16 @@
                     Load Date
                 </th>
                 <th>
-                    Load #
-                </th>
-                <th>
                     Docket #
                 </th>
                 <th>
                     Client
+                </th>
+                <th>
+                    Transporter
+                </th>
+                <th>
+                    Vehicle
                 </th>
                 <th>
                     Ref #
@@ -68,16 +71,19 @@
                             @count
                         </td>
                         <td>
-                            @(( item.ShipmentDate ?? item.CreatedOn ).ToString( "yyyy-MM-dd" ))
-                        </td>
-                        <td>
-                            @item.LoadNumber
+                            @(item.ShipmentDate?.ToString( "yyyy-MM-dd" ))
                         </td>
                         <td>
                             @item.DocketNumber
                         </td>
                         <td>
                             @item.ClientName
+                        </td>
+                        <td>
+                            @item.TransporterName
+                        </td>
+                        <td>
+                            @item.VehicleRegistration
                         </td>
                         <td>
                             @item.Ref

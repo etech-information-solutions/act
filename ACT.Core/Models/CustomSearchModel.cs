@@ -484,6 +484,8 @@ namespace ACT.Core.Models
             }
         }
 
+        public bool HasAuthorisationCode { get; set; }
+
         #endregion
 
 
