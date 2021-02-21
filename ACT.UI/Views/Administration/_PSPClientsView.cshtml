@@ -1,0 +1,81 @@
+﻿@model PSP
+
+@using ACT.Data.Models;
+
+@{
+    int count = 1;
+}
+
+<div id="item-details" class="item-details" style="width: auto;">
+
+    <h2>
+        <img alt="" src="@Url.Content( "~/images/info.png" )" />
+        <span>PSP Clients (@Model.PSPClients.Count)</span>
+    </h2>
+
+    <table id="PSP-client-table" class="da-table">
+
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Client</th>
+                <th>Contact</th>
+                <th>Chep Reference</th>
+                <th>Finance Accounting Code</th>
+                <th>Contract Renewal Date</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach ( PSPClient b in Model.PSPClients )
+            {
+                <tr>
+                    <td>
+                        @count
+                    </td>
+                    <td>
+                        @b.Client.CompanyName
+                    </td>
+                    <td>
+                        @b.Client.ContactPerson (@b.Client.ContactNumber / @b.Client.Email)
+                    </td>
+                    <td>
+                        @b.Client.ChepReference
+                    </td>
+                    <td>
+                        @b.FinAccountingCode
+                    </td>
+                    <td>
+                        @(b.ContractRenewalDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                </tr>
+
+                count++;
+            }
+        </tbody>
+
+    </table>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <p>
+            @Html.ActionLink( "Edit", "EditPSP", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+
+            @if ( ViewBag.IncludeLayout == null )
+            {
+                <span style="padding: 0 5px;">/</span>
+                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Close</a>
+            }
+        </p>
+    }
+
+    @if ( ViewBag.IncludeLayout != null )
+    {
+        <div class="back-to-list">
+            @Html.ActionLink( "Back to List", "Index" )
+        </div>
+    }
+
+</div>

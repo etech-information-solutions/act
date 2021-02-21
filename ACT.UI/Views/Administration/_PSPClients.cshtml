@@ -1,47 +1,69 @@
-﻿@model PSP
+﻿@model List<PSPClient>
 
-@using ACT.Core.Enums;
 @using ACT.Data.Models;
 
 
-<div id="item-details" class="item-details" style="width: auto;">
+@Html.Partial( "_Notification" )
 
-    <h2>
-        <img alt="" src="@Url.Content( "~/images/info.png" )" />
-        <span>PSP Clients (@Model.PSPClients.Count)</span>
-    </h2>
+<div class="editor-label" style="margin-bottom: 10px;">
 
-    <ul class="list">
-        @foreach ( Client item in Model.PSPClients.Select( s => s.Client ) )
-        {
-            <li>
-                <a data-quick-link="1" data-target="#clients" data-id="@item.Id">
-                    @item.CompanyName (@item.CompanyRegistrationNumber)
-                </a>
-            </li>
-        }
-    </ul>
+    <p>
+        <strong class="uppercase">Clients (@Model.NullableCount())</strong>
+    </p>
 
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+</div>
 
-    @if ( ViewBag.IncludeLayout == null )
-    {
-        <p>
-            @Html.ActionLink( "Edit", "EditPSP", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+<div class="editor-field">
 
-            @if ( ViewBag.IncludeLayout == null )
+    <table id="psp-client-table" class="da-table">
+
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Contact</th>
+                <th>Chep Reference</th>
+                <th>Finance Account Code</th>
+                <th>Contract Renewal Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @if ( Model.NullableAny() )
             {
-                <span style="padding: 0 5px;">/</span>
-                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Close</a>
-            }
-        </p>
-    }
+                int count = 0;
 
-    @if ( ViewBag.IncludeLayout != null )
-    {
-        <div class="back-to-list">
-            @Html.ActionLink( "Back to List", "Index" )
-        </div>
-    }
+                foreach ( PSPClient b in Model )
+                {
+                    <tr id="row-psp-client-@count">
+                        <td style="position: relative;">
+                            <input name="PSPClients[@count].Id" type="hidden" value="@b.Id" />
+                            @b.Client.CompanyName
+                        </td>
+                        <td>
+                            @b.Client.ContactPerson (@b.Client.ContactNumber / @b.Client.Email)
+                        </td>
+                        <td>
+                            @b.Client.ChepReference
+                        </td>
+                        <td>
+                            <input class="input" name="PSPClients[@count].FinAccountingCode" placeholder="Enter Finance Accounting Code" style="padding: 0 5px; width: 87%;" type="text" value="@b.FinAccountingCode">
+                        </td>
+                        <td>
+                            <input class="input date-picker" name="PSPClients[@count].ContractRenewalDate" placeholder="Select Contract Renewal Date" style="padding: 0 5px; width: 87%;" type="text" value="@b.ContractRenewalDate">
+                        </td>
+                        <td>
+                            @Html.ActionLink( "Remove", "DeletePSPClient", new { id = b.Id }, new { @class = "del", @data_delete = "1", @data_id = b.Id, @data_target = "#row-psp-client-" + count, @data_refresh_target = "#psp-client", @rel = "tipsyE", @title = "Remove this item?" } )
+                        </td>
+                    </tr>
+
+                    count++;
+                }
+            }
+
+        </tbody>
+
+    </table>
 
 </div>

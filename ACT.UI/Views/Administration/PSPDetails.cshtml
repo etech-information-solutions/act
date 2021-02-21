@@ -361,6 +361,68 @@
 
     </div>
 
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    <div class="display-label" style="margin-bottom: 10px;">
+
+        <p>
+            <strong class="uppercase">Clients (@Model.PSPClients.NullableCount())</strong>
+        </p>
+
+    </div>
+
+    <div class="display-field" style="width: auto;">
+
+        <table id="PSP-client-table" class="da-table">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Client</th>
+                    <th>Contact</th>
+                    <th>Chep Reference</th>
+                    <th>Finance Accounting Code</th>
+                    <th>Contract Renewal Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if ( Model.PSPClients.NullableAny() )
+                {
+                    int count = 1;
+
+                    foreach ( PSPClient b in Model.PSPClients )
+                    {
+                        <tr>
+                            <td>
+                                @count
+                            </td>
+                            <td>
+                                @b.Client.CompanyName
+                            </td>
+                            <td>
+                                @b.Client.ContactPerson (@b.Client.ContactNumber / @b.Client.Email)
+                            </td>
+                            <td>
+                                @b.Client.ChepReference
+                            </td>
+                            <td>
+                                @b.FinAccountingCode
+                            </td>
+                            <td>
+                                @(b.ContractRenewalDate?.ToString( "yyyy-MM-dd" ))
+                            </td>
+                        </tr>
+
+                        count++;
+                    }
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 
     @if ( ViewBag.IncludeLayout == null )

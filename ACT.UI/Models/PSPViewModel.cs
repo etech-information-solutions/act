@@ -88,6 +88,8 @@ namespace ACT.UI.Models
         [Display( Name = "Status" )]
         public PSPClientStatus Status { get; set; }
 
+        public List<PSPClient> PSPClients { get; set; }
+
         public List<PSPBudget> PSPBudgets { get; set; }
 
         public AddressViewModel Address { get; set; }

@@ -1,17 +1,14 @@
 ﻿@model PagingExtension
 
-@using ACT.Data.Models;
 @using ACT.Core.Enums;
-@using ACT.Core.Models;
+@using ACT.Data.Models;
+@using ACT.Core.Models.Custom;
 
 @{
     ViewBag.ShowExport = true;
     ViewBag.ShowCustom = true;
-    ViewBag.ShowQuickStructure = true;
 
     ViewBag.ViewName = "_ManageTransporters";
-
-    UserModel user = User.Get();
 }
 
 
@@ -19,8 +16,8 @@
 
 
 @{
-    Int32 count = Model.Start;
-    List<Transporter> items = (List<Transporter>)Model.Items;
+    int count = Model.Start;
+    List<TransporterCustomModel> items = ( List<TransporterCustomModel> ) Model.Items;
 }
 
 
@@ -36,27 +33,35 @@
     <span class="loader"></span>
 </p>
 
-
 <table id="transporters-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#transporters-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
-            @*<th data-name="Count">
+            <th data-name="Count">
                 #
-            </th>*@
-            <th data-name="Name" data-column="Name">
-                Transporter Reg Name
             </th>
-            <th data-name="Cell" data-column="Cell">
+            <th data-name="Name" data-column="Name">
+                Name
+            </th>
+            <th data-name="TradingName" data-column="TradingName">
                 Trading Name
             </th>
-            <th data-name="Status" data-column="Status">
-                Registration Number
+            <th data-name="Status" data-column="RegistrationNumber">
+                Registration #
             </th>
-            <th data-name="Type" data-column="Type">
-                Company Contact Number
+            <th data-name="ContactNumber" data-column="ContactNumber">
+                Contact #
             </th>
-            <th data-name="LastLogin" data-column="LastLogin">
+            <th data-name="Email" data-column="Email">
                 Email
+            </th>
+            <th data-name="Status" data-column="Status">
+                Status
+            </th>
+            <th data-name="ContactCount" data-column="ContactCount">
+                Contacts
+            </th>
+            <th data-name="VehicleCount" data-column="VehicleCount">
+                Vehicles
             </th>
             <th data-name="Actions">
                 Actions
@@ -65,17 +70,21 @@
     </thead>
 
     <tbody>
-        @if (Model != null && items != null && items.Count() > 0)
+        @if ( Model != null && items != null && items.Count() > 0 )
         {
-            foreach (var item in items)
+            foreach ( var item in items )
             {
-                Status status = (Status)item.Status;
+                Status status = ( Status ) item.Status;
 
-                String active = status.Equals(Status.Active) ? "active" : "inactive";
-                String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+                string active = status.Equals( Status.Active ) ? "active" : "inactive";
+                string enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
-                    <td style="width: 15%;">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
                         @item.Name
                     </td>
                     <td>
@@ -89,16 +98,87 @@
                     </td>
                     <td>
                         @item.Email
-                    </td>                    
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+                    </td>
+                    <td width="10%">
+                        @if ( item.Contacts != null && item.Contacts.Any( c => c.Status == ( Int32 ) Status.Active ) )
+                        {
+                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                                <a data-sticky-one="1" data-target="#transporter-@item.Id-contacts" data-trigger="mouseover" data-arrow="center-right" data-title="Contacts">
+                                    <i class="fa fa-phone"></i>@item.ContactCount contacts
+                                </a>
+
+                                <div id="transporter-@item.Id-contacts" class="none">
+                                    <ul class="list" style="max-height: 200px; overflow-y: auto;">
+                                        @foreach ( Contact d in item.Contacts.Where( c => c.Status == ( Int32 ) Status.Active ) )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                @d.ContactName -
+                                                <a href="tel:@d.ContactCell">@d.ContactCell</a>
+                                                <a href="mailto:@d.ContactEmail">@d.ContactEmail</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>@item.ContactCount contacts</span>
+                        }
+                    </td>
+                    <td width="10%">
+                        @if ( item.Vehicles != null && item.Vehicles.Any( c => c.Status == ( Int32 ) Status.Active ) )
+                        {
+                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                                <a data-sticky-one="1" data-target="#transporter-@item.Id-vehicles" data-trigger="mouseover" data-arrow="center-right" data-title="Vehicles">
+                                    <i class="fa fa-truck"></i>@item.VehicleCount vehicles
+                                </a>
+
+                                <div id="transporter-@item.Id-vehicles" class="none">
+                                    <ul class="list" style="max-height: 200px; overflow-y: auto;">
+                                        @foreach ( Vehicle d in item.Vehicles.Where( c => c.Status == ( Int32 ) Status.Active ) )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                @d.Make @d.Model - @d.Year (Reg #@d.Registration)
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>@item.VehicleCount vehicles</span>
+                        }
+                    </td>
 
                     <td width="15%">
-                        @Html.ActionLink("Details", "TransporterDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                        @Html.ActionLink("Edit", "EditTransporter", new { id = item.Id, returnView = "ManageTransporters" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
-                        @Html.ActionLink(enable, "DeleteTransporter", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managetransporters", @rel = "tipsyE", @title = enable + " this item?" })
-                        <a href="#" onclick="ContactsModal('@item.Id')"><i class="fa fa-phone"></i>Contacts</a>
-                        <a href="#" onclick="VehiclesModal('@item.Id')"><i class="fa fa-truck"></i>Vehicles</a>
+                            @Html.ActionLink( "Details", "TransporterDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                            @Html.ActionLink( "Edit", "EditTransporter", new { id = item.Id, returnView = "ManageTransporters" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                            @Html.ActionLink( enable, "DeleteTransporter", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managetransporters", @rel = "tipsyE", @title = enable + " this item?" } )
+
+                        </div>
+
+                        <a href="@Url.Action( "TransporterContacts", "Client", new { id = item.Id } )" data-details="1" data-id="@item.Id" data-target=".tr-@item.Id-item">
+                            <i class="fa fa-phone"></i>Contacts
+                        </a>
+
+                        <a href="@Url.Action( "TransporterVehicles", "Client", new { id = item.Id } )" data-details="1" data-id="@item.Id" data-target=".tr-@item.Id-item">
+                            <i class="fa fa-truck"></i>Vehicles
+                        </a>
+
                     </td>
 
 

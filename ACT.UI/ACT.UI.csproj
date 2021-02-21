@@ -501,7 +501,7 @@
     <Content Include="Views\Administration\_PSPConfig.cshtml" />
     <Content Include="Views\Administration\_ApproveDeclinePSP.cshtml" />
     <Content Include="Views\Administration\_PSPUsers.cshtml" />
-    <Content Include="Views\Administration\_PSPClients.cshtml" />
+    <Content Include="Views\Administration\_PSPClientsView.cshtml" />
     <Content Include="Views\Administration\_PSPProducts.cshtml" />
     <Content Include="Views\Administration\_PSPInvoices.cshtml" />
     <Content Include="Views\Administration\_Regions.cshtml" />
@@ -650,9 +650,6 @@
     <Content Include="Views\Administration\_ManageTransporters.cshtml" />
     <Content Include="Views\Shared\_Vehicles.cshtml" />
     <Content Include="Views\Shared\_Contacts.cshtml" />
-    <Content Include="Views\Administration\AddTransporter.cshtml" />
-    <Content Include="Views\Administration\TransporterDetails.cshtml" />
-    <Content Include="Views\Administration\EditTransporter.cshtml" />
     <Content Include="Views\Shared\_VehiclesView.cshtml" />
     <Content Include="Views\Shared\_ContactsView.cshtml" />
     <Content Include="Views\Pallet\ImportPoolingAgentData.cshtml" />
@@ -690,6 +687,10 @@
     <Content Include="Views\ClientReporting\_AuthorisationStats.cshtml" />
     <Content Include="Views\DashBoard\_AgeOfOutstandingPODData.cshtml" />
     <Content Include="Views\DashBoard\_AgeOfOutstandingPOD.cshtml" />
+    <Content Include="Views\Administration\AddTransporter.cshtml" />
+    <Content Include="Views\Administration\EditTransporter.cshtml" />
+    <Content Include="Views\Administration\TransporterDetails.cshtml" />
+    <Content Include="Views\Administration\_PSPClients.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

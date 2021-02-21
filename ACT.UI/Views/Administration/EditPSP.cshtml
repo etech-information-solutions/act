@@ -446,7 +446,7 @@
                         <option value="">-- select</option>
                         @foreach ( int p in Enum.GetValues( typeof( Province ) ) )
                         {
-                            Province province = (Province) p;
+                            Province province = ( Province ) p;
 
                             string text = province.GetDisplayText();
 
@@ -486,6 +486,14 @@
                 @Html.TextBoxFor( model => model.NumberOfLostPallets, new { @class = "input", @placeholder = "Enter Number Of Lost Pallets" } )
                 @Html.ValidationMessageFor( model => model.NumberOfLostPallets )
             </div>
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
+
+        <div id="psp-client">
+
+            @Html.Partial( "_PSPClients", Model.PSPClients )
 
         </div>
 

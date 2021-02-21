@@ -22,6 +22,7 @@ namespace ACT.Data.Models
         public string ModifiedBy { get; set; }
         public int Status { get; set; }
         public string FinAccountingCode { get; set; }
+        public Nullable<System.DateTime> ContractRenewalDate { get; set; }
     
         public virtual Client Client { get; set; }
         public virtual PSP PSP { get; set; }

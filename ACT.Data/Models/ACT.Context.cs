@@ -64,7 +64,6 @@ namespace ACT.Data.Models
         public virtual DbSet<PSP> PSPs { get; set; }
         public virtual DbSet<PSPBilling> PSPBillings { get; set; }
         public virtual DbSet<PSPBudget> PSPBudgets { get; set; }
-        public virtual DbSet<PSPClient> PSPClients { get; set; }
         public virtual DbSet<PSPConfig> PSPConfigs { get; set; }
         public virtual DbSet<PSPProduct> PSPProducts { get; set; }
         public virtual DbSet<PSPUser> PSPUsers { get; set; }
@@ -88,5 +87,6 @@ namespace ACT.Data.Models
         public virtual DbSet<PSPPeriod> PSPPeriods { get; set; }
         public virtual DbSet<ChepLoad> ChepLoads { get; set; }
         public virtual DbSet<OutstandingReason> OutstandingReasons { get; set; }
+        public virtual DbSet<PSPClient> PSPClients { get; set; }
     }
 }
