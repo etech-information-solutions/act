@@ -17,7 +17,7 @@
 @Html.Partial( "_Notification" )
 
 @{
-    Int32 count = Model.Start;
+    int count = Model.Start;
     List<SiteCustomModel> items = ( List<SiteCustomModel> ) Model.Items;
 }
 
@@ -87,8 +87,8 @@
             {
                 Status status = ( Status ) item.Status;
 
-                string active = status.Equals( Status.Active ) ? "active" : "inactive";
-                string enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
                 string siteTypeName = ( item.SiteType != null ) ? ( ( SiteType ) item.SiteType ).GetDisplayText() : "N/A";
 

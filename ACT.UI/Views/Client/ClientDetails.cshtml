@@ -63,7 +63,16 @@
             Chep Reference
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.ChepReference )
+            <ul class="list">
+                @foreach ( ClientChepAccount item in Model.ClientChepAccounts )
+                {
+                    string active = ( ( CommonStatus ) item.Status == CommonStatus.Active ) ? "active" : "inactive";
+
+                    <li class="@active">
+                        @item.ChepReference
+                    </li>
+                }
+            </ul>
         </div>
 
         <div class="display-label">

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
 using System.Threading;
+
 using ACT.Core.Enums;
 using ACT.Core.Extension;
 using ACT.Core.Models;
@@ -17,6 +18,8 @@ namespace ACT.Monitor
     public partial class Monitor : ServiceBase
     {
         //private System.Timers.Timer DinnerMonitorTimer;
+
+        private Timer ClientTimer;
 
         private Timer DisputeTimer;
 
@@ -57,6 +60,7 @@ namespace ACT.Monitor
                 Writer.WriteLine( $"========================   SERVICE STARTED @ {DateTime.Now}   ========================" );
 
                 // Start independent Timers
+                this.ConfigureTimers( Timers.ClientMonitorTimer );
                 this.ConfigureTimers( Timers.DisputeMonitorTimer );
 
                 // Polls are in seconds, so we multiply by 1000 to convert seconds to milliseconds
@@ -93,22 +97,23 @@ namespace ACT.Monitor
                     //    DinnerMonitorTimer = null;
                     //}
 
-                    // Fire an E-mail for RED ALERT
-                    //List<string> receivers = new List<string>
-                    //{
-                    //    "msimwaba@gmail.com"
-                    //};
+                    //Fire an E - mail for RED ALERT
 
-                    //EmailModel mail = new EmailModel()
-                    //{
-                    //    Recipients = receivers,
-                    //    Body = "<p>THE <b>ACT MONITOR (Windows Service)</b> HAS BEEN STOPPED! PLEASE RECTIFY IMMEDIATELY...</p><p>You can safely ignore this e-mail but you'll be held responsible for customer unsatisfictory!</p><p>Best Regards<br /> ACT Team</p>",
-                    //    From = "support@testact.co.za",
-                    //    Subject = "ACT MONITOR HAS BEEN STOPPED!"
-                    //};
+                    List<string> receivers = new List<string>
+                    {
+                        "msimwaba@gmail.com"
+                    };
 
-                    //bool sent = Mail.Send( mail );
-                    //mail.Dispose();
+                    EmailModel mail = new EmailModel()
+                    {
+                        Recipients = receivers,
+                        Body = "<p>THE <b>ACT MONITOR (Windows Service)</b> HAS BEEN STOPPED! PLEASE RECTIFY IMMEDIATELY...</p><p>You can safely ignore this e-mail but you'll be held responsible for customer unsatisfictory!</p><p>Best Regards<br /> ACT Team</p>",
+                        From = "support@testact.co.za",
+                        Subject = "ACT MONITOR HAS BEEN STOPPED!"
+                    };
+
+                    bool sent = Mail.Send( mail );
+                    mail.Dispose();
                 }
                 catch ( Exception ex )
                 {
@@ -207,6 +212,46 @@ namespace ACT.Monitor
 
             switch ( timer )
             {
+                case Timers.ClientMonitorTimer:
+
+                    #region Member Monitor Timer
+
+                    ClientTimer = new Timer( new TimerCallback( ClientTimerCallback ) );
+
+                    //Set the Default Time.
+                    scheduledTime = DateTime.MinValue;
+
+                    //Get the Scheduled Time from AppSettings.
+                    span = ConfigSettings.SystemRules.ClientMonitorTime.Value;
+                    scheduledTime = DateTime.Parse( $"{span.Hours}:{span.Minutes}:{span.Seconds}" );
+
+                    if ( DateTime.Now > scheduledTime )
+                    {
+                        //If Scheduled Time is passed set Schedule for the next day.
+                        scheduledTime = scheduledTime.AddDays( 1 );
+                    }
+
+                    Writer.WriteLine();
+                    Writer.WriteLine( "Client Monitor Scheduled Time: {0}", scheduledTime );
+
+                    timeSpan = scheduledTime.Subtract( DateTime.Now );
+
+                    Writer.WriteLine();
+                    Writer.WriteLine( "Client Monitor Time Span: {0}", timeSpan );
+
+                    //Get the difference in Minutes between the Scheduled and Current Time.
+                    dueTime = Convert.ToInt32( timeSpan.TotalMilliseconds );
+
+                    Writer.WriteLine();
+                    Writer.WriteLine( "Client Monitor Due Time: {0}", dueTime );
+
+                    // Change the Timer's Due Time.
+                    ClientTimer.Change( dueTime, Timeout.Infinite );
+
+                    #endregion
+
+                    break;
+
                 case Timers.DisputeMonitorTimer:
 
                     #region Member Monitor Timer
@@ -247,6 +292,45 @@ namespace ACT.Monitor
 
                     break;
             }
+        }
+
+
+
+        public void ClientTimerCallback( object e )
+        {
+            try
+            {
+                ConfigSettings.SetRules();
+
+                ArchiveLog( ConfigSettings.SystemRules.ClientMonitorPath, 10.0 );
+
+                using ( StreamWriter writer = new StreamWriter( $"{ConfigSettings.SystemRules.ClientMonitorPath}\\log.log", true ) )
+                {
+                    writer.AutoFlush = true;
+
+                    try
+                    {
+                        writer.WriteLine();
+                        writer.WriteLine( $"BEGIN Client MONITOR @ {DateTime.Now}   ========================" );
+
+                        ClientMonitor.Run( writer );
+
+                        writer.WriteLine();
+                        writer.WriteLine( $"END Client MONITOR @ {DateTime.Now}   ========================" );
+                    }
+                    catch ( Exception ex )
+                    {
+                        BaseMonitor.Error( writer, ex, "ClientTimerCallback" );
+                    }
+                }
+            }
+            catch ( Exception ex )
+            {
+                BaseMonitor.Error( Writer, ex, "ClientTimerCallback" );
+            }
+
+            // Reset Timer
+            ConfigureTimers( Timers.ClientMonitorTimer );
         }
 
 

@@ -18,7 +18,7 @@
 @{
     UserModel user = User.Get();
 
-    Int32 count = Model.Start;
+    int count = Model.Start;
     List<PSPCustomModel> items = ( List<PSPCustomModel> ) Model.Items;
 }
 
@@ -92,8 +92,8 @@
                 PSPClientStatus status = ( PSPClientStatus ) item.Status;
                 ServiceType serviceType = ( ServiceType ) item.ServiceRequired;
 
-                String enable = status == PSPClientStatus.Verified ? "Disable" : "Enable";
-                String active = status == PSPClientStatus.Verified ? "active" : status == PSPClientStatus.Unverified ? "pending" : "inactive";
+                string enable = status == PSPClientStatus.Verified ? "Disable" : "Enable";
+                string active = status == PSPClientStatus.Verified ? "active" : status == PSPClientStatus.Unverified ? "pending" : "inactive";
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 

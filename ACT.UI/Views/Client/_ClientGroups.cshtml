@@ -19,7 +19,7 @@
 
 @{
     UserModel user = User.Get();
-    Int32 count = Model.Start;
+    int count = Model.Start;
     List<GroupCustomModel> items = ( List<GroupCustomModel> ) Model.Items;
 }
 
@@ -76,8 +76,8 @@
             {
                 Status status = ( Status ) item.Status;
 
-                string active = status.Equals( Status.Active ) ? "active" : "inactive";
-                string enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
                     <td width="1%">

@@ -48,6 +48,8 @@ namespace ACT.Core.Models.Custom
 
         public string PSPCompanyName { get; set; }
 
+        public DateTime? ContractRenewalDate { get; set; }
+
 
         public List<Document> Documents { get; set; }
     }

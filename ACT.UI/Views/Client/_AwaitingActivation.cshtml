@@ -20,7 +20,7 @@
 @{
     UserModel user = User.Get();
 
-    Int32 count = Model.Start;
+    int count = Model.Start;
     List<Client> items = (List<Client>)Model.Items;
 
     ClientService cservice = new ClientService();
@@ -91,8 +91,8 @@
             {
                 Status status = (Status)item.Status;
 
-                String active = status.Equals(Status.Active) ? "active" : "inactive";
-                String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+                string active = status.Equals(Status.Active) ? "active" : "inactive";
+                string enable = status.Equals(Status.Active) ? "Disable" : "Enable";
                 Address addr = new Address();
                 string addressline1 = "";
                 string suburb = "";

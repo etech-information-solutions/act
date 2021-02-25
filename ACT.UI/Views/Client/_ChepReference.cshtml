@@ -1,0 +1,92 @@
+﻿@model List<ClientChepAccount>
+
+@using ACT.Core.Enums;
+@using ACT.Data.Models;
+
+@{
+    int count = 0;
+}
+
+<table id="client-chep-reference-table" class="da-table">
+    <thead>
+        <tr>
+            <th>Chep Reference</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model.NullableAny() )
+        {
+            foreach ( ClientChepAccount item in Model )
+            {
+                string active = ( ( CommonStatus ) item.Status == CommonStatus.Active ) ? "active" : "inactive";
+
+                <tr id="client-@count-chep-reference" class="add-more-row @active">
+                    <td style="position: relative;">
+                        @if ( ( count + 1 ) == Model.Count )
+                        {
+                            <a data-add-one-more="1" data-target="#client-@count-chep-reference" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                                <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                            </a>
+                        }
+
+                        <input name="ClientChepAccounts[@count].Id" type="hidden" value="@item.Id" />
+                        <input class="input" name="ClientChepAccounts[@count].ChepReference" placeholder="Enter Chep Reference" required="required" style="padding: 0 5px; width: 87%;" type="text" value="@item.ChepReference">
+                    </td>
+                    <td>
+                        <select name="ClientChepAccounts[@count].Status" required="required" class="chzn" style="width: 98%;">
+                            <option value="">-- select</option>
+                            @foreach ( int e in Enum.GetValues( typeof( CommonStatus ) ) )
+                            {
+                                CommonStatus s = ( CommonStatus ) e;
+
+                                if ( s == CommonStatus.None )
+                                {
+                                    continue;
+                                }
+
+                                string sel = ( e == item.Status ) ? "selected=selected" : string.Empty;
+
+                                <option value="@e" @sel>@s.GetDisplayText()</option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+
+                count++;
+            }
+        }
+        else
+        {
+            <tr id="client-@count-chep-reference" class="add-more-row">
+                <td style="position: relative;">
+                    @if ( ( count + 1 ) == Model.Count )
+                    {
+                        <a data-add-one-more="1" data-target="#client-@count-chep-reference" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                            <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                        </a>
+                    }
+
+                    <input name="ClientChepAccounts[@count].Id" type="hidden" value="" />
+                    <input name="ClientChepAccounts[@count].ChepReference" class="input" placeholder="Enter Chep Reference" required="required" style="padding: 0 5px; width: 87%;" type="text" value="">
+                </td>
+                <td>
+                    <select name="ClientChepAccounts[@count].Status" class="chzn" style="width: 98%;">
+                        @foreach ( int e in Enum.GetValues( typeof( CommonStatus ) ) )
+                        {
+                            CommonStatus s = ( CommonStatus ) e;
+
+                            if ( s == CommonStatus.None )
+                            {
+                                continue;
+                            }
+
+                            <option value="@e">@s.GetDisplayText()</option>
+                        }
+                    </select>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

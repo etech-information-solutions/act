@@ -358,7 +358,7 @@ input[disabled="disabled"], input[disabled="true"], input[data-always-disabled="
 }
 
 
-table tr.inactive, table td.inactive {
+table tr.inactive, table td.inactive, li.inactive {
     background-color: #FFE6BA !important;
 }
 

@@ -50,7 +50,7 @@
             Province
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Province.Name)
+            @( Model.Province.HasValue ? ( ( Province ) Model.Province ).GetDisplayText() : string.Empty )
         </div>
 
     </div>

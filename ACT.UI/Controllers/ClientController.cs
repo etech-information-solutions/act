@@ -120,7 +120,7 @@ namespace ACT.UI.Controllers
                                                     address?.Addressline1,
                                                     address?.Addressline2,
                                                     address?.Town,
-                                                    ( address != null ? ( (Province) address.Province ).GetDisplayText() : string.Empty ),
+                                                    ( address != null ? ( ( Province ) address.Province ).GetDisplayText() : string.Empty ),
                                                     item.PostalCode,
                                                     item.ContactName,
                                                     item.ContactNo,
@@ -336,6 +336,7 @@ namespace ACT.UI.Controllers
             using ( DocumentService dservice = new DocumentService() )
             using ( PSPClientService pcservice = new PSPClientService() )
             using ( ClientBudgetService bservice = new ClientBudgetService() )
+            using ( ClientChepAccountService ccaservice = new ClientChepAccountService() )
             {
                 #region Validation
 
@@ -426,6 +427,37 @@ namespace ACT.UI.Controllers
                         };
 
                         bservice.Create( b );
+                    }
+                }
+
+                #endregion
+
+                #region Client Chep Accounts
+
+                if ( model.ClientChepAccounts.NullableAny() )
+                {
+                    foreach ( ClientChepAccount item in model.ClientChepAccounts )
+                    {
+                        ClientChepAccount cca = ccaservice.GetById( item.Id );
+
+                        if ( cca == null )
+                        {
+                            cca = new ClientChepAccount()
+                            {
+                                ClientId = model.Id,
+                                Status = item.Status,
+                                ChepReference = item.ChepReference,
+                            };
+
+                            ccaservice.Create( cca );
+                        }
+                        else
+                        {
+                            cca.Status = item.Status;
+                            cca.ChepReference = item.ChepReference;
+
+                            ccaservice.Update( cca );
+                        }
                     }
                 }
 
@@ -576,14 +608,25 @@ namespace ACT.UI.Controllers
                         PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
-                        Province = ( address != null ) ? (Province) address.Province : Province.All,
+                        Province = ( address != null ) ? ( Province ) address.Province : Province.All,
                         AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
                     },
 
                     ClientBudgets = new List<ClientBudget>(),
 
                     Files = new List<FileViewModel>(),
+
+                    ClientChepAccounts = client.ClientChepAccounts.ToList()
                 };
+
+                if ( !client.ClientChepAccounts.NullableAny( a => client.ChepReference?.Trim()?.ToLower() == client.ChepReference?.Trim()?.ToLower() ) )
+                {
+                    model.ClientChepAccounts.Add( new ClientChepAccount()
+                    {
+                        Status = ( int ) CommonStatus.Active,
+                        ChepReference = client.ChepReference
+                    } );
+                }
 
                 #endregion
 
@@ -674,6 +717,7 @@ namespace ACT.UI.Controllers
             using ( DocumentService dservice = new DocumentService() )
             using ( PSPClientService pcservice = new PSPClientService() )
             using ( ClientBudgetService bservice = new ClientBudgetService() )
+            using ( ClientChepAccountService ccaservice = new ClientChepAccountService() )
             {
                 //if ( !ModelState.IsValid )
                 //{
@@ -806,6 +850,37 @@ namespace ACT.UI.Controllers
                             b.Status = ( int ) Status.Active;
 
                             bservice.Update( b );
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region Client Chep Accounts
+
+                if ( model.ClientChepAccounts.NullableAny() )
+                {
+                    foreach ( ClientChepAccount item in model.ClientChepAccounts )
+                    {
+                        ClientChepAccount cca = ccaservice.GetById( item.Id );
+
+                        if ( cca == null )
+                        {
+                            cca = new ClientChepAccount()
+                            {
+                                ClientId = model.Id,
+                                Status = item.Status,
+                                ChepReference = item.ChepReference,
+                            };
+
+                            ccaservice.Create( cca );
+                        }
+                        else
+                        {
+                            cca.Status = item.Status;
+                            cca.ChepReference = item.ChepReference;
+
+                            ccaservice.Update( cca );
                         }
                     }
                 }
@@ -1040,7 +1115,7 @@ namespace ACT.UI.Controllers
                         PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
-                        Province = ( address != null ) ? (Province) address.Province : Province.All,
+                        Province = ( address != null ) ? ( Province ) address.Province : Province.All,
                         AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
                     },
 
@@ -1951,6 +2026,16 @@ namespace ACT.UI.Controllers
                     ReceivingContact = model.ReceivingContact,
                     FinanceContactNo = model.FinanceContactNo,
                     ReceivingContactNo = model.ReceivingContactNo,
+                    ReceivingEmail = model.ReceivingEmail,
+
+                    DepotManager = model.DepotManager,
+                    DepotManagerEmail = model.DepotManagerEmail,
+                    DepotManagerContact = model.DepotManagerContact,
+                    FinanceEmail = model.FinanceEmail,
+                    LocationNumber = model.LocationNumber,
+
+                    ARPMSalesManagerId = model.ARPMSalesManagerId,
+                    CLCode = model.CLCode,
                 };
 
                 site = sservice.Create( site );
@@ -2080,10 +2165,17 @@ namespace ACT.UI.Controllers
                     Status = ( Status ) site.Status,
                     SiteCodeChep = site.SiteCodeChep,
                     PlanningPoint = site.PlanningPoint,
+                    FinanceEmail = site.FinanceEmail,
                     FinanceContact = site.FinanceContact,
                     FinanceContactNo = site.FinanceContactNo,
                     ReceivingContact = site.ReceivingContact,
                     ReceivingContactNo = site.ReceivingContactNo,
+                    ReceivingEmail = site.ReceivingEmail,
+                    DepotManager = site.DepotManager,
+                    DepotManagerEmail = site.DepotManagerEmail,
+                    DepotManagerContact = site.DepotManagerContact,
+                    LocationNumber = site.LocationNumber,
+
                     SiteType = ( site.SiteType.HasValue ? ( SiteType ) site.SiteType : SiteType.All ),
 
 
@@ -2149,7 +2241,7 @@ namespace ACT.UI.Controllers
                         PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
-                        Province = ( address != null ) ? (Province) address.Province : Province.All,
+                        Province = ( address != null ) ? ( Province ) address.Province : Province.All,
                         Longitude = address.Longitude,
                         Latitude = address.Latitude,
                     };
@@ -2223,10 +2315,16 @@ namespace ACT.UI.Controllers
                 site.SiteType = ( int ) model.SiteType;
                 site.SiteCodeChep = model.SiteCodeChep;
                 site.PlanningPoint = model.PlanningPoint;
+                site.FinanceEmail = model.FinanceEmail;
                 site.FinanceContact = model.FinanceContact;
                 site.ReceivingContact = model.ReceivingContact;
                 site.FinanceContactNo = model.FinanceContactNo;
                 site.ReceivingContactNo = model.ReceivingContactNo;
+                site.ReceivingEmail = model.ReceivingEmail;
+                site.DepotManager = model.DepotManager;
+                site.DepotManagerEmail = model.DepotManagerEmail;
+                site.DepotManagerContact = model.DepotManagerContact;
+                site.LocationNumber = model.LocationNumber;
 
                 sservice.Update( site );
 
@@ -3053,7 +3151,7 @@ namespace ACT.UI.Controllers
                                 {
                                     if ( provinceId > 0 )
                                     {
-                                        provinceName = ( (Province) provinceId ).GetDisplayText();
+                                        provinceName = ( ( Province ) provinceId ).GetDisplayText();
                                     }
                                 }
                                 catch ( Exception ex )

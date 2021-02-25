@@ -15,7 +15,7 @@
 @Html.Partial( "_Notification" )
 
 @{
-    Int32 count = Model.Start;
+    int count = Model.Start;
     List<Bank> items = ( List<Bank> ) Model.Items;
 }
 
@@ -63,8 +63,8 @@
             {
                 Status status = ( Status ) item.Status;
 
-                String active = status.Equals( Status.Active ) ? "active" : "inactive";
-                String enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 

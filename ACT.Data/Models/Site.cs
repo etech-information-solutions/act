@@ -56,6 +56,8 @@ namespace ACT.Data.Models
         public string DepotManagerEmail { get; set; }
         public Nullable<int> Province { get; set; }
         public string LocationNumber { get; set; }
+        public Nullable<int> ARPMSalesManagerId { get; set; }
+        public string CLCode { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepAudit> ChepAudits { get; set; }
@@ -71,5 +73,6 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Site> Site1 { get; set; }
         public virtual Site Site2 { get; set; }
+        public virtual User User { get; set; }
     }
 }

@@ -103,6 +103,30 @@
                 @Html.ValidationMessageFor( model => model.SiteCodeChep )
             </div>
 
+            <div class="editor-label">
+                @Html.LabelFor( model => model.LocationNumber )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.LocationNumber, new { @class = "input", @placeholder = "Enter Site Location Number" } )
+                @Html.ValidationMessageFor( model => model.LocationNumber )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.Longitude )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Longitude, new { @class = "input", @placeholder = "Enter Site Longitude" } )
+                @Html.ValidationMessageFor( model => model.Longitude )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.Latitude )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Latitude, new { @class = "input", @placeholder = "Enter Site Latitude" } )
+                @Html.ValidationMessageFor( model => model.Latitude )
+            </div>
+
         </div>
 
         <div class="left" style="width: 45%;">
@@ -140,6 +164,14 @@
             </div>
 
             <div class="editor-label">
+                @Html.LabelFor( model => model.FinanceEmail )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.FinanceEmail, new { @class = "input", @placeholder = "Enter Finance Email Address" } )
+                @Html.ValidationMessageFor( model => model.FinanceEmail )
+            </div>
+
+            <div class="editor-label">
                 @Html.LabelFor( model => model.ReceivingContact )
             </div>
             <div class="editor-field">
@@ -156,19 +188,35 @@
             </div>
 
             <div class="editor-label">
-                @Html.LabelFor( model => model.Longitude )
+                @Html.LabelFor( model => model.ReceivingEmail )
             </div>
             <div class="editor-field">
-                @Html.TextBoxFor( model => model.Longitude, new { @class = "input", @placeholder = "Enter Site Longitude" } )
-                @Html.ValidationMessageFor( model => model.Longitude )
+                @Html.TextBoxFor( model => model.ReceivingEmail, new { @class = "input", @placeholder = "Enter Receiving Email Address" } )
+                @Html.ValidationMessageFor( model => model.ReceivingEmail )
             </div>
 
             <div class="editor-label">
-                @Html.LabelFor( model => model.Latitude )
+                @Html.LabelFor( model => model.DepotManager )
             </div>
             <div class="editor-field">
-                @Html.TextBoxFor( model => model.Latitude, new { @class = "input", @placeholder = "Enter Site Latitude" } )
-                @Html.ValidationMessageFor( model => model.Latitude )
+                @Html.TextBoxFor( model => model.DepotManager, new { @class = "input", @placeholder = "Enter Depot Manager Name" } )
+                @Html.ValidationMessageFor( model => model.DepotManager )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.DepotManagerContact )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.DepotManagerContact, new { @class = "input", @placeholder = "Enter Depot Manager Contact Number" } )
+                @Html.ValidationMessageFor( model => model.DepotManagerContact )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.DepotManagerEmail )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.DepotManagerEmail, new { @class = "input", @placeholder = "Enter Depot Manager Email Address" } )
+                @Html.ValidationMessageFor( model => model.DepotManagerEmail )
             </div>
 
         </div>
@@ -262,9 +310,9 @@
 
                 <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
                     <option value="">-- select</option>
-                    @foreach ( int p in Enum.GetValues( typeof(Province) ) )
+                    @foreach ( int p in Enum.GetValues( typeof( Province ) ) )
                     {
-                        Province province = (Province) p;
+                        Province province = ( Province ) p;
 
                         string text = province.GetDisplayText();
 

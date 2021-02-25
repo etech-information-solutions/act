@@ -11,8 +11,8 @@
     -->
 
 @{
-    String vn = ( ( String ) ViewBag.ViewName ?? "" );
-    String action = vn.Replace( "_", "" );
+    string vn = ( ( string ) ViewBag.ViewName ?? "" );
+    string action = vn.Replace( "_", "" );
 
     UserModel user = User.Get();
 }

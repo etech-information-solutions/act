@@ -18,7 +18,7 @@
 @{
     UserModel user = User.Get();
 
-    Int32 count = Model.Start;
+    int count = Model.Start;
     List<ClientKPICustomModel> items = ( List<ClientKPICustomModel> ) Model.Items;
 }
 
@@ -87,8 +87,8 @@
             {
                 Status status = ( Status ) item.Status;
 
-                string active = status.Equals( Status.Active ) ? "active" : "inactive";
-                string enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
                 string targetPeriod = ( item.TargetPeriod != null ? ( ( ( TargetPeriod ) item.TargetPeriod ).GetDisplayText() ) : "" );
 

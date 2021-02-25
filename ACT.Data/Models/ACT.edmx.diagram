@@ -53,7 +53,6 @@
         <EntityTypeShape EntityType="ACTModel.SiteAudit" Width="1.5" PointX="10.5" PointY="37.875" />
         <EntityTypeShape EntityType="ACTModel.SiteBilling" Width="1.5" PointX="7.5" PointY="38.875" />
         <EntityTypeShape EntityType="ACTModel.SiteBudget" Width="1.5" PointX="7.5" PointY="64.125" />
-        <EntityTypeShape EntityType="ACTModel.SystemConfig" Width="1.5" PointX="9.75" PointY="0.75" />
         <EntityTypeShape EntityType="ACTModel.Task" Width="1.5" PointX="18" PointY="27.75" />
         <EntityTypeShape EntityType="ACTModel.Token" Width="1.5" PointX="3" PointY="90.75" />
         <EntityTypeShape EntityType="ACTModel.Transporter" Width="1.5" PointX="10.5" PointY="19.625" />
@@ -145,6 +144,10 @@
         <EntityTypeShape EntityType="ACTModel.PSPClient" Width="1.5" PointX="8.25" PointY="43.875" />
         <AssociationConnector Association="ACTModel.FK_PSPClients_Clients" />
         <AssociationConnector Association="ACTModel.FK_PSPClients_PSP" />
+        <EntityTypeShape EntityType="ACTModel.ClientChepAccount" Width="1.5" PointX="5.25" PointY="80.625" />
+        <AssociationConnector Association="ACTModel.FK_ClientChepAccount_Client" />
+        <EntityTypeShape EntityType="ACTModel.SystemConfig" Width="1.5" PointX="10.375" PointY="0.75" />
+        <AssociationConnector Association="ACTModel.FK_Site_User" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

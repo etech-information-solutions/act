@@ -54,17 +54,17 @@
 
             <div class="left" style="width: 30%; margin-right: 2%;">
 
-                <div class="editor-field" style="text-align: center; margin-bottom: 20px; border: 1px dashed #ddd; padding: 10px;">
+                <div class="editor-field" style="text-align: center; border: 1px dashed #ddd; border-bottom: 0 none; padding: 10px 10px 0 10px;">
 
                     <label for="Files-0-File">
                         Company Logo <br />
                         <img class="image-preview" style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
                     </label>
 
-                    <p class="company-files">
-                        <input id="Files-0-File" name="Files[0].File" type="file" value="" data-val-file="1" data-increment="1" data-upload-image="1" class="input" />
-                        <input id="Files-0-Name" name="Files[0].Name" type="hidden" value="Logo" />
-                        <input id="Files-0-Description" name="Files[0].Description" class="input" type="hidden" value="Company Logo" />
+                    <p id="extra-files-clone" class="company-files data-increment" style="border-bottom: 1px dashed #ddd; padding-bottom: 20px;">
+                        <input name="Files[0].File" type="file" value="" data-val-file="1" data-increment="1" data-upload-image="1" class="input" />
+                        <input name="Files[0].Name" type="hidden" value="Logo" />
+                        <input name="Files[0].Description" class="input" type="text" value="Company Logo" placeholder="Enter file description" required="required" style="margin-top: 5px;" />
                     </p>
 
                 </div>
@@ -98,9 +98,10 @@
                 <div class="editor-label">
                     @Html.LabelFor( model => model.ChepReference )
                 </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.ChepReference, new { @class = "input", @placeholder = "Enter Chep reference Number" } )
-                    @Html.ValidationMessageFor( model => model.ChepReference )
+                <div class="editor-field" style="margin-bottom: 20px;">
+
+                    @Html.Partial( "_ChepReference", Model.ClientChepAccounts )
+
                 </div>
 
                 <div class="edit-label">
@@ -313,7 +314,7 @@
                     <label for="RegistrationFile">Company Registration File</label>
                 </div>
 
-                <div class="editor-field" style="margin-bottom: 17px;">
+                <div class="editor-field data-increment" style="margin-bottom: 17px;">
 
                     <input id="RegistrationFile" name="Files[1].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
                     <input name="Files[1].Name" type="hidden" value="CompanyRegistrationFile" />
@@ -327,7 +328,7 @@
                         <label for="VATRegistrationFile">VAT Registration File</label>
                     </div>
 
-                    <div class="editor-field" style="margin-bottom: 17px;">
+                    <div class="editor-field data-increment" style="margin-bottom: 17px;">
 
                         <input id="VATRegistrationFile" name="Files[2].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
                         <input name="Files[2].Name" type="hidden" value="VATRegistrationFile" />
@@ -343,7 +344,7 @@
                         <label for="BBBEELevelFile">BBBEE Level Certificate</label>
                     </div>
 
-                    <div class="editor-field" style="margin-bottom: 17px;">
+                    <div class="editor-field data-increment" style="margin-bottom: 17px;">
 
                         <input id="BBBEELevelFile" name="Files[3].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
                         <input name="Files[3].Name" type="hidden" value="BBBEELevelCertificate" />
@@ -357,13 +358,25 @@
                     <label for="SignedPSPContractFile">Signed PSP Contract Document</label>
                 </div>
 
-                <div class="editor-field" style="margin-bottom: 20px;">
+                <div class="editor-field data-increment" style="margin-bottom: 20px;">
 
                     <input id="SignedPSPContractFile" name="Files[4].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
                     <input name="Files[4].Name" type="hidden" value="SignedPSPContractFile" />
                     <input name="Files[4].Description" class="input" type="hidden" value="Signed PSP Contract File" />
 
                 </div>
+
+                <div class="clear"></div>
+
+                <div id="extra-files" style="border-top: 1px dashed #ddd; padding-top: 10px; margin-top: 10px;">
+
+                </div>
+
+                <p style="margin-top: 10px;">
+                    <a data-add-one-more="1" data-auto-increment="1" data-target="#extra-files" data-clone-target="#extra-files-clone" data-increment-val=".data-increment" rel="tipsyW" title="Add another document?">
+                        <img alt="Add" src="@Url.Content( "~/Images/add.png" )" /> Add another document?
+                    </a>
+                </p>
 
                 <div class="clear"></div>
 
@@ -411,9 +424,9 @@
 
                         <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
                             <option value="">-- select</option>
-                            @foreach ( int p in Enum.GetValues( typeof(Province) ) )
+                            @foreach ( int p in Enum.GetValues( typeof( Province ) ) )
                             {
-                                Province province = (Province) p;
+                                Province province = ( Province ) p;
 
                                 string text = province.GetDisplayText();
 

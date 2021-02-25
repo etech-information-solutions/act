@@ -21,5 +21,14 @@ namespace ACT.Core.Enums
 
         [StringEnumDisplayText( "Transporter Depot" )]
         TransporterDepot = 3,
+
+        [StringEnumDisplayText( "Grains" )]
+        Grains = 4,
+
+        [StringEnumDisplayText( "Groceries" )]
+        Groceries = 5,
+
+        [StringEnumDisplayText( "Mills" )]
+        Mills = 6
     }
 }

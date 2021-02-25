@@ -81,6 +81,7 @@
     <Compile Include="Enums\PostingType.cs" />
     <Compile Include="Enums\ActionType.cs" />
     <Compile Include="Enums\BalanceStatus.cs" />
+    <Compile Include="Enums\CommonStatus.cs" />
     <Compile Include="Enums\TypeOfPalletUse.cs" />
     <Compile Include="Enums\VehicleType.cs" />
     <Compile Include="Enums\ReconciliationStatus.cs" />
@@ -214,6 +215,7 @@
     <Compile Include="Services\ClientCustomerService.cs" />
     <Compile Include="Services\DisputeReasonService.cs" />
     <Compile Include="Services\DeclineReasonService.cs" />
+    <Compile Include="Services\ClientChepAccountService.cs" />
     <Compile Include="Services\OutstandingReasonService .cs" />
     <Compile Include="Services\UserTaskService.cs" />
     <Compile Include="Services\TaskService.cs" />

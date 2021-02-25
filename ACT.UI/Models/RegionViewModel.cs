@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+
 using ACT.Core.Enums;
 using ACT.Core.Services;
 
@@ -17,8 +18,8 @@ namespace ACT.UI.Models
         public int PSPId { get; set; }
 
         [Required]
-        [Display(Name = "Province")]
-        public int ProvinceId { get; set; }
+        [Display( Name = "Province" )]
+        public Province Province { get; set; }
 
         [Display( Name = "Regional Manager" )]
         public int? RegionManagerId { get; set; }
@@ -37,7 +38,7 @@ namespace ACT.UI.Models
         public Status Status { get; set; }
 
         public bool EditMode { get; set; }
-        public bool ContextualMode { get; set; }
+
         #endregion
 
 
@@ -53,19 +54,6 @@ namespace ACT.UI.Models
                 using ( PSPService pservice = new PSPService() )
                 {
                     return pservice.List( true );
-                }
-            }
-        }
-
-        public Dictionary<int, string> ProvinceOptions
-        {
-            get
-            {
-                if (!EditMode) return null;
-
-                using (RegionService rservice = new RegionService())
-                {
-                    return rservice.ListProvinces();
                 }
             }
         }

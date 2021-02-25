@@ -19,7 +19,7 @@
 
 
 @{
-    Int32 count = Model.Start;
+    int count = Model.Start;
     List<UserCustomModel> items = ( List<UserCustomModel> ) Model.Items;
 }
 
@@ -73,8 +73,8 @@
 
                 RoleType roleType = ( RoleType ) item.Type;
 
-                String active = status.Equals( Status.Active ) ? "active" : "inactive";
-                String enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 

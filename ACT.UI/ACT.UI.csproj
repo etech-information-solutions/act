@@ -691,6 +691,7 @@
     <Content Include="Views\Administration\EditTransporter.cshtml" />
     <Content Include="Views\Administration\TransporterDetails.cshtml" />
     <Content Include="Views\Administration\_PSPClients.cshtml" />
+    <Content Include="Views\Client\_ChepReference.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

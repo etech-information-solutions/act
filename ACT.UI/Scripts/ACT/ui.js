@@ -1268,6 +1268,11 @@
                     {
                         if ( this.files && this.files[0] )
                         {
+                            if ( this.files[0].type.split( "/" )[0] != "image" )
+                            {
+                                return;
+                            }
+
                             var reader = new FileReader();
 
                             reader.onload = function ( e )
@@ -1360,6 +1365,7 @@
                 var i = $( this );
 
                 var target = $( i.attr( 'data-target' ) );
+                var tclone = $( i.attr( 'data-clone-target' ) );
                 var autoIncrement = i.attr( 'data-auto-increment' );
 
                 i.unbind( 'click' );
@@ -1432,7 +1438,7 @@
                     else
                     {
                         // Get clone instance as a jquery object
-                        clone = target.children().first().clone();
+                        clone = tclone.length ? tclone.clone() : target.children().first().clone();
 
                         // Check if this clone needs auto incrementing for it's element id or name
                         if ( autoIncrement !== undefined && autoIncrement === "1" )

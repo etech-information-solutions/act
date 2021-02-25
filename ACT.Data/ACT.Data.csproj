@@ -105,6 +105,9 @@
     <Compile Include="Models\ClientBudget.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ClientChepAccount.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ClientCustomer.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>

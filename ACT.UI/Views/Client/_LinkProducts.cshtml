@@ -22,7 +22,7 @@
 
 
 @{
-    Int32 count = Model.Start;
+    int count = Model.Start;
     List<ClientProductCustomModel> items = ( List<ClientProductCustomModel> ) Model.Items;
 }
 
@@ -81,8 +81,8 @@
                 Status status = ( Status ) item.Status;
                 RateType rateType = ( RateType ) item.RateType;
 
-                string active = status.Equals( Status.Active ) ? "active" : "inactive";
-                string enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 

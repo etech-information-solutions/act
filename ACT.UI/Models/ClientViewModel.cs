@@ -46,7 +46,7 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string VATNumber { get; set; }
 
-        [Display( Name = "Chep Reference" )]
+        [Display( Name = "Chep Reference (s)" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string ChepReference { get; set; }
 
@@ -107,6 +107,8 @@ namespace ACT.UI.Models
         public PSPClientStatus Status { get; set; }
 
         public List<ClientBudget> ClientBudgets { get; set; }
+
+        public List<ClientChepAccount> ClientChepAccounts { get; set; }
 
         public AddressViewModel Address { get; set; }
 

@@ -21,7 +21,7 @@
 @{
     UserModel user = User.Get();
 
-    Int32 count = Model.Start;
+    int count = Model.Start;
     List<ClientCustomModel> items = ( List<ClientCustomModel> ) Model.Items;
 }
 
@@ -101,8 +101,8 @@
                 PSPClientStatus status = ( PSPClientStatus ) item.Status;
                 ServiceType serviceType = ( ServiceType ) item.ServiceRequired;
 
-                String enable = status.Equals( PSPClientStatus.Verified ) ? "Disable" : "Enable";
-                String active = status == PSPClientStatus.Verified ? "active" : status == PSPClientStatus.Unverified ? "pending" : "inactive";
+                string enable = status.Equals( PSPClientStatus.Verified ) ? "Disable" : "Enable";
+                string active = status == PSPClientStatus.Verified ? "active" : status == PSPClientStatus.Unverified ? "pending" : "inactive";
 
                 if ( item.BudgetCount <= 0 && item.EstimatedLoadCount > 0 )
                 {

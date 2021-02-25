@@ -29,6 +29,7 @@ namespace ACT.Data.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public int Status { get; set; }
+        public Nullable<int> Province { get; set; }
     
         public virtual PSP PSP { get; set; }
         public virtual User User { get; set; }

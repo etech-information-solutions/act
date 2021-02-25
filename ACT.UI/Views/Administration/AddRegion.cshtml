@@ -46,11 +46,11 @@
                 </div>
 
                 <div class="edit-label">
-                    @Html.LabelFor(model => model.ProvinceId)
+                    @Html.LabelFor( model => model.Province )
                 </div>
                 <div class="edit-field">
-                    @Html.DropDownListFor(model => model.ProvinceId, model => Model.ProvinceOptions, r => r.Key, r => r.Value, true, new { @class = "chzn", @style = "width: 95%;" })
-                    @Html.ValidationMessageFor(model => model.RegionManagerId)
+                    @Html.EnumDropDownFor( model => model.Province, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.Province )
                 </div>
 
             </div>

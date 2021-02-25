@@ -85,10 +85,31 @@
         </div>
 
         <div class="display-label">
-            Chep Site Code
+            Chep GLID No
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.SiteCodeChep )
+        </div>
+
+        <div class="display-label">
+            Location Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.LocationNumber )
+        </div>
+
+        <div class="display-label">
+            X Coordinate
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.XCord )
+        </div>
+
+        <div class="display-label">
+            Y Coordinate
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.YCord )
         </div>
 
     </div>
@@ -124,6 +145,13 @@
         </div>
 
         <div class="display-label">
+            Finance Email Address
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.FinanceEmail )
+        </div>
+
+        <div class="display-label">
             Receiving Contact Name
         </div>
         <div class="display-field">
@@ -138,17 +166,31 @@
         </div>
 
         <div class="display-label">
-            X Coordinate
+            Receiving Email Address
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.XCord )
+            @Html.DisplayFor( model => model.ReceivingEmail )
         </div>
 
         <div class="display-label">
-            Y Coordinate
+            Depot Manager Name
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.YCord )
+            @Html.DisplayFor( model => model.DepotManager )
+        </div>
+
+        <div class="display-label">
+            Depot Manager Contact Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.DepotManagerContact )
+        </div>
+
+        <div class="display-label">
+            Depot Manager Email Address
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.DepotManagerEmail )
         </div>
 
     </div>

@@ -16,7 +16,7 @@
 @Html.Partial( "_Notification" )
 
 @{
-    Int32 count = Model.Start;
+    int count = Model.Start;
     List<Role> items = ( List<Role> ) Model.Items;
 
     UserRoleService urservice = new UserRoleService();

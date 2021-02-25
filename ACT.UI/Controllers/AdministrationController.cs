@@ -2805,11 +2805,9 @@ namespace ACT.UI.Controllers
                 return View( model );
             }
 
-            Region region = new Region();
-
-            using ( RegionService service = new RegionService() )
+            using ( RegionService rservice = new RegionService() )
             {
-                if ( service.Exist( model.Name, model.PSPId ) )
+                if ( rservice.Exist( model.Name, model.PSPId ) )
                 {
                     // Region already exist!
                     Notify( $"Sorry, a Region with the Name \"{model.Name}\" already exists for the selected PSP!", NotificationType.Error );
@@ -2817,18 +2815,22 @@ namespace ACT.UI.Controllers
                     return View( model );
                 }
 
-                region.Name = model.Name;
-                region.PSPId = model.PSPId;
-                region.Status = ( int ) model.Status;
-                region.Description = model.Description;
-                region.RegionManagerId = model.RegionManagerId;
+                Region region = new Region
+                {
+                    Name = model.Name,
+                    PSPId = model.PSPId,
+                    Status = ( int ) model.Status,
+                    Description = model.Description,
+                    Province = ( int ) model.Province,
+                    RegionManagerId = model.RegionManagerId
+                };
 
-                region = service.Create( region );
+                rservice.Create( region );
 
                 Notify( "The Region was successfully created.", NotificationType.Success );
             }
 
-            return RedirectToAction( "Regions" );
+            return Regions( new PagingModel(), new CustomSearchModel() );
         }
 
         //
@@ -2836,33 +2838,31 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Edit )]
         public ActionResult EditRegion( int id )
         {
-            Region region;
-
             using ( RegionService service = new RegionService() )
             {
-                region = service.GetById( id );
+                Region region = service.GetById( id );
+
+                if ( region == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                RegionViewModel model = new RegionViewModel()
+                {
+                    Id = region.Id,
+                    EditMode = true,
+                    Name = region.Name,
+                    PSPId = region.PSPId,
+                    Description = region.Description,
+                    Status = ( Status ) region.Status,
+                    RegionManagerId = region.RegionManagerId,
+                    Province = ( Province ) region.Province,
+                };
+
+                return View( model );
             }
-
-            if ( region == null )
-            {
-                Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                return PartialView( "_AccessDenied" );
-            }
-
-            RegionViewModel model = new RegionViewModel()
-            {
-                Id = region.Id,
-                EditMode = true,
-                Name = region.Name,
-                PSPId = region.PSPId,
-                Description = region.Description,
-                Status = ( Status ) region.Status,
-                RegionManagerId = region.RegionManagerId,
-                //ProvinceId = region.ProvinceId
-            };
-
-            return View( model );
         }
 
         //
@@ -2878,11 +2878,9 @@ namespace ACT.UI.Controllers
                 return View( model );
             }
 
-            Region region;
-
-            using ( RegionService service = new RegionService() )
+            using ( RegionService rservice = new RegionService() )
             {
-                region = service.GetById( model.Id );
+                Region region = rservice.GetById( model.Id );
 
                 if ( region == null )
                 {
@@ -2891,7 +2889,7 @@ namespace ACT.UI.Controllers
                     return View( model );
                 }
 
-                if ( region.Name != model.Name && region.PSPId != model.PSPId && service.Exist( model.Name, model.PSPId ) )
+                if ( region.Name.Trim().ToLower() != model.Name.Trim().ToLower() && region.PSPId != model.PSPId && rservice.Exist( model.Name, model.PSPId ) )
                 {
                     // Region already exist!
                     Notify( $"Sorry, a Region with the Name \"{model.Name}\" already exists for the selected PSP!", NotificationType.Error );
@@ -2903,14 +2901,15 @@ namespace ACT.UI.Controllers
                 region.PSPId = model.PSPId;
                 region.Status = ( int ) model.Status;
                 region.Description = model.Description;
+                region.Province = ( int ) model.Province;
                 region.RegionManagerId = model.RegionManagerId;
 
-                region = service.Update( region );
+                rservice.Update( region );
 
                 Notify( "The selected Region's details were successfully updated.", NotificationType.Success );
             }
 
-            return RedirectToAction( "Regions" );
+            return Regions( new PagingModel(), new CustomSearchModel() );
         }
 
         //
@@ -2919,11 +2918,9 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Delete )]
         public ActionResult DeleteRegion( RegionViewModel model )
         {
-            Region region;
-
             using ( RegionService service = new RegionService() )
             {
-                region = service.GetById( model.Id );
+                Region region = service.GetById( model.Id );
 
                 if ( region == null )
                 {
@@ -2939,7 +2936,7 @@ namespace ACT.UI.Controllers
                 Notify( "The selected Region was successfully updated.", NotificationType.Success );
             }
 
-            return RedirectToAction( "Regions" );
+            return Regions( new PagingModel(), new CustomSearchModel() );
         }
 
         #endregion
@@ -3856,7 +3853,7 @@ namespace ACT.UI.Controllers
 
             using ( RegionService service = new RegionService() )
             {
-                model = service.ListCSM( pm, csm );
+                model = service.List1( pm, csm );
                 total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
             }
 

@@ -527,10 +527,9 @@ namespace ACT.Core.Models
 
                 case "Regions":
 
-                    using ( RegionService cservice = new RegionService() )
+                    using ( PSPService pservice = new PSPService() )
                     {
-                        RegionOptions = cservice.List( true );
-                        ProvinceOptions = cservice.ListProvinces();
+                        PSPOptions = pservice.List( true );
                     }
 
                     break;

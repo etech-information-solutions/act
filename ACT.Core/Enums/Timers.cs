@@ -12,5 +12,8 @@ namespace ACT.Core.Enums
 
         [StringEnumDisplayText( "Dispute Monitor Timer" )]
         DisputeMonitorTimer = 1,
+
+        [StringEnumDisplayText( "Client Monitor Timer" )]
+        ClientMonitorTimer = 2,
     }
 }

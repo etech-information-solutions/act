@@ -41,5 +41,12 @@ namespace ACT.Data.Models
         public bool DisputeMonitorEnabled { get; set; }
         public Nullable<System.DateTime> LastDisputeMonitorRun { get; set; }
         public Nullable<int> LastDisputeMonitorCount { get; set; }
+        public Nullable<System.TimeSpan> ClientMonitorTime { get; set; }
+        public string ClientMonitorInterval { get; set; }
+        public string ClientMonitorPath { get; set; }
+        public bool ClientMonitorEnabled { get; set; }
+        public Nullable<System.DateTime> LastClientMonitorRun { get; set; }
+        public Nullable<int> LastClientMonitorCount { get; set; }
+        public Nullable<int> ClientContractRenewalReminderMonths { get; set; }
     }
 }

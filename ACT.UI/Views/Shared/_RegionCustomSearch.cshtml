@@ -1,6 +1,6 @@
 ﻿@model ACT.Core.Models.CustomSearchModel
 
-<!-- 
+<!--
     This is a sample custom search view. You'll need to create your own view depending on the page where the custom search is needed.
     E.g _PRCustomSearch for the Payment Requisition page or _UserCustomSearch for the Manage User page and build the view with the necessary fields which
     must already exist in the ACT.Core.Models.CustomSearchModel, the model that's passed. If a field is missing from this model, please add it and likewise
@@ -8,58 +8,69 @@
     -->
 
 @{
-    String vn = ( ( String ) ViewBag.ViewName ?? "" );
-    String action = vn.Replace( "_", "" );
+    string vn = ( ( string ) ViewBag.ViewName ?? "" );
+    string action = vn.Replace( "_", "" );
 }
 
 <div id="custom-search" class="custom-search">
 
     <div id="search-query" class="search-query">
 
-        @using (Ajax.BeginForm(action, new { }, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = action.ToLower(), OnBegin = "ACT.UI.BeginCustomSearch($('#sticky-one form'), true);", OnComplete = "ACT.UI.CompleteCustomSearch();" }, new { @style = "width: auto; padding: 0;" }))
+        @using ( Ajax.BeginForm( action, new { }, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = action.ToLower(), OnBegin = "ACT.UI.BeginCustomSearch($('#sticky-one form'), true);", OnComplete = "ACT.UI.CompleteCustomSearch();" }, new { @style = "width: auto; padding: 0;" } ) )
         {
-            @*<div class="editor-label">
-                @Html.LabelFor( model => model.ClientId )
+            <div class="left" style="width: 49%; margin-right: 1%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.PSPId )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.PSPId, model => model.PSPOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                </div>
+
             </div>
-            <div class="editor-field">
-                @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+
+            <div class="left" style="width: 49%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Province )
+                </div>
+                <div class="editor-field">
+                    @Html.EnumDropDownFor( model => model.Province, false, true, new { @class = "chzn", @style = "width: 100%;" } )
+                </div>
+
             </div>
 
             <div class="clear"></div>
 
-            <div class="left" style="width: 48%;">
+            <div class="left" style="width: 49%; margin-right: 1%;">
+
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.ProductId )
+                    @Html.LabelFor( model => model.FromDate )
                 </div>
                 <div class="editor-field">
-                    @Html.DropDownListFor( model => model.ProductId, model => model.ProductOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.TextBoxFor( model => model.FromDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " } )
                 </div>
+
             </div>
-            <div class="right" style="width: 48%;">
+
+            <div class="left" style="width: 49%;">
+
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.PSPClientStatus )
+                    @Html.LabelFor( model => model.ToDate )
                 </div>
                 <div class="editor-field">
-                    @Html.EnumDropDownFor( model => model.PSPClientStatus, false, true, new { @class = "chzn", @style = "width: 100%;" } )
+                    @Html.TextBoxFor( model => model.ToDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " } )
                 </div>
-            </div>
 
-            <div class="clear"></div>*@
-
-            <div class="editor-label">
-                @Html.LabelFor(model => model.ProvinceId)
-            </div>
-            <div class="editor-field">
-                @Html.DropDownListFor(model => model.ProvinceId, model => model.ProvinceOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" })
             </div>
 
             <div class="clear"></div>
 
             <div class="editor-label">
-                @Html.LabelFor(model => model.Query)
+                @Html.LabelFor( model => model.Query )
             </div>
             <div class="editor-field">
-                @Html.TextBoxFor(model => model.Query, new { @placeholder = "Search Text", @style = "width: 86%;" })
+                @Html.TextBoxFor( model => model.Query, new { @placeholder = "Search Text", @style = "width: 86%;" } )
                 <a rel="tipsyE" title="..search by any other field">
                     <img alt="" src="@Url.Content( "~/Images/info.png" )" style="vertical-align: middle;" />
                 </a>

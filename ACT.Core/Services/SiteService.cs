@@ -126,12 +126,13 @@ namespace ACT.Core.Services
 
             query = $"{query} WHERE (1=1)";
 
-            // Limit to only show Sites for logged in user
+            // Limit to only show Sites for logged in user 
             if ( !CurrentUser.IsAdmin )
             {
                 query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu
                                                        INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId
-                                                       LEFT OUTER JOIN [dbo].[ClientSite] cs ON pc.ClientId=cs.ClientId
+                                                       LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON pc.ClientId=cc.ClientId
+                                                       LEFT OUTER JOIN [dbo].[ClientSite] cs ON cc.Id=cs.ClientCustomerId
                                               WHERE
                                                 cs.SiteId=s.Id AND
                                                 pu.UserId=@userid
@@ -222,7 +223,7 @@ namespace ACT.Core.Services
             }
 
             // Parameters
-
+            
             #region Parameters
 
             List<object> parameters = new List<object>()
@@ -262,7 +263,8 @@ namespace ACT.Core.Services
             {
                 query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu
                                                        INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId
-                                                       LEFT OUTER JOIN [dbo].[ClientSite] cs ON pc.ClientId=cs.ClientId
+                                                       LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON pc.ClientId=cc.ClientId
+                                                       LEFT OUTER JOIN [dbo].[ClientSite] cs ON cc.Id=cs.ClientCustomerId
                                               WHERE
                                                 cs.SiteId=s.Id AND
                                                 pu.UserId=@userid

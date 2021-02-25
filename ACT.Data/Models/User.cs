@@ -29,6 +29,7 @@ namespace ACT.Data.Models
             this.UserNotifications = new HashSet<UserNotification>();
             this.UserRoles = new HashSet<UserRole>();
             this.UserTasks = new HashSet<UserTask>();
+            this.Sites = new HashSet<Site>();
         }
     
         public int Id { get; set; }
@@ -70,5 +71,7 @@ namespace ACT.Data.Models
         public virtual ICollection<UserRole> UserRoles { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserTask> UserTasks { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Site> Sites { get; set; }
     }
 }

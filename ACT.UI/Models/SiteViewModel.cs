@@ -65,7 +65,7 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string Depot { get; set; }
 
-        [Display( Name = "Chep Site Code" )]
+        [Display( Name = "Chep GLID No" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string SiteCodeChep { get; set; }
 
@@ -88,6 +88,30 @@ namespace ACT.UI.Models
         [Display( Name = "Receiving Contact Name" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string ReceivingContact { get; set; }
+
+        [Display( Name = "Receiving Email Address" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string ReceivingEmail { get; set; }
+
+        [Display( Name = "Depot Manager" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string DepotManager { get; set; }
+
+        [Display( Name = "Depot Manager Email" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string DepotManagerEmail { get; set; }
+
+        [Display( Name = "Depot Manager Contact" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string DepotManagerContact { get; set; }
+
+        [Display( Name = "Finance Email" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string FinanceEmail { get; set; }
+
+        [Display( Name = "Location Number" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string LocationNumber { get; set; }
 
         public bool EditMode { get; set; }
 
@@ -156,6 +180,9 @@ namespace ACT.UI.Models
                 }
             }
         }
+
+        public int? ARPMSalesManagerId { get; internal set; }
+        public string CLCode { get; internal set; }
 
         #endregion
     }

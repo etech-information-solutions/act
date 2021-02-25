@@ -223,6 +223,7 @@ namespace ACT.Core.Services
             string query = @"SELECT
                                 c.*,
                                 p.CompanyName as [PSPCompanyName],
+                                pc.ContractRenewalDate as [ContractRenewalDate],
                                 (SELECT COUNT(1) FROM [dbo].[ClientUser] cu WHERE c.Id=cu.ClientId) AS [UserCount],
                                 (SELECT COUNT(1) FROM [dbo].[ClientBudget] cb WHERE c.Id=cb.ClientId) AS [BudgetCount],
                                 (SELECT COUNT(1) FROM [dbo].[ClientProduct] cp WHERE c.Id=cp.ClientId) AS [ProductCount],
