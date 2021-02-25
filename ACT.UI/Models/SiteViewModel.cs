@@ -24,6 +24,9 @@ namespace ACT.UI.Models
         [Display( Name = "Region" )]
         public int? RegionId { get; set; }
 
+        [Display( Name = "ARPM Sales Manager" )]
+        public int? ARPMSalesManagerId { get; set; }
+
         [Required]
         [Display( Name = "Site Name" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 3 )]
@@ -113,6 +116,10 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string LocationNumber { get; set; }
 
+        [Display( Name = "CL Code" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string CLCode { get; set; }
+
         public bool EditMode { get; set; }
 
         public List<ClientCustomer> Clients { get; set; }
@@ -181,8 +188,19 @@ namespace ACT.UI.Models
             }
         }
 
-        public int? ARPMSalesManagerId { get; internal set; }
-        public string CLCode { get; internal set; }
+        public Dictionary<int, string> ARPMSalesManagerOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+
+                using ( UserService rservice = new UserService() )
+                {
+                    return rservice.List( true, RoleType.ARPMSalesManager );
+                }
+            }
+        }
+
 
         #endregion
     }

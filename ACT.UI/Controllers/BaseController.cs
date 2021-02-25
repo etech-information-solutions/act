@@ -1146,10 +1146,6 @@ namespace ACT.UI.Controllers
                 {
                     foreach ( ClientLoad l in clLoads )
                     {
-                        q = $"UPDATE [dbo].[ClientLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id={l.Id};";
-
-                        clservice.Query( q );
-
                         List<ChepLoadCustomModel> cheps = chservice.ListClientLoadMatch( l.ReceiverNumber?.Trim() );
 
                         if ( !cheps.NullableAny() ) continue;
@@ -1158,6 +1154,10 @@ namespace ACT.UI.Controllers
 
                         if ( sum == 0 )
                         {
+                            q = $"UPDATE [dbo].[ClientLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id={l.Id};";
+
+                            clservice.Query( q );
+
                             // Complete recon
                             q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) BalanceStatus.Balanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
 

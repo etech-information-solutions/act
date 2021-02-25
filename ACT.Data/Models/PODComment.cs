@@ -12,26 +12,22 @@ namespace ACT.Data.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class OutstandingReason
+    public partial class PODComment
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public OutstandingReason()
+        public PODComment()
         {
-            this.ChepLoads = new HashSet<ChepLoad>();
             this.ClientLoads = new HashSet<ClientLoad>();
-            this.ChepLoadJournals = new HashSet<ChepLoadJournal>();
         }
     
         public int Id { get; set; }
-        public string Description { get; set; }
+        public System.DateTime CreatedOn { get; set; }
+        public System.DateTime ModifiedOn { get; set; }
+        public string ModifiedBy { get; set; }
+        public string Comment { get; set; }
         public int Status { get; set; }
-        public bool IsPODOutstanding { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ChepLoad> ChepLoads { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ChepLoadJournal> ChepLoadJournals { get; set; }
     }
 }

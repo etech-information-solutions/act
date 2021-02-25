@@ -96,6 +96,9 @@
     <Compile Include="Models\ChepLoadChep.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ChepLoadJournal.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Client.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
@@ -178,6 +181,9 @@
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\OutstandingReason.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\PODComment.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Product.cs">

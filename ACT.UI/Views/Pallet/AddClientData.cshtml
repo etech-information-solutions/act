@@ -70,12 +70,24 @@
                     @Html.ValidationMessageFor( model => model.OutstandingReasonId )
                 </div>
 
-                <div class="editor-label ">
+                <div class="editor-label">
                     @Html.LabelFor( model => model.Status )
                 </div>
                 <div class="editor-field">
-                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @data_client_load_status = 1, @data_target = "#cancelled-status-reason", @style = "width: 98%;" } )
                     @Html.ValidationMessageFor( model => model.Status )
+                </div>
+
+                <div id="cancelled-status-reason" class="none">
+
+                    <div class="editor-label ">
+                        @Html.LabelFor( model => model.CancelledReason )
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor( model => model.CancelledReason, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.ValidationMessageFor( model => model.CancelledReason )
+                    </div>
+
                 </div>
 
                 <div class="editor-label ">
@@ -91,7 +103,7 @@
                     @Html.LabelFor( model => model.LoadDate )
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.LoadDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " } )
+                    @Html.TextBoxFor( model => model.LoadDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
                     @Html.ValidationMessageFor( model => model.LoadDate )
                 </div>
 
@@ -99,7 +111,7 @@
                     @Html.LabelFor( model => model.EffectiveDate )
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.EffectiveDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " } )
+                    @Html.TextBoxFor( model => model.EffectiveDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
                     @Html.ValidationMessageFor( model => model.EffectiveDate )
                 </div>
 
@@ -107,7 +119,7 @@
                     @Html.LabelFor( model => model.NotifyDate )
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.NotifyDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " } )
+                    @Html.TextBoxFor( model => model.NotifyDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
                     @Html.ValidationMessageFor( model => model.NotifyDate )
                 </div>
 
@@ -169,6 +181,14 @@
                 <div class="editor-field">
                     @Html.TextBoxFor( model => model.PODNumber, new { @class = "input", @placeholder = "Please Complete" } )
                     @Html.ValidationMessageFor( model => model.PODNumber )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.PODCommentId )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.PODCommentId, model => Model.PODCommentOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.PODCommentId )
                 </div>
 
                 <div class="editor-label ">

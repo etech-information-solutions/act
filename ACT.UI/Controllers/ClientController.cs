@@ -2176,6 +2176,9 @@ namespace ACT.UI.Controllers
                     DepotManagerContact = site.DepotManagerContact,
                     LocationNumber = site.LocationNumber,
 
+                    ARPMSalesManagerId = site.ARPMSalesManagerId,
+                    CLCode = site.CLCode,
+
                     SiteType = ( site.SiteType.HasValue ? ( SiteType ) site.SiteType : SiteType.All ),
 
 
@@ -2325,6 +2328,9 @@ namespace ACT.UI.Controllers
                 site.DepotManagerEmail = model.DepotManagerEmail;
                 site.DepotManagerContact = model.DepotManagerContact;
                 site.LocationNumber = model.LocationNumber;
+
+                site.ARPMSalesManagerId = model.ARPMSalesManagerId;
+                site.CLCode = model.CLCode;
 
                 sservice.Update( site );
 

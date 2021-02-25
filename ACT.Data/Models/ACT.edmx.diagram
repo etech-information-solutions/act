@@ -148,6 +148,12 @@
         <AssociationConnector Association="ACTModel.FK_ClientChepAccount_Client" />
         <EntityTypeShape EntityType="ACTModel.SystemConfig" Width="1.5" PointX="10.375" PointY="0.75" />
         <AssociationConnector Association="ACTModel.FK_Site_User" />
+        <EntityTypeShape EntityType="ACTModel.PODComment" Width="1.5" PointX="10.375" PointY="10" />
+        <AssociationConnector Association="ACTModel.FK_ClientLoad_PODComment" />
+        <EntityTypeShape EntityType="ACTModel.ChepLoadJournal" Width="1.5" PointX="23.75" PointY="27.75" />
+        <AssociationConnector Association="ACTModel.FK_ChepLoadJournal_Client" />
+        <AssociationConnector Association="ACTModel.FK_ChepLoadJournal_ClientSite" />
+        <AssociationConnector Association="ACTModel.FK_ChepLoadJournal_OutstandingReason" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -55,6 +55,14 @@
                 @Html.ValidationMessageFor( model => model.RegionId )
             </div>
 
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ARPMSalesManagerId )
+            </div>
+            <div class="editor-field">
+                @Html.DropDownListFor( model => model.ARPMSalesManagerId, model => Model.ARPMSalesManagerOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.ARPMSalesManagerId )
+            </div>
+
             <div class="edit-label">
                 @Html.LabelFor( model => model.Status )
             </div>
@@ -217,6 +225,14 @@
             <div class="editor-field">
                 @Html.TextBoxFor( model => model.DepotManagerEmail, new { @class = "input", @placeholder = "Enter Depot Manager Email Address" } )
                 @Html.ValidationMessageFor( model => model.DepotManagerEmail )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.CLCode )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.CLCode, new { @class = "input", @placeholder = "Enter CL Code" } )
+                @Html.ValidationMessageFor( model => model.CLCode )
             </div>
 
         </div>

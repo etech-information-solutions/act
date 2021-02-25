@@ -136,6 +136,7 @@
 
             // Client Management
             this.DataLinkProduct( $( '*[data-link-product="1"]' ) );
+            this.DataClientLoadStatus( $( '*[data-client-load-status="1"]' ) );
 
             if ( window.location.search !== "" && !$( "tr.edit" ).length && $( ".dataTable" ).length && !ACT.UI.PageViewIdProcessed )
             {
@@ -5185,6 +5186,38 @@
             $( "<div />" ).load( siteurl + "/AutoReconcileInvoices", {}, function ( d )
             {
                 window.location.reload();
+            } );
+        },
+
+        DataClientLoadStatus: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() == "4" )
+                        {
+                            target.slideDown( 900, function ()
+                            {
+                                target.find( "input.input" ).attr( "required", "required" );
+                            } );
+
+                            ACT.UI.DataHighlightFields( target );
+                        }
+                        else
+                        {
+                            target.slideUp( 900, function ()
+                            {
+                                target.find( "input.input" ).removeAttr( "required" );
+                            } );
+                        }
+                    } );
             } );
         }
 

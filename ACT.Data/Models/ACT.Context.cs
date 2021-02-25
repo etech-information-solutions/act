@@ -89,5 +89,7 @@ namespace ACT.Data.Models
         public virtual DbSet<PSPClient> PSPClients { get; set; }
         public virtual DbSet<ClientChepAccount> ClientChepAccounts { get; set; }
         public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
+        public virtual DbSet<PODComment> PODComments { get; set; }
+        public virtual DbSet<ChepLoadJournal> ChepLoadJournals { get; set; }
     }
 }

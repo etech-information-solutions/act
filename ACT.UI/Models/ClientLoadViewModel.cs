@@ -31,6 +31,9 @@ namespace ACT.UI.Models
         [Display( Name = "Outstanding Reason" )]
         public int? OutstandingReasonId { get; set; }
 
+        [Display( Name = "POD Comment" )]
+        public int? PODCommentId { get; set; }
+
         [Display( Name = "Load Number" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string LoadNumber { get; set; }
@@ -128,6 +131,10 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ChepCompensationNo { get; set; }
 
+        [Display( Name = "Cancelled Reason" )]
+        [StringLength( 500, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        public string CancelledReason { get; set; }
+
 
 
         [Display( Name = "Import Loads" )]
@@ -199,6 +206,19 @@ namespace ACT.UI.Models
                 if ( !EditMode ) return null;
 
                 using ( OutstandingReasonService service = new OutstandingReasonService() )
+                {
+                    return service.List( true );
+                }
+            }
+        }
+
+        public Dictionary<int, string> PODCommentOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+
+                using ( PODCommentService service = new PODCommentService() )
                 {
                     return service.List( true );
                 }

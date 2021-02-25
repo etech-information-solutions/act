@@ -30,6 +30,7 @@ namespace ACT.Data.Models
             this.ChepLoads = new HashSet<ChepLoad>();
             this.PSPClients = new HashSet<PSPClient>();
             this.ClientChepAccounts = new HashSet<ClientChepAccount>();
+            this.ChepLoadJournals = new HashSet<ChepLoadJournal>();
         }
     
         public int Id { get; set; }
@@ -85,5 +86,7 @@ namespace ACT.Data.Models
         public virtual ICollection<PSPClient> PSPClients { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientChepAccount> ClientChepAccounts { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChepLoadJournal> ChepLoadJournals { get; set; }
     }
 }

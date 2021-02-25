@@ -18,5 +18,8 @@ namespace ACT.Core.Enums
 
         [StringEnumDisplayText( "PCN Found" )]
         PCNFound = 3,
+
+        [StringEnumDisplayText( "Cancelled" )]
+        Cancelled = 4,
     }
 }

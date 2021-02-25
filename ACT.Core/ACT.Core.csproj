@@ -212,6 +212,8 @@
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ChepLoadChepService.cs" />
+    <Compile Include="Services\PODCommentService.cs" />
+    <Compile Include="Services\ChepLoadJournalService.cs" />
     <Compile Include="Services\ClientCustomerService.cs" />
     <Compile Include="Services\DisputeReasonService.cs" />
     <Compile Include="Services\DeclineReasonService.cs" />

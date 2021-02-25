@@ -828,6 +828,7 @@ namespace ACT.UI.Controllers
                     NewQuantity = model.NewQuantity,
                     DeliveryNote = model.DeliveryNote,
                     ClientSiteId = model.ClientSiteId,
+                    PODCommentId = model.PODCommentId,
                     ReconcileDate = model.ReconcileDate,
                     TransporterId = model.TransporterId,
                     AccountNumber = model.AccountNumber,
@@ -836,6 +837,7 @@ namespace ACT.UI.Controllers
                     AdminMovement = model.AdminMovement,
                     ReceiverNumber = model.ReceiverNumber,
                     OutstandingQty = model.OutstandingQty,
+                    CancelledReason = model.CancelledReason,
                     ReferenceNumber = model.ReferenceNumber,
                     OriginalQuantity = model.OriginalQuantity,
                     ClientDescription = model.ClientDescription,
@@ -967,6 +969,7 @@ namespace ACT.UI.Controllers
                     NewQuantity = load.NewQuantity,
                     DeliveryNote = load.DeliveryNote,
                     ClientSiteId = load.ClientSiteId,
+                    PODCommentId = load.PODCommentId,
                     TransporterId = load.TransporterId,
                     ReconcileDate = load.ReconcileDate,
                     AccountNumber = load.AccountNumber,
@@ -975,6 +978,7 @@ namespace ACT.UI.Controllers
                     ChepInvoiceNo = load.ChepInvoiceNo,
                     OutstandingQty = load.OutstandingQty,
                     ReceiverNumber = load.ReceiverNumber,
+                    CancelledReason = load.CancelledReason,
                     ReferenceNumber = load.ReferenceNumber,
                     OriginalQuantity = load.OriginalQuantity,
                     ClientDescription = load.ClientDescription,
@@ -1032,6 +1036,7 @@ namespace ACT.UI.Controllers
                 load.NewQuantity = model.NewQuantity;
                 load.DeliveryNote = model.DeliveryNote;
                 load.ClientSiteId = model.ClientSiteId;
+                load.PODCommentId = model.PODCommentId;
                 load.ReconcileDate = model.ReconcileDate;
                 load.TransporterId = model.TransporterId;
                 load.AccountNumber = model.AccountNumber;
@@ -1041,6 +1046,7 @@ namespace ACT.UI.Controllers
                 load.ReceiverNumber = model.ReceiverNumber;
                 load.OutstandingQty = model.OutstandingQty;
                 load.ReferenceNumber = model.ReferenceNumber;
+                load.CancelledReason = model.CancelledReason;
                 load.OriginalQuantity = model.OriginalQuantity;
                 load.ClientDescription = model.ClientDescription;
                 load.ChepCompensationNo = model.ChepCompensationNo;
@@ -1339,8 +1345,8 @@ namespace ACT.UI.Controllers
                     {
                         #region Create Client Load
 
-                        cQuery = $" {cQuery} INSERT INTO [dbo].[ClientLoad]([ClientId],[ClientSiteId],[ToClientSiteId],[VehicleId],[TransporterId],[CreatedOn],[ModifiedOn],[ModifiedBy],[LoadNumber],[LoadDate],[EffectiveDate],[NotifyDate],[AccountNumber],[ClientDescription],[DeliveryNote],[ReferenceNumber],[ReceiverNumber],[OriginalQuantity],[NewQuantity],[PODNumber],[PCNNumber],[PRNNumber],[Status],[PostingType],[THAN],[ReturnQty],[PODStatus],[InvoiceStatus],[UID]) ";
-                        cQuery = $" {cQuery} VALUES ({model.ClientId},{cs1.Id},{cs2.Id},{v.Id},{t.Id},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 2 ]}','{loadDate}','{deliveryDate}','{deliveryDate}','{load[ 5 ]}','{load[ 6 ]}','{load[ 12 ]}','{load[ 10 ]}','{load[ 12 ]}',{qty},{qty},'{pod}','{pcn}','{prn}',{( int ) status},{( int ) PostingType.Import},'{load[ 17 ]}',{returnQty},{podStatus},0,'{uid}') ";
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[ClientLoad]([ClientId],[ClientSiteId],[ToClientSiteId],[VehicleId],[TransporterId],[OutstandingReasonId],[CreatedOn],[ModifiedOn],[ModifiedBy],[LoadNumber],[LoadDate],[EffectiveDate],[NotifyDate],[AccountNumber],[ClientDescription],[DeliveryNote],[ReferenceNumber],[ReceiverNumber],[OriginalQuantity],[NewQuantity],[PODNumber],[PCNNumber],[PRNNumber],[Status],[PostingType],[THAN],[ReturnQty],[PODStatus],[InvoiceStatus],[UID]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},{cs1.Id},{cs2.Id},{v.Id},{t.Id},9,'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 2 ]}','{loadDate}','{deliveryDate}','{deliveryDate}','{load[ 5 ]}','{load[ 6 ]}','{load[ 12 ]}','{load[ 10 ]}','{load[ 12 ]}',{qty},{qty},'{pod}','{pcn}','{prn}',{( int ) status},{( int ) PostingType.Import},'{load[ 17 ]}',{returnQty},{podStatus},0,'{uid}') ";
 
                         #endregion
 

@@ -25,5 +25,11 @@ namespace ACT.Core.Enums
 
         [StringEnumDisplayText( "Super Admin" )]
         SuperAdmin = 5,
+
+        [StringEnumDisplayText( "Transporter" )]
+        Transporter = 6,
+
+        [StringEnumDisplayText( "ARPM Sales Manager" )]
+        ARPMSalesManager = 7,
     }
 }

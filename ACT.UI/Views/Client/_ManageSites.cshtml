@@ -202,9 +202,9 @@
                         <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
                             @Html.ActionLink( enable, "DeleteSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managesites", @rel = "tipsyE", @title = enable + " this item?", @style = "margin-left: 0;" } )
 
-                            <a href="#" onclick="LinkToSubSites('@item.Id')">
+                            @*<a href="#" onclick="LinkToSubSites('@item.Id')">
                                 <i class="fa fa-link"></i>Subsites
-                            </a>
+                            </a>*@
                         </div>
                     </td>
                 </tr>

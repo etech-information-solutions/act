@@ -174,7 +174,7 @@ namespace ACT.UI.Models
                 }
             }
         }
-
+        
         public List<DisputeReason> DisputeReasonOptions
         {
             get

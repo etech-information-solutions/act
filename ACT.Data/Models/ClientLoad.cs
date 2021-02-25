@@ -66,6 +66,8 @@ namespace ACT.Data.Models
         public Nullable<decimal> TransporterLiableQty { get; set; }
         public string ClientLoadComment { get; set; }
         public string ClientLoadNotes { get; set; }
+        public string CancelledReason { get; set; }
+        public Nullable<int> PODCommentId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }
@@ -81,5 +83,6 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Tasks { get; set; }
         public virtual OutstandingReason OutstandingReason { get; set; }
+        public virtual PODComment PODComment { get; set; }
     }
 }

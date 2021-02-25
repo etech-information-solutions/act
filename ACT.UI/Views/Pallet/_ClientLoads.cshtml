@@ -16,11 +16,11 @@
             <th data-name="LoadDate">
                 Load Date
             </th>
-            <th data-name="Equipment">
-                Product
+            <th data-name="DeliveryNote">
+                Delivery Note #
             </th>
-            <th data-name="LoadNumber">
-                Load #
+            <th data-name="ReceiverNumber">
+                Ref #
             </th>
             <th data-name="OriginalQuantity">
                 Qty
@@ -44,10 +44,10 @@
                         @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
                     </td>
                     <td>
-                        @item.Equipment
+                        @item.DeliveryNote
                     </td>
                     <td>
-                        @item.LoadNumber
+                        @item.ReceiverNumber
                     </td>
                     <td>
                         @item.OriginalQuantity

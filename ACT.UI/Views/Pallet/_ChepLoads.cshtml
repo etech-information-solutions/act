@@ -13,17 +13,20 @@
             <th data-name="Count">
                 #
             </th>
-            <th data-name="Agent">
-                Agent
+            <th data-name="Reference">
+                Ref #
             </th>
-            <th data-name="ShipmentDate">
-                Load Date
-            </th>
-            <th data-name="Equipment">
-                Product
+            <th data-name="Other Reference">
+                Other Ref #
             </th>
             <th data-name="DocketNumber">
                 Docket #
+            </th>
+            <th data-name="LoadDate">
+                Load Date
+            </th>
+            <th data-name="EffectiveDate">
+                Effective Date
             </th>
             <th data-name="Quantity">
                 Qty
@@ -44,16 +47,19 @@
                         @count
                     </td>
                     <td>
-                        Chep
+                        @item.Ref
+                    </td>
+                    <td>
+                        @item.OtherRef
+                    </td>
+                    <td>
+                        @item.DocketNumber
                     </td>
                     <td>
                         @(item.ShipmentDate?.ToString( "yyyy-MM-dd" ))
                     </td>
                     <td>
-                        @item.Equipment
-                    </td>
-                    <td>
-                        @item.DocketNumber
+                        @(item.EffectiveDate?.ToString( "yyyy-MM-dd" ))
                     </td>
                     <td>
                         @item.Quantity
