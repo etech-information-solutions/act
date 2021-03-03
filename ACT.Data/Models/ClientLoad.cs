@@ -21,6 +21,7 @@ namespace ACT.Data.Models
             this.ClientInvoices = new HashSet<ClientInvoice>();
             this.Journals = new HashSet<Journal>();
             this.Tasks = new HashSet<Task>();
+            this.ClientAuthorisations = new HashSet<ClientAuthorisation>();
         }
     
         public int Id { get; set; }
@@ -68,6 +69,8 @@ namespace ACT.Data.Models
         public string ClientLoadNotes { get; set; }
         public string CancelledReason { get; set; }
         public Nullable<int> PODCommentId { get; set; }
+        public bool ManuallyMatchedLoad { get; set; }
+        public string ManuallyMatchedUID { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }
@@ -84,5 +87,7 @@ namespace ACT.Data.Models
         public virtual ICollection<Task> Tasks { get; set; }
         public virtual OutstandingReason OutstandingReason { get; set; }
         public virtual PODComment PODComment { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
     }
 }

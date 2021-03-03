@@ -312,7 +312,8 @@ namespace ACT.UI.Controllers
                 EditMode = true,
                 Address = new AddressViewModel(),
                 Files = new List<FileViewModel>(),
-                ClientBudgets = new List<ClientBudget>()
+                ClientBudgets = new List<ClientBudget>(),
+                ClientChepAccounts = new List<ClientChepAccount>(),
             };
 
             return View( model );

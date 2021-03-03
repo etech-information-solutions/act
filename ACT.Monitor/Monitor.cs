@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data.Entity.Validation;
-using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
 using System.Threading;
 
 using ACT.Core.Enums;
-using ACT.Core.Extension;
 using ACT.Core.Models;
 using ACT.Mailer;
 using ACT.Monitor.Monitors;

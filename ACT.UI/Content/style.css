@@ -1411,11 +1411,17 @@ tr.duplicate-highlight td {
 
 .auto-recon {
     color: #fff;
-    padding: 10px;
-    margin: 0 0 0 11%;
+    border: 0 none;
+    cursor: pointer;
+    padding: 8px 10px;
     border-radius: 4px;
     background: #012d71;
     text-transform: uppercase;
+}
+
+.manual-recon {
+    display: none;
+    background: #ff1e12 !important;
 }
 
 

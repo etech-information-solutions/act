@@ -87,6 +87,15 @@
             this.DataReconcileLoadsDragDrop( $( '.recon-draggable' ), $( '.recon-droppable' ) );
             this.DataReconcileInvoicesDragDrop( $( '.invoice-draggable' ), $( '.invoice-droppable' ) );
 
+            this.DataReconcileCheck( $( '[data-r-c="1"]' ) );
+            this.DataReconcileParentCheck( $( '[data-r-p-c="1"]' ) );
+
+            this.DataManualRecon( $( '[data-manual-recon="1"]' ) );
+            this.DataManualReconed( $( '[data-manual-reconed="1"]' ) );
+
+            this.DataLoadExtra( $( '[data-load-extra="1"]' ) );
+            this.DataLoadVersion( $( '[data-load-version="1"]' ) );
+
 
             // Table Quick Links Operations
             this.DataStep( $( '*[data-step="1"]' ) );
@@ -2586,49 +2595,55 @@
 
                 // 4. Page Navigation (Indexing)
                 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                var navigation = [];
 
-                var navigation = i.find( "#page-navigation" );
-
-                var next_cntr = navigation.find( "#data-page-nav-next" );
-                var previous_cntr = navigation.find( "#data-page-nav-previous" );
-
-                if ( !i.find( ".dataTables_wrapper #page-navigation" ).length )
+                i.find( ".page-navigation" ).each( function ()
                 {
-                    i.find( ".dataTables_wrapper" ).append( navigation );
-                }
+                    var ng = navigation = $( this );
 
-                next_cntr.add( previous_cntr ).each( function ()
-                {
-                    var n = $( this );
+                    var next_cntr = ng.find( "#data-page-nav-next" );
+                    var previous_cntr = ng.find( "#data-page-nav-previous" );
 
-                    n
-                        .unbind( "click" )
-                        .bind( "click", function ()
-                        {
-                            if ( n.hasClass( "inactive" ) ) return;
+                    if ( !i.find( ".dataTables_wrapper #page-navigation" ).length )
+                    {
+                        i.find( ".dataTables_wrapper" ).append( ng );
+                    }
 
-                            var skip = parseInt( n.attr( "data-skip" ) );
-                            var page = parseInt( n.attr( "data-page" ) );
+                    next_cntr.add( previous_cntr ).each( function ()
+                    {
+                        var n = $( this );
 
-                            ACT.UI[t].PageSkip = skip;
-                            ACT.UI[t].PageNumber = page;
+                        var tg = ( ng.attr( "data-is-tiny" ) == "1" ) ? $( ng.attr( "data-target" ) ) : i;
 
-                            var url = ( siteurl + navigation.attr( "data-url" ) ).split( '?' )[0].replace( siteurl, "" );
-
-                            if ( ACT.UI[t].IsCustomSearch )
+                        n
+                            .unbind( "click" )
+                            .bind( "click", function ()
                             {
-                                return ACT.UI.DataDoCustomSearch( n, i, url, ACT.UI.AfterSort );
-                            }
+                                if ( n.hasClass( "inactive" ) ) return;
 
-                            var params = ACT.UI.GetCustomSearchParams( t );
+                                var skip = parseInt( n.attr( "data-skip" ) );
+                                var page = parseInt( n.attr( "data-page" ) );
 
-                            params.Page = page;
-                            params.Skip = skip;
-                            params.Take = ACT.UI[t].PageLength;
-                            params.Query = ACT.UI[t].PageSearch;
+                                ACT.UI[t].PageSkip = skip;
+                                ACT.UI[t].PageNumber = page;
 
-                            ACT.UI.Get( n, i, url, params, ACT.UI.AfterSort, true );
-                        } );
+                                var url = ( siteurl + ng.attr( "data-url" ) ).split( '?' )[0].replace( siteurl, "" );
+
+                                if ( ACT.UI[t].IsCustomSearch )
+                                {
+                                    return ACT.UI.DataDoCustomSearch( n, tg, url, ACT.UI.AfterSort );
+                                }
+
+                                var params = ACT.UI.GetCustomSearchParams( t );
+
+                                params.Page = page;
+                                params.Skip = skip;
+                                params.Take = ACT.UI[t].PageLength;
+                                params.Query = ACT.UI[t].PageSearch;
+
+                                ACT.UI.Get( n, tg, url, params, ACT.UI.AfterSort, true );
+                            } );
+                    } );
                 } );
 
                 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4815,93 +4830,11 @@
             } )
         },
 
+
+
         DataReconcileLoadsDragDrop: function ( draggable, droppable )
         {
-            draggable.draggable();
-            droppable.droppable( {
-                hoverClass: "drop-hover",
-                drop: function ( event, ui )
-                {
-                    var dragId = ui.draggable.attr( "data-cid" );
-                    var dragDocket = ui.draggable.attr( "data-docket" );
-                    var dragProduct = ui.draggable.attr( "data-product" );
-                    var dragParent = $( ui.draggable.attr( "data-parent" ) );
-                    var dragQty = parseFloat( ui.draggable.attr( "data-qty" ) );
 
-                    var dropId = $( this ).attr( "data-cid" );
-                    var dropProduct = $( this ).attr( "data-product" );
-                    var dropLoad = $( this ).attr( "data-load-number" );
-                    var dropParent = $( $( this ).attr( "data-parent" ) );
-                    var dropQty = parseFloat( $( this ).attr( "data-qty" ) );
-
-                    var msg = "";
-
-                    msg += "<p>Are you sure you would like to reconcile a Pooling Agent Load with <b>Docket # " + dragDocket + "</b> with a Client Load with <b>Load # " + dropLoad + "</b>?</p>";
-
-                    if ( dragQty != dropQty )
-                    {
-                        msg += "<p><img src='" + imgurl + "/Images/warn.png' style='max-height: 20px;' /> <b>Please Note:</b> The quantities for the loads you are about to reconcile are not the same!</p>";
-                    }
-
-                    msg += "<p>This process is permanent and cannot be reversed!</p>";
-                    msg += "<p style='border-top: 1px solid #fff; padding-top: 10px; margin: 15px 0; text-align: center;'>";
-                    msg += "    <input id='btnYes' type='button' value='YES!' class='btn-yes' />";
-                    msg += "    <span style='padding: 0 5px;'>/</span>";
-                    msg += "    <input id='btnNo' type='button' value='No..' class='btn-no' />";
-                    msg += "</p>";
-
-                    var close = $( ACT.Modal.Container ).find( '#modalClose' );
-
-                    close.css( "display", "none" );
-
-                    ACT.Modal.Open( msg, "Reconcile Loads", false );
-
-                    setTimeout( function ()
-                    {
-                        var btnNo = $( ACT.Modal.Container ).find( '#btnNo' );
-                        var btnYes = $( ACT.Modal.Container ).find( '#btnYes' );
-
-                        btnYes
-                            .unbind( "click" )
-                            .bind( "click", function ()
-                            {
-                                ACT.Loader.Show( btnYes.parent().find( "span" ), true );
-
-                                $( "<div/>" ).load( siteurl + "/ReconcileLoad", { chid: dragId, clid: dropId, product: dragProduct }, function ( d )
-                                {
-                                    var i = $( this );
-
-                                    $( ACT.Modal.Container ).find( '#modal-body' ).html( d );
-                                    $( ACT.Modal.Container ).find( '#modal-body .notification' ).slideDown( 900 );
-
-                                    if ( i.find( ".message-success" ) )
-                                    {
-                                        ACT.UI.DataSearchChepLoads( dragParent );
-                                        ACT.UI.DataSearchClientLoads( dropParent );
-
-                                        close.css( "display", "block" );
-                                    }
-                                    else
-                                    {
-                                        ui.draggable.css( { "left": 0, "top": 0 } );
-
-                                        ACT.Loader.Hide();
-                                    }
-                                } );
-                            } );
-
-                        btnNo
-                            .unbind( "click" )
-                            .bind( "click", function ()
-                            {
-                                ui.draggable.css( { "left": 0, "top": 0 } );
-
-                                ACT.Modal.Close();
-                            } );
-
-                    }, '1000' );
-                }
-            } );
         },
 
         DataSearchChepLoads: function ( target )
@@ -4915,7 +4848,7 @@
 
             ACT.Loader.Show( target.find( "#loader" ), true );
 
-            update.load( siteurl + "/ChepLoads", params, function ()
+            update.load( siteurl + "/UnReconciledChepLoads", params, function ()
             {
                 ACT.Loader.Hide();
 
@@ -4934,7 +4867,7 @@
 
             ACT.Loader.Show( target.find( "#loader" ), true );
 
-            update.load( siteurl + "/ClientLoads", params, function ()
+            update.load( siteurl + "/UnReconciledClientLoads", params, function ()
             {
                 ACT.Loader.Hide();
 
@@ -5013,7 +4946,7 @@
 
                     close.css( "display", "none" );
 
-                    ACT.Modal.Open( msg, "Reconcile Invoice", false );
+                    ACT.Modal.Open( msg, title, false );
 
                     setTimeout( function ()
                     {
@@ -5217,6 +5150,317 @@
                                 target.find( "input.input" ).removeAttr( "required" );
                             } );
                         }
+                    } );
+            } );
+        },
+
+        DataReconcileCheck: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var sel = $( i.attr( "data-sel" ) );
+                var compare = $( i.attr( "data-compare" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).is( ":checked" ) )
+                        {
+                            ACT.UI.DataShowManualRecon( sel, compare );
+                        }
+                        else
+                        {
+                            ACT.UI.DataShowManualRecon( sel, compare );
+                        }
+                    } );
+            } );
+        },
+
+        DataReconcileParentCheck: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var check = $( i.attr( "data-check" ) );
+
+                var sel = $( i.attr( "data-sel" ) );
+                var compare = $( i.attr( "data-compare" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).is( ":checked" ) )
+                        {
+                            check.prop( "checked", true ).attr( "checked", "checked" );
+
+                            ACT.UI.DataShowManualRecon( sel, compare );
+                        }
+                        else
+                        {
+                            check.prop( "checked", false ).removeAttr( "checked" );
+
+                            ACT.UI.DataShowManualRecon( sel, compare );
+                        }
+                    } );
+            } );
+        },
+
+        DataShowManualRecon: function ( sel, compare )
+        {
+            var selL = sel.find( 'input[type="checkbox"]:checked' ).length;
+            var compareL = compare.find( 'input[type="checkbox"]:checked' ).length;
+
+            selL = ( sel.find( 'input[data-r-p-c="1"]' ).is( ":checked" ) && selL > 0 ) ? selL - 1 : selL;
+            compareL = ( compare.find( 'input[data-r-p-c="1"]' ).is( ":checked" ) && compareL > 0 ) ? compareL - 1 : compareL;
+
+            sel.find( "#sel-count" ).text( " (" + selL + ")" );
+            compare.find( "#sel-count" ).text( " (" + compareL + ")" );
+
+            if ( !selL || !compareL )
+            {
+                $( ".manual-recon" ).fadeOut( 1200 );
+            }
+            else
+            {
+                $( ".manual-recon" ).fadeIn( 1200 );
+            }
+        },
+
+        DataManualRecon: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var uid = i.attr( "data-uid" );
+                var title = i.attr( "data-title" );
+
+                var chep = $( i.attr( "data-chep" ) );
+                var client = $( i.attr( "data-client" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var selL = chep.find( 'input[type="checkbox"]:checked' ).length;
+                        var compareL = client.find( 'input[type="checkbox"]:checked' ).length;
+
+                        selL = ( chep.find( 'input[data-r-p-c="1"]' ).is( ":checked" ) && selL > 0 ) ? selL - 1 : selL;
+                        compareL = ( client.find( 'input[data-r-p-c="1"]' ).is( ":checked" ) && compareL > 0 ) ? compareL - 1 : compareL;
+
+                        var chepQty = 0,
+                            clientQty = 0;
+
+                        var chepIds = [],
+                            clientIds = [];
+
+                        chep.find( 'input[type="checkbox"]:checked' ).each( function ()
+                        {
+                            chepIds.push( $( this ).attr( "data-id" ) );
+                            chepQty += parseFloat( $( this ).attr( "data-qty" ) );
+                        } );
+
+                        client.find( 'input[type="checkbox"]:checked' ).each( function ()
+                        {
+                            clientIds.push( $( this ).attr( "data-id" ) );
+                            clientQty += parseFloat( $( this ).attr( "data-qty" ) );
+                        } );
+
+                        var msg = "";
+
+                        msg += "<p>Are you sure you would like to reconcile the " + selL + " selected Pooling Loads with the " + compareL + " selected Client Loads?</p>";
+
+                        if ( chepQty != clientQty )
+                        {
+                            msg += "<p><img src='" + imgurl + "/Images/warn.png' style='max-height: 20px;' /> <b>Please Note:</b> The quantities for the loads you are about to reconcile are not the same!</p>";
+                        }
+
+                        msg += "<p>This process is permanent and cannot be reversed!</p>";
+                        msg += "<p style='border-top: 1px solid #fff; padding-top: 10px; margin: 15px 0; text-align: center;'>";
+                        msg += "    <input id='btnYes' type='button' value='YES!' class='btn-yes' />";
+                        msg += "    <span style='padding: 0 5px;'>/</span>";
+                        msg += "    <input id='btnNo' type='button' value='No..' class='btn-no' />";
+                        msg += "</p>";
+
+                        var close = $( ACT.Modal.Container ).find( '#modalClose' );
+
+                        close.css( "display", "none" );
+
+                        if ( uid != "" )
+                        {
+                            // Manual Update
+                            $( ACT.Modal.Container ).removeAttr( "style" );
+                            $( ACT.Modal.Container ).find( ".modalContent" ).removeAttr( "style" );
+                        }
+
+                        ACT.Modal.Open( msg, title, false );
+
+                        setTimeout( function ()
+                        {
+                            var btnNo = $( ACT.Modal.Container ).find( '#btnNo' );
+                            var btnYes = $( ACT.Modal.Container ).find( '#btnYes' );
+
+                            btnYes
+                                .unbind( "click" )
+                                .bind( "click", function ()
+                                {
+                                    ACT.Loader.Show( btnYes.parent().find( "span" ), true );
+
+                                    $( "<div />" ).load( siteurl + "/ReconcileLoad", { chepIds: chepIds, clientIds: clientIds, uid: uid }, function ( d )
+                                    {
+                                        var x = $( this );
+
+                                        $( ACT.Modal.Container ).find( '#modal-body' ).html( d );
+                                        $( ACT.Modal.Container ).find( '#modal-body .notification' ).slideDown( 900 );
+
+                                        if ( x.find( ".message-success" ) )
+                                        {
+                                            if ( uid != "" )
+                                            {
+                                                $( 'a[data-refresh="1"]' ).click();
+                                            }
+                                            else
+                                            {
+                                                ACT.UI.DataSearchChepLoads( chep );
+                                                ACT.UI.DataSearchClientLoads( client );
+
+                                                chep.find( "#sel-count" ).text( " (0)" );
+                                                client.find( "#sel-count" ).text( " (0)" );
+
+                                                $( ".manual-recon" ).fadeOut( 1200 );
+                                            }
+
+                                            close.css( "display", "block" );
+                                        }
+                                        else
+                                        {
+                                            ACT.Loader.Hide();
+                                        }
+                                    } );
+                                } );
+
+                            btnNo
+                                .unbind( "click" )
+                                .bind( "click", function ()
+                                {
+                                    ACT.Modal.Close();
+                                } );
+
+                        }, '1000' );
+                    } );
+            } );
+        },
+
+        DataManualReconed: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var uid = i.attr( "data-uid" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var msg = '<p>Please wait whilst we retrieve the list of manually reconciled loads for the selected item...</p><p style="text-align: center;"><img src="' + imgurl + '/images/loader.gif" /></p>';
+
+                        ACT.Modal.Open( msg, "Manually Reconciled Loads", false );
+
+                        $( "<div />" ).load( siteurl + "/ManuallyReconciledLoads", { ManuallyMatchedUID: uid }, function ( d )
+                        {
+                            ACT.Modal.Close();
+
+                            setTimeout( function ()
+                            {
+                                $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", ( $( "body" ).outerWidth() - 20 ) );
+
+                                ACT.Modal.Open( d, "Manually Reconciled Loads", false );
+
+                                setTimeout( function ()
+                                {
+                                    ACT.Init.Start( true );
+                                }, 2000 );
+                            }, 1000 );
+                        } );
+                    } );
+            } );
+        },
+
+        DataLoadExtra: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var docketNumber = i.attr( "data-docket-number" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var msg = '<p>Please wait whilst we retrieve the original reconciled and balanced load for the selected extra transaction...</p><p style="text-align: center;"><img src="' + imgurl + '/images/loader.gif" /></p>';
+
+                        ACT.Modal.Open( msg, "Extra Chep Load", false );
+
+                        $( "<div />" ).load( siteurl + "/ExtraChepLoads", { DocketNumber: docketNumber }, function ( d )
+                        {
+                            ACT.Modal.Close();
+
+                            setTimeout( function ()
+                            {
+                                $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", ( $( "body" ).outerWidth() - 20 ) );
+
+                                ACT.Modal.Open( d, "Extra Chep Load", false );
+
+                                setTimeout( function ()
+                                {
+                                    ACT.Init.Start( true );
+                                }, 2000 );
+                            }, 1000 );
+                        } );
+                    } );
+            } );
+        },
+
+        DataLoadVersion: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var versions = i.attr( "data-versions" );
+                var docketNumber = i.attr( "data-docket-number" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var msg = '<p>Please wait whilst we retrieve ' + versions + ' versions of the selected load...</p><p style="text-align: center;"><img src="' + imgurl + '/images/loader.gif" /></p>';
+
+                        ACT.Modal.Open( msg, "Chep Load Versions (" + versions + ")", false );
+
+                        $( "<div />" ).load( siteurl + "/ChepLoadVersions", { DocketNumber: docketNumber }, function ( d )
+                        {
+                            ACT.Modal.Close();
+
+                            setTimeout( function ()
+                            {
+                                $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", ( $( "body" ).outerWidth() - 20 ) );
+
+                                ACT.Modal.Open( d, "Chep Load Versions (" + versions + ")", false );
+
+                                setTimeout( function ()
+                                {
+                                    ACT.Init.Start( true );
+                                }, 2000 );
+                            }, 1000 );
+                        } );
                     } );
             } );
         }

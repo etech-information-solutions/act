@@ -90,6 +90,14 @@
                         @Html.ValidationMessageFor( model => model.InvoiceRunDay )
                     </div>
 
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.ClientContractRenewalReminderMonths )
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor( model => model.ClientContractRenewalReminderMonths, new { @placeholder = "E.g. 3" } )
+                        @Html.ValidationMessageFor( model => model.ClientContractRenewalReminderMonths )
+                    </div>
+
                 </div>
 
                 <div class="left" style="width: 48%;">
@@ -116,6 +124,14 @@
                     <div class="edit-field">
                         @Html.TextBoxFor( model => model.PasswordChange, new { @placeholder = "30" } )
                         @Html.ValidationMessageFor( model => model.PasswordChange )
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.DisputeDaysToResolve )
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor( model => model.DisputeDaysToResolve, new { @placeholder = "e.g. 10" } )
+                        @Html.ValidationMessageFor( model => model.DisputeDaysToResolve )
                     </div>
 
                     <div class="edit-label">
@@ -187,6 +203,42 @@
                     <div class="edit-field">
                         @Html.EnumDropDownFor( model => model.DisputeMonitorEnabled, false, new { @class = "chzn", @style = "width: 98%" } )
                         @Html.ValidationMessageFor( model => model.DisputeMonitorEnabled )
+                    </div>
+
+                </div>
+
+                <div class="left" style="width: 48%;">
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.ClientMonitorPath )
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor( model => model.ClientMonitorPath, new { @placeholder = "Enter Client Monitor Path" } )
+                        @Html.ValidationMessageFor( model => model.ClientMonitorPath )
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.ClientMonitorTime )
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor( model => model.ClientMonitorTime, new { @placeholder = "Select Client Monitor Time", @class = "time-picker" } )
+                        @Html.ValidationMessageFor( model => model.ClientMonitorTime )
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.ClientMonitorInterval )
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor( model => model.ClientMonitorInterval, new { @placeholder = "Enter Client Monitor Interval" } )
+                        @Html.ValidationMessageFor( model => model.ClientMonitorInterval )
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.ClientMonitorEnabled )
+                    </div>
+                    <div class="edit-field">
+                        @Html.EnumDropDownFor( model => model.ClientMonitorEnabled, false, new { @class = "chzn", @style = "width: 98%" } )
+                        @Html.ValidationMessageFor( model => model.ClientMonitorEnabled )
                     </div>
 
                 </div>

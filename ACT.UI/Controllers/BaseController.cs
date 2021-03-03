@@ -10,7 +10,6 @@ using System.Web.Script.Serialization;
 using ACT.Core.Models;
 using ACT.Core.Helpers;
 using System.Text.RegularExpressions;
-using ACT.Core.Extension;
 using System.Net;
 using ACT.Mailer;
 using ACT.UI.Models;
@@ -1171,7 +1170,7 @@ namespace ACT.UI.Controllers
                         }
                         else if ( sum < 0 )
                         {
-                            q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Unreconciled},[BalanceStatus]={( int ) BalanceStatus.NotBalanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+                            q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Unreconciled},[BalanceStatus]={( int ) BalanceStatus.NotBalanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE [ManuallyMatchedLoad]=0 AND Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
 
                             chservice.Query( q );
                         }

@@ -14,13 +14,7 @@ namespace ACT.UI.Models
 
         public int Id { get; set; }
 
-        [Required]
-        [Display( Name = "Client Site" )]
-        public int? ClientSiteId { get; set; }
-
-        [Required]
-        [Display( Name = "Transporter" )]
-        public int? TransporterId { get; set; }
+        public int ClientLoadId { get; set; }
 
         [Display( Name = "Code" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
@@ -36,11 +30,6 @@ namespace ACT.UI.Models
         public string LoadNumber { get; set; }
 
         [Required]
-        [Display( Name = "Docket Number" )]
-        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
-        public string DocketNumber { get; set; }
-
-        [Required]
         [Display( Name = "Status" )]
         public Status Status { get; set; }
 
@@ -51,28 +40,6 @@ namespace ACT.UI.Models
 
 
         #region Model Options
-
-        public Dictionary<int, string> ClientSiteOptions
-        {
-            get
-            {
-                using ( ClientSiteService sservice = new ClientSiteService() )
-                {
-                    return sservice.List( true );
-                }
-            }
-        }
-
-        public Dictionary<int, string> TransporterOptions
-        {
-            get
-            {
-                using ( TransporterService tservice = new TransporterService() )
-                {
-                    return tservice.List( true );
-                }
-            }
-        }
 
         #endregion
     }

@@ -1,11 +1,7 @@
 ﻿@model PagingExtension
 
-@using ACT.Data.Models;
 @using ACT.Core.Enums;
-@using ACT.Core.Models;
 @using ACT.Core.Models.Custom;
-@using ACT.Core.Services;
-@using ACT.UI.Models;
 
 @{
     ViewBag.ShowExport = true;
@@ -19,11 +15,9 @@
 
 
 @{
-    UserModel user = User.Get();
-
     int count = Model.Start;
 
-    List<ChepLoadCustomModel> items = ( List<ChepLoadCustomModel> ) Model.Items;
+    List<ClientAuthorisationCustomModel> items = ( List<ClientAuthorisationCustomModel> ) Model.Items;
 }
 
 
@@ -34,11 +28,6 @@
     </div>
 }
 
-@*<p>
-        @Html.ActionLink( "Add", "AddAuthorisationCode", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Authorisation Code?", @data_edit = "1", @data_id = 0, @data_target = "#authorisationcodes" } )
-        <span class="loader"></span>
-    </p>*@
-
 <table id="authorisationcodes-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#authorisationcodes-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
@@ -48,32 +37,38 @@
             <th data-name="LoadDate" data-column="cl.LoadDate">
                 Load Date
             </th>
+            <th data-name="LoadNumber" data-column="cl.LoadNumber">
+                Load #
+            </th>
+            <th data-name="ReceiverNumber" data-column="cl.ReceiverNumber">
+                Ref #
+            </th>
+            <th data-name="DeliveryNote" data-column="cl.DeliveryNote">
+                Delivery #
+            </th>
+            <th data-name="Transporter" data-column="t.TradingName">
+                Transporter
+            </th>
+            <th data-name="Vehicle" data-column="v.Registration">
+                Vehicle
+            </th>
             <th data-name="CompanyName" data-column="c.CompanyName">
                 Client
             </th>
-            <th data-name="DocketNumber" data-column="cl.DocketNumber">
-                Docket #
+            <th data-name="FromSiteName" data-column="s1.Description">
+                From Site
             </th>
-            <th data-name="Ref" data-column="cl.Ref">
-                Ref #
+            <th data-name="ToSiteName" data-column="s2.Description">
+                To Site
             </th>
-            <th data-name="OtherRef" data-column="cl.OtherRef">
-                Other Ref #
-            </th>
-            <th data-name="TransactionType" data-column="cl.TransactionType">
-                Transaction Type
-            </th>
-            <th data-name="Quantity" data-column="cl.Quantity">
-                Qty
-            </th>
-            <th data-name="Status" data-column="cl.Status">
-                Status
-            </th>
-            <th data-name="BalanceStatus" data-column="cl.BalanceStatus">
-                Balanced
+            <th data-name="Authoriser" data-column="u.Name">
+                Authoriser
             </th>
             <th data-name="Code" data-column="ca.Code">
-                Code
+                Auth Code
+            </th>
+            <th data-name="AuthorisationDate" data-column="ca.AuthorisationDate">
+                Auth Date
             </th>
             <th data-name="Actions">
                 Actions
@@ -84,53 +79,62 @@
     <tbody>
         @if ( Model != null && items != null && items.Count() > 0 )
         {
-            foreach ( ChepLoadCustomModel item in items )
+            foreach ( ClientAuthorisationCustomModel item in items )
             {
-                PostingType postingType = ( PostingType ) item.PostingType;
-                BalanceStatus balanceStatus = ( BalanceStatus ) item.BalanceStatus;
-                ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
+                Status status = ( Status ) ( item.Status ?? 1 );
 
-                string active = ( status == ReconciliationStatus.Reconciled ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
+                string active = ( status == Status.Active ) ? "active" : "inactive";
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+                <tr id="authorisationcodes-@item.Id-item" class="authorisationcodes-@item.Id-item @active">
 
                     <td width="1%">
                         @count
                     </td>
                     <td>
-                        @(item.EffectiveDate?.ToString( "yyyy-MM-dd" ))
+                        @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @item.LoadNumber
+                    </td>
+                    <td>
+                        @item.ReceiverNumber
+                    </td>
+                    <td>
+                        @item.DeliveryNote
+                    </td>
+                    <td>
+                        @item.TransporterName
+                    </td>
+                    <td>
+                        @item.VehicleRegistration
                     </td>
                     <td>
                         @item.ClientName
                     </td>
                     <td>
-                        @item.DocketNumber
+                        @item.FromSiteName
                     </td>
                     <td>
-                        @item.Ref
+                        @item.ToSiteName
                     </td>
-                    <td>
-                        @item.OtherRef
+                    <td class="purple">
+                        @item.AuthoriserName
                     </td>
-                    <td>
-                        @item.TransactionType
+                    <td class="purple">
+                        @(item.AuthorisationDate?.ToString( "yyyy-MM-dd @HH:mm tt" ))
                     </td>
-                    <td>
-                        @item.Quantity
-                    </td>
-                    <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
-                        @status.GetDisplayText()
-                    </td>
-                    <td class="@(balanceStatus == BalanceStatus.Balanced ? "active" : "inactive")">
-                        @balanceStatus.GetDisplayText()
-                    </td>
-                    <td>
-                        @item.AuthorisationCode
+                    <td class="purple">
+                        @item.Code
                     </td>
                     <td width="5%">
-                        @if ( string.IsNullOrEmpty( item.AuthorisationCode ) )
+                        @if ( string.IsNullOrEmpty( item.Code ) )
                         {
-                            @Html.ActionLink( "Generate", "GenerateAuthorisationCode", new { id = item.Id }, new { @class = "add append-search", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#authorisationcodes", @rel = "tipsyE", @title = "Generate authorisation code this load?" } )
+                            @Html.ActionLink( "Generate", "GenerateAuthorisationCode", new { id = item.Id }, new { @class = "add append-search", @data_delete = "1", @data_id = item.Id, @data_target = "#authorisationcodes-" + item.Id + "-item", @data_refresh_target = "#authorisationcodes", @rel = "tipsyE", @title = "Generate authorisation code this load?" } )
+                        }
+                        else
+                        {
+                            @Html.ActionLink( enable, "DeleteAuthorisationCode", new { Id = item.ClientAuthorisationId }, new { @class = "warn append-search", @data_delete = "1", @data_id = item.ClientAuthorisationId, @data_target = "#authorisationcodes-" + item.Id + "-item", @data_refresh_target = "#authorisationcodes", @rel = "tipsyE", @title = enable + " this item?" } )
                         }
                     </td>
 

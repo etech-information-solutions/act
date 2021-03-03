@@ -547,6 +547,14 @@ namespace ACT.UI.Controllers
                 DisputeMonitorTime = config.DisputeMonitorTime,
                 DisputeMonitorInterval = config.DisputeMonitorInterval,
                 DisputeMonitorEnabled = config.DisputeMonitorEnabled ? YesNo.Yes : YesNo.No,
+
+                ClientMonitorPath = config.ClientMonitorPath,
+                ClientMonitorTime = config.ClientMonitorTime,
+                ClientMonitorInterval = config.ClientMonitorInterval,
+                ClientMonitorEnabled = config.ClientMonitorEnabled ? YesNo.Yes : YesNo.No,
+
+                ClientContractRenewalReminderMonths = config.ClientContractRenewalReminderMonths,
+                DisputeDaysToResolve = config.DisputeDaysToResolve
             };
 
             return View( model );
@@ -603,6 +611,14 @@ namespace ACT.UI.Controllers
                 config.DisputeMonitorTime = model.DisputeMonitorTime;
                 config.DisputeMonitorInterval = model.DisputeMonitorInterval;
                 config.DisputeMonitorEnabled = model.DisputeMonitorEnabled.GetBoolValue();
+
+                config.ClientMonitorPath = model.ClientMonitorPath;
+                config.ClientMonitorTime = model.ClientMonitorTime;
+                config.ClientMonitorInterval = model.ClientMonitorInterval;
+                config.ClientMonitorEnabled = model.ClientMonitorEnabled.GetBoolValue();
+
+                config.ClientContractRenewalReminderMonths = model.ClientContractRenewalReminderMonths;
+                config.DisputeDaysToResolve = model.DisputeDaysToResolve;
 
                 service.Update( config );
             }

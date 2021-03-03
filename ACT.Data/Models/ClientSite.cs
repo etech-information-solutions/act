@@ -17,7 +17,6 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public ClientSite()
         {
-            this.ClientAuthorisations = new HashSet<ClientAuthorisation>();
             this.ClientLoads = new HashSet<ClientLoad>();
             this.ClientLoads1 = new HashSet<ClientLoad>();
             this.DeliveryNotes = new HashSet<DeliveryNote>();
@@ -48,8 +47,6 @@ namespace ACT.Data.Models
         public string LiquorLicenceNumber { get; set; }
         public string ClientSiteCode { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
         public virtual ClientCustomer ClientCustomer { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads { get; set; }

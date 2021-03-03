@@ -79,6 +79,29 @@ namespace ACT.UI.Models
         public YesNo DisputeMonitorEnabled { get; set; }
 
 
+
+        [Display( Name = "Client Monitor Path" )]
+        [StringLength( 250, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        public string ClientMonitorPath { get; set; }
+
+        [Display( Name = "Client Monitor Interval" )]
+        public string ClientMonitorInterval { get; set; }
+
+        [Display( Name = "Client Monitor Time" )]
+        public TimeSpan? ClientMonitorTime { get; set; }
+
+        [Display( Name = "Client Monitor Enabled" )]
+        public YesNo ClientMonitorEnabled { get; set; }
+
+        
+
+        [Display( Name = "Client Contract Renewal Reminder (in months)" )]
+        public int? ClientContractRenewalReminderMonths { get; set; }
+
+        [Display( Name = "Dispute Resolve Time (in days)" )]
+        public int? DisputeDaysToResolve { get; set; }
+
+
         #endregion
 
 

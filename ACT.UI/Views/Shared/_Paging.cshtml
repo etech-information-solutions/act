@@ -80,7 +80,7 @@
         <span class="total">Showing @Model.Start to @Model.Middle of @Model.Total entries</span>
     </div>
 
-    <div id="page-navigation" class="piece page-navigation" data-target="#item-list" data-url="@Request.RawUrl">
+    <div id="page-navigation" class="piece page-navigation" data-is-tiny="0" data-target="#item-list" data-url="@Request.RawUrl">
 
         @{
             String showNext = Model.ShowNext ? "active" : "inactive";

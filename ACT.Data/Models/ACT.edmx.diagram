@@ -14,7 +14,6 @@
         <EntityTypeShape EntityType="ACTModel.ChepClient" Width="1.5" PointX="21" PointY="33.375" />
         <EntityTypeShape EntityType="ACTModel.ChepLoadChep" Width="1.5" PointX="18" PointY="46" />
         <EntityTypeShape EntityType="ACTModel.Client" Width="1.5" PointX="3" PointY="26.625" />
-        <EntityTypeShape EntityType="ACTModel.ClientAuthorisation" Width="1.5" PointX="18" PointY="32.75" />
         <EntityTypeShape EntityType="ACTModel.ClientBudget" Width="1.5" PointX="5.25" PointY="73.875" />
         <EntityTypeShape EntityType="ACTModel.ClientCustomer" Width="1.5" PointX="5.25" PointY="28.75" />
         <EntityTypeShape EntityType="ACTModel.ClientGroup" Width="1.5" PointX="8.25" PointY="20.375" />
@@ -78,8 +77,6 @@
         <AssociationConnector Association="ACTModel.FK_DeliveryNote_Clients" />
         <AssociationConnector Association="ACTModel.FK_SiteAudit_Client" />
         <AssociationConnector Association="ACTModel.FK_UserTasks_Clients" />
-        <AssociationConnector Association="ACTModel.FK_ClientAuthorisation_Transporter" />
-        <AssociationConnector Association="ACTModel.FK_ClientAuthorisations_ClientSites" />
         <AssociationConnector Association="ACTModel.FK_ClientSite_ClientCustomer" />
         <AssociationConnector Association="ACTModel.FK_ClientGroups_Groups" />
         <AssociationConnector Association="ACTModel.FK_ClientInvoices_ClientLoads" />
@@ -137,7 +134,6 @@
         <AssociationConnector Association="ACTModel.FK_ChepLoad_ClientSite" />
         <AssociationConnector Association="ACTModel.FK_ChepLoad_OutstandingReason" />
         <AssociationConnector Association="ACTModel.FK_ChepLoadChep_ChepLoad" />
-        <AssociationConnector Association="ACTModel.FK_ClientAuthorisation_ChepLoad" />
         <AssociationConnector Association="ACTModel.FK_Disputes_ChepLoads" />
         <AssociationConnector Association="ACTModel.FK_UserTasks_ChepLoads" />
         <AssociationConnector Association="ACTModel.FK_ClientLoad_OutstandingReason" />
@@ -154,7 +150,12 @@
         <AssociationConnector Association="ACTModel.FK_ChepLoadJournal_Client" />
         <AssociationConnector Association="ACTModel.FK_ChepLoadJournal_ClientSite" />
         <AssociationConnector Association="ACTModel.FK_ChepLoadJournal_OutstandingReason" />
-      </Diagram>
+        <AssociationConnector Association="ACTModel.FK_ChepLoadJournal_ChepLoad" />
+        <AssociationConnector Association="ACTModel.FK_ChepLoad_ChepLoad" />
+        <EntityTypeShape EntityType="ACTModel.ClientAuthorisation" Width="1.5" PointX="15" PointY="45" />
+        <AssociationConnector Association="ACTModel.FK_ClientAuthorisation_ClientLoad" />
+        <AssociationConnector Association="ACTModel.FK_ClientAuthorisation_User" />
+        </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

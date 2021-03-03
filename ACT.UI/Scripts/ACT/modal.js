@@ -31,7 +31,7 @@
 
             $( ACT.Modal.Container ).fadeIn( 'medium', function ()
             {
-                ACT.UI.DataCallBack(callback);
+                ACT.UI.DataCallBack( callback );
             } );
 
             $( '.modalContainer' ).center();
@@ -50,6 +50,8 @@
 
                 $( ACT.Modal.Container ).find( '#modal-body' ).html( '' );
                 $( ACT.Modal.Container ).find( '#modal-title' ).html( '' );
+                $( ACT.Modal.Container ).removeAttr( "style" );
+                $( ACT.Modal.Container ).find( ".modalContent" ).removeAttr( "style" );
             } );
         }
     }

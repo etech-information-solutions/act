@@ -52,5 +52,7 @@ namespace ACT.Core.Models.Custom
         public string ChepLoadAccountNumber { get; set; }
 
         public string DisputeReasonDetails { get; set; }
+
+        public Nullable<decimal> Disputes { get; set; }
     }
 }

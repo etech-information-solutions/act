@@ -15,20 +15,17 @@ namespace ACT.Data.Models
     public partial class ClientAuthorisation
     {
         public int Id { get; set; }
-        public Nullable<int> ClientSiteId { get; set; }
-        public Nullable<int> ChepLoadId { get; set; }
-        public Nullable<int> TransporterId { get; set; }
+        public int UserId { get; set; }
+        public int ClientLoadId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
-        public string DocketNumber { get; set; }
         public string Code { get; set; }
         public string LoadNumber { get; set; }
         public System.DateTime AuthorisationDate { get; set; }
         public int Status { get; set; }
     
-        public virtual Transporter Transporter { get; set; }
-        public virtual ClientSite ClientSite { get; set; }
-        public virtual ChepLoad ChepLoad { get; set; }
+        public virtual ClientLoad ClientLoad { get; set; }
+        public virtual User User { get; set; }
     }
 }

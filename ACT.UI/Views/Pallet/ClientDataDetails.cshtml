@@ -335,7 +335,14 @@
                                 @item.DocketNumber
                             </td>
                             <td>
-                                @item.Ref
+                                @(item.CorrectedRef ?? item.Ref)
+
+                                @if ( !string.IsNullOrEmpty( item.CorrectedRef ) )
+                                {
+                                    <a rel="tipsyW" title="Manually corrected, was: @item.Ref">
+                                        <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
+                                    </a>
+                                }
                             </td>
                             <td>
                                 @item.Equipment

@@ -8,7 +8,6 @@ using MailKit.Net.Imap;
 using MailKit;
 using MimeKit;
 
-using ACT.Core.Extension;
 using ACT.Core.Services;
 using ACT.Data.Models;
 using ACT.Core.Enums;

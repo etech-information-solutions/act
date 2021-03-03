@@ -314,6 +314,70 @@ namespace ACT.UI.Controllers
             return PoolingAgentData( new PagingModel(), new CustomSearchModel() );
         }
 
+        // GET: Pallet/EditUnReconciledChepLoad/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditUnReconciledChepLoad( int id )
+        {
+            using ( ChepLoadService service = new ChepLoadService() )
+            {
+                ChepLoad load = service.GetById( id );
+
+                if ( load == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                ChepLoadViewModel model = new ChepLoadViewModel()
+                {
+                    Id = load.Id,
+                    Reference = load.Ref,
+                    OtherRef = load.OtherRef,
+                };
+
+                return View( model );
+            }
+        }
+
+        // POST: Pallet/EditUnReconciledChepLoad/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditUnReconciledChepLoad( ChepLoadViewModel model )
+        {
+            if ( string.IsNullOrEmpty( model.Reference ) || string.IsNullOrEmpty( model.OtherRef ) )
+            {
+                Notify( "Sorry, the selected item was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( ChepLoadService service = new ChepLoadService() )
+            {
+                ChepLoad load = service.GetById( model.Id );
+
+                if ( load == null )
+                {
+                    Notify( "Sorry, that item does not exist! Please specify a valid item Id and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                #region Update Chep Load
+
+                load.CorrectedRef = model.Reference;
+                load.CorrectedOtherRef = model.OtherRef;
+
+                service.Update( load );
+
+                #endregion
+            }
+
+            //Notify( "The selected Item details were successfully updated.", NotificationType.Success );
+
+            return UnReconciledChepLoads( new PagingModel(), new CustomSearchModel() );
+        }
+
         // GET: Client/AddSite
         [Requires( PermissionTo.Create )]
         public ActionResult ImportPoolingAgentData( bool isExchange = false )
@@ -351,6 +415,7 @@ namespace ACT.UI.Controllers
             using ( ChepLoadService clservice = new ChepLoadService() )
             using ( ClientSiteService csservice = new ClientSiteService() )
             using ( ClientCustomerService ccservice = new ClientCustomerService() )
+            using ( ChepLoadJournalService cjservice = new ChepLoadJournalService() )
             using ( TextFieldParser parser = new TextFieldParser( model.File.InputStream ) )
             {
                 parser.Delimiters = new string[] { "," };
@@ -391,6 +456,7 @@ namespace ACT.UI.Controllers
                            createDate1 = string.Empty;
 
                     int isExchange = model.IsExchange ? 1 : 0;
+                    int isExtra = ( l != null && l.Status == ( int ) ReconciliationStatus.Reconciled && l.BalanceStatus == ( int ) BalanceStatus.Balanced ) ? 1 : 0;
 
                     #region Dates
 
@@ -513,12 +579,12 @@ namespace ACT.UI.Controllers
 
                     #endregion
 
-                    if ( l == null )
+                    if ( l == null || isExtra == 1 )
                     {
                         #region Create Chep Load
 
-                        cQuery = $" {cQuery} INSERT INTO [dbo].[ChepLoad] ([ClientId],[ClientSiteId],[CreatedOn],[ModifiedOn],[ModifiedBy],[ChepStatus],[TransactionType],[DocketNumber],[OriginalDocketNumber],[UMI],[LocationId],[Location],[OtherPartyId],[OtherParty],[OtherPartyCountry],[EquipmentCode],[Equipment],[Quantity],[Ref],[OtherRef],[BatchRef],[ShipmentDate],[DeliveryDate],[EffectiveDate],[CreateDate],[CreatedBy],[InvoiceNumber],[Reason],[DataSource],[BalanceStatus],[Status],[PostingType], [IsExchange]) ";
-                        cQuery = $" {cQuery} VALUES ({model.ClientId},{cs.Id},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}',{qty},'{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}',{shipmentDate1},{deliveryDate1},{effectiveDate1},{createDate1},'{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) ReconciliationStatus.Unreconciled},{( int ) ReconciliationStatus.Unreconciled},{( int ) PostingType.Import},{isExchange}) ";
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[ChepLoad] ([ClientId],[ClientSiteId],[ChepLoadId],[CreatedOn],[ModifiedOn],[ModifiedBy],[ChepStatus],[TransactionType],[DocketNumber],[OriginalDocketNumber],[UMI],[LocationId],[Location],[OtherPartyId],[OtherParty],[OtherPartyCountry],[EquipmentCode],[Equipment],[Quantity],[Ref],[OtherRef],[BatchRef],[ShipmentDate],[DeliveryDate],[EffectiveDate],[CreateDate],[CreatedBy],[InvoiceNumber],[Reason],[DataSource],[BalanceStatus],[Status],[PostingType],[IsExchange],[IsExtra]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},{cs.Id},{( l != null ? l.Id + "" : "NULL" )},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}',{qty},'{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}',{shipmentDate1},{deliveryDate1},{effectiveDate1},{createDate1},'{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) ReconciliationStatus.Unreconciled},{( int ) ReconciliationStatus.Unreconciled},{( int ) PostingType.Import},{isExchange},{isExtra}) ";
 
                         #endregion
 
@@ -585,6 +651,26 @@ namespace ACT.UI.Controllers
                             errs.Add( ex.ToString() );
                         }
                     }
+
+                    #region Create ChepLoad Journal
+
+                    cQuery = $" INSERT INTO [dbo].[ChepLoadJournal] ([ClientId],[ClientSiteId],[ChepLoadId],[CreatedOn],[ModifiedOn],[ModifiedBy],[ChepStatus],[TransactionType],[DocketNumber],[OriginalDocketNumber],[UMI],[LocationId],[Location],[OtherPartyId],[OtherParty],[OtherPartyCountry],[EquipmentCode],[Equipment],[Quantity],[Ref],[OtherRef],[BatchRef],[ShipmentDate],[DeliveryDate],[EffectiveDate],[CreateDate],[CreatedBy],[InvoiceNumber],[Reason],[DataSource],[BalanceStatus],[Status],[PostingType],[IsExchange]) ";
+                    cQuery = $" VALUES ({model.ClientId},{cs.Id},{( l != null ? l.Id + "" : "NULL" )},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}',{qty},'{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}',{shipmentDate1},{deliveryDate1},{effectiveDate1},{createDate1},'{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) ReconciliationStatus.Unreconciled},{( int ) ReconciliationStatus.Unreconciled},{( int ) PostingType.Import},{isExchange}) ";
+
+                    try
+                    {
+                        clservice.Query( cQuery );
+
+                        created++;
+                    }
+                    catch ( Exception ex )
+                    {
+                        errors++;
+
+                        errs.Add( ex.ToString() );
+                    }
+
+                    #endregion
                 }
 
                 cQuery = string.Empty;
@@ -743,6 +829,42 @@ namespace ACT.UI.Controllers
             Notify( "The items were successfully updated.", NotificationType.Success );
 
             return AllocatePoolingAgentData( chepLoadId );
+        }
+
+        //
+        // GET: /Pallet/ExtraChepLoads
+        public ActionResult ExtraChepLoads( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( ChepLoadService chservice = new ChepLoadService() )
+            {
+                pm.Sort = "ASC";
+                pm.SortBy = "cl.[Id]";
+
+                List<ChepLoadCustomModel> model = chservice.List1( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : chservice.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_ExtraChepLoads", paging );
+            }
+        }
+
+        //
+        // GET: /Pallet/ChepLoadVersions
+        public ActionResult ChepLoadVersions( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( ChepLoadJournalService cjservice = new ChepLoadJournalService() )
+            {
+                pm.Sort = "ASC";
+                pm.SortBy = "cj.[Id]";
+
+                List<ChepLoadJournalCustomModel> model = cjservice.List1( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : cjservice.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_ChepLoadVersions", paging );
+            }
         }
 
         #endregion
@@ -1478,10 +1600,9 @@ namespace ACT.UI.Controllers
         #region Reconcile Loads
 
 
-
         //
-        // GET: /Pallet/ChepLoads
-        public ActionResult ChepLoads( PagingModel pm, CustomSearchModel csm )
+        // GET: /Pallet/UnReconciledChepLoads
+        public ActionResult UnReconciledChepLoads( PagingModel pm, CustomSearchModel csm )
         {
             using ( ChepLoadService chservice = new ChepLoadService() )
             {
@@ -1491,94 +1612,135 @@ namespace ACT.UI.Controllers
 
                 pm.SortBy = "cl.[ShipmentDate]";
 
-                List<ChepLoadCustomModel> chModel = chservice.List1( pm, csm );
-                int chTotal = ( chModel.Count < pm.Take && pm.Skip == 0 ) ? chModel.Count : chservice.Total1( pm, csm );
-
-                PagingExtension paging = PagingExtension.Create( chModel, chTotal, pm.Skip, pm.Take, pm.Page );
-
-                return PartialView( "_ChepLoads", paging );
-            }
-        }
-
-        //
-        // GET: /Pallet/ClientLoads
-        public ActionResult ClientLoads( PagingModel pm, CustomSearchModel csm )
-        {
-            using ( ClientLoadService chservice = new ClientLoadService() )
-            {
-                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
-
-                pm.Sort = "ASC";
-
-                pm.SortBy = "cl.[LoadDate]";
-
-                List<ClientLoadCustomModel> model = chservice.List1( pm, csm );
+                List<ChepLoadCustomModel> model = chservice.List1( pm, csm );
                 int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : chservice.Total1( pm, csm );
 
                 PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
-                return PartialView( "_ClientLoads", paging );
+                return PartialView( "_UnReconciledChepLoads", paging );
             }
         }
 
         //
+        // GET: /Pallet/UnReconciledClientLoads
+        public ActionResult UnReconciledClientLoads( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            {
+                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
+
+                pm.Sort = "ASC";
+                pm.SortBy = "cl.[LoadDate]";
+
+                List<ClientLoadCustomModel> model = clservice.List1( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : clservice.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_UnReconciledClientLoads", paging );
+            }
+        }
+
+
+        //
         // GET: /Pallet/ReconcileLoads
-        public ActionResult ReconcileLoad( int chid, int clid, string product )
+        public ActionResult ReconcileLoad( List<int> chepIds, List<int> clientIds, string uid = "" )
         {
             using ( TransactionScope scope = new TransactionScope() )
             using ( ChepLoadService chservice = new ChepLoadService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
-            using ( ChepClientService ccservice = new ChepClientService() )
             {
-                ChepLoad ch = chservice.GetById( chid );
-
-                if ( ch == null )
+                if ( !string.IsNullOrEmpty( uid ) )
                 {
-                    Notify( "Sorry, the specified Pooling Agent Load could not be found. Please try again", NotificationType.Error );
+                    chservice.Query( $"UPDATE [dbo].[ChepLoad] SET [ManuallyMatchedUID]=NULL, [ManuallyMatchedLoad]=0, [Status]={( int ) ReconciliationStatus.Unreconciled} WHERE [ManuallyMatchedUID]='{uid}' AND [Id] NOT IN({string.Join( ",", chepIds )});" );
+                    clservice.Query( $"UPDATE [dbo].[ClientLoad] SET [ManuallyMatchedUID]=NULL, [ManuallyMatchedLoad]=0, [Status]={( int ) ReconciliationStatus.Unreconciled}, [OrderStatus]={( int ) ReconciliationStatus.Unreconciled} WHERE [ManuallyMatchedUID]='{uid}' AND [Id] NOT IN({string.Join( ",", clientIds )});" );
 
-                    return PartialView( "_AccessDenied" );
+                    scope.Complete();
+
+                    Notify( "The selected loads were successfully reconciled.", NotificationType.Success );
+
+                    return PartialView( "_Notification" );
                 }
 
-                ClientLoad cl = clservice.GetById( clid );
+                uid = chservice.GetSha1Md5String( $"{DateTime.Now}_{CurrentUser.Email}" );
 
-                if ( cl == null )
+                if ( uid.Length > 250 )
                 {
-                    Notify( "Sorry, the specified Client Load could not be found. Please try again", NotificationType.Error );
-
-                    return PartialView( "_AccessDenied" );
+                    uid = uid.Substring( 0, 250 );
                 }
 
-                ChepClient cc = new ChepClient()
+                if ( chepIds.NullableAny() )
                 {
-                    ChepLoadsId = ch.Id,
-                    ClientLoadsId = cl.Id,
-                    Status = ( int ) ReconciliationStatus.Reconciled,
-                };
+                    foreach ( int id in chepIds )
+                    {
+                        ChepLoad ch = chservice.GetById( id );
 
-                ccservice.Create( cc );
+                        if ( ch == null )
+                        {
+                            continue;
+                        }
 
-                ch.BalanceStatus = ( int ) ReconciliationStatus.Reconciled;
+                        ch.ManuallyMatchedUID = uid;
+                        ch.ManuallyMatchedLoad = true;
+                        ch.Status = ( int ) ReconciliationStatus.Reconciled;
 
-                chservice.Update( ch );
-
-                cl.Status = ( int ) ReconciliationStatus.Reconciled;
-                cl.OrderStatus = ( int ) ReconciliationStatus.Reconciled;
-
-                if ( string.IsNullOrWhiteSpace( cl.Equipment ) )
-                {
-                    cl.Equipment = product;
+                        chservice.Update( ch );
+                    }
                 }
 
-                clservice.Update( cl );
+                if ( clientIds.NullableAny() )
+                {
+                    foreach ( int id in clientIds )
+                    {
+                        ClientLoad cl = clservice.GetById( id );
+
+                        if ( cl == null )
+                        {
+                            continue;
+                        }
+
+                        cl.ManuallyMatchedUID = uid;
+                        cl.ManuallyMatchedLoad = true;
+                        cl.Status = ( int ) ReconciliationStatus.Reconciled;
+                        cl.OrderStatus = ( int ) ReconciliationStatus.Reconciled;
+
+                        clservice.Update( cl );
+                    }
+                }
 
                 scope.Complete();
 
-                Notify( "The selected loads were successfully reconcilled.", NotificationType.Success );
+                Notify( "The selected loads were successfully reconciled.", NotificationType.Success );
             }
 
             return PartialView( "_Notification" );
         }
 
+
+        public ActionResult ManuallyReconciledLoads( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( ChepLoadService chservice = new ChepLoadService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            {
+                pm.Sort = "ASC";
+
+                pm.SortBy = "cl.[ShipmentDate]";
+
+                List<ChepLoadCustomModel> chModel = chservice.List1( pm, csm );
+                int chTotal = ( chModel.Count < pm.Take && pm.Skip == 0 ) ? chModel.Count : chservice.Total1( pm, csm );
+
+                ViewBag.ChepLoads = PagingExtension.Create( chModel, chTotal, pm.Skip, pm.Take, pm.Page );
+
+                pm.SortBy = "cl.[LoadDate]";
+
+                List<ClientLoadCustomModel> clModel = clservice.List1( pm, csm );
+                int clTotal = ( clModel.Count < pm.Take && pm.Skip == 0 ) ? clModel.Count : clservice.Total1( pm, csm );
+
+                ViewBag.ClientLoads = PagingExtension.Create( clModel, clTotal, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_ManuallyReconciledLoads", csm );
+            }
+        }
 
 
         #region Chep Load Documents
@@ -3957,162 +4119,6 @@ namespace ACT.UI.Controllers
         }
 
         //
-        // GET: /Pallet/AddAuthorisationCode/5 
-        [Requires( PermissionTo.Create )]
-        public ActionResult AddAuthorisationCode()
-        {
-            AuthorisationCodeViewModel model = new AuthorisationCodeViewModel() { EditMode = true };
-
-            return View( model );
-        }
-
-        //
-        // POST: /Pallet/AddAuthorisationCode/5
-        [HttpPost]
-        [Requires( PermissionTo.Create )]
-        public ActionResult AddAuthorisationCode( AuthorisationCodeViewModel model )
-        {
-            if ( !ModelState.IsValid )
-            {
-                Notify( "Sorry, the Authorisation Code was not created. Please correct all errors and try again.", NotificationType.Error );
-
-                return View( model );
-            }
-
-            using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
-            using ( ChepLoadService clservice = new ChepLoadService() )
-            {
-                if ( caservice.ExistByDocketNumber( model.DocketNumber ) )
-                {
-                    // AuthorisationCode already exist!
-                    Notify( $"Sorry, an Authorisation Code with the Docket Number \"{model.DocketNumber}\" already exists!", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                if ( caservice.ExistByLoadNumber( model.LoadNumber ) )
-                {
-                    // AuthorisationCode already exist!
-                    Notify( $"Sorry, an Authorisation Code with the Load Number \"{model.LoadNumber}\" already exists!", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                string number = ( caservice.MaxString( "Code" ) as string ) ?? "0";
-
-                int.TryParse( number.Trim().Replace( "AC", "" ), out int n );
-
-                model.Code = caservice.FormatNumber( "AC", ( n + 1 ) );
-
-                ClientAuthorisation code = new ClientAuthorisation()
-                {
-                    Code = model.Code,
-                    LoadNumber = model.LoadNumber,
-                    Status = ( int ) model.Status,
-                    DocketNumber = model.DocketNumber,
-                    ClientSiteId = model.ClientSiteId,
-                    TransporterId = model.TransporterId,
-                    AuthorisationDate = model.AuthorisationDate.Value,
-                };
-
-                caservice.Create( code );
-
-                Notify( "The Authorisation Code was successfully created.", NotificationType.Success );
-
-                return AuthorisationCodes( new PagingModel(), new CustomSearchModel() );
-            }
-        }
-
-        //
-        // GET: /Pallet/EditAuthorisationCode/5
-        [Requires( PermissionTo.Edit )]
-        public ActionResult EditAuthorisationCode( int id )
-        {
-            using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
-            {
-                ClientAuthorisation code = caservice.GetById( id );
-
-                if ( code == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return PartialView( "_AccessDenied" );
-                }
-
-                AuthorisationCodeViewModel model = new AuthorisationCodeViewModel()
-                {
-                    Id = code.Id,
-                    EditMode = true,
-                    Code = code.Code,
-                    LoadNumber = code.LoadNumber,
-                    Status = ( Status ) code.Status,
-                    ClientSiteId = code.ClientSiteId,
-                    DocketNumber = code.DocketNumber,
-                    TransporterId = code.TransporterId,
-                    AuthorisationDate = code.AuthorisationDate,
-                };
-
-                return View( model );
-            }
-        }
-
-        //
-        // POST: /Pallet/EditAuthorisationCode/5
-        [HttpPost]
-        [Requires( PermissionTo.Edit )]
-        public ActionResult EditAuthorisationCode( AuthorisationCodeViewModel model )
-        {
-            using ( ClientAuthorisationService service = new ClientAuthorisationService() )
-            using ( ChepLoadService clservice = new ChepLoadService() )
-            {
-                if ( !ModelState.IsValid )
-                {
-                    Notify( "Sorry, the selected Authorisation Code was not updated. Please correct all errors and try again.", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                ClientAuthorisation code = service.GetById( model.Id );
-
-                if ( code == null )
-                {
-                    Notify( "Sorry, that Authorisation Code does not exist! Please specify a valid AuthorisationCode Id and try again.", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                if ( !code.DocketNumber.Equals( model.DocketNumber ) && service.ExistByDocketNumber( model.DocketNumber ) )
-                {
-                    // Authorisation Code already exist!
-                    Notify( $"Sorry, an Authorisation Code with the Docket Number \"{model.DocketNumber}\" already exists!", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                if ( !code.LoadNumber.Equals( model.LoadNumber ) && service.ExistByLoadNumber( model.LoadNumber ) )
-                {
-                    // Authorisation Code already exist!
-                    Notify( $"Sorry, an Authorisation Code with the Load Number \"{model.LoadNumber}\" already exists!", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                code.LoadNumber = model.LoadNumber;
-                code.Status = ( int ) model.Status;
-                code.DocketNumber = model.DocketNumber;
-                code.ClientSiteId = model.ClientSiteId;
-                code.TransporterId = model.TransporterId;
-                code.AuthorisationDate = model.AuthorisationDate.Value;
-
-                service.Update( code );
-
-                Notify( "The selected Authorisation Code's details were successfully updated.", NotificationType.Success );
-
-                return AuthorisationCodes( new PagingModel(), new CustomSearchModel() );
-            }
-        }
-
-        //
         // POST: /Pallet/DeleteAuthorisationCode/5
         [HttpPost]
         [Requires( PermissionTo.Delete )]
@@ -4139,22 +4145,25 @@ namespace ACT.UI.Controllers
             }
         }
 
-        public ActionResult GenerateAuthorisationCode( int id, PagingModel pm, CustomSearchModel csm )
+        /// <summary>
+        /// Generates a new authorisation code
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public ActionResult GenerateAuthorisationCode( PagingModel pm, CustomSearchModel csm )
         {
-            using ( ChepLoadService chservice = new ChepLoadService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
             using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
             {
-                ChepLoad ch = chservice.GetById( id );
+                ClientLoad cl = clservice.GetById( csm.Id );
 
-                if ( ch == null )
+                if ( cl == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
                     return PartialView( "_AccessDenied" );
                 }
-
-                List<ClientLoad> cl = clservice.ListByChepRefOtherRef( ch.Ref?.Trim(), ch.OtherRef?.Trim() );
 
                 string number = ( caservice.MaxString( "Code" ) as string ) ?? "0";
 
@@ -4165,16 +4174,47 @@ namespace ACT.UI.Controllers
                 ClientAuthorisation ca = new ClientAuthorisation()
                 {
                     Code = code,
-                    ChepLoadId = ch.Id,
+                    ClientLoadId = cl.Id,
+                    UserId = CurrentUser.Id,
+                    LoadNumber = cl.LoadNumber,
                     Status = ( int ) Status.Active,
-                    DocketNumber = ch.DocketNumber,
                     AuthorisationDate = DateTime.Now,
-                    LoadNumber = cl?.FirstOrDefault()?.LoadNumber,
-                    ClientSiteId = cl?.FirstOrDefault()?.ClientSiteId,
-                    TransporterId = cl?.FirstOrDefault()?.TransporterId,
                 };
 
-                caservice.Create( ca );
+                ca = caservice.Create( ca );
+
+                ca = caservice.GetById( ca.Id );
+
+                List<string> recipients = new List<string>();
+
+                if ( !string.IsNullOrEmpty( cl?.Transporter?.Email ) )
+                {
+                    recipients.Add( cl?.Transporter?.Email );
+                }
+                if ( !string.IsNullOrEmpty( cl?.ClientSite1?.Site?.ReceivingEmail ) )
+                {
+                    recipients.Add( cl?.ClientSite1?.Site?.ReceivingEmail );
+                }
+                if ( !string.IsNullOrEmpty( cl?.ClientSite1?.Site?.User?.Email ) )
+                {
+                    recipients.Add( cl?.ClientSite1?.Site?.User?.Email );
+                }
+
+                if ( recipients.NullableAny() )
+                {
+                    // Email
+                    string body = RenderViewToString( ControllerContext, "~/Views/Email/_AuthorisationCodeNotify.cshtml", ca, true );
+
+                    EmailModel email = new EmailModel()
+                    {
+                        Body = body,
+                        Recipients = recipients,
+                        From = ConfigSettings.SystemRules.SystemContactEmail,
+                        Subject = "ACT Pallet Solutions - Load Authorisation",
+                    };
+
+                    Mail.Send( email );
+                }
 
                 Notify( "The Authorisation Code was successfully created for the selected Chep Load.", NotificationType.Success );
 
@@ -4306,7 +4346,7 @@ namespace ACT.UI.Controllers
 
                 csm.IsOP = true;
                 csm.BalanceStatus = BalanceStatus.NotBalanced;
-                csm.ReconciliationStatus = ReconciliationStatus.Reconciled;
+                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
 
                 List<ChepLoadCustomModel> model = service.List1( pm, csm );
                 int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
@@ -4334,6 +4374,29 @@ namespace ACT.UI.Controllers
             PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
             return PartialView( "_Exceptions", paging );
+        }
+
+        //
+        // GET: /Pallet/AuthorisationCodes
+        public ActionResult AuthorisationCodes( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            using ( ClientAuthorisationService service = new ClientAuthorisationService() )
+            {
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "AuthorisationCodes";
+
+                    return PartialView( "_AuthorisationCodesCustomSearch", new CustomSearchModel( "AuthorisationCodes" ) );
+                }
+
+                List<ClientAuthorisationCustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_AuthorisationCodes", paging );
+            }
         }
 
         //
@@ -4379,29 +4442,6 @@ namespace ACT.UI.Controllers
                 PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
                 return PartialView( "_Disputes", paging );
-            }
-        }
-
-        //
-        // GET: /Pallet/AuthorisationCodes
-        public ActionResult AuthorisationCodes( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
-        {
-            using ( ClientAuthorisationService service = new ClientAuthorisationService() )
-            {
-                if ( givecsm )
-                {
-                    ViewBag.ViewName = "AuthorisationCodes";
-
-                    return PartialView( "_AuthorisationCodesCustomSearch", new CustomSearchModel( "AuthorisationCodes" ) );
-                }
-
-                List<ChepLoadCustomModel> model = service.List1( pm, csm );
-
-                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
-
-                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
-
-                return PartialView( "_AuthorisationCodes", paging );
             }
         }
 

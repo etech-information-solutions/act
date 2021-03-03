@@ -1,14 +1,10 @@
 ﻿@model PagingExtension
 
 @using ACT.Core.Enums;
-@using ACT.Core.Models;
 @using ACT.Core.Models.Custom;
 
 @{
-    ViewBag.ShowExport = true;
-    ViewBag.ShowCustom = true;
-
-    ViewBag.ViewName = "_PoolingAgentData";
+    ViewBag.ViewName = "_ChepLoadVersions";
 }
 
 
@@ -16,31 +12,11 @@
 
 
 @{
-    UserModel user = User.Get();
-
     int count = Model.Start;
     List<ChepLoadCustomModel> items = ( List<ChepLoadCustomModel> ) Model.Items;
 }
 
-
-@if ( Model == null || !items.Any() )
-{
-    <div class="notification message-warn" style="margin-bottom: 20px;">
-        There are no Pooling Agent Load Entries available matching your search criteria.
-    </div>
-}
-
-<p>
-    @Html.ActionLink( "Import", "ImportPoolingAgentData", new { IsExchange = false }, new { @class = "csv", @rel = "tipsyS", @title = "Import Chep loads?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" } )
-
-    <span style="padding: 0 5px;">|</span>
-
-    @Html.ActionLink( "Import Exchange Load", "ImportPoolingAgentData", new { IsExchange = true }, new { @class = "csv", @rel = "tipsyS", @title = "Import Exchange Loads?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" } )
-
-    <span class="loader"></span>
-</p>
-
-<table id="pad-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#pad-table_wrapper" data-starting-point=".ap-tabs ul">
+<table id="ExtraChepLoads-table" class="da-table" data-fixed-header-target="#ExtraChepLoads-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
             <th data-name="Count">
@@ -96,7 +72,7 @@
 
                 string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+                <tr id="Extra-@item.Id-ChepLoads" class="Extra-@item.Id-ChepLoads @active">
 
                     <td width="1%">
                         @count
@@ -112,25 +88,6 @@
                     </td>
                     <td>
                         @item.DocketNumber
-
-                        @if ( item.VersionCount > 1 || item.IsExtra )
-                        {
-                            <div style="border-top: 1px dashed #7368e3; padding-top: 5px; margin-top: 10px;">
-                                @if ( item.IsExtra && item.ChepLoadId.HasValue )
-                                {
-                                    <a data-load-extra="1" data-docket-number="@item.DocketNumber" class="block" rel="tipysE" title="This trx was added to a reconciled and balanced load, click to view original load..">
-                                        <img src="@Url.Content( "~/Images/extra.png" )" width="20" />
-                                    </a>
-                                }
-                                @if ( item.VersionCount > 1 )
-                                {
-                                    <a data-load-version="1" data-docket-number="@item.DocketNumber" data-versions="@item.VersionCount" class="block" rel="tipysW" title="+@item.VersionCount versions of this load, click to view all versions..">
-                                        <img src="@Url.Content( "~/Images/version.png" )" width="20" />
-                                    </a>
-                                }
-                            </div>
-
-                        }
                     </td>
                     <td>
                         @(item.CorrectedRef ?? item.Ref)
@@ -163,37 +120,13 @@
                     </td>
                     <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
                         @status.GetDisplayText()
-
-                        @if ( item.ManuallyMatchedLoad )
-                        {
-                            <a data-manual-reconed="1" data-uid="@item.ManuallyMatchedUID" rel="tipsyE" title="This load was manually reconciled, click for more details...">
-                                <img src="@Url.Content( "~/Images/clients.png" )" width="20" />
-                            </a>
-                        }
                     </td>
                     <td class="@(balanceStatus == BalanceStatus.Balanced ? "active" : "inactive")">
                         @balanceStatus.GetDisplayText()
                     </td>
                     <td width="5%">
 
-                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
-
-                            @Html.ActionLink( "Details", "PoolingAgentDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-
-                        </div>
-
-                        @Html.ActionLink( "Allocate", "AllocatePoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-
-                        @if ( postingType == PostingType.Manual )
-                        {
-                            @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
-
-                                    @Html.ActionLink( "Edit", "EditPoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item", @style = "margin-right: 0;" } )
-
-                                    @Html.ActionLink( enable, "DeletePoolingAgentData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?", @style = "margin-left: 0;" } )
-
-                                </div>*@
-                        }
+                        @Html.ActionLink( "Details", "PoolingAgentDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".Extra-" + item.Id + "-ChepLoads" } )
 
                     </td>
 

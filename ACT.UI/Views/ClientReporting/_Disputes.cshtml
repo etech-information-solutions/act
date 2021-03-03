@@ -35,9 +35,6 @@
             <th data-name="EffectiveDate" data-column="d.EffectiveDate">
                 Eff. Date
             </th>
-            <th data-name="OriginalDocketNumber" data-column="d.OriginalDocketNumber">
-                Orig. Docket #
-            </th>
             <th data-name="DocketNumber" data-column="d.DocketNumber">
                 Docket #
             </th>
@@ -59,6 +56,9 @@
             <th data-name="Status" data-column="d.Status">
                 Status
             </th>
+            <th data-name="DaysLeft">
+                Days Left
+            </th>
             <th data-name="DisputeReasonDetails" data-column="dr.Reason">
                 Reason
             </th>
@@ -75,7 +75,13 @@
             {
                 DisputeStatus status = ( DisputeStatus ) item.Status;
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+                int? d = item.Disputes.HasValue ? ( int ) item.Disputes : ConfigSettings.SystemRules.DisputeDaysToResolve;
+
+                int? daysLeft = ( status == DisputeStatus.Active ) ? ( d - ( DateTime.Now - item.CreatedOn ).Days ) : 0;
+
+                string red = ( status == DisputeStatus.Active && ( DateTime.Now - item.CreatedOn ).Days >= ConfigSettings.SystemRules.DisputeDaysToResolve ) ? "red-bg" : string.Empty;
+
+                <tr id="disputes-@item.Id-item" class="disputes-@item.Id-item @red">
 
                     <td width="1%">
                         @count
@@ -87,9 +93,6 @@
                             <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
                             <span></span>
                         </a>
-                    </td>
-                    <td>
-                        @item.OriginalDocketNumber
                     </td>
                     <td>
                         @item.DocketNumber
@@ -118,10 +121,13 @@
                         }
                     </td>
                     <td>
+                        @daysLeft
+                    </td>
+                    <td>
                         @item.DisputeReasonDetails
                     </td>
                     <td width="4%">
-                        @Html.ActionLink( "Details", "DisputeDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink( "Details", "DisputeDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".disputes-" + item.Id + "-item" } )
                     </td>
 
                 </tr>

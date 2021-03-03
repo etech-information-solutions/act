@@ -7,6 +7,7 @@ using ACT.Core.Services;
 using ACT.Data.Models;
 using System.Reflection;
 using ACT.Core.Models.Simple;
+using System.Data;
 
 namespace ACT.Core.Models
 {
@@ -20,6 +21,16 @@ namespace ACT.Core.Models
 
 
         #region Properties
+
+        /// <summary>
+        /// An entity's Id
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Identifies a Chepload
+        /// </summary>
+        public int ChepLoadId { get; set; }
 
         /// <summary>
         /// Can be used as a selected user 
@@ -407,6 +418,14 @@ namespace ACT.Core.Models
             get; set;
         }
 
+        /// <summary>
+        /// Some unique identifier
+        /// </summary>
+        public string ManuallyMatchedUID { get; set; }
+
+        public bool HasAuthorisationCode { get; set; }
+        public string DocketNumber { get; set; }
+
         #endregion
 
 
@@ -483,8 +502,6 @@ namespace ACT.Core.Models
                 return MvcHelper.GetControllerNames();
             }
         }
-
-        public bool HasAuthorisationCode { get; set; }
 
         #endregion
 

@@ -297,6 +297,7 @@
     <Content Include="Images\email.png" />
     <Content Include="Images\error.png" />
     <Content Include="Images\excel.gif" />
+    <Content Include="Images\extra.png" />
     <Content Include="Images\fancybox_loading%402x.gif" />
     <Content Include="Images\fancybox_loading.gif" />
     <Content Include="Images\fancybox_overlay.png" />
@@ -368,6 +369,7 @@
     <Content Include="Images\ui-icons_ffffff_256x240.png" />
     <Content Include="Images\unchecked.png" />
     <Content Include="Images\username.png" />
+    <Content Include="Images\version.png" />
     <Content Include="Images\view.png" />
     <Content Include="Images\warn.png" />
     <Content Include="Images\warning.png" />
@@ -656,8 +658,8 @@
     <Content Include="Views\Pallet\PoolingAgentDataDetails.cshtml" />
     <Content Include="Views\Pallet\ImportClientData.cshtml" />
     <Content Include="Views\Pallet\ClientDataDetails.cshtml" />
-    <Content Include="Views\Pallet\_ChepLoads.cshtml" />
-    <Content Include="Views\Pallet\_ClientLoads.cshtml" />
+    <Content Include="Views\Pallet\_UnReconciledChepLoads.cshtml" />
+    <Content Include="Views\Pallet\_UnReconciledClientLoads.cshtml" />
     <Content Include="Views\Pallet\_TinyPaging.cshtml" />
     <Content Include="Views\Pallet\_ClientLoadJournals.cshtml" />
     <Content Include="Views\Pallet\_ClientLoadComments.cshtml" />
@@ -692,6 +694,13 @@
     <Content Include="Views\Administration\TransporterDetails.cshtml" />
     <Content Include="Views\Administration\_PSPClients.cshtml" />
     <Content Include="Views\Client\_ChepReference.cshtml" />
+    <Content Include="Views\Pallet\EditUnReconciledChepLoad.cshtml" />
+    <Content Include="Views\Pallet\_ManuallyReconciledLoads.cshtml" />
+    <Content Include="Views\Pallet\_ManuallyReconciledChepLoads.cshtml" />
+    <Content Include="Views\Pallet\_ManuallyReconciledClientLoads.cshtml" />
+    <Content Include="Views\Pallet\_ExtraChepLoads.cshtml" />
+    <Content Include="Views\Pallet\_ChepLoadVersions.cshtml" />
+    <Content Include="Views\Email\_AuthorisationCodeNotify.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

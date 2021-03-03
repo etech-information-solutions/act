@@ -1,8 +1,12 @@
 ﻿@model PagingExtension
 
+@using ACT.Core.Enums;
 @using ACT.Core.Models.Custom;
 
 @{
+    ViewBag.Target = "#chep-loads-data";
+    ViewBag.Url = Url.Action( "UnReconciledChepLoads", new { ReconciliationStatus = ReconciliationStatus.Unreconciled } );
+
     int count = Model.Start;
     List<ChepLoadCustomModel> items = ( List<ChepLoadCustomModel> ) Model.Items;
 }
@@ -12,6 +16,9 @@
         <tr>
             <th data-name="Count">
                 #
+            </th>
+            <th data-name="Check">
+                <input type="checkbox" data-r-p-c="1" data-check=".chep-loads-check" data-sel="#chep-loads" data-compare="#client-loads" />
             </th>
             <th data-name="Reference">
                 Ref #
@@ -42,18 +49,43 @@
         {
             foreach ( var item in items )
             {
-                <tr id="tr-@item.Id-item" class="chep-@item.Id-item recon-draggable" data-cid="@item.Id" data-qty="@item.Quantity" data-product="@item.Equipment" data-docket="@item.DocketNumber" data-parent="#chep-loads">
+                <tr id="chep-@item.Id-item" class="chep-@item.Id-item">
                     <td width="1%">
                         @count
                     </td>
                     <td>
-                        @item.Ref
+                        <input type="checkbox" class="chep-loads-check" data-r-c="1" data-id="@item.Id" data-qty="@item.Quantity" data-sel="#chep-loads" data-compare="#client-loads" />
                     </td>
                     <td>
-                        @item.OtherRef
+                        @(item.CorrectedRef ?? item.Ref)
+
+                        @if ( !string.IsNullOrEmpty( item.CorrectedRef ) )
+                        {
+                            <a rel="tipsyW" title="Manually corrected, was: @item.Ref">
+                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
+                            </a>
+                        }
+
+                    </td>
+                    <td>
+                        @(item.CorrectedOtherRef ?? item.OtherRef)
+
+                        @if ( !string.IsNullOrEmpty( item.CorrectedOtherRef ) )
+                        {
+                            <a rel="tipsyW" title="Manually corrected, was: @item.OtherRef">
+                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
+                            </a>
+                        }
                     </td>
                     <td>
                         @item.DocketNumber
+
+                        @if ( item.VersionCount > 1 )
+                        {
+                            <a data-load-version="1" data-docket="@item.DocketNumber" class="block" rel="tipysE" title="+@item.VersionCount versions of this load, click to view all versions..">
+                                <small>+@item.VersionCount versions</small>
+                            </a>
+                        }
                     </td>
                     <td>
                         @(item.ShipmentDate?.ToString( "yyyy-MM-dd" ))
@@ -65,6 +97,8 @@
                         @item.Quantity
                     </td>
                     <td>
+
+                        @Html.ActionLink( "Edit", "EditUnReconciledChepLoad", new { id = item.Id }, new { @class = "edit", @style = "margin-left: 0;", @data_details = "1", @data_id = item.Id, @data_target = ".chep-" + item.Id + "-item" } )
 
                         @Html.ActionLink( " ", "ChepLoadComments", new { id = item.Id }, new { @class = "chat", @rel = "tipsyS", @title = "View Comments", @data_details = "1", @data_id = item.Id, @data_target = ".chep-" + item.Id + "-item" } )
 

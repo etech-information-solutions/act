@@ -17,7 +17,6 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Transporter()
         {
-            this.ClientAuthorisations = new HashSet<ClientAuthorisation>();
             this.ClientLoads = new HashSet<ClientLoad>();
         }
     
@@ -32,8 +31,6 @@ namespace ACT.Data.Models
         public string RegistrationNumber { get; set; }
         public int Status { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads { get; set; }
     }

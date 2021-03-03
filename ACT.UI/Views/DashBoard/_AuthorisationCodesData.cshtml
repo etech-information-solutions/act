@@ -1,5 +1,5 @@
 ﻿
-@model List<ChepLoadCustomModel>
+@model List<ClientAuthorisationCustomModel>
 
 @using ACT.Core.Enums;
 @using ACT.Core.Models.Custom;
@@ -27,31 +27,37 @@
                     Load Date
                 </th>
                 <th>
-                    Client
-                </th>
-                <th>
-                    Docket #
+                    Load #
                 </th>
                 <th>
                     Ref #
                 </th>
                 <th>
-                    Other Ref #
+                    Delivery #
                 </th>
                 <th>
-                    Transaction Type
+                    Transporter
                 </th>
                 <th>
-                    Qty
+                    Vehicle
                 </th>
                 <th>
-                    Status
+                    Client
                 </th>
                 <th>
-                    Balanced
+                    From Site
                 </th>
                 <th>
-                    Code
+                    To Site
+                </th>
+                <th>
+                    Authoriser
+                </th>
+                <th>
+                    Auth Code
+                </th>
+                <th>
+                    Auth Date
                 </th>
             </tr>
         </thead>
@@ -63,46 +69,50 @@
 
                 foreach ( var item in Model )
                 {
-                    PostingType postingType = ( PostingType ) item.PostingType;
-                    BalanceStatus balanceStatus = ( BalanceStatus ) item.BalanceStatus;
-                    ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
+                    Status status = ( Status ) ( item.Status ?? 1 );
 
-                    string active = ( status == ReconciliationStatus.Reconciled ) ? "active" : "inactive";
+                    string active = ( status == Status.Active ) ? "active" : "inactive";
 
-                    <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+                    <tr id="authorisationcodes-@item.Id-item" class="authorisationcodes-@item.Id-item @active">
 
                         <td width="1%">
                             @count
                         </td>
                         <td>
-                            @(item.EffectiveDate?.ToString( "yyyy-MM-dd" ))
+                            @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
+                        </td>
+                        <td>
+                            @item.LoadNumber
+                        </td>
+                        <td>
+                            @item.ReceiverNumber
+                        </td>
+                        <td>
+                            @item.DeliveryNote
+                        </td>
+                        <td>
+                            @item.TransporterName
+                        </td>
+                        <td>
+                            @item.VehicleRegistration
                         </td>
                         <td>
                             @item.ClientName
                         </td>
                         <td>
-                            @item.DocketNumber
+                            @item.FromSiteName
                         </td>
                         <td>
-                            @item.Ref
+                            @item.ToSiteName
                         </td>
                         <td>
-                            @item.OtherRef
+                            @item.AuthoriserName
                         </td>
                         <td>
-                            @item.TransactionType
+                            @(item.AuthorisationDate?.ToString( "yyyy-MM-dd @HH:mm t" ))
                         </td>
                         <td>
-                            @item.Quantity
-                        </td>
-                        <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
-                            @status.GetDisplayText()
-                        </td>
-                        <td class="@(balanceStatus == BalanceStatus.Balanced ? "active" : "inactive")">
-                            @balanceStatus.GetDisplayText()
-                        </td>
-                        <td>
-                            @item.AuthorisationCode
+                            @item.Code
                         </td>
 
                     </tr>

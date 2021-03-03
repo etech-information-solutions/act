@@ -48,5 +48,6 @@ namespace ACT.Data.Models
         public Nullable<System.DateTime> LastClientMonitorRun { get; set; }
         public Nullable<int> LastClientMonitorCount { get; set; }
         public Nullable<int> ClientContractRenewalReminderMonths { get; set; }
+        public Nullable<int> DisputeDaysToResolve { get; set; }
     }
 }

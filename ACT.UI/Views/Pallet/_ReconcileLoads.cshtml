@@ -54,12 +54,22 @@
 @Html.Partial( "_Notification" )
 
 <p style="margin: 15px 0; font-weight: bold; position: relative;">
-    <img alt="Tip" src="@Url.Content("~/Images/info.png")" style="margin-right: 5px;" />
-    Drag a pooling agent load and drop it on a matching client load to reconcile...
 
-    <a class="auto-recon" data-auto-recon="1" data-type="loads" data-title="Auto Reconcile Loads">
-        Auto Reconcile
-    </a>
+    <span class="left">
+
+        <button class="auto-recon manual-recon" data-manual-recon="1" data-chep="#chep-loads" data-client="#client-loads" data-uid="" data-title="Manual Reconcile Loads">
+            Reconcile Selection
+        </button>
+
+    </span>
+
+    <span class="right">
+
+        <button class="auto-recon" data-auto-recon="1" data-type="loads" data-title="Auto Reconcile Loads">
+            Auto Reconcile
+        </button>
+
+    </span>
 
     <span class="block clear"></span>
 </p>
@@ -69,7 +79,7 @@
     <div style="padding: 10px; border: 1px solid #cacaca; text-transform: uppercase; position: relative; background: #eee; border-bottom: 0; border-top-left-radius: 4px; border-top-right-radius: 4px;">
 
         <div class="left" style="margin-top: 8px;">
-            Pooling Agent Loads <span id="loader"></span>
+            Pooling Loads <span id="sel-count">(0)</span> <span id="loader"></span>
         </div>
 
         <div class="right" style="position: relative; width: 45%;">
@@ -87,7 +97,7 @@
 
     <div id="chep-loads-data" class="list-data">
 
-        @Html.Partial( "_ChepLoads", ( PagingExtension ) ViewBag.ChepLoads )
+        @Html.Partial( "_UnReconciledChepLoads", ( PagingExtension ) ViewBag.ChepLoads )
 
     </div>
 
@@ -98,7 +108,7 @@
     <div style="padding: 10px; border: 1px solid #cacaca; text-transform: uppercase; position: relative; background: #eee; border-bottom: 0; border-top-left-radius: 4px; border-top-right-radius: 4px;">
 
         <div class="left" style="margin-top: 8px;">
-            Client Loads <span id="loader"></span>
+            Client Loads <span id="sel-count">(0)</span> <span id="loader"></span>
         </div>
 
         <div class="right" style="position: relative; width: 45%;">
@@ -116,7 +126,7 @@
 
     <div id="client-loads-data" class="list-data">
 
-        @Html.Partial( "_ClientLoads", ( PagingExtension ) ViewBag.ClientLoads )
+        @Html.Partial( "_UnReconciledClientLoads", ( PagingExtension ) ViewBag.ClientLoads )
 
     </div>
 

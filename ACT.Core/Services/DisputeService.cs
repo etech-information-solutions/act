@@ -233,7 +233,8 @@ namespace ACT.Core.Services
 	                            d.*,
 	                            dr.Reason AS [DisputeReasonDetails],
 	                            u1.Name + ' ' + u1.Surname AS [ActionUser],
-	                            u2.Name + ' ' + u2.Surname AS [ResolvedUser]
+	                            u2.Name + ' ' + u2.Surname AS [ResolvedUser],
+	                            (SELECT TOP 1 k.[Disputes] FROM [dbo].[ClientKPI] k WHERE k.[ClientId]=cl.[ClientId]) AS [Disputes]
                              FROM
 	                            [dbo].[Dispute] d
                                 LEFT OUTER JOIN [dbo].[DisputeReason] dr ON dr.[Id]=d.[DisputeReasonId]

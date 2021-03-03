@@ -19,9 +19,10 @@ namespace ACT.Data.Models
         {
             this.ChepClients = new HashSet<ChepClient>();
             this.ChepLoadCheps = new HashSet<ChepLoadChep>();
-            this.ClientAuthorisations = new HashSet<ClientAuthorisation>();
             this.Disputes = new HashSet<Dispute>();
             this.Tasks = new HashSet<Task>();
+            this.ChepLoadJournals = new HashSet<ChepLoadJournal>();
+            this.ChepLoad1 = new HashSet<ChepLoad>();
         }
     
         public int Id { get; set; }
@@ -61,6 +62,12 @@ namespace ACT.Data.Models
         public bool IsExchange { get; set; }
         public bool IsPSPPickup { get; set; }
         public bool TransporterLiable { get; set; }
+        public bool ManuallyMatchedLoad { get; set; }
+        public string ManuallyMatchedUID { get; set; }
+        public string CorrectedRef { get; set; }
+        public string CorrectedOtherRef { get; set; }
+        public bool IsExtra { get; set; }
+        public Nullable<int> ChepLoadId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }
@@ -70,10 +77,13 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepLoadChep> ChepLoadCheps { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Dispute> Disputes { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Tasks { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChepLoadJournal> ChepLoadJournals { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChepLoad> ChepLoad1 { get; set; }
+        public virtual ChepLoad ChepLoad2 { get; set; }
     }
 }

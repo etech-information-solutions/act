@@ -34,7 +34,6 @@ namespace ACT.Data.Models
         public virtual DbSet<ChepClient> ChepClients { get; set; }
         public virtual DbSet<ChepLoadChep> ChepLoadCheps { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
-        public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
         public virtual DbSet<ClientBudget> ClientBudgets { get; set; }
         public virtual DbSet<ClientCustomer> ClientCustomers { get; set; }
         public virtual DbSet<ClientGroup> ClientGroups { get; set; }
@@ -91,5 +90,6 @@ namespace ACT.Data.Models
         public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
         public virtual DbSet<PODComment> PODComments { get; set; }
         public virtual DbSet<ChepLoadJournal> ChepLoadJournals { get; set; }
+        public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
     }
 }

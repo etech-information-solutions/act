@@ -138,6 +138,7 @@
     <Compile Include="Interfaces\IRole.cs" />
     <Compile Include="Interfaces\IUser.cs" />
     <Compile Include="Models\Custom\ChepLoadChepCustomModel.cs" />
+    <Compile Include="Models\Custom\ChepLoadJournalCustomModel.cs" />
     <Compile Include="Models\Custom\ClientCustomerCustomModel.cs" />
     <Compile Include="Models\Custom\EmailCustomModel.cs" />
     <Compile Include="Models\Custom\AddressCustomModel.cs" />

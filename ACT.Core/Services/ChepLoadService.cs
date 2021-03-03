@@ -47,6 +47,8 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
+                { new SqlParameter( "cmsDocketNumber", csm.DocketNumber ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmManuallyMatchedUID", csm.ManuallyMatchedUID ?? ( object ) DBNull.Value ) },
             };
 
             #endregion
@@ -132,6 +134,16 @@ namespace ACT.Core.Services
                 }
             }
 
+            if ( !string.IsNullOrEmpty( csm.ManuallyMatchedUID ) )
+            {
+                query = $"{query} AND (cl.ManuallyMatchedUID=@csmManuallyMatchedUID) ";
+            }
+
+            if ( !string.IsNullOrEmpty( csm.DocketNumber ) )
+            {
+                query = $"{query} AND (cl.DocketNumber=@csmDocketNumber) ";
+            }
+
             #endregion
 
             // Normal Search
@@ -206,6 +218,8 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
+                { new SqlParameter( "cmsDocketNumber", csm.DocketNumber ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmManuallyMatchedUID", csm.ManuallyMatchedUID ?? ( object ) DBNull.Value ) },
             };
 
             #endregion
@@ -214,6 +228,7 @@ namespace ACT.Core.Services
                                 cl.*,
                                 c.[CompanyName] AS [ClientName],
                                 r.[Description] AS [OutstandingReason],
+                                (SELECT COUNT(1) FROM [dbo].[ChepLoadJournal] cj WHERE cl.Id=cj.[ChepLoadId]) AS [VersionCount],
                                 (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ChepLoad') AS [DocumentCount],
                                 (SELECT COUNT(1) FROM [dbo].[Comment] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ChepLoad') AS [CommentCount]";
 
@@ -302,6 +317,16 @@ namespace ACT.Core.Services
                 }
             }
 
+            if ( !string.IsNullOrEmpty( csm.ManuallyMatchedUID ) )
+            {
+                query = $"{query} AND (cl.ManuallyMatchedUID=@csmManuallyMatchedUID) ";
+            }
+
+            if ( !string.IsNullOrEmpty( csm.DocketNumber ) )
+            {
+                query = $"{query} AND (cl.DocketNumber=@csmDocketNumber) ";
+            }
+
             #endregion
 
             // Normal Search
@@ -369,7 +394,7 @@ namespace ACT.Core.Services
 
             return model;
         }
-        
+
 
         /// <summary>
         /// Gets a list of Chep Loads

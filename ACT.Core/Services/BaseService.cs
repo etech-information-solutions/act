@@ -8,16 +8,12 @@ using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
-using System.Transactions;
 using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Data.Models;
 using ACT.Core.Interfaces;
-using ACT.Core.Extension;
 using System.IO;
 using System.Net;
-using System.Net.Http;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace ACT.Core.Services

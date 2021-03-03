@@ -43,10 +43,17 @@ namespace ACT.Core.Models.Custom
         public bool IsExchange { get; set; }
         public bool IsPSPPickup { get; set; }
         public bool TransporterLiable { get; set; }
+        public bool ManuallyMatchedLoad { get; set; }
+        public string ManuallyMatchedUID { get; set; }
+        public string CorrectedRef { get; set; }
+        public string CorrectedOtherRef { get; set; }
+        public bool IsExtra { get; set; }
+        public Nullable<int> ChepLoadId { get; set; }
 
         public virtual Client Client { get; set; }
-        public int? DocumentCount { get; set; }
-        public int? CommentCount { get; set; }
+        public int VersionCount { get; set; }
+        public int DocumentCount { get; set; }
+        public int CommentCount { get; set; }
         public List<Comment> Comments { get; set; }
         public List<Document> Documents { get; set; }
 

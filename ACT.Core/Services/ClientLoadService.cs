@@ -55,12 +55,13 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmVehicleId", csm.VehicleId ) },
                 { new SqlParameter( "csmTransporterId", csm.TransporterId ) },
                 { new SqlParameter( "csmInvoiceStatus", ( int ) csm.InvoiceStatus ) },
-                { new SqlParameter( "csmOutstandingReasonId", csm.OutstandingReasonId ) },
-                { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmOutstandingReasonId", csm.OutstandingReasonId ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
+                { new SqlParameter( "csmManuallyMatchedUID", csm.ManuallyMatchedUID ?? ( object ) DBNull.Value ) },
             };
 
             #endregion
@@ -143,6 +144,11 @@ namespace ACT.Core.Services
                 }
             }
 
+            if ( !string.IsNullOrEmpty( csm.ManuallyMatchedUID ) )
+            {
+                query = $"{query} AND (cl.ManuallyMatchedUID=@csmManuallyMatchedUID) ";
+            }
+
             #endregion
 
             // Normal Search
@@ -201,12 +207,13 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmVehicleId", csm.VehicleId ) },
                 { new SqlParameter( "csmTransporterId", csm.TransporterId ) },
                 { new SqlParameter( "csmInvoiceStatus", ( int ) csm.InvoiceStatus ) },
-                { new SqlParameter( "csmOutstandingReasonId", csm.OutstandingReasonId ) },
-                { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmOutstandingReasonId", csm.OutstandingReasonId ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
+                { new SqlParameter( "csmManuallyMatchedUID", csm.ManuallyMatchedUID ?? ( object ) DBNull.Value ) },
             };
 
             #endregion
@@ -215,7 +222,6 @@ namespace ACT.Core.Services
 
             if ( true == false /*csm.ReconciliationStatus == ReconciliationStatus.Reconciled*/ )
             {
-
                 query = @"SELECT
                             cl.*,
                             cl1.PostingType,
@@ -237,7 +243,6 @@ namespace ACT.Core.Services
                             LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
                             LEFT OUTER JOIN [dbo].[Site] s1 ON s.[Id]=s1.[SiteId]
                             LEFT OUTER JOIN [dbo].[OutstandingReason] otr ON otr.[Id]=cl.[OutstandingReasonId]";
-
             }
             else
             {
@@ -326,6 +331,11 @@ namespace ACT.Core.Services
                 {
                     query = $"{query} AND (cl.LoadDate<=@csmToDate) ";
                 }
+            }
+
+            if ( !string.IsNullOrEmpty( csm.ManuallyMatchedUID ) )
+            {
+                query = $"{query} AND (cl.ManuallyMatchedUID=@csmManuallyMatchedUID) ";
             }
 
             #endregion

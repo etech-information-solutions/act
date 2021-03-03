@@ -116,6 +116,10 @@ div span.strike {
     background: #ff1e12 !important;
 }
 
+.red-bg .display-field {
+    background: #ff1e12 !important;
+}
+
 .green-bg {
     color: #002e70;
     background: #ddf9da !important;

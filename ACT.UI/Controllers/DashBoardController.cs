@@ -437,7 +437,7 @@ namespace ACT.UI.Controllers
 
                     csm.HasAuthorisationCode = true;
 
-                    List<ChepLoadCustomModel> authCodes = aservice.List1( new PagingModel() { Take = int.MaxValue }, csm );
+                    List<ClientAuthorisationCustomModel> authCodes = aservice.List1( new PagingModel() { Take = int.MaxValue }, csm );
 
                     return PartialView( "_AuthorisationCodesData", authCodes );
                 }

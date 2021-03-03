@@ -1,0 +1,91 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums; 
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.Target = "#client-loads-data";
+    ViewBag.Url = Url.Action( "UnReconciledClientLoads", new { ReconciliationStatus = ReconciliationStatus.Unreconciled } );
+
+    int count = Model.Start;
+    List<ClientLoadCustomModel> items = ( List<ClientLoadCustomModel> ) Model.Items;
+}
+
+<table id="client-table" class="da-table small fixed-headerx" data-fixed-header-target="#client-loads" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="Check">
+                <input type="checkbox" data-r-p-c="1" data-check=".client-loads-check" data-sel="#client-loads" data-compare="#chep-loads" />
+            </th>
+            <th data-name="LoadDate">
+                Load Date
+            </th>
+            <th data-name="DeliveryNote">
+                Delivery Note #
+            </th>
+            <th data-name="ReceiverNumber">
+                Ref #
+            </th>
+            <th data-name="OriginalQuantity">
+                Qty
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items.NullableAny() )
+        {
+            foreach ( var item in items )
+            {
+                <tr id="tr-@item.Id-item" class="client-@item.Id-item">
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        <input type="checkbox" class="client-loads-check" data-r-c="1" data-id="@item.Id" data-qty="@item.OriginalQuantity" data-sel="#client-loads" data-compare="#chep-loads" />
+                    </td>
+                    <td>
+                        @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @item.DeliveryNote
+                    </td>
+                    <td>
+                        @item.ReceiverNumber
+                    </td>
+                    <td>
+                        @item.OriginalQuantity
+                    </td>
+                    <td width="10%">
+
+                        @Html.ActionLink( " ", "ClientLoadComments", new { id = item.Id }, new { @class = "chat", @rel = "tipsyS", @title = "View Comments", @data_details = "1", @data_id = item.Id, @data_target = ".client-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( " ", "ClientLoadJournals", new { id = item.Id }, new { @class = "reports", @rel = "tipsyS", @title = "View Journals", @data_details = "1", @data_id = item.Id, @data_target = ".client-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( " ", "ClientLoadDocuments", new { id = item.Id }, new { @class = "docs", @rel = "tipsyE", @title = "View Documents", @data_details = "1", @data_id = item.Id, @data_target = ".client-" + item.Id + "-item", @style = "margin-right: 0;" } )
+
+                    </td>
+                </tr>
+
+                count++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6">
+                    There are no records to display
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_TinyPaging" )

@@ -4,7 +4,7 @@ using System.Web.Security;
 using ACT.Core.Services;
 using ACT.Data.Models;
 
-namespace ACT.Core.Extension
+namespace System
 {
     public static class ConfigSettings
     {
