@@ -13,7 +13,7 @@ namespace ACT.Core.Models.Simple
         public string SiteName { get; set; }
         public string ClientName { get; set; }
 
-        public decimal? Total { get; set; }
+        public int? Total { get; set; }
 
         public decimal? Month1 { get; set; }
 

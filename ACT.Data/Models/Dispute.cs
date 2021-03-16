@@ -18,8 +18,8 @@ namespace ACT.Data.Models
         public Nullable<int> ChepLoadId { get; set; }
         public Nullable<int> ActionedById { get; set; }
         public Nullable<int> ResolvedById { get; set; }
-        public Nullable<int> DisputeReasonId { get; set; }
         public Nullable<int> ProductId { get; set; }
+        public Nullable<int> DisputeReasonId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -55,10 +55,10 @@ namespace ACT.Data.Models
         public string DataSource { get; set; }
         public Nullable<int> HasDocket { get; set; }
     
+        public virtual ChepLoad ChepLoad { get; set; }
         public virtual DisputeReason DisputeReason { get; set; }
         public virtual Product Product1 { get; set; }
         public virtual User User { get; set; }
         public virtual User User1 { get; set; }
-        public virtual ChepLoad ChepLoad { get; set; }
     }
 }

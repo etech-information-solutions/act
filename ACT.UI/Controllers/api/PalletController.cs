@@ -61,7 +61,7 @@ namespace ACT.UI.Controllers.api
         {
             List<SimpleOutstandingPallets> response = new List<SimpleOutstandingPallets>();
 
-            CustomSearchModel csm = new CustomSearchModel() { };
+            CustomSearchModel csm = new CustomSearchModel() { BalanceStatus = BalanceStatus.NotBalanced };
 
             using ( ClientLoadService clservice = new ClientLoadService() )
             {
@@ -323,7 +323,7 @@ namespace ACT.UI.Controllers.api
 
                 CustomSearchModel csm = new CustomSearchModel();
 
-                PagingModel pm = new PagingModel() { SortBy = "cl.PCNNumber, cl.PRNNumber, cl.PODNumber" };
+                PagingModel pm = new PagingModel() { SortBy = "cl.PCNNumber, cl.PRNNumber, cl.PODNumber", Skip = 0, Take = int.MaxValue };
 
                 List<ClientLoadCustomModel> model = service.ListOutstandingShipments( pm, csm );
 
@@ -345,9 +345,11 @@ namespace ACT.UI.Controllers.api
                     return Request.CreateResponse( HttpStatusCode.OK, new ResponseModel() { Code = -1, Description = "Shipment could not be found" } );
                 }
 
+                load.OutstandingReasonId = null;
                 load.PCNNumber = model.PCNNumber;
                 load.PODNumber = model.PODNumber;
                 load.PRNNumber = model.PRNNumber;
+                load.PODStatus = ( int ) Status.Active;
 
                 clservice.Update( load );
 
@@ -386,7 +388,7 @@ namespace ACT.UI.Controllers.api
                     }
 
                     // Create folder
-                    string path = HostingEnvironment.MapPath( $"~/{VariableExtension.SystemRules.ImagesLocation}/ClientLoads/{load.DeliveryNote?.Trim()}/" );
+                    string path = HostingEnvironment.MapPath( $"~/{VariableExtension.SystemRules.ImagesLocation}/ClientLoads/{load.LoadNumber?.Trim()}/" );
 
                     string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
 
@@ -415,7 +417,7 @@ namespace ACT.UI.Controllers.api
                         Description = comment,
                         IsMain = true,
                         Extension = ext,
-                        Location = $"ClientLoads/{load.DeliveryNote?.Trim()}/{now}-{file.FileName}"
+                        Location = $"ClientLoads/{load.LoadNumber?.Trim()}/{now}-{file.FileName}"
                     };
 
                     iservice.Create( image );

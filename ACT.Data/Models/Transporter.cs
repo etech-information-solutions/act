@@ -30,6 +30,8 @@ namespace ACT.Data.Models
         public string TradingName { get; set; }
         public string RegistrationNumber { get; set; }
         public int Status { get; set; }
+        public string ContactName { get; set; }
+        public string SupplierCode { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads { get; set; }

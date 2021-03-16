@@ -17,6 +17,7 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Document()
         {
+            this.Journals = new HashSet<Journal>();
             this.UserDocuments = new HashSet<UserDocument>();
         }
     
@@ -36,6 +37,8 @@ namespace ACT.Data.Models
         public double Size { get; set; }
         public string Url { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Journal> Journals { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserDocument> UserDocuments { get; set; }
     }

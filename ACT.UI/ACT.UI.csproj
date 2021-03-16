@@ -162,6 +162,7 @@
     <Compile Include="Controllers\api\PalletController.cs" />
     <Compile Include="Controllers\ClientReportingController.cs" />
     <Compile Include="Controllers\DashBoardController.cs" />
+    <Compile Include="Controllers\TransporterController.cs" />
     <Compile Include="Models\AuthorisationCodeViewModel.cs" />
     <Compile Include="Models\ChepAuditViewModel.cs" />
     <Compile Include="Models\ChepLoadChepViewModel.cs" />
@@ -701,6 +702,11 @@
     <Content Include="Views\Pallet\_ExtraChepLoads.cshtml" />
     <Content Include="Views\Pallet\_ChepLoadVersions.cshtml" />
     <Content Include="Views\Email\_AuthorisationCodeNotify.cshtml" />
+    <Content Include="Views\Transporter\Index.cshtml" />
+    <Content Include="Views\Transporter\_SiteAudits.cshtml" />
+    <Content Include="Views\Transporter\_OutstandingReport.cshtml" />
+    <Content Include="Views\Transporter\_PODManagement.cshtml" />
+    <Content Include="Views\Transporter\_MyNotifications.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

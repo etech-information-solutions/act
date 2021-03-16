@@ -16,14 +16,6 @@ namespace ACT.Core.Services
 
         }
 
-        public override Broadcast GetById( int id )
-        {
-            base.context.Configuration.LazyLoadingEnabled = true;
-            base.context.Configuration.ProxyCreationEnabled = true;
-
-            return base.GetById( id );
-        }
-
         public override List<Broadcast> List( PagingModel pm, CustomSearchModel csm )
         {
             base.context.Configuration.LazyLoadingEnabled = true;
@@ -218,7 +210,17 @@ namespace ACT.Core.Services
 
             query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
-            return context.Database.SqlQuery<BroadcastCustomModel>( query, parameters.ToArray() ).ToList();
+            List<BroadcastCustomModel> model = context.Database.SqlQuery<BroadcastCustomModel>( query, parameters.ToArray() ).ToList();
+
+            if ( csm.IncludeUserBroadCasts )
+            {
+                foreach ( BroadcastCustomModel item in model )
+                {
+                    item.UserBroadcasts = context.UserBroadcasts.Where( ub => ub.BroadcastId == item.Id ).ToList();
+                }
+            }
+
+            return model;
         }
 
         /// <summary>

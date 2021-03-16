@@ -217,12 +217,12 @@ export class OutstandingshipmentdetailPage implements OnInit
     }
 
     // Any uploads
-    /*if ( !this.PODLoaded && !this.PCNLoaded && !this.PRNLoaded )
+    if ( !this.PODLoaded || !this.PCNLoaded || !this.PRNLoaded )
     {
-      this.auth.ShowError( "Nothing has been upload, please upload snapshots of POD, PCN, and PRN" );
-
+      this.auth.ShowError( "Please upload snapshots of POD, PCN, and PRN" );
+      
       return false;
-    }*/
+    }
 
     return valid;
   }

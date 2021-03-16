@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Transporter";
+}
+
+
+<div class="ap-tabs">
+
+    <ul>
+        <li data-hot-spot="1" data-c="Transporter" data-t="SiteAudits" class="none">
+            <a data-ap-tab="1" data-target="#siteaudits" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="SiteAudits">Site Audit</a>
+        </li>
+        <li data-hot-spot="1" data-c="Transporter" data-t="OutstandingReport" class="none">
+            <a data-ap-tab="1" data-target="#outstandingreport" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="OutstandingReport">Outstanding Report</a>
+        </li>
+        <li data-hot-spot="1" data-c="Transporter" data-t="PODManagement" class="none">
+            <a data-ap-tab="1" data-target="#podmanagement" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PODManagement">POD Management</a>
+        </li>
+        <li data-hot-spot="1" data-c="Transporter" data-t="MyNotifications" class="none">
+            <a data-ap-tab="1" data-target="#mynotifications" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="MyNotifications">Notifications</a>
+        </li>
+
+        <li class="last"></li>
+    </ul>
+
+
+
+    <div id="tab-data" class="tab-data">
+
+        <div id="siteaudits" class="da-tab none" data-load-url="SiteAudits"> </div>
+
+        <div id="outstandingreport" class="da-tab none" data-load-url="OutstandingReport"> </div>
+
+        <div id="podmanagement" class="da-tab none" data-load-url="PODManagement"> </div>
+
+        <div id="mynotifications" class="da-tab none" data-load-url="MyNotifications"> </div>
+
+    </div>
+
+</div>

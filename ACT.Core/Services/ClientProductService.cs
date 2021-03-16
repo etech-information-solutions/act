@@ -220,5 +220,15 @@ namespace ACT.Core.Services
 
             return context.Database.SqlQuery<ClientProductCustomModel>( query, parameters.ToArray() ).ToList();
         }
+
+        /// <summary>
+        /// Gets a list of products using the specified client id
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <returns></returns>
+        public List<ClientProduct> ListByClient( int clientId )
+        {
+            return context.ClientProducts.Include( "Product" ).Where( cp => cp.ClientId == clientId ).ToList();
+        }
     }
 }

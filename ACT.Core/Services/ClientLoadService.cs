@@ -796,6 +796,7 @@ namespace ACT.Core.Services
 
             List<object> parameters = new List<object>()
             {
+                { new SqlParameter( "csmBalanceStatus", ( int ) csm.BalanceStatus ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
@@ -807,19 +808,13 @@ namespace ACT.Core.Services
             string query = @"SELECT
 	                        s.[Id] AS [SiteId],
 	                        s.[Name] AS [SiteName],
-	                        SUM(ch.[NewQuantity] - cl.[NewQuantity]) AS [Total]
+	                        COUNT(ch.[Id]) AS [Total]
                          FROM
-	                        [dbo].[ClientLoad] cl,
-	                        [dbo].[ChepClient] cc,
-	                        [dbo].[ChepLoad] ch,
-	                        [dbo].[ClientSite] cs,
-	                        [dbo].[Site] s
+	                        [dbo].[ChepLoad] ch
+	                        LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=ch.[ClientSiteId]
+	                        LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
                          WHERE
-	                        (cl.[Id]=cc.[ClientLoadsId]) AND
-	                        (ch.[Id]=cc.[ChepLoadsId]) AND
-	                        (cs.[Id]=cl.[ClientSiteId]) AND
-	                        (s.[Id]=cs.[SiteId]) AND
-	                        (cl.[Status]=0)";
+	                        (1=1)";
 
             // Custom Search
 
@@ -827,22 +822,32 @@ namespace ACT.Core.Services
 
             if ( csm.ClientId > 0 )
             {
-                query = $"{query} AND (cl.ClientId=@csmClientId) ";
+                query = $"{query} AND (ch.ClientId=@csmClientId) ";
+            }
+
+            if ( csm.ReconciliationStatus != ReconciliationStatus.All )
+            {
+                query = $"{query} AND (ch.Status=@csmReconciliationStatus) ";
+            }
+
+            if ( csm.BalanceStatus != BalanceStatus.None )
+            {
+                query = $"{query} AND (ch.BalanceStatus=@csmBalanceStatus) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (cl.LoadDate >= @csmFromDate AND cl.LoadDate <= @csmToDate) ";
+                query = $"{query} AND (ch.[EffectiveDate] >= @csmFromDate AND ch.[EffectiveDate] <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (cl.LoadDate>=@csmFromDate) ";
+                    query = $"{query} AND (ch.[EffectiveDate]>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (cl.LoadDate<=@csmToDate) ";
+                    query = $"{query} AND (ch.[EffectiveDate]<=@csmToDate) ";
                 }
             }
 
@@ -898,8 +903,8 @@ namespace ACT.Core.Services
 
             #region WHERE
 
-            query = $"{query} WHERE (1=1)";
-            //query = $"{query} WHERE (cl.[PCNNumber] IS NULL OR cl.[PODNumber] IS NULL OR cl.[PRNNumber] IS NULL)";
+            //query = $"{query} WHERE (1=1)";
+            query = $"{query} WHERE (cl.[OutstandingReasonId]=9)";
 
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
@@ -969,6 +974,10 @@ namespace ACT.Core.Services
             // ORDER
 
             query = $"{query} ORDER BY {pm.SortBy}";
+
+            // SKIP, TAKE
+
+            query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
             List<ClientLoadCustomModel> model = context.Database.SqlQuery<ClientLoadCustomModel>( query, parameters.ToArray() ).ToList();
 

@@ -32,9 +32,13 @@ namespace ACT.Data.Models
         public virtual DbSet<Broadcast> Broadcasts { get; set; }
         public virtual DbSet<ChepAudit> ChepAudits { get; set; }
         public virtual DbSet<ChepClient> ChepClients { get; set; }
+        public virtual DbSet<ChepLoad> ChepLoads { get; set; }
         public virtual DbSet<ChepLoadChep> ChepLoadCheps { get; set; }
+        public virtual DbSet<ChepLoadJournal> ChepLoadJournals { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
+        public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
         public virtual DbSet<ClientBudget> ClientBudgets { get; set; }
+        public virtual DbSet<ClientChepAccount> ClientChepAccounts { get; set; }
         public virtual DbSet<ClientCustomer> ClientCustomers { get; set; }
         public virtual DbSet<ClientGroup> ClientGroups { get; set; }
         public virtual DbSet<ClientInvoice> ClientInvoices { get; set; }
@@ -58,11 +62,14 @@ namespace ACT.Data.Models
         public virtual DbSet<Invoice> Invoices { get; set; }
         public virtual DbSet<Journal> Journals { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
+        public virtual DbSet<OutstandingReason> OutstandingReasons { get; set; }
+        public virtual DbSet<PODComment> PODComments { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<ProductPrice> ProductPrices { get; set; }
         public virtual DbSet<PSP> PSPs { get; set; }
         public virtual DbSet<PSPBilling> PSPBillings { get; set; }
         public virtual DbSet<PSPBudget> PSPBudgets { get; set; }
+        public virtual DbSet<PSPClient> PSPClients { get; set; }
         public virtual DbSet<PSPConfig> PSPConfigs { get; set; }
         public virtual DbSet<PSPProduct> PSPProducts { get; set; }
         public virtual DbSet<PSPUser> PSPUsers { get; set; }
@@ -72,6 +79,7 @@ namespace ACT.Data.Models
         public virtual DbSet<SiteAudit> SiteAudits { get; set; }
         public virtual DbSet<SiteBilling> SiteBillings { get; set; }
         public virtual DbSet<SiteBudget> SiteBudgets { get; set; }
+        public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
         public virtual DbSet<Task> Tasks { get; set; }
         public virtual DbSet<Token> Tokens { get; set; }
         public virtual DbSet<Transporter> Transporters { get; set; }
@@ -83,13 +91,5 @@ namespace ACT.Data.Models
         public virtual DbSet<UserTask> UserTasks { get; set; }
         public virtual DbSet<Vehicle> Vehicles { get; set; }
         public virtual DbSet<PSPPeriod> PSPPeriods { get; set; }
-        public virtual DbSet<ChepLoad> ChepLoads { get; set; }
-        public virtual DbSet<OutstandingReason> OutstandingReasons { get; set; }
-        public virtual DbSet<PSPClient> PSPClients { get; set; }
-        public virtual DbSet<ClientChepAccount> ClientChepAccounts { get; set; }
-        public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
-        public virtual DbSet<PODComment> PODComments { get; set; }
-        public virtual DbSet<ChepLoadJournal> ChepLoadJournals { get; set; }
-        public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
     }
 }

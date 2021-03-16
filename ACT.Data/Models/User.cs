@@ -17,20 +17,20 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public User()
         {
+            this.ClientAuthorisations = new HashSet<ClientAuthorisation>();
             this.ClientUsers = new HashSet<ClientUser>();
             this.Comments = new HashSet<Comment>();
             this.Disputes = new HashSet<Dispute>();
             this.Disputes1 = new HashSet<Dispute>();
             this.PSPUsers = new HashSet<PSPUser>();
             this.Regions = new HashSet<Region>();
+            this.Sites = new HashSet<Site>();
             this.Tokens = new HashSet<Token>();
             this.UserBroadcasts = new HashSet<UserBroadcast>();
             this.UserDocuments = new HashSet<UserDocument>();
             this.UserNotifications = new HashSet<UserNotification>();
             this.UserRoles = new HashSet<UserRole>();
             this.UserTasks = new HashSet<UserTask>();
-            this.Sites = new HashSet<Site>();
-            this.ClientAuthorisations = new HashSet<ClientAuthorisation>();
         }
     
         public int Id { get; set; }
@@ -49,6 +49,8 @@ namespace ACT.Data.Models
         public string Pin { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientUser> ClientUsers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Comment> Comments { get; set; }
@@ -61,6 +63,8 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Region> Regions { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Site> Sites { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Token> Tokens { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserBroadcast> UserBroadcasts { get; set; }
@@ -72,9 +76,5 @@ namespace ACT.Data.Models
         public virtual ICollection<UserRole> UserRoles { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserTask> UserTasks { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Site> Sites { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
     }
 }

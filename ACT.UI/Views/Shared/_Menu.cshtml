@@ -84,7 +84,16 @@
             </li>
         }
 
-        <li style="border-top: 5px solid #f5f5f5; border-bottom: 5px solid #f5f5f5;">
+        @if ( User.Has( PermissionTo.View, PermissionContext.Transporter ) )
+        {
+            <li data-hot-spot="1" data-c="Transporter" data-t="" class="@(controller.ToLower().Equals( "transporter" ) ? "current" : "")">
+                <a rel="tipsyW" title="Transporter" href="@Url.Action( "Index", "Transporter" )">
+                    <span>Transporter</span>
+                </a>
+            </li>
+        }
+
+        <li style="border-top: 5px solid #f5f5f5; border-bottom: 5px solid #f5f5f5; margin-top: 5px;">
             <a class="red-bg" href="@Url.Action( "LogOff", "Account" )" style="padding: 10px 20px;">
                 LOGOUT
             </a>
@@ -94,48 +103,4 @@
 
     <div class="clear"></div>
 
-
-    <script>
-        @*$(document).ready(function () {
-            GetClientList();
-
-            $("#ClientListAdmin").change(function () {
-                var cId = $('option:selected', this).val();
-                SetClient(cId);
-            });
-        });
-
-        function GetClientList() {
-            var options = $("#ClientListAdmin");
-            options.empty();
-            $.ajax({
-                type: "GET",
-                url: "GetClientList",
-                contentType: "application/json;charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                    options.append($("<option />").val('0').text('All Clients'));
-                    $.each(data, function (id, model) {
-                        options.append($("<option />").val(model.Value).text(model.Text));
-                    });
-                    $('#ClientListAdmin [value=' + @sessClient + ']').prop('selected', true);
-                },
-                error: function (response) {
-                    alert('Error retrieving client details');
-                }
-            });
-        }
-
-        function SetClient(cId) {
-            $.ajax({
-                type: 'POST',
-                url: "SetClient",
-                data: { "ClientId": cId },
-                success: function (response) {
-                    //window.location.href = 'Index#managesites';
-                    location.reload();
-                }
-            });
-        }*@
-    </script>
 </div>

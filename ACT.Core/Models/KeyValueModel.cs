@@ -6,22 +6,28 @@ using System.Threading.Tasks;
 
 namespace ACT.Core.Models
 {
-    class KeyValueModel
+    public class KeyValueModel
     {
         public string TKey { get; set; }
 
         public string TValue { get; set; }
     }
-    class IntKeyValueModel
+    public class IntKeyValueModel
     {
         public int TKey { get; set; }
 
         public int TValue { get; set; }
     }
-    class IntStringKeyValueModel
+    public class IntStringKeyValueModel
     {
         public int TKey { get; set; }
 
         public string TValue { get; set; }
+    }
+    public class CommonModel
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
     }
 }

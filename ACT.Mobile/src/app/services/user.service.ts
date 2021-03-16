@@ -21,6 +21,7 @@ export class UserService
 
   PSPs: any;
   Rules: any;
+  Roles: any;
   Sites: any;
   Clients: any;
 
@@ -72,6 +73,8 @@ export class UserService
   RefreshSiteAudits: boolean = false;
   RemoveSiteAuditConfirmed: boolean = false;
 
+  IsTransporter: boolean = false;
+
   SelfieUrl: string = "../../assets/imgs/user-profile.png";
 
   MonthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -116,6 +119,7 @@ export class UserService
   {
     await this.GetUser();
     await this.SetRules();
+    await this.SetRoles();
     await this.SetDeviceUser();
     await this.SetAppDetails();
 
@@ -186,6 +190,11 @@ export class UserService
       // Store User Details
       this.storage.set( "DeviceUser", this.CurrentUser );
       this.storage.set( "CurrentUser", this.CurrentUser );
+
+      if ( this.CurrentUser != undefined && this.CurrentUser.RoleType == 6 )
+      {
+        this.IsTransporter = true;
+      }
     }
     catch( error )
     {
@@ -215,6 +224,11 @@ export class UserService
         // Store User Details
         this.storage.set( "DeviceUser", this.CurrentUser );
         this.storage.set( "CurrentUser", this.CurrentUser );
+
+        if ( this.CurrentUser != undefined && this.CurrentUser.RoleType == 6 )
+        {
+          this.IsTransporter = true;
+        }
       }
     }
     catch( error )
@@ -576,6 +590,11 @@ export class UserService
     await this.storage.get( "CurrentUser" ).then( ( user ) =>
     {
       this.CurrentUser = user;
+
+      if ( this.CurrentUser != undefined && this.CurrentUser.RoleType == 6 )
+      {
+        this.IsTransporter = true;
+      }
     });
   }
 
@@ -587,6 +606,21 @@ export class UserService
       this.Rules = await this.http.get<iSystemRulesModel>( url ).toPromise();
 
       await this.storage.set( "Rules", this.Rules );
+    }
+    catch( error )
+    {
+      return;
+    }
+  }
+
+  async SetRoles()
+  {
+    try
+    {
+      var url = `${this.APIUrl}/api/Account/GetRoles?apikey=${this.APIKey}`;
+      this.Roles = await this.http.get<iSystemRulesModel>( url ).toPromise();
+
+      await this.storage.set( "Roles", this.Roles );
     }
     catch( error )
     {

@@ -31,6 +31,11 @@ export class PodmanagementPage implements OnInit
     await this.GetOutstandingShipments();
   }
 
+  ngAfterViewInit() 
+  {
+    this.auth.ContentPage = this.content;
+  }
+
   async ionViewWillEnter()
   {
     if ( this.auth.RefreshShipments )

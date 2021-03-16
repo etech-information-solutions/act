@@ -33,6 +33,7 @@ namespace ACT.Data.Models
         public bool Customer { get; set; }
         public bool Product { get; set; }
         public bool Pallet { get; set; }
+        public bool Transporter { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserRole> UserRoles { get; set; }

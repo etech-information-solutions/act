@@ -33,7 +33,7 @@ namespace ACT.Data.Models
         public string VINNumber { get; set; }
         public string Registration { get; set; }
         public string Descriptoin { get; set; }
-        public int Type { get; set; }
+        public Nullable<int> Type { get; set; }
         public int Status { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

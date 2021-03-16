@@ -17,37 +17,44 @@ export class AppComponent implements OnInit
     {
       title: 'Home',
       url: '/home',
-      icon: 'home'
+      icon: 'home',
+      strict: true
     },
     {
       title: 'Site Audit',
       url: '/siteaudit',
-      icon: 'shield-checkmark'
+      icon: 'shield-checkmark',
+      strict: true
     },
     {
       title: 'Outstanding Report',
       url: '/outstandingreport',
-      icon: 'mail'
+      icon: 'mail',
+      strict: false
     },
     {
       title: 'POD Management',
       url: '/podmanagement',
-      icon: 'document-text'
+      icon: 'document-text',
+      strict: false
     },
     {
       title: 'Notifications',
       url: '/notifications',
-      icon: 'notifications'
+      icon: 'notifications',
+      strict: false
     },
     {
       title: 'Settings',
       url: '/settings',
-      icon: 'settings'
+      icon: 'settings',
+      strict: false
     },
     {
       title: 'Logout',
       url: '/logout',
-      icon: 'log-out'
+      icon: 'log-out',
+      strict: false
     }
   ];
 

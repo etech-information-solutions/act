@@ -500,5 +500,15 @@ namespace ACT.Core.Services
 
             return context.ClientAuthorisations.FirstOrDefault( ca => ca.Code == code );
         }
+
+        /// <summary>
+        /// Checks if a Client Authorisation with the specified load number already exists
+        /// </summary>
+        /// <param name="loadNumber"></param>
+        /// <returns></returns>
+        public ClientAuthorisation GetByLoadNumber( string loadNumber )
+        {
+            return context.ClientAuthorisations.Include( "User" ).FirstOrDefault( d => d.LoadNumber == loadNumber );
+        }
     }
 }

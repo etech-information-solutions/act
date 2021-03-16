@@ -18,8 +18,8 @@ namespace ACT.Data.Models
         public OutstandingReason()
         {
             this.ChepLoads = new HashSet<ChepLoad>();
-            this.ClientLoads = new HashSet<ClientLoad>();
             this.ChepLoadJournals = new HashSet<ChepLoadJournal>();
+            this.ClientLoads = new HashSet<ClientLoad>();
         }
     
         public int Id { get; set; }
@@ -30,8 +30,8 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepLoad> ChepLoads { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientLoad> ClientLoads { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepLoadJournal> ChepLoadJournals { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoad> ClientLoads { get; set; }
     }
 }

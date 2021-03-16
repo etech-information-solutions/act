@@ -17,6 +17,7 @@ namespace ACT.Data.Models
         public int Id { get; set; }
         public Nullable<int> SiteAuditId { get; set; }
         public Nullable<int> ClientLoadId { get; set; }
+        public Nullable<int> DocumetId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -28,6 +29,7 @@ namespace ACT.Data.Models
         public int Status { get; set; }
     
         public virtual ClientLoad ClientLoad { get; set; }
+        public virtual Document Document { get; set; }
         public virtual SiteAudit SiteAudit { get; set; }
     }
 }

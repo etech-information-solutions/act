@@ -17,16 +17,16 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public ClientSite()
         {
+            this.ChepLoads = new HashSet<ChepLoad>();
+            this.ChepLoadJournals = new HashSet<ChepLoadJournal>();
             this.ClientLoads = new HashSet<ClientLoad>();
             this.ClientLoads1 = new HashSet<ClientLoad>();
             this.DeliveryNotes = new HashSet<DeliveryNote>();
-            this.ChepLoads = new HashSet<ChepLoad>();
-            this.ChepLoadJournals = new HashSet<ChepLoadJournal>();
         }
     
         public int Id { get; set; }
-        public Nullable<int> SiteId { get; set; }
         public int ClientCustomerId { get; set; }
+        public int SiteId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -47,6 +47,10 @@ namespace ACT.Data.Models
         public string LiquorLicenceNumber { get; set; }
         public string ClientSiteCode { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChepLoad> ChepLoads { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChepLoadJournal> ChepLoadJournals { get; set; }
         public virtual ClientCustomer ClientCustomer { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads { get; set; }
@@ -55,9 +59,5 @@ namespace ACT.Data.Models
         public virtual Site Site { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<DeliveryNote> DeliveryNotes { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ChepLoad> ChepLoads { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ChepLoadJournal> ChepLoadJournals { get; set; }
     }
 }

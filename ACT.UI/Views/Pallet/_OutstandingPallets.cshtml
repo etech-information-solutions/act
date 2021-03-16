@@ -52,12 +52,6 @@
             <th data-name="Ref" data-column="cl.Ref">
                 Ref #
             </th>
-            <th data-name="Equipment" data-column="cl.Equipment">
-                Equipment
-            </th>
-            <th data-name="InvoiceNumber" data-column="cl.InvoiceNumber">
-                Invoice #
-            </th>
             <th data-name="TransactionType" data-column="cl.TransactionType">
                 Transaction Type
             </th>
@@ -125,12 +119,6 @@
                         }
                     </td>
                     <td>
-                        @item.Equipment
-                    </td>
-                    <td>
-                        @item.InvoiceNumber
-                    </td>
-                    <td>
                         @item.TransactionType
                     </td>
                     <td>
@@ -184,6 +172,8 @@
                         <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
                             @Html.ActionLink( "Details", "PoolingAgentDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item-op" } )
+                            
+                            @Html.ActionLink( "POD", "AllocatePoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item-op", @style = "margin-left: 0;" } )
 
                         </div>
 

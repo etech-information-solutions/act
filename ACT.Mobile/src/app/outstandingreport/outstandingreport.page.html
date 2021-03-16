@@ -104,7 +104,7 @@
           <ion-col style="border-left: 0 none; background-color: #012d71;">&nbsp;</ion-col>
           <ion-col style="border-left: 0 none; background-color: #012d71;">&nbsp;</ion-col>
           
-          <ng-container *ngIf="this.Years.length > 0">
+          <ng-container *ngIf="this.Years.length > 0"> 
             
             <ion-col style="border-left: 0 none; background-color: #012d71;">&nbsp;</ion-col>
   
@@ -205,5 +205,9 @@
     </ion-grid>
     
   </div>
+
+  <ion-infinite-scroll threshold="200px" (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 
 </ion-content>

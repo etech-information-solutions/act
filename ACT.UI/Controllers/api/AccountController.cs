@@ -462,6 +462,19 @@ namespace ACT.UI.Controllers.API
         }
 
         [HttpGet]
+        public object GetRoles( string apiKey )
+        {
+            List<object> obj = new List<object>();
+
+            foreach ( int e in Enum.GetValues( typeof( RoleType ) ) )
+            {
+                obj.Add( new { Key = e, Value = ( ( RoleType ) e ).GetDisplayText() } );
+            }
+
+            return obj;
+        }
+
+        [HttpGet]
         public List<PSPCustomModel> GetPSPs( string email, string apiKey )
         {
             using ( PSPService service = new PSPService() )
@@ -473,13 +486,13 @@ namespace ACT.UI.Controllers.API
         }
 
         [HttpGet]
-        public List<SiteCustomModel> GetSites( string email, string apiKey )
+        public List<CommonModel> GetSites( string email, string apiKey )
         {
             using ( SiteService service = new SiteService() )
             {
                 service.CurrentUser = service.GetUser( email );
 
-                return service.List1( new PagingModel() { Take = int.MaxValue, Skip = 0, Query = string.Empty }, new CustomSearchModel() { Status = Status.Active } );
+                return service.ListTiny( new PagingModel() { Take = int.MaxValue, Skip = 0, Query = string.Empty }, new CustomSearchModel() { Status = Status.Active } );
             }
         }
 

@@ -1,6 +1,5 @@
-﻿@model ClientLoad
+﻿@model ChepLoad
 
-@using ACT.Core.Enums
 @using ACT.Data.Models;
 
 @{
@@ -11,14 +10,20 @@
 
     ViewBag.Title = "Details";
 
-    List<ChepLoad> chepLoads = ViewBag.ChepLoads;
+    List<ClientLoad> clientLoads = ViewBag.ClientLoads;
+
+    ClientLoad cl = clientLoads?.FirstOrDefault();
+
+    ClientAuthorisation ca = ViewBag.ClientAuthorisation;
+
+    List<ClientProduct> clientProducts = ViewBag.ClientProducts;
 }
 
 @if ( ViewBag.IncludeLayout != null )
 {
     <h2>
         <img alt="" src="@Url.Content( "~/images/info.png" )" />
-        <span>Client Data Details</span>
+        <span>Load Details</span>
     </h2>
 }
 
@@ -28,356 +33,482 @@
     {
         <h2>
             <img alt="" src="@Url.Content( "~/images/info.png" )" />
-            <span>Client Data Details</span>
+            <span>Load Details</span>
         </h2>
     }
 
     <div class="left" style="width: 31%; margin-right: 3%;">
 
-        <div class="display-label ">
-            Client
+        <div class="display-label">
+            Load/Shipment Number
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Client.CompanyName )
+            @( cl?.LoadNumber )
         </div>
-
-        <div class="display-label ">
-            Vehicle
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.Vehicle.Descriptoin )
-        </div>
-
-        <div class="display-label ">
-            Client Site
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.ClientSite.Site.Description )
-        </div>
-
-        <div class="display-label ">
-            Transporter
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.Transporter.Name )
-        </div>
-
-        <div class="display-label ">
-            Outstanding Reason
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.OutstandingReason.Description )
-        </div>
-
-        <div class="display-label ">
-            Status
-        </div>
-        <div class="display-field">
-            @( ( ( ReconciliationStatus ) Model.Status ).GetDisplayText() )
-        </div>
-
-        <div class="display-label ">
-            Reconcile Invoice
-        </div>
-        <div class="display-field">
-            @( Model.ReconcileInvoice == true ? "YES" : "NO" )
-        </div>
-
 
         <div class="display-label">
             Load Date
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.LoadDate )
+            @( cl?.LoadDate?.ToString( "dd/MM/yyyy" ) )
         </div>
 
         <div class="display-label">
-            Effective Date
+            Client Site From
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.EffectiveDate )
+            @( cl?.ClientSite?.Site?.Name )
         </div>
 
         <div class="display-label">
-            Notify Date
+            Region From
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.NotifyDate )
+            @( cl?.ClientSite?.Site?.Region?.Name )
+        </div>
+
+        <div class="display-label">
+            Client Site To
+        </div>
+        <div class="display-field">
+            @( cl?.ClientSite1?.Site?.Name )
+        </div>
+
+        <div class="display-label">
+            Region To
+        </div>
+        <div class="display-field">
+            @( cl?.ClientSite1?.Site?.Region?.Name )
+        </div>
+
+        <div class="display-label">
+            Customer Group
+        </div>
+        <div class="display-field">
+            @( cl?.Client?.ClientGroups?.FirstOrDefault()?.Group?.Description )
+        </div>
+
+        <div class="display-label">
+            Delivery Note
+        </div>
+        <div class="display-field">
+            @( cl?.DeliveryNote )
+        </div>
+
+        <div class="display-label">
+            Invoice Number
+        </div>
+        <div class="display-field">
+            @( cl?.ChepInvoiceNo )
+        </div>
+
+        <div class="display-label">
+            Sales Order Number
+        </div>
+        <div class="display-field">
+            @( cl?.ReferenceNumber )
+        </div>
+
+        <div class="display-label">
+            Primary/Second
+        </div>
+        <div class="display-field">
+            &nbsp;
+        </div>
+
+        <div class="display-label">
+            Depot STO Number
+        </div>
+        <div class="display-field">
+            &nbsp;
         </div>
 
     </div>
 
     <div class="left" style="width: 31%; margin-right: 3%;">
 
-        <div class="display-label ">
-            Original Quantity
+        <div class="display-label">
+            CHEP ACC NO/GLID
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.OriginalQuantity )
-        </div>
-
-        <div class="display-label ">
-            Return Quantity
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.ReturnQty )
-        </div>
-
-        <div class="display-label ">
-            New Quantity
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.NewQuantity )
-        </div>
-
-        <div class="display-label ">
-            Outstanding Quantity
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.OutstandingQty )
-        </div>
-
-        <div class="display-label ">
-            Debrief Quantity
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.DebriefQty )
-        </div>
-
-        <div class="display-label ">
-            Admin Movement
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.AdminMovement )
-        </div>
-
-        <div class="display-label ">
-            POD
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.PODNumber )
-        </div>
-
-        <div class="display-label ">
-            PCN
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.PCNNumber )
-        </div>
-
-        <div class="display-label ">
-            PRN
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.PRNNumber )
+            @( Model?.DocketNumber )
         </div>
 
         <div class="display-label">
-            Reconcile Date
+            Delivery Date
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.ReconcileDate )
+            @( Model?.DeliveryDate )
+        </div>
+
+        <div class="display-label">
+            Transporter Name
+        </div>
+        <div class="display-field">
+            @( cl?.Transporter?.Name )
+        </div>
+
+        <div class="display-label">
+            Fleet Number
+        </div>
+        <div class="display-field">
+            &nbsp;
+        </div>
+
+        <div class="display-label">
+            Vehicle Registration
+        </div>
+        <div class="display-field">
+            @( cl?.Vehicle?.Registration )
+        </div>
+
+        <div class="display-label">
+            Debtors Code
+        </div>
+        <div class="display-field">
+            &nbsp;
+        </div>
+
+        <div class="display-label">
+            Customer Account Number
+        </div>
+        <div class="display-field">
+            @( cl?.ClientSite1?.Site?.AccountCode )
+        </div>
+
+        <div class="display-label">
+            Customer Order Number
+        </div>
+        <div class="display-field">
+            @( cl?.ReferenceNumber )
+        </div>
+
+        <div class="display-label">
+            Other Reference
+        </div>
+        <div class="display-field">
+            @( cl?.ReceiverNumber )
+        </div>
+
+        <div class="display-label">
+            Load Sheet Number
+        </div>
+        <div class="display-field">
+            &nbsp;
+        </div>
+
+        <div class="display-label">
+            GRV Number
+        </div>
+        <div class="display-field">
+            &nbsp;
         </div>
 
     </div>
 
     <div class="left" style="width: 31%;">
 
-        <div class="display-label ">
-            Load #
+        <div class="display-label">
+            ACT Control DOC No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.LoadNumber )
+            &nbsp;
         </div>
 
-        <div class="display-label ">
-            Account #
+        <div class="display-label">
+            CHEP Exchange DOC No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.AccountNumber )
+            @( Model?.IsExchange == true ? Model?.DocketNumber : string.Empty )
         </div>
 
-        <div class="display-label ">
-            Client Description
+        <div class="display-label">
+            CHEP Customer THAN DOC No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.ClientDescription )
+            @( Model?.TransactionType?.ToUpper()?.Trim() == "TRANSFER OUT" ? Model?.DocketNumber : string.Empty )
         </div>
 
-        <div class="display-label ">
-            Reference #
+        <div class="display-label">
+            Warehouse Transfer DOC No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.ReferenceNumber )
+            @( Model?.TransactionType?.ToUpper()?.Trim() == "TRANSFER IN" ? Model?.DocketNumber : string.Empty )
         </div>
 
-        <div class="display-label ">
-            Receiver #
+        <div class="display-label">
+            Debrief Document No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.ReceiverNumber )
+            &nbsp;
         </div>
 
-        <div class="display-label ">
-            Equipment
+        <div class="display-label">
+            Pallet Return Slip No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.Equipment )
+            @( Model?.DocketNumber )
         </div>
 
-        <div class="display-label ">
-            Delivery Note #
+        <div class="display-label">
+            Pallet Return Date
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.DeliveryNote )
+            @( Model?.EffectiveDate?.ToString( "dd/MM/yyyy" ) )
         </div>
 
-        <div class="display-label ">
-            Chep Invoice #
+        <div class="display-label">
+            Authorization Code
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.ChepInvoiceNo )
+            @( ca?.Code )
         </div>
 
-        <div class="display-label ">
-            Chep Compensation #
+        <div class="display-label">
+            Authorized By
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.ChepCompensationNo )
+            @( ca?.User?.Name ) @( ca?.User?.Surname )
         </div>
 
-        <div class="display-label ">
-            THAN
+        <div class="display-label">
+            CHEP Comp No
         </div>
         <div class="display-field">
-            @Html.DisplayFor( model => model.THAN )
+            @( cl?.ChepCompensationNo  ) <!-- Will be captured by user in edit mode -->
+        </div>
+
+        <div class="display-label">
+            GRV Date
+        </div>
+        <div class="display-field">
+            &nbsp;
         </div>
 
     </div>
 
-    @if ( ViewBag.CanEdit == true )
-    {
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
 
-        <p>
-            <strong>Chep Loads (@chepLoads.NullableCount())</strong>
-        </p>
+    <div class="left" style="width: 60%; padding-right: 20px; border-right: 1px solid #ddd;">
 
-        <table id="chep-loads-table" class="da-table small">
+        @{
+            decimal width = 100 / clientProducts.NullableCount();
+        }
 
-            <thead>
-                <tr>
-                    <th>
-                        #
-                    </th>
-                    <th>
-                        Load Date
-                    </th>
-                    <th>
-                        Created
-                    </th>
-                    <th>
-                        Docket #
-                    </th>
-                    <th>
-                        Ref #
-                    </th>
-                    <th>
-                        Equipment
-                    </th>
-                    <th>
-                        Invoice #
-                    </th>
-                    <th>
-                        Transaction Type
-                    </th>
-                    <th>
-                        Qty
-                    </th>
-                    <th>
-                        Status
-                    </th>
-                    <th >
-                        Balanced
-                    </th>
-                    <th>
-                        Actions
-                    </th>
-                </tr>
-            </thead>
+        <div class="display-label">
+            Equipment
+        </div>
+        <div class="display-field">
 
-            <tbody>
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                string active = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() ) ? "active" : "";
 
-                @if ( chepLoads.NullableAny() )
-                {
-                    int count = 1;
-
-                    foreach ( ChepLoad item in chepLoads )
-                    {
-                        PostingType postingType = ( PostingType ) item.PostingType;
-                        BalanceStatus balanceStatus = ( BalanceStatus ) item.BalanceStatus;
-                        ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
-
-                        string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
-
-                        <tr id="tr-@item.Id-chep-load-item" class="tr-@item.Id-chep-load-item @active">
-
-                            <td width="1%">
-                                @count
-                            </td>
-                            <td>
-                                @(item.EffectiveDate?.ToString( "yyyy-MM-dd" ))
-                            </td>
-                            <td>
-                                On @(item.CreateDate?.ToString( "yyyy-MM-dd" ) ) <br /> by @item.CreatedBy
-                            </td>
-                            <td>
-                                @item.DocketNumber
-                            </td>
-                            <td>
-                                @(item.CorrectedRef ?? item.Ref)
-
-                                @if ( !string.IsNullOrEmpty( item.CorrectedRef ) )
-                                {
-                                    <a rel="tipsyW" title="Manually corrected, was: @item.Ref">
-                                        <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
-                                    </a>
-                                }
-                            </td>
-                            <td>
-                                @item.Equipment
-                            </td>
-                            <td>
-                                @item.InvoiceNumber
-                            </td>
-                            <td>
-                                @item.TransactionType
-                            </td>
-                            <td>
-                                @item.Quantity
-                            </td>
-                            <td>
-                                @status.GetDisplayText()
-                            </td>
-                            <td>
-                                @balanceStatus.GetDisplayText()
-                            </td>
-                            <td width="5%">
-
-                                @Html.ActionLink( "Details", "PoolingAgentDataDetails", new { id = item.Id, CanEdit = false }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-chep-load-item" } )
-
-                            </td>
-
+                                <td class="@active" style="width: @width%">
+                                    @item.Equipment
+                                </td>
+                            }
                         </tr>
+                    </thead>
+                </table>
+            }
 
-                        count++;
-                    }
-                }
+        </div>
 
-            </tbody>
+        <div class="display-label">
+            Quantity
+        </div>
+        <div class="display-field">
 
-        </table>
-    }
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
+                                string active = isCurrent ? "active" : "";
+
+                                <td class="@active" style="width: @width%">
+                                    @( isCurrent ? cl?.OriginalQuantity : 0 )
+                                </td>
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            }
+
+        </div>
+
+        <div class="display-label">
+            Returned/Transferred Qty
+        </div>
+        <div class="display-field">
+
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
+                                string active = isCurrent ? "active" : "";
+
+                                <td class="@active" style="width: @width%">
+                                    @( isCurrent ? cl?.ReturnQty : 0 )
+                                </td>
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            }
+
+        </div>
+
+        <div class="display-label">
+            Debrief Qty
+        </div>
+        <div class="display-field">
+
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
+                                string active = isCurrent ? "active" : "";
+
+                                <td class="@active" style="width: @width%">
+                                    @( isCurrent ? cl?.DebriefQty : 0 )
+                                </td>
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            }
+
+        </div>
+
+        <div class="display-label">
+            Transporter Liable
+        </div>
+        <div class="display-field">
+
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
+                                string active = isCurrent ? "active" : "";
+
+                                <td class="@active" style="width: @width%">
+                                    @( isCurrent ? cl?.TransporterLiableQty : 0 )
+                                </td>
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            }
+
+        </div>
+
+        <div class="display-label">
+            Admin Movement
+        </div>
+        <div class="display-field">
+
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
+                                string active = isCurrent ? "active" : "";
+
+                                <td class="@active" style="width: @width%">
+                                    @( isCurrent ? cl?.AdminMovement : 0 )
+                                </td>
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            }
+
+        </div>
+
+        <div class="display-label">
+            Outstanding Qty at Customer
+        </div>
+        <div class="display-field">
+
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
+                                string active = isCurrent ? "active" : "";
+
+                                <td class="@active" style="width: @width%">
+                                    @( isCurrent ? cl?.OutstandingQty : 0 )
+                                </td>
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            }
+
+        </div>
+
+    </div>
+
+    <div class="right" style="width: 35%;">
+
+        <div class="display-label">
+            Document Type
+        </div>
+        <div class="display-field">
+            @( Model?.IsExchange == true ? "EXCHANGE CUSTOMER" : "" )
+        </div>
+
+        <div class="display-label">
+            Load Type
+        </div>
+        <div class="display-field">
+            @( !string.IsNullOrEmpty( cl?.PCNNumber ) ? "PCN" : "PRN" )
+        </div>
+
+        <div class="display-label">
+            Comment
+        </div>
+        <div class="display-field">
+            @( cl?.ClientLoadComment )
+        </div>
+
+        <div class="display-label">
+            Pallet Notes
+        </div>
+        <div class="display-field">
+            @( cl?.ClientLoadNotes )
+        </div>
+
+    </div>
 
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
 
@@ -387,7 +518,7 @@
             @if ( ViewBag.CanEdit == true )
             {
                 <span>
-                    @Html.ActionLink( "Edit", "EditClientData", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+                    @Html.ActionLink( "Edit", "EditClientData", new { id = Model?.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model?.Id, @data_target = "#tr-" + Model?.Id + "-item" } )
                 </span>
                 <span style="padding: 0 5px;">/</span>
             }

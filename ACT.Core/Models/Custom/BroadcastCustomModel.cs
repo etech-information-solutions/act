@@ -2,7 +2,10 @@
 namespace ACT.Core.Models.Custom
 {
     using System;
-    
+    using System.Collections.Generic;
+
+    using ACT.Data.Models;
+
     public partial class BroadcastCustomModel
     {
         public int Id { get; set; }
@@ -24,5 +27,6 @@ namespace ACT.Core.Models.Custom
         public int ResponseCode { get; set; }
 
         public string Description { get; set; }
+        public virtual ICollection<UserBroadcast> UserBroadcasts { get; set; }
     }
 }

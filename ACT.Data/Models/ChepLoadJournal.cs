@@ -17,6 +17,7 @@ namespace ACT.Data.Models
         public int Id { get; set; }
         public int ClientId { get; set; }
         public Nullable<int> ClientSiteId { get; set; }
+        public Nullable<int> ChepLoadId { get; set; }
         public Nullable<int> OutstandingReasonId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
@@ -51,11 +52,10 @@ namespace ACT.Data.Models
         public bool IsExchange { get; set; }
         public bool IsPSPPickup { get; set; }
         public bool TransporterLiable { get; set; }
-        public Nullable<int> ChepLoadId { get; set; }
     
+        public virtual ChepLoad ChepLoad { get; set; }
         public virtual Client Client { get; set; }
         public virtual ClientSite ClientSite { get; set; }
         public virtual OutstandingReason OutstandingReason { get; set; }
-        public virtual ChepLoad ChepLoad { get; set; }
     }
 }

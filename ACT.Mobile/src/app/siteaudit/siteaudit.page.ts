@@ -28,10 +28,10 @@ export class SiteauditPage implements OnInit
 
   async ngOnInit()
   {
-    await this.auth.SetPSPs();
-    await this.auth.SetSites();
-    await this.auth.SetClients();
     await this.GetSiteAudits();
+    await this.auth.SetPSPs();
+    await this.auth.SetClients();
+    await this.auth.SetSites();
   }
 
   ngAfterViewInit() 

@@ -106,6 +106,8 @@ namespace ACT.UI.Controllers
         {
             using ( ChepLoadService chservice = new ChepLoadService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( ClientProductService cpservice = new ClientProductService() )
+            using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
             {
                 ChepLoad model = chservice.GetById( id );
 
@@ -123,7 +125,23 @@ namespace ACT.UI.Controllers
 
                 ViewBag.CanEdit = canEdit;
 
-                ViewBag.ClientLoads = clservice.ListByChepRefOtherRef( model.Ref, model.OtherRef );
+                List<ClientLoad> cl = clservice.ListByChepRefOtherRef( model.Ref, model.OtherRef );
+
+                if ( cl.NullableAny() )
+                {
+                    ViewBag.ClientAuthorisation = caservice.GetByLoadNumber( cl?.FirstOrDefault()?.LoadNumber );
+                }
+
+                ViewBag.ClientLoads = cl;
+
+                List<ClientProduct> cp = model.Client.ClientProducts.ToList();
+
+                if ( !cp.NullableAny() )
+                {
+                    cp = new List<ClientProduct>() { { new ClientProduct() { Equipment = model.EquipmentCode, ProductDescription = model.Equipment } } };
+                }
+
+                ViewBag.ClientProducts = cp;
 
                 return View( model );
             }
@@ -896,9 +914,22 @@ namespace ACT.UI.Controllers
 
                 ViewBag.CanEdit = canEdit;
 
-                ViewBag.ChepLoads = chservice.ListByReference( model.ReceiverNumber );
+                ViewBag.ClientAuthorisation = model.ClientAuthorisations.FirstOrDefault();
 
-                return View( model );
+                ViewBag.ClientLoads = new List<ClientLoad>() { model };
+
+                ChepLoad chep = chservice.ListByReference( model.ReceiverNumber?.Trim() )?.FirstOrDefault();
+
+                List<ClientProduct> cp = model.Client.ClientProducts.ToList();
+
+                if ( !cp.NullableAny() )
+                {
+                    cp = new List<ClientProduct>() { { new ClientProduct() { Equipment = chep?.EquipmentCode, ProductDescription = chep?.Equipment ?? model.Equipment } } };
+                }
+
+                ViewBag.ClientProducts = cp;
+
+                return View( chep );
             }
         }
 

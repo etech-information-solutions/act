@@ -1,6 +1,5 @@
 ﻿@model ChepLoad
 
-@using ACT.Core.Enums
 @using ACT.Data.Models;
 
 @{
@@ -14,13 +13,17 @@
     List<ClientLoad> clientLoads = ViewBag.ClientLoads;
 
     ClientLoad cl = clientLoads?.FirstOrDefault();
+
+    ClientAuthorisation ca = ViewBag.ClientAuthorisation;
+
+    List<ClientProduct> clientProducts = ViewBag.ClientProducts;
 }
 
 @if ( ViewBag.IncludeLayout != null )
 {
     <h2>
         <img alt="" src="@Url.Content( "~/images/info.png" )" />
-        <span>Chep Load Details</span>
+        <span>Load Details</span>
     </h2>
 }
 
@@ -30,7 +33,7 @@
     {
         <h2>
             <img alt="" src="@Url.Content( "~/images/info.png" )" />
-            <span>Chep Load Details</span>
+            <span>Load Details</span>
         </h2>
     }
 
@@ -128,14 +131,14 @@
             CHEP ACC NO/GLID
         </div>
         <div class="display-field">
-            @( Model.DocketNumber )
+            @( Model?.DocketNumber )
         </div>
 
         <div class="display-label">
             Delivery Date
         </div>
         <div class="display-field">
-            @( Model.DeliveryDate )
+            @( Model?.DeliveryDate )
         </div>
 
         <div class="display-label">
@@ -216,21 +219,21 @@
             CHEP Exchange DOC No
         </div>
         <div class="display-field">
-            @( Model.IsExchange ? Model.DocketNumber : string.Empty )
+            @( Model?.IsExchange == true ? Model?.DocketNumber : string.Empty )
         </div>
 
         <div class="display-label">
             CHEP Customer THAN DOC No
         </div>
         <div class="display-field">
-            @( Model.TransactionType?.ToUpper()?.Trim() == "TRANSFER OUT" ? Model.DocketNumber : string.Empty )
+            @( Model?.TransactionType?.ToUpper()?.Trim() == "TRANSFER OUT" ? Model?.DocketNumber : string.Empty )
         </div>
 
         <div class="display-label">
             Warehouse Transfer DOC No
         </div>
         <div class="display-field">
-            @( Model.TransactionType?.ToUpper()?.Trim() == "TRANSFER IN" ? Model.DocketNumber : string.Empty )
+            @( Model?.TransactionType?.ToUpper()?.Trim() == "TRANSFER IN" ? Model?.DocketNumber : string.Empty )
         </div>
 
         <div class="display-label">
@@ -244,35 +247,35 @@
             Pallet Return Slip No
         </div>
         <div class="display-field">
-            @( Model.DocketNumber )
+            @( Model?.DocketNumber )
         </div>
 
         <div class="display-label">
             Pallet Return Date
         </div>
         <div class="display-field">
-            @( Model.EffectiveDate?.ToString( "dd/MM/yyyy" ) )
+            @( Model?.EffectiveDate?.ToString( "dd/MM/yyyy" ) )
         </div>
 
         <div class="display-label">
             Authorization Code
         </div>
         <div class="display-field">
-            @( Model.ClientAuthorisations?.FirstOrDefault()?.Code )
+            @( ca?.Code )
         </div>
 
         <div class="display-label">
             Authorized By
         </div>
         <div class="display-field">
-            @( Model.ClientAuthorisations?.FirstOrDefault()?.ModifiedBy )
+            @( ca?.User?.Name ) @( ca?.User?.Surname )
         </div>
 
         <div class="display-label">
             CHEP Comp No
         </div>
         <div class="display-field">
-            @( cl?.ChepCompensationNo  )
+            @( cl?.ChepCompensationNo  ) <!-- Will be captured by user in edit mode -->
         </div>
 
         <div class="display-label">
@@ -284,10 +287,228 @@
 
     </div>
 
-    @if ( ViewBag.CanEdit == true )
-    {
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
 
-    }
+    <div class="left" style="width: 60%; padding-right: 20px; border-right: 1px solid #ddd;">
+
+        @{ 
+            decimal width = 100 / clientProducts.NullableCount();
+        }
+
+        <div class="display-label">
+            Equipment
+        </div>
+        <div class="display-field">
+
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                string active = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() ) ? "active" : "";
+
+                                <td class="@active" style="width: @width%">
+                                    @item.Equipment
+                                </td>
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            }
+
+        </div>
+
+        <div class="display-label">
+            Quantity
+        </div>
+        <div class="display-field">
+
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
+                                string active = isCurrent ? "active" : "";
+
+                                <td class="@active" style="width: @width%">
+                                    @( isCurrent ? Model?.Quantity : 0 )
+                                </td>
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            }
+
+        </div>
+
+        <div class="display-label">
+            Returned/Transferred Qty
+        </div>
+        <div class="display-field">
+
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
+                                string active = isCurrent ? "active" : "";
+
+                                <td class="@active" style="width: @width%">
+                                    @( isCurrent ? cl?.ReturnQty : 0 )
+                                </td>
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            }
+
+        </div>
+
+        <div class="display-label">
+            Debrief Qty
+        </div>
+        <div class="display-field">
+
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
+                                string active = isCurrent ? "active" : "";
+
+                                <td class="@active" style="width: @width%">
+                                    @( isCurrent ? cl?.DebriefQty : 0 )
+                                </td>
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            }
+
+        </div>
+
+        <div class="display-label">
+            Transporter Liable
+        </div>
+        <div class="display-field">
+
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
+                                string active = isCurrent ? "active" : "";
+
+                                <td class="@active" style="width: @width%">
+                                    @( isCurrent ? cl?.TransporterLiableQty : 0 )
+                                </td>
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            }
+
+        </div>
+
+        <div class="display-label">
+            Admin Movement
+        </div>
+        <div class="display-field">
+
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
+                                string active = isCurrent ? "active" : "";
+
+                                <td class="@active" style="width: @width%">
+                                    @( isCurrent ? cl?.AdminMovement : 0 )
+                                </td>
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            }
+
+        </div>
+
+        <div class="display-label">
+            Outstanding Qty at Customer
+        </div>
+        <div class="display-field">
+
+            @if ( clientProducts.NullableAny() )
+            {
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            @foreach ( var item in clientProducts )
+                            {
+                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
+                                string active = isCurrent ? "active" : "";
+
+                                <td class="@active" style="width: @width%">
+                                    @( isCurrent ? cl?.OutstandingQty : 0 )
+                                </td>
+                            }
+                        </tr>
+                    </thead>
+                </table>
+            }
+
+        </div>
+
+    </div>
+
+    <div class="right" style="width: 35%;">
+
+        <div class="display-label">
+            Document Type
+        </div>
+        <div class="display-field">
+            @( Model?.IsExchange == true ? "EXCHANGE CUSTOMER" : "" )
+        </div>
+
+        <div class="display-label">
+            Load Type
+        </div>
+        <div class="display-field">
+            @( !string.IsNullOrEmpty( cl?.PCNNumber ) ? "PCN" : "PRN" )
+        </div>
+
+        <div class="display-label">
+            Comment
+        </div>
+        <div class="display-field">
+            @( cl?.ClientLoadComment )
+        </div>
+
+        <div class="display-label">
+            Pallet Notes
+        </div>
+        <div class="display-field">
+            @( cl?.ClientLoadNotes )
+        </div>
+
+    </div>
 
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
 
@@ -297,8 +518,9 @@
             @if ( ViewBag.CanEdit == true )
             {
                 <span>
-                    @Html.ActionLink( "Edit", "EditPoolingAgentData", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+                    @Html.ActionLink( "Edit", "EditPoolingAgentData", new { id = Model?.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model?.Id, @data_target = "#tr-" + Model?.Id + "-item" } )
                 </span>
+
                 <span style="padding: 0 5px;">/</span>
             }
 

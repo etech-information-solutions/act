@@ -425,6 +425,7 @@ namespace ACT.Core.Models
 
         public bool HasAuthorisationCode { get; set; }
         public string DocketNumber { get; set; }
+        public bool IncludeUserBroadCasts { get; set; }
 
         #endregion
 

@@ -28,6 +28,7 @@ namespace ACT.Data.Models
         public int Id { get; set; }
         public Nullable<int> SiteId { get; set; }
         public Nullable<int> RegionId { get; set; }
+        public Nullable<int> ARPMSalesManagerId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -36,6 +37,7 @@ namespace ACT.Data.Models
         public string XCord { get; set; }
         public string YCord { get; set; }
         public string Address { get; set; }
+        public string Town { get; set; }
         public string PostalCode { get; set; }
         public string ContactNo { get; set; }
         public string ContactName { get; set; }
@@ -56,16 +58,15 @@ namespace ACT.Data.Models
         public string DepotManagerEmail { get; set; }
         public Nullable<int> Province { get; set; }
         public string LocationNumber { get; set; }
-        public Nullable<int> ARPMSalesManagerId { get; set; }
         public string CLCode { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepAudit> ChepAudits { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientSite> ClientSites { get; set; }
-        public virtual Region Region { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SiteAudit> SiteAudits { get; set; }
+        public virtual User User { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SiteBilling> SiteBillings { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
@@ -73,6 +74,5 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Site> Site1 { get; set; }
         public virtual Site Site2 { get; set; }
-        public virtual User User { get; set; }
     }
 }
