@@ -1,0 +1,129 @@
+﻿@model ClientLoadViewModel
+
+@using ACT.Core.Enums;
+@using ACT.UI.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Edit Shipment Data";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "EditClientLoad", "Transporter", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clientdata", @class = "custom-validate", @style = "width: auto;", id = "editclientload" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content("~/images/edit.png")" />
+            <span>Edit Shipment Data</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        @Html.HiddenFor( model => model.Id )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="left grouped-area" style="width: 29%; margin-right: 1%;">
+
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.PODNumber )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.PODNumber, new { @class = "input", @placeholder = "Please Complete", @required = "required" } )
+                    @Html.ValidationMessageFor( model => model.PODNumber )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.PODCommentId )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.PODCommentId, model => Model.PODCommentOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @required = "required", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.PODCommentId )
+                </div>
+
+                <div class="editor-label">
+                    POD Snapshoot
+                </div>
+                <div class="editor-field">
+                    <input name="Files[0].File" type="file" value="" class="input" />
+                    <input name="Files[0].Name" type="hidden" value="PODNumber" />
+                </div>
+
+            </div>
+
+            <div class="left grouped-area" style="width: 29%; margin-right: 1%;">
+
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.PCNNumber )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.PCNNumber, new { @class = "input", @placeholder = "Please Complete", @required = "required" } )
+                    @Html.ValidationMessageFor( model => model.PCNNumber )
+                </div>
+
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.PCNComments )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.PCNComments, new { @class = "input", @placeholder = "Please Complete", @required = "required" } )
+                    @Html.ValidationMessageFor( model => model.PCNComments )
+                </div>
+
+                <div class="editor-label">
+                    PCN Snapshoot
+                </div>
+                <div class="editor-field">
+                    <input name="Files[1].File" type="file" value="" class="input" />
+                    <input name="Files[1].Name" type="hidden" value="PCNNumber" />
+                </div>
+
+            </div>
+
+            <div class="left grouped-area" style="width: 29%;">
+
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.PRNNumber )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.PRNNumber, new { @class = "input", @placeholder = "Please Complete", @required = "required" } )
+                    @Html.ValidationMessageFor( model => model.PRNNumber )
+                </div>
+
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.PRNComments )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.PRNComments, new { @class = "input", @placeholder = "Please Complete", @required = "required" } )
+                    @Html.ValidationMessageFor( model => model.PRNComments )
+                </div>
+
+                <div class="editor-label">
+                    PRN Snapshoot
+                </div>
+                <div class="editor-field">
+                    <input name="Files[2].File" type="file" value="" class="input" />
+                    <input name="Files[2].Name" type="hidden" value="PRNNumber" />
+                </div>
+
+            </div>
+
+            <div class="clear"></div>
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+        <p>
+            <input id="save-btn" type="submit" value="Update" />
+            <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+        </p>
+
+    </div>
+}

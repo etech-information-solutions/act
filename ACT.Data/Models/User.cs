@@ -31,6 +31,9 @@ namespace ACT.Data.Models
             this.UserNotifications = new HashSet<UserNotification>();
             this.UserRoles = new HashSet<UserRole>();
             this.UserTasks = new HashSet<UserTask>();
+            this.ClientLoads = new HashSet<ClientLoad>();
+            this.ClientLoads1 = new HashSet<ClientLoad>();
+            this.ClientLoads2 = new HashSet<ClientLoad>();
         }
     
         public int Id { get; set; }
@@ -47,6 +50,9 @@ namespace ACT.Data.Models
         public string Password { get; set; }
         public Nullable<System.DateTime> PasswordDate { get; set; }
         public string Pin { get; set; }
+        public int ChatStatus { get; set; }
+        public bool SendChat { get; set; }
+        public bool ReceiveChat { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
@@ -76,5 +82,11 @@ namespace ACT.Data.Models
         public virtual ICollection<UserRole> UserRoles { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserTask> UserTasks { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoad> ClientLoads { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoad> ClientLoads1 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoad> ClientLoads2 { get; set; }
     }
 }

@@ -4476,6 +4476,29 @@ namespace ACT.UI.Controllers
             }
         }
 
+        //
+        // GET: /Transporter/SiteAudits
+        public ActionResult SiteAudits( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            using ( SiteAuditService service = new SiteAuditService() )
+            {
+                if ( givecsm )
+                {
+                    ViewBag.ViewName = "SiteAudits";
+
+                    return PartialView( "_SiteAuditsCustomSearch", new CustomSearchModel( "SiteAudits" ) );
+                }
+
+                List<SiteAuditCustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_SiteAudits", paging );
+            }
+        }
+
         #endregion
     }
 }

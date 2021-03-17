@@ -895,16 +895,24 @@ namespace ACT.Core.Services
 
             string query = @"SELECT
                                 cl.*,
+                                pc.Comment AS [PODComment],
+                                podu.Name + ' ' + podu.Surname AS [PODCommentBy],
+                                pcnu.Name + ' ' + pcnu.Surname AS [PCNCommentBy],
+                                prnu.Name + ' ' + prnu.Surname AS [PRNCommentBy],
                                 (SELECT COUNT(1) FROM [dbo].[Image] i WHERE cl.Id=i.ObjectId AND i.ObjectType IN('PCNNumber', 'PODNumber', 'PRNNumber')) AS [ImageCount]
                               FROM
-                                [dbo].[ClientLoad] cl";
+                                [dbo].[ClientLoad] cl
+                                LEFT OUTER JOIN [dbo].[PODComment] pc ON pc.[Id]=cl.[PODCommentId]
+                                LEFT OUTER JOIN [dbo].[User] podu ON podu.[Id]=cl.[PODCommentById]
+                                LEFT OUTER JOIN [dbo].[User] pcnu ON pcnu.[Id]=cl.[PCNCommentById]
+                                LEFT OUTER JOIN [dbo].[User] prnu ON prnu.[Id]=cl.[PRNCommentById]";
 
             // WHERE
 
             #region WHERE
 
-            //query = $"{query} WHERE (1=1)";
-            query = $"{query} WHERE (cl.[OutstandingReasonId]=9)";
+            query = $"{query} WHERE (1=1)";
+            //query = $"{query} WHERE (cl.[OutstandingReasonId]=9)";
 
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
@@ -1064,4 +1072,3 @@ namespace ACT.Core.Services
         }
     }
 }
-

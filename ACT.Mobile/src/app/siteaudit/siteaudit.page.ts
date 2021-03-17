@@ -23,6 +23,11 @@ export class SiteauditPage implements OnInit
       this.auth.GoToPage( "login" );
     }
 
+    if ( this.auth.IsTransporter )
+    {
+      this.auth.GoToPage( "outstandingreport" );
+    }
+
     this.menuCtrl.enable( true );
   }
 

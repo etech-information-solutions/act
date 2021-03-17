@@ -53,6 +53,6 @@ namespace ACT.Core.Models.Custom
 
         public string DisputeReasonDetails { get; set; }
 
-        public Nullable<decimal> Disputes { get; set; }
+        public decimal? Disputes { get; set; }
     }
 }

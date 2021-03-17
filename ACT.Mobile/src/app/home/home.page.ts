@@ -21,6 +21,11 @@ export class HomePage implements OnInit
       this.auth.GoToPage( "login" );
     }
 
+    if ( this.auth.IsTransporter )
+    {
+      this.auth.GoToPage( "outstandingreport" );
+    }
+
     this.menuCtrl.enable( true );
   }
 

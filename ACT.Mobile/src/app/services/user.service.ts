@@ -257,7 +257,7 @@ export class UserService
 
     for ( let r of this.Notifications )
     {
-      if ( ( r.Message.toLowerCase().includes( query ) ) )
+      if ( ( r.Message != undefined && r.Message.toLowerCase().includes( query ) ) )
       {
         resp.push( r );
       }
@@ -319,13 +319,13 @@ export class UserService
 
     for ( let r of this.SiteAudits )
     {
-      if ( r.ClientName.toLowerCase().includes( query ) ||
-           r.SiteName.toLowerCase().includes( query ) ||
-           r.PSPName.toLowerCase().includes( query ) ||
-           r.CustomerName.toLowerCase().includes( query ) ||
-           r.RepName.toLowerCase().includes( query ) ||
-           r.PalletAuditor.toLowerCase().includes( query ) ||
-           r.Equipment.toLowerCase().includes( query ) )
+      if ( ( r.ClientName != undefined && r.ClientName.toLowerCase().includes( query ) ) ||
+           ( r.SiteName != undefined && r.SiteName.toLowerCase().includes( query ) ) ||
+           ( r.PSPName != undefined && r.PSPName.toLowerCase().includes( query ) ) ||
+           ( r.CustomerName != undefined && r.CustomerName.toLowerCase().includes( query ) ) ||
+           ( r.RepName != undefined && r.RepName.toLowerCase().includes( query ) ) ||
+           ( r.PalletAuditor != undefined && r.PalletAuditor.toLowerCase().includes( query ) ) ||
+           ( r.Equipment != undefined && r.Equipment.toLowerCase().includes( query ) ) )
       {
         resp.push( r );
       }
@@ -387,21 +387,23 @@ export class UserService
 
     for ( let r of this.OutstandingPallets )
     {
-      if ( r.ClientName.toLowerCase().includes( query ) ||
-           r.SiteName.toLowerCase().includes( query ) ||
-           r.SubSiteName.toLowerCase().includes( query ) ||
-           r.LoadNumber.toLowerCase().includes( query ) ||
-           r.AccountNumber.toLowerCase().includes( query ) ||
-           r.DeliveryNote.toLowerCase().includes( query ) ||
-           r.ReferenceNumber.toLowerCase().includes( query ) ||
-           r.ReceiverNumber.toLowerCase().includes( query ) ||
-           r.Equipment.toLowerCase().includes( query ) ||
-           r.PODNumber.toLowerCase().includes( query ) ||
-           r.PCNNumber.toLowerCase().includes( query ) ||
-           r.PRNNumber.toLowerCase().includes( query ) ||
-           r.ProvCode.toLowerCase().includes( query ) ||
-           r.DocketNumber.toLowerCase().includes( query ) ||
-           r.THAN.toLowerCase().includes( query )
+      if ( ( r.ClientName != undefined && r.ClientName.toLowerCase().includes( query ) ) ||
+           ( r.SiteName != undefined && r.SiteName.toLowerCase().includes( query ) ) ||
+           ( r.SubSiteName != undefined && r.SubSiteName.toLowerCase().includes( query ) ) ||
+           ( r.LoadNumber != undefined && r.LoadNumber.toLowerCase().includes( query ) ) ||
+           ( r.DeliveryNote != undefined && r.DeliveryNote.toLowerCase().includes( query ) ) ||
+           ( r.ReferenceNumber != undefined && r.ReferenceNumber.toLowerCase().includes( query ) ) ||
+           ( r.ReceiverNumber != undefined && r.ReceiverNumber.toLowerCase().includes( query ) ) ||
+           ( r.Equipment != undefined && r.Equipment.toLowerCase().includes( query ) ) ||
+           ( r.PODNumber != undefined && r.PODNumber.toLowerCase().includes( query ) ) ||
+           ( r.PCNNumber != undefined && r.PCNNumber.toLowerCase().includes( query ) ) ||
+           ( r.PRNNumber != undefined && r.PRNNumber.toLowerCase().includes( query ) ) ||
+           ( r.ChepInvoiceNo != undefined && r.ChepInvoiceNo.toLowerCase().includes( query ) ) ||
+           ( r.DocketNumber != undefined && r.DocketNumber.toLowerCase().includes( query ) ) ||
+           ( r.THAN != undefined && r.THAN.toLowerCase().includes( query ) ) ||
+           ( r.ChepCompensationNo != undefined && r.ChepCompensationNo.toLowerCase().includes( query ) ) ||
+           ( r.TransporterName != undefined && r.TransporterName.toLowerCase().includes( query ) ) ||
+           ( r.VehicleRegistration != undefined && r.VehicleRegistration.toLowerCase().includes( query ) )
           )
       {
         resp.push( r );
@@ -464,21 +466,23 @@ export class UserService
 
     for ( let r of this.OutstandingShipments )
     {
-      if ( r.ClientName.toLowerCase().includes( query ) ||
-           r.SiteName.toLowerCase().includes( query ) ||
-           r.SubSiteName.toLowerCase().includes( query ) ||
-           r.LoadNumber.toLowerCase().includes( query ) ||
-           r.AccountNumber.toLowerCase().includes( query ) ||
-           r.DeliveryNote.toLowerCase().includes( query ) ||
-           r.ReferenceNumber.toLowerCase().includes( query ) ||
-           r.ReceiverNumber.toLowerCase().includes( query ) ||
-           r.Equipment.toLowerCase().includes( query ) ||
-           r.PODNumber.toLowerCase().includes( query ) ||
-           r.PCNNumber.toLowerCase().includes( query ) ||
-           r.PRNNumber.toLowerCase().includes( query ) ||
-           r.ProvCode.toLowerCase().includes( query ) ||
-           r.DocketNumber.toLowerCase().includes( query ) ||
-           r.THAN.toLowerCase().includes( query )
+      if ( ( r.ClientName != undefined && r.ClientName.toLowerCase().includes( query ) ) ||
+           ( r.SiteName != undefined && r.SiteName.toLowerCase().includes( query ) ) ||
+           ( r.SubSiteName != undefined && r.SubSiteName.toLowerCase().includes( query ) ) ||
+           ( r.LoadNumber != undefined && r.LoadNumber.toLowerCase().includes( query ) ) ||
+           ( r.DeliveryNote != undefined && r.DeliveryNote.toLowerCase().includes( query ) ) ||
+           ( r.ReferenceNumber != undefined && r.ReferenceNumber.toLowerCase().includes( query ) ) ||
+           ( r.ReceiverNumber != undefined && r.ReceiverNumber.toLowerCase().includes( query ) ) ||
+           ( r.Equipment != undefined && r.Equipment.toLowerCase().includes( query ) ) ||
+           ( r.PODNumber != undefined && r.PODNumber.toLowerCase().includes( query ) ) ||
+           ( r.PCNNumber != undefined && r.PCNNumber.toLowerCase().includes( query ) ) ||
+           ( r.PRNNumber != undefined && r.PRNNumber.toLowerCase().includes( query ) ) ||
+           ( r.ChepInvoiceNo != undefined && r.ChepInvoiceNo.toLowerCase().includes( query ) ) ||
+           ( r.DocketNumber != undefined && r.DocketNumber.toLowerCase().includes( query ) ) ||
+           ( r.THAN != undefined && r.THAN.toLowerCase().includes( query ) ) ||
+           ( r.ChepCompensationNo != undefined && r.ChepCompensationNo.toLowerCase().includes( query ) ) ||
+           ( r.TransporterName != undefined && r.TransporterName.toLowerCase().includes( query ) ) ||
+           ( r.VehicleRegistration != undefined && r.VehicleRegistration.toLowerCase().includes( query ) )
           )
       {
         resp.push( r );
@@ -500,7 +504,7 @@ export class UserService
       return this.OutstandingShipments;
     }
 
-    var loading = await this.ShowLoading( "Fetching report..." );
+    var loading = await this.ShowLoading( "Fetching outstanding shipments..." );
 
     try
     {

@@ -99,6 +99,9 @@
     <Compile Include="Models\ChepLoadJournal.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ChepLoadOLD.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Client.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>

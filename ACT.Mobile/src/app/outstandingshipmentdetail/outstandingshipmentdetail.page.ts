@@ -69,17 +69,16 @@ export class OutstandingshipmentdetailPage implements OnInit
       {
         if ( d.ObjectType == "PCNNumber" )
         {
-          this.PCNComment = d.Description;
+          //this.PCNComment = d.Description;
           this.PCNUrl = this.auth.APIUrl + "Account/ViewImage?id=" + d.Id;
         }
         else if ( d.ObjectType == "PODNumber" )
         {
-          this.PODComment = d.Description;
+          //this.PODComment = d.Description;
           this.PODUrl = this.auth.APIUrl + "Account/ViewImage?id=" + d.Id;
         }
         else if ( d.ObjectType == "PRNNumber" )
         {
-          this.PRNComment = d.Description;
           this.PRNUrl = this.auth.APIUrl + "Account/ViewImage?id=" + d.Id;
         }
       });
@@ -89,6 +88,10 @@ export class OutstandingshipmentdetailPage implements OnInit
     this.PCNNumber = this.auth.OutstandingShipment.PCNNumber;
     this.PODNumber = this.auth.OutstandingShipment.PODNumber;
     this.PRNNumber = this.auth.OutstandingShipment.PRNNumber;
+    
+    this.PODComment = this.auth.OutstandingShipment.PODComments;
+    this.PRNComment = this.auth.OutstandingShipment.PRNComments;
+    this.PCNComment = this.auth.OutstandingShipment.PCNComments;
   }
 
   async PresentPhotoOptions( type: number )

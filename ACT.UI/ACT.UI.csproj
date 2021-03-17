@@ -703,10 +703,11 @@
     <Content Include="Views\Pallet\_ChepLoadVersions.cshtml" />
     <Content Include="Views\Email\_AuthorisationCodeNotify.cshtml" />
     <Content Include="Views\Transporter\Index.cshtml" />
-    <Content Include="Views\Transporter\_SiteAudits.cshtml" />
+    <Content Include="Views\Pallet\_SiteAudits.cshtml" />
     <Content Include="Views\Transporter\_OutstandingReport.cshtml" />
     <Content Include="Views\Transporter\_PODManagement.cshtml" />
     <Content Include="Views\Transporter\_MyNotifications.cshtml" />
+    <Content Include="Views\Transporter\EditClientLoad.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

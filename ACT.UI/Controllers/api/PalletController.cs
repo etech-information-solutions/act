@@ -345,11 +345,24 @@ namespace ACT.UI.Controllers.api
                     return Request.CreateResponse( HttpStatusCode.OK, new ResponseModel() { Code = -1, Description = "Shipment could not be found" } );
                 }
 
-                load.OutstandingReasonId = null;
+                //load.OutstandingReasonId = null;
                 load.PCNNumber = model.PCNNumber;
                 load.PODNumber = model.PODNumber;
                 load.PRNNumber = model.PRNNumber;
+
+                load.PCNCommentDate = DateTime.Now;
+                load.PODCommentDate = DateTime.Now;
+                load.PRNCommentDate = DateTime.Now;
+
+                load.PCNComments = model.PCNComments;
+                load.PODComments = model.PODComments;
+                load.PRNComments = model.PRNComments;
+
                 load.PODStatus = ( int ) Status.Active;
+
+                load.PODCommentById = clservice.CurrentUser.Id;
+                load.PCNCommentById = clservice.CurrentUser.Id;
+                load.PRNCommentById = clservice.CurrentUser.Id;
 
                 clservice.Update( load );
 
@@ -388,7 +401,7 @@ namespace ACT.UI.Controllers.api
                     }
 
                     // Create folder
-                    string path = HostingEnvironment.MapPath( $"~/{VariableExtension.SystemRules.ImagesLocation}/ClientLoads/{load.LoadNumber?.Trim()}/" );
+                    string path = HostingEnvironment.MapPath( $"~/{VariableExtension.SystemRules.ImagesLocation}/ClientLoad/{load.LoadNumber?.Trim()}/" );
 
                     string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
 
@@ -417,7 +430,7 @@ namespace ACT.UI.Controllers.api
                         Description = comment,
                         IsMain = true,
                         Extension = ext,
-                        Location = $"ClientLoads/{load.LoadNumber?.Trim()}/{now}-{file.FileName}"
+                        Location = $"ClientLoad/{load.LoadNumber?.Trim()}/{now}-{file.FileName}"
                     };
 
                     iservice.Create( image );

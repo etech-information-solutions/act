@@ -135,10 +135,18 @@ namespace ACT.UI.Models
         [StringLength( 500, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string CancelledReason { get; set; }
 
+        [Display( Name = "PCN Comments" )]
+        public string PCNComments { get; set; }
+
+        [Display( Name = "PRN Comments" )]
+        public string PRNComments { get; set; }
+
 
 
         [Display( Name = "Import Loads" )]
         public HttpPostedFileBase File { get; set; }
+
+        public List<FileViewModel> Files { get; set; }
 
         public bool EditMode { get; set; }
 

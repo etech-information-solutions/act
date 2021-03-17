@@ -71,6 +71,15 @@ namespace ACT.Data.Models
         public string CancelledReason { get; set; }
         public bool ManuallyMatchedLoad { get; set; }
         public string ManuallyMatchedUID { get; set; }
+        public string PODComments { get; set; }
+        public string PCNComments { get; set; }
+        public string PRNComments { get; set; }
+        public Nullable<int> PODCommentById { get; set; }
+        public Nullable<int> PCNCommentById { get; set; }
+        public Nullable<int> PRNCommentById { get; set; }
+        public Nullable<System.DateTime> PODCommentDate { get; set; }
+        public Nullable<System.DateTime> PCNCommentDate { get; set; }
+        public Nullable<System.DateTime> PRNCommentDate { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }
@@ -83,7 +92,10 @@ namespace ACT.Data.Models
         public virtual ClientSite ClientSite { get; set; }
         public virtual ClientSite ClientSite1 { get; set; }
         public virtual OutstandingReason OutstandingReason { get; set; }
+        public virtual User User { get; set; }
         public virtual PODComment PODComment { get; set; }
+        public virtual User User1 { get; set; }
+        public virtual User User2 { get; set; }
         public virtual Transporter Transporter { get; set; }
         public virtual Vehicle Vehicle { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
