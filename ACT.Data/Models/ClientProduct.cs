@@ -37,7 +37,7 @@ namespace ACT.Data.Models
         public int Status { get; set; }
         public string Equipment { get; set; }
         public string AccountingCode { get; set; }
-        public Nullable<int> RateType { get; set; }
+        public int RateType { get; set; }
     
         public virtual Client Client { get; set; }
         public virtual PSP PSP { get; set; }

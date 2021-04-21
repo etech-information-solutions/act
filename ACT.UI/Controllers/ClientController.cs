@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using ExcelDataReader;
 using System.Data;
+using Microsoft.VisualBasic.FileIO;
 
 namespace ACT.UI.Controllers
 {
@@ -445,7 +446,7 @@ namespace ACT.UI.Controllers
                         {
                             cca = new ClientChepAccount()
                             {
-                                ClientId = model.Id,
+                                ClientId = client.Id,
                                 Status = item.Status,
                                 ChepReference = item.ChepReference,
                             };
@@ -3321,10 +3322,10 @@ namespace ACT.UI.Controllers
             {
                 #region Validation
 
-                if ( !string.IsNullOrEmpty( model.RegistrationNumber ) && tservice.ExistByRegistrationNumber( model.RegistrationNumber.Trim() ) )
+                if ( !string.IsNullOrEmpty( model.Name ) && tservice.ExistByClientAndName( model.ClientId, model.Name.Trim() ) )
                 {
                     // Transporter already exist!
-                    Notify( $"Sorry, a Transporter with the Registration Number \"{model.RegistrationNumber}\" already exists!", NotificationType.Error );
+                    Notify( $"Sorry, a Transporter with the Company Name \"{model.Name}\" for the selected client already exists!", NotificationType.Error );
 
                     return View( model );
                 }
@@ -3337,10 +3338,15 @@ namespace ACT.UI.Controllers
                 {
                     Name = model.Name,
                     Email = model.Email,
+                    ClientId = model.ClientId,
                     Status = ( int ) Status.Active,
                     TradingName = model.TradingName,
+                    ContactName = model.ContactName,
+                    SupplierCode = model.SupplierCode,
                     ContactNumber = model.ContactNumber,
                     RegistrationNumber = model.RegistrationNumber,
+                    ClientTransporterCode = model.ClientTransporterCode,
+                    ChepClientTransporterCode = model.ChepClientTransporterCode,
                 };
 
                 t = tservice.Create( t );
@@ -3469,10 +3475,15 @@ namespace ACT.UI.Controllers
                     EditMode = true,
                     Contacts = contacts,
                     Vehicles = vehicles,
+                    ClientId = t.ClientId,
+                    ContactName = t.ContactName,
                     TradingName = t.TradingName,
                     Status = ( Status ) t.Status,
+                    SupplierCode = t.SupplierCode,
                     ContactNumber = t.ContactNumber,
                     RegistrationNumber = t.RegistrationNumber,
+                    ClientTransporterCode = t.ClientTransporterCode,
+                    ChepClientTransporterCode = t.ChepClientTransporterCode,
                 };
 
                 return View( model );
@@ -3500,10 +3511,10 @@ namespace ACT.UI.Controllers
 
                 #region Validations
 
-                if ( !string.IsNullOrEmpty( model.RegistrationNumber ) && model.RegistrationNumber.Trim().ToLower() != t.RegistrationNumber.Trim().ToLower() && tservice.ExistByRegistrationNumber( model.RegistrationNumber.Trim() ) )
+                if ( !string.IsNullOrEmpty( model.Name ) && model.Name.Trim().ToLower() != t.Name.Trim().ToLower() && tservice.ExistByClientAndName( model.ClientId, model.Name.Trim() ) )
                 {
                     // Role already exist!
-                    Notify( $"Sorry, a Transporter with the Company Registration Number \"{model.RegistrationNumber} ({model.RegistrationNumber})\" already exists!", NotificationType.Error );
+                    Notify( $"Sorry, a Transporter with the Company Name \"{model.Name}\" for the selected client already exists!", NotificationType.Error );
 
                     return View( model );
                 }
@@ -3512,14 +3523,17 @@ namespace ACT.UI.Controllers
 
                 #region Transporter
 
-                // Update Transporter
                 t.Id = model.Id;
                 t.Name = model.Name;
                 t.Email = model.Email;
                 t.Status = ( int ) model.Status;
                 t.TradingName = model.TradingName;
+                t.ContactName = model.ContactName;
+                t.SupplierCode = model.SupplierCode;
                 t.ContactNumber = model.ContactNumber;
                 t.RegistrationNumber = model.RegistrationNumber;
+                t.ClientTransporterCode = model.ClientTransporterCode ?? string.Empty;
+                t.ChepClientTransporterCode = model.ChepClientTransporterCode ?? string.Empty;
 
                 tservice.Update( t );
 
@@ -3617,6 +3631,152 @@ namespace ACT.UI.Controllers
             }
 
             Notify( "The selected Transporter details were successfully updated.", NotificationType.Success );
+
+            return ManageTransporters( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // GET: Client/ImportTransporter
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportTransporter()
+        {
+            TransporterViewModel model = new TransporterViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        // POST: Client/ImportTransporter
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportTransporter( TransporterViewModel model )
+        {
+            if ( model.File == null )
+            {
+                Notify( "Please select a file to upload and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            int line = 0,
+                count = 0,
+                errors = 0,
+                skipped = 0,
+                created = 0,
+                updated = 0,
+                errorDocId = 0;
+
+            string cQuery, uQuery;
+
+            List<string> errs = new List<string>();
+
+            using ( TransporterService tservice = new TransporterService() )
+            using ( TextFieldParser parser = new TextFieldParser( model.File.InputStream ) )
+            {
+                parser.Delimiters = new string[] { "," };
+
+                while ( true )
+                {
+                    string[] load = parser.ReadFields();
+
+                    if ( load == null )
+                    {
+                        break;
+                    }
+
+                    line++;
+
+                    if ( line == 1 ) continue;
+
+                    cQuery = uQuery = string.Empty;
+
+                    count++;
+
+                    if ( load.NullableCount() < 2 )
+                    {
+                        skipped++;
+
+                        continue;
+                    }
+
+                    load = load.ToSQLSafe();
+
+                    Transporter t = tservice.GetByClientAndName( model.ClientId, load[ 0 ] );
+
+                    if ( t == null )
+                    {
+                        #region Create Transporter
+
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[Transporter] ([ClientId],[CreatedOn],[ModifiedOn],[ModifiedBy],[Name],[ContactNumber],[Email],[TradingName],[RegistrationNumber],[ContactName],[SupplierCode],[ClientTransporterCode],[ChepClientTransporterCode],[Status]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 1 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}',{( int ) Status.Active}) ";
+
+                        #endregion
+
+                        try
+                        {
+                            tservice.Query( cQuery );
+
+                            created++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+
+                            errs.Add( ex.ToString() );
+                        }
+                    }
+                    else
+                    {
+                        #region Update Transporter
+
+                        uQuery = $@"{uQuery} UPDATE [dbo].[Transporter] SET
+                                                    [ModifiedOn]='{DateTime.Now}',
+                                                    [ModifiedBy]='{CurrentUser.Email}',
+                                                    [Name]='{load[ 0 ]}',
+                                                    [ContactNumber]='{load[ 1 ]}',
+                                                    [Email]='{load[ 2 ]}',
+                                                    [TradingName]='{load[ 3 ]}',
+                                                    [RegistrationNumber]='{load[ 4 ]}',
+                                                    [ContactName]='{load[ 6 ]}',
+                                                    [SupplierCode]='{load[ 7 ]}',
+                                                    [ClientTransporterCode]='{load[ 8 ]}',
+                                                    [ChepClientTransporterCode]='{load[ 9 ]}',
+                                                    [Status]={( int ) Status.Active}
+                                                WHERE
+                                                    [Id]={t.Id}";
+
+                        #endregion
+
+                        try
+                        {
+                            tservice.Query( uQuery );
+
+                            updated++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+
+                            errs.Add( ex.ToString() );
+                        }
+                    }
+                }
+
+                cQuery = string.Empty;
+                uQuery = string.Empty;
+
+                if ( errs.NullableAny() )
+                {
+                    errorDocId = LogImportErrors( errs, model.ClientId ?? 0 );
+                }
+            }
+
+            string resp = $"{created} Transporters were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.";
+
+            if ( errs.NullableAny() && errorDocId > 0 )
+            {
+                resp = $"{resp} <a href='/Client/ViewDocument/{errorDocId}' target='_blank'>Click here</a> to view the errors.";
+            }
+
+            Notify( resp, NotificationType.Success );
 
             return ManageTransporters( new PagingModel(), new CustomSearchModel() );
         }
@@ -3814,7 +3974,7 @@ namespace ACT.UI.Controllers
             {
                 ViewBag.ViewName = "ManageTransporters";
 
-                return PartialView( "_ManageTransportersCustomSearch", new CustomSearchModel() );
+                return PartialView( "_ManageTransportersCustomSearch", new CustomSearchModel( "ManageTransporters" ) );
             }
 
             using ( TransporterService service = new TransporterService() )

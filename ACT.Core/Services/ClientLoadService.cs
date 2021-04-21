@@ -61,6 +61,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
+                { new SqlParameter( "useremail", ( CurrentUser != null ) ? CurrentUser.Email : "" ) },
                 { new SqlParameter( "csmManuallyMatchedUID", csm.ManuallyMatchedUID ?? ( object ) DBNull.Value ) },
             };
 
@@ -91,6 +92,10 @@ namespace ACT.Core.Services
             else if ( CurrentUser.RoleType == RoleType.Client )
             {
                 query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Transporter )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Transporter] t WHERE t.[Id]=cl.[TransporterId] AND t.[Email]=@useremail)";
             }
 
             #endregion
@@ -213,6 +218,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
+                { new SqlParameter( "useremail", ( CurrentUser != null ) ? CurrentUser.Email : "" ) },
                 { new SqlParameter( "csmManuallyMatchedUID", csm.ManuallyMatchedUID ?? ( object ) DBNull.Value ) },
             };
 
@@ -280,6 +286,10 @@ namespace ACT.Core.Services
             else if ( CurrentUser.RoleType == RoleType.Client )
             {
                 query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Transporter )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Transporter] t WHERE t.[Id]=cl.[TransporterId] AND t.[Email]=@useremail)";
             }
 
             #endregion

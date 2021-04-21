@@ -118,7 +118,10 @@ namespace ACT.Core.Services
                                 COUNT(1) AS [Total]
                              FROM
                                 [dbo].[Site] s
-                                LEFT OUTER JOIN [dbo].[Region] r ON r.[Id]=s.[RegionId]";
+                                LEFT OUTER JOIN [dbo].[Region] r ON r.[Id]=s.[RegionId]
+                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON s.Id=cs.SiteId
+                                LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cs.ClientCustomerId=cc.Id
+                                LEFT OUTER JOIN [dbo].[Client] c ON cc.ClientId=c.Id";
 
             // WHERE
 
@@ -129,14 +132,7 @@ namespace ACT.Core.Services
             // Limit to only show Sites for logged in user 
             if ( !CurrentUser.IsAdmin )
             {
-                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu
-                                                       INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId
-                                                       LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON pc.ClientId=cc.ClientId
-                                                       LEFT OUTER JOIN [dbo].[ClientSite] cs ON cc.Id=cs.ClientCustomerId
-                                              WHERE
-                                                cs.SiteId=s.Id AND
-                                                pu.UserId=@userid
-                                             ) ";
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE cs.SiteId=s.Id AND pu.UserId=@userid ) ";
             }
 
             #endregion
@@ -244,13 +240,17 @@ namespace ACT.Core.Services
 
             string query = @"SELECT
                                 s.*,
+                                c.[CompanyName] AS [ClientName],
                                 r.[Description] AS [RegionName],
                                 (SELECT COUNT (1) FROM [dbo].[Site] s1 WHERE s1.[SiteId]=s.[Id]) AS [SubSiteCount],
                                 (SELECT COUNT (1) FROM [dbo].[ClientSite] cs WHERE cs.[SiteId]=s.[Id]) AS [ClientCount],
                                 (SELECT COUNT (1) FROM [dbo].[SiteBudget] sb WHERE sb.[SiteId]=s.[Id]) AS [BudgetCount]
                              FROM
                                 [dbo].[Site] s
-                                LEFT OUTER JOIN [dbo].[Region] r ON r.[Id]=s.[RegionId]";
+                                LEFT OUTER JOIN [dbo].[Region] r ON r.[Id]=s.[RegionId]
+                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON s.Id=cs.SiteId
+                                LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cs.ClientCustomerId=cc.Id
+                                LEFT OUTER JOIN [dbo].[Client] c ON cc.ClientId=c.Id";
 
             // WHERE
 
@@ -261,14 +261,7 @@ namespace ACT.Core.Services
             // Limit to only show Sites for logged in user 
             if ( !CurrentUser.IsAdmin )
             {
-                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu
-                                                       INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId
-                                                       LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON pc.ClientId=cc.ClientId
-                                                       LEFT OUTER JOIN [dbo].[ClientSite] cs ON cc.Id=cs.ClientCustomerId
-                                              WHERE
-                                                cs.SiteId=s.Id AND
-                                                pu.UserId=@userid
-                                             ) ";
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE cs.SiteId=s.Id AND pu.UserId=@userid ) ";
             }
 
             #endregion

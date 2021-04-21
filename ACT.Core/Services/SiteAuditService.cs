@@ -18,19 +18,6 @@ namespace ACT.Core.Services
         }
 
         /// <summary>
-        /// Gets a Site Audit using the specified Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public override SiteAudit GetById( int id )
-        {
-            context.Configuration.LazyLoadingEnabled = true;
-            context.Configuration.ProxyCreationEnabled = true;
-
-            return base.GetById( id );
-        }
-
-        /// <summary>
         /// Gets the total number of Site Audits matching the specified params
         /// </summary>
         /// <param name="pm"></param>
@@ -115,17 +102,17 @@ namespace ACT.Core.Services
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (sa.CreatedOn >= @csmFromDate AND sa.CreatedOn <= @csmToDate) ";
+                query = $"{query} AND (sa.AuditDate >= @csmFromDate AND sa.AuditDate <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (sa.CreatedOn>=@csmFromDate) ";
+                    query = $"{query} AND (sa.AuditDate>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (sa.CreatedOn<=@csmToDate) ";
+                    query = $"{query} AND (sa.AuditDate<=@csmToDate) ";
                 }
             }
 
@@ -247,17 +234,17 @@ namespace ACT.Core.Services
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (sa.CreatedOn >= @csmFromDate AND sa.CreatedOn <= @csmToDate) ";
+                query = $"{query} AND (sa.AuditDate >= @csmFromDate AND sa.AuditDate <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (sa.CreatedOn>=@csmFromDate) ";
+                    query = $"{query} AND (sa.AuditDate>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (sa.CreatedOn<=@csmToDate) ";
+                    query = $"{query} AND (sa.AuditDate<=@csmToDate) ";
                 }
             }
 

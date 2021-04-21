@@ -47,6 +47,9 @@
             <th data-name="CreatedOn" data-column="s.CreatedOn">
                 Date
             </th>
+            <th data-name="ClientName" data-column="c.CompanyName">
+                Client
+            </th>
             <th data-name="RegionName" data-column="r.Name">
                 Region
             </th>
@@ -106,6 +109,9 @@
                         </a>
                     </td>
                     <td>
+                        @item.ClientName
+                    </td>
+                    <td>
                         @item.RegionName
                     </td>
                     <td>
@@ -162,7 +168,7 @@
                             </li>
                             <li>
                                 <a data-sticky-one="1" data-target="#site-@item.Id-clients" data-trigger="mouseover" data-arrow="center-right" data-title="Clients">
-                                    @item.ClientCount Clients
+                                    @item.ClientCount Customers
                                 </a>
 
                                 <div id="site-@item.Id-clients" class="none">
@@ -203,8 +209,8 @@
                             @Html.ActionLink( enable, "DeleteSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managesites", @rel = "tipsyE", @title = enable + " this item?", @style = "margin-left: 0;" } )
 
                             @*<a href="#" onclick="LinkToSubSites('@item.Id')">
-                                <i class="fa fa-link"></i>Subsites
-                            </a>*@
+                                    <i class="fa fa-link"></i>Subsites
+                                </a>*@
                         </div>
                     </td>
                 </tr>

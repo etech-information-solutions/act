@@ -90,23 +90,22 @@ namespace ACT.UI.Controllers
                 Redirect( returnUrl );
             }
 
-            return RedirectToAction( "Index", "DashBoard" );
-
-            // return DoLogin( user.RoleType );
+            return DoLogin( user.RoleType );
         }
 
         public ActionResult DoLogin( RoleType roleType )
         {
             switch ( roleType )
             {
-                case RoleType.Client:
+                case RoleType.Transporter:
 
-                    return RedirectToAction( "Index", "Client" );
+                    return RedirectToAction( "Index", "Transporter" );
 
                 case RoleType.PSP:
+                case RoleType.Client:
                 case RoleType.SuperAdmin:
 
-                    return RedirectToAction( "Index", "Administration" );
+                    return RedirectToAction( "Index", "DashBoard" );
             }
 
             return LogOff();

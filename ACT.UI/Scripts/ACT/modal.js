@@ -29,7 +29,7 @@
                 $( ACT.Modal.Container ).find( '#btns' ).css( "display", "none" );
             }
 
-            $( ACT.Modal.Container ).fadeIn( 'medium', function ()
+            $( ACT.Modal.Container ).fadeIn( 900, function ()
             {
                 ACT.UI.DataCallBack( callback );
             } );
@@ -40,6 +40,8 @@
         Close: function ()
         {
             $( ".announcement" ).slideUp( 1200 );
+
+            ACT.UI.DataSettingClient = false;
 
             $( ACT.Modal.Container ).fadeOut( 500, function ()
             {

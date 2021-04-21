@@ -17,6 +17,10 @@ namespace ACT.Core.Models.Custom
         public string TradingName { get; set; }
         public string RegistrationNumber { get; set; }
         public int Status { get; set; }
+        public string ContactName { get; set; }
+        public string SupplierCode { get; set; }
+
+        public string ClientName { get; set; }
 
         public int ContactCount { get; set; }
 

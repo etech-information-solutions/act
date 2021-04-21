@@ -40,6 +40,7 @@ namespace ACT.Core.Models.Custom
         public int? ARPMSalesManagerId { get; set; }
         public string CLCode { get; set; }
 
+        public string ClientName { get; set; }
         public string RegionName { get; set; }
 
         public int SubSiteCount { get; set; }

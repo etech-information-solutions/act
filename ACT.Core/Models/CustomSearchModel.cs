@@ -16,6 +16,14 @@ namespace ACT.Core.Models
         public CustomSearchModel()
         {
             SetDefaults();
+
+            using ( ClientService cservice = new ClientService() )
+            {
+                if ( cservice.SelectedClient != null && ClientId == 0 )
+                {
+                    ClientId = cservice.SelectedClient.Id;
+                }
+            }
         }
 
 
@@ -525,7 +533,7 @@ namespace ACT.Core.Models
             {
                 case "Users":
 
-                    
+
 
                     break;
 
@@ -565,9 +573,12 @@ namespace ACT.Core.Models
                     break;
 
 
+                case "SetClient":
                 case "ClientKPI":
                 case "ReconcileLoads":
+                case "MovementReport":
                 case "ReconcileInvoice":
+                case "ManageTransporters":
 
                     using ( ClientService cservice = new ClientService() )
                     {
@@ -599,16 +610,6 @@ namespace ACT.Core.Models
                     using ( SiteService sservice = new SiteService() )
                     {
                         SiteOptions = sservice.List( true );
-                    }
-
-                    break;
-
-
-                case "MovementReport":
-
-                    using ( ClientService cservice = new ClientService() )
-                    {
-                        ClientOptions = cservice.List( true );
                     }
 
                     break;
@@ -701,6 +702,25 @@ namespace ACT.Core.Models
                     }
 
                     break;
+
+                case "SiteAudits":
+
+                    using ( SiteService sservice = new SiteService() )
+                    using ( ClientService cservice = new ClientService() )
+                    {
+                        SiteOptions = sservice.List( true );
+                        ClientOptions = cservice.List( true );
+                    }
+
+                    break;
+            }
+
+            using ( ClientService cservice = new ClientService() )
+            {
+                if ( cservice.SelectedClient != null && ClientId == 0 )
+                {
+                    ClientId = cservice.SelectedClient.Id;
+                }
             }
         }
 

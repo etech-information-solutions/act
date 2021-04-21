@@ -47,6 +47,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
+                { new SqlParameter( "useremail", ( CurrentUser != null ) ? CurrentUser.Email : "" ) },
                 { new SqlParameter( "cmsDocketNumber", csm.DocketNumber ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmManuallyMatchedUID", csm.ManuallyMatchedUID ?? ( object ) DBNull.Value ) },
             };
@@ -71,11 +72,19 @@ namespace ACT.Core.Services
 
             #region WHERE
 
-            query = $"{ query} WHERE (1=1)";
+            query = $"{query} WHERE (1=1)";
 
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=c.[Id] AND pu.[UserId]=@userid) ";
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Transporter )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Transporter] t WHERE t.[Id]=cl.[TransporterId] AND t.[Email]=@useremail)";
             }
 
             #endregion
@@ -218,6 +227,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
+                { new SqlParameter( "useremail", ( CurrentUser != null ) ? CurrentUser.Email : "" ) },
                 { new SqlParameter( "cmsDocketNumber", csm.DocketNumber ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmManuallyMatchedUID", csm.ManuallyMatchedUID ?? ( object ) DBNull.Value ) },
             };
@@ -258,7 +268,15 @@ namespace ACT.Core.Services
 
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=c.[Id] AND pu.[UserId]=@userid) ";
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Transporter )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Transporter] t WHERE t.[Id]=cl.[TransporterId] AND t.[Email]=@useremail)";
             }
 
             #endregion

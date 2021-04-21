@@ -377,7 +377,6 @@
     <Content Include="Images\wireless-signal.png" />
     <Content Include="Scripts\ACT\act.js" />
     <Content Include="Scripts\ACT\menu.js" />
-    <Content Include="Scripts\ACT\shortcut.js" />
     <Content Include="Scripts\ACT\loader.js" />
     <Content Include="Scripts\ACT\modal.js" />
     <Content Include="Scripts\ACT\startup.js" />
@@ -708,6 +707,10 @@
     <Content Include="Views\Transporter\_PODManagement.cshtml" />
     <Content Include="Views\Transporter\_MyNotifications.cshtml" />
     <Content Include="Views\Transporter\EditClientLoad.cshtml" />
+    <Content Include="Views\Shared\_SiteAuditsCustomSearch.cshtml" />
+    <Content Include="Views\Shared\_ClientList.cshtml" />
+    <Content Include="Views\Client\ImportTransporter.cshtml" />
+    <Content Include="Views\Administration\ImportTransporter.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

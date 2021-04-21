@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 
+using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Core.Models.Custom;
 using ACT.Data.Models;
@@ -37,6 +38,8 @@ namespace ACT.Core.Services
             {
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmStatus", ( int ) csm.Status ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
@@ -45,7 +48,11 @@ namespace ACT.Core.Services
 
             #endregion
 
-            string query = string.Format( @"SELECT COUNT(t.Id) AS [Total] FROM [dbo].[Transporter] t" );
+            string query = @"SELECT
+                                COUNT(t.Id) AS [Total]
+                             FROM
+                                [dbo].[Transporter] t
+                                LEFT OUTER JOIN [dbo].[Client] c ON t.[ClientId]=c.[Id]";
 
             // WHERE
 
@@ -53,11 +60,30 @@ namespace ACT.Core.Services
 
             query = $"{query} WHERE (1=1)";
 
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
+            }
+
             #endregion
 
             // Custom Search
 
             #region Custom Search
+
+            if ( csm.ClientId != 0 )
+            {
+                query = $"{query} AND (t.ClientId=@csmClientId) ";
+            }
+
+            if ( csm.Status != Status.All )
+            {
+                query = $"{query} AND (t.Status=@csmStatus) ";
+            }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
@@ -83,11 +109,16 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (v.TradingName LIKE '%{1}%' OR
-                                                  v.Name LIKE '%{1}%' OR
-                                                  v.Email LIKE '%{1}%' OR
-                                                  v.ContactNumber LIKE '%{1}%' OR
-                                                  v.RegistrationNumber LIKE '%{1}%'
+                query = string.Format( @"{0} AND (t.TradingName LIKE '%{1}%' OR
+                                                  t.Name LIKE '%{1}%' OR
+                                                  t.Email LIKE '%{1}%' OR
+                                                  t.ContactName LIKE '%{1}%' OR
+                                                  t.ContactNumber LIKE '%{1}%' OR
+                                                  t.SupplierCode LIKE '%{1}%' OR
+                                                  t.RegistrationNumber LIKE '%{1}%' OR
+                                                  c.CompanyName LIKE '%{1}%' OR
+                                                  t.ClientTransporterCode LIKE '%{1}%' OR
+                                                  t.ChepClientTransporterCode LIKE '%{1}%'
                                                   ) ", query, csm.Query.Trim() );
             }
 
@@ -108,7 +139,7 @@ namespace ACT.Core.Services
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
-                csm.ToDate = csm.ToDate?.AddDays( 1 ); 
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
             }
 
             // Parameters
@@ -119,6 +150,8 @@ namespace ACT.Core.Services
             {
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmStatus", ( int ) csm.Status ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
@@ -127,12 +160,14 @@ namespace ACT.Core.Services
 
             #endregion
 
-            string query = string.Format( @"SELECT
-                                               t.*,
-                                               (SELECT COUNT(1) FROM [dbo].[Contact] c WHERE c.ObjectType='Transporter' AND c.ObjectId=t.Id) AS ContactCount,
-                                               (SELECT COUNT(1) FROM [dbo].[Vehicle] v WHERE v.ObjectType='Transporter' AND v.ObjectId=t.Id) AS VehicleCount
-                                            FROM
-                                               [dbo].[Transporter] t" );
+            string query = @"SELECT
+                                t.*,
+                                c.CompanyName AS [ClientName],
+                                (SELECT COUNT(1) FROM [dbo].[Contact] c WHERE c.ObjectType='Transporter' AND c.ObjectId=t.Id) AS ContactCount,
+                                (SELECT COUNT(1) FROM [dbo].[Vehicle] v WHERE v.ObjectType='Transporter' AND v.ObjectId=t.Id) AS VehicleCount
+                             FROM
+                                [dbo].[Transporter] t
+                                LEFT OUTER JOIN [dbo].[Client] c ON t.[ClientId]=c.[Id]";
 
             // WHERE
 
@@ -140,11 +175,30 @@ namespace ACT.Core.Services
 
             query = $"{query} WHERE (1=1)";
 
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
+            }
+
             #endregion
 
             // Custom Search
 
             #region Custom Search
+
+            if ( csm.ClientId != 0 )
+            {
+                query = $"{query} AND (t.ClientId=@csmClientId) ";
+            }
+
+            if ( csm.Status != Status.All )
+            {
+                query = $"{query} AND (t.Status=@csmStatus) ";
+            }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
@@ -170,11 +224,16 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (v.TradingName LIKE '%{1}%' OR
-                                                  v.Name LIKE '%{1}%' OR
-                                                  v.Email LIKE '%{1}%' OR
-                                                  v.ContactNumber LIKE '%{1}%' OR
-                                                  v.RegistrationNumber LIKE '%{1}%'
+                query = string.Format( @"{0} AND (t.TradingName LIKE '%{1}%' OR
+                                                  t.Name LIKE '%{1}%' OR
+                                                  t.Email LIKE '%{1}%' OR
+                                                  t.ContactName LIKE '%{1}%' OR
+                                                  t.ContactNumber LIKE '%{1}%' OR
+                                                  t.SupplierCode LIKE '%{1}%' OR
+                                                  t.RegistrationNumber LIKE '%{1}%' OR
+                                                  c.CompanyName LIKE '%{1}%' OR
+                                                  t.ClientTransporterCode LIKE '%{1}%' OR
+                                                  t.ChepClientTransporterCode LIKE '%{1}%'
                                                   ) ", query, csm.Query.Trim() );
             }
 
@@ -251,9 +310,20 @@ namespace ACT.Core.Services
             return context.Transporters.Any( t => t.RegistrationNumber.Trim() == registrationNumber.Trim() );
         }
 
-        public Transporter GetByName( string name )
+        /// <summary>
+        /// Checks if a transporter with the specified name and client already exists?
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool ExistByClientAndName( int? clientId, string name )
         {
-            return context.Transporters.FirstOrDefault( t => t.Name.ToLower().Trim() == name.ToLower().Trim() );
+            return context.Transporters.Any( t => t.Name.ToLower().Trim() == name.ToLower().Trim() && t.ClientId == clientId );
+        }
+
+        public Transporter GetByClientAndName( int? clientId, string name )
+        {
+            return context.Transporters.FirstOrDefault( t => t.Name.ToLower().Trim() == name.ToLower().Trim() && t.ClientId == clientId );
         }
     }
 }

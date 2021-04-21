@@ -70,8 +70,8 @@
                         @if ( item.Images.NullableAny( i => i.ObjectType == "PCNNumber" ) )
                         {
                             <div class="right">
-                                <a class="docs" data-sticky-one="1" data-target="#clientload-@item.Id-PCNSnapshoot" data-trigger="mouseover" data-arrow="center-right" data-title="PCN Snapshoot">
-                                    &nbsp;
+                                <a class="camera" data-sticky-one="1" data-target="#clientload-@item.Id-PCNSnapshoot" data-trigger="mouseover" data-arrow="center-right" data-title="PCN Snapshoot">
+                                    <img src="@Url.Content( "~/Images/camera.png" )" />
                                 </a>
                                 <div id="clientload-@item.Id-PCNSnapshoot" class="none">
                                     <ul class="list">
@@ -91,7 +91,7 @@
 
                         @if ( !string.IsNullOrEmpty( item.PCNComments ) && !string.IsNullOrEmpty( item.PCNCommentBy ) && item.PCNCommentDate.HasValue )
                         {
-                            <div style="border-top: 1px solid #ddd; padding-top: 5px; margin-top: 2px;">
+                            <div style="border-top: 1px solid #ddd; padding-top: 5px; margin-top: 8px;">
                                 <i>@item.PCNCommentBy:</i> @item.PCNComments
                                 <em class="block"><small>On @item.PCNCommentDate.Value.ToString( "yyyy-MM-dd @ HH:mm tt" )</small></em>
                             </div>
@@ -103,8 +103,8 @@
                         @if ( item.Images.NullableAny( i => i.ObjectType == "PODNumber" ) )
                         {
                             <div class="right">
-                                <a class="docs" data-sticky-one="1" data-target="#clientload-@item.Id-PODSnapshoot" data-trigger="mouseover" data-arrow="center-right" data-title="POD Snapshoot">
-                                    &nbsp;
+                                <a class="camera" data-sticky-one="1" data-target="#clientload-@item.Id-PODSnapshoot" data-trigger="mouseover" data-arrow="center-right" data-title="POD Snapshoot">
+                                    <img src="@Url.Content( "~/Images/camera.png" )" />
                                 </a>
                                 <div id="clientload-@item.Id-PODSnapshoot" class="none">
                                     <ul class="list">
@@ -124,7 +124,7 @@
 
                         @if ( ( !string.IsNullOrEmpty( item.PODComments ) || !string.IsNullOrEmpty( item.PODComment ) ) && !string.IsNullOrEmpty( item.PODCommentBy ) && item.PODCommentDate.HasValue )
                         {
-                            <div style="border-top: 1px solid #ddd; padding-top: 5px; margin-top: 2px;">
+                            <div style="border-top: 1px solid #ddd; padding-top: 5px; margin-top: 8px;">
                                 <i>@item.PODCommentBy:</i> @(item.PODComment ?? item.PODComments)
                                 <em class="block"><small>On @item.PODCommentDate.Value.ToString( "yyyy-MM-dd @ HH:mm tt" )</small></em>
                             </div>
@@ -136,8 +136,8 @@
                         @if ( item.Images.NullableAny( i => i.ObjectType == "PRNNumber" ) )
                         {
                             <div class="right">
-                                <a class="docs" data-sticky-one="1" data-target="#clientload-@item.Id-PRNSnapshoot" data-trigger="mouseover" data-arrow="center-right" data-title="PRN Snapshoot">
-                                    &nbsp;
+                                <a class="camera" data-sticky-one="1" data-target="#clientload-@item.Id-PRNSnapshoot" data-trigger="mouseover" data-arrow="center-right" data-title="PRN Snapshoot">
+                                    <img src="@Url.Content( "~/Images/camera.png" )" />
                                 </a>
                                 <div id="clientload-@item.Id-PRNSnapshoot" class="none">
                                     <ul class="list">
@@ -157,7 +157,7 @@
 
                         @if ( !string.IsNullOrEmpty( item.PRNComments ) && !string.IsNullOrEmpty( item.PRNCommentBy ) && item.PRNCommentDate.HasValue )
                         {
-                            <div style="border-top: 1px solid #ddd; padding-top: 5px; margin-top: 2px;">
+                            <div style="border-top: 1px solid #ddd; padding-top: 5px; margin-top: 8px;">
                                 <i>@item.PRNCommentBy:</i> @item.PRNComments
                                 <em class="block"><small>On @item.PRNCommentDate.Value.ToString( "yyyy-MM-dd @ HH:mm tt" )</small></em>
                             </div>

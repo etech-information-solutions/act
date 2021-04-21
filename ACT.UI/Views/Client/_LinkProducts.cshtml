@@ -43,6 +43,15 @@
 <table id="products-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#products-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="CreatedOn" data-column="cp.CreatedOn">
+                Created
+            </th>
+            <th data-name="ClientName" data-column="c.CompanyName">
+                Client
+            </th>
             <th data-name="Name" data-column="p.Name">
                 Name
             </th>
@@ -86,6 +95,20 @@
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
+                    <td>
+                        @count
+                    </td>
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="ClientProduct">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.ClientName
+                    </td>
                     <td>
                         @item.ProductName
                     </td>

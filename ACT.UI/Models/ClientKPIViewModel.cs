@@ -66,6 +66,11 @@ namespace ACT.UI.Models
             {
                 using ( ClientService cservice = new ClientService() )
                 {
+                    if ( cservice.SelectedClient != null )
+                    {
+                        ClientId = cservice.SelectedClient.Id;
+                    }
+
                     return cservice.List( true );
                 }
             }

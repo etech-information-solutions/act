@@ -512,23 +512,21 @@ namespace ACT.UI.Controllers
         /// <returns></returns>
         public JsonResult GetClient( int clientId = 0 )
         {
-            Client client;
-
-            string logoPath = "~/Images/no-preview.png";
-
             using ( ClientService service = new ClientService() )
             {
-                client = service.GetById( clientId );
-            }
+                string logoPath = "~/Images/no-preview.png";
 
-            return new JsonResult()
-            {
-                Data = new
+                Client client = service.GetById( clientId );
+
+                return new JsonResult()
                 {
-                    Id = client.Id,
-                    Logo = logoPath
-                }
-            };
+                    Data = new
+                    {
+                        Id = client.Id,
+                        Logo = logoPath
+                    }
+                };
+            }
         }
 
         //
@@ -748,130 +746,31 @@ namespace ACT.UI.Controllers
 
         //
         // Returns a general list of all active clients allowed in the current context to be selected from
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetClientList()
+        public ActionResult GetClients()
         {
-
-            List<ClientCustomModel> model = new List<ClientCustomModel>();
-            PagingModel pm = new PagingModel();
-            CustomSearchModel csm = new CustomSearchModel();
-
-            using ( ClientService service = new ClientService() )
-            {
-                pm.Sort = pm.Sort ?? "ASC";
-                pm.SortBy = pm.SortBy ?? "Name";
-                csm.Status = Status.Active;
-                csm.Status = Status.Active;
-
-                model = service.List1( pm, csm );
-            }
-            if ( model.Any() )
-            {
-                IEnumerable<SelectListItem> clientDDL = model.Select( c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.CompanyName
-
-                } );
-
-
-                return Json( clientDDL, JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
+            return PartialView( "_ClientList", new CustomSearchModel( "SetClient" ) );
         }
 
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetClientDetail( string clientId )
+        public ActionResult SetClient( int? id )
         {
-            if ( clientId != null && clientId != "" )
+            using ( ClientService cservice = new ClientService() )
             {
-                Client client = null;
+                Client c = cservice.GetById( id ?? 0 );
 
-                using ( ClientService bservice = new ClientService() )
+                if ( c == null )
                 {
-                    client = bservice.GetById( int.Parse( clientId ) );
-                    return Json( client, JsonRequestBehavior.AllowGet );
+                    ContextExtensions.RemoveCachedUserData( "SEL_client" );
+
+                    Notify( "Your default set working client has successfully been removed.", NotificationType.Success );
+
+                    return PartialView( "_Notification" );
                 }
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
 
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult GetObjectAddress( string objectId, string objectType )
-        {
-            if ( objectId != null && objectId != "" && !string.IsNullOrEmpty( objectType ) )
-            {
-                Address address = null;
+                ContextExtensions.CacheUserData( "SEL_client", c );
 
-                using ( AddressService bservice = new AddressService() )
-                {
-                    address = bservice.GetByColumnsWhere( "ObjectId", int.Parse( objectId ), "ObjectType", objectType );
-                    return Json( address, JsonRequestBehavior.AllowGet );
-                }
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
+                Notify( "The selected Client was successfully set.", NotificationType.Success );
 
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetClient( string ClientId )
-        {
-            if ( ClientId != null )
-            {
-                int.TryParse( ClientId, out int intClientId ); //to ensure we have a parseable value to use, whether 0 or greater, and not a NaN
-                Session[ "ClientId" ] = intClientId;
-
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetSite( string SiteId )
-        {
-            if ( SiteId != null )
-            {
-                Session[ "SiteId" ] = SiteId;
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
-            }
-        }
-
-        [AcceptVerbs( HttpVerbs.Get | HttpVerbs.Post )]
-        public JsonResult SetClientSite( string SiteId )
-        {
-            if ( SiteId != null )
-            {
-                int clientId = 0;
-                if ( int.Parse( SiteId ) > 0 )
-                {
-                    using ( SiteService service = new SiteService() )
-                    {
-                        clientId = service.GetClientBySite( int.Parse( SiteId ) );
-                    }
-                    Session[ "ClientId" ] = clientId;
-                }
-                Session[ "SiteId" ] = SiteId;
-                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
-            }
-            else
-            {
-                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
+                return PartialView( "_Notification" );
             }
         }
 
@@ -1089,9 +988,9 @@ namespace ACT.UI.Controllers
                         Name = p.Name,
                         Description = p.Description,
                         CreatedOn = p.CreatedOn.ToString( "yyyy/MM/dd" ),
-                        LostRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Lost && pp.Status == ( int ) Status.Active ).Rate,
-                        IssueRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Issue && pp.Status == ( int ) Status.Active ).Rate,
-                        HireRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Hire && pp.Status == ( int ) Status.Active ).Rate,
+                        LostRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Lost && pp.Status == ( int ) Status.Active )?.Rate,
+                        IssueRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Issue && pp.Status == ( int ) Status.Active )?.Rate,
+                        HireRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Hire && pp.Status == ( int ) Status.Active )?.Rate,
                     }
                 };
             }
@@ -1265,7 +1164,7 @@ namespace ACT.UI.Controllers
 
                 List<int?> clientIds = new List<int?>();
 
-                DateTime minYear = model.Min( m => m.ShipmentDate ) ?? DateTime.Now;
+                DateTime minYear = model.NullableAny() ? model.Min( m => m.ShipmentDate ) ?? DateTime.Now : DateTime.Now;
 
                 foreach ( ChepLoadCustomModel item in model )
                 {
@@ -1491,7 +1390,7 @@ namespace ACT.UI.Controllers
 
             string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
 
-            string fileName = $"{path}{now}-ImportPoolingAgentData-Errors.txt";
+            string fileName = $"{path}{now}-Import-Errors.txt";
 
             using ( StreamWriter sw = new StreamWriter( fileName, true ) )
             using ( DocumentService dservice = new DocumentService() )
@@ -1508,11 +1407,11 @@ namespace ACT.UI.Controllers
                     ObjectId = r,
                     ObjectType = "Error",
                     Status = ( int ) Status.Active,
-                    Name = "Import Pooling Agent Data Errors",
-                    Title = "Import Pooling Agent Data Errors",
-                    Category = "Import Pooling Agent Data Errors",
-                    Description = "Import Pooling Agent Data Errors",
-                    Location = $"Errors/{now}-ImportPoolingAgentData-Errors.txt",
+                    Name = "Import Errors",
+                    Title = "Import Errors",
+                    Category = "Import Errors",
+                    Description = "Import Errors",
+                    Location = $"Errors/{now}-Import-Errors.txt",
                 };
 
                 doc = dservice.Create( doc );

@@ -18,6 +18,9 @@ namespace ACT.Core.Enums
         Monthly = 1,
 
         [StringEnumDisplayText( "Annually" )]
-        Annually = 2
+        Annually = 2,
+
+        [StringEnumDisplayText( "Daily" )]
+        Daily = 3
     }
 }

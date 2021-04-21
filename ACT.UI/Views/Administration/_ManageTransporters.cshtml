@@ -1,8 +1,8 @@
 ﻿@model PagingExtension
 
 @using ACT.Core.Enums;
-@using ACT.Data.Models;
 @using ACT.Core.Models.Custom;
+@using ACT.Data.Models;
 
 @{
     ViewBag.ShowExport = true;
@@ -29,9 +29,12 @@
 }
 
 <p>
-    @Html.ActionLink( "Add Transporter", "AddTransporter", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new transporter?", @data_edit = "1", @data_id = 0, @data_target = "#managetransporters" } )
+    @Html.ActionLink( "Add", "AddTransporter", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new transporter?", @data_edit = "1", @data_id = 0, @data_target = "#managetransporters" } )
+    <span style="padding: 0 4px;">/</span>
+    @Html.ActionLink( "Import", "ImportTransporter", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import transporters?", @data_edit = "1", @data_id = 0, @data_target = "#managetransporters" } )
     <span class="loader"></span>
 </p>
+
 
 <table id="transporters-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#transporters-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
@@ -39,22 +42,22 @@
             <th data-name="Count">
                 #
             </th>
-            <th data-name="Name" data-column="Name">
+            <th data-name="ClientName" data-column="c.CompanyName">
+                Client
+            </th>
+            <th data-name="Name" data-column="t.Name">
                 Name
             </th>
-            <th data-name="TradingName" data-column="TradingName">
-                Trading Name
-            </th>
-            <th data-name="Status" data-column="RegistrationNumber">
+            <th data-name="Status" data-column="t.RegistrationNumber">
                 Registration #
             </th>
-            <th data-name="ContactNumber" data-column="ContactNumber">
-                Contact #
+            <th data-name="SupplierCode" data-column="t.SupplierCode">
+                Supplier Code
             </th>
-            <th data-name="Email" data-column="Email">
-                Email
+            <th data-name="Email" data-column="t.Email">
+                Contact
             </th>
-            <th data-name="Status" data-column="Status">
+            <th data-name="Status" data-column="t.Status">
                 Status
             </th>
             <th data-name="ContactCount" data-column="ContactCount">
@@ -85,18 +88,19 @@
                         @count
                     </td>
                     <td>
-                        @item.Name
+                        @item.ClientName
                     </td>
                     <td>
-                        @item.TradingName
+                        @item.Name
                     </td>
                     <td>
                         @item.RegistrationNumber
                     </td>
                     <td>
-                        @item.ContactNumber
+                        @item.SupplierCode
                     </td>
                     <td>
+                        @item.ContactNumber <br />
                         @item.Email
                     </td>
                     <td>

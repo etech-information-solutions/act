@@ -61,6 +61,16 @@ namespace ACT.Core.Services
 
             query = $"{query} WHERE (1=1)";
 
+            // Limit to only show clients for logged in PSP
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
+            }
+
             #endregion
 
             // Custom Search
@@ -160,6 +170,16 @@ namespace ACT.Core.Services
             #region WHERE
 
             query = $"{query} WHERE (1=1)";
+
+            // Limit to only show clients for logged in PSP
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
+            }
 
             #endregion
 

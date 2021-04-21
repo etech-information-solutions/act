@@ -161,9 +161,14 @@ namespace ACT.UI.Models
             {
                 if ( !EditMode ) return null;
 
-                using ( ClientService service = new ClientService() )
+                using ( ClientService cservice = new ClientService() )
                 {
-                    return service.List( true );
+                    if ( cservice.SelectedClient != null )
+                    {
+                        ClientId = cservice.SelectedClient.Id;
+                    }
+
+                    return cservice.List( true );
                 }
             }
         }

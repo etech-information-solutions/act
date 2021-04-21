@@ -36,7 +36,6 @@
             $( 'select.chzn' ).chznreadonly( true );
 
             // Reset auto log off timer
-            //ACT.UI.AutoLogOff(lgt);
         },
 
         Hide: function ()

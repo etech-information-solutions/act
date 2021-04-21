@@ -515,7 +515,7 @@ form fieldset, fieldset {
     height: 10px;
 }
 
-input.input-validation-error {
+.input-validation-error {
     border: 1px solid #e80c4d !important;
 }
 

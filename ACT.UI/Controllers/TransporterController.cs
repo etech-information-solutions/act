@@ -64,6 +64,7 @@ namespace ACT.UI.Controllers
                     model.Files.Add( new FileViewModel()
                     {
                         Id = podImg.Id,
+                        Name = "PODNumber",
                         Extension = podImg.Extension
                     } );
                 }
@@ -73,6 +74,7 @@ namespace ACT.UI.Controllers
                     model.Files.Add( new FileViewModel()
                     {
                         Id = pcnImg.Id,
+                        Name = "PCNNumber",
                         Extension = pcnImg.Extension
                     } );
                 }
@@ -82,6 +84,7 @@ namespace ACT.UI.Controllers
                     model.Files.Add( new FileViewModel()
                     {
                         Id = prnImg.Id,
+                        Name = "PRNNumber",
                         Extension = prnImg.Extension
                     } );
                 }

@@ -147,6 +147,9 @@
             this.DataLinkProduct( $( '*[data-link-product="1"]' ) );
             this.DataClientLoadStatus( $( '*[data-client-load-status="1"]' ) );
 
+            // Body Keypress
+            this.DataSetClient( $( window ), 113 );
+
             if ( window.location.search !== "" && !$( "tr.edit" ).length && $( ".dataTable" ).length && !ACT.UI.PageViewIdProcessed )
             {
                 var viewid = false,
@@ -1272,6 +1275,8 @@
             {
                 var i = $( this );
 
+                var target = $( i.attr( "data-upload-target" ) );
+
                 i
                     .unbind( "change" )
                     .bind( "change", function ()
@@ -1282,6 +1287,8 @@
                             {
                                 return;
                             }
+
+                            img = target.length > 0 ? target : img;
 
                             var reader = new FileReader();
 
@@ -1349,7 +1356,7 @@
                             {
                                 ACT.UI.DataHighlightFields( target );
 
-                                target.find( "input:visible" ).attr( "required", "required" );
+                                //target.find( "input:visible" ).attr( "required", "required" );
                             } );
                         }
                         else
@@ -5462,6 +5469,83 @@
                             }, 1000 );
                         } );
                     } );
+            } );
+        },
+
+        DataSettingClient: false,
+
+        DataSetClient: function ( sender, code )
+        {
+            sender.bind( "keydown", function ( e )
+            {
+                e = ( e ) ? e : window.event;
+
+                var charCode = ( e.which ) ? e.which : e.keyCode;
+
+                if ( charCode != code ) return;
+
+                if ( ACT.UI.DataSettingClient && $( ACT.Modal.Container ).is( ":visible" ) ) return false;
+
+                e.preventDefault();
+
+                var title = "Set Client";
+                var msg = '<p>Please wait whilst we fetch a list of clients you can work on today...</p>' + ACT.Loader.Html;
+
+                ACT.Modal.Open( msg, title, false, [] );
+
+                setTimeout( function ()
+                {
+                    //ACT.Loader.Show( [] );
+
+                    if ( ACT.UI.DataSettingClient && $( ACT.Modal.Container ).is( ":visible" ) ) return false;
+
+                    ACT.UI.DataSettingClient = true;
+
+                    $( "<div />" ).load( siteurl + "/GetClients", {}, function ( d )
+                    {
+                        //ACT.Loader.Hide();
+
+                        $( this ).find( '[for="ClientId"]' ).html( "Select Client" ).css( { "display": "block", "margin-bottom": "5px", "text-transform": "uppercase" } );
+
+                        var html = $( this ).html();
+
+                        html = "<p>Please select a client you would like to work on and click Submit to proceed:</p>" + html;
+
+                        var body = $( ACT.Modal.Container ).find( "#modal-body" );
+
+                        $( ACT.Modal.Container ).find( '#btns' ).css( "display", "block" );
+
+                        body.html( html );
+
+                        ACT.Init.PluginInit( body );
+
+                        // Submit button click 
+                        var sel = $( ACT.Modal.Container ).find( '#ClientId' );
+                        var btn = $( ACT.Modal.Container ).find( '#btnConfirm' );
+
+                        btn
+                            .unbind( "click" )
+                            .bind( "click", function ()
+                            {
+                                $( ACT.Modal.Container ).find( '#s2id_ClientId' ).removeClass( "input-validation-error " );
+
+                                ACT.Loader.Show( btn, true );
+
+                                $( "<div />" ).load( siteurl + "/SetClient", { id: sel.val() }, function ()
+                                {
+                                    body.find( ".notification" ).remove();
+                                    $( this ).find( ".notification" ).css( "margin-top", "0" );
+
+                                    body.prepend( $( this ).html() );
+
+                                    ACT.Init.Start( false );
+
+                                    ACT.Loader.Hide();
+                                } );
+                            } );
+                    } );
+
+                }, 1000 );
             } );
         }
 

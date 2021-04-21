@@ -31,6 +31,14 @@
         <div class="left" style="width: 25%; margin-right: 2%;">
 
             <div class="editor-label">
+                @Html.LabelFor( model => model.ClientId )
+            </div>
+            <div class="editor-field">
+                @Html.DropDownListFor( model => model.ClientId, model => Model.ClientOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @required = "required", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.ClientId )
+            </div>
+
+            <div class="editor-label">
                 Name
             </div>
             <div class="editor-field">
@@ -45,6 +53,7 @@
                 @Html.TextBoxFor( model => model.TradingName, new { @class = "input", @placeholder = "Enter Transporter Trading Name" } )
                 @Html.ValidationMessageFor( model => model.TradingName )
             </div>
+
             <div class="editor-label">
                 Registrtion #
             </div>
@@ -54,11 +63,43 @@
             </div>
 
             <div class="editor-label">
+                Supplier Code
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.SupplierCode, new { @class = "input", @placeholder = "Enter Transporter Supplier Code" } )
+                @Html.ValidationMessageFor( model => model.SupplierCode )
+            </div>
+
+            <div class="editor-label">
+                Transporter Client Code
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ClientTransporterCode, new { @class = "input", @placeholder = "Enter Transporter Client Code" } )
+                @Html.ValidationMessageFor( model => model.ClientTransporterCode )
+            </div>
+
+            <div class="editor-label">
+                Transporter Chep Code
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ChepClientTransporterCode, new { @class = "input", @placeholder = "Enter Transporter Chep Code" } )
+                @Html.ValidationMessageFor( model => model.ChepClientTransporterCode )
+            </div>
+
+            <div class="editor-label">
                 Email
             </div>
             <div class="editor-field">
                 @Html.TextBoxFor( model => model.Email, new { @class = "input", @placeholder = "Enter Transporter Email" } )
                 @Html.ValidationMessageFor( model => model.Email )
+            </div>
+
+            <div class="editor-label">
+                Contact Name
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ContactName, new { @class = "input", @placeholder = "Enter Transporter Contact Person Name" } )
+                @Html.ValidationMessageFor( model => model.ContactName )
             </div>
 
             <div class="editor-label">

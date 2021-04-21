@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+
 using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Core.Models.Custom;
@@ -36,11 +37,11 @@ namespace ACT.Core.Services
 
             query = $"SELECT c.Id AS [TKey], c.CompanyName AS [TValue] FROM [dbo].[Client] c WHERE (1=1)";
 
-            if (CurrentUser.Roles.Any(r => r.Type == RoleType.PSP.GetIntValue() ))
+            if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM PSPUser[pu] RIGHT JOIN PSPClient[pc] on pc.PSPId = pu.PSPId WHERE pu.UserId = 25 AND pc.ClientId = c.Id)";
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
             }
-            else if (!CurrentUser.IsAdmin)
+            else if ( CurrentUser.RoleType == RoleType.Client )
             {
                 query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
             }
@@ -92,11 +93,13 @@ namespace ACT.Core.Services
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
                 { new SqlParameter( "csmPSPId", csm.PSPId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmStatus", ( int ) csm.PSPClientStatus ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "useremail", ( CurrentUser != null ) ? CurrentUser.Email : "" ) },
             };
 
             #endregion
@@ -115,14 +118,17 @@ namespace ACT.Core.Services
             query = $"{query} WHERE (1=1)";
 
             // Limit to only show clients for logged in PSP
-            if ( !CurrentUser.IsAdmin )
+            if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu
-                                                       INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId
-                                              WHERE
-                                                pc.ClientId=c.Id AND
-                                                pu.UserId=@userid
-                                             ) ";
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Transporter )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Transporter] t WHERE t.[Id]=cl.[TransporterId] AND t.[Email]=@useremail)";
             }
 
             #endregion
@@ -134,6 +140,11 @@ namespace ACT.Core.Services
             if ( csm.PSPId > 0 )
             {
                 query = $"{query} AND (p.Id=@csmPSPId) ";
+            }
+
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND (c.Id=@csmClientId) ";
             }
 
             if ( csm.PSPClientStatus != PSPClientStatus.All )
@@ -211,11 +222,13 @@ namespace ACT.Core.Services
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
                 { new SqlParameter( "csmPSPId", csm.PSPId ) },
+                { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmStatus", ( int ) csm.PSPClientStatus ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "useremail", ( CurrentUser != null ) ? CurrentUser.Email : "" ) },
             };
 
             #endregion
@@ -242,14 +255,17 @@ namespace ACT.Core.Services
             query = $"{query} WHERE (1=1)";
 
             // Limit to only show clients for logged in PSP
-            if ( !CurrentUser.IsAdmin )
+            if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu
-                                                       INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId
-                                              WHERE
-                                                pc.ClientId=c.Id AND
-                                                pu.UserId=@userid
-                                             ) ";
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Transporter )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Transporter] t WHERE t.[Id]=cl.[TransporterId] AND t.[Email]=@useremail)";
             }
 
             #endregion
@@ -261,6 +277,10 @@ namespace ACT.Core.Services
             if ( csm.PSPId > 0 )
             {
                 query = $"{query} AND (p.Id=@csmPSPId) ";
+            }
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND (c.Id=@csmClientId) ";
             }
 
             if ( csm.PSPClientStatus != PSPClientStatus.All )

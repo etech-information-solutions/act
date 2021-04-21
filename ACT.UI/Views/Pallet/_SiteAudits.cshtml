@@ -1,1 +1,122 @@
-﻿
+﻿@model PagingExtension
+
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_SiteAudits";
+}
+
+@Html.Partial( "_Notification" )
+
+@{
+    int count = Model.Start;
+    List<SiteAuditCustomModel> items = ( List<SiteAuditCustomModel> ) Model.Items;
+}
+
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Site Audits available matching your search criteria.
+    </div>
+}
+
+<p>
+    @Html.ActionLink( "Add", "AddSiteAudit", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Site Audit?", @data_edit = "1", @data_id = 0, @data_target = "#siteaudits" } )
+    <span class="loader"></span>
+</p>
+
+<table id="SiteAudit-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#SiteAudit-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="LoadDate" data-column="sa.AuditDate">
+                Audit Date
+            </th>
+            <th data-name="SiteName" data-column="s.Name">
+                Site
+            </th>
+            <th data-name="CompanyName" data-column="c.CompanyName">
+                Customer
+            </th>
+            <th data-name="RepName" data-column="sa.RepName">
+                Sales Rep
+            </th>
+            <th data-name="PalletAuditor" data-column="sa.PalletAuditor">
+                Pallet Auditor
+            </th>
+            <th data-name="PalletAuditor" data-column="sa.Equipment">
+                Equipment
+            </th>
+            <th data-name="PalletsOutstanding" data-column="sa.PalletsOutstanding">
+                Outstanding Pallets
+            </th>
+            <th data-name="PalletsCounted" data-column="sa.PalletsCounted">
+                Counted Pallets
+            </th>
+            <th data-name="WriteoffPallets" data-column="sa.WriteoffPallets">
+                Written off Pallets
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                <tr id="PODManagement-@item.Id-item" class="PODManagement-@item.Id-item">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @(item.AuditDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @item.SiteName
+                    </td>
+                    <td>
+                        @item.ClientName
+                    </td>
+                    <td>
+                        @item.RepName
+                    </td>
+                    <td>
+                        @item.PalletAuditor
+                    </td>
+                    <td>
+                        @item.Equipment
+                    </td>
+                    <td>
+                        @item.PalletsOutstanding
+                    </td>
+                    <td>
+                        @item.PalletsCounted
+                    </td>
+                    <td>
+                        @item.WriteoffPallets
+                    </td>
+                    <td width="10%">
+                        @Html.ActionLink( "Edit", "EditSiteAudit", new { id = item.Id, returnView = "SiteAudits" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".PODManagement-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( "Details", "SiteAuditDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+@Html.Partial( "_Paging" )

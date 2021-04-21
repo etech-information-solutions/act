@@ -1348,7 +1348,7 @@ namespace ACT.UI.Controllers
 
                     #region Transporter
 
-                    Transporter t = tservice.GetByName( load[ 15 ] );
+                    Transporter t = tservice.GetByClientAndName( model.ClientId, load[ 15 ] );
 
                     if ( t == null )
                     {
@@ -1543,8 +1543,7 @@ namespace ACT.UI.Controllers
                                                     [PRNNumber]='{prn}',
                                                     [THAN]='{load[ 17 ]}',
                                                     [ReturnQty]={returnQty},
-                                                    [PODStatus]={podStatus},
-                                                    [UID]={( int ) Status.Active}
+                                                    [PODStatus]={podStatus}
                                                 WHERE
                                                     [Id]={l.Id}";
 
@@ -4257,6 +4256,146 @@ namespace ACT.UI.Controllers
 
         //-------------------------------------------------------------------------------------
 
+        #region Site Audit
+        /*
+        //
+        // GET: /Pallet/SiteAuditDetails/5
+        public ActionResult SiteAuditDetails( int id, bool layout = true )
+        {
+            using ( SiteAuditService service = new SiteAuditService() )
+            {
+                SiteAudit sa = service.GetById( id );
+
+                if ( sa == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return RedirectToAction( "Index" );
+                }
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                return View( sa );
+            }
+        }
+
+        //
+        // GET: /Pallet/AddSiteAudit/5 
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddSiteAudit()
+        {
+            SiteAuditViewModel model = new SiteAuditViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        //
+        // POST: /Pallet/AddSiteAudit/5
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddSiteAudit( SiteAuditViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the SiteAudit was not created. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( SiteAuditService dservice = new SiteAuditService() )
+            using ( ProductService pservice = new ProductService() )
+            using ( ChepLoadService clservice = new ChepLoadService() )
+            {
+                SiteAudit sa = new SiteAudit()
+                {
+                    Imported = false,
+                    ProductId = p?.Id,
+                    Action = model.Action,
+                };
+
+                dservice.Create( sa );
+
+                Notify( "The SiteAudit was successfully created.", NotificationType.Success );
+
+                return SiteAudits( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
+        //
+        // GET: /Pallet/EditSiteAudit/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditSiteAudit( int id )
+        {
+            using ( SiteAuditService service = new SiteAuditService() )
+            {
+                SiteAudit sa = service.GetById( id );
+
+                if ( sa == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                SiteAuditViewModel model = new SiteAuditViewModel()
+                {
+                    Id = sa.Id,
+                    EditMode = true,
+                    Action = sa.Action,
+                };
+
+                model.DaysLeft = model.DaysLeft ?? 0;
+
+                model.DaysLeft = ( model.Status == SiteAuditStatus.Active ) ? ( model.DaysLeft - ( DateTime.Now - sa.CreatedOn ).Days ) : ( model.DaysLeft - ( DateTime.Now - sa.ResolvedOn )?.Days );
+
+                return View( model );
+            }
+        }
+
+        //
+        // POST: /Pallet/EditSiteAudit/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditSiteAudit( SiteAuditViewModel model )
+        {
+            using ( SiteAuditService service = new SiteAuditService() )
+            using ( ProductService pservice = new ProductService() )
+            using ( ChepLoadService clservice = new ChepLoadService() )
+            {
+                if ( !ModelState.IsValid )
+                {
+                    Notify( "Sorry, the selected SiteAudit was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                SiteAudit sa = service.GetById( model.Id );
+
+                if ( sa == null )
+                {
+                    Notify( "Sorry, that SiteAudit does not exist! Please specify a valid SiteAudit Id and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                sa.ProductId = p?.Id;
+                sa.Action = model.Action;
+
+                service.Update( sa );
+
+                Notify( "The selected SiteAudit's details were successfully updated.", NotificationType.Success );
+
+                return SiteAudits( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+        */
+        #endregion
+
+        //-------------------------------------------------------------------------------------
+
 
         #region Partial Views
 
@@ -4477,7 +4616,7 @@ namespace ACT.UI.Controllers
         }
 
         //
-        // GET: /Transporter/SiteAudits
+        // GET: /Pallet/SiteAudits
         public ActionResult SiteAudits( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
             using ( SiteAuditService service = new SiteAuditService() )

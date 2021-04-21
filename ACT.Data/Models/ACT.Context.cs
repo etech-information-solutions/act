@@ -43,7 +43,6 @@ namespace ACT.Data.Models
         public virtual DbSet<ClientGroup> ClientGroups { get; set; }
         public virtual DbSet<ClientInvoice> ClientInvoices { get; set; }
         public virtual DbSet<ClientKPI> ClientKPIs { get; set; }
-        public virtual DbSet<ClientProduct> ClientProducts { get; set; }
         public virtual DbSet<ClientProductMonthly> ClientProductMonthlies { get; set; }
         public virtual DbSet<ClientSite> ClientSites { get; set; }
         public virtual DbSet<ClientUser> ClientUsers { get; set; }
@@ -74,14 +73,12 @@ namespace ACT.Data.Models
         public virtual DbSet<PSPUser> PSPUsers { get; set; }
         public virtual DbSet<Region> Regions { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
-        public virtual DbSet<Site> Sites { get; set; }
         public virtual DbSet<SiteAudit> SiteAudits { get; set; }
         public virtual DbSet<SiteBilling> SiteBillings { get; set; }
         public virtual DbSet<SiteBudget> SiteBudgets { get; set; }
         public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
         public virtual DbSet<Task> Tasks { get; set; }
         public virtual DbSet<Token> Tokens { get; set; }
-        public virtual DbSet<Transporter> Transporters { get; set; }
         public virtual DbSet<UserBroadcast> UserBroadcasts { get; set; }
         public virtual DbSet<UserDocument> UserDocuments { get; set; }
         public virtual DbSet<UserNotification> UserNotifications { get; set; }
@@ -92,5 +89,8 @@ namespace ACT.Data.Models
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<ChepLoadOLD> ChepLoadOLDs { get; set; }
         public virtual DbSet<ClientLoad> ClientLoads { get; set; }
+        public virtual DbSet<Site> Sites { get; set; }
+        public virtual DbSet<ClientProduct> ClientProducts { get; set; }
+        public virtual DbSet<Transporter> Transporters { get; set; }
     }
 }

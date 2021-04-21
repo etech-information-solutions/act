@@ -36,8 +36,8 @@ export class UserService
   APIAuthenticationHeader: any;
 
   APIKey: any = "_12345testing_";
-  //APIUrl: any = "http://act.loc/";
-  APIUrl: any = "http://www.testact.co.za/";
+  APIUrl: any = "http://act.loc/";
+  //APIUrl: any = "http://www.testact.co.za/";
 
   Time: any = [];
 

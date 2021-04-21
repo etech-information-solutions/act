@@ -10,12 +10,16 @@
     }
 
     ViewBag.Title = "Edit Shipment Data";
+
+    string podSnapshoot = Model.Files.NullableAny( f => f.Name == "PODNumber" ) ? Url.Action( "ViewImage", new { id = Model.Files.FirstOrDefault( d => d.Name == "PODNumber" ).Id } ) : Url.Content( "~/Images/no-preview.png" ),
+           pcnSnapshoot = Model.Files.NullableAny( f => f.Name == "PCNNumber" ) ? Url.Action( "ViewImage", new { id = Model.Files.FirstOrDefault( d => d.Name == "PCNNumber" ).Id } ) : Url.Content( "~/Images/no-preview.png" ),
+           prnSnapshoot = Model.Files.NullableAny( f => f.Name == "PRNNumber" ) ? Url.Action( "ViewImage", new { id = Model.Files.FirstOrDefault( d => d.Name == "PRNNumber" ).Id } ) : Url.Content( "~/Images/no-preview.png" );
 }
 
 
 @Html.Partial( "_Notification" )
 
-@using ( Html.BeginForm( "EditClientLoad", "Transporter", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clientdata", @class = "custom-validate", @style = "width: auto;", id = "editclientload" } ) )
+@using ( Html.BeginForm( "EditClientLoad", "Transporter", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#podmanagement", @class = "custom-validate", @style = "width: auto;", id = "editclientload" } ) )
 {
     <div id="edit-item">
 
@@ -51,8 +55,15 @@
                 <div class="editor-label">
                     POD Snapshoot
                 </div>
-                <div class="editor-field">
-                    <input name="Files[0].File" type="file" value="" class="input" />
+                <div class="editor-field" style="text-align: center; border: 1px dashed #ddd; padding: 10px;">
+
+                    <label>
+                        <a href="@podSnapshoot" target="_blank">
+                            <img id="pod-snapshoot-preview" style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="" src="@podSnapshoot" />
+                        </a>
+                    </label>
+
+                    <input name="Files[0].File" type="file" value="" class="input" data-upload-image="1" data-upload-target="#pod-snapshoot-preview" />
                     <input name="Files[0].Name" type="hidden" value="PODNumber" />
                 </div>
 
@@ -79,8 +90,15 @@
                 <div class="editor-label">
                     PCN Snapshoot
                 </div>
-                <div class="editor-field">
-                    <input name="Files[1].File" type="file" value="" class="input" />
+                <div class="editor-field" style="text-align: center; border: 1px dashed #ddd; padding: 10px;">
+
+                    <label>
+                        <a href="@pcnSnapshoot" target="_blank">
+                            <img id="pcn-snapshoot-preview" style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="" src="@pcnSnapshoot" />
+                        </a>
+                    </label>
+
+                    <input name="Files[1].File" type="file" value="" class="input" data-upload-image="1" data-upload-target="#pcn-snapshoot-preview" />
                     <input name="Files[1].Name" type="hidden" value="PCNNumber" />
                 </div>
 
@@ -107,8 +125,15 @@
                 <div class="editor-label">
                     PRN Snapshoot
                 </div>
-                <div class="editor-field">
-                    <input name="Files[2].File" type="file" value="" class="input" />
+                <div class="editor-field" style="text-align: center; border: 1px dashed #ddd; padding: 10px;">
+
+                    <label>
+                        <a href="@prnSnapshoot" target="_blank">
+                            <img id="prn-snapshoot-preview" style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="" src="@prnSnapshoot" />
+                        </a>
+                    </label>
+
+                    <input name="Files[2].File" type="file" value="" class="input" data-upload-image="1" data-upload-target="#prn-snapshoot-preview" />
                     <input name="Files[2].Name" type="hidden" value="PRNNumber" />
                 </div>
 

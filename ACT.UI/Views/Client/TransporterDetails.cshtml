@@ -26,6 +26,20 @@
     <div class="left" style="width: 25%; margin-right: 2%;">
 
         <div class="display-label">
+            Date Created
+        </div>
+        <div class="display-field">
+            @Model.CreatedOn
+        </div>
+
+        <div class="display-label">
+            Client
+        </div>
+        <div class="display-field">
+            @(Model.Client?.CompanyName)
+        </div>
+
+        <div class="display-label">
             Name
         </div>
         <div class="display-field">
@@ -40,10 +54,31 @@
         </div>
 
         <div class="display-label">
-            Registration Number
+            Registration #
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.RegistrationNumber )
+        </div>
+
+        <div class="display-label">
+            Supplier Code
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.SupplierCode )
+        </div>
+
+        <div class="display-label">
+            Transporter Client Code
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ClientTransporterCode )
+        </div>
+
+        <div class="display-label">
+            Transporter Chep Code
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ChepClientTransporterCode )
         </div>
 
         <div class="display-label">
@@ -54,15 +89,22 @@
         </div>
 
         <div class="display-label">
+            Contact Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ContactName )
+        </div>
+
+        <div class="display-label">
             Contact Number
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.ContactNumber )
         </div>
+
         <div class="display-label">
             Status
         </div>
-
         <div class="display-field">
             @(( ( Status ) Model.Status ).GetDisplayText())
         </div>
