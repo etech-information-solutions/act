@@ -20,44 +20,44 @@ namespace ACT.UI.Models
 
         [Required]
         [Display( Name = "Name" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string Name { get; set; }
 
         [Required]
         [Display( Name = "Trading Name" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string TradingName { get; set; }
 
         [Display( Name = "Contact Name" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string ContactName { get; set; }
 
         [Display( Name = "Contact Number" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string ContactNumber { get; set; }
 
         [Required]
         [Display( Name = "Email" )]
-        [StringLength( 100, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string Email { get; set; }
 
         [Required]
         [Display( Name = "Registration Number" )]
-        [StringLength( 20, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string RegistrationNumber { get; set; }
 
 
 
         [Display( Name = "Supplier Code" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string SupplierCode { get; set; }
 
         [Display( Name = "Transporter Code" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string ClientTransporterCode { get; set; }
 
         [Display( Name = "Chep Transporter Code" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string ChepClientTransporterCode { get; set; }
 
 

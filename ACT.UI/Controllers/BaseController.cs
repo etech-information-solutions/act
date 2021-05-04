@@ -1411,7 +1411,7 @@ namespace ACT.UI.Controllers
                     Title = "Import Errors",
                     Category = "Import Errors",
                     Description = "Import Errors",
-                    Location = $"Errors/{now}-Import-Errors.txt",
+                    Location = $"Errors/{r}/{now}-Import-Errors.txt",
                 };
 
                 doc = dservice.Create( doc );

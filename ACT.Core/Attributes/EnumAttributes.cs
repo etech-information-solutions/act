@@ -53,7 +53,7 @@ namespace ACT.Core.Attributes
 
         public StringEnumValueAttribute( string value )
         {
-            this.Value = value;
+            Value = value;
         }
 
         public string Value { get; set; }
@@ -68,9 +68,14 @@ namespace ACT.Core.Attributes
     public class StringEnumDisplayTextAttribute : Attribute
     {
 
-        public StringEnumDisplayTextAttribute( string value )
+        public StringEnumDisplayTextAttribute( string value, bool addDate = false )
         {
-            this.Value = value;
+            //if ( addDate )
+            //{
+            //    value = $"{value} (e.g. {DateTime.Now.ToString( value )})";
+            //}
+
+            Value = value;
         }
 
         public string Value { get; set; }

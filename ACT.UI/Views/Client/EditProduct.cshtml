@@ -29,7 +29,7 @@
 
         <div id="item-details" class="item-details" style="width: auto;">
 
-            <div class="left" style="width: 40%; margin-right: 10%;">
+            <div class="left" style="width: 40%; margin-right: 5%;">
 
                 <div class="edit-label">
                     @Html.LabelFor( model => model.Status )
@@ -67,7 +67,7 @@
                     @Html.LabelFor( model => model.ActiveDate )
                 </div>
                 <div class="edit-field">
-                    <input class="date-picker" data-val="true" data-val-date="The field Select Active Date must be a date." id="ActiveDate" name="ActiveDate" placeholder="Select Product Active Date" readonly="readonly" type="text" value="@( Model.ActiveDate.Value.ToString( "yyyy/MM/dd" ) )" aria-describedby="ActiveDate-error" aria-invalid="false">
+                    <input class="date-picker" data-val="true" data-val-date="The field Select Active Date must be a date." id="ActiveDate" name="ActiveDate" placeholder="Select Product Active Date" readonly="readonly" type="text" value="@( Model.ActiveDate?.ToString( "yyyy/MM/dd" ) )" aria-describedby="ActiveDate-error" aria-invalid="false">
                     @Html.ValidationMessageFor( model => model.ActiveDate )
                 </div>
 
@@ -79,7 +79,7 @@
                     @Html.LabelFor( model => model.HireRate )
                 </div>
                 <div class="edit-field">
-                    <input data-val="true" data-val-number="The field Hire Rate must be a number." id="HireRate" name="HireRate" placeholder="Enter Product Hire Rate" type="text" value="@( Math.Round( Model.HireRate ?? 0, 2 ) )" class="valid" aria-describedby="HireRate-error" aria-invalid="false">
+                    @Html.TextBoxFor( model => model.HireRate, new { @style = "width: 93%;", @placeholder = "Enter Product Hire Rate" } )
                     @Html.ValidationMessageFor( model => model.HireRate )
                 </div>
 
@@ -87,7 +87,7 @@
                     @Html.LabelFor( model => model.LostRate )
                 </div>
                 <div class="edit-field">
-                    <input data-val="true" data-val-number="The field Lost Rate must be a number." id="LostRate" name="LostRate" placeholder="Enter Product Lost Rate" type="text" value="@( Math.Round( Model.LostRate ?? 0, 2 ) )" aria-describedby="LostRate-error" class="valid" aria-invalid="false">
+                    @Html.TextBoxFor( model => model.LostRate, new { @style = "width: 93%;", @placeholder = "Enter Product Lost Rate" } )
                     @Html.ValidationMessageFor( model => model.LostRate )
                 </div>
 
@@ -95,7 +95,7 @@
                     @Html.LabelFor( model => model.IssueRate )
                 </div>
                 <div class="edit-field">
-                    <input data-val="true" data-val-number="The field Issue Rate must be a number." id="IssueRate" name="IssueRate" placeholder="Enter Product Issue Rate" type="text" value="@( Math.Round( Model.IssueRate ?? 0, 2 ) )" aria-describedby="IssueRate-error" class="valid" aria-invalid="false">
+                    @Html.TextBoxFor( model => model.IssueRate, new { @style = "width: 93%;", @placeholder = "Enter Product Issue Rate" } )
                     @Html.ValidationMessageFor( model => model.IssueRate )
                 </div>
 
@@ -103,7 +103,7 @@
                     @Html.LabelFor( model => model.PassonRate )
                 </div>
                 <div class="edit-field">
-                    <input data-val="true" data-val-number="The field Passon Rate must be a number." id="PassonRate" name="PassonRate" placeholder="Enter Product Passon Rate" type="text" value="@( Math.Round( Model.PassonRate ?? 0, 2 ) )" aria-describedby="PassonRate-error" class="valid" aria-invalid="false">
+                    @Html.TextBoxFor( model => model.PassonRate, new { @style = "width: 93%;", @placeholder = "Enter Product Passon Rate" } )
                     @Html.ValidationMessageFor( model => model.PassonRate )
                 </div>
 

@@ -3029,8 +3029,6 @@ namespace ACT.UI.Controllers
                 return View( model );
             }
 
-            Product product = new Product();
-
             using ( ProductService pservice = new ProductService() )
             using ( TransactionScope scope = new TransactionScope() )
             using ( DocumentService dservice = new DocumentService() )
@@ -3050,9 +3048,12 @@ namespace ACT.UI.Controllers
 
                 #region Product
 
-                product.Name = model.Name;
-                product.Status = ( int ) model.Status;
-                product.Description = model.Description;
+                Product product = new Product
+                {
+                    Name = model.Name,
+                    Status = ( int ) model.Status,
+                    Description = model.Description,
+                };
 
                 product = pservice.Create( product );
 

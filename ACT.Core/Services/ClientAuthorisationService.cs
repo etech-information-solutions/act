@@ -144,8 +144,6 @@ namespace ACT.Core.Services
                                                   cl.[PRNNumber] LIKE '%{1}%' OR
                                                   cl.[THAN] LIKE '%{1}%' OR
                                                   cl.[ChepCompensationNo] LIKE '%{1}%' OR
-                                                  cl.[LoadNumber] LIKE '%{1}%' OR
-                                                  ca.[LoadNumber] LIKE '%{1}%' OR
                                                   ca.[Code] LIKE '%{1}%' OR
                                                   s1.[Name] LIKE '%{1}%' OR
                                                   s1.[Description] LIKE '%{1}%' OR
@@ -306,8 +304,6 @@ namespace ACT.Core.Services
                                                   cl.[PRNNumber] LIKE '%{1}%' OR
                                                   cl.[THAN] LIKE '%{1}%' OR
                                                   cl.[ChepCompensationNo] LIKE '%{1}%' OR
-                                                  cl.[LoadNumber] LIKE '%{1}%' OR
-                                                  ca.[LoadNumber] LIKE '%{1}%' OR
                                                   ca.[Code] LIKE '%{1}%' OR
                                                   s1.[Name] LIKE '%{1}%' OR
                                                   s1.[Description] LIKE '%{1}%' OR
@@ -377,9 +373,9 @@ namespace ACT.Core.Services
 	                            c.CompanyName AS [Description]
                              FROM
                                 [dbo].[ClientAuthorisation] ca
-                                INNER JOIN [dbo].[ChepLoad] cl ON cl.[Id]=(SELECT TOP 1 cl1.[Id] FROM [dbo].[ChepLoad] cl1 WHERE ca.[DocketNumber]=cl1.[DocketNumber])
-                                LEFT OUTER JOIN [dbo].[Transporter] t ON t.[Id]=ca.[TransporterId]
-                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=ca.[ClientSiteId]
+                                INNER JOIN [dbo].[ClientLoad] cl ON cl.[Id]=ca.[ClientLoadId]
+                                LEFT OUTER JOIN [dbo].[Transporter] t ON t.[Id]=cl.[TransporterId]
+                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=cl.[ClientSiteId]
                                 LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
                                 LEFT OUTER JOIN [dbo].[Client] c ON c.[Id]=cl.[ClientId]";
 
@@ -441,27 +437,19 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (cl.[ChepStatus] LIKE '%{1}%' OR
-                                                  cl.[TransactionType] LIKE '%{1}%' OR
-                                                  cl.[DocketNumber] LIKE '%{1}%' OR
-                                                  cl.[OriginalDocketNumber] LIKE '%{1}%' OR
-                                                  cl.[UMI] LIKE '%{1}%' OR
-                                                  cl.[LocationId] LIKE '%{1}%' OR
-                                                  cl.[Location] LIKE '%{1}%' OR
-                                                  cl.[OtherPartyId] LIKE '%{1}%' OR
-                                                  cl.[OtherParty] LIKE '%{1}%' OR
-                                                  cl.[OtherPartyCountry] LIKE '%{1}%' OR
-                                                  cl.[EquipmentCode] LIKE '%{1}%' OR
+                query = string.Format( @"{0} AND (cl.[LoadNumber] LIKE '%{1}%' OR
+                                                  cl.[AccountNumber] LIKE '%{1}%' OR
+                                                  cl.[ClientDescription] LIKE '%{1}%' OR
+                                                  cl.[DeliveryNote] LIKE '%{1}%' OR
+                                                  cl.[ReferenceNumber] LIKE '%{1}%' OR
+                                                  cl.[ReceiverNumber] LIKE '%{1}%' OR
                                                   cl.[Equipment] LIKE '%{1}%' OR
-                                                  cl.[Ref] LIKE '%{1}%' OR
-                                                  cl.[OtherRef] LIKE '%{1}%' OR
-                                                  cl.[BatchRef] LIKE '%{1}%' OR
-                                                  cl.[InvoiceNumber] LIKE '%{1}%' OR
-                                                  cl.[DataSource] LIKE '%{1}%' OR
-                                                  cl.[CreatedBy] LIKE '%{1}%' OR
-                                                  cl.[Quantity] LIKE '%{1}%' OR
-                                                  ca.[LoadNumber] LIKE '%{1}%' OR
-                                                  ca.[DocketNumber] LIKE '%{1}%' OR
+                                                  cl.[PODNumber] LIKE '%{1}%' OR
+                                                  cl.[PCNNumber] LIKE '%{1}%' OR
+                                                  cl.[PRNNumber] LIKE '%{1}%' OR
+                                                  cl.[THAN] LIKE '%{1}%' OR
+                                                  cl.[ChepInvoiceNo] LIKE '%{1}%' OR
+                                                  cl.[ChepCompensationNo] LIKE '%{1}%' OR
                                                   ca.[Code] LIKE '%{1}%' OR
                                                   s.[Description] LIKE '%{1}%' OR
                                                   c.[CompanyName] LIKE '%{1}%' OR

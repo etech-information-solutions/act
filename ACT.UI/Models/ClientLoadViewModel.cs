@@ -14,11 +14,11 @@ namespace ACT.UI.Models
 
         public int Id { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Client" )]
         public int ClientId { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Vehicle" )]
         public int? VehicleId { get; set; }
 
@@ -38,39 +38,39 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string LoadNumber { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Load Date" )]
         public DateTime? LoadDate { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Effective Date" )]
         public DateTime? EffectiveDate { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Notify Date" )]
         public DateTime? NotifyDate { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Account Number" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string AccountNumber { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Client Description" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ClientDescription { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Delivery Note" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string DeliveryNote { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Reference Number" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ReferenceNumber { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Receiver Number" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ReceiverNumber { get; set; }
@@ -79,7 +79,7 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string Equipment { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Original Quantity" )]
         public decimal? OriginalQuantity { get; set; }
 
@@ -141,6 +141,9 @@ namespace ACT.UI.Models
         [Display( Name = "PRN Comments" )]
         public string PRNComments { get; set; }
 
+        [Display( Name = "Select a Date Format being used in the file your import file" )]
+        public DateFormats DateFormats { get; set; }
+
 
 
         [Display( Name = "Import Loads" )]
@@ -151,6 +154,7 @@ namespace ACT.UI.Models
         public bool EditMode { get; set; }
 
         #endregion
+
 
 
         #region Model Options

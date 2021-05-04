@@ -130,7 +130,7 @@
                                     <label for="ProductPrices_@p.Type.GetIntValue()-Rate">Rate</label>
                                 </div>
                                 <div class="edit-field">
-                                    <input id="ProductPrices_@p.Type.GetIntValue()-Rate" name="ProductPrices[@i].Rate" type="text" value="@( Math.Round( p.Rate ?? 0, 2 ).ToString().Replace(",", ".") )" placeholder="Enter price option Rate" />
+                                    <input id="ProductPrices_@p.Type.GetIntValue()-Rate" name="ProductPrices[@i].Rate" type="text" value="@p.Rate" placeholder="Enter price option Rate" />
                                     <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-Rate" data-valmsg-replace="true"></span>
                                 </div>
 

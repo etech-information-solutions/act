@@ -34,6 +34,22 @@
         <div class="left" style="width: 45%; margin-right: 4%;">
 
             <div class="editor-label">
+                @Html.LabelFor( model => model.ClientId )
+            </div>
+            <div class="editor-field">
+                @Html.DropDownListFor( model => model.ClientId, model => Model.ClientOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.ClientId )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.SiteId )
+            </div>
+            <div class="editor-field">
+                @Html.DropDownListFor( model => model.SiteId, model => Model.SiteOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.SiteId )
+            </div>
+
+            <div class="editor-label">
                 @Html.LabelFor( model => model.Name )
             </div>
             <div class="editor-field">
@@ -121,6 +137,10 @@
                 @Html.ValidationMessageFor( model => model.LocationNumber )
             </div>
 
+        </div>
+
+        <div class="left" style="width: 45%;">
+
             <div class="editor-label">
                 @Html.LabelFor( model => model.Longitude )
             </div>
@@ -136,10 +156,6 @@
                 @Html.TextBoxFor( model => model.Latitude, new { @class = "input", @placeholder = "Enter Site Latitude" } )
                 @Html.ValidationMessageFor( model => model.Latitude )
             </div>
-
-        </div>
-
-        <div class="left" style="width: 45%;">
 
             <div class="editor-label">
                 @Html.LabelFor( model => model.ContactName )
@@ -258,7 +274,7 @@
                         @foreach ( KeyValuePair<int, string> item in Model.ClientCustomerOptions )
                         {
                             string readOnly = !user.IsAdmin ? "readonly=readonly" : "";
-                            string chk = Model.Clients.Any( i => i.Id == item.Key ) || !user.IsAdmin ? "checked=checked" : "";
+                            string chk = Model.Clients.Any( i => i.Id == item.Key ) ? "checked=checked" : "";
 
                             <li style="background: none; padding-left: 0;">
                                 <label>
@@ -350,13 +366,13 @@
 
         </div>
 
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+        @*<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 
         <div id="site-budget">
 
             @Html.Partial( "_SiteBudgets", Model.SiteBudgets )
 
-        </div>
+        </div>*@
 
         <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 

@@ -130,9 +130,13 @@ namespace ACT.Core.Services
             query = $"{query} WHERE (1=1)";
 
             // Limit to only show Sites for logged in user 
-            if ( !CurrentUser.IsAdmin )
+            if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE cs.SiteId=s.Id AND pu.UserId=@userid ) ";
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
             }
 
             #endregion
@@ -194,7 +198,14 @@ namespace ACT.Core.Services
                                                   s.[ReceivingContact] LIKE '%{1}%' OR
                                                   s.[ReceivingContactNo] LIKE '%{1}%' OR
                                                   r.[Name] LIKE '%{1}%' OR
-                                                  r.[Description] LIKE '%{1}%'
+                                                  cc.[CustomerName] LIKE '%{1}%' OR
+                                                  cc.[CustomerNumber] LIKE '%{1}%' OR
+                                                  cs.[AccountingCode] LIKE '%{1}%' OR
+                                                  cs.[GLIDNo] LIKE '%{1}%' OR
+                                                  cs.[KAMName] LIKE '%{1}%' OR
+                                                  cs.[ClientSiteCode] LIKE '%{1}%' OR
+                                                  cs.[LiquorLicenceNumber] LIKE '%{1}%' OR
+                                                  cs.[ClientCustomerNumber] LIKE '%{1}%'
                                              ) ", query, csm.Query.Trim() );
             }
 
@@ -219,7 +230,7 @@ namespace ACT.Core.Services
             }
 
             // Parameters
-            
+
             #region Parameters
 
             List<object> parameters = new List<object>()
@@ -259,9 +270,13 @@ namespace ACT.Core.Services
             query = $"{query} WHERE (1=1)";
 
             // Limit to only show Sites for logged in user 
-            if ( !CurrentUser.IsAdmin )
+            if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE cs.SiteId=s.Id AND pu.UserId=@userid ) ";
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
             }
 
             #endregion
@@ -323,7 +338,14 @@ namespace ACT.Core.Services
                                                   s.[ReceivingContact] LIKE '%{1}%' OR
                                                   s.[ReceivingContactNo] LIKE '%{1}%' OR
                                                   r.[Name] LIKE '%{1}%' OR
-                                                  r.[Description] LIKE '%{1}%'
+                                                  cc.[CustomerName] LIKE '%{1}%' OR
+                                                  cc.[CustomerNumber] LIKE '%{1}%' OR
+                                                  cs.[AccountingCode] LIKE '%{1}%' OR
+                                                  cs.[GLIDNo] LIKE '%{1}%' OR
+                                                  cs.[KAMName] LIKE '%{1}%' OR
+                                                  cs.[ClientSiteCode] LIKE '%{1}%' OR
+                                                  cs.[LiquorLicenceNumber] LIKE '%{1}%' OR
+                                                  cs.[ClientCustomerNumber] LIKE '%{1}%'
                                              ) ", query, csm.Query.Trim() );
             }
 
@@ -396,7 +418,10 @@ namespace ACT.Core.Services
                                 s.Id,
                                 s.[Name]
                              FROM
-                                [dbo].[Site] s";
+                                [dbo].[Site] s
+                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON s.Id=cs.SiteId
+                                LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cs.ClientCustomerId=cc.Id
+                                LEFT OUTER JOIN [dbo].[Client] c ON cc.ClientId=c.Id";
 
             // WHERE
 
@@ -404,17 +429,14 @@ namespace ACT.Core.Services
 
             query = $"{query} WHERE (1=1)";
 
-            // Limit to only show Sites for logged in user 
-            if ( !CurrentUser.IsAdmin )
+            // Limit to only show Sites for logged in user
+            if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu
-                                                       INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId
-                                                       LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON pc.ClientId=cc.ClientId
-                                                       LEFT OUTER JOIN [dbo].[ClientSite] cs ON cc.Id=cs.ClientCustomerId
-                                              WHERE
-                                                cs.SiteId=s.Id AND
-                                                pu.UserId=@userid
-                                             ) ";
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
             }
 
             #endregion
@@ -542,6 +564,16 @@ namespace ACT.Core.Services
         public Site GetBySiteCode( string code )
         {
             return context.Sites.Include( "ClientSites" ).FirstOrDefault( s => s.SiteCodeChep.Trim() == code.Trim() );
+        }
+
+        public Site GetByClientAndName( int clientId, string siteName )
+        {
+            return context.Sites.FirstOrDefault( s => s.Name.Trim() == siteName.Trim() && s.ClientSites.Any( cs => cs.ClientCustomer.ClientId == clientId ) );
+        }
+
+        public bool ExistByClientAndName( int clientId, string siteName )
+        {
+            return context.Sites.Any( s => s.Name.Trim() == siteName.Trim() && s.ClientSites.Any( cs => cs.ClientCustomer.ClientId == clientId ) );
         }
     }
 }

@@ -193,7 +193,6 @@
     <Compile Include="Models\ImportFileModel.cs" />
     <Compile Include="Models\GroupViewModel.cs" />
     <Compile Include="Models\DeliveryNoteViewModel.cs" />
-    <Compile Include="Models\SiteViewImportModel.cs" />
     <Compile Include="Models\TransporterViewModel.cs" />
     <Compile Include="Models\SiteViewModel.cs" />
     <Compile Include="Models\ClientGroupViewModel.cs" />

@@ -27,6 +27,14 @@
 
         <div class="left" style="width: 30%;">
 
+            <div class="edit-label">
+                @Html.LabelFor( model => model.DateFormats )
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor( model => model.DateFormats, false, false, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.DateFormats )
+            </div>
+
             <div class="editor-label">
                 @Html.LabelFor( model => model.File )
             </div>

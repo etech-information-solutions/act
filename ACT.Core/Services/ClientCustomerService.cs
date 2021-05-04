@@ -44,19 +44,23 @@ namespace ACT.Core.Services
                 { new SqlParameter( "clientid", clientId ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
             };
-
+            
             string query = string.Empty;
 
-            query = $"SELECT c.Id AS [TKey], c.[CustomerName] + ' ' + c.[CustomerNumber] AS [TValue] FROM [dbo].[ClientCustomer] c WHERE (1=1)";
+            query = $"SELECT cc.Id AS [TKey], cc.[CustomerName] + ' (' + cs.[AccountingCode] + ')' AS [TValue] FROM [dbo].[ClientCustomer] cc, [dbo].[ClientSite] cs WHERE (cs.[ClientCustomerId]=cc.[Id])";
 
-            if ( !CurrentUser.IsAdmin )
+            if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.ClientId)";
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=cc.ClientId AND pu.UserId=@userid ) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=cc.ClientId)";
             }
 
             if ( clientId > 0 )
             {
-                query = $"{query} AND c.ClientId=@clientid";
+                query = $"{query} AND cc.ClientId=@clientid";
             }
 
             model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();

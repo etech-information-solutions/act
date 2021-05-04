@@ -105,6 +105,10 @@
             @Html.DisplayFor( model => model.LocationNumber )
         </div>
 
+    </div>
+
+    <div class="left" style="width: 30%; margin-right: 4%;">
+
         <div class="display-label">
             X Coordinate
         </div>
@@ -118,10 +122,6 @@
         <div class="display-field">
             @Html.DisplayFor( model => model.YCord )
         </div>
-
-    </div>
-
-    <div class="left" style="width: 30%; margin-right: 4%;">
 
         <div class="display-label">
             Contact Name
@@ -296,7 +296,7 @@
 
     <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
 
-    <div id="budgets">
+    @*<div id="budgets">
 
         <div class="display-label" style="margin-bottom: 10px;">
             Budgets (@Model.SiteBudgets.NullableCount())
@@ -392,7 +392,7 @@
 
         </div>
 
-    </div>
+    </div>*@
 
     <p>
         @Html.ActionLink( "Edit", "EditSite", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )

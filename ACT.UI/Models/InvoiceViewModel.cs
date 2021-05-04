@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
-using ACT.Core.Models;
-using ACT.Core.Services;
 
 namespace ACT.UI.Models
 {
@@ -16,7 +14,7 @@ namespace ACT.UI.Models
 
         [Required]
         [Display( Name = "Invoice #" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string Number { get; set; }
 
         [Required]
@@ -33,7 +31,7 @@ namespace ACT.UI.Models
 
         [Required]
         [Display( Name = "Load Number" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string LoadNumber { get; set; }
 
         [Display( Name = "File" )]

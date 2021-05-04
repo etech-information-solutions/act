@@ -93,9 +93,11 @@
                 string active = ( status == Status.Active ) ? "active" : "inactive";
                 string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
+                string italic = item.SiteId.HasValue ? "italic" : "";
+
                 string siteTypeName = ( item.SiteType != null ) ? ( ( SiteType ) item.SiteType ).GetDisplayText() : "N/A";
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active @italic">
 
                     <td width="1%">
                         @count
@@ -116,6 +118,14 @@
                     </td>
                     <td>
                         @item.Name
+
+                        @if ( item.SiteId.HasValue )
+                        {
+                            <a class="block" rel="tipsyE" title="I am a sub-site">
+                                <img alt="" src="@Url.Content( "~/Images/sub.png" )" style="max-width: 22px;" />
+                                <span></span>
+                            </a>
+                        }
                     </td>
                     <td>
                         @item.XCord,@item.YCord
@@ -167,7 +177,7 @@
 
                             </li>
                             <li>
-                                <a data-sticky-one="1" data-target="#site-@item.Id-clients" data-trigger="mouseover" data-arrow="center-right" data-title="Clients">
+                                <a data-sticky-one="1" data-target="#site-@item.Id-clients" data-trigger="mouseover" data-arrow="center-right" data-title="Customers">
                                     @item.ClientCount Customers
                                 </a>
 
@@ -191,13 +201,13 @@
                                     }
                                 </div>
                             </li>
-                            <li>
+                            @*<li>
                                 @Html.ActionLink( item.BudgetCount + " Budgets", "SiteDetails", new { id = item.Id }, new { @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                            </li>
+                            </li>*@
                         </ul>
                     </td>
 
-                    <td width="12%">
+                    <td width="9%">
 
                         <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
                             @Html.ActionLink( "Details", "SiteDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item", @style = "margin-left: 0;" } )
@@ -207,10 +217,6 @@
 
                         <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
                             @Html.ActionLink( enable, "DeleteSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managesites", @rel = "tipsyE", @title = enable + " this item?", @style = "margin-left: 0;" } )
-
-                            @*<a href="#" onclick="LinkToSubSites('@item.Id')">
-                                    <i class="fa fa-link"></i>Subsites
-                                </a>*@
                         </div>
                     </td>
                 </tr>

@@ -93,7 +93,7 @@
                 string active = ( status == Status.Active ) ? "active" : "inactive";
                 string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+                <tr id="linkproducts-@item.Id-item" class="linkproducts-@item.Id-item @active">
 
                     <td>
                         @count
@@ -112,20 +112,20 @@
                     <td>
                         @item.ProductName
                     </td>
-                    <td>
+                    <td width="15%">
                         @item.ProductDescription
                     </td>
                     <td>
-                        @( ( item.Rate ?? 0 ).ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ) )
+                        R @item.Rate
                     </td>
                     <td>
-                        @( ( item.IssueRate ?? 0 ).ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ) )
+                        R @item.IssueRate
                     </td>
                     <td>
-                        @( ( item.LostRate ?? 0 ).ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ) )
+                        R @item.LostRate
                     </td>
                     <td>
-                        @( ( item.PassonRate ?? 0 ).ToString( "C", System.Globalization.CultureInfo.CreateSpecificCulture( "en-ZA" ) ) )
+                        R @item.PassonRate
                     </td>
                     <td>
                         @rateType.GetDisplayText()
@@ -135,11 +135,11 @@
                     </td>
                     <td width="15%">
 
-                        @Html.ActionLink( "Details", "ProductDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink( "Details", "ProductDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".linkproducts-" + item.Id + "-item" } )
 
-                        @Html.ActionLink( "Edit", "EditProduct", new { id = item.Id, returnView = "LinkProducts" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink( "Edit", "EditProduct", new { id = item.Id, returnView = "LinkProducts" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".linkproducts-" + item.Id + "-item" } )
 
-                        @Html.ActionLink( enable, "DeleteProduct", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#linkproducts", @rel = "tipsyE", @title = enable + " this item?" } )
+                        @Html.ActionLink( enable, "DeleteProduct", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#linkproducts-" + item.Id + "-item", @data_refresh_target = "#linkproducts", @rel = "tipsyE", @title = enable + " this item?" } )
 
                     </td>
 

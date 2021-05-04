@@ -15,7 +15,7 @@ namespace ACT.UI.Models
 
         public int Id { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Client" )]
         public int ClientId { get; set; }
 
@@ -26,27 +26,27 @@ namespace ACT.UI.Models
         public PostingType PostingType { get; set; }
 
         [Display( Name = "Chep Status" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ChepStatus { get; set; }
 
         [Display( Name = "Transaction Type" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string TransactionType { get; set; }
 
         [Display( Name = "Docket Number" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string DocketNumber { get; set; }
 
         [Display( Name = "Original Docket Number" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string OriginalDocketNumber { get; set; }
 
         [Display( Name = "UMI" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string UMI { get; set; }
 
         [Display( Name = "Location Id" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string LocationId { get; set; }
 
         [Display( Name = "Location" )]
@@ -54,15 +54,15 @@ namespace ACT.UI.Models
         public string Location { get; set; }
 
         [Display( Name = "Other Party Id" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string OtherPartyId { get; set; }
 
         [Display( Name = "Other Party" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string OtherParty { get; set; }
 
         [Display( Name = "Other Party Country" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string OtherPartyCountry { get; set; }
 
         [Display( Name = "Equipment Code" )]
@@ -70,22 +70,22 @@ namespace ACT.UI.Models
         public string EquipmentCode { get; set; }
 
         [Display( Name = "Equipment" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string Equipment { get; set; }
 
         [Display( Name = "Quantity" )]
         public int? Quantity { get; set; }
 
         [Display( Name = "Ref #" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string Reference { get; set; }
 
         [Display( Name = "Other Ref #" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string OtherRef { get; set; }
 
         [Display( Name = "Batch Ref #" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string BatchRef { get; set; }
 
         [Display( Name = "Shipment Date" )]
@@ -101,11 +101,11 @@ namespace ACT.UI.Models
         public DateTime? CreateDate { get; set; }
 
         [Display( Name = "Create By" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string CreatedBy { get; set; }
 
         [Display( Name = "Invoice #" )]
-        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string InvoiceNumber { get; set; }
 
         [Display( Name = "Reason" )]
@@ -127,6 +127,9 @@ namespace ACT.UI.Models
 
         [Display( Name = "Is Transporter Liable?" )]
         public YesNo TransporterLiable { get; set; }
+
+        [Display( Name = "Select a Date Format being used in the file your import file" )]
+        public DateFormats DateFormats { get; set; }
 
         public List<Comment> ChepLoadComments { get; set; }
 

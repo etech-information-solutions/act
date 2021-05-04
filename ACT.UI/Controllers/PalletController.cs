@@ -480,7 +480,7 @@ namespace ACT.UI.Controllers
 
                     if ( !DateTime.TryParse( load[ 17 ], out DateTime shipmentDate ) )
                     {
-                        if ( !DateTime.TryParseExact( load[ 17 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out shipmentDate ) )
+                        if ( !DateTime.TryParseExact( load[ 17 ], model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out shipmentDate ) )
                         {
                             shipmentDate1 = "NULL";
                         }
@@ -496,7 +496,7 @@ namespace ACT.UI.Controllers
 
                     if ( !DateTime.TryParse( load[ 18 ], out DateTime deliveryDate ) )
                     {
-                        if ( !DateTime.TryParseExact( load[ 18 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out deliveryDate ) )
+                        if ( !DateTime.TryParseExact( load[ 18 ], model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out deliveryDate ) )
                         {
                             deliveryDate1 = "NULL";
                         }
@@ -512,7 +512,7 @@ namespace ACT.UI.Controllers
 
                     if ( !DateTime.TryParse( load[ 19 ], out DateTime effectiveDate ) )
                     {
-                        if ( !DateTime.TryParseExact( load[ 19 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out effectiveDate ) )
+                        if ( !DateTime.TryParseExact( load[ 19 ], model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out effectiveDate ) )
                         {
                             effectiveDate1 = "NULL";
                         }
@@ -528,7 +528,7 @@ namespace ACT.UI.Controllers
 
                     if ( !DateTime.TryParse( load[ 20 ], out DateTime createDate ) )
                     {
-                        if ( !DateTime.TryParseExact( load[ 20 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out createDate ) )
+                        if ( !DateTime.TryParseExact( load[ 20 ], model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out createDate ) )
                         {
                             createDate1 = "NULL";
                         }
@@ -549,7 +549,7 @@ namespace ACT.UI.Controllers
                     ClientSite cs = new ClientSite();
                     Site site = sservice.GetBySiteCode( load[ 6 ].Trim() );
 
-                    if ( site == null )
+                    if ( site == null && !string.IsNullOrWhiteSpace( load[ 6 ].Trim() ) )
                     {
                         site = new Site()
                         {
@@ -562,7 +562,7 @@ namespace ACT.UI.Controllers
                         site = sservice.Create( site );
                     }
 
-                    if ( !site.ClientSites.NullableAny() )
+                    if ( !site.ClientSites.NullableAny() && !string.IsNullOrWhiteSpace( load[ 6 ].Trim() ) )
                     {
                         ClientCustomer cc = ccservice.GetByClient( model.ClientId );
 
@@ -590,7 +590,7 @@ namespace ACT.UI.Controllers
 
                         cs = csservice.Create( cs );
                     }
-                    else
+                    else if ( !string.IsNullOrWhiteSpace( load[ 6 ].Trim() ) )
                     {
                         cs = site.ClientSites.FirstOrDefault();
                     }
@@ -1332,14 +1332,14 @@ namespace ACT.UI.Controllers
 
                     if ( !DateTime.TryParse( load[ 3 ], out DateTime loadDate ) )
                     {
-                        DateTime.TryParseExact( load[ 3 ], "yyyy-MM-dd h:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime loadDate1 );
+                        DateTime.TryParseExact( load[ 3 ], model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime loadDate1 );
 
                         loadDate = loadDate1;
                     }
 
                     if ( !DateTime.TryParse( load[ 3 ], out DateTime deliveryDate ) )
                     {
-                        DateTime.TryParseExact( load[ 3 ], "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime deliveryDate1 );
+                        DateTime.TryParseExact( load[ 3 ], model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime deliveryDate1 );
 
                         deliveryDate = deliveryDate1;
                     }
@@ -1350,14 +1350,17 @@ namespace ACT.UI.Controllers
 
                     Transporter t = tservice.GetByClientAndName( model.ClientId, load[ 15 ] );
 
-                    if ( t == null )
+                    if ( t == null && !string.IsNullOrWhiteSpace( load[ 15 ] ) )
                     {
                         t = new Transporter()
                         {
                             Name = load[ 15 ],
                             TradingName = load[ 15 ],
-                            RegistrationNumber = load[ 14 ],
+                            SupplierCode = load[ 14 ],
+                            ClientId = model.ClientId,
                             Status = ( int ) Status.Active,
+                            RegistrationNumber = load[ 14 ],
+                            ClientTransporterCode = load[ 14 ],
                         };
 
                         t = tservice.Create( t );
@@ -1369,7 +1372,7 @@ namespace ACT.UI.Controllers
 
                     Vehicle v = vservice.GetByRegistrationNumber( reg, "Transporter" );
 
-                    if ( v == null )
+                    if ( v == null && !string.IsNullOrWhiteSpace( load[ 13 ] ) )
                     {
                         v = new Vehicle()
                         {
@@ -1388,10 +1391,10 @@ namespace ACT.UI.Controllers
 
                     #region Client Site 1
 
-                    ClientSite cs1 = new ClientSite();
+                    ClientSite cs1 = null;
                     Site site = sservice.GetBySiteCode( load[ 0 ].Trim() );
 
-                    if ( site == null )
+                    if ( site == null && !string.IsNullOrWhiteSpace( load[ 0 ] ) )
                     {
                         site = new Site()
                         {
@@ -1404,7 +1407,7 @@ namespace ACT.UI.Controllers
                         site = sservice.Create( site );
                     }
 
-                    if ( !site.ClientSites.NullableAny() )
+                    if ( site != null && !site.ClientSites.NullableAny() && !string.IsNullOrWhiteSpace( load[ 0 ] ) )
                     {
                         ClientCustomer cc = ccservice.GetByClient( model.ClientId );
 
@@ -1433,7 +1436,7 @@ namespace ACT.UI.Controllers
 
                         cs1 = csservice.Create( cs1 );
                     }
-                    else
+                    else if ( site != null && !string.IsNullOrWhiteSpace( load[ 0 ] ) )
                     {
                         cs1 = site.ClientSites.FirstOrDefault();
                     }
@@ -1442,15 +1445,15 @@ namespace ACT.UI.Controllers
 
                     #region Client Site 2
 
-                    ClientSite cs2 = new ClientSite();
+                    ClientSite cs2 = null;
                     Site site2 = sservice.GetBySiteCode( load[ 5 ].Trim() );
 
-                    if ( site2 == null )
+                    if ( site2 == null && !string.IsNullOrWhiteSpace( load[ 5 ] ) )
                     {
                         site2 = new Site()
                         {
                             Name = load[ 1 ].Trim(),
-                            Description = load[ 1 ].Trim(),
+                            Description = load[ 6 ].Trim(),
                             SiteCodeChep = load[ 5 ].Trim(),
                             Status = ( int ) Status.Active,
                         };
@@ -1458,7 +1461,7 @@ namespace ACT.UI.Controllers
                         site2 = sservice.Create( site2 );
                     }
 
-                    if ( !site2.ClientSites.NullableAny() )
+                    if ( site2 != null && !site2.ClientSites.NullableAny() && !string.IsNullOrWhiteSpace( load[ 5 ] ) )
                     {
                         ClientCustomer cc = ccservice.GetByClient( model.ClientId );
 
@@ -1487,19 +1490,24 @@ namespace ACT.UI.Controllers
 
                         cs2 = csservice.Create( cs2 );
                     }
-                    else
+                    else if ( site2 != null && !string.IsNullOrWhiteSpace( load[ 5 ] ) )
                     {
                         cs2 = site2.ClientSites.FirstOrDefault();
                     }
 
                     #endregion
 
+                    string tid = t != null ? t.Id + "" : "NULL";
+                    string vid = v != null ? v.Id + "" : "NULL";
+                    string cs1id = cs1 != null ? cs1.Id + "" : "NULL";
+                    string cs2id = cs2 != null ? cs2.Id + "" : "NULL";
+
                     if ( l == null )
                     {
                         #region Create Client Load
 
                         cQuery = $" {cQuery} INSERT INTO [dbo].[ClientLoad]([ClientId],[ClientSiteId],[ToClientSiteId],[VehicleId],[TransporterId],[OutstandingReasonId],[CreatedOn],[ModifiedOn],[ModifiedBy],[LoadNumber],[LoadDate],[EffectiveDate],[NotifyDate],[AccountNumber],[ClientDescription],[DeliveryNote],[ReferenceNumber],[ReceiverNumber],[OriginalQuantity],[NewQuantity],[PODNumber],[PCNNumber],[PRNNumber],[Status],[PostingType],[THAN],[ReturnQty],[PODStatus],[InvoiceStatus],[UID]) ";
-                        cQuery = $" {cQuery} VALUES ({model.ClientId},{cs1.Id},{cs2.Id},{v.Id},{t.Id},9,'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 2 ]}','{loadDate}','{deliveryDate}','{deliveryDate}','{load[ 5 ]}','{load[ 6 ]}','{load[ 12 ]}','{load[ 10 ]}','{load[ 12 ]}',{qty},{qty},'{pod}','{pcn}','{prn}',{( int ) status},{( int ) PostingType.Import},'{load[ 17 ]}',{returnQty},{podStatus},0,'{uid}') ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},{cs1id},{cs2id},{vid},{tid},9,'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 2 ]}','{loadDate}','{deliveryDate}','{deliveryDate}','{load[ 5 ]}','{load[ 6 ]}','{load[ 12 ]}','{load[ 10 ]}','{load[ 12 ]}',{qty},{qty},'{pod}','{pcn}','{prn}',{( int ) status},{( int ) PostingType.Import},'{load[ 17 ]}',{returnQty},{podStatus},0,'{uid}') ";
 
                         #endregion
 
@@ -1523,10 +1531,10 @@ namespace ACT.UI.Controllers
                         uQuery = $@"{uQuery} UPDATE [dbo].[ClientLoad] SET
                                                     [ModifiedOn]='{DateTime.Now}',
                                                     [ModifiedBy]='{CurrentUser.Email}',
-                                                    [VehicleId]={v.Id},
-                                                    [ClientSiteId]={cs1.Id},
-                                                    [ToClientSiteId]={cs2.Id},
-                                                    [TransporterId]={t.Id},
+                                                    [VehicleId]={vid},
+                                                    [ClientSiteId]={cs1id},
+                                                    [ToClientSiteId]={cs2id},
+                                                    [TransporterId]={tid},
                                                     [LoadNumber]='{load[ 2 ]}',
                                                     [LoadDate]='{loadDate}',
                                                     [EffectiveDate]='{deliveryDate}',
@@ -3952,7 +3960,7 @@ namespace ACT.UI.Controllers
 
                     if ( !DateTime.TryParse( load[ 10 ], out DateTime shipmentDate ) )
                     {
-                        if ( !DateTime.TryParseExact( load[ 10 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out shipmentDate ) )
+                        if ( !DateTime.TryParseExact( load[ 10 ], model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out shipmentDate ) )
                         {
                             shipmentDate1 = "NULL";
                         }
@@ -3968,7 +3976,7 @@ namespace ACT.UI.Controllers
 
                     if ( !DateTime.TryParse( load[ 11 ], out DateTime deliveryDate ) )
                     {
-                        if ( !DateTime.TryParseExact( load[ 11 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out deliveryDate ) )
+                        if ( !DateTime.TryParseExact( load[ 11 ], model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out deliveryDate ) )
                         {
                             deliveryDate1 = "NULL";
                         }
@@ -3984,7 +3992,7 @@ namespace ACT.UI.Controllers
 
                     if ( !DateTime.TryParse( load[ 9 ], out DateTime effectiveDate ) )
                     {
-                        if ( !DateTime.TryParseExact( load[ 9 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out effectiveDate ) )
+                        if ( !DateTime.TryParseExact( load[ 9 ], model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out effectiveDate ) )
                         {
                             effectiveDate1 = "NULL";
                         }
@@ -4000,7 +4008,7 @@ namespace ACT.UI.Controllers
 
                     if ( !DateTime.TryParse( load[ 17 ], out DateTime correctionRequestDate ) )
                     {
-                        if ( !DateTime.TryParseExact( load[ 17 ], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out correctionRequestDate ) )
+                        if ( !DateTime.TryParseExact( load[ 17 ], model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out correctionRequestDate ) )
                         {
                             correctionRequestDate1 = "NULL";
                         }

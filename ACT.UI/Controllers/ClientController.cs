@@ -1985,26 +1985,32 @@ namespace ACT.UI.Controllers
             using ( TransactionScope scope = new TransactionScope() )
             using ( ClientSiteService csservice = new ClientSiteService() )
             using ( SiteBudgetService sbservice = new SiteBudgetService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
             {
+                Site site1 = sservice.GetById( model.SiteId ?? 0 );
+
                 #region Validation
 
-                if ( sservice.ExistByNameRegion( model.Name?.Trim()?.ToLower(), model.RegionId ) )
+                if ( sservice.ExistByClientAndName( model.ClientId, model.Name?.Trim()?.ToLower() ) )
                 {
                     Notify( $"Sorry, a Site with the name {model.Name} in the specified region already exists.", NotificationType.Error );
 
                     return View( model );
                 }
 
-                Site existingSite = sservice.ExistByXYCoords( model.Longitude, model.Latitude );
-
-                if ( existingSite != null )
-                {
-                    // Instead of pass back to view, we will create the new site as a subsite of the existing site.
-                    // Get the existing site first
-                    model.SiteId = existingSite.Id;
-                }
-
                 #endregion
+
+                if ( !model.SiteId.HasValue && !string.IsNullOrWhiteSpace( model.Longitude ) && !string.IsNullOrWhiteSpace( model.Latitude ) )
+                {
+                    Site existingSite = sservice.ExistByXYCoords( model.Longitude?.Trim(), model.Latitude?.Trim() );
+
+                    if ( existingSite != null )
+                    {
+                        // Instead of pass back to view, we will create the new site as a subsite of the existing site.
+                        // Get the existing site first
+                        model.SiteId = existingSite.Id;
+                    }
+                }
 
                 #region Create Site
 
@@ -2087,6 +2093,28 @@ namespace ACT.UI.Controllers
                         csservice.Create( csSite );
                     }
                 }
+                else
+                {
+                    ClientCustomer cc = new ClientCustomer()
+                    {
+                        ClientId = model.ClientId,
+                        Status = ( int ) model.Status,
+                        CustomerNumber = model.AccountCode,
+                        CustomerName = site1?.Name ?? model.Name,
+                    };
+
+                    cc = ccservice.Create( cc );
+
+                    ClientSite csSite = new ClientSite()
+                    {
+                        SiteId = site.Id,
+                        ClientCustomerId = cc.Id,
+                        Status = ( int ) model.Status,
+                        AccountingCode = site.AccountCode,
+                    };
+
+                    csservice.Create( csSite );
+                }
 
                 #endregion
 
@@ -2157,6 +2185,7 @@ namespace ACT.UI.Controllers
                     EditMode = true,
                     Name = site.Name,
                     Depot = site.Depot,
+                    SiteId = site.SiteId,
                     Latitude = site.YCord,
                     Longitude = site.XCord,
                     RegionId = site.RegionId,
@@ -2186,6 +2215,7 @@ namespace ACT.UI.Controllers
 
                     Clients = new List<ClientCustomer>(),
                     SiteBudgets = new List<SiteBudget>(),
+                    ClientId = site.ClientSites.FirstOrDefault()?.ClientCustomer?.ClientId ?? 0,
                 };
 
                 #endregion
@@ -2275,8 +2305,11 @@ namespace ACT.UI.Controllers
             using ( TransactionScope scope = new TransactionScope() )
             using ( ClientSiteService csservice = new ClientSiteService() )
             using ( SiteBudgetService sbservice = new SiteBudgetService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
             {
                 Site site = sservice.GetById( model.Id );
+
+                Site site1 = sservice.GetById( model.SiteId ?? 0 );
 
                 #region Validations
 
@@ -2287,28 +2320,32 @@ namespace ACT.UI.Controllers
                     return PartialView( "_AccessDenied" );
                 }
 
-                if ( site.Name?.Trim()?.ToLower() != model.Name?.Trim()?.ToLower() && site.RegionId != model.RegionId && sservice.ExistByNameRegion( model.Name?.Trim()?.ToLower(), model.RegionId ) )
+                if ( site.Name?.Trim()?.ToLower() != model.Name?.Trim()?.ToLower() && site.RegionId != model.RegionId && sservice.ExistByClientAndName( model.ClientId, model.Name?.Trim()?.ToLower() ) )
                 {
                     Notify( $"Sorry, a Site with the name {model.Name} in the specified region already exists.", NotificationType.Error );
 
                     return View( model );
                 }
 
-                Site existingSite = sservice.ExistByXYCoords( model.Longitude?.Trim(), model.Latitude?.Trim() );
-
-                if ( existingSite != null && site.Id != existingSite.Id && site.SiteId != existingSite.Id )
-                {
-                    // Instead of pass back to view, we will create the new site as a subsite of the existing site.
-                    // Get the existing site first
-                    model.SiteId = existingSite.Id;
-                }
-
                 #endregion
+
+                if ( !model.SiteId.HasValue && !string.IsNullOrWhiteSpace( model.Longitude ) && !string.IsNullOrWhiteSpace( model.Latitude ) )
+                {
+                    Site existingSite = sservice.ExistByXYCoords( model.Longitude?.Trim(), model.Latitude?.Trim() );
+
+                    if ( existingSite != null && site.Id != existingSite.Id && site.SiteId != existingSite.Id )
+                    {
+                        // Instead of pass back to view, we will create the new site as a subsite of the existing site.
+                        // Get the existing site first
+                        model.SiteId = existingSite.Id;
+                    }
+                }
 
                 #region Update Site
 
                 site.Name = model.Name;
                 site.Depot = model.Depot;
+                site.SiteId = model.SiteId;
                 site.YCord = model.Latitude;
                 site.XCord = model.Longitude;
                 site.RegionId = model.RegionId;
@@ -2340,7 +2377,7 @@ namespace ACT.UI.Controllers
 
                 #region Add Client Site
 
-                csservice.Query( $"UPDATE [dbo].[ClientSite] SET [Status]={( int ) Status.Inactive} WHERE SiteId={site.Id}" );
+                csservice.Query( $"UPDATE [dbo].[ClientSite] SET [Status]={( int ) Status.Inactive} WHERE [SiteId]={site.Id}" );
 
                 if ( model.Clients.NullableAny( c => c.Id > 0 ) )
                 {
@@ -2370,6 +2407,28 @@ namespace ACT.UI.Controllers
                             csservice.Create( cs );
                         }
                     }
+                }
+                else
+                {
+                    ClientCustomer cc = new ClientCustomer()
+                    {
+                        ClientId = model.ClientId,
+                        Status = ( int ) model.Status,
+                        CustomerNumber = model.AccountCode,
+                        CustomerName = site1?.Name ?? model.Name,
+                    };
+
+                    cc = ccservice.Create( cc );
+
+                    ClientSite csSite = new ClientSite()
+                    {
+                        SiteId = site.Id,
+                        ClientCustomerId = cc.Id,
+                        Status = ( int ) model.Status,
+                        AccountingCode = site.AccountCode,
+                    };
+
+                    csservice.Create( csSite );
                 }
 
                 #endregion
@@ -2557,65 +2616,105 @@ namespace ACT.UI.Controllers
                 return View( model );
             }
 
-            int rowNo = 0,
+            int line = 0,
+                count = 0,
+                errors = 0,
                 skipped = 0,
-                processed = 0;
+                created = 0,
+                updated = 0,
+                errorDocId = 0;
+
+            string cQuery, uQuery;
+
+            List<string> errs = new List<string>();
 
             using ( SiteService sservice = new SiteService() )
             using ( RegionService rservice = new RegionService() )
             using ( AddressService aservice = new AddressService() )
             using ( ClientSiteService csservice = new ClientSiteService() )
             using ( ClientCustomerService ccservice = new ClientCustomerService() )
-            using ( IExcelDataReader reader = ExcelReaderFactory.CreateReader( model.SiteImportFile.InputStream ) )
+            using ( TextFieldParser parser = new TextFieldParser( model.SiteImportFile.InputStream ) )
             {
-                // DataSet - The result of each spreadsheet will be created in the result.Tables
-                DataSet result = reader.AsDataSet();
+                parser.Delimiters = new string[] { "," };
 
-                while ( rowNo < result.Tables[ 1 ].Rows.Count )
+                while ( true )
                 {
-                    if ( rowNo < 2 )
+                    string[] load = parser.ReadFields();
+
+                    if ( load == null )
                     {
-                        rowNo++;
+                        break;
+                    }
+
+                    line++;
+
+                    if ( line == 1 ) continue;
+
+                    cQuery = uQuery = string.Empty;
+
+                    count++;
+
+                    if ( load.NullableCount() < 2 )
+                    {
+                        skipped++;
 
                         continue;
                     }
+
+                    load = load.ToSQLSafe();
 
                     try
                     {
                         using ( TransactionScope scope = new TransactionScope() )
                         {
-                            string siteNumber = result.Tables[ 1 ].Rows[ rowNo ][ 2 ]?.ToString()?.Trim(),
-                                   customerNumber = result.Tables[ 1 ].Rows[ rowNo ][ 3 ]?.ToString()?.Trim(),
-                                   customerName = result.Tables[ 1 ].Rows[ rowNo ][ 4 ]?.ToString()?.Trim(),
-                                   siteName = result.Tables[ 1 ].Rows[ rowNo ][ 5 ]?.ToString()?.Trim(),
-                                   addressLine1 = result.Tables[ 1 ].Rows[ rowNo ][ 6 ]?.ToString()?.Trim(),
-                                   addressLine2 = result.Tables[ 1 ].Rows[ rowNo ][ 7 ]?.ToString()?.Trim(),
-                                   town = result.Tables[ 1 ].Rows[ rowNo ][ 8 ]?.ToString()?.Trim(),
-                                   xCord = result.Tables[ 1 ].Rows[ rowNo ][ 9 ]?.ToString()?.Trim(),
-                                   yCord = result.Tables[ 1 ].Rows[ rowNo ][ 10 ]?.ToString()?.Trim(),
-                                   kamContact = result.Tables[ 1 ].Rows[ rowNo ][ 13 ]?.ToString()?.Trim(),
-                                   managerContact = result.Tables[ 1 ].Rows[ rowNo ][ 14 ]?.ToString()?.Trim(),
-                                   liquorLicenseNumber = result.Tables[ 1 ].Rows[ rowNo ][ 17 ]?.ToString()?.Trim(),
-                                   kamName = result.Tables[ 1 ].Rows[ rowNo ][ 19 ]?.ToString()?.Trim(),
-                                   region = result.Tables[ 1 ].Rows[ rowNo ][ 20 ]?.ToString()?.Trim(),
-                                   province = result.Tables[ 1 ].Rows[ rowNo ][ 21 ]?.ToString()?.Trim(),
-                                   salesManager = result.Tables[ 1 ].Rows[ rowNo ][ 23 ]?.ToString()?.Trim(),
-                                   salesRepCluster = result.Tables[ 1 ].Rows[ rowNo ][ 24 ]?.ToString()?.Trim(),
-                                   salesRep = result.Tables[ 1 ].Rows[ rowNo ][ 25 ]?.ToString()?.Trim();
+                            string siteNumber = load[ 0 ],
+                                   customerNumber = load[ 1 ],
+                                   customerName = load[ 2 ],
+                                   siteName = load[ 3 ],
+                                   subSiteName = load[ 4 ],
+                                   addressLine1 = load[ 5 ],
+                                   addressLine2 = load[ 6 ],
+                                   town = load[ 7 ],
+                                   xCord = load[ 8 ],
+                                   yCord = load[ 9 ],
+                                   kamContact = load[ 10 ],
+                                   managerContact = load[ 11 ],
+                                   liquorLicenseNumber = load[ 12 ],
+                                   kamName = load[ 13 ],
+                                   region = load[ 14 ],
+                                   province = load[ 15 ],
+                                   salesManager = load[ 16 ],
+                                   salesRepCluster = load[ 17 ],
+                                   salesRep = load[ 18 ];
 
                             if ( string.IsNullOrEmpty( siteName ) || string.IsNullOrEmpty( customerName ) || string.IsNullOrEmpty( customerNumber ) )
                             {
-                                rowNo++;
                                 skipped++;
 
-                                continue;
+                                throw new Exception( $"Site name, Customer Name or Customer Number missing @ line {line}!" );
                             }
 
                             Region r = rservice.Search( region, province );
 
                             #region Site
 
-                            Site s = sservice.GetByXYCoordinates( xCord, yCord );
+                            Site s;
+
+                            int? siteId = null;
+
+                            if ( !string.IsNullOrWhiteSpace( subSiteName ) )
+                            {
+                                s = sservice.GetByClientAndName( model.ClientId, subSiteName );
+                                Site s1 = sservice.GetByClientAndName( model.ClientId, siteName );
+
+                                siteName = subSiteName;
+
+                                siteId = s1?.Id;
+                            }
+                            else
+                            {
+                                s = sservice.GetByClientAndName( model.ClientId, siteName );
+                            }
 
                             if ( s == null )
                             {
@@ -2626,6 +2725,7 @@ namespace ACT.UI.Controllers
                                     XCord = xCord,
                                     YCord = yCord,
                                     Name = siteName,
+                                    SiteId = siteId,
                                     RegionId = r?.Id,
                                     Depot = siteNumber,
                                     Description = siteName,
@@ -2643,14 +2743,17 @@ namespace ACT.UI.Controllers
                                 };
 
                                 s = sservice.Create( s );
+
+                                created++;
                             }
-                            else if ( s != null && s?.Name?.Trim().ToLower() == siteName?.Trim().ToLower() )
+                            else if ( s != null )
                             {
                                 // Same site, update
 
                                 s.XCord = xCord;
                                 s.YCord = yCord;
                                 s.Name = siteName;
+                                s.SiteId = siteId;
                                 s.Depot = siteNumber;
                                 s.Description = siteName;
                                 s.AccountCode = siteNumber;
@@ -2667,42 +2770,8 @@ namespace ACT.UI.Controllers
                                 s.RegionId = ( r?.Id ?? s.RegionId );
 
                                 s = sservice.Update( s );
-                            }
-                            else if ( s != null && s?.Name?.Trim().ToLower() != siteName?.Trim().ToLower() )
-                            {
-                                // Create new site, as a Sub-site
 
-                                s = new Site()
-                                {
-                                    SiteId = s.Id,
-                                    XCord = xCord,
-                                    YCord = yCord,
-                                    Name = siteName,
-                                    RegionId = r?.Id,
-                                    Depot = siteNumber,
-                                    Description = siteName,
-                                    AccountCode = siteNumber,
-                                    ContactName = salesManager,
-                                    ContactNo = managerContact,
-                                    DepotManager = salesManager,
-                                    FinanceContact = salesManager,
-                                    Status = ( int ) Status.Active,
-                                    ReceivingContact = salesManager,
-                                    FinanceContactNo = managerContact,
-                                    ReceivingContactNo = managerContact,
-                                    DepotManagerContact = managerContact,
-                                    Address = $"{addressLine1}\n {addressLine2}\n {town}",
-                                };
-
-                                s = sservice.Create( s );
-                            }
-
-                            if ( s == null )
-                            {
-                                rowNo++;
-                                skipped++;
-
-                                continue;
+                                updated++;
                             }
 
                             #endregion
@@ -2830,21 +2899,34 @@ namespace ACT.UI.Controllers
 
                             #endregion
 
-                            rowNo++;
-                            processed++;
-
                             scope.Complete();
                         }
                     }
                     catch ( Exception ex )
                     {
-                        rowNo++;
+                        errors++;
 
+                        errs.Add( ex.ToString() );
                     }
+                }
+
+                cQuery = string.Empty;
+                uQuery = string.Empty;
+
+                if ( errs.NullableAny() )
+                {
+                    errorDocId = LogImportErrors( errs, model.ClientId );
                 }
             }
 
-            Notify( $"{processed} sites were successfully uploaded, {skipped} were skipped.", NotificationType.Success );
+            string resp = $"{created} sites were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.";
+
+            if ( errs.NullableAny() && errorDocId > 0 )
+            {
+                resp = $"{resp} <a href='/Client/ViewDocument/{errorDocId}' target='_blank'>Click here</a> to view the erros.";
+            }
+
+            Notify( resp, NotificationType.Success );
 
             return ManageSites( new PagingModel(), new CustomSearchModel() );
         }

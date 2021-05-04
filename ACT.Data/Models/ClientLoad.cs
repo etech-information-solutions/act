@@ -92,8 +92,9 @@ namespace ACT.Data.Models
         public virtual ClientSite ClientSite { get; set; }
         public virtual ClientSite ClientSite1 { get; set; }
         public virtual OutstandingReason OutstandingReason { get; set; }
-        public virtual User User { get; set; }
         public virtual PODComment PODComment { get; set; }
+        public virtual Transporter Transporter { get; set; }
+        public virtual User User { get; set; }
         public virtual User User1 { get; set; }
         public virtual User User2 { get; set; }
         public virtual Vehicle Vehicle { get; set; }
@@ -101,7 +102,5 @@ namespace ACT.Data.Models
         public virtual ICollection<Journal> Journals { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Tasks { get; set; }
-        public virtual User User3 { get; set; }
-        public virtual Transporter Transporter { get; set; }
     }
 }
