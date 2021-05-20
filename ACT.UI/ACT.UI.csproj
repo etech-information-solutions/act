@@ -660,7 +660,7 @@
     <Content Include="Views\Pallet\_UnReconciledChepLoads.cshtml" />
     <Content Include="Views\Pallet\_UnReconciledClientLoads.cshtml" />
     <Content Include="Views\Pallet\_TinyPaging.cshtml" />
-    <Content Include="Views\Pallet\_ClientLoadJournals.cshtml" />
+    <Content Include="Views\Pallet\_EditClientLoadJournals.cshtml" />
     <Content Include="Views\Pallet\_ClientLoadComments.cshtml" />
     <Content Include="Views\Pallet\_ClientLoadDocuments.cshtml" />
     <Content Include="Views\Pallet\_ChepLoadComments.cshtml" />
@@ -710,6 +710,11 @@
     <Content Include="Views\Shared\_ClientList.cshtml" />
     <Content Include="Views\Client\ImportTransporter.cshtml" />
     <Content Include="Views\Administration\ImportTransporter.cshtml" />
+    <Content Include="Views\Pallet\_ViewPOD.cshtml" />
+    <Content Include="Views\Pallet\_UploadPOD.cshtml" />
+    <Content Include="Views\Pallet\_ClientLoadJournals.cshtml" />
+    <Content Include="Views\Pallet\_ChepLoadJournals.cshtml" />
+    <Content Include="Views\Pallet\_ChepLoadShipments.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

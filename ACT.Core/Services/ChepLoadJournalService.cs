@@ -39,6 +39,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
                 { new SqlParameter( "cmsClientId", csm.ClientId ) },
+                { new SqlParameter( "csmChepLoadId", csm.ChepLoadId ) },
                 { new SqlParameter( "csmStatus", ( int ) csm.Status ) },
                 { new SqlParameter( "csmBalanceStatus", ( int ) csm.BalanceStatus ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
@@ -47,8 +48,9 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
-                { new SqlParameter( "cmsDocketNumber", csm.DocketNumber ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmDocketNumber", csm.DocketNumber ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmManuallyMatchedUID", csm.ManuallyMatchedUID ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmOriginalDocketNumber", csm.OriginalDocketNumber ?? ( object ) DBNull.Value ) },
             };
 
             #endregion
@@ -105,6 +107,10 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (c.Id=@cmsClientId)";
             }
+            if ( csm.ChepLoadId > 0 )
+            {
+                query = $"{query} AND (cj.ChepLoadId=@csmChepLoadId)";
+            }
             if ( csm.BalanceStatus != BalanceStatus.None )
             {
                 query = $"{query} AND (cj.BalanceStatus=@csmBalanceStatus)";
@@ -142,6 +148,11 @@ namespace ACT.Core.Services
             if ( !string.IsNullOrEmpty( csm.DocketNumber ) )
             {
                 query = $"{query} AND (cj.DocketNumber=@csmDocketNumber) ";
+            }
+
+            if ( !string.IsNullOrEmpty( csm.OriginalDocketNumber ) )
+            {
+                query = $"{query} AND (cj.OriginalDocketNumber=@csmOriginalDocketNumber) ";
             }
 
             #endregion
@@ -211,6 +222,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "take", pm.Take ) },
                 { new SqlParameter( "cmsClientId", csm.ClientId ) },
                 { new SqlParameter( "csmStatus", ( int ) csm.Status ) },
+                { new SqlParameter( "csmChepLoadId", csm.ChepLoadId ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmBalanceStatus", ( int ) csm.BalanceStatus ) },
                 { new SqlParameter( "csmOutstandingReasonId", csm.OutstandingReasonId ) },
@@ -218,8 +230,9 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
-                { new SqlParameter( "cmsDocketNumber", csm.DocketNumber ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmDocketNumber", csm.DocketNumber ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmManuallyMatchedUID", csm.ManuallyMatchedUID ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmOriginalDocketNumber", csm.OriginalDocketNumber ?? ( object ) DBNull.Value ) },
             };
 
             #endregion
@@ -227,8 +240,7 @@ namespace ACT.Core.Services
             string query = @"SELECT
                                 cj.*,
                                 c.[CompanyName] AS [ClientName],
-                                r.[Description] AS [OutstandingReason],
-                                (SELECT COUNT(1) FROM [dbo].[ChepLoadJournal] cj WHERE cj.Id=cj.[ChepLoadId]) AS [VersionCount]";
+                                r.[Description] AS [OutstandingReason]";
 
             if ( csm.IsPODOutstanding )
             {
@@ -286,6 +298,10 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (c.Id=@cmsClientId)";
             }
+            if ( csm.ChepLoadId > 0 )
+            {
+                query = $"{query} AND (cj.ChepLoadId=@csmChepLoadId)";
+            }
             if ( csm.BalanceStatus != BalanceStatus.None )
             {
                 query = $"{query} AND (cj.BalanceStatus=@csmBalanceStatus)";
@@ -323,6 +339,11 @@ namespace ACT.Core.Services
             if ( !string.IsNullOrEmpty( csm.DocketNumber ) )
             {
                 query = $"{query} AND (cj.DocketNumber=@csmDocketNumber) ";
+            }
+
+            if ( !string.IsNullOrEmpty( csm.OriginalDocketNumber ) )
+            {
+                query = $"{query} AND (cj.OriginalDocketNumber=@csmOriginalDocketNumber) ";
             }
 
             #endregion
@@ -375,6 +396,16 @@ namespace ACT.Core.Services
             List<ChepLoadJournalCustomModel> model = context.Database.SqlQuery<ChepLoadJournalCustomModel>( query, parameters.ToArray() ).ToList();
 
             return model;
+        }
+
+        /// <summary>
+        /// Gets the ChepLoadJournal id using the specified UID
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public int GetIdByUID( string uid )
+        {
+            return context.Database.SqlQuery<int>( $"SELECT cj.Id FROM [dbo].[ChepLoadJournal] cj WHERE cj.[UID]='{uid}';" ).FirstOrDefault();
         }
     }
 }

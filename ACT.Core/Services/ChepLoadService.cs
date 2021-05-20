@@ -48,7 +48,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
                 { new SqlParameter( "useremail", ( CurrentUser != null ) ? CurrentUser.Email : "" ) },
-                { new SqlParameter( "cmsDocketNumber", csm.DocketNumber ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmDocketNumber", csm.DocketNumber ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmManuallyMatchedUID", csm.ManuallyMatchedUID ?? ( object ) DBNull.Value ) },
             };
 
@@ -228,7 +228,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmReconciliationStatus", ( int ) csm.ReconciliationStatus ) },
                 { new SqlParameter( "useremail", ( CurrentUser != null ) ? CurrentUser.Email : "" ) },
-                { new SqlParameter( "cmsDocketNumber", csm.DocketNumber ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "csmDocketNumber", csm.DocketNumber ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmManuallyMatchedUID", csm.ManuallyMatchedUID ?? ( object ) DBNull.Value ) },
             };
 
@@ -426,6 +426,7 @@ namespace ACT.Core.Services
 
             List<object> parameters = new List<object>()
             {
+                { new SqlParameter( "userid", CurrentUser.Id ) },
                 { new SqlParameter( "actStatus", Status.Active ) },
             };
 
@@ -503,9 +504,21 @@ namespace ACT.Core.Services
         /// </summary>
         /// <param name="receiverNumber"></param>
         /// <returns></returns>
-        public List<ChepLoadCustomModel> ListClientLoadMatch( string receiverNumber )
+        public List<ChepLoadCustomModel> ListClientLoadMatch( string receiverNumber, int clientId = 0 )
         {
-            string q = $"SELECT ch.Id, ch.Quantity FROM [dbo].[ChepLoad] ch WHERE RTRIM(LTRIM(ch.Ref))='{receiverNumber}' OR RTRIM(LTRIM(ch.OtherRef))='{receiverNumber}';";
+            if ( string.IsNullOrEmpty( receiverNumber ) )
+            {
+                return new List<ChepLoadCustomModel>();
+            }
+
+            string q = $"SELECT ch.Id, ch.Quantity FROM [dbo].[ChepLoad] ch WHERE (RTRIM(LTRIM(ch.Ref))='{receiverNumber}' OR RTRIM(LTRIM(ch.OtherRef))='{receiverNumber}')";
+
+            if ( clientId > 0 )
+            {
+                q += $" AND (ch.[ClientId]={clientId})";
+            }
+
+            q += ";";
 
             return context.Database.SqlQuery<ChepLoadCustomModel>( q ).ToList();
         }
@@ -515,9 +528,29 @@ namespace ACT.Core.Services
         /// </summary>
         /// <param name="reference"></param>
         /// <returns></returns>
-        public List<ChepLoad> ListByReference( string reference )
+        public List<ChepLoad> ListByReference( int clientId, string reference )
         {
-            return context.ChepLoads.Where( ch => ch.Ref.Trim() == reference.Trim() || ch.OtherRef.Trim() == reference.Trim() ).ToList();
+            if ( string.IsNullOrEmpty( reference ) || clientId == 0 )
+            {
+                return new List<ChepLoad>();
+            }
+
+            return context.ChepLoads.Where( ch => ch.ClientId == clientId && ( ch.Ref.Trim() == reference.Trim() || ch.OtherRef.Trim() == reference.Trim() ) ).ToList();
+        }
+
+        /// <summary>
+        /// Gets a list of ChepLoads using the specified Ref #
+        /// </summary>
+        /// <param name="reference"></param>
+        /// <returns></returns>
+        public List<ChepLoad> ListByReference( int clientId, string reference, string otherreference )
+        {
+            if ( string.IsNullOrEmpty( reference ) || clientId == 0 )
+            {
+                return new List<ChepLoad>();
+            }
+
+            return context.ChepLoads.Where( ch => ch.ClientId == clientId && ( ch.Ref.Trim() == reference.Trim() || ch.OtherRef.Trim() == reference.Trim() || ch.Ref.Trim() == otherreference.Trim() || ch.OtherRef.Trim() == otherreference.Trim() ) ).ToList();
         }
 
         /// <summary>

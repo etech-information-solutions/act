@@ -46,17 +46,17 @@
             <th data-name="Count">
                 #
             </th>
-            <th data-name="CreateDate" data-column="cl.CreateDate">
-                Created
+            <th data-name="EffectiveDate" data-column="cl.EffectiveDate">
+                Effective Date
             </th>
-            <th data-name="LoadDate" data-column="cl.EffectiveDate">
-                Load Date
+            <th data-name="DeliveryDate" data-column="cl.DeliveryDate">
+                Delivery Date
             </th>
-            <th data-name="CompanyName" data-column="c.CompanyName">
-                Client
+            <th data-name="Location" data-column="cl.Location">
+                Supplier From
             </th>
-            <th data-name="DocketNumber" data-column="cl.DocketNumber">
-                Docket #
+            <th data-name="Otherpartyid" data-column="cl.Otherpartyid">
+                Customer To
             </th>
             <th data-name="Ref" data-column="cl.Ref">
                 Ref
@@ -64,20 +64,23 @@
             <th data-name="OtherRef" data-column="cl.OtherRef">
                 Other Ref
             </th>
-            <th data-name="InvoiceNumber" data-column="cl.InvoiceNumber">
-                Invoice #
-            </th>
             <th data-name="TransactionType" data-column="cl.TransactionType">
                 Transaction Type
+            </th>
+            <th data-name="Equipment" data-column="cl.Equipment">
+                Equipment
             </th>
             <th data-name="Quantity" data-column="cl.Quantity">
                 Qty
             </th>
+            <th data-name="InvoiceNumber" data-column="cl.InvoiceNumber">
+                Invoice #
+            </th>
+            <th data-name="DocketNumber" data-column="cl.DocketNumber">
+                Docket #
+            </th>
             <th data-name="Status" data-column="cl.Status">
                 Status
-            </th>
-            <th data-name="BalanceStatus" data-column="cl.BalanceStatus">
-                Balanced
             </th>
             <th data-name="Actions">
                 Actions
@@ -96,19 +99,54 @@
 
                 string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+                <tr id="poolingagentdata-@item.Id-item" class="poolingagentdata-@item.Id-item @active">
 
                     <td width="1%">
                         @count
                     </td>
                     <td>
-                        On @(item.CreateDate?.ToString( "yyyy-MM-dd" ) ) <br /> by @item.CreatedBy
-                    </td>
-                    <td>
                         @(item.EffectiveDate?.ToString( "yyyy-MM-dd" ))
                     </td>
                     <td>
-                        @item.ClientName
+                        @(item.DeliveryDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @item.Location
+                    </td>
+                    <td>
+                        @item.OtherPartyId, @item.OtherParty
+                    </td>
+                    <td>
+                        @(item.CorrectedRef ?? item.Ref)
+
+                        @if ( !string.IsNullOrEmpty( item.CorrectedRef ) )
+                        {
+                            <a rel="tipsyW" title="Manually corrected, was: @item.Ref">
+                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @(item.CorrectedOtherRef ?? item.OtherRef)
+
+                        @if ( !string.IsNullOrEmpty( item.CorrectedOtherRef ) )
+                        {
+                            <a rel="tipsyW" title="Manually corrected, was: @item.OtherRef">
+                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @item.TransactionType
+                    </td>
+                    <td>
+                        @item.Equipment
+                    </td>
+                    <td>
+                        @item.Quantity
+                    </td>
+                    <td>
+                        @item.InvoiceNumber
                     </td>
                     <td>
                         @item.DocketNumber
@@ -132,35 +170,6 @@
 
                         }
                     </td>
-                    <td>
-                        @(item.CorrectedRef ?? item.Ref)
-
-                        @if ( !string.IsNullOrEmpty( item.CorrectedRef ) )
-                        {
-                            <a rel="tipsyW" title="Manually corrected, was: @item.Ref">
-                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
-                            </a>
-                        }
-                    </td>
-                    <td>
-                        @(item.CorrectedOtherRef ?? item.OtherRef)
-
-                        @if ( !string.IsNullOrEmpty( item.CorrectedOtherRef ) )
-                        {
-                            <a rel="tipsyW" title="Manually corrected, was: @item.OtherRef">
-                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
-                            </a>
-                        }
-                    </td>
-                    <td>
-                        @item.InvoiceNumber
-                    </td>
-                    <td>
-                        @item.TransactionType
-                    </td>
-                    <td>
-                        @item.Quantity
-                    </td>
                     <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
                         @status.GetDisplayText()
 
@@ -171,28 +180,31 @@
                             </a>
                         }
                     </td>
-                    <td class="@(balanceStatus == BalanceStatus.Balanced ? "active" : "inactive")">
-                        @balanceStatus.GetDisplayText()
-                    </td>
-                    <td width="5%">
+                    <td width="10%">
 
                         <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
-                            @Html.ActionLink( "Details", "PoolingAgentDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            @Html.ActionLink( " ", "ChepLoadShipments", new { id = item.Id, clientId = item.ClientId, reference = ( item.Ref ?? item.OtherRef ), otherreference = ( item.OtherRef ?? item.Ref ), edit = false }, new { @class = "matched", @rel = "tipsyE", @title = "View Related Shipments?", @style = "padding-left: 28px; margin-left: 0; margin-right: 20%;", @data_chepload_shipment = "1", @data_id = item.Id, @data_clientid = item.ClientId, @data_reference = ( item.Ref ?? item.OtherRef ), @data_otherreference = ( item.OtherRef ?? item.Ref ) } )
+
+                            @Html.ActionLink( "Details", "PoolingAgentDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".poolingagentdata-" + item.Id + "-item" } )
 
                         </div>
 
-                        @Html.ActionLink( "Allocate", "AllocatePoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        <span>
+                            @Html.ActionLink( "Journals", "ChepLoadJournals", new { DocketNumber = item.DocketNumber, edit = false }, new { @class = "reports", @rel = "tipsyE", @title = "View Journals", @style = "padding-left: 28px; margin-left: 0; background-position-y: center;", @data_chepload_journal = "1", @data_docketnumber = item.DocketNumber } )
+                        </span>
+
+                        @*@Html.ActionLink( "Allocate", "AllocatePoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".poolingagentdata-" + item.Id + "-item" } )*@
 
                         @if ( postingType == PostingType.Manual )
                         {
                             @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
-                                    @Html.ActionLink( "Edit", "EditPoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item", @style = "margin-right: 0;" } )
+                                @Html.ActionLink( "Edit", "EditPoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".poolingagentdata-" + item.Id + "-item", @style = "margin-right: 0;" } )
 
-                                    @Html.ActionLink( enable, "DeletePoolingAgentData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?", @style = "margin-left: 0;" } )
+                                @Html.ActionLink( enable, "DeletePoolingAgentData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#poolingagentdata-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?", @style = "margin-left: 0;" } )
 
-                                </div>*@
+                            </div>*@
                         }
 
                     </td>

@@ -1,0 +1,40 @@
+﻿@model ClientLoad
+
+@using ACT.Data.Models;
+
+@{
+    Image podImg = ViewBag.PODImage;
+    string podSnapshoot = podImg != null ? Url.Action( "ViewImage", new { id = podImg.Id } ) : Url.Content( "~/Images/no-preview.png" );
+}
+
+<div class="display-label">
+    POD Number:
+</div>
+<div class="display-field" style="color: #111;">
+    @Model.PODNumber
+</div>
+
+<div class="display-label">
+    Load Comment
+</div>
+<div class="display-field" style="color: #111;">
+    @Html.Raw( Model.PODComment?.Comment ?? "&nbsp;" )
+</div>
+
+<div class="editor-label" style="margin-bottom: 5px;">
+    POD Snapshoot
+</div>
+<div class="editor-field" style="text-align: center; border: 1px dashed #ddd; padding: 10px;">
+
+    <label>
+        <a href="@podSnapshoot" target="_blank">
+            <img id="pod-snapshoot-preview" style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="" src="@podSnapshoot" />
+        </a>
+    </label>
+</div>
+
+<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+<p>
+    <a onclick="ACT.Modal.Close();">Close</a>
+</p>

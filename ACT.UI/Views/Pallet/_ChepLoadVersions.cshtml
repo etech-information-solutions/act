@@ -13,10 +13,10 @@
 
 @{
     int count = Model.Start;
-    List<ChepLoadCustomModel> items = ( List<ChepLoadCustomModel> ) Model.Items;
+    List<ChepLoadJournalCustomModel> items = ( List<ChepLoadJournalCustomModel> ) Model.Items;
 }
 
-<table id="ExtraChepLoads-table" class="da-table" data-fixed-header-target="#ExtraChepLoads-table_wrapper" data-starting-point=".ap-tabs ul">
+<table id="ExtraChepLoads-table" class="da-table" data-fixed-header-target="#ExtraChepLoads-table_wrapper" data-starting-point=".ap-tabs ul" style="color: #000;">
     <thead>
         <tr>
             <th data-name="Count">
@@ -90,24 +90,10 @@
                         @item.DocketNumber
                     </td>
                     <td>
-                        @(item.CorrectedRef ?? item.Ref)
-
-                        @if ( !string.IsNullOrEmpty( item.CorrectedRef ) )
-                        {
-                            <a rel="tipsyW" title="Manually corrected, was: @item.Ref">
-                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
-                            </a>
-                        }
+                        @item.Ref
                     </td>
                     <td>
-                        @(item.CorrectedOtherRef ?? item.OtherRef)
-
-                        @if ( !string.IsNullOrEmpty( item.CorrectedOtherRef ) )
-                        {
-                            <a rel="tipsyW" title="Manually corrected, was: @item.OtherRef">
-                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
-                            </a>
-                        }
+                        @item.OtherRef
                     </td>
                     <td>
                         @item.InvoiceNumber

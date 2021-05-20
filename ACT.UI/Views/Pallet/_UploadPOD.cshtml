@@ -1,0 +1,55 @@
+﻿@model ClientLoadViewModel
+
+@using ACT.UI.Models;
+
+@{
+    string podSnapshoot = Model.Files.NullableAny( f => f.Name == "PODNumber" ) ? Url.Action( "ViewImage", new { id = Model.Files.FirstOrDefault( d => d.Name == "PODNumber" ).Id } ) : Url.Content( "~/Images/no-preview.png" );
+}
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "UploadLoadPOD", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#modal-body", @style = "width: auto;", id = "upload-load-pod" } ) )
+{
+
+    @Html.ValidationSummary( true )
+
+    @Html.HiddenFor( model => model.Id )
+
+    <div class="editor-label ">
+        @Html.LabelFor( model => model.PODNumber )
+    </div>
+    <div class="editor-field">
+        @Html.TextBoxFor( model => model.PODNumber, new { @class = "input", @placeholder = "Please Complete", @required = "required" } )
+        @Html.ValidationMessageFor( model => model.PODNumber )
+    </div>
+
+    <div class="editor-label">
+        @Html.LabelFor( model => model.PODCommentId )
+    </div>
+    <div class="editor-field">
+        @Html.DropDownListFor( model => model.PODCommentId, model => Model.PODCommentOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @required = "required", @style = "width: 98%;" } )
+        @Html.ValidationMessageFor( model => model.PODCommentId )
+    </div>
+
+    <div class="editor-label" style="margin-bottom: 5px;">
+        POD Snapshoot
+    </div>
+    <div class="editor-field" style="text-align: center; border: 1px dashed #ddd; padding: 10px;">
+
+        <label>
+            <a href="@podSnapshoot" target="_blank">
+                <img id="pod-snapshoot-preview" style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="" src="@podSnapshoot" />
+            </a>
+        </label>
+
+        <input name="Files[0].File" type="file" value="" class="input" data-upload-image="1" data-upload-target="#pod-snapshoot-preview" />
+        <input name="Files[0].Name" type="hidden" value="PODNumber" />
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+    <p>
+        <input id="save-btn" type="submit" value="Update" />
+        <span style="padding: 0 5px;">/</span> <a onclick="ACT.Modal.Close();">Cancel</a>
+    </p>
+}

@@ -325,5 +325,10 @@ namespace ACT.Core.Services
         {
             return context.Transporters.FirstOrDefault( t => t.Name.ToLower().Trim() == name.ToLower().Trim() && t.ClientId == clientId );
         }
+
+        public int? GetIdByClientAndName( int? clientId, string name )
+        {
+            return context.Database.SqlQuery<int?>( $"SELECT t.[Id] FROM [dbo].[Transporter] t WHERE t.[ClientId]={clientId} AND t.[Name]='{name?.Trim()}';" ).FirstOrDefault();
+        }
     }
 }

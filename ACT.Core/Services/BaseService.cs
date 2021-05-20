@@ -96,6 +96,8 @@ namespace ACT.Core.Services
 
         public BaseService()
         {
+            context.Database.CommandTimeout = 600; // Minimun set to 10 minutes
+
             context.Configuration.LazyLoadingEnabled = false;
             context.Configuration.ProxyCreationEnabled = false;
         }

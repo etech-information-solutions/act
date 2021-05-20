@@ -68,6 +68,7 @@ namespace ACT.Data.Models
         public string CorrectedRef { get; set; }
         public string CorrectedOtherRef { get; set; }
         public bool IsExtra { get; set; }
+        public string UID { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }

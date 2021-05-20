@@ -264,5 +264,16 @@ namespace ACT.Core.Services
         {
             return context.Vehicles.FirstOrDefault( v => v.Registration.Trim() == reg.Trim() && v.ObjectType == objectType );
         }
+
+        /// <summary>
+        /// Gets a vehicle using the specified Registration Number and Object Type
+        /// </summary>
+        /// <param name="reg"></param>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
+        public int? GetIdByRegistrationNumber( string reg, string objectType )
+        {
+            return context.Database.SqlQuery<int?>( $"SELECT v.[Id] FROM [dbo].[Vehicle] v WHERE v.[Registration]='{reg}' AND v.[ObjectType]='{objectType}';" ).FirstOrDefault();
+        }
     }
 }

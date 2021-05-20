@@ -52,6 +52,8 @@ namespace ACT.Data.Models
         public bool IsExchange { get; set; }
         public bool IsPSPPickup { get; set; }
         public bool TransporterLiable { get; set; }
+        public string Version { get; set; }
+        public string UID { get; set; }
     
         public virtual ChepLoad ChepLoad { get; set; }
         public virtual Client Client { get; set; }

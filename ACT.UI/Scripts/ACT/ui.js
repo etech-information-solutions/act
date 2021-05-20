@@ -150,6 +150,20 @@
             // Body Keypress
             this.DataSetClient( $( window ), 113 );
 
+
+            // Client Load Buttons
+            this.DataViewPOD( $( '*[data-view-pod="1"]' ) );
+            this.DataUploadPOD( $( '*[data-upload-pod="1"]' ) );
+            this.DataReturnDoc( $( '*[data-return-doc="1"]' ) );
+            this.DataControlDoc( $( '*[data-control-doc="1"]' ) );
+            this.DataLoadDisputes( $( '*[data-load-disputes="1"]' ) );
+            this.DataLoadMovements( $( '*[data-load-movements="1"]' ) );
+            this.DataClientLoadJournal( $( '*[data-clientload-journal="1"]' ) );
+
+            // Chep Load Buttons
+            this.DataChepLoadJournal( $( '*[data-chepload-journal="1"]' ) );
+            this.DataChepLoadShipment( $( '*[data-chepload-shipment="1"]' ) );
+
             if ( window.location.search !== "" && !$( "tr.edit" ).length && $( ".dataTable" ).length && !ACT.UI.PageViewIdProcessed )
             {
                 var viewid = false,
@@ -5417,17 +5431,23 @@
 
                         $( "<div />" ).load( siteurl + "/ExtraChepLoads", { DocketNumber: docketNumber }, function ( d )
                         {
-                            ACT.Modal.Close();
+                            //ACT.Modal.Close();
+
+                            var di = $( this );
 
                             setTimeout( function ()
                             {
-                                $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", ( $( "body" ).outerWidth() - 20 ) );
+                                di.find( "table" ).css( "color", "#354052" );
 
-                                ACT.Modal.Open( d, "Extra Chep Load", false );
+                                $( ACT.Modal.Container ).find( "#modal-body" ).html( di.html() );
+                                $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", ( $( "body" ).outerWidth() - 20 ) );
+                                $( '.modalContainer' ).center();
+
+                                //ACT.Modal.Open( di.html(), "Extra Chep Load", false );
 
                                 setTimeout( function ()
                                 {
-                                    ACT.Init.Start( true );
+                                    ACT.Init.PluginInit( $( ACT.Modal.Container ) );
                                 }, 2000 );
                             }, 1000 );
                         } );
@@ -5452,7 +5472,7 @@
 
                         ACT.Modal.Open( msg, "Chep Load Versions (" + versions + ")", false );
 
-                        $( "<div />" ).load( siteurl + "/ChepLoadVersions", { DocketNumber: docketNumber }, function ( d )
+                        $( "<div />" ).load( siteurl + "/ChepLoadVersions", { OriginalDocketNumber: docketNumber }, function ( d )
                         {
                             ACT.Modal.Close();
 
@@ -5536,6 +5556,8 @@
                                     body.find( ".notification" ).remove();
                                     $( this ).find( ".notification" ).css( "margin-top", "0" );
 
+                                    $( "#sc-m" ).text( sel.find( "option:selected" ).text() );
+
                                     body.prepend( $( this ).html() );
 
                                     ACT.Init.Start( false );
@@ -5547,7 +5569,283 @@
 
                 }, 1000 );
             } );
-        }
+        },
 
+        DataViewPOD: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( i.hasClass( "disabled" ) )
+                        {
+                            return;
+                        }
+
+                        ACT.Loader.Show( i.find( "#loader" ), true );
+
+                        $( "<div />" ).load( siteurl + "/ViewPOD", { id: id }, function ( d )
+                        {
+                            ACT.Modal.Open( d, "View POD", false, [] );
+
+                            setTimeout( function ()
+                            {
+                                ACT.Init.Start( true );
+
+                            }, 1000 );
+
+                            ACT.Loader.Hide();
+                        } );
+                    } );
+            } );
+        },
+
+        DataUploadPOD: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( i.hasClass( "disabled" ) )
+                        {
+                            return;
+                        }
+
+                        ACT.Loader.Show( i.find( "#loader" ), true );
+
+                        $( "<div />" ).load( siteurl + "/UploadPOD", { id: id }, function ( d )
+                        {
+                            ACT.Modal.Open( d, "Upload POD", false, [] );
+
+                            setTimeout( function ()
+                            {
+                                ACT.Init.Start( true );
+
+                                var btn = $( ACT.Modal.Container ).find( "#save-btn" );
+                                var form = $( ACT.Modal.Container ).find( "#upload-load-pod" );
+
+                                btn.bind( "click", function ()
+                                {
+                                    form.submit();
+                                } );
+
+                            }, 1000 );
+
+                            ACT.Loader.Hide();
+                        } );
+                    } );
+            } );
+        },
+
+        DataReturnDoc: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( i.hasClass( "disabled" ) )
+                        {
+                            return;
+                        }
+
+
+                    } );
+            } );
+        },
+
+        DataControlDoc: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( i.hasClass( "disabled" ) )
+                        {
+                            return;
+                        }
+
+
+                    } );
+            } );
+        },
+
+        DataLoadDisputes: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( i.hasClass( "disabled" ) )
+                        {
+                            return;
+                        }
+
+
+                    } );
+            } );
+        },
+
+        DataLoadMovements: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( i.hasClass( "disabled" ) )
+                        {
+                            return;
+                        }
+
+
+                    } );
+            } );
+        },
+
+        DataClientLoadJournal: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        ACT.Loader.Show( i.parent(), true );
+
+                        $( "<div />" ).load( siteurl + "/ClientLoadJournals", { id: id, edit: false }, function ( d )
+                        {
+                            var width = ( 70 / 100 ) * $( window ).outerWidth();
+
+                            $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", width );
+
+                            ACT.Modal.Open( d, "Client Load Journals", false, [] );
+
+                            setTimeout( function ()
+                            {
+                                ACT.Init.PluginInit( $( ACT.Modal.Container ) );
+
+                            }, 1000 );
+
+                            ACT.Loader.Hide();
+                        } );
+
+                        return false;
+                    } );
+            } );
+        },
+
+        DataChepLoadJournal: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var docketnumber = i.attr( "data-docketnumber" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        ACT.Loader.Show( i.parent(), true );
+
+                        $( "<div />" ).load( siteurl + "/ChepLoadJournals", { OriginalDocketNumber: docketnumber }, function ( d )
+                        {
+                            var width = ( 90 / 100 ) * $( window ).outerWidth();
+
+                            $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", width );
+
+                            ACT.Modal.Open( d, "Chep Load Journals", false, [] );
+
+                            setTimeout( function ()
+                            {
+                                ACT.Init.PluginInit( $( ACT.Modal.Container ) );
+
+                            }, 1000 );
+
+                            ACT.Loader.Hide();
+                        } );
+
+                        return false;
+                    } );
+            } );
+        },
+
+        DataChepLoadShipment: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+                var clientid = i.attr( "data-clientid" );
+                var reference = i.attr( "data-reference" );
+                var otherreference = i.attr( "data-otherreference" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        ACT.Loader.Show( i.parent(), true );
+
+                        $( "<div />" ).load( siteurl + "/ChepLoadShipments", { id: id, clientid: clientid, reference: reference, otherreference: otherreference }, function ( d )
+                        {
+                            var width = ( 60 / 100 ) * $( window ).outerWidth();
+
+                            $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", width );
+
+                            ACT.Modal.Open( d, "Chep Load Related Shipments", false, [] );
+
+                            setTimeout( function ()
+                            {
+                                ACT.Init.PluginInit( $( ACT.Modal.Container ) );
+
+                            }, 1000 );
+
+                            ACT.Loader.Hide();
+                        } );
+
+                        return false;
+                    } );
+            } );
+        }
     };
 } )();

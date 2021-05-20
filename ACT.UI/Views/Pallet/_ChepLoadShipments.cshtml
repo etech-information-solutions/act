@@ -1,0 +1,47 @@
+﻿@model List<ChepLoad>
+
+@using ACT.Data.Models;
+
+<table id="chep-shipments-table" class="da-table small" style="color: #000;">
+
+    <thead>
+        <tr>
+            <th>Docket Number</th>
+            <th>Reference</th>
+            <th>Other Reference</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @if ( Model.NullableAny() )
+        {
+            int count = 0;
+
+            foreach ( ChepLoad item in Model )
+            {
+                <tr>
+                    <td>
+                        @item.DocketNumber
+                    </td>
+                    <td>
+                        @item.Ref
+                    </td>
+                    <td>
+                        @item.OtherRef
+                    </td>
+                </tr>
+
+                count++;
+            }
+        }
+
+    </tbody>
+
+</table>
+
+<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px;">&nbsp;</div>
+
+<p>
+    <a onclick="ACT.Modal.Close();">Close</a>
+</p>

@@ -9,14 +9,6 @@
     }
 
     ViewBag.Title = "Details";
-
-    List<ClientLoad> clientLoads = ViewBag.ClientLoads;
-
-    ClientLoad cl = clientLoads?.FirstOrDefault();
-
-    ClientAuthorisation ca = ViewBag.ClientAuthorisation;
-
-    List<ClientProduct> clientProducts = ViewBag.ClientProducts;
 }
 
 @if ( ViewBag.IncludeLayout != null )
@@ -27,7 +19,7 @@
     </h2>
 }
 
-<div id="item-details" class="item-details" style="width: auto;">
+<div id="item-details" class="item-details load-view" style="width: auto;">
 
     @if ( ViewBag.IncludeLayout == null )
     {
@@ -37,475 +29,164 @@
         </h2>
     }
 
-    <div class="left" style="width: 31%; margin-right: 3%;">
+    <div class="left" style="width: 41%; margin-right: 3%;">
 
-        <div class="display-label">
-            Load/Shipment Number
+        <div class="edit-label">
+            Client
         </div>
         <div class="display-field">
-            @( cl?.LoadNumber )
+            @( Model?.Client?.CompanyName ?? "&nbsp;" )
         </div>
 
-        <div class="display-label">
-            Load Date
+        <div class="edit-label">
+            TransactionType
         </div>
         <div class="display-field">
-            @( cl?.LoadDate?.ToString( "dd/MM/yyyy" ) )
+            @( Model?.TransactionType ?? "&nbsp;" )
         </div>
 
-        <div class="display-label">
-            Client Site From
+        <div class="edit-label">
+            Docket Number
         </div>
         <div class="display-field">
-            @( cl?.ClientSite?.Site?.Name )
+            @( Model?.DocketNumber ?? "&nbsp;" )
         </div>
 
-        <div class="display-label">
-            Region From
+        <div class="edit-label">
+            Original DocketNumber
         </div>
         <div class="display-field">
-            @( cl?.ClientSite?.Site?.Region?.Name )
+            @( Model?.OriginalDocketNumber ?? "&nbsp;" )
         </div>
 
-        <div class="display-label">
-            Client Site To
+        <div class="edit-label">
+            Location Id
         </div>
         <div class="display-field">
-            @( cl?.ClientSite1?.Site?.Name )
+            @( Model?.LocationId ?? "&nbsp;" )
         </div>
 
-        <div class="display-label">
-            Region To
+        <div class="edit-label">
+            Location
         </div>
         <div class="display-field">
-            @( cl?.ClientSite1?.Site?.Region?.Name )
+            @( Model?.Location ?? "&nbsp;" )
         </div>
 
-        <div class="display-label">
-            Customer Group
+        <div class="edit-label">
+            Other Party Id
         </div>
         <div class="display-field">
-            @( cl?.Client?.ClientGroups?.FirstOrDefault()?.Group?.Description )
+            @( Model?.OtherPartyId ?? "&nbsp;" )
         </div>
 
-        <div class="display-label">
-            Delivery Note
+        <div class="edit-label">
+            Other Party
         </div>
         <div class="display-field">
-            @( cl?.DeliveryNote )
+            @( Model?.OtherParty ?? "&nbsp;" )
         </div>
 
-        <div class="display-label">
-            Invoice Number
+        <div class="edit-label">
+            Other Party Country
         </div>
         <div class="display-field">
-            @( cl?.ChepInvoiceNo )
+            @( Model?.OtherPartyCountry ?? "&nbsp;" )
         </div>
 
-        <div class="display-label">
-            Sales Order Number
-        </div>
-        <div class="display-field">
-            @( cl?.ReferenceNumber )
-        </div>
-
-        <div class="display-label">
-            Primary/Second
-        </div>
-        <div class="display-field">
-            &nbsp;
-        </div>
-
-        <div class="display-label">
-            Depot STO Number
-        </div>
-        <div class="display-field">
-            &nbsp;
-        </div>
-
-    </div>
-
-    <div class="left" style="width: 31%; margin-right: 3%;">
-
-        <div class="display-label">
-            CHEP ACC NO/GLID
-        </div>
-        <div class="display-field">
-            @( Model?.DocketNumber )
-        </div>
-
-        <div class="display-label">
-            Delivery Date
-        </div>
-        <div class="display-field">
-            @( Model?.DeliveryDate )
-        </div>
-
-        <div class="display-label">
-            Transporter Name
-        </div>
-        <div class="display-field">
-            @( cl?.Transporter?.Name )
-        </div>
-
-        <div class="display-label">
-            Fleet Number
-        </div>
-        <div class="display-field">
-            &nbsp;
-        </div>
-
-        <div class="display-label">
-            Vehicle Registration
-        </div>
-        <div class="display-field">
-            @( cl?.Vehicle?.Registration )
-        </div>
-
-        <div class="display-label">
-            Debtors Code
-        </div>
-        <div class="display-field">
-            &nbsp;
-        </div>
-
-        <div class="display-label">
-            Customer Account Number
-        </div>
-        <div class="display-field">
-            @( cl?.ClientSite1?.Site?.AccountCode )
-        </div>
-
-        <div class="display-label">
-            Customer Order Number
-        </div>
-        <div class="display-field">
-            @( cl?.ReferenceNumber )
-        </div>
-
-        <div class="display-label">
-            Other Reference
-        </div>
-        <div class="display-field">
-            @( cl?.ReceiverNumber )
-        </div>
-
-        <div class="display-label">
-            Load Sheet Number
-        </div>
-        <div class="display-field">
-            &nbsp;
-        </div>
-
-        <div class="display-label">
-            GRV Number
-        </div>
-        <div class="display-field">
-            &nbsp;
-        </div>
-
-    </div>
-
-    <div class="left" style="width: 31%;">
-
-        <div class="display-label">
-            ACT Control DOC No
-        </div>
-        <div class="display-field">
-            &nbsp;
-        </div>
-
-        <div class="display-label">
-            CHEP Exchange DOC No
-        </div>
-        <div class="display-field">
-            @( Model?.IsExchange == true ? Model?.DocketNumber : string.Empty )
-        </div>
-
-        <div class="display-label">
-            CHEP Customer THAN DOC No
-        </div>
-        <div class="display-field">
-            @( Model?.TransactionType?.ToUpper()?.Trim() == "TRANSFER OUT" ? Model?.DocketNumber : string.Empty )
-        </div>
-
-        <div class="display-label">
-            Warehouse Transfer DOC No
-        </div>
-        <div class="display-field">
-            @( Model?.TransactionType?.ToUpper()?.Trim() == "TRANSFER IN" ? Model?.DocketNumber : string.Empty )
-        </div>
-
-        <div class="display-label">
-            Debrief Document No
-        </div>
-        <div class="display-field">
-            &nbsp;
-        </div>
-
-        <div class="display-label">
-            Pallet Return Slip No
-        </div>
-        <div class="display-field">
-            @( Model?.DocketNumber )
-        </div>
-
-        <div class="display-label">
-            Pallet Return Date
-        </div>
-        <div class="display-field">
-            @( Model?.EffectiveDate?.ToString( "dd/MM/yyyy" ) )
-        </div>
-
-        <div class="display-label">
-            Authorization Code
-        </div>
-        <div class="display-field">
-            @( ca?.Code )
-        </div>
-
-        <div class="display-label">
-            Authorized By
-        </div>
-        <div class="display-field">
-            @( ca?.User?.Name ) @( ca?.User?.Surname )
-        </div>
-
-        <div class="display-label">
-            CHEP Comp No
-        </div>
-        <div class="display-field">
-            @( cl?.ChepCompensationNo  ) <!-- Will be captured by user in edit mode -->
-        </div>
-
-        <div class="display-label">
-            GRV Date
-        </div>
-        <div class="display-field">
-            &nbsp;
-        </div>
-
-    </div>
-
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
-
-    <div class="left" style="width: 60%; padding-right: 20px; border-right: 1px solid #ddd;">
-
-        @{ 
-            decimal width = 100 / clientProducts.NullableCount();
-        }
-
-        <div class="display-label">
+        <div class="edit-label">
             Equipment
         </div>
         <div class="display-field">
-
-            @if ( clientProducts.NullableAny() )
-            {
-                <table style="width: 100%;">
-                    <thead>
-                        <tr>
-                            @foreach ( var item in clientProducts )
-                            {
-                                string active = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() ) ? "active" : "";
-
-                                <td class="@active" style="width: @width%">
-                                    @item.Equipment
-                                </td>
-                            }
-                        </tr>
-                    </thead>
-                </table>
-            }
-
+            @( Model?.Equipment ?? "&nbsp;" )
         </div>
 
-        <div class="display-label">
+        <div class="edit-label">
             Quantity
         </div>
         <div class="display-field">
-
-            @if ( clientProducts.NullableAny() )
-            {
-                <table style="width: 100%;">
-                    <thead>
-                        <tr>
-                            @foreach ( var item in clientProducts )
-                            {
-                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
-                                string active = isCurrent ? "active" : "";
-
-                                <td class="@active" style="width: @width%">
-                                    @( isCurrent ? Model?.Quantity : 0 )
-                                </td>
-                            }
-                        </tr>
-                    </thead>
-                </table>
-            }
-
-        </div>
-
-        <div class="display-label">
-            Returned/Transferred Qty
-        </div>
-        <div class="display-field">
-
-            @if ( clientProducts.NullableAny() )
-            {
-                <table style="width: 100%;">
-                    <thead>
-                        <tr>
-                            @foreach ( var item in clientProducts )
-                            {
-                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
-                                string active = isCurrent ? "active" : "";
-
-                                <td class="@active" style="width: @width%">
-                                    @( isCurrent ? cl?.ReturnQty : 0 )
-                                </td>
-                            }
-                        </tr>
-                    </thead>
-                </table>
-            }
-
-        </div>
-
-        <div class="display-label">
-            Debrief Qty
-        </div>
-        <div class="display-field">
-
-            @if ( clientProducts.NullableAny() )
-            {
-                <table style="width: 100%;">
-                    <thead>
-                        <tr>
-                            @foreach ( var item in clientProducts )
-                            {
-                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
-                                string active = isCurrent ? "active" : "";
-
-                                <td class="@active" style="width: @width%">
-                                    @( isCurrent ? cl?.DebriefQty : 0 )
-                                </td>
-                            }
-                        </tr>
-                    </thead>
-                </table>
-            }
-
-        </div>
-
-        <div class="display-label">
-            Transporter Liable
-        </div>
-        <div class="display-field">
-
-            @if ( clientProducts.NullableAny() )
-            {
-                <table style="width: 100%;">
-                    <thead>
-                        <tr>
-                            @foreach ( var item in clientProducts )
-                            {
-                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
-                                string active = isCurrent ? "active" : "";
-
-                                <td class="@active" style="width: @width%">
-                                    @( isCurrent ? cl?.TransporterLiableQty : 0 )
-                                </td>
-                            }
-                        </tr>
-                    </thead>
-                </table>
-            }
-
-        </div>
-
-        <div class="display-label">
-            Admin Movement
-        </div>
-        <div class="display-field">
-
-            @if ( clientProducts.NullableAny() )
-            {
-                <table style="width: 100%;">
-                    <thead>
-                        <tr>
-                            @foreach ( var item in clientProducts )
-                            {
-                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
-                                string active = isCurrent ? "active" : "";
-
-                                <td class="@active" style="width: @width%">
-                                    @( isCurrent ? cl?.AdminMovement : 0 )
-                                </td>
-                            }
-                        </tr>
-                    </thead>
-                </table>
-            }
-
-        </div>
-
-        <div class="display-label">
-            Outstanding Qty at Customer
-        </div>
-        <div class="display-field">
-
-            @if ( clientProducts.NullableAny() )
-            {
-                <table style="width: 100%;">
-                    <thead>
-                        <tr>
-                            @foreach ( var item in clientProducts )
-                            {
-                                bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == Model?.EquipmentCode?.Trim()?.ToLower() );
-                                string active = isCurrent ? "active" : "";
-
-                                <td class="@active" style="width: @width%">
-                                    @( isCurrent ? cl?.OutstandingQty : 0 )
-                                </td>
-                            }
-                        </tr>
-                    </thead>
-                </table>
-            }
-
+            @( Model?.Quantity )
         </div>
 
     </div>
 
-    <div class="right" style="width: 35%;">
+    <div class="right" style="width: 41%;">
 
-        <div class="display-label">
-            Document Type
+        <div class="edit-label">
+            Ref #
         </div>
         <div class="display-field">
-            @( Model?.IsExchange == true ? "EXCHANGE CUSTOMER" : "" )
+            @( Model?.Ref ?? "&nbsp;" )
         </div>
 
-        <div class="display-label">
-            Load Type
+        <div class="edit-label">
+            Other Ref #
         </div>
         <div class="display-field">
-            @( !string.IsNullOrEmpty( cl?.PCNNumber ) ? "PCN" : "PRN" )
+            @( Model?.OtherRef ?? "&nbsp;" )
         </div>
 
-        <div class="display-label">
-            Comment
+        <div class="edit-label">
+            Batch Ref #
         </div>
         <div class="display-field">
-            @( cl?.ClientLoadComment )
+            @( Model?.BatchRef ?? "&nbsp;" )
         </div>
 
-        <div class="display-label">
-            Pallet Notes
+        <div class="edit-label">
+            Shipment Date
         </div>
         <div class="display-field">
-            @( cl?.ClientLoadNotes )
+            @( Model?.ShipmentDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Delivery Date
+        </div>
+        <div class="display-field">
+            @( Model?.DeliveryDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Effective Date
+        </div>
+        <div class="display-field">
+            @( Model?.EffectiveDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Create Date
+        </div>
+        <div class="display-field">
+            @( Model?.CreateDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Created By
+        </div>
+        <div class="display-field">
+            @( Model?.CreatedBy ?? "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Invoice #
+        </div>
+        <div class="display-field">
+            @( Model?.InvoiceNumber ?? "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Reason
+        </div>
+        <div class="display-field">
+            @( Model?.Reason ?? "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Data Source
+        </div>
+        <div class="display-field">
+            @( Model?.DataSource ?? "&nbsp;" )
         </div>
 
     </div>
@@ -515,18 +196,9 @@
     @if ( ViewBag.IncludeLayout == null )
     {
         <p>
-            @if ( ViewBag.CanEdit == true )
-            {
-                <span>
-                    @Html.ActionLink( "Edit", "EditPoolingAgentData", new { id = Model?.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model?.Id, @data_target = "#tr-" + Model?.Id + "-item" } )
-                </span>
-
-                <span style="padding: 0 5px;">/</span>
-            }
-
             @if ( ViewBag.IncludeLayout == null )
             {
-                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
+                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Close</a>
             }
         </p>
     }

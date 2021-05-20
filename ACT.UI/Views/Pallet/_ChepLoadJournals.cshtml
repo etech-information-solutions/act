@@ -1,0 +1,87 @@
+﻿@model List<ChepLoadJournalCustomModel>
+
+@using ACT.Core.Models.Custom;
+
+<table id="chep-journals-table" class="da-table small" style="color: #000;">
+
+    <thead>
+        <tr>
+            <th>Version</th>
+            <th>Effective Date</th>
+            <th>Delivery Date</th>
+            <th>Supplier From</th>
+            <th>Customer To</th>
+            <th>Reference</th>
+            <th>Other Reference</th>
+            <th>Transaction Type</th>
+            <th>Equipment</th>
+            <th>Qty</th>
+            <th>Invoice Number</th>
+            <th>Created By</th>
+            <th>Date Created</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @if ( Model.NullableAny() )
+        {
+            int count = 0;
+
+            foreach ( ChepLoadJournalCustomModel item in Model )
+            {
+                <tr>
+                    <td>
+                        @item.Version
+                    </td>
+                    <td>
+                        @(item.EffectiveDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @(item.DeliveryDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @item.Location
+                    </td>
+                    <td>
+                        @item.OtherPartyId, @item.OtherParty
+                    </td>
+                    <td>
+                        @item.Ref
+                    </td>
+                    <td>
+                        @item.OtherRef
+                    </td>
+                    <td>
+                        @item.TransactionType
+                    </td>
+                    <td>
+                        @item.Equipment
+                    </td>
+                    <td>
+                        @item.Quantity
+                    </td>
+                    <td>
+                        @item.InvoiceNumber
+                    </td>
+                    <td>
+                        @item.CreatedBy
+                    </td>
+                    <td>
+                        @(item.CreateDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                </tr>
+
+                count++;
+            }
+        }
+
+    </tbody>
+
+</table>
+
+<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px;">&nbsp;</div>
+
+<p>
+    <a onclick="ACT.Modal.Close();">Close</a>
+</p>

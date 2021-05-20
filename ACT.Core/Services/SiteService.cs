@@ -568,7 +568,7 @@ namespace ACT.Core.Services
 
         public Site GetByClientAndName( int clientId, string siteName )
         {
-            return context.Sites.FirstOrDefault( s => s.Name.Trim() == siteName.Trim() && s.ClientSites.Any( cs => cs.ClientCustomer.ClientId == clientId ) );
+            return context.Sites.Include( "ClientSites" ).FirstOrDefault( s => s.Name.Trim() == siteName.Trim() && s.ClientSites.Any( cs => cs.ClientCustomer.ClientId == clientId ) );
         }
 
         public bool ExistByClientAndName( int clientId, string siteName )

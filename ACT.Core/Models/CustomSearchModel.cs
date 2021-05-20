@@ -86,6 +86,15 @@ namespace ACT.Core.Models
         }
 
         /// <summary>
+        /// Can be used as a selected POD Comment
+        /// </summary>
+        [Display( Name = "POD Comment" )]
+        public int PODCommentId
+        {
+            get; set;
+        }
+
+        /// <summary>
         /// Can be used as selected Clients
         /// </summary>
         [Display( Name = "Client Ids" )]
@@ -99,6 +108,15 @@ namespace ACT.Core.Models
         /// </summary>
         [Display( Name = "Site" )]
         public int SiteId
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// Can be used as a selected To Site 
+        /// </summary>
+        [Display( Name = "To Site" )]
+        public int ToSiteId
         {
             get; set;
         }
@@ -433,6 +451,7 @@ namespace ACT.Core.Models
 
         public bool HasAuthorisationCode { get; set; }
         public string DocketNumber { get; set; }
+        public string OriginalDocketNumber { get; set; }
         public bool IncludeUserBroadCasts { get; set; }
 
         #endregion

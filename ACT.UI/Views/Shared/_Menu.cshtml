@@ -1,12 +1,16 @@
-﻿@using ACT.Core.Enums
+﻿@using ACT.Core.Enums;
+@using ACT.Data.Models; 
+@using ACT.Core.Models; 
 
 @{
-    string controller = ViewContext.RouteData.Values[ "controller" ].ToString();
+        string controller = ViewContext.RouteData.Values[ "controller" ].ToString();
 
-    var user = ( Request.IsAuthenticated && ViewBag.CurrentUser != null ) ? ( ACT.Core.Models.UserModel ) ViewBag.CurrentUser : User.Get();
+        Client client = ( ViewBag.SelectedClient != null ) ? ViewBag.SelectedClient : new Client() { CompanyName = "N/A" };
 
-    //string sessClient = ( HttpContext.Current.Session[ "ClientId" ] != null ? HttpContext.Current.Session[ "ClientId" ].ToString() : "0" );
-}
+        //UserModel user = ( Request.IsAuthenticated && ViewBag.CurrentUser != null ) ? ( UserModel ) ViewBag.CurrentUser : User.Get();
+
+        //string sessClient = ( HttpContext.Current.Session[ "ClientId" ] != null ? HttpContext.Current.Session[ "ClientId" ].ToString() : "0" );
+    }
 
 <div class="menu">
     <ul>
@@ -17,8 +21,15 @@
             </a>
         </li>
 
-        <li class="welcome">
+        @*<li class="welcome">
             Welcome <strong>@user.Name</strong>
+        </li>*@
+        <li class="welcome" style="font-size: 14px; color: #333;">
+            Selected Client:
+
+            <span id="sc-m" class="block" style="border-top: 1px dashed #fff; padding-top: 3px; margin-top: 3px; color: #012d71;">
+                @(client?.CompanyName)
+            </span>
         </li>
         @*@if ( User.Has( PermissionTo.View, PermissionContext.Client ) )
         {

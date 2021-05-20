@@ -105,6 +105,11 @@ namespace ACT.UI.Controllers
             {
                 UserModel user = service.GetUser( email );
 
+                if ( service.SelectedClient != null )
+                {
+                    ViewBag.SelectedClient = service.SelectedClient;
+                }
+
                 return user;
             }
         }
@@ -1028,23 +1033,28 @@ namespace ACT.UI.Controllers
         /// Auto reconciles Client/Chep loads with matching references
         /// </summary>
         /// <returns></returns>
-        public ActionResult AutoReconcileLoads()
+        public ActionResult AutoReconcileLoads( int clientId = 0 )
         {
             using ( ChepLoadService chservice = new ChepLoadService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
             {
+                if ( clientId == 0 && chservice.SelectedClient != null )
+                {
+                    clientId = chservice.SelectedClient.Id;
+                }
+
                 int count = 0;
                 string q = string.Empty;
 
                 #region Client & Chep Load
 
-                List<ClientLoad> clLoads = clservice.GetAutoReconcilliableLoads();
+                List<ClientLoad> clLoads = clservice.GetAutoReconcilliableLoads( clientId );
 
                 if ( clLoads.NullableAny() )
                 {
                     foreach ( ClientLoad l in clLoads )
                     {
-                        List<ChepLoadCustomModel> cheps = chservice.ListClientLoadMatch( l.ReceiverNumber?.Trim() );
+                        List<ChepLoadCustomModel> cheps = chservice.ListClientLoadMatch( l.ReceiverNumber?.Trim(), clientId );
 
                         if ( !cheps.NullableAny() ) continue;
 

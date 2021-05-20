@@ -65,7 +65,7 @@
                     @Html.LabelFor( model => model.ActiveDate )
                 </div>
                 <div class="edit-field">
-                    <input class="date-picker" data-val="true" data-val-date="The field Select Active Date must be a date." id="ActiveDate" name="ActiveDate" placeholder="Select Product Active Date" readonly="readonly" type="text" value="@( Model.ActiveDate.Value.ToString( "yyyy/MM/dd" ) )" aria-describedby="ActiveDate-error" aria-invalid="false">
+                    <input class="date-picker" data-val="true" data-val-date="The field Select Active Date must be a date." id="ActiveDate" name="ActiveDate" placeholder="Select Product Active Date" readonly="readonly" type="text" value="" aria-describedby="ActiveDate-error" aria-invalid="false">
                     @Html.ValidationMessageFor( model => model.ActiveDate )
                 </div>
 

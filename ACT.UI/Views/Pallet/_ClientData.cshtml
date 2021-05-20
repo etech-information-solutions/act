@@ -47,35 +47,35 @@
             <th data-name="LoadDate" data-column="cl.LoadDate">
                 Load Date
             </th>
-            <th data-name="Client" data-column="c.CompanyName">
-                Client
+            <th data-name="Client" data-column="ch.LocationId">
+                Chep Account/GLID #
+            </th>
+            <th data-name="FromSite" data-column="s.Description">
+                Supplier From
             </th>
             <th data-name="LoadNumber" data-column="cl.LoadNumber">
                 Shipment #
             </th>
-            <th data-name="DeliveryNote" data-column="cl.DeliveryNote">
-                Delivery Note
-            </th>
-            <th data-name="ReceiverNumber" data-column="cl.ReceiverNumber">
-                Invoice #
-            </th>
-            <th data-name="ReferenceNumber" data-column="cl.ReferenceNumber">
-                Ref
-            </th>
-            <th data-name="PODNumber" data-column="cl.PODNumber">
-                POD
-            </th>
-            <th data-name="PCNNumber" data-column="cl.PCNNumber">
-                PCN
-            </th>
-            <th data-name="PRNNumber" data-column="cl.PRNNumber">
-                PRN
+            <th data-name="ToSite" data-column="s2.Description">
+                Customer To
             </th>
             <th data-name="OriginalQuantity" data-column="cl.OriginalQuantity">
                 Qty
             </th>
+            <th data-name="PODComment" data-column="pc.Comment">
+                Comment
+            </th>
             <th data-name="Status" data-column="cl.Status">
                 Status
+            </th>
+            <th data-name="Transporter" data-column="t.Name">
+                Transporter
+            </th>
+            <th data-name="Vehicle" data-column="v.Registration">
+                Vehicle
+            </th>
+            <th data-name="InvoiceNumber" data-column="ch.InvoiceNumber">
+                Invoice #
             </th>
             <th data-name="Actions">
                 Actions
@@ -92,7 +92,7 @@
 
                 string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+                <tr id="clientdata-@item.Id-item" class="clientdata-@item.Id-item ">
                     <td>
                         @count
                     </td>
@@ -100,44 +100,46 @@
                         @item.LoadDate.Value.ToString( "yyyy-MM-dd" )
                     </td>
                     <td>
-                        @item.ClientName
+                        @item.ChepAccountGLIDNo
+                    </td>
+                    <td>
+                        @item.SiteName
                     </td>
                     <td>
                         @item.LoadNumber
                     </td>
                     <td>
-                        @Html.Raw( item.DeliveryNote?.Replace( ";", "<br/>" )?.Replace( ",", "<br/>" ) )
-                    </td>
-                    <td>
-                        @Html.Raw( item.ReceiverNumber?.Replace( ";", "<br/>" )?.Replace( ",", "<br/>" ) )
-                    </td>
-                    <td>
-                        @Html.Raw( item.ReferenceNumber?.Replace( ";", "<br/>" )?.Replace( ",", "<br/>" ) )
-                    </td>
-                    <td>
-                        @Html.Raw( item.PODNumber?.Replace( ";", "<br/>" )?.Replace( ",", "<br/>" ) )
-                    </td>
-                    <td>
-                        @Html.Raw( item.PCNNumber?.Replace( ";", "<br/>" )?.Replace( ",", "<br/>" ) )
-                    </td>
-                    <td>
-                        @Html.Raw( item.PRNNumber?.Replace( ";", "<br/>" )?.Replace( ",", "<br/>" ) )
+                        @item.ToSiteName
                     </td>
                     <td>
                         @item.OriginalQuantity
                     </td>
+                    <td>
+                        @item.PODComment
+                    </td>
                     <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
                         @status
                     </td>
-                    <td width="10%">
+                    <td>
+                        @item.TransporterName
+                    </td>
+                    <td>
+                        @item.VehicleRegistration
+                    </td>
+                    <td>
+                        @item.InvoiceNumber
+                    </td>
+                    <td width="5%">
 
                         <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
-                            @Html.ActionLink( "Details", "ClientDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-
-                            @Html.ActionLink( "Edit", "EditClientData", new { id = item.Id, returnView = "ClientData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            @Html.ActionLink( "Details", "EditClientData", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
 
                         </div>
+
+                        @*<span>
+                            @Html.ActionLink( "Journals", "ClientLoadJournals", new { id = item.Id, edit = false }, new { @class = "reports", @rel = "tipsyS", @title = "View Journals", @style = "padding-left: 28px; margin-left: 0; background-position-y: center;", @data_clientload_journal = "1", @data_id = item.Id } )
+                        </span>*@
 
                     </td>
                 </tr>

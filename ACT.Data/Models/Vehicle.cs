@@ -35,6 +35,7 @@ namespace ACT.Data.Models
         public string Descriptoin { get; set; }
         public Nullable<int> Type { get; set; }
         public int Status { get; set; }
+        public string FleetNumber { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads { get; set; }

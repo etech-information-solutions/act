@@ -8,10 +8,11 @@ namespace ACT.Core.Models.Custom
     {
         public int Id { get; set; }
         public int ClientId { get; set; }
-        public int? ClientSiteId { get; set; }
-        public int? OutstandingReasonId { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime ModifiedOn { get; set; }
+        public Nullable<int> ClientSiteId { get; set; }
+        public Nullable<int> ChepLoadId { get; set; }
+        public Nullable<int> OutstandingReasonId { get; set; }
+        public System.DateTime CreatedOn { get; set; }
+        public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public string ChepStatus { get; set; }
         public string TransactionType { get; set; }
@@ -25,30 +26,26 @@ namespace ACT.Core.Models.Custom
         public string OtherPartyCountry { get; set; }
         public string EquipmentCode { get; set; }
         public string Equipment { get; set; }
-        public int? Quantity { get; set; }
+        public Nullable<int> Quantity { get; set; }
         public string Ref { get; set; }
         public string OtherRef { get; set; }
         public string BatchRef { get; set; }
-        public DateTime? ShipmentDate { get; set; }
-        public DateTime? DeliveryDate { get; set; }
-        public DateTime? EffectiveDate { get; set; }
-        public DateTime? CreateDate { get; set; }
+        public Nullable<System.DateTime> ShipmentDate { get; set; }
+        public Nullable<System.DateTime> DeliveryDate { get; set; }
+        public Nullable<System.DateTime> EffectiveDate { get; set; }
+        public Nullable<System.DateTime> CreateDate { get; set; }
         public string CreatedBy { get; set; }
         public string InvoiceNumber { get; set; }
         public string Reason { get; set; }
         public string DataSource { get; set; }
-        public int? BalanceStatus { get; set; }
+        public Nullable<int> BalanceStatus { get; set; }
         public int Status { get; set; }
         public int PostingType { get; set; }
         public bool IsExchange { get; set; }
         public bool IsPSPPickup { get; set; }
         public bool TransporterLiable { get; set; }
-        public bool ManuallyMatchedLoad { get; set; }
-        public string ManuallyMatchedUID { get; set; }
-        public string CorrectedRef { get; set; }
-        public string CorrectedOtherRef { get; set; }
-        public bool IsExtra { get; set; }
-        public int? ChepLoadId { get; set; }
+        public string Version { get; set; }
+        public string UID { get; set; }
 
         public virtual Client Client { get; set; }
         public int VersionCount { get; set; }

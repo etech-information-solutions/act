@@ -70,9 +70,13 @@ namespace ACT.Core.Models.Custom
         public List<Document> Documents { get; set; }
 
         public string DocketNumber { get; set; }
+        public string InvoiceNumber { get; set; }
+        public string ChepAccountGLIDNo { get; set; }
 
         public int? SiteId { get; set; }
+        public int? ToSiteId { get; set; }
         public string SiteName { get; set; }
+        public string ToSiteName { get; set; }
         public string ClientName { get; set; }
         public string SubSiteName { get; set; }
         public string OutstandingReason { get; set; }
