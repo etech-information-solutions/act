@@ -6,40 +6,28 @@ namespace ACT.Core.Enums
     [StringEnum]
     public enum DocumentType
     {
-        [UiIgnoreEnumValue]
-        [StringEnumDisplayText( "All" )]
-        All = -1,
+        [StringEnumDisplayText( "None" )]
+        None = -1,
 
-        [StringEnumDisplayText( "Email" )]
-        Email, // 0
+        [StringEnumDisplayText( "ACT Control Doc" )]
+        ACTControlDoc = 0,
 
-        [StringEnumDisplayText( "Quotation" )]
-        Quotation, // 1
+        [StringEnumDisplayText( "Production Plant" )]
+        ProductionPlant = 1,
 
-        [StringEnumDisplayText( "Invoice/Receipt" )]
-        Invoice, // 2
+        [StringEnumDisplayText( "Exchange Customer" )]
+        ExchangeCustomer = 2,
 
-        [StringEnumDisplayText( "Contract" )]
-        Contract, // 3
+        [StringEnumDisplayText( "THAN" )]
+        THAN = 3,
 
-        [StringEnumDisplayText( "Statement" )]
-        Statement, // 4
+        [StringEnumDisplayText( "Export Customer" )]
+        ExportCustomer = 4,
 
-        //[StringEnumDisplayText( "Receipt" )]
-        //Receipt,
+        [StringEnumDisplayText( "NPD Customer" )]
+        NPDCustomer = 5,
 
-        [StringEnumDisplayText( "Refund on Advancement (Proof of Payment)" )]
-        Refund, // 5
-
-        [StringEnumDisplayText( "Budget" )]
-        Budget, // 6
-
-        [UiIgnoreEnumValue]
-        [StringEnumDisplayText( "Provincial Refund" )]
-        ProvincialRefund, // 7
-
-        [UiIgnoreEnumValue]
-        [StringEnumDisplayText( "Write Off" )]
-        WriteOff, // 8
+        [StringEnumDisplayText( "Depot to Depot" )]
+        DepotToDepot = 6,
     }
 }

@@ -39,10 +39,10 @@ namespace ACT.Data.Models
         public string AccountingCode { get; set; }
         public int RateType { get; set; }
     
-        public virtual Client Client { get; set; }
         public virtual PSP PSP { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientProductMonthly> ClientProductMonthlies { get; set; }
         public virtual Product Product { get; set; }
+        public virtual Client Client { get; set; }
     }
 }

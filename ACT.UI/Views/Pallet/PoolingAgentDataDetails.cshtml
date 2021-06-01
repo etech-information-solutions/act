@@ -35,77 +35,77 @@
             Client
         </div>
         <div class="display-field">
-            @( Model?.Client?.CompanyName ?? "&nbsp;" )
+            @Html.Raw( Model?.Client?.CompanyName ?? "&nbsp;" )
         </div>
 
         <div class="edit-label">
             TransactionType
         </div>
         <div class="display-field">
-            @( Model?.TransactionType ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.TransactionType ) ? Model?.TransactionType : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Docket Number
         </div>
         <div class="display-field">
-            @( Model?.DocketNumber ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.DocketNumber ) ? Model?.DocketNumber : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Original DocketNumber
         </div>
         <div class="display-field">
-            @( Model?.OriginalDocketNumber ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.OriginalDocketNumber ) ? Model?.OriginalDocketNumber : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Location Id
         </div>
         <div class="display-field">
-            @( Model?.LocationId ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.LocationId ) ? Model?.LocationId : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Location
         </div>
         <div class="display-field">
-            @( Model?.Location ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.Location ) ? Model?.Location : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Other Party Id
         </div>
         <div class="display-field">
-            @( Model?.OtherPartyId ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.OtherPartyId ) ? Model?.OtherPartyId : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Other Party
         </div>
         <div class="display-field">
-            @( Model?.OtherParty ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.OtherParty ) ? Model?.OtherParty : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Other Party Country
         </div>
         <div class="display-field">
-            @( Model?.OtherPartyCountry ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.OtherPartyCountry ) ? Model?.OtherPartyCountry : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Equipment
         </div>
         <div class="display-field">
-            @( Model?.Equipment ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.Equipment ) ? Model?.Equipment : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Quantity
         </div>
         <div class="display-field">
-            @( Model?.Quantity )
+            @Html.Raw( Model?.Quantity )
         </div>
 
     </div>
@@ -116,77 +116,77 @@
             Ref #
         </div>
         <div class="display-field">
-            @( Model?.Ref ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.Ref ) ? Model?.Ref : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Other Ref #
         </div>
         <div class="display-field">
-            @( Model?.OtherRef ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.OtherRef ) ? Model?.OtherRef : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Batch Ref #
         </div>
         <div class="display-field">
-            @( Model?.BatchRef ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.BatchRef ) ? Model?.BatchRef : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Shipment Date
         </div>
         <div class="display-field">
-            @( Model?.ShipmentDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
+            @Html.Raw( Model?.ShipmentDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Delivery Date
         </div>
         <div class="display-field">
-            @( Model?.DeliveryDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
+            @Html.Raw( Model?.DeliveryDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Effective Date
         </div>
         <div class="display-field">
-            @( Model?.EffectiveDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
+            @Html.Raw( Model?.EffectiveDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Create Date
         </div>
         <div class="display-field">
-            @( Model?.CreateDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
+            @Html.Raw( Model?.CreateDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Created By
         </div>
         <div class="display-field">
-            @( Model?.CreatedBy ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.CreatedBy ) ? Model?.CreatedBy : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Invoice #
         </div>
         <div class="display-field">
-            @( Model?.InvoiceNumber ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.InvoiceNumber ) ? Model?.InvoiceNumber : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Reason
         </div>
         <div class="display-field">
-            @( Model?.Reason ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.Reason ) ? Model?.Reason : "&nbsp;" )
         </div>
 
         <div class="edit-label">
             Data Source
         </div>
         <div class="display-field">
-            @( Model?.DataSource ?? "&nbsp;" )
+            @Html.Raw( !string.IsNullOrEmpty( Model?.DataSource ) ? Model?.DataSource : "&nbsp;" )
         </div>
 
     </div>

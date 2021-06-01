@@ -644,7 +644,7 @@ namespace ACT.UI.Controllers
                     return Redirect( d.Url );
                 }
 
-                return File( path, System.Web.MimeMapping.GetMimeMapping( path ) );
+                return File( path, MimeMapping.GetMimeMapping( path ) );
             }
         }
 
@@ -681,7 +681,7 @@ namespace ACT.UI.Controllers
                     return Redirect( d.Url );
                 }
 
-                return File( path, System.Web.MimeMapping.GetMimeMapping( path ), Path.GetFileName( path ) );
+                return File( path, MimeMapping.GetMimeMapping( path ), Path.GetFileName( path ) );
             }
         }
 
@@ -698,7 +698,7 @@ namespace ACT.UI.Controllers
 
                 string path = Server.MapPath( string.Format( "{0}/{1}", VariableExtension.SystemRules.ImagesLocation, i.Location ) );
 
-                return File( path, System.Web.MimeMapping.GetMimeMapping( path ) );
+                return File( path, MimeMapping.GetMimeMapping( path ) );
             }
         }
 
@@ -715,7 +715,7 @@ namespace ACT.UI.Controllers
 
                 string path = Server.MapPath( string.Format( "{0}/{1}", VariableExtension.SystemRules.ImagesLocation, d.Location ) );
 
-                return File( path, System.Web.MimeMapping.GetMimeMapping( path ), Path.GetFileName( path ) );
+                return File( path, MimeMapping.GetMimeMapping( path ), Path.GetFileName( path ) );
             }
         }
 
@@ -948,7 +948,7 @@ namespace ACT.UI.Controllers
         {
             using ( ClientSiteService sservice = new ClientSiteService() )
             {
-                Dictionary<int, string> siteOptions = sservice.List( true, clientId );
+                Dictionary<int, string> siteOptions = sservice.List( true, new PagingModel(), new CustomSearchModel() { ClientId = clientId } );
 
                 return PartialView( "_Sites", new DeliveryNoteViewModel() { SiteOptions = siteOptions } ); // Views/Pallet/_Sites
             }
@@ -1559,6 +1559,25 @@ namespace ACT.UI.Controllers
             }
 
             return outstandingReasons;
+        }
+
+        /// <summary>
+        /// Gets a list of client sites using the specified params
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public ActionResult SearchClientSites( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            {
+                pm.Sort = "ASC";
+                pm.SortBy = "s.Name";
+
+                Dictionary<int, string> results = csservice.List( true, pm, csm );
+
+                return PartialView( "_ClientSiteResults", results );
+            }
         }
 
         #endregion

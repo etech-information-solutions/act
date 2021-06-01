@@ -1487,18 +1487,51 @@ tr.duplicate-highlight td {
         background: #aaa !important;
     }
 
+.search-icon {
+    top: -1px;
+    right: -3px;
+    width: 20px;
+    padding: 4px;
+    background: #ddd;
+    position: absolute;
+    border-bottom-left-radius: 6px;
+}
 
+.search-results {
+    left: 0px;
+    z-index: 100;
+    display: none;
+    font-size: 10px;
+    background: #fff;
+    padding: 5px 10px;
+    position: absolute;
+    overflow-x: hidden;
+    border: 1px solid #cacaca;
+    border-top: 0 none;
+}
 
-    footer {
-        left: 0;
-        bottom: 0;
-        margin: 0;
-        z-index: 1;
-        width: 100%;
-        padding: 20px 0;
-        font-weight: bold;
-        text-align: center;
+    .search-results ul {
+        overflow-y: auto;
+        max-height: 250px;
     }
+
+        .search-results ul li:hover {
+            cursor: pointer;
+            background-color: #efefef;
+        }
+
+
+
+footer {
+    left: 0;
+    bottom: 0;
+    margin: 0;
+    z-index: 1;
+    width: 100%;
+    padding: 20px 0;
+    font-weight: bold;
+    text-align: center;
+}
 
     footer.logged-in {
         width: auto;

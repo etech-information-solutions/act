@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 using ACT.Core.Enums;
+using ACT.Core.Models;
 using ACT.Core.Services;
 
 namespace ACT.UI.Models
@@ -155,7 +156,7 @@ namespace ACT.UI.Models
                 {
                     using ( ClientSiteService sservice = new ClientSiteService() )
                     {
-                        siteOptions = sservice.List( true, ClientId );
+                        siteOptions = sservice.List( true, new PagingModel(), new CustomSearchModel() { ClientId = ClientId } );
                     }
                 }
 

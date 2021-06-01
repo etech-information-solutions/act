@@ -20,8 +20,9 @@ namespace ACT.Data.Models
             this.DeliveryNotes = new HashSet<DeliveryNote>();
             this.ClientLoads = new HashSet<ClientLoad>();
             this.ClientLoads1 = new HashSet<ClientLoad>();
-            this.ChepLoads = new HashSet<ChepLoad>();
             this.ChepLoadJournals = new HashSet<ChepLoadJournal>();
+            this.ChepLoads = new HashSet<ChepLoad>();
+            this.ExtendedClientLoads = new HashSet<ExtendedClientLoad>();
         }
     
         public int Id { get; set; }
@@ -56,8 +57,10 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChepLoadJournal> ChepLoadJournals { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepLoad> ChepLoads { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ChepLoadJournal> ChepLoadJournals { get; set; }
+        public virtual ICollection<ExtendedClientLoad> ExtendedClientLoads { get; set; }
     }
 }

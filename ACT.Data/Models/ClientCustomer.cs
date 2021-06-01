@@ -34,8 +34,8 @@ namespace ACT.Data.Models
         public Nullable<int> CustomerUserId { get; set; }
         public int Status { get; set; }
     
-        public virtual Client Client { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientSite> ClientSites { get; set; }
+        public virtual Client Client { get; set; }
     }
 }

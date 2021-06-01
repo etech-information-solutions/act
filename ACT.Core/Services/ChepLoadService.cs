@@ -545,10 +545,17 @@ namespace ACT.Core.Services
         /// <returns></returns>
         public List<ChepLoad> ListByReference( int clientId, string reference, string otherreference )
         {
-            if ( string.IsNullOrEmpty( reference ) || clientId == 0 )
+            if ( clientId == 0 && SelectedClient != null )
+            {
+                clientId = SelectedClient.Id;
+            }
+            else if ( clientId == 0 && SelectedClient == null )
             {
                 return new List<ChepLoad>();
             }
+
+            reference = !string.IsNullOrWhiteSpace( reference ) ? reference : Guid.NewGuid().ToString();
+            otherreference = !string.IsNullOrWhiteSpace( otherreference ) ? otherreference : Guid.NewGuid().ToString();
 
             return context.ChepLoads.Where( ch => ch.ClientId == clientId && ( ch.Ref.Trim() == reference.Trim() || ch.OtherRef.Trim() == reference.Trim() || ch.Ref.Trim() == otherreference.Trim() || ch.OtherRef.Trim() == otherreference.Trim() ) ).ToList();
         }

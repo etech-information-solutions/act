@@ -378,6 +378,8 @@ namespace ACT.UI.Controllers
                     PalletTypeOther = model.OtherTypeOfPalletUse,
                     NumberOfLostPallets = model.NumberOfLostPallets,
                     CompanyRegistrationNumber = model.CompanyRegistrationNumber,
+
+                    IsChepClient = model.IsChepClient.GetBoolValue(),
                 };
 
                 client = service.Create( client );
@@ -601,6 +603,7 @@ namespace ACT.UI.Controllers
                     PSPName = client.PSPName,
                     ServiceType = ( ServiceType ) client.ServiceRequired,
                     TypeOfPalletUse = ( TypeOfPalletUse ) client.PalletType,
+                    IsChepClient = client.IsChepClient ? YesNo.Yes : YesNo.No,
 
                     Address = new AddressViewModel()
                     {
@@ -773,6 +776,7 @@ namespace ACT.UI.Controllers
                 client.PSPName = model.PSPName;
                 client.ServiceRequired = ( int ) model.ServiceType;
                 client.PalletType = ( int ) model.TypeOfPalletUse;
+                client.IsChepClient = model.IsChepClient.GetBoolValue();
 
                 cservice.Update( client );
 
@@ -2099,8 +2103,8 @@ namespace ACT.UI.Controllers
                     {
                         ClientId = model.ClientId,
                         Status = ( int ) model.Status,
-                        CustomerNumber = model.AccountCode,
                         CustomerName = site1?.Name ?? model.Name,
+                        CustomerNumber = model.CustomerNoDebtorCode,
                     };
 
                     cc = ccservice.Create( cc );
@@ -2414,8 +2418,8 @@ namespace ACT.UI.Controllers
                     {
                         ClientId = model.ClientId,
                         Status = ( int ) model.Status,
-                        CustomerNumber = model.AccountCode,
                         CustomerName = site1?.Name ?? model.Name,
+                        CustomerNumber = model.CustomerNoDebtorCode,
                     };
 
                     cc = ccservice.Create( cc );

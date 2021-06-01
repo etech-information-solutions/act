@@ -18,19 +18,6 @@ namespace ACT.Core.Services
         }
 
         /// <summary>
-        /// Gets a Client KPI using the specified Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public override Group GetById( int id )
-        {
-            context.Configuration.LazyLoadingEnabled = true;
-            context.Configuration.ProxyCreationEnabled = true;
-
-            return base.GetById( id );
-        }
-
-        /// <summary>
         /// Gets a count of KPIs matching the specified search params
         /// </summary>
         /// <param name="pm"></param>
@@ -244,6 +231,44 @@ namespace ACT.Core.Services
             }
 
             return groups;
+        }
+
+        /// <summary>
+        /// Gets a list of Groups available to the logged in user
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public Dictionary<int, string> List( bool v )
+        {
+            Dictionary<int, string> pspOptions = new Dictionary<int, string>();
+            List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+            };
+
+            string query = $"SELECT g.Id AS [TKey], g.Description AS [TValue] FROM [dbo].[Group] g WHERE (1=1)";
+
+            //if ( CurrentUser.RoleType == RoleType.PSP )
+            //{
+            //    query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu WHERE pu.UserId=@userid AND pu.PSPId=r.PSPId)";
+            //}
+
+            model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();
+
+            if ( model != null && model.Any() )
+            {
+                foreach ( var k in model )
+                {
+                    if ( pspOptions.Keys.Any( x => x == k.TKey ) )
+                        continue;
+
+                    pspOptions.Add( k.TKey, ( k.TValue ?? "" ).Trim() );
+                }
+            }
+
+            return pspOptions;
         }
     }
 }

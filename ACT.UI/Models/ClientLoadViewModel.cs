@@ -4,7 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Web;
 
 using ACT.Core.Enums;
+using ACT.Core.Models;
 using ACT.Core.Services;
+using ACT.Data.Models;
 
 namespace ACT.UI.Models
 {
@@ -21,12 +23,15 @@ namespace ACT.UI.Models
         //[Required]
         [Display( Name = "Vehicle Registration:" )]
         public int? VehicleId { get; set; }
+        public string VehicleRegistration { get; set; }
 
         [Display( Name = "Supplier From:" )]
         public int? ClientSiteId { get; set; }
+        public ClientSite FromClientSiteName { get; set; }
 
         [Display( Name = "Customer To:" )]
         public int? ClientSiteIdTo { get; set; }
+        public ClientSite ToClientSiteName { get; set; }
 
 
         [Display( Name = "Region From:" )]
@@ -38,6 +43,7 @@ namespace ACT.UI.Models
 
         [Display( Name = "Transporter Name:" )]
         public int? TransporterId { get; set; }
+        public string TransporterName { get; set; }
 
         [Display( Name = "Outstanding Reason:" )]
         public int? OutstandingReasonId { get; set; }
@@ -103,7 +109,7 @@ namespace ACT.UI.Models
         [Display( Name = "Return Date:" )]
         public DateTime? ReconcileDate { get; set; }
 
-        [Display( Name = "POD:" )]
+        [Display( Name = "POD Number:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string PODNumber { get; set; }
 
@@ -137,7 +143,7 @@ namespace ACT.UI.Models
         [Display( Name = "Transporter Liable:" )]
         public decimal TransporterLiableQty { get; set; }
 
-        [ Display( Name = "Invoice Number:" )]
+        [Display( Name = "Invoice Number:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ChepInvoiceNo { get; set; }
 
@@ -177,8 +183,51 @@ namespace ACT.UI.Models
 
         public bool HasPOD { get; set; }
 
+        public bool HasDisputes { get; set; }
+
         #endregion
 
+
+
+        #region Chepload Properties
+
+        [Display( Name = "Delivery Date:" )]
+        public DateTime? DeliveryDate { get; set; }
+
+        [Display( Name = "CHEP ACC NO/GLID:" )]
+        public string ChepAccountNumberGlid { get; set; }
+
+        [Display( Name = "Customer Order Number:" )]
+        public string ChepRef { get; set; }
+
+        [Display( Name = "Other Reference:" )]
+        public string ChepOtherRef { get; set; }
+
+        [Display( Name = "Chep Invoice Number:" )]
+        public string ChepInvoiceNumber { get; set; }
+
+        [Display( Name = "Pallet Return Slip No:" )]
+        public string PalletReturnSlipNo { get; set; }
+
+        public string DocketNumber { get; set; }
+
+        public string ChepCustomerThanDocNo { get; set; }
+
+        public string WarehouseTransferDocNo { get; set; }
+
+        public DateTime? PalletReturnDate { get; set; }
+
+        public DateTime? ChepEffectiveDate { get; set; }
+
+
+        [Display( Name = "Document Type:" )]
+        public DocumentType DocumentType { get; set; }
+
+        public ExtendedClientLoad ExtendedClientLoad { get; set; }
+
+        public List<ClientLoadQuantity> ClientLoadQuantities { get; set; }
+
+        #endregion
 
 
         #region Model Options
@@ -203,6 +252,7 @@ namespace ACT.UI.Models
 
         public Dictionary<int, string> VehicleOptions
         {
+            //get; set;
             get
             {
                 if ( !EditMode ) return null;
@@ -211,24 +261,26 @@ namespace ACT.UI.Models
                 {
                     return service.List( true );
                 }
-            }
+            }/**/
         }
 
         public Dictionary<int, string> ClientSiteOptions
         {
+            //get; set;
             get
             {
                 if ( !EditMode ) return null;
 
                 using ( ClientSiteService service = new ClientSiteService() )
                 {
-                    return service.List( true );
+                    return service.List( true, new PagingModel() { Sort = "ASC", SortBy = "s.Name" }, new CustomSearchModel() { ClientId = ClientId } );
                 }
-            }
+            }/**/
         }
 
         public Dictionary<int, string> TransporterOptions
         {
+            //get; set;
             get
             {
                 if ( !EditMode ) return null;
@@ -237,7 +289,7 @@ namespace ACT.UI.Models
                 {
                     return service.List( true );
                 }
-            }
+            }/**/
         }
 
         public Dictionary<int, string> OutstandingReasonOptions
@@ -260,19 +312,6 @@ namespace ACT.UI.Models
                 if ( !EditMode ) return null;
 
                 using ( PODCommentService service = new PODCommentService() )
-                {
-                    return service.List( true );
-                }
-            }
-        }
-
-        public Dictionary<int, string> RegionOptions
-        {
-            get
-            {
-                if ( !EditMode ) return null;
-
-                using ( RegionService service = new RegionService() )
                 {
                     return service.List( true );
                 }

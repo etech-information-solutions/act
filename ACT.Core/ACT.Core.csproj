@@ -213,6 +213,9 @@
     <Compile Include="Models\StringDropDownModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\ClientLoadQuantityService.cs" />
+    <Compile Include="Services\ClientLoadHistoryService.cs" />
+    <Compile Include="Services\ExtendedClientLoadService.cs" />
     <Compile Include="Services\ChepLoadChepService.cs" />
     <Compile Include="Services\PODCommentService.cs" />
     <Compile Include="Services\ChepLoadJournalService.cs" />

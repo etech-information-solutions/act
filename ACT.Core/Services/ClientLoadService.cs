@@ -1118,6 +1118,9 @@ namespace ACT.Core.Services
             context.Configuration.LazyLoadingEnabled = true;
             context.Configuration.ProxyCreationEnabled = true;
 
+            otherRef = !string.IsNullOrWhiteSpace( otherRef ) ? otherRef : Guid.NewGuid().ToString();
+            reference = !string.IsNullOrWhiteSpace( reference ) ? reference : Guid.NewGuid().ToString();
+
             return context.ClientLoads.Where( cl => cl.ReceiverNumber.Trim() == reference.Trim() || cl.ReceiverNumber == otherRef.Trim() ).ToList();
         }
     }

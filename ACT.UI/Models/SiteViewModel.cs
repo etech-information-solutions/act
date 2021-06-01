@@ -65,6 +65,10 @@ namespace ACT.UI.Models
         [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string AccountCode { get; set; }
 
+        [Display( Name = "Customer No/Debtor Code" )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string CustomerNoDebtorCode { get; set; }
+
         [Display( Name = "Depot" )]
         [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string Depot { get; set; }
@@ -133,6 +137,7 @@ namespace ACT.UI.Models
         public HttpPostedFileBase SiteImportFile { get; set; }
 
         #endregion
+
 
 
         #region Model Options

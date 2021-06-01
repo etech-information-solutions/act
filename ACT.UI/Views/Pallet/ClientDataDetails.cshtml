@@ -1,6 +1,7 @@
 ﻿@model ClientLoadViewModel
 
 @using ACT.UI.Models;
+@using ACT.Core.Enums;
 @using ACT.Data.Models;
 
 @{
@@ -21,13 +22,70 @@
     ClientAuthorisation ca = ViewBag.ClientAuthorisation;
 
     List<ClientProduct> clientProducts = ViewBag.ClientProducts;
+
+    if ( Model.ExtendedClientLoad != null )
+    {
+        ExtendedClientLoad ec = Model.ExtendedClientLoad;
+
+        ch = new ChepLoad()
+        {
+            Id = ec.Id,
+            Ref = ec.Ref,
+            UID = ec.UID,
+            UMI = ec.UMI,
+            Status = ec.Status,
+            Reason = ec.Reason,
+            IsExtra = ec.IsExtra,
+            Location = ec.Location,
+            BatchRef = ec.BatchRef,
+            ClientId = ec.ClientId,
+            OtherRef = ec.OtherRef,
+            Quantity = ec.Quantity,
+            CreatedBy = ec.CreatedBy,
+            CreatedOn = ec.CreatedOn,
+            Equipment = ec.Equipment,
+            CreateDate = ec.CreateDate,
+            DataSource = ec.DataSource,
+            ChepStatus = ec.ChepStatus,
+            IsExchange = ec.IsExchange,
+            LocationId = ec.LocationId,
+            ModifiedBy = ec.ModifiedBy,
+            ModifiedOn = ec.ModifiedOn,
+            OtherParty = ec.OtherParty,
+            IsPSPPickup = ec.IsPSPPickup,
+            PostingType = ec.PostingType,
+            ClientSiteId = ec.ClientSiteId,
+            CorrectedRef = ec.CorrectedRef,
+            DeliveryDate = ec.DeliveryDate,
+            DocketNumber = ec.DocketNumber,
+            DocumentType = ec.DocumentType,
+            OtherPartyId = ec.OtherPartyId,
+            ShipmentDate = ec.ShipmentDate,
+            BalanceStatus = ec.BalanceStatus,
+            EffectiveDate = ec.EffectiveDate,
+            EquipmentCode = ec.EquipmentCode,
+            InvoiceNumber = ec.InvoiceNumber,
+            TransactionType = ec.TransactionType,
+            OtherPartyCountry = ec.OtherPartyCountry,
+            CorrectedOtherRef = ec.CorrectedOtherRef,
+            TransporterLiable = ec.TransporterLiable,
+            ManuallyMatchedUID = ec.ManuallyMatchedUID,
+            ManuallyMatchedLoad = ec.ManuallyMatchedLoad,
+            OutstandingReasonId = ec.OutstandingReasonId,
+            OriginalDocketNumber = ec.OriginalDocketNumber,
+
+            Client = ec.Client,
+            ClientSite = ec.ClientSite,
+            OutstandingReason = ec.OutstandingReason,
+        };
+    }
 }
 
 @if ( ViewBag.IncludeLayout != null )
 {
     @*<h2>
-            <img alt="" src="@Url.Content( "~/images/info.png" )" />
-            <span>Load Details</span>
+          <img alt="" src="@Url.Content( "~/images/info.png" )" />
+          <span>Load Details</span>
         </h2>*@
 }
 
@@ -48,326 +106,336 @@
         <div class="left" style="width: 31%; margin-right: 2%;">
 
             <div class="edit-label ">
-                @Html.LabelFor( model => model.LoadNumber )
+                Load/Shipment Number:
             </div>
             <div class="edit-field">
                 @Html.TextBoxFor( model => model.LoadNumber, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
 
             <div class="edit-label">
-                @Html.LabelFor( model => model.LoadDate )
+                Load Date:
             </div>
             <div class="edit-field">
                 <input class="date-picker" data-val="true" data-val-date="The field Load Date: must be a date." id="LoadDate" name="LoadDate" placeholder="     /       /       " type="text" value="@(Model.LoadDate?.ToString( "yyyy-MM-dd" ))">
             </div>
 
+
+
             <div class="edit-label">
-                @Html.LabelFor( model => model.ClientSiteId )
+                Supplier From:
             </div>
             <div class="edit-field">
                 @Html.DropDownListFor( model => model.ClientSiteId, model => Model.ClientSiteOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 100%;" } )
             </div>
 
             <div class="edit-label">
-                Region From
+                Region From:
             </div>
             <div class="display-field">
                 @Html.Raw( cl?.ClientSite?.Site?.Region?.Name ?? "&nbsp;" )
             </div>
 
+
+
             <div class="edit-label">
-                @Html.LabelFor( model => model.ClientSiteIdTo )
+                Customer To:
             </div>
             <div class="edit-field">
                 @Html.DropDownListFor( model => model.ClientSiteIdTo, model => Model.ClientSiteOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 100%;" } )
             </div>
 
             <div class="edit-label">
-                Region To
+                Region To:
             </div>
             <div class="display-field">
                 @Html.Raw( cl?.ClientSite1?.Site?.Region?.Name ?? "&nbsp;" )
             </div>
 
             <div class="edit-label">
-                Customer Group
+                Customer Group:
             </div>
             <div class="display-field">
                 @Html.Raw( cl?.Client?.ClientGroups?.FirstOrDefault()?.Group?.Description ?? "&nbsp;" )
             </div>
 
             <div class="edit-label ">
-                @Html.LabelFor( model => model.DeliveryNote )
+                Delivery Note Number:
             </div>
             <div class="edit-field">
                 @Html.TextBoxFor( model => model.DeliveryNote, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
 
             <div class="edit-label ">
-                @Html.LabelFor( model => model.ChepInvoiceNo )
+                Invoice Number:
             </div>
             <div class="edit-field">
                 @Html.TextBoxFor( model => model.PODNumber, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
 
             <div class="edit-label ">
-                @Html.LabelFor( model => model.ReferenceNumber )
+                Sales Order Number:
             </div>
             <div class="edit-field">
                 @Html.TextBoxFor( model => model.ReferenceNumber, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
 
-            @*<div class="edit-label">
-                    Primary/Second
-                </div>
-                <div class="edit-field">
-                    &nbsp;
-                </div>
-
-                <div class="edit-label">
-                    Depot STO Number
-                </div>
-                <div class="edit-field">
-                    &nbsp;
-                </div>*@
+            <div class="edit-label">
+                Reconciliation Status:
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 100%;" } )
+            </div>
 
         </div>
 
         <div class="left" style="width: 31%; margin-right: 2%;">
 
             <div class="edit-label">
-                CHEP ACC NO/GLID
+                CHEP ACC NO/GLID:
             </div>
             <div class="display-field">
-                @Html.Raw( ( !string.IsNullOrWhiteSpace( ch?.LocationId ) ? ch?.LocationId?.Trim() : "&nbsp;" ) )
+                @*@Html.Raw( ( !string.IsNullOrWhiteSpace( ch?.LocationId ) ? ch?.LocationId?.Trim() : "&nbsp;" ) )*@
+                @*@Html.Raw( cl?.Client?.ClientCustomers?.FirstOrDefault()?.CustomerNumber ?? "&nbsp;" )*@
+                &nbsp;
             </div>
 
             <div class="edit-label">
-                Delivery Date
+                Delivery Date:
             </div>
             <div class="display-field">
-                @Html.Raw( ch?.DeliveryDate?.ToString( "yyyy/MM/dd" ) ?? "&nbsp;" )
+                <input class="date-picker" data-val="true" data-val-date="The field Load Date: must be a date." id="DeliveryDate" name="DeliveryDate" placeholder="     /       /       " type="text" value="@(ch?.DeliveryDate?.ToString( "yyyy/MM/dd" ))">
             </div>
 
             <div class="edit-label">
-                @Html.LabelFor( model => model.TransporterId )
+                Transporter Name:
             </div>
             <div class="edit-field">
                 @Html.DropDownListFor( model => model.TransporterId, model => Model.TransporterOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 100%;" } )
             </div>
 
             <div class="edit-label">
-                Fleet Number
+                Fleet Number:
             </div>
             <div class="display-field">
                 @Html.Raw( cl?.Vehicle?.FleetNumber ?? "&nbsp;" )
             </div>
 
             <div class="edit-label">
-                @Html.LabelFor( model => model.VehicleId )
+                Vehicle Registration:
             </div>
             <div class="edit-field">
                 @Html.DropDownListFor( model => model.VehicleId, model => Model.VehicleOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 100%;" } )
             </div>
 
             <div class="edit-label">
-                Debtors Code
+                Debtors Code:
             </div>
             <div class="display-field">
-                @Html.Raw( cl?.Client?.ClientCustomers?.FirstOrDefault()?.CustomerNumber ?? "&nbsp;" )
+                @Html.Raw( ( !string.IsNullOrWhiteSpace( Model?.FromClientSiteName?.ClientCustomerNumber ) ? Model?.FromClientSiteName?.ClientCustomerNumber : "&nbsp;" ) )
             </div>
 
             <div class="edit-label">
-                Customer Account Number
+                Customer Account Number:
             </div>
             <div class="display-field">
-                @Html.Raw( ( !string.IsNullOrWhiteSpace( ch?.OtherPartyId ) ? ch?.OtherPartyId?.Trim() : "&nbsp;" ) )
+                @Html.Raw( ( !string.IsNullOrWhiteSpace( Model?.FromClientSiteName?.Site?.AccountCode ) ? Model?.FromClientSiteName?.Site?.AccountCode : "&nbsp;" ) )
             </div>
 
             <div class="edit-label">
-                Customer Order Number
+                Customer Order Number:
             </div>
             <div class="display-field">
-                @Html.Raw( ( !string.IsNullOrWhiteSpace( ch?.Ref ) ? ch?.Ref?.Trim() : "&nbsp;" ) )
+                @*@Html.Raw( ( !string.IsNullOrWhiteSpace( ch?.Ref ) ? ch?.Ref?.Trim() : "&nbsp;" ) )*@
+                @Html.TextBoxFor( model => model.ChepRef, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
 
             <div class="edit-label">
-                Other Reference
+                Other Reference:
             </div>
             <div class="display-field">
-                @Html.Raw( ( !string.IsNullOrWhiteSpace( ch?.OtherRef ) ? ch?.OtherRef?.Trim() : "&nbsp;" ) )
+                @*@Html.Raw( ( !string.IsNullOrWhiteSpace( ch?.OtherRef ) ? ch?.OtherRef?.Trim() : "&nbsp;" ) )*@
+                @Html.TextBoxFor( model => model.ChepOtherRef, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
 
             <div class="edit-label ">
-                @Html.LabelFor( model => model.ReceiverNumber )
+                Chep Invoice Number:
             </div>
             <div class="edit-field">
-                @Html.TextBoxFor( model => model.ReceiverNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                @*@Html.Raw( ( !string.IsNullOrWhiteSpace( ch?.InvoiceNumber ) ? ch?.InvoiceNumber?.Trim() : "&nbsp;" ) )*@
+                @Html.TextBoxFor( model => model.ChepInvoiceNumber, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
-
-            @*<div class="edit-label">
-                    GRV Number
-                </div>
-                <div class="edit-field">
-                    &nbsp;
-                </div>*@
 
         </div>
 
         <div class="left" style="width: 31%;">
 
             <div class="edit-label">
-                ACT Control DOC No
+                ACT Control DOC No:
             </div>
             <div class="display-field">
-                @Html.Raw( ca?.Code ?? "&nbsp;" )
+                @*@Html.Raw( ca?.Code ?? "&nbsp;" )*@
+                &nbsp;
             </div>
 
             <div class="edit-label">
-                CHEP Exchange DOC No
+                CHEP Exchange DOC No:
             </div>
             <div class="display-field">
-                @{
-                    string exNo = "&nbsp;";
+                @*@{
+                        string exNo = "&nbsp;";
 
-                    if ( chepLoads.NullableAny( c => c?.Ref?.StartsWith( "50000" ) == true || c?.Ref?.StartsWith( "52" ) == true || c?.Ref?.StartsWith( "51" ) == true ) )
-                    {
-                        exNo = chepLoads.FirstOrDefault( c => c?.Ref?.StartsWith( "50000" ) == true || c?.Ref?.StartsWith( "52" ) == true || c?.Ref?.StartsWith( "51" ) == true ).Ref;
+                        if ( Model.ReceiverNumber?.StartsWith( "50000" ) == true || Model.ReceiverNumber?.StartsWith( "52" ) == true || Model.ReceiverNumber?.StartsWith( "51" ) == true )
+                        {
+                            exNo = Model.ReceiverNumber;
+                        }
                     }
-                }
-                @Html.Raw( exNo )
+
+                    @Html.Raw( exNo )*@
+                @Html.TextBoxFor( model => model.ReceiverNumber, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
 
             <div class="edit-label">
-                CHEP Customer THAN DOC No
+                CHEP Customer THAN DOC No:
             </div>
             <div class="display-field">
-                @{
-                    string docNo = "&nbsp;";
+                @*@{
+                        string docNo = "&nbsp;";
 
-                    if ( chepLoads.NullableAny( c => c?.DocketNumber?.StartsWith( "42" ) == true ) )
-                    {
-                        docNo = chepLoads.FirstOrDefault( c => c?.DocketNumber?.StartsWith( "42" ) == true ).DocketNumber;
+                        if ( chepLoads.NullableAny( c => c?.DocketNumber?.StartsWith( "42" ) == true ) )
+                        {
+                            docNo = chepLoads.FirstOrDefault( c => c?.DocketNumber?.StartsWith( "42" ) == true ).DocketNumber;
+                        }
                     }
-                }
-                @Html.Raw( docNo )
+
+                    @Html.Raw( docNo )*@
+                @Html.TextBoxFor( model => model.ChepCustomerThanDocNo, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
 
             <div class="edit-label">
-                Warehouse Transfer DOC No
+                Warehouse Transfer DOC No:
             </div>
             <div class="display-field">
-                @{
-                    string tdocNo = chepLoads?.Where( c => c?.IsExchange == true )
-                                             ?.OrderByDescending( o => o.Id )
-                                             ?.FirstOrDefault()
-                                             ?.DocketNumber;
-                }
-                @Html.Raw( tdocNo ?? "&nbsp;" )
+                @*@{
+                        string tdocNo = chepLoads?.Where( c => c?.IsExchange == true )
+                                                 ?.OrderByDescending( o => o.Id )
+                                                 ?.FirstOrDefault()
+                                                 ?.DocketNumber;
+                    }
+
+                    @Html.Raw( tdocNo ?? "&nbsp;" )*@
+                @Html.TextBoxFor( model => model.WarehouseTransferDocNo, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
 
-            @*<div class="edit-label">
-                    Debrief Document No
-                </div>
-                <div class="display-field">
-                    &nbsp;
-                </div>*@
-
-            <div class="edit-label ">
-                @Html.LabelFor( model => model.DebriefDocketNo )
+            <div class="edit-label">
+                Debrief Docket No:
             </div>
             <div class="edit-field">
                 @Html.TextBoxFor( model => model.DebriefDocketNo, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
 
             <div class="edit-label">
-                Pallet Return Slip No
+                Pallet Return Slip No:
             </div>
             <div class="display-field">
-                @{
-                    string rdocNo = chepLoads?.Where( c => c?.TransactionType?.ToUpper() == "RETURN" )
-                                             ?.FirstOrDefault()
-                                             ?.DocketNumber;
-                }
-                @Html.Raw( rdocNo ?? "&nbsp;" )
+                @*@{
+                        string rdocNo = chepLoads?.Where( c => c?.TransactionType?.ToUpper() == "RETURN" )
+                                                 ?.FirstOrDefault()
+                                                 ?.DocketNumber;
+                    }
+
+                    @Html.Raw( rdocNo ?? "&nbsp;" )*@
+                @Html.TextBoxFor( model => model.PalletReturnSlipNo, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
 
             <div class="edit-label">
-                Pallet Return Date
+                Pallet Return Date:
             </div>
             <div class="display-field">
-                @{
-                    DateTime? returnDate = chepLoads?.Where( c => c?.TransactionType?.ToUpper() == "RETURN" )
-                                                    ?.FirstOrDefault()
-                                                    ?.EffectiveDate;
-                }
-                @Html.Raw( returnDate?.ToString( "yyyy/MM/dd" ) ?? "&nbsp;" )
+                @*@{
+                        DateTime? returnDate = chepLoads?.Where( c => c?.TransactionType?.ToUpper() == "RETURN" )
+                                                        ?.FirstOrDefault()
+                                                        ?.EffectiveDate;
+                    }
+                    @Html.Raw( returnDate?.ToString( "yyyy/MM/dd" ) ?? "&nbsp;" )*@
+                <input class="date-picker" data-val="true" data-val-date="The field Load Date: must be a date." id="PalletReturnDate" name="PalletReturnDate" placeholder="     /       /       " type="text" value="@(Model.PalletReturnDate?.ToString( "yyyy/MM/dd" ))">
             </div>
 
             <div class="edit-label">
-                Authorization Date
+                Autorisation No.:
+            </div>
+            <div class="display-field">
+                @Html.Raw( ca?.Code ?? "&nbsp;" )
+            </div>
+
+            <div class="edit-label">
+                Authorization Date:
             </div>
             <div class="display-field">
                 @Html.Raw( ca?.AuthorisationDate.ToString( "yyyy/MM/dd" ) ?? "&nbsp;" )
             </div>
 
             <div class="edit-label">
-                Authorized By
+                Authorized By:
             </div>
             <div class="display-field">
                 @{
                     string auth = ( ca?.User != null ) ? ca.User.Name + " " + ca.User.Surname : "&nbsp;";
                 }
 
-                @Html.Raw( auth );
+                @Html.Raw( auth )
             </div>
 
             <div class="edit-label">
-                CHEP Comp No
+                CHEP Comp No:
             </div>
             <div class="display-field">
-                @{
-                    string podNo = clientLoads?.Where( c => c?.PODNumber?.StartsWith( "89" ) == true )
-                                              ?.FirstOrDefault()
-                                              ?.PODNumber;
-                }
-                @Html.Raw( podNo ?? "&nbsp;" )
+                @*@{
+                        string podNo = clientLoads?.Where( c => c?.PODNumber?.StartsWith( "89" ) == true )
+                                                  ?.FirstOrDefault()
+                                                  ?.PODNumber;
+                    }
+                    @Html.Raw( podNo ?? "&nbsp;" )*@
+                @Html.TextBoxFor( model => model.PODNumber, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
 
             <div class="edit-label">
-                Compensation Date
+                Compensation Date:
             </div>
             <div class="display-field">
-                @Html.Raw( ch?.EffectiveDate?.ToString( "dd/MM/yyyy" ) ?? "&nbsp;" )
+                @*@Html.Raw( ch?.EffectiveDate?.ToString( "dd/MM/yyyy" ) ?? "&nbsp;" )*@
+                <input class="date-picker" data-val="true" data-val-date="The field Load Date: must be a date." id="ChepEffectiveDate" name="ChepEffectiveDate" placeholder="     /       /       " type="text" value="@(Model.ChepEffectiveDate?.ToString( "yyyy/MM/dd" ))">
             </div>
 
         </div>
 
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 10px 0; height: 0;">&nbsp;</div>
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 10px 0; height: 10px;">&nbsp;</div>
 
         <div class="left" style="width: 63%; padding-right: 20px; border-right: 1px solid #ddd; margin-right: 20px;">
 
             @{
+                int cqCount = 0;
                 decimal width = 100 / clientProducts.NullableCount();
             }
 
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
-                Equipment
+                Equipment:
             </div>
             <div class="edit-field">
 
                 @if ( clientProducts.NullableAny() )
                 {
-                    <table style="width: 100%;">
+                    <table id="client-load-equipments" style="width: 100%;">
                         <thead>
                             <tr>
                                 @foreach ( var item in clientProducts )
                                 {
-                                    string active = ( item.Equipment?.Trim()?.ToLower() == ch?.EquipmentCode?.Trim()?.ToLower() ) ? "active" : "";
+                                    string active = ( Model.ClientLoadQuantities?.NullableAny( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() ) == true ) ? "active" : "";
 
                                     <td class="@active" style="width: @width%">
-                                        @item.Equipment
+                                        <input name="ClientLoadQuantities[@cqCount].EquipmentCode" type="text" value="@(item.Equipment?.Trim())" />
                                     </td>
+
+                                    cqCount++;
                                 }
                             </tr>
                         </thead>
@@ -379,30 +447,29 @@
             <div class="clear"></div>
 
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
-                Delivered Quantity
+                Delivered Quantity:
             </div>
             <div class="edit-field">
 
                 @if ( clientProducts.NullableAny() )
                 {
+                    cqCount = 0;
+
                     <table style="width: 100%;">
                         <thead>
                             <tr>
                                 @foreach ( var item in clientProducts )
                                 {
-                                    bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == ch?.EquipmentCode?.Trim()?.ToLower() );
-                                    string active = isCurrent ? "active" : "";
+                                    ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
+                                    
+                                    bool isCurrent = ( clq != null );
+                                    string active = ( clq != null ) ? "active" : "";
 
                                     <td class="@active" style="width: @width%">
-                                        @if ( isCurrent )
-                                        {
-                                            @Html.TextBoxFor( model => model.OriginalQuantity, new { @class = "input", @placeholder = "Please Complete" } )
-                                        }
-                                        else
-                                        {
-                                            <span>0</span>
-                                        }
+                                        <input name="ClientLoadQuantities[@cqCount].OriginalQuantity" type="text" value="@(clq?.OriginalQuantity)" />
                                     </td>
+
+                                    cqCount++;
                                 }
                             </tr>
                         </thead>
@@ -414,30 +481,29 @@
             <div class="clear"></div>
 
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
-                Returned/Transferred Qty
+                Returned/Transferred Qty:
             </div>
             <div class="edit-field">
 
                 @if ( clientProducts.NullableAny() )
                 {
+                    cqCount = 0;
+
                     <table style="width: 100%;">
                         <thead>
                             <tr>
                                 @foreach ( var item in clientProducts )
                                 {
-                                    bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == ch?.EquipmentCode?.Trim()?.ToLower() );
-                                    string active = isCurrent ? "active" : "";
+                                    ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
+
+                                    bool isCurrent = ( clq != null );
+                                    string active = ( clq != null ) ? "active" : "";
 
                                     <td class="@active" style="width: @width%">
-                                        @if ( isCurrent )
-                                        {
-                                            @Html.TextBoxFor( model => model.ReturnQty, new { @class = "input", @placeholder = "Please Complete" } )
-                                        }
-                                        else
-                                        {
-                                            <span>0</span>
-                                        }
+                                        <input name="ClientLoadQuantities[@cqCount].ReturnQty" type="text" value="@(clq?.ReturnQty)" />
                                     </td>
+
+                                    cqCount++;
                                 }
                             </tr>
                         </thead>
@@ -449,30 +515,29 @@
             <div class="clear"></div>
 
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
-                Debrief Qty
+                Debrief Qty:
             </div>
             <div class="edit-field">
 
                 @if ( clientProducts.NullableAny() )
                 {
+                    cqCount = 0;
+
                     <table style="width: 100%;">
                         <thead>
                             <tr>
                                 @foreach ( var item in clientProducts )
                                 {
-                                    bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == ch?.EquipmentCode?.Trim()?.ToLower() );
-                                    string active = isCurrent ? "active" : "";
+                                    ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
+
+                                    bool isCurrent = ( clq != null );
+                                    string active = ( clq != null ) ? "active" : "";
 
                                     <td class="@active" style="width: @width%">
-                                        @if ( isCurrent )
-                                        {
-                                            @Html.TextBoxFor( model => model.DebriefQty, new { @class = "input", @placeholder = "Please Complete" } )
-                                        }
-                                        else
-                                        {
-                                            <span>0</span>
-                                        }
+                                        <input name="ClientLoadQuantities[@cqCount].DebriefQty" type="text" value="@(clq?.DebriefQty)" />
                                     </td>
+
+                                    cqCount++;
                                 }
                             </tr>
                         </thead>
@@ -484,30 +549,29 @@
             <div class="clear"></div>
 
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
-                Transporter Liable
+                Transporter Liable:
             </div>
             <div class="edit-field">
 
                 @if ( clientProducts.NullableAny() )
                 {
+                    cqCount = 0;
+
                     <table style="width: 100%;">
                         <thead>
                             <tr>
                                 @foreach ( var item in clientProducts )
                                 {
-                                    bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == ch?.EquipmentCode?.Trim()?.ToLower() );
-                                    string active = isCurrent ? "active" : "";
+                                    ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
+
+                                    bool isCurrent = ( clq != null );
+                                    string active = ( clq != null ) ? "active" : "";
 
                                     <td class="@active" style="width: @width%">
-                                        @if ( isCurrent )
-                                        {
-                                            @Html.TextBoxFor( model => model.TransporterLiableQty, new { @class = "input", @placeholder = "Please Complete" } )
-                                        }
-                                        else
-                                        {
-                                            <span>0</span>
-                                        }
+                                        <input name="ClientLoadQuantities[@cqCount].TransporterLiableQty" type="text" value="@(clq?.TransporterLiableQty)" />
                                     </td>
+
+                                    cqCount++;
                                 }
                             </tr>
                         </thead>
@@ -519,30 +583,29 @@
             <div class="clear"></div>
 
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
-                Admin Movement
+                Admin Movement:
             </div>
             <div class="edit-field">
 
                 @if ( clientProducts.NullableAny() )
                 {
+                    cqCount = 0;
+
                     <table style="width: 100%;">
                         <thead>
                             <tr>
                                 @foreach ( var item in clientProducts )
                                 {
-                                    bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == ch?.EquipmentCode?.Trim()?.ToLower() );
-                                    string active = isCurrent ? "active" : "";
+                                    ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
+
+                                    bool isCurrent = ( clq != null );
+                                    string active = ( clq != null ) ? "active" : "";
 
                                     <td class="@active" style="width: @width%">
-                                        @if ( isCurrent )
-                                        {
-                                            @Html.TextBoxFor( model => model.AdminMovement, new { @class = "input", @placeholder = "Please Complete" } )
-                                        }
-                                        else
-                                        {
-                                            <span>0</span>
-                                        }
+                                        <input name="ClientLoadQuantities[@cqCount].AdminMovementQty" type="text" value="@(clq?.AdminMovementQty)" />
                                     </td>
+
+                                    cqCount++;
                                 }
                             </tr>
                         </thead>
@@ -554,30 +617,29 @@
             <div class="clear"></div>
 
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
-                Outstanding Qty at Customer
+                Outstanding Qty at Customer:
             </div>
             <div class="edit-field">
 
                 @if ( clientProducts.NullableAny() )
                 {
+                    cqCount = 0;
+
                     <table style="width: 100%;">
                         <thead>
                             <tr>
                                 @foreach ( var item in clientProducts )
                                 {
-                                    bool isCurrent = ( item.Equipment?.Trim()?.ToLower() == ch?.EquipmentCode?.Trim()?.ToLower() );
-                                    string active = isCurrent ? "active" : "";
+                                    ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
+
+                                    bool isCurrent = ( clq != null );
+                                    string active = ( clq != null ) ? "active" : "";
 
                                     <td class="@active" style="width: @width%">
-                                        @if ( isCurrent )
-                                        {
-                                            @Html.TextBoxFor( model => model.OutstandingQty, new { @class = "input", @placeholder = "Please Complete" } )
-                                        }
-                                        else
-                                        {
-                                            <span>0</span>
-                                        }
+                                        <input name="ClientLoadQuantities[@cqCount].OutstandingQty" type="text" value="@(clq?.OutstandingQty)" />
                                     </td>
+
+                                    cqCount++;
                                 }
                             </tr>
                         </thead>
@@ -591,28 +653,40 @@
         <div class="left" style="width: 33%;">
 
             <div class="edit-label" style="width: 45% !important;">
-                Document Type
+                Document Type:
             </div>
             <div class="display-field">
-                @( ch?.IsExchange == true ? "EXCHANGE" : "THAN" )
+                @Html.EnumDropDownFor( model => model.DocumentType, false, true, new { @class = "chzn", @style = "width: 100%;" } )
             </div>
 
-            @*<div class="edit-label" style="width: 45% !important;">
-                    Load Type
-                </div>
-                <div class="edit-field">
-                    @( ch?.IsExchange == true ? "EXCHANGE" : "THAN" )
-                </div>*@
+            <div class="edit-label" style="width: 45% !important;">
+                Load Type
+            </div>
+            <div class="edit-field">
+                @{
+                    string ltype = "THAN";
+
+                    if ( Model.ReceiverNumber?.StartsWith( "50000" ) == true || Model.ReceiverNumber?.StartsWith( "52" ) == true || Model.ReceiverNumber?.StartsWith( "51" ) == true )
+                    {
+                        ltype = "PCN";
+                    }
+                    else if ( Model.DocumentType == DocumentType.ACTControlDoc )
+                    {
+                        ltype = "OTHER";
+                    }
+                }
+                @Html.Raw( ltype )
+            </div>
 
             <div class="edit-label" style="width: 45% !important;">
-                @Html.LabelFor( model => model.PODCommentId )
+                Load Comment:
             </div>
             <div class="edit-field">
                 @Html.DropDownListFor( model => model.PODCommentId, model => Model.PODCommentOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 100%;" } )
             </div>
 
             <div class="edit-label " style="width: 45% !important; vertical-align: top;">
-                @Html.LabelFor( model => model.ClientLoadNotes )
+                Pallet Notes:
             </div>
             <div class="edit-field">
                 @Html.TextAreaFor( model => model.ClientLoadNotes, 5, 10, new { @class = "input", @placeholder = "Please Complete" } )
@@ -639,7 +713,7 @@
                 </a>
                 <span style="padding: 0 5px;"></span>
 
-                <a data-load-disputes="1" data-id="@Model.Id" class="disabled">
+                <a data-load-disputes="1" data-id="@Model.Id" class="@( Model.HasDisputes ? "" : "disabled" )">
                     Disputes
                     <span id="loader"></span>
                 </a>

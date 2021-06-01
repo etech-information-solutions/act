@@ -715,6 +715,7 @@
     <Content Include="Views\Pallet\_ClientLoadJournals.cshtml" />
     <Content Include="Views\Pallet\_ChepLoadJournals.cshtml" />
     <Content Include="Views\Pallet\_ChepLoadShipments.cshtml" />
+    <Content Include="Views\Shared\_ClientSiteResults.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

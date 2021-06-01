@@ -106,6 +106,9 @@ namespace ACT.UI.Models
         [Display( Name = "Status" )]
         public PSPClientStatus Status { get; set; }
 
+        [Display( Name = "Chep Client?" )]
+        public YesNo IsChepClient { get; set; }
+
         public List<ClientBudget> ClientBudgets { get; set; }
 
         public List<ClientChepAccount> ClientChepAccounts { get; set; }

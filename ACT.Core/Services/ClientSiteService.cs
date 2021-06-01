@@ -27,29 +27,112 @@ namespace ACT.Core.Services
         }
 
 
+
         /// <summary>
         /// Gets a list of clients
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        public Dictionary<int, string> List( bool v, int clientId = 0 )
+        public int Total( bool v, PagingModel pm, CustomSearchModel csm )
+        {
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "clientid", csm.ClientId ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+            };
+
+            #endregion
+
+            string query = $"SELECT COUNT(1) AS [Total] FROM [dbo].[ClientSite] cs, [dbo].[Site] s WHERE (s.Id=cs.SiteId)";
+
+            if ( csm.ClientId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientCustomer] cc WHERE cc.ClientId=@clientid)";
+            }
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
+            {
+                query = string.Format( @"{0} AND (s.[Name] LIKE '%{1}%' OR
+                                                  s.[Description] LIKE '%{1}%' OR
+                                                  s.[AccountCode] LIKE '%{1}%'
+                                             ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            CountModel model = context.Database.SqlQuery<CountModel>( query.Trim(), parameters.ToArray() ).FirstOrDefault();
+
+            return model.Total;
+        }
+
+        /// <summary>
+        /// Gets a list of clients
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public Dictionary<int, string> List( bool v, PagingModel pm, CustomSearchModel csm )
         {
             Dictionary<int, string> clientOptions = new Dictionary<int, string>();
             List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
 
+            if ( csm.ClientId <= 0 && SelectedClient != null )
+            {
+                csm.ClientId = SelectedClient.Id;
+            }
+
+            // Parameters
+
+            #region Parameters
+
             List<object> parameters = new List<object>()
             {
-                { new SqlParameter( "clientid", clientId ) },
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "clientid", csm.ClientId ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
             };
 
-            string query = string.Empty;
+            #endregion
 
-            query = $"SELECT cs.[Id] AS [TKey], s.[Description] AS [TValue] FROM [dbo].[ClientSite] cs, [dbo].[Site] s WHERE (s.Id=cs.SiteId)";
+            string query = $"SELECT cs.[Id] AS [TKey], s.[Description] AS [TValue] FROM [dbo].[Site] s LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=(SELECT TOP 1 cs1.[Id] FROM [dbo].[ClientSite] cs1 WHERE cs1.[SiteId]=s.[Id]) WHERE (1=1)";
 
-            if ( clientId > 0 )
+            if ( csm.ClientId > 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientCustomer] cc WHERE cc.ClientId=@clientid)";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientCustomer] cc WHERE cs.ClientCustomerId=cc.Id AND cc.ClientId=@clientid)";
+            }
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
+            {
+                query = string.Format( @"{0} AND (s.[Name] LIKE '%{1}%' OR
+                                                  s.[Description] LIKE '%{1}%' OR
+                                                  s.[AccountCode] LIKE '%{1}%'
+                                             ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            // ORDER
+
+            query = $"{query} ORDER BY {pm.SortBy} {pm.Sort}";
+
+            // SKIP, TAKE
+            if ( pm.Take != ConfigSettings.PagingTake )
+            {
+                query = $"{query} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY;";
             }
 
             model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();

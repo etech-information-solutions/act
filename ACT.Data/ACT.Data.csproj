@@ -129,6 +129,12 @@
     <Compile Include="Models\ClientLoad.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ClientLoadHistory.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ClientLoadQuantity.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ClientProduct.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
@@ -166,6 +172,9 @@
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\EstimatedLoad.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ExtendedClientLoad.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Group.cs">

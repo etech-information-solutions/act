@@ -20,12 +20,12 @@
 
     bool showServiceRequiredSection = true;
 
-    if (user.RoleType == RoleType.PSP && pSPOptions.Count() == 1)
+    if ( user.RoleType == RoleType.PSP && pSPOptions.Count() == 1 )
     {
-        showServiceRequiredSection = false;
-        Model.ServiceType = ServiceType.HaveCompany;
         Model.PSP = user.PSPs.First();
+        showServiceRequiredSection = false;
         Model.PSPId = user.PSPs.First().Id;
+        Model.ServiceType = ServiceType.HaveCompany;
     }
 
     if ( !pSPOptions.NullableAny() )
@@ -112,11 +112,11 @@
                     @Html.ValidationMessageFor( model => model.Status )
                 </div>
 
-                <div class="@(showServiceRequiredSection ? "block" : "none")">
+                <div class="@(showServiceRequiredSection ? "block" : "none")" style="margin-bottom: 10px;">
 
-                <div class="editor-label" style="margin: 0 0 10px 0;">
-                    @Html.LabelFor( model => model.ServiceType )
-                </div>
+                    <div class="editor-label" style="margin: 0 0 10px 0;">
+                        @Html.LabelFor( model => model.ServiceType )
+                    </div>
 
                     <div class="editor-field">
                         @foreach ( int k in Enum.GetValues( typeof( ServiceType ) ) )
@@ -144,7 +144,7 @@
                     </div>
                 </div>
 
-                <div id="psp-list" class="@(Model.ServiceType == ServiceType.HaveCompany ? "block" : "none")" style="margin-top: 20px;">
+                <div id="psp-list" class="@(Model.ServiceType == ServiceType.HaveCompany ? "block" : "none")">
 
                     <div class="editor-label">
                         @Html.LabelFor( model => model.PSPId )
@@ -167,6 +167,14 @@
 
                     </div>
 
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.IsChepClient )
+                </div>
+                <div class="edit-field">
+                    @Html.EnumDropDownFor( model => model.IsChepClient, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.IsChepClient )
                 </div>
 
             </div>

@@ -23,7 +23,7 @@ namespace ACT.Data.Models
         public int Status { get; set; }
         public string GroupName { get; set; }
     
-        public virtual Client Client { get; set; }
         public virtual Group Group { get; set; }
+        public virtual Client Client { get; set; }
     }
 }

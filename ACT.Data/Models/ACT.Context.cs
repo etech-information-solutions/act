@@ -34,7 +34,6 @@ namespace ACT.Data.Models
         public virtual DbSet<ChepClient> ChepClients { get; set; }
         public virtual DbSet<ChepLoadChep> ChepLoadCheps { get; set; }
         public virtual DbSet<ChepLoadOLD> ChepLoadOLDs { get; set; }
-        public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
         public virtual DbSet<ClientBudget> ClientBudgets { get; set; }
         public virtual DbSet<ClientChepAccount> ClientChepAccounts { get; set; }
@@ -90,7 +89,11 @@ namespace ACT.Data.Models
         public virtual DbSet<PSPPeriod> PSPPeriods { get; set; }
         public virtual DbSet<ClientLoad> ClientLoads { get; set; }
         public virtual DbSet<Vehicle> Vehicles { get; set; }
-        public virtual DbSet<ChepLoad> ChepLoads { get; set; }
         public virtual DbSet<ChepLoadJournal> ChepLoadJournals { get; set; }
+        public virtual DbSet<Client> Clients { get; set; }
+        public virtual DbSet<ClientLoadHistory> ClientLoadHistories { get; set; }
+        public virtual DbSet<ClientLoadQuantity> ClientLoadQuantities { get; set; }
+        public virtual DbSet<ChepLoad> ChepLoads { get; set; }
+        public virtual DbSet<ExtendedClientLoad> ExtendedClientLoads { get; set; }
     }
 }

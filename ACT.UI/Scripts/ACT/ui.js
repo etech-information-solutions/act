@@ -100,6 +100,7 @@
             // Table Quick Links Operations
             this.DataStep( $( '*[data-step="1"]' ) );
             this.DataCollapse( $( '*[data-collapse="1"]' ) );
+            this.DataInputSearch( $( '*[data-input-search="1"]' ) );
             this.DataCheckOptions( $( '*[data-check-options="1"]' ) );
 
             // PR Create / Edit
@@ -1289,7 +1290,14 @@
             {
                 var i = $( this );
 
-                var target = $( i.attr( "data-upload-target" ) );
+                var target = i.parent().find( i.attr( "data-upload-target" ) );
+
+                if ( !target.length )
+                {
+                    target = $( i.attr( "data-upload-target" ) );
+                }
+
+                img = target.length > 0 ? target : img;
 
                 i
                     .unbind( "change" )
@@ -1301,8 +1309,6 @@
                             {
                                 return;
                             }
-
-                            img = target.length > 0 ? target : img;
 
                             var reader = new FileReader();
 
@@ -1491,6 +1497,14 @@
                                 $( this )
                                     .find( 'input[type="file"],input[type="text"],input[type="hidden"],textarea,select' )
                                     .removeAttr( "required" );
+                            } );
+                        }
+
+                        if ( clone.find( 'img[reset-src]' ) )
+                        {
+                            clone.find( 'img[reset-src]' ).each( function ()
+                            {
+                                $( this ).attr( "src", $( this ).attr( "reset-src" ) );
                             } );
                         }
 
@@ -5844,6 +5858,50 @@
                         } );
 
                         return false;
+                    } );
+            } );
+        },
+
+        DataInputSearch: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "id" );
+                var cid = i.attr( "data-cid" );
+                var url = i.attr( "data-url" );
+                var update = $( i.attr( "data-update" ) );
+
+                var top = i.offset().top;
+
+                var width = i.outerWidth();
+                var height = i.outerHeight();
+
+                i
+                    .unbind( "keyup" )
+                    .bind( "keyup", function ()
+                    {
+                        clearTimeout( ACT.UI.PageSearchTimer );
+
+                        var q = $( this ).val().trim();
+
+                        ACT.UI.PageSearchTimer = setTimeout( function ()
+                        {
+                            $( "<div />" ).load( url, { Query: q, ClientId: cid, Skip: 0, Take: 50, Page: 0 }, function ( d )
+                            {
+                                var did = id + "-search-results";
+                                var div = "<div id='" + did + "' class='search-results' style='width: " + ( width - 21 ) + "px; top: " + height + "px;'>" + d + "</div>";
+
+                                i.parent().find( "#" + did ).remove();
+
+                                i.parent().append( div );
+
+                                $( "#" + did ).css( "display", "block" );
+
+                                ACT.Init.Start( true );
+                            } );
+                        }, 700 );
                     } );
             } );
         }

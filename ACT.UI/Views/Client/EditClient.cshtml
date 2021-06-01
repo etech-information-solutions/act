@@ -3,7 +3,6 @@
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
 @using ACT.UI.Models;
-@using ACT.Data.Models;
 
 @{
     if ( ViewBag.IncludeLayout == null )
@@ -23,10 +22,10 @@
 
     if ( user.RoleType == RoleType.PSP && pSPOptions.Count() == 1 )
     {
-        showServiceRequiredSection = false;
-        Model.ServiceType = ServiceType.HaveCompany;
         Model.PSP = user.PSPs.First();
         Model.PSPId = user.PSPs.First().Id;
+        showServiceRequiredSection = false;
+        Model.ServiceType = ServiceType.HaveCompany;
     }
 
 
@@ -120,10 +119,11 @@
                 @Html.ValidationMessageFor( model => model.Status )
             </div>
 
-            <div class="editor-label" style="margin: 0 0 10px 0;">
-                @Html.LabelFor( model => model.ServiceType )
-            </div>
-            <div class="@(showServiceRequiredSection ? "block" : "none")">
+            <div class="@(showServiceRequiredSection ? "block" : "none")" style="margin-bottom: 10px;">
+
+                <div class="editor-label" style="margin: 0 0 10px 0;">
+                    @Html.LabelFor( model => model.ServiceType )
+                </div>
 
                 <div class="editor-field">
                     @foreach ( int k in Enum.GetValues( typeof( ServiceType ) ) )
@@ -149,15 +149,17 @@
                         <div></div>
                     }
                 </div>
+
             </div>
 
-            <div id="psp-list" class="@(Model.ServiceType == ServiceType.HaveCompany ? "block" : "none")" style="margin-top: 20px;">
+            <div id="psp-list" class="@(Model.ServiceType == ServiceType.HaveCompany ? "block" : "none")">
 
                 <div class="editor-label">
                     @Html.LabelFor( model => model.PSPId )
                 </div>
                 <div class="editor-field">
                     @Html.DropDownListFor( model => model.PSPId, model => pSPOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @data_psp_reg = "1", @data_target = "#other-psp-name", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.PSPId )
                 </div>
 
                 <div id="other-psp-name" class="@(Model.PSPId == -1 ? "block" : "none")" style="margin-top: 20px;">
@@ -173,6 +175,14 @@
 
                 </div>
 
+            </div>
+
+            <div class="edit-label">
+                @Html.LabelFor( model => model.IsChepClient )
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor( model => model.IsChepClient, false, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.IsChepClient )
             </div>
 
         </div>

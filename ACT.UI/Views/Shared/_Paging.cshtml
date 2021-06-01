@@ -83,8 +83,8 @@
     <div id="page-navigation" class="piece page-navigation" data-is-tiny="0" data-target="#item-list" data-url="@Request.RawUrl">
 
         @{
-            String showNext = Model.ShowNext ? "active" : "inactive";
-            String showPrev = Model.ShowPrev ? "active" : "inactive";
+            string showNext = Model.ShowNext ? "active" : "inactive";
+            string showPrev = Model.ShowPrev ? "active" : "inactive";
         }
 
         @if ( Model.Total >= 0 )

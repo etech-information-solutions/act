@@ -36,8 +36,8 @@ namespace ACT.Data.Models
         public string ChepClientTransporterCode { get; set; }
         public int Status { get; set; }
     
-        public virtual Client Client { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads { get; set; }
+        public virtual Client Client { get; set; }
     }
 }

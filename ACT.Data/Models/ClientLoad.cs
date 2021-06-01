@@ -22,6 +22,9 @@ namespace ACT.Data.Models
             this.ClientInvoices = new HashSet<ClientInvoice>();
             this.Journals = new HashSet<Journal>();
             this.Tasks = new HashSet<Task>();
+            this.ClientLoadHistories = new HashSet<ClientLoadHistory>();
+            this.ClientLoadQuantities = new HashSet<ClientLoadQuantity>();
+            this.ExtendedClientLoads = new HashSet<ExtendedClientLoad>();
         }
     
         public int Id { get; set; }
@@ -84,8 +87,6 @@ namespace ACT.Data.Models
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }
-        public virtual Client Client { get; set; }
-        public virtual Client Client1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
@@ -103,5 +104,13 @@ namespace ACT.Data.Models
         public virtual ICollection<Journal> Journals { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Tasks { get; set; }
+        public virtual Client Client { get; set; }
+        public virtual Client Client1 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoadHistory> ClientLoadHistories { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoadQuantity> ClientLoadQuantities { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ExtendedClientLoad> ExtendedClientLoads { get; set; }
     }
 }

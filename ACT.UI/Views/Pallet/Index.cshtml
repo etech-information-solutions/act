@@ -10,12 +10,6 @@
 <div class="ap-tabs">
 
     <ul>
-        @if ( user.IsAdmin || user.IsPSPAdmin )
-        {
-            <li data-hot-spot="1" data-c="Pallet" data-t="PoolingAgentData" class="none">
-                <a data-ap-tab="1" data-target="#poolingagentdata" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PoolingAgentData">Pooling Loads</a>
-            </li>
-        }
         <li data-hot-spot="1" data-c="Pallet" data-t="ClientData" class="none">
             <a data-ap-tab="1" data-target="#clientdata" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientData">Client Loads</a>
         </li>
@@ -41,17 +35,18 @@
         <li data-hot-spot="1" data-c="Pallet" data-t="SiteAudits" class="none">
             <a data-ap-tab="1" data-target="#siteaudits" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="SiteAudits">Site Audit</a>
         </li>
+        @if ( user.IsAdmin || user.IsPSPAdmin )
+        {
+            <li data-hot-spot="1" data-c="Pallet" data-t="PoolingAgentData" class="none">
+                <a data-ap-tab="1" data-target="#poolingagentdata" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PoolingAgentData">Pooling Loads</a>
+            </li>
+        }
         <li class="last"></li>
     </ul>
 
 
 
     <div id="tab-data" class="tab-data">
-
-        @if ( user.IsAdmin || user.IsPSPAdmin )
-        {
-            <div id="poolingagentdata" class="da-tab none" data-load-url="PoolingAgentData"> </div>
-        }
 
         <div id="clientdata" class="da-tab none" data-load-url="ClientData"> </div>
 
@@ -70,6 +65,11 @@
         <div id="disputes" class="da-tab none" data-load-url="Disputes"> </div>
 
         <div id="siteaudits" class="da-tab none" data-load-url="SiteAudits"> </div>
+
+        @if ( user.IsAdmin || user.IsPSPAdmin )
+        {
+            <div id="poolingagentdata" class="da-tab none" data-load-url="PoolingAgentData"> </div>
+        }
     </div>
 
 </div>

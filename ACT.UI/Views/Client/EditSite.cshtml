@@ -106,6 +106,14 @@
             </div>
 
             <div class="editor-label">
+                @Html.LabelFor( model => model.CustomerNoDebtorCode )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.CustomerNoDebtorCode, new { @class = "input", @placeholder = "Enter Customer No/Debtor Code" } )
+                @Html.ValidationMessageFor( model => model.CustomerNoDebtorCode )
+            </div>
+
+            <div class="editor-label">
                 @Html.LabelFor( model => model.PlanningPoint )
             </div>
             <div class="editor-field">
@@ -368,11 +376,11 @@
 
         @*<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 
-        <div id="site-budget">
+            <div id="site-budget">
 
-            @Html.Partial( "_SiteBudgets", Model.SiteBudgets )
+                @Html.Partial( "_SiteBudgets", Model.SiteBudgets )
 
-        </div>*@
+            </div>*@
 
         <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 

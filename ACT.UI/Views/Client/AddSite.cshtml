@@ -104,6 +104,14 @@
             </div>
 
             <div class="editor-label">
+                @Html.LabelFor( model => model.CustomerNoDebtorCode )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.CustomerNoDebtorCode, new { @class = "input", @placeholder = "Enter Customer No/Debtor Code" } )
+                @Html.ValidationMessageFor( model => model.CustomerNoDebtorCode )
+            </div>
+
+            <div class="editor-label">
                 @Html.LabelFor( model => model.PlanningPoint )
             </div>
             <div class="editor-field">

@@ -3,34 +3,60 @@
 @using ACT.Data.Models;
 
 @{
-    Image podImg = ViewBag.PODImage;
-    string podSnapshoot = podImg != null ? Url.Action( "ViewImage", new { id = podImg.Id } ) : Url.Content( "~/Images/no-preview.png" );
+    List<Image> images = ViewBag.Images;
+    //string podSnapshoot = podImg != null ? Url.Action( "ViewImage", new { id = podImg.Id } ) : Url.Content( "~/Images/no-preview.png" );
 }
 
-<div class="display-label">
+<div class="display-label" style="padding-left: 0;">
     POD Number:
 </div>
 <div class="display-field" style="color: #111;">
     @Model.PODNumber
 </div>
 
-<div class="display-label">
+<div class="display-label" style="padding-left: 0;">
     Load Comment
 </div>
 <div class="display-field" style="color: #111;">
     @Html.Raw( Model.PODComment?.Comment ?? "&nbsp;" )
 </div>
 
-<div class="editor-label" style="margin-bottom: 5px;">
-    POD Snapshoot
+<div class="display-label" style="padding-left: 0;">
+    POD Snapshots:
 </div>
-<div class="editor-field" style="text-align: center; border: 1px dashed #ddd; padding: 10px;">
+<div class="display-field" style="text-align: center; margin-bottom: 0;">
 
-    <label>
-        <a href="@podSnapshoot" target="_blank">
-            <img id="pod-snapshoot-preview" style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="" src="@podSnapshoot" />
-        </a>
-    </label>
+    @if ( images.NullableAny() )
+    {
+        foreach ( Image i in images )
+        {
+            bool isImage = new List<string>() { ".jpg", ".jpeg", ".png", ".tiff", ".gif", ".bmp", ".raw" }.Contains( i?.Extension?.ToLower() );
+
+            <div style="border: 1px dashed #4d4a4a; padding: 10px; display: inline-block; width: 40%; margin-right: 10px; margin-bottom: 10px; vertical-align: top;">
+
+                <a href="@Url.Action( "ViewImage", new { id = i.Id } )" target="_blank">
+                    @if ( isImage )
+                    {
+                        <img alt="" src="@Url.Action( "ViewImage", new { id = i.Id } )" style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" />
+                    }
+                    else
+                    {
+                        <span>
+                            <img alt="" src="@Url.Content( "~/Images/download.png" )" /> @i.Description (@i.Extension)
+                        </span>
+                    }
+                </a>
+
+            </div>
+        }
+    }
+    else
+    {
+        <div class="message-warn">
+            There are no POD Snapshots uploaded for this load.
+        </div>
+    }
+
 </div>
 
 <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>

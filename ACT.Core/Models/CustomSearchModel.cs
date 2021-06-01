@@ -751,7 +751,7 @@ namespace ACT.Core.Models
             this.Province = Province.All;
             this.RoleType = RoleType.All;
             this.ClientStatus = Status.Active;
-            this.DocumentType = DocumentType.All;
+            this.DocumentType = DocumentType.None;
             this.ActivityType = ActivityTypes.All;
             this.InvoiceStatus = InvoiceStatus.All;
             this.DisputeStatus = DisputeStatus.All;
