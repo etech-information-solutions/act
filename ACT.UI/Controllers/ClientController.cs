@@ -2990,6 +2990,7 @@ namespace ACT.UI.Controllers
         public ActionResult AddProduct( ProductViewModel model )
         {
             using ( ClientService cservice = new ClientService() )
+            using ( ProductService pservice = new ProductService() )
             using ( ClientProductService cpservice = new ClientProductService() )
             {
                 Client c = cservice.GetById( model.ClientId );
@@ -3008,6 +3009,8 @@ namespace ACT.UI.Controllers
                     return View( model );
                 }
 
+                Product p = pservice.GetById( model.ProductId );
+
                 ClientProduct cp = new ClientProduct()
                 {
                     Rate = model.HireRate,
@@ -3021,8 +3024,8 @@ namespace ACT.UI.Controllers
                     Status = ( int ) model.Status,
                     ActiveDate = model.ActiveDate,
                     RateType = ( int ) model.RateType,
+                    ProductDescription = p.Description,
                     AccountingCode = model.AccountingCode,
-                    ProductDescription = model.Description,
                     PSPId = c.PSPClients.FirstOrDefault().PSPId,
                 };
 
@@ -3107,7 +3110,7 @@ namespace ACT.UI.Controllers
                 cp.ActiveDate = model.ActiveDate;
                 cp.RateType = ( int ) model.RateType;
                 cp.AccountingCode = model.AccountingCode;
-                cp.ProductDescription = model.Description;
+                //cp.ProductDescription = model.Description;
 
                 #endregion
 

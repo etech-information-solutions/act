@@ -488,7 +488,7 @@
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="FieldName" Type="varchar" MaxLength="150" Nullable="false" />
-          <Property Name="OldValue" Type="varchar" MaxLength="150" Nullable="false" />
+          <Property Name="OldValue" Type="varchar" MaxLength="150" />
           <Property Name="NewValue" Type="varchar" MaxLength="150" Nullable="false" />
         </EntityType>
         <EntityType Name="ClientLoadQuantity">
@@ -3475,7 +3475,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="ChepLoadJournal" EntitySet="ChepLoadJournals" />
           </AssociationSet>
           <EntitySet Name="Clients" EntityType="ACTModel.Client" />
-          <EntitySet Name="ClientLoadHistories" EntityType="ACTModel.ClientLoadHistory" />
           <EntitySet Name="ClientLoadQuantities" EntityType="ACTModel.ClientLoadQuantity" />
           <AssociationSet Name="FK_ChepLoadJournal_Client" Association="ACTModel.FK_ChepLoadJournal_Client">
             <End Role="Client" EntitySet="Clients" />
@@ -3537,10 +3536,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="Client" EntitySet="Clients" />
             <End Role="Task" EntitySet="Tasks" />
           </AssociationSet>
-          <AssociationSet Name="FK_ClientLoadHistory_ClientLoad" Association="ACTModel.FK_ClientLoadHistory_ClientLoad">
-            <End Role="ClientLoad" EntitySet="ClientLoads" />
-            <End Role="ClientLoadHistory" EntitySet="ClientLoadHistories" />
-          </AssociationSet>
           <AssociationSet Name="FK_ClientLoadQuantity_ClientLoad" Association="ACTModel.FK_ClientLoadQuantity_ClientLoad">
             <End Role="ClientLoad" EntitySet="ClientLoads" />
             <End Role="ClientLoadQuantity" EntitySet="ClientLoadQuantities" />
@@ -3598,6 +3593,11 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <AssociationSet Name="FK_ExtendedClientLoad_OutstandingReason" Association="ACTModel.FK_ExtendedClientLoad_OutstandingReason">
             <End Role="OutstandingReason" EntitySet="OutstandingReasons" />
             <End Role="ExtendedClientLoad" EntitySet="ExtendedClientLoads" />
+          </AssociationSet>
+          <EntitySet Name="ClientLoadHistories" EntityType="ACTModel.ClientLoadHistory" />
+          <AssociationSet Name="FK_ClientLoadHistory_ClientLoad" Association="ACTModel.FK_ClientLoadHistory_ClientLoad">
+            <End Role="ClientLoad" EntitySet="ClientLoads" />
+            <End Role="ClientLoadHistory" EntitySet="ClientLoadHistories" />
           </AssociationSet>
           </EntityContainer>
         <EntityType Name="Address">
@@ -5599,9 +5599,9 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="Tasks" Relationship="ACTModel.FK_Task_ClientLoad" FromRole="ClientLoad" ToRole="Task" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_ClientLoads_ChepClients" FromRole="ClientLoad" ToRole="Client" />
           <NavigationProperty Name="Client1" Relationship="ACTModel.FK_ClientLoads_Clients" FromRole="ClientLoad" ToRole="Client" />
-          <NavigationProperty Name="ClientLoadHistories" Relationship="ACTModel.FK_ClientLoadHistory_ClientLoad" FromRole="ClientLoad" ToRole="ClientLoadHistory" />
           <NavigationProperty Name="ClientLoadQuantities" Relationship="ACTModel.FK_ClientLoadQuantity_ClientLoad" FromRole="ClientLoad" ToRole="ClientLoadQuantity" />
           <NavigationProperty Name="ExtendedClientLoads" Relationship="ACTModel.FK_ExtendedClientLoad_ClientLoad" FromRole="ClientLoad" ToRole="ExtendedClientLoad" />
+          <NavigationProperty Name="ClientLoadHistories" Relationship="ACTModel.FK_ClientLoadHistory_ClientLoad" FromRole="ClientLoad" ToRole="ClientLoadHistory" />
         </EntityType>
         <EntityType Name="Vehicle">
           <Key>
@@ -5915,20 +5915,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="ChepLoads" Relationship="ACTModel.FK_ChepLoad_Client" FromRole="Client" ToRole="ChepLoad" />
           <NavigationProperty Name="ExtendedClientLoads" Relationship="ACTModel.FK_ExtendedClientLoad_Client" FromRole="Client" ToRole="ExtendedClientLoad" />
         </EntityType>
-        <EntityType Name="ClientLoadHistory">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ClientLoadId" Type="Int32" Nullable="false" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="FieldName" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="OldValue" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="NewValue" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="ClientLoad" Relationship="ACTModel.FK_ClientLoadHistory_ClientLoad" FromRole="ClientLoadHistory" ToRole="ClientLoad" />
-        </EntityType>
         <EntityType Name="ClientLoadQuantity">
           <Key>
             <PropertyRef Name="Id" />
@@ -6124,20 +6110,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="Task">
               <PropertyRef Name="ClientId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ClientLoadHistory_ClientLoad">
-          <End Type="ACTModel.ClientLoad" Role="ClientLoad" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="ACTModel.ClientLoadHistory" Role="ClientLoadHistory" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ClientLoad">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ClientLoadHistory">
-              <PropertyRef Name="ClientLoadId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -6422,6 +6394,34 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="ExtendedClientLoad">
               <PropertyRef Name="OutstandingReasonId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ClientLoadHistory">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClientLoadId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="FieldName" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="OldValue" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="NewValue" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ClientLoad" Relationship="ACTModel.FK_ClientLoadHistory_ClientLoad" FromRole="ClientLoadHistory" ToRole="ClientLoad" />
+        </EntityType>
+        <Association Name="FK_ClientLoadHistory_ClientLoad">
+          <End Type="ACTModel.ClientLoad" Role="ClientLoad" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="ACTModel.ClientLoadHistory" Role="ClientLoadHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ClientLoadHistory">
+              <PropertyRef Name="ClientLoadId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -7843,20 +7843,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="ClientLoadHistories">
-            <EntityTypeMapping TypeName="ACTModel.ClientLoadHistory">
-              <MappingFragment StoreEntitySet="ClientLoadHistory">
-                <ScalarProperty Name="NewValue" ColumnName="NewValue" />
-                <ScalarProperty Name="OldValue" ColumnName="OldValue" />
-                <ScalarProperty Name="FieldName" ColumnName="FieldName" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="ClientLoadId" ColumnName="ClientLoadId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="ClientLoadQuantities">
             <EntityTypeMapping TypeName="ACTModel.ClientLoadQuantity">
               <MappingFragment StoreEntitySet="ClientLoadQuantity">
@@ -7973,6 +7959,20 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="ClientLoadId" ColumnName="ClientLoadId" />
                 <ScalarProperty Name="ClientSiteId" ColumnName="ClientSiteId" />
                 <ScalarProperty Name="ClientId" ColumnName="ClientId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ClientLoadHistories">
+            <EntityTypeMapping TypeName="ACTModel.ClientLoadHistory">
+              <MappingFragment StoreEntitySet="ClientLoadHistory">
+                <ScalarProperty Name="NewValue" ColumnName="NewValue" />
+                <ScalarProperty Name="OldValue" ColumnName="OldValue" />
+                <ScalarProperty Name="FieldName" ColumnName="FieldName" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ClientLoadId" ColumnName="ClientLoadId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

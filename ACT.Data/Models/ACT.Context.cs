@@ -91,9 +91,9 @@ namespace ACT.Data.Models
         public virtual DbSet<Vehicle> Vehicles { get; set; }
         public virtual DbSet<ChepLoadJournal> ChepLoadJournals { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
-        public virtual DbSet<ClientLoadHistory> ClientLoadHistories { get; set; }
         public virtual DbSet<ClientLoadQuantity> ClientLoadQuantities { get; set; }
         public virtual DbSet<ChepLoad> ChepLoads { get; set; }
         public virtual DbSet<ExtendedClientLoad> ExtendedClientLoads { get; set; }
+        public virtual DbSet<ClientLoadHistory> ClientLoadHistories { get; set; }
     }
 }

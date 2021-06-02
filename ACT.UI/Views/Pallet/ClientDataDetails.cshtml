@@ -78,6 +78,8 @@
             ClientSite = ec.ClientSite,
             OutstandingReason = ec.OutstandingReason,
         };
+
+        Model.DocumentType = ( DocumentType ) ec.DocumentType;
     }
 }
 
@@ -116,7 +118,7 @@
                 Load Date:
             </div>
             <div class="edit-field">
-                <input class="date-picker" data-val="true" data-val-date="The field Load Date: must be a date." id="LoadDate" name="LoadDate" placeholder="     /       /       " type="text" value="@(Model.LoadDate?.ToString( "yyyy-MM-dd" ))">
+                <input class="date-picker" data-val="true" data-val-date="The field Load Date: must be a date." id="LoadDate" name="LoadDate" placeholder="     /       /       " type="text" value="@(Model.LoadDate?.ToString( "yyyy/MM/dd" ))">
             </div>
 
 
@@ -202,7 +204,7 @@
             <div class="edit-label">
                 Delivery Date:
             </div>
-            <div class="display-field">
+            <div class="edit-field chep-field">
                 <input class="date-picker" data-val="true" data-val-date="The field Load Date: must be a date." id="DeliveryDate" name="DeliveryDate" placeholder="     /       /       " type="text" value="@(ch?.DeliveryDate?.ToString( "yyyy/MM/dd" ))">
             </div>
 
@@ -244,7 +246,7 @@
             <div class="edit-label">
                 Customer Order Number:
             </div>
-            <div class="display-field">
+            <div class="edit-field chep-field">
                 @*@Html.Raw( ( !string.IsNullOrWhiteSpace( ch?.Ref ) ? ch?.Ref?.Trim() : "&nbsp;" ) )*@
                 @Html.TextBoxFor( model => model.ChepRef, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
@@ -252,7 +254,7 @@
             <div class="edit-label">
                 Other Reference:
             </div>
-            <div class="display-field">
+            <div class="edit-field chep-field">
                 @*@Html.Raw( ( !string.IsNullOrWhiteSpace( ch?.OtherRef ) ? ch?.OtherRef?.Trim() : "&nbsp;" ) )*@
                 @Html.TextBoxFor( model => model.ChepOtherRef, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
@@ -260,7 +262,7 @@
             <div class="edit-label ">
                 Chep Invoice Number:
             </div>
-            <div class="edit-field">
+            <div class="edit-field chep-field">
                 @*@Html.Raw( ( !string.IsNullOrWhiteSpace( ch?.InvoiceNumber ) ? ch?.InvoiceNumber?.Trim() : "&nbsp;" ) )*@
                 @Html.TextBoxFor( model => model.ChepInvoiceNumber, new { @class = "input", @placeholder = "Please Complete" } )
             </div>
@@ -280,7 +282,7 @@
             <div class="edit-label">
                 CHEP Exchange DOC No:
             </div>
-            <div class="display-field">
+            <div class="edit-field">
                 @*@{
                         string exNo = "&nbsp;";
 
@@ -297,7 +299,7 @@
             <div class="edit-label">
                 CHEP Customer THAN DOC No:
             </div>
-            <div class="display-field">
+            <div class="edit-field chep-field">
                 @*@{
                         string docNo = "&nbsp;";
 
@@ -314,7 +316,7 @@
             <div class="edit-label">
                 Warehouse Transfer DOC No:
             </div>
-            <div class="display-field">
+            <div class="edit-field chep-field">
                 @*@{
                         string tdocNo = chepLoads?.Where( c => c?.IsExchange == true )
                                                  ?.OrderByDescending( o => o.Id )
@@ -336,7 +338,7 @@
             <div class="edit-label">
                 Pallet Return Slip No:
             </div>
-            <div class="display-field">
+            <div class="edit-field chep-field">
                 @*@{
                         string rdocNo = chepLoads?.Where( c => c?.TransactionType?.ToUpper() == "RETURN" )
                                                  ?.FirstOrDefault()
@@ -350,7 +352,7 @@
             <div class="edit-label">
                 Pallet Return Date:
             </div>
-            <div class="display-field">
+            <div class="edit-field chep-field">
                 @*@{
                         DateTime? returnDate = chepLoads?.Where( c => c?.TransactionType?.ToUpper() == "RETURN" )
                                                         ?.FirstOrDefault()
@@ -389,19 +391,18 @@
                 CHEP Comp No:
             </div>
             <div class="display-field">
-                @*@{
-                        string podNo = clientLoads?.Where( c => c?.PODNumber?.StartsWith( "89" ) == true )
-                                                  ?.FirstOrDefault()
-                                                  ?.PODNumber;
-                    }
-                    @Html.Raw( podNo ?? "&nbsp;" )*@
-                @Html.TextBoxFor( model => model.PODNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                @{
+                    string podNo = clientLoads?.Where( c => c?.PODNumber?.StartsWith( "89" ) == true )
+                                              ?.FirstOrDefault()
+                                              ?.PODNumber;
+                }
+                @Html.Raw( podNo ?? "&nbsp;" )
             </div>
 
             <div class="edit-label">
                 Compensation Date:
             </div>
-            <div class="display-field">
+            <div class="edit-field chep-field">
                 @*@Html.Raw( ch?.EffectiveDate?.ToString( "dd/MM/yyyy" ) ?? "&nbsp;" )*@
                 <input class="date-picker" data-val="true" data-val-date="The field Load Date: must be a date." id="ChepEffectiveDate" name="ChepEffectiveDate" placeholder="     /       /       " type="text" value="@(Model.ChepEffectiveDate?.ToString( "yyyy/MM/dd" ))">
             </div>
@@ -420,7 +421,7 @@
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
                 Equipment:
             </div>
-            <div class="edit-field">
+            <div class="edit-field" style="margin-bottom: 0 !important;">
 
                 @if ( clientProducts.NullableAny() )
                 {
@@ -429,9 +430,7 @@
                             <tr>
                                 @foreach ( var item in clientProducts )
                                 {
-                                    string active = ( Model.ClientLoadQuantities?.NullableAny( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() ) == true ) ? "active" : "";
-
-                                    <td class="@active" style="width: @width%">
+                                    <td style="width: @width%">
                                         <input name="ClientLoadQuantities[@cqCount].EquipmentCode" type="text" value="@(item.Equipment?.Trim())" />
                                     </td>
 
@@ -449,7 +448,7 @@
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
                 Delivered Quantity:
             </div>
-            <div class="edit-field">
+            <div class="edit-field" style="margin-bottom: 0 !important;">
 
                 @if ( clientProducts.NullableAny() )
                 {
@@ -461,11 +460,8 @@
                                 @foreach ( var item in clientProducts )
                                 {
                                     ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
-                                    
-                                    bool isCurrent = ( clq != null );
-                                    string active = ( clq != null ) ? "active" : "";
 
-                                    <td class="@active" style="width: @width%">
+                                    <td style="width: @width%">
                                         <input name="ClientLoadQuantities[@cqCount].OriginalQuantity" type="text" value="@(clq?.OriginalQuantity)" />
                                     </td>
 
@@ -483,7 +479,7 @@
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
                 Returned/Transferred Qty:
             </div>
-            <div class="edit-field">
+            <div class="edit-field" style="margin-bottom: 0 !important;">
 
                 @if ( clientProducts.NullableAny() )
                 {
@@ -496,10 +492,7 @@
                                 {
                                     ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
 
-                                    bool isCurrent = ( clq != null );
-                                    string active = ( clq != null ) ? "active" : "";
-
-                                    <td class="@active" style="width: @width%">
+                                    <td style="width: @width%">
                                         <input name="ClientLoadQuantities[@cqCount].ReturnQty" type="text" value="@(clq?.ReturnQty)" />
                                     </td>
 
@@ -517,7 +510,7 @@
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
                 Debrief Qty:
             </div>
-            <div class="edit-field">
+            <div class="edit-field" style="margin-bottom: 0 !important;">
 
                 @if ( clientProducts.NullableAny() )
                 {
@@ -530,10 +523,7 @@
                                 {
                                     ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
 
-                                    bool isCurrent = ( clq != null );
-                                    string active = ( clq != null ) ? "active" : "";
-
-                                    <td class="@active" style="width: @width%">
+                                    <td style="width: @width%">
                                         <input name="ClientLoadQuantities[@cqCount].DebriefQty" type="text" value="@(clq?.DebriefQty)" />
                                     </td>
 
@@ -551,7 +541,7 @@
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
                 Transporter Liable:
             </div>
-            <div class="edit-field">
+            <div class="edit-field" style="margin-bottom: 0 !important;">
 
                 @if ( clientProducts.NullableAny() )
                 {
@@ -564,10 +554,7 @@
                                 {
                                     ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
 
-                                    bool isCurrent = ( clq != null );
-                                    string active = ( clq != null ) ? "active" : "";
-
-                                    <td class="@active" style="width: @width%">
+                                    <td style="width: @width%">
                                         <input name="ClientLoadQuantities[@cqCount].TransporterLiableQty" type="text" value="@(clq?.TransporterLiableQty)" />
                                     </td>
 
@@ -585,7 +572,7 @@
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
                 Admin Movement:
             </div>
-            <div class="edit-field">
+            <div class="edit-field" style="margin-bottom: 0 !important;">
 
                 @if ( clientProducts.NullableAny() )
                 {
@@ -598,10 +585,7 @@
                                 {
                                     ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
 
-                                    bool isCurrent = ( clq != null );
-                                    string active = ( clq != null ) ? "active" : "";
-
-                                    <td class="@active" style="width: @width%">
+                                    <td style="width: @width%">
                                         <input name="ClientLoadQuantities[@cqCount].AdminMovementQty" type="text" value="@(clq?.AdminMovementQty)" />
                                     </td>
 
@@ -619,7 +603,7 @@
             <div class="edit-label" style="width: 24% !important; vertical-align: top;">
                 Outstanding Qty at Customer:
             </div>
-            <div class="edit-field">
+            <div class="edit-field" style="margin-bottom: 0 !important;">
 
                 @if ( clientProducts.NullableAny() )
                 {
@@ -632,10 +616,7 @@
                                 {
                                     ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
 
-                                    bool isCurrent = ( clq != null );
-                                    string active = ( clq != null ) ? "active" : "";
-
-                                    <td class="@active" style="width: @width%">
+                                    <td style="width: @width%">
                                         <input name="ClientLoadQuantities[@cqCount].OutstandingQty" type="text" value="@(clq?.OutstandingQty)" />
                                     </td>
 
@@ -655,7 +636,7 @@
             <div class="edit-label" style="width: 45% !important;">
                 Document Type:
             </div>
-            <div class="display-field">
+            <div class="edit-field chep-field">
                 @Html.EnumDropDownFor( model => model.DocumentType, false, true, new { @class = "chzn", @style = "width: 100%;" } )
             </div>
 
@@ -694,7 +675,7 @@
 
         </div>
 
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 10px;">&nbsp;</div>
 
         @if ( ViewBag.IncludeLayout == null )
         {

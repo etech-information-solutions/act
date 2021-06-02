@@ -78,7 +78,7 @@ namespace ACT.Core.Services
                                                 [dbo].[PSPUser] pu
                                               WHERE
                                                 (pu.UserId=@userid) AND
-                                                (EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE (pc.[PSPId]=pu.[PSPId] AND pc.[ClientId]=c.[Id])
+                                                EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE pc.[PSPId]=pu.[PSPId] AND pc.[ClientId]=c.[Id])
                                              ) ";
             }
             else if ( CurrentUser.RoleType == RoleType.Client )
@@ -216,7 +216,7 @@ namespace ACT.Core.Services
                                                 [dbo].[PSPUser] pu
                                               WHERE
                                                 (pu.UserId=@userid) AND
-                                                (EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE (pc.[PSPId]=pu.[PSPId] AND pc.[ClientId]=c.[Id])
+                                                EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc WHERE pc.[PSPId]=pu.[PSPId] AND pc.[ClientId]=c.[Id])
                                              ) ";
             }
             else if ( CurrentUser.RoleType == RoleType.Client )

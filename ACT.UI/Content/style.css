@@ -1449,9 +1449,22 @@ tr.duplicate-highlight td {
     background: #f9f5f5;
 }
 
+.load-view .edit-field.chep-field input {
+    background: #f5f9f9;
+}
+
+.load-view .chep-field .select2-choice {
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eeeeee), color-stop(0.5, #f5f9f9)) !important;
+}
+
 .load-view .edit-label, .load-view .edit-field, .load-view .display-field {
+    margin-top: 0 !important;
     margin-bottom: 2px !important;
     display: inline-block !important;
+}
+
+.load-view label {
+    margin-bottom: 0 !important;
 }
 
 .load-view input[type="text"] {
@@ -1485,6 +1498,14 @@ tr.duplicate-highlight td {
 
     .load-view .extra-btns a.disabled {
         background: #aaa !important;
+    }
+
+.load-view table tr td {
+    padding: 2px 2px 3px 2px !important;
+}
+
+    .load-view table tr td input[type="text"] {
+        width: 82%;
     }
 
 .search-icon {

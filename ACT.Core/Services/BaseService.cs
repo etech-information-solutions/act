@@ -807,8 +807,6 @@ namespace ACT.Core.Services
         /// <returns></returns>
         public virtual T Create( T item, bool track = true )
         {
-            System.Reflection.PropertyInfo[] properties = item.GetType().GetProperties();
-
             // Tracking
             if ( track )
             {

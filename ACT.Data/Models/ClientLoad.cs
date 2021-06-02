@@ -22,9 +22,9 @@ namespace ACT.Data.Models
             this.ClientInvoices = new HashSet<ClientInvoice>();
             this.Journals = new HashSet<Journal>();
             this.Tasks = new HashSet<Task>();
-            this.ClientLoadHistories = new HashSet<ClientLoadHistory>();
             this.ClientLoadQuantities = new HashSet<ClientLoadQuantity>();
             this.ExtendedClientLoads = new HashSet<ExtendedClientLoad>();
+            this.ClientLoadHistories = new HashSet<ClientLoadHistory>();
         }
     
         public int Id { get; set; }
@@ -107,10 +107,10 @@ namespace ACT.Data.Models
         public virtual Client Client { get; set; }
         public virtual Client Client1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientLoadHistory> ClientLoadHistories { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoadQuantity> ClientLoadQuantities { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ExtendedClientLoad> ExtendedClientLoads { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoadHistory> ClientLoadHistories { get; set; }
     }
 }

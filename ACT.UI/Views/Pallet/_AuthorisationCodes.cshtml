@@ -38,7 +38,7 @@
                 Load Date
             </th>
             <th data-name="LoadNumber" data-column="cl.LoadNumber">
-                Load #
+                Shipment #
             </th>
             <th data-name="ReceiverNumber" data-column="cl.ReceiverNumber">
                 Ref #
@@ -56,10 +56,10 @@
                 Client
             </th>
             <th data-name="FromSiteName" data-column="s1.Description">
-                From Site
+                From Supplier
             </th>
             <th data-name="ToSiteName" data-column="s2.Description">
-                To Site
+                Customer To
             </th>
             <th data-name="Authoriser" data-column="u.Name">
                 Authoriser
@@ -83,7 +83,7 @@
             {
                 Status status = ( Status ) ( item.Status ?? 1 );
 
-                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
+                string enable = ( status == Status.Active ) ? "Delete" : "Enable";
                 string active = ( status == Status.Active ) ? "active" : "inactive";
 
                 <tr id="authorisationcodes-@item.Id-item" class="authorisationcodes-@item.Id-item @active">
@@ -136,6 +136,13 @@
                         {
                             @Html.ActionLink( enable, "DeleteAuthorisationCode", new { Id = item.ClientAuthorisationId }, new { @class = "warn append-search", @data_delete = "1", @data_id = item.ClientAuthorisationId, @data_target = "#authorisationcodes-" + item.Id + "-item", @data_refresh_target = "#authorisationcodes", @rel = "tipsyE", @title = enable + " this item?" } )
                         }
+
+                        @*<div style="border-top: 1px dashed #7368e3; padding-top: 4px; margin-top: 10px;">
+
+                            @Html.ActionLink( "Details", "EditClientData", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = "#authorisationcodes-" + item.Id + "-item" } )
+
+                        </div>*@
+
                     </td>
 
                 </tr>

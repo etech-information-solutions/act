@@ -24,7 +24,6 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string Name { get; set; }
 
-        [Required]
         [Display( Name = "Description" )]
         [StringLength( 500, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string Description { get; set; }

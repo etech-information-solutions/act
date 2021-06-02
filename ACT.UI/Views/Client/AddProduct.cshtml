@@ -53,13 +53,13 @@
                     @Html.ValidationMessageFor( model => model.ProductId )
                 </div>
 
-                <div class="edit-label">
+                @*<div class="edit-label">
                     @Html.LabelFor( model => model.Description )
                 </div>
                 <div class="edit-field">
                     @Html.TextAreaFor( model => model.Description, new { @style = "width: 93%;", @placeholder = "Enter Product Description" } )
                     @Html.ValidationMessageFor( model => model.Description )
-                </div>
+                </div>*@
 
                 <div class="edit-label">
                     @Html.LabelFor( model => model.ActiveDate )

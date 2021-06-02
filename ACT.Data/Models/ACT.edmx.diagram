@@ -137,7 +137,6 @@
         <AssociationConnector Association="ACTModel.FK_ChepLoadJournal_ClientSite" />
         <AssociationConnector Association="ACTModel.FK_ChepLoadJournal_OutstandingReason" />
         <EntityTypeShape EntityType="ACTModel.Client" Width="1.5" PointX="0.75" PointY="41" />
-        <EntityTypeShape EntityType="ACTModel.ClientLoadHistory" Width="1.5" PointX="32" PointY="44" />
         <EntityTypeShape EntityType="ACTModel.ClientLoadQuantity" Width="1.5" PointX="32" PointY="62.75" />
         <AssociationConnector Association="ACTModel.FK_ChepLoadJournal_Client" />
         <AssociationConnector Association="ACTModel.FK_ClientBudget_Clients" />
@@ -154,7 +153,6 @@
         <AssociationConnector Association="ACTModel.FK_SiteAudit_Client" />
         <AssociationConnector Association="ACTModel.FK_Transporter_Client" />
         <AssociationConnector Association="ACTModel.FK_UserTasks_Clients" />
-        <AssociationConnector Association="ACTModel.FK_ClientLoadHistory_ClientLoad" />
         <AssociationConnector Association="ACTModel.FK_ClientLoadQuantity_ClientLoad" />
         <EntityTypeShape EntityType="ACTModel.ChepLoad" Width="1.5" PointX="21.75" PointY="40.125" />
         <EntityTypeShape EntityType="ACTModel.ExtendedClientLoad" Width="1.5" PointX="29" PointY="40.125" />
@@ -171,6 +169,8 @@
         <AssociationConnector Association="ACTModel.FK_ExtendedClientLoad_ClientLoad" />
         <AssociationConnector Association="ACTModel.FK_ExtendedClientLoad_ClientSite" />
         <AssociationConnector Association="ACTModel.FK_ExtendedClientLoad_OutstandingReason" />
+        <EntityTypeShape EntityType="ACTModel.ClientLoadHistory" Width="1.5" PointX="29" PointY="52.25" />
+        <AssociationConnector Association="ACTModel.FK_ClientLoadHistory_ClientLoad" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
