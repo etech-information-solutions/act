@@ -119,7 +119,7 @@ namespace ACT.Core.Services
                              FROM
                                 [dbo].[Site] s
                                 LEFT OUTER JOIN [dbo].[Region] r ON r.[Id]=s.[RegionId]
-                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON s.Id=cs.SiteId
+                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.Id=(SELECT TOP 1 cs1.Id FROM [dbo].[ClientSite] cs1 WHERE cs1.SiteId=s.Id)
                                 LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cs.ClientCustomerId=cc.Id
                                 LEFT OUTER JOIN [dbo].[Client] c ON cc.ClientId=c.Id";
 
@@ -259,7 +259,7 @@ namespace ACT.Core.Services
                              FROM
                                 [dbo].[Site] s
                                 LEFT OUTER JOIN [dbo].[Region] r ON r.[Id]=s.[RegionId]
-                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON s.Id=cs.SiteId
+                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.Id=(SELECT TOP 1 cs1.Id FROM [dbo].[ClientSite] cs1 WHERE cs1.SiteId=s.Id)
                                 LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cs.ClientCustomerId=cc.Id
                                 LEFT OUTER JOIN [dbo].[Client] c ON cc.ClientId=c.Id";
 
@@ -365,7 +365,7 @@ namespace ACT.Core.Services
             {
                 foreach ( SiteCustomModel item in model.Where( p => p.ClientCount > 0 ) )
                 {
-                    item.Clients = context.ClientSites.Where( cs => cs.SiteId == item.Id ).Select( s => s.ClientCustomer.CustomerName ).ToList();
+                    item.Clients = context.ClientSites.Where( cs => cs.SiteId == item.Id ).Select( s => s.ClientCustomer.CustomerName ).Distinct().ToList();
                 }
             }
 

@@ -25,7 +25,6 @@ namespace ACT.Data.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Address> Addresses { get; set; }
         public virtual DbSet<AuditLog> AuditLogs { get; set; }
         public virtual DbSet<Bank> Banks { get; set; }
         public virtual DbSet<BankDetail> BankDetails { get; set; }
@@ -34,7 +33,6 @@ namespace ACT.Data.Models
         public virtual DbSet<ChepClient> ChepClients { get; set; }
         public virtual DbSet<ChepLoadChep> ChepLoadCheps { get; set; }
         public virtual DbSet<ChepLoadOLD> ChepLoadOLDs { get; set; }
-        public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
         public virtual DbSet<ClientBudget> ClientBudgets { get; set; }
         public virtual DbSet<ClientChepAccount> ClientChepAccounts { get; set; }
         public virtual DbSet<ClientCustomer> ClientCustomers { get; set; }
@@ -43,12 +41,10 @@ namespace ACT.Data.Models
         public virtual DbSet<ClientKPI> ClientKPIs { get; set; }
         public virtual DbSet<ClientProduct> ClientProducts { get; set; }
         public virtual DbSet<ClientProductMonthly> ClientProductMonthlies { get; set; }
-        public virtual DbSet<ClientSite> ClientSites { get; set; }
         public virtual DbSet<ClientUser> ClientUsers { get; set; }
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<Contact> Contacts { get; set; }
         public virtual DbSet<DeclineReason> DeclineReasons { get; set; }
-        public virtual DbSet<DeliveryNote> DeliveryNotes { get; set; }
         public virtual DbSet<DeliveryNoteLine> DeliveryNoteLines { get; set; }
         public virtual DbSet<Dispute> Disputes { get; set; }
         public virtual DbSet<DisputeReason> DisputeReasons { get; set; }
@@ -70,7 +66,6 @@ namespace ACT.Data.Models
         public virtual DbSet<PSPConfig> PSPConfigs { get; set; }
         public virtual DbSet<PSPProduct> PSPProducts { get; set; }
         public virtual DbSet<PSPUser> PSPUsers { get; set; }
-        public virtual DbSet<Region> Regions { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Site> Sites { get; set; }
         public virtual DbSet<SiteAudit> SiteAudits { get; set; }
@@ -95,5 +90,12 @@ namespace ACT.Data.Models
         public virtual DbSet<ChepLoad> ChepLoads { get; set; }
         public virtual DbSet<ExtendedClientLoad> ExtendedClientLoads { get; set; }
         public virtual DbSet<ClientLoadHistory> ClientLoadHistories { get; set; }
+        public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
+        public virtual DbSet<ClientSite> ClientSites { get; set; }
+        public virtual DbSet<Country> Countries { get; set; }
+        public virtual DbSet<Province> Provinces { get; set; }
+        public virtual DbSet<Address> Addresses { get; set; }
+        public virtual DbSet<DeliveryNote> DeliveryNotes { get; set; }
+        public virtual DbSet<Region> Regions { get; set; }
     }
 }

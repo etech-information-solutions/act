@@ -97,7 +97,6 @@
     <Compile Include="Enums\BroadcastType.cs" />
     <Compile Include="Enums\Timers.cs" />
     <Compile Include="Enums\BankAccountType.cs" />
-    <Compile Include="Enums\Province.cs" />
     <Compile Include="Enums\RoleType.cs" />
     <Compile Include="Enums\DocumentType.cs" />
     <Compile Include="Enums\Months.cs" />
@@ -215,6 +214,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ClientLoadQuantityService.cs" />
     <Compile Include="Services\ClientLoadHistoryService.cs" />
+    <Compile Include="Services\CountryService.cs" />
+    <Compile Include="Services\ProvinceService.cs" />
     <Compile Include="Services\ExtendedClientLoadService.cs" />
     <Compile Include="Services\ChepLoadChepService.cs" />
     <Compile Include="Services\PODCommentService.cs" />

@@ -18,13 +18,13 @@ namespace ACT.Data.Models
         public ClientLoad()
         {
             this.ChepClients = new HashSet<ChepClient>();
-            this.ClientAuthorisations = new HashSet<ClientAuthorisation>();
             this.ClientInvoices = new HashSet<ClientInvoice>();
             this.Journals = new HashSet<Journal>();
             this.Tasks = new HashSet<Task>();
             this.ClientLoadQuantities = new HashSet<ClientLoadQuantity>();
             this.ExtendedClientLoads = new HashSet<ExtendedClientLoad>();
             this.ClientLoadHistories = new HashSet<ClientLoadHistory>();
+            this.ClientAuthorisations = new HashSet<ClientAuthorisation>();
         }
     
         public int Id { get; set; }
@@ -88,11 +88,7 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientInvoice> ClientInvoices { get; set; }
-        public virtual ClientSite ClientSite { get; set; }
-        public virtual ClientSite ClientSite1 { get; set; }
         public virtual OutstandingReason OutstandingReason { get; set; }
         public virtual PODComment PODComment { get; set; }
         public virtual Transporter Transporter { get; set; }
@@ -112,5 +108,9 @@ namespace ACT.Data.Models
         public virtual ICollection<ExtendedClientLoad> ExtendedClientLoads { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoadHistory> ClientLoadHistories { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
+        public virtual ClientSite ClientSite { get; set; }
+        public virtual ClientSite ClientSite1 { get; set; }
     }
 }

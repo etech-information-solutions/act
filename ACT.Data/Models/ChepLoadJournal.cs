@@ -55,9 +55,9 @@ namespace ACT.Data.Models
         public string Version { get; set; }
         public string UID { get; set; }
     
-        public virtual ClientSite ClientSite { get; set; }
         public virtual OutstandingReason OutstandingReason { get; set; }
         public virtual Client Client { get; set; }
         public virtual ChepLoad ChepLoad { get; set; }
+        public virtual ClientSite ClientSite { get; set; }
     }
 }

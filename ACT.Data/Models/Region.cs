@@ -21,6 +21,8 @@ namespace ACT.Data.Models
         }
     
         public int Id { get; set; }
+        public Nullable<int> CountryId { get; set; }
+        public Nullable<int> ProvinceId { get; set; }
         public Nullable<int> RegionManagerId { get; set; }
         public int PSPId { get; set; }
         public System.DateTime CreatedOn { get; set; }
@@ -29,8 +31,9 @@ namespace ACT.Data.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public int Status { get; set; }
-        public Nullable<int> Province { get; set; }
     
+        public virtual Country Country { get; set; }
+        public virtual Province Province { get; set; }
         public virtual PSP PSP { get; set; }
         public virtual User User { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

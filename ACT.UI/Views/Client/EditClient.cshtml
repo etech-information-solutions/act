@@ -567,30 +567,11 @@
                 </div>
 
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.Address.Province )
+                    @Html.LabelFor( model => model.Address.ProvinceId )
                 </div>
                 <div class="editor-field">
-
-                    <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
-                        <option value="">-- select</option>
-                        @foreach ( int p in Enum.GetValues( typeof( Province ) ) )
-                        {
-                            Province province = ( Province ) p;
-
-                            string text = province.GetDisplayText();
-
-                            if ( text.ToLower() == "all" )
-                            {
-                                continue;
-                            }
-
-                            string sel = ( province == Model.Address.Province ) ? "selected=selected" : string.Empty;
-
-                            <option value="@p" @sel>@text</option>
-                        }
-                    </select>
-
-                    @Html.ValidationMessageFor( model => model.Address.Province )
+                    @Html.DropDownListFor( model => model.Address.ProvinceId, model => Model.Address.ProvinceOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.Address.ProvinceId )
                 </div>
 
             </div>

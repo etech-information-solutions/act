@@ -14,14 +14,14 @@
 }
 
 
-@Html.Partial("_Notification")
+@Html.Partial( "_Notification" )
 
 
 @{
     UserModel user = User.Get();
 
     int count = Model.Start;
-    List<Client> items = (List<Client>)Model.Items;
+    List<Client> items = ( List<Client> ) Model.Items;
 
     ClientService cservice = new ClientService();
 
@@ -29,7 +29,7 @@
 }
 
 
-@if (Model == null || !items.Any())
+@if ( Model == null || !items.Any() )
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
         There are no Clients available matching your search criteria.
@@ -37,12 +37,12 @@
 }
 
 @*@if (user.IsAdmin || user.IsPSPAdmin)
-{
-    <p>
-        @Html.ActionLink("Add", "AddClient", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Client?", @data_edit = "1", @data_id = 0, @data_target = "#clientlist" })
-        <span class="loader"></span>
-    </p>
-}*@
+    {
+        <p>
+            @Html.ActionLink("Add", "AddClient", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Client?", @data_edit = "1", @data_id = 0, @data_target = "#clientlist" })
+            <span class="loader"></span>
+        </p>
+    }*@
 
 
 <table id="awaitingactivation-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#awaitingactivation-table_wrapper" data-starting-point=".ap-tabs ul">
@@ -85,25 +85,27 @@
     </thead>
 
     <tbody>
-        @if (Model != null && items != null && items.Count() > 0)
+        @if ( Model != null && items != null && items.Count() > 0 )
         {
-            foreach (var item in items)
+            foreach ( var item in items )
             {
-                Status status = (Status)item.Status;
+                Status status = ( Status ) item.Status;
 
-                string active = status.Equals(Status.Active) ? "active" : "inactive";
-                string enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+                string active = status.Equals( Status.Active ) ? "active" : "inactive";
+                string enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
                 Address addr = new Address();
                 string addressline1 = "";
                 string suburb = "";
                 string town = "";
                 string province = "";
-                using (AddressService aservice = new AddressService())
+
+                using ( AddressService aservice = new AddressService() )
                 {
-                    addr = aservice.Get(item.Id, "Client");
-                    if (addr != null)
+                    addr = aservice.Get( item.Id, "Client" );
+
+                    if ( addr != null )
                     {
-                        province = ((Province)addr.Province).GetDisplayText();
+                        province = addr.Province?.Description;
                         addressline1 = addr.Addressline1;
                         suburb = addr.Addressline2;
                         town = addr.Town;
@@ -146,11 +148,11 @@
                     </td>
 
                     <td width="15%">
-                        @Html.ActionLink("Details", "ClientDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        @Html.ActionLink( "Details", "ClientDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
 
-                        @Html.ActionLink("Edit", "EditClient", new { id = item.Id, returnView = "AwaitingActivation" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        @Html.ActionLink( "Edit", "EditClient", new { id = item.Id, returnView = "AwaitingActivation" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
 
-                        @Html.ActionLink(enable, "DeleteClient", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#awaitingactivation", @rel = "tipsyE", @title = enable + " this item?" })
+                        @Html.ActionLink( enable, "DeleteClient", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#awaitingactivation", @rel = "tipsyE", @title = enable + " this item?" } )
 
                     </td>
 
@@ -166,4 +168,4 @@
 
 @*@Html.Partial( "_PSPCustomSearch", new ACT.Core.Models.CustomSearchModel( "PSP" ) )*@
 
-@Html.Partial("_Paging")
+@Html.Partial( "_Paging" )

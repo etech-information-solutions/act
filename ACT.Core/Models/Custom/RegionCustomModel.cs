@@ -20,5 +20,8 @@ namespace ACT.Core.Models.Custom
         public string PSPName { get; set; }
         public string RegionManagerEmail { get; set; }
         public string RegionManagerName { get; set; }
+
+        public string CountryName { get; set; }
+        public string ProvinceName { get; set; }
     }
 }

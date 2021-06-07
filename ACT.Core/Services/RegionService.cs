@@ -144,12 +144,17 @@ namespace ACT.Core.Services
             string query = @"SELECT
                                 r.*,
                                 p.CompanyName AS [PSPName],
+                                p.CompanyName AS [PSPName],
+                                c.[Name] AS [CountryName],
                                 u.Email AS [RegionManagerEmail],
+                                pv.[Description] AS [ProvinceName],
                                 u.Name + ' ' + u.Surname AS [RegionManagerName]
                              FROM
                                 [dbo].[Region] r
                                 INNER JOIN [dbo].[PSP] p ON p.Id=r.PSPId
-                                LEFT OUTER JOIN [dbo].[User] u ON u.Id=r.RegionManagerId";
+                                LEFT OUTER JOIN [dbo].[User] u ON u.Id=r.RegionManagerId
+                                LEFT OUTER JOIN [dbo].[Country] c ON c.Id=r.CountryId
+                                LEFT OUTER JOIN [dbo].[Province] pv ON pv.Id=r.ProvinceId";
 
             // WHERE
 

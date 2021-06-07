@@ -39,6 +39,12 @@ namespace ACT.Core.Services
             return context.Disputes.FirstOrDefault( d => d.DocketNumber == docketNumber );
         }
 
+        /// <summary>
+        /// Gets a total count of Client Disputes matching the specified search params
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
         public int Total1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
@@ -70,10 +76,15 @@ namespace ACT.Core.Services
 	                            COUNT(d.[Id]) AS [Total]
                              FROM
 	                            [dbo].[Dispute] d
-                                LEFT OUTER JOIN [dbo].[DisputeReason] dr ON dr.[Id]=d.[DisputeReasonId]
-                                LEFT OUTER JOIN [dbo].[ChepLoad] cl ON cl.[Id]=d.[ChepLoadId]
                                 LEFT OUTER JOIN [dbo].[User] u1 ON u1.[Id]=d.[ActionedById]
-                                LEFT OUTER JOIN [dbo].[User] u2 ON u2.[Id]=d.[ResolvedById]";
+                                LEFT OUTER JOIN [dbo].[User] u2 ON u2.[Id]=d.[ResolvedById]
+                                LEFT OUTER JOIN [dbo].[DisputeReason] dr ON dr.[Id]=d.[DisputeReasonId]
+                                LEFT OUTER JOIN [dbo].[ChepLoad] ch ON ch.[Id]=(SELECT TOP 1 ch1.[Id] FROM [dbo].[ChepLoad] ch1 WHERE ch1.[DocketNumber]=d.[DocketNumber])
+                                LEFT OUTER JOIN [dbo].[ClientLoad] cl ON cl.[Id]=(SELECT TOP 1 cl1.[Id] FROM [dbo].[ClientLoad] cl1 WHERE cl1.[ReceiverNumber]=d.[Reference] OR cl1.[ReceiverNumber]=d.[OtherReference])
+                                LEFT OUTER JOIN [dbo].[ClientSite] cs1 ON cs1.[Id]=cl.[ClientSiteId]
+                                LEFT OUTER JOIN [dbo].[ClientSite] cs2 ON cs2.[Id]=cl.[ToClientSiteId]
+                                LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs1.[SiteId]
+                                LEFT OUTER JOIN [dbo].[Site] s2 ON s2.[Id]=cs2.[SiteId]";
 
             // WHERE
 
@@ -84,36 +95,15 @@ namespace ACT.Core.Services
             // Limit to only show Disputes for logged in user
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $@"{query} AND EXISTS(SELECT
-                                                1
-                                              FROM
-                                                [dbo].[PSPUser] pu
-                                              WHERE
-                                                (pu.UserId=@userid) AND
-                                                (EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc
-                                                        INNER JOIN [dbo].[ClientLoad] cl1 ON cl1.[ClientId]=pc.[ClientId]
-                                                        INNER JOIN [dbo].[ChepClient] cc ON (cc.[ClientLoadsId]=cl1.[Id] AND cc.[ChepLoadsId]=cl.[Id])
-                                                        WHERE
-                                                            (pc.[PSPId]=pu.[PSPId])
-                                                       )
-                                                )
-                                             ) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=ch.[ClientId] AND pu.[UserId]=@userid) ";
             }
             else if ( CurrentUser.RoleType == RoleType.Client )
             {
-                query = $@"{query} AND EXISTS(SELECT
-                                                1
-                                              FROM
-                                                [dbo].[ClientUser] cu 
-                                              WHERE
-                                                (cu.UserId=@userid) AND
-                                                (EXISTS(SELECT 1 FROM [dbo].[ClientLoad] cl1
-                                                        INNER JOIN [dbo].[ChepClient] cc ON (cc.[ClientLoadsId]=cl1.[Id] AND cc.[ChepLoadsId]=cl.[Id])
-                                                        WHERE
-                                                            (cl1.[ClientId]=cu.[ClientId])
-                                                       )
-                                                )
-                                             ) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=ch.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Transporter )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Transporter] t WHERE t.[Id]=cl.[TransporterId] AND t.[Email]=@useremail)";
             }
 
             #endregion
@@ -140,7 +130,7 @@ namespace ACT.Core.Services
             }
             if ( csm.SiteId != 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[Id]=cl.[ClientSiteId] AND cs.SiteId=@csmSiteId) ";
+                query = $"{query} AND (s.SiteId=@csmSiteId) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -231,16 +221,26 @@ namespace ACT.Core.Services
 
             string query = @"SELECT
 	                            d.*,
+	                            ch.Id AS [ChepLoadId],
+	                            cl.Id AS [ClientLoadId],
+                                s.Description AS [SiteName],
+	                            cl.LoadNumber AS [LoadNumber],
+                                s2.Description AS [ToSiteName],
 	                            dr.Reason AS [DisputeReasonDetails],
 	                            u1.Name + ' ' + u1.Surname AS [ActionUser],
 	                            u2.Name + ' ' + u2.Surname AS [ResolvedUser],
 	                            (SELECT TOP 1 k.[Disputes] FROM [dbo].[ClientKPI] k WHERE k.[ClientId]=cl.[ClientId]) AS [Disputes]
                              FROM
 	                            [dbo].[Dispute] d
-                                LEFT OUTER JOIN [dbo].[DisputeReason] dr ON dr.[Id]=d.[DisputeReasonId]
-                                LEFT OUTER JOIN [dbo].[ChepLoad] cl ON cl.[Id]=d.[ChepLoadId]
                                 LEFT OUTER JOIN [dbo].[User] u1 ON u1.[Id]=d.[ActionedById]
-                                LEFT OUTER JOIN [dbo].[User] u2 ON u2.[Id]=d.[ResolvedById]";
+                                LEFT OUTER JOIN [dbo].[User] u2 ON u2.[Id]=d.[ResolvedById]
+                                LEFT OUTER JOIN [dbo].[DisputeReason] dr ON dr.[Id]=d.[DisputeReasonId]
+                                LEFT OUTER JOIN [dbo].[ChepLoad] ch ON ch.[Id]=(SELECT TOP 1 ch1.[Id] FROM [dbo].[ChepLoad] ch1 WHERE ch1.[DocketNumber]=d.[DocketNumber])
+                                LEFT OUTER JOIN [dbo].[ClientLoad] cl ON cl.[Id]=(SELECT TOP 1 cl1.[Id] FROM [dbo].[ClientLoad] cl1 WHERE cl1.[ReceiverNumber]=d.[Reference] OR cl1.[ReceiverNumber]=d.[OtherReference])
+                                LEFT OUTER JOIN [dbo].[ClientSite] cs1 ON cs1.[Id]=cl.[ClientSiteId]
+                                LEFT OUTER JOIN [dbo].[ClientSite] cs2 ON cs2.[Id]=cl.[ToClientSiteId]
+                                LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs1.[SiteId]
+                                LEFT OUTER JOIN [dbo].[Site] s2 ON s2.[Id]=cs2.[SiteId]";
 
             // WHERE
 
@@ -251,36 +251,15 @@ namespace ACT.Core.Services
             // Limit to only show Disputes for logged in user
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $@"{query} AND EXISTS(SELECT
-                                                1
-                                              FROM
-                                                [dbo].[PSPUser] pu
-                                              WHERE
-                                                (pu.UserId=@userid) AND
-                                                (EXISTS(SELECT 1 FROM [dbo].[PSPClient] pc
-                                                        INNER JOIN [dbo].[ClientLoad] cl1 ON cl1.[ClientId]=pc.[ClientId]
-                                                        INNER JOIN [dbo].[ChepClient] cc ON (cc.[ClientLoadsId]=cl1.[Id] AND cc.[ChepLoadsId]=cl.[Id])
-                                                        WHERE
-                                                            (pc.[PSPId]=pu.[PSPId])
-                                                       )
-                                                )
-                                             ) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=ch.[ClientId] AND pu.[UserId]=@userid) ";
             }
             else if ( CurrentUser.RoleType == RoleType.Client )
             {
-                query = $@"{query} AND EXISTS(SELECT
-                                                1
-                                              FROM
-                                                [dbo].[ClientUser] cu 
-                                              WHERE
-                                                (cu.UserId=@userid) AND
-                                                (EXISTS(SELECT 1 FROM [dbo].[ClientLoad] cl1
-                                                        INNER JOIN [dbo].[ChepClient] cc ON (cc.[ClientLoadsId]=cl1.[Id] AND cc.[ChepLoadsId]=cl.[Id])
-                                                        WHERE
-                                                            (cl1.[ClientId]=cu.[ClientId])
-                                                       )
-                                                )
-                                             ) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=ch.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Transporter )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Transporter] t WHERE t.[Id]=cl.[TransporterId] AND t.[Email]=@useremail)";
             }
 
             #endregion
@@ -307,7 +286,7 @@ namespace ACT.Core.Services
             }
             if ( csm.SiteId != 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[Id]=cl.[ClientSiteId] AND cs.SiteId=@csmSiteId) ";
+                query = $"{query} AND (s.SiteId=@csmSiteId) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )

@@ -1,0 +1,59 @@
+﻿@model AuthorisationCodeViewModel
+
+@using ACT.UI.Models;
+
+@{
+    /**/
+
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Edit Authorisation Comment";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "EditAuthorisationComment", "Pallet", FormMethod.Post, new { @data_ajax_form = "1", @data_target = "#authorisationcodes", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content( "~/images/edit.png" )" />
+            <span>Edit Authorisation Comment</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        @Html.HiddenFor( model => model.Id )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="left" style="width: 47%; margin-right: 4%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Comment )
+                </div>
+                <div class="editor-field">
+                    @Html.TextAreaFor( model => model.Comment, 5, 10, new { @class = "input", @required="1", @placeholder = "Enter your comment" } )
+                    @Html.ValidationMessageFor( model => model.Comment )
+                </div>
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+            </p>
+
+        </div>
+
+    </div>
+}

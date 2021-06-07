@@ -240,7 +240,7 @@
                 Customer Account Number:
             </div>
             <div class="display-field">
-                @Html.Raw( ( !string.IsNullOrWhiteSpace( Model?.FromClientSiteName?.Site?.AccountCode ) ? Model?.FromClientSiteName?.Site?.AccountCode : "&nbsp;" ) )
+                @Html.Raw( ( !string.IsNullOrWhiteSpace( Model?.FromClientSiteName?.AccountingCode ) ? Model?.FromClientSiteName?.AccountingCode : "&nbsp;" ) )
             </div>
 
             <div class="edit-label">
@@ -688,11 +688,15 @@
                     <span style="padding: 0 5px;">/</span>
                 }
 
-                <a data-upload-pod="1" data-id="@Model.Id">
-                    Upload POD
-                    <span id="loader"></span>
-                </a>
-                <span style="padding: 0 5px;"></span>
+                @if ( Model.Id > 0 )
+                {
+                    <a data-upload-pod="1" data-id="@Model.Id">
+                        Upload POD
+                        <span id="loader"></span>
+                    </a>
+
+                    <span style="padding: 0 5px;"></span>
+                }
 
                 <a data-load-disputes="1" data-id="@Model.Id" class="@( Model.HasDisputes ? "" : "disabled" )">
                     Disputes
@@ -706,11 +710,14 @@
                 </a>
                 <span style="padding: 0 5px;"></span>
 
-                <a data-view-pod="1" data-id="@Model.Id" class="@( Model.HasPOD ? "" : "disabled" )">
-                    View POD
-                    <span id="loader"></span>
-                </a>
-                <span style="padding: 0 5px;"></span>
+                @if ( Model.Id > 0 )
+                {
+                    <a data-view-pod="1" data-id="@Model.Id" class="@( Model.HasPOD ? "" : "disabled" )">
+                        View POD
+                        <span id="loader"></span>
+                    </a>
+                    <span style="padding: 0 5px;"></span>
+                }
 
                 <a data-control-doc="1" data-id="@Model.Id" class="disabled">
                     Control DOC

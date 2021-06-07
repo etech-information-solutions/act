@@ -439,9 +439,6 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Account\ForgotPassword.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\ResetPassword.cshtml" />
@@ -544,7 +541,6 @@
     <Content Include="Views\Shared\_AwaitingActivationCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ManageTransportersCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ClientGroupsCustomSearch.cshtml" />
-    <Content Include="Views\Client\partials\_ManageSitesList.cshtml" />
     <Content Include="Views\Client\bak_ManageSites.cshtml" />
     <Content Include="Views\Shared\_ListDocuments.cshtml" />
     <Content Include="Views\Client\_ClientKPI.cshtml" />
@@ -560,14 +556,6 @@
     <Content Include="Views\Pallet\_ReconcileInvoices.cshtml" />
     <Content Include="Views\Pallet\_ReconcileLoads.cshtml" />
     <Content Include="Views\Finance\Index.cshtml" />
-    <Content Include="Views\Generic\_ClientData.cshtml" />
-    <Content Include="Views\Generic\_Disputes.cshtml" />
-    <Content Include="Views\Generic\_Exceptions.cshtml" />
-    <Content Include="Views\Generic\_GenerateDeliveryNote.cshtml" />
-    <Content Include="Views\Generic\_PoolingAgentData.cshtml" />
-    <Content Include="Views\Generic\_ReconcileInvoice.cshtml" />
-    <Content Include="Views\Generic\_ReconcileLoads.cshtml" />
-    <Content Include="Views\Generic\Index.cshtml" />
     <Content Include="Views\ClientReporting\Index.cshtml" />
     <Content Include="Views\ClientReporting\_Disputes.cshtml" />
     <Content Include="Views\Shared\_DisputesCustomSearch.cshtml" />
@@ -577,7 +565,6 @@
     <Content Include="Views\Pallet\EditClientData.cshtml" />
     <Content Include="Views\Shared\_PoolingAgentDataCustomSearch.cshtml" />
     <Content Include="Views\Shared\_ClientDataCustomSearch.cshtml" />
-    <Content Include="Views\Pallet\__AddDeliveryNote.cshtml" />
     <Content Include="Views\Pallet\_EditDeliveryNote.cshtml" />
     <Content Include="Views\Pallet\AddDeliveryNote.cshtml" />
     <Content Include="Views\ClientReporting\AddChepAudit.cshtml" />
@@ -716,6 +703,9 @@
     <Content Include="Views\Pallet\_ChepLoadJournals.cshtml" />
     <Content Include="Views\Pallet\_ChepLoadShipments.cshtml" />
     <Content Include="Views\Shared\_ClientSiteResults.cshtml" />
+    <Content Include="Views\Pallet\_SiteContactDetails.cshtml" />
+    <Content Include="Views\Pallet\_TransporterContactDetails.cshtml" />
+    <Content Include="Views\Pallet\EditAuthorisationComment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

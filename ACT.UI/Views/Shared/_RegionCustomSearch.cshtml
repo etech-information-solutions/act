@@ -32,10 +32,10 @@
             <div class="left" style="width: 49%;">
 
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.Province )
+                    @Html.LabelFor( model => model.ProvinceId )
                 </div>
                 <div class="editor-field">
-                    @Html.EnumDropDownFor( model => model.Province, false, true, new { @class = "chzn", @style = "width: 100%;" } )
+                    @Html.DropDownListFor( model => model.ProvinceId, model => Model.ProvinceOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
                 </div>
 
             </div>

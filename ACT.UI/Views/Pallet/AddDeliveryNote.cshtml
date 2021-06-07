@@ -151,11 +151,11 @@
                 </div>
 
                 <div class="edit-label">
-                    @Html.LabelFor( model => model.CustomerProvince )
+                    @Html.LabelFor( model => model.CustomerProvinceId )
                 </div>
                 <div class="edit-field">
-                    @Html.EnumDropDownFor( model => model.CustomerProvince, true, new { @class = "chzn", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.CustomerProvince )
+                    @Html.DropDownListFor( model => model.CustomerProvinceId, model => Model.ProvinceOptions, p => p.Key, p => p.Value, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.CustomerProvinceId )
                 </div>
 
             </div>
@@ -198,11 +198,11 @@
                 </div>
 
                 <div class="edit-label">
-                    @Html.LabelFor( model => model.DeliveryProvince )
+                    @Html.LabelFor( model => model.DeliveryProvinceId )
                 </div>
                 <div class="edit-field">
-                    @Html.EnumDropDownFor( model => model.DeliveryProvince, true, new { @class = "chzn", @style = "width: 98%;", data_field = "Province" } )
-                    @Html.ValidationMessageFor( model => model.DeliveryProvince )
+                    @Html.DropDownListFor( model => model.DeliveryProvinceId, model => Model.ProvinceOptions, p => p.Key, p => p.Value, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.DeliveryProvinceId )
                 </div>
 
             </div>
@@ -247,11 +247,11 @@
                 </div>
 
                 <div class="edit-label">
-                    @Html.LabelFor( model => model.BillingProvince )
+                    @Html.LabelFor( model => model.BillingProvinceId )
                 </div>
                 <div class="edit-field">
-                    @Html.EnumDropDownFor( model => model.BillingProvince, true, new { @class = "chzn", @style = "width: 98%;", data_field = "Province" } )
-                    @Html.ValidationMessageFor( model => model.BillingProvince )
+                    @Html.DropDownListFor( model => model.BillingProvinceId, model => Model.ProvinceOptions, p => p.Key, p => p.Value, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.BillingProvinceId )
                 </div>
 
             </div>

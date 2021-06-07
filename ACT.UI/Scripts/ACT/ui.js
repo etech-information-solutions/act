@@ -160,6 +160,7 @@
             this.DataLoadDisputes( $( '*[data-load-disputes="1"]' ) );
             this.DataLoadMovements( $( '*[data-load-movements="1"]' ) );
             this.DataClientLoadJournal( $( '*[data-clientload-journal="1"]' ) );
+            this.DataUpdateOutstandingReason( $( '*[data-update-outstanding-reason="1"]' ) );
 
             // Chep Load Buttons
             this.DataChepLoadJournal( $( '*[data-chepload-journal="1"]' ) );
@@ -1700,8 +1701,8 @@
                 Skip: ACT.UI[t].PageSkip || ACT.UI.PageSkip || 0,
                 Take: ACT.UI[t].PageLength || ACT.UI.PageLength || 50,
                 Page: ACT.UI[t].PageNumber || ACT.UI.PageNumber || 0,
-                Sort: ACT.UI[t].PageSort || ACT.UI.PageSort || "ASC",
-                SortBy: ACT.UI[t].PageSortBy || ACT.UI.PageSortBy || "Id",
+                Sort: ACT.UI[t].PageSort || ACT.UI.PageSort || "DESC",
+                SortBy: ACT.UI[t].PageSortBy || ACT.UI.PageSortBy || "CreatedOn",
                 UserId: ACT.UI[t].PageUserId || ACT.UI.PageUserId || 0,
                 Status: ACT.UI[t].PageStatus || ACT.UI.PageStatus || -1,
                 DisputeStatus: ACT.UI[t].PageDisputeStatus || ACT.UI.PageDisputeStatus || -1,
@@ -1752,8 +1753,8 @@
             ACT.UI[t].PageSkip = ACT.UI.PageSkip = 0;
             ACT.UI[t].PageNumber = ACT.UI.PageNumber = 1;
             ACT.UI[t].PageLength = ACT.UI.PageLength = 50;
-            ACT.UI[t].PageSort = ACT.UI.PageSort = "ASC";
-            ACT.UI[t].PageSortBy = ACT.UI.PageSortBy = "Id";
+            ACT.UI[t].PageSort = ACT.UI.PageSort = "DESC";
+            ACT.UI[t].PageSortBy = ACT.UI.PageSortBy = "CreatedOn";
             ACT.UI[t].PageUserId = ACT.UI.PageUserId = 0;
             ACT.UI[t].PageSiteId = ACT.UI.PageSiteId = 0;
             ACT.UI[t].PageStatus = ACT.UI.PageStatusId = -1;
@@ -5904,6 +5905,34 @@
                         }, 700 );
                     } );
             } );
+        },
+
+        DataUpdateOutstandingReason: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        ACT.Loader.Show( i.parent().find( "#loader" ) );
+
+                        $( "<div />" ).load( siteurl + "UpdateOutstandingReason", { id: id, orid: $( this ).val() }, function ( d )
+                        {
+                            ACT.Modal.Open( $( this ).html(), "Update Outstanding Reason", false, [] );
+
+                            setTimeout( function ()
+                            {
+                                $( ACT.Modal.Container ).find( ".notification" ).stop().slideDown( 700 );
+                            }, 900 );
+
+                            ACT.Loader.Hide();
+                        } );
+                    } );
+            } )
         }
     };
 } )();

@@ -48,7 +48,10 @@
             <th data-name="Description" data-column="Description">
                 Description
             </th>
-            <th data-name="Province" data-column="Province">
+            <th data-name="Country" data-column="c.Name">
+                Country
+            </th>
+            <th data-name="Province" data-column="pv.Description">
                 Province
             </th>
             <th data-name="RegionalManagerId" data-column="RegionalManagerId">
@@ -93,7 +96,10 @@
                         @item.Description
                     </td>
                     <td>
-                        @( item.Province.HasValue ? ( ( Province ) item.Province ).GetDisplayText() : string.Empty )
+                        @( item.CountryName )
+                    </td>
+                    <td>
+                        @( item.ProvinceName )
                     </td>
                     <td>
                         @item.RegionManagerName

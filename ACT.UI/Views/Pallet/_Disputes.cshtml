@@ -1,10 +1,7 @@
 ﻿@model PagingExtension
 
-@using ACT.Data.Models;
 @using ACT.Core.Enums;
-@using ACT.Core.Models;
 @using ACT.Core.Models.Custom;
-@using ACT.Core.Services;
 @using ACT.Core.Models;
 
 @{
@@ -79,6 +76,15 @@
             <th data-name="DisputeReasonDetails" data-column="dr.Reason">
                 Reason
             </th>
+            <th data-name="SupplierFrom" data-column="s.Name">
+                Supplier From
+            </th>
+            <th data-name="LoadNumber" data-column="cl.LoadNumber">
+                Shipment #
+            </th>
+            <th data-name="CustomerTo" data-column="s1.Name">
+                Customer To
+            </th>
             <th data-name="Actions">
                 Actions
             </th>
@@ -96,7 +102,7 @@
                 string active = ( status == DisputeStatus.Active || status == DisputeStatus.Resolved ) ? "active" : "inactive";
 
 
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+                <tr id="disputes-@item.Id-item" class="disputes-@item.Id-item @active">
 
                     <td width="1%">
                         @count
@@ -141,12 +147,45 @@
                     <td>
                         @item.DisputeReasonDetails
                     </td>
+                    <td>
+                        @item.SiteName
+                    </td>
+                    <td>
+                        @item.LoadNumber
+                    </td>
+                    <td>
+                        @item.ToSiteName
+                    </td>
                     <td width="15%">
-                        @Html.ActionLink( "Details", "DisputeDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink( "Details", "DisputeDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".disputes-" + item.Id + "-item" } )
 
-                        @Html.ActionLink( "Edit", "EditDispute", new { id = item.Id, returnView = "Disputes" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink( "Edit", "EditDispute", new { id = item.Id, returnView = "Disputes" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".disputes-" + item.Id + "-item" } )
 
-                        @Html.ActionLink( enable, "DeleteDispute", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#disputes", @rel = "tipsyE", @title = enable + " this item?" } )
+                        @Html.ActionLink( enable, "DeleteDispute", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#disputes-" + item.Id + "-item", @data_refresh_target = "#disputes", @rel = "tipsyE", @title = enable + " this item?" } )
+
+                        @if ( item.ClientLoadId.HasValue )
+                        {
+                            <div style="border-top: 1px dashed #ccc; padding-top: 5px; margin-top: 5px; text-align: center;">
+
+                                @Html.ActionLink( "Load Details", "EditClientData", new { id = ( item.ClientLoadId ?? -1 ), cheploadId = item.ChepLoadId }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".disputes-" + item.Id + "-item" } )
+
+                            </div>
+
+                            <div style="border-top: 1px dashed #ccc; padding-top: 10px; margin-top: 5px; text-align: center;">
+
+                                <a class="docs" data-upload-pod="1" data-id="@item.ClientLoadId">
+                                    Upload POD
+                                    <span id="loader"></span>
+                                </a>
+
+                                <a class="download" data-view-pod="1" data-id="@item.ClientLoadId">
+                                    View POD
+                                    <span id="loader"></span>
+                                </a>
+
+                            </div>
+                        }
+
                     </td>
 
 

@@ -48,11 +48,19 @@
                 </div>
 
                 <div class="edit-label">
-                    @Html.LabelFor( model => model.Province )
+                    @Html.LabelFor( model => model.CountryId )
                 </div>
                 <div class="edit-field">
-                    @Html.EnumDropDownFor( model => model.Province, false, new { @class = "chzn", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.Province )
+                    @Html.DropDownListFor( model => model.CountryId, model => Model.CountryOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.CountryId )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.ProvinceId )
+                </div>
+                <div class="edit-field">
+                    @Html.DropDownListFor( model => model.ProvinceId, model => Model.ProvinceOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.ProvinceId )
                 </div>
 
             </div>

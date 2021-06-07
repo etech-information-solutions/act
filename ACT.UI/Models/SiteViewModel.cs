@@ -6,6 +6,7 @@ using System.Web;
 using ACT.Core.Enums;
 using ACT.Core.Services;
 using ACT.Data.Models;
+
 namespace ACT.UI.Models
 {
     public class SiteViewModel
@@ -124,6 +125,42 @@ namespace ACT.UI.Models
         [Display( Name = "CL Code" )]
         [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string CLCode { get; set; }
+
+        
+
+        [Display( Name = "Client Sales Manager" )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string ClientSalesManager { get; set; }
+
+        [Display( Name = "Client Manager Contact" )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string ClientManagerContact { get; set; }
+
+        [Display( Name = "Client Manager Email" )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string ClientManagerEmail { get; set; }
+
+        [Display( Name = "Client Sales Rep Contact" )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string ClientSalesRepContact { get; set; }
+
+        [Display( Name = "Client Sales Rep Email" )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string ClientSalesRegEmail { get; set; }
+
+        [Display( Name = "Authorisation Email 1" )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string AuthorisationEmail1 { get; set; }
+
+        [Display( Name = "Authorisation Email 2" )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string AuthorisationEmail2 { get; set; }
+
+        [Display( Name = "Authorisation Email 3" )]
+        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string AuthorisationEmail3 { get; set; }
+
+
 
         public bool EditMode { get; set; }
 

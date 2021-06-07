@@ -208,6 +208,7 @@ namespace ACT.Core.Services
                                 s1.Description AS [FromSiteName],
                                 ca.Id AS [ClientAuthorisationId],
                                 t.TradingName AS [TransporterName],
+                                ca.Comment AS [AuthorisationComment],
                                 v.Registration AS [VehicleRegistration],
                                 ca.AuthorisationDate AS [AuthorisationDate],
                                 u.Name + ' ' + u.Surname AS [AuthoriserName]

@@ -153,6 +153,9 @@
     <Compile Include="Models\Contact.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Country.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\DeclineReason.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
@@ -202,6 +205,9 @@
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ProductPrice.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Province.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\PSP.cs">

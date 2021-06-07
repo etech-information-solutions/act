@@ -29,7 +29,7 @@
 
         @Html.ValidationSummary( true )
 
-        <div class="left" style="width: 45%; margin-right: 4%;">
+        <div class="left" style="width: 31%; margin-right: 2%;">
 
             <div class="editor-label">
                 @Html.LabelFor( model => model.ClientId )
@@ -145,7 +145,7 @@
 
         </div>
 
-        <div class="left" style="width: 45%;">
+        <div class="left" style="width: 31%; margin-right: 2%;">
 
             <div class="editor-label">
                 @Html.LabelFor( model => model.Longitude )
@@ -261,9 +261,77 @@
 
         </div>
 
+        <div class="left" style="width: 31%;">
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.AuthorisationEmail1 )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.AuthorisationEmail1, new { @class = "input", @placeholder = "Enter Authorisation Email 1" } )
+                @Html.ValidationMessageFor( model => model.AuthorisationEmail1 )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.AuthorisationEmail2 )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.AuthorisationEmail2, new { @class = "input", @placeholder = "Enter Authorisation Email 2" } )
+                @Html.ValidationMessageFor( model => model.AuthorisationEmail2 )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.AuthorisationEmail3 )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.AuthorisationEmail3, new { @class = "input", @placeholder = "Enter Authorisation Email 3" } )
+                @Html.ValidationMessageFor( model => model.AuthorisationEmail3 )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ClientSalesManager )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ClientSalesManager, new { @class = "input", @placeholder = "Enter Client Sales Manager" } )
+                @Html.ValidationMessageFor( model => model.ClientSalesManager )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ClientManagerContact )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ClientManagerContact, new { @class = "input", @placeholder = "Enter Client Manager Contact" } )
+                @Html.ValidationMessageFor( model => model.ClientManagerContact )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ClientManagerEmail )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ClientManagerEmail, new { @class = "input", @placeholder = "Enter Client Manager Email" } )
+                @Html.ValidationMessageFor( model => model.ClientManagerEmail )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ClientSalesRepContact )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ClientSalesRepContact, new { @class = "input", @placeholder = "Enter Client Sales Rep Contact" } )
+                @Html.ValidationMessageFor( model => model.ClientSalesRepContact )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ClientSalesRegEmail )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ClientSalesRegEmail, new { @class = "input", @placeholder = "Enter Client Sales Rep Email" } )
+                @Html.ValidationMessageFor( model => model.ClientSalesRegEmail )
+            </div>
+
+        </div>
+
         <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 
-        <div class="left grouped-area" style="width: 40%; margin-right: 5%;">
+        <div class="left grouped-area" style="width: 45%; margin-right: 3%;">
 
             <div class="editor-label">
                 <p>
@@ -305,7 +373,7 @@
 
         </div>
 
-        <div class="left grouped-area" style="width: 40%;">
+        <div class="left grouped-area" style="width: 45%;">
 
             <p>
                 <strong class="uppercase">Address Details</strong>
@@ -344,30 +412,11 @@
             </div>
 
             <div class="editor-label">
-                @Html.LabelFor( model => model.Address.Province )
+                @Html.LabelFor( model => model.Address.ProvinceId )
             </div>
             <div class="editor-field">
-
-                <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
-                    <option value="">-- select</option>
-                    @foreach ( int p in Enum.GetValues( typeof( Province ) ) )
-                    {
-                        Province province = ( Province ) p;
-
-                        string text = province.GetDisplayText();
-
-                        if ( text.ToLower() == "all" )
-                        {
-                            continue;
-                        }
-
-                        string sel = ( province == Model.Address.Province ) ? "selected=selected" : string.Empty;
-
-                        <option value="@p" @sel>@text</option>
-                    }
-                </select>
-
-                @Html.ValidationMessageFor( model => model.Address.Province )
+                @Html.DropDownListFor( model => model.Address.ProvinceId, model => Model.Address.ProvinceOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.Address.ProvinceId )
             </div>
 
         </div>

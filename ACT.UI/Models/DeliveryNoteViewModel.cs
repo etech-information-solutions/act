@@ -46,7 +46,7 @@ namespace ACT.UI.Models
         public string CustomerPostalCode { get; set; }
 
         [Display( Name = "Province" )]
-        public Province CustomerProvince { get; set; }
+        public int? CustomerProvinceId { get; set; }
 
         [Display( Name = "Contact Number" )]
         public string ContactNumber { get; set; }
@@ -67,7 +67,7 @@ namespace ACT.UI.Models
         public string DeliveryPostalCode { get; set; }
 
         [Display( Name = "Province" )]
-        public Province DeliveryProvince { get; set; }
+        public int? DeliveryProvinceId { get; set; }
 
 
         [Display( Name = "Billing Address" )]
@@ -85,7 +85,7 @@ namespace ACT.UI.Models
         public string BillingPostalCode { get; set; }
 
         [Display( Name = "Province" )]
-        public Province BillingProvince { get; set; }
+        public int? BillingProvinceId { get; set; }
 
 
         [Display( Name = "Invoice Number" )]
@@ -128,6 +128,19 @@ namespace ACT.UI.Models
 
 
         #region Model Options
+
+        public Dictionary<int, string> ProvinceOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+
+                using ( ProvinceService pservice = new ProvinceService() )
+                {
+                    return pservice.List( true );
+                }
+            }
+        }
 
         public Dictionary<int, string> ClientOptions
         {

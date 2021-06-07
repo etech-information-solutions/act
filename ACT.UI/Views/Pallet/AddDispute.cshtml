@@ -30,13 +30,13 @@
 
             <div class="left" style="width: 31%; margin-right: 3%;">
 
-                <div class="editor-label">
+                @*<div class="editor-label">
                     @Html.LabelFor( model => model.ChepLoadId )
                 </div>
                 <div class="editor-field">
                     @Html.DropDownListFor( model => model.ChepLoadId, model => model.ChepLoadOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @data_dispute_chepload = "1", @data_target = ".cheploaded", @style = "width: 98%;" } )
                     @Html.ValidationMessageFor( model => model.ChepLoadId )
-                </div>
+                </div>*@
 
                 <div class="edit-label">
                     @Html.LabelFor( model => model.DaysLeft )

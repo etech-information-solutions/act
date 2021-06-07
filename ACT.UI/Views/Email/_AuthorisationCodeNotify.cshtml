@@ -64,10 +64,13 @@
                         Vehicle: <b>@(Model?.ClientLoad?.Vehicle.Registration))</b>
                     </li>
                     <li>
-                        From: <b>@(Model?.ClientLoad?.ClientSite?.Site?.Description)) (Contact: @(Model?.ClientLoad?.ClientSite?.Site?.ReceivingContact) / @(Model?.ClientLoad?.ClientSite?.Site?.ReceivingContactNo) / @(Model?.ClientLoad?.ClientSite?.Site?.ReceivingEmail))</b>
+                        From Supplier: <b>@(Model?.ClientLoad?.ClientSite?.Site?.Description)) (Contact: @(Model?.ClientLoad?.ClientSite?.Site?.ReceivingContact) / @(Model?.ClientLoad?.ClientSite?.Site?.ReceivingContactNo) / @(Model?.ClientLoad?.ClientSite?.Site?.ReceivingEmail))</b>
                     </li>
                     <li>
-                        To: <b>@(Model?.ClientLoad?.ClientSite1?.Site?.Description)) (Contact: @(Model?.ClientLoad?.ClientSite1?.Site?.ReceivingContact) / @(Model?.ClientLoad?.ClientSite1?.Site?.ReceivingContactNo) / @(Model?.ClientLoad?.ClientSite1?.Site?.ReceivingEmail))</b>
+                        Customer To: <b>@(Model?.ClientLoad?.ClientSite1?.Site?.Description)) (Contact: @(Model?.ClientLoad?.ClientSite1?.Site?.ReceivingContact) / @(Model?.ClientLoad?.ClientSite1?.Site?.ReceivingContactNo) / @(Model?.ClientLoad?.ClientSite1?.Site?.ReceivingEmail))</b>
+                    </li>
+                    <li>
+                        Load Date: <b>@(Model?.ClientLoad?.LoadDate?.ToString( "yyyy/MM/dd" ))</b>
                     </li>
                     <li>
                         Load Number: <b>@(Model?.ClientLoad?.LoadNumber))</b>

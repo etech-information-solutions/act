@@ -24,8 +24,9 @@ namespace ACT.Data.Models
         public string LoadNumber { get; set; }
         public System.DateTime AuthorisationDate { get; set; }
         public int Status { get; set; }
+        public string Comment { get; set; }
     
-        public virtual User User { get; set; }
         public virtual ClientLoad ClientLoad { get; set; }
+        public virtual User User { get; set; }
     }
 }

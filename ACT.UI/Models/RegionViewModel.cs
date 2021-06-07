@@ -19,7 +19,11 @@ namespace ACT.UI.Models
 
         [Required]
         [Display( Name = "Province" )]
-        public Province Province { get; set; }
+        public int? ProvinceId { get; set; }
+
+        [Required]
+        [Display( Name = "Country" )]
+        public int? CountryId { get; set; }
 
         [Display( Name = "Regional Manager" )]
         public int? RegionManagerId { get; set; }
@@ -67,6 +71,32 @@ namespace ACT.UI.Models
                 using ( UserService uservice = new UserService() )
                 {
                     return uservice.List( true, RoleType.PSP );
+                }
+            }
+        }
+
+        public Dictionary<int, string> ProvinceOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+
+                using ( ProvinceService pservice = new ProvinceService() )
+                {
+                    return pservice.List( true );
+                }
+            }
+        }
+
+        public Dictionary<int, string> CountryOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+
+                using ( CountryService cservice = new CountryService() )
+                {
+                    return cservice.List( true );
                 }
             }
         }

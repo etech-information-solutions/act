@@ -145,6 +145,10 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (cl.InvoiceStatus=@csmInvoiceStatus)";
             }
+            if ( csm.IsOP )
+            {
+                query = $"{query} AND (cl.PODNumber='')";
+            }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
@@ -206,7 +210,6 @@ namespace ACT.Core.Services
 
             return model.Total;
         }
-
 
         /// <summary>
         /// Gets a list of Items matching the specified search params
@@ -339,6 +342,10 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (cl.InvoiceStatus=@csmInvoiceStatus)";
             }
+            if ( csm.IsOP )
+            {
+                query = $"{query} AND (cl.PODNumber='')";
+            }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
@@ -419,6 +426,8 @@ namespace ACT.Core.Services
 
             return model;
         }
+
+
 
         /// <summary>
         /// Gets loads per month for the specified From-To date as well as other applicable search params

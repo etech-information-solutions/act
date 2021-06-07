@@ -20,7 +20,7 @@
     UserModel user = User.Get();
 
     int count = Model.Start;
-    List<ChepLoadCustomModel> items = ( List<ChepLoadCustomModel> ) Model.Items;
+    List<ClientLoadCustomModel> items = ( List<ClientLoadCustomModel> ) Model.Items;
 }
 
 
@@ -37,35 +37,38 @@
             <th data-name="Count">
                 #
             </th>
-            <th data-name="LoadDate" data-column="cl.ShipmentDate">
+            <th data-name="LoadDate" data-column="cl.LoadDate">
                 Load Date
             </th>
-            <th data-name="CreateDate" data-column="cl.CreateDate">
-                Created
+            <th data-name="Client" data-column="ch.LocationId">
+                Chep Account/GLID #
             </th>
-            <th data-name="CompanyName" data-column="c.CompanyName">
-                Client
+            <th data-name="FromSite" data-column="s.Description">
+                Supplier From
             </th>
-            <th data-name="DocketNumber" data-column="cl.DocketNumber">
-                Docket #
+            <th data-name="LoadNumber" data-column="cl.LoadNumber">
+                Shipment #
             </th>
-            <th data-name="Ref" data-column="cl.Ref">
-                Ref #
+            <th data-name="ToSite" data-column="s2.Description">
+                Customer To
             </th>
-            <th data-name="TransactionType" data-column="cl.TransactionType">
-                Transaction Type
-            </th>
-            <th data-name="Quantity" data-column="cl.Quantity">
+            <th data-name="OriginalQuantity" data-column="cl.OriginalQuantity">
                 Qty
             </th>
-            <th data-name="OutstandingReasonId" data-column="cl.OutstandingReasonId">
-                Outstanding Reason
+            <th data-name="PODComment" data-column="pc.Comment">
+                Comment
             </th>
             <th data-name="Status" data-column="cl.Status">
                 Status
             </th>
-            <th data-name="BalanceStatus" data-column="cl.BalanceStatus">
-                Balanced
+            <th data-name="Transporter" data-column="t.Name">
+                Transporter
+            </th>
+            <th data-name="Vehicle" data-column="v.Registration">
+                Vehicle
+            </th>
+            <th data-name="InvoiceNumber" data-column="ch.InvoiceNumber">
+                Invoice #
             </th>
             <th data-name="Actions">
                 Actions
@@ -74,115 +77,76 @@
     </thead>
 
     <tbody>
-        @if ( Model != null && items != null && items.Count() > 0 )
+        @if ( items.NullableAny() )
         {
+            Dictionary<int, string> outstandingReasons = ViewBag.OutstandingReasonOptions;
+
             foreach ( var item in items )
             {
-                PostingType postingType = ( PostingType ) item.PostingType;
                 ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
-                BalanceStatus balanceStatus = ( BalanceStatus ) item.BalanceStatus;
 
                 string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
 
-                <tr id="tr-@item.Id-item-op" class="tr-@item.Id-item-op @active">
-
-                    <td width="1%">
+                <tr id="OutstandingPallets-@item.Id-item" class="OutstandingPallets-@item.Id-item ">
+                    <td>
                         @count
                     </td>
                     <td>
-                        @(item.ShipmentDate?.ToString( "yyyy-MM-dd" ))
+                        @item.LoadDate.Value.ToString( "yyyy-MM-dd" )
                     </td>
                     <td>
-                        On @(item.CreateDate?.ToString( "yyyy-MM-dd" ) ) <br /> by @item.CreatedBy
+                        @item.ChepAccountGLIDNo
                     </td>
                     <td>
-                        @item.ClientName
+                        @item.SiteName
                     </td>
                     <td>
-                        @item.DocketNumber
-
-                        @if ( item.VersionCount > 1 )
-                        {
-                            <a data-load-version="1" data-docket="@item.DocketNumber" class="block" rel="tipysE" title="+@item.VersionCount versions of this load, click to view all versions..">
-                                <small>+@item.VersionCount versions</small>
-                            </a>
-                        }
+                        @item.LoadNumber
                     </td>
                     <td>
-                        @(item.CorrectedRef ?? item.Ref)
-
-                        @if ( !string.IsNullOrEmpty( item.CorrectedRef ) )
-                        {
-                            <a rel="tipsyW" title="Manually corrected, was: @item.Ref">
-                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
-                            </a>
-                        }
+                        @item.ToSiteName
                     </td>
                     <td>
-                        @item.TransactionType
+                        @item.OriginalQuantity
                     </td>
                     <td>
-                        @item.Quantity
-                    </td>
-                    <td width="15%">
-                        @item.OutstandingReason
+                        <select class="chzn" data-update-outstanding-reason="1" data-id="@item.Id" style="width: 100%;">
+                            <option>Select...</option>
+                            @foreach ( KeyValuePair<int,string> or in outstandingReasons )
+                            {
+                                string sel = ( or.Key == item.OutstandingReasonId ) ? "selected=selected" : "";
 
-                        <div style="border-top: 1px dashed #7368e3; padding-top: 4px; margin-top: 10px;">
-
-                            @Html.ActionLink( "Edit", "EditOutstandingPallet", new { id = item.Id, returnView = "OutstandingPallets" }, new { @class = "edit", @rel = "tipsyS", @title = "Update outstanding reason?", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item-op" } )
-
-                            <a class="chat" data-sticky-one="1" data-target="#osp-@item.Id-comments" data-trigger="mouseover" data-arrow="center-right" data-title="Comments (@item.Comments.NullableCount())">
-                                Comments (@item.Comments.NullableCount())
-                            </a>
-                            <div id="osp-@item.Id-comments" class="none">
-
-                                <ul class="list">
-                                    @if ( item.Comments.NullableAny() )
-                                    {
-                                        foreach ( Comment c in item.Comments )
-                                        {
-                                            <li style="line-height: 20px;">
-                                                @c.Details
-
-                                                <small class="block" style="font-size: 10px; text-align: right; font-style: italic;"> by @c.User.Name @c.User.Surname on @c.CreatedOn.ToString( "yyyy-MM-dd @HH:mm tt" )</small>
-                                                <div class="clear"></div>
-                                            </li>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <li>
-                                            No comments...
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
-
-                        </div>
-
+                                <option value="@or.Key" @sel>@or.Value</option>
+                            }
+                        </select>
+                        <span id="loader"></span>
                     </td>
                     <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
-                        @status.GetDisplayText()
+                        @status
                     </td>
-                    <td class="@(balanceStatus == BalanceStatus.Balanced ? "active" : "inactive")">
-                        @balanceStatus.GetDisplayText()
+                    <td>
+                        @item.TransporterName
+                    </td>
+                    <td>
+                        @item.VehicleRegistration
+                    </td>
+                    <td>
+                        @item.InvoiceNumber
                     </td>
                     <td width="5%">
 
                         <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
-                            @Html.ActionLink( "Details", "PoolingAgentDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item-op" } )
-                            
-                            @Html.ActionLink( "POD", "AllocatePoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item-op", @style = "margin-left: 0;" } )
+                            @Html.ActionLink( "Details", "EditClientData", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".OutstandingPallets-" + item.Id + "-item" } )
 
                         </div>
 
-                        @Html.ActionLink( "Allocate", "AllocatePoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item-op", @style = "margin-left: 0;" } )
+                        @*<span>
+                                @Html.ActionLink( "Journals", "ClientLoadJournals", new { id = item.Id, edit = false }, new { @class = "reports", @rel = "tipsyS", @title = "View Journals", @style = "padding-left: 28px; margin-left: 0; background-position-y: center;", @data_clientload_journal = "1", @data_id = item.Id } )
+                            </span>*@
 
                     </td>
-
                 </tr>
-
                 count++;
             }
         }

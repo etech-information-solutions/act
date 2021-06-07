@@ -121,7 +121,7 @@ namespace ACT.UI.Controllers
                                                     address?.Addressline1,
                                                     address?.Addressline2,
                                                     address?.Town,
-                                                    ( address != null ? ( ( Province ) address.Province ).GetDisplayText() : string.Empty ),
+                                                    ( address != null ? address.Province.Description : string.Empty ),
                                                     item.PostalCode,
                                                     item.ContactName,
                                                     item.ContactNo,
@@ -481,7 +481,7 @@ namespace ACT.UI.Controllers
                         Type = ( int ) model.Address.AddressType,
                         Addressline1 = model.Address.AddressLine1,
                         Addressline2 = model.Address.AddressLine2,
-                        Province = ( int ) model.Address.Province,
+                        ProvinceId = model.Address.ProvinceId,
                     };
 
                     aservice.Create( address );
@@ -613,7 +613,7 @@ namespace ACT.UI.Controllers
                         PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
-                        Province = ( address != null ) ? ( Province ) address.Province : Province.All,
+                        ProvinceId = address?.ProvinceId ?? 0,
                         AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
                     },
 
@@ -911,7 +911,7 @@ namespace ACT.UI.Controllers
                             Type = ( int ) model.Address.AddressType,
                             Addressline1 = model.Address.AddressLine1,
                             Addressline2 = model.Address.AddressLine2,
-                            Province = ( int ) model.Address.Province,
+                            ProvinceId = model.Address.ProvinceId,
                         };
 
                         aservice.Create( address );
@@ -923,7 +923,7 @@ namespace ACT.UI.Controllers
                         address.Type = ( int ) model.Address.AddressType;
                         address.Addressline1 = model.Address.AddressLine1;
                         address.Addressline2 = model.Address.AddressLine2;
-                        address.Province = ( int ) model.Address.Province;
+                        address.ProvinceId = model.Address.ProvinceId;
 
                         aservice.Update( address );
                     }
@@ -1121,7 +1121,7 @@ namespace ACT.UI.Controllers
                         PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
-                        Province = ( address != null ) ? ( Province ) address.Province : Province.All,
+                        ProvinceId = address?.ProvinceId ?? 0,
                         AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
                     },
 
@@ -2070,7 +2070,7 @@ namespace ACT.UI.Controllers
                         PostalCode = model.Address.PostCode,
                         Addressline1 = model.Address.AddressLine1,
                         Addressline2 = model.Address.AddressLine2,
-                        Province = ( int ) model.Address.Province,
+                        ProvinceId = model.Address.ProvinceId,
                     };
 
                     aservice.Create( address );
@@ -2092,6 +2092,18 @@ namespace ACT.UI.Controllers
                             ClientCustomerId = c.Id,
                             Status = ( int ) model.Status,
                             AccountingCode = site.AccountCode,
+                            KAMName = site.ContactName,
+                            KAMContact = site.ContactNo,
+                            KAMEmail = site.ReceivingEmail,
+                            AuthorisationEmail1 = model.AuthorisationEmail1,
+                            AuthorisationEmail2 = model.AuthorisationEmail2,
+                            AuthorisationEmail3 = model.AuthorisationEmail3,
+                            ClientManagerContact = model.ClientManagerContact,
+                            ClientManagerEmail = model.ClientManagerEmail,
+                            ClientSalesManager = model.ClientSalesManager,
+                            ClientSalesRegEmail = model.ClientSalesRegEmail,
+                            ClientSalesRepContact = model.ClientSalesRepContact,
+
                         };
 
                         csservice.Create( csSite );
@@ -2115,6 +2127,17 @@ namespace ACT.UI.Controllers
                         ClientCustomerId = cc.Id,
                         Status = ( int ) model.Status,
                         AccountingCode = site.AccountCode,
+                        KAMName = site.ContactName,
+                        KAMContact = site.ContactNo,
+                        KAMEmail = site.ReceivingEmail,
+                        AuthorisationEmail1 = model.AuthorisationEmail1,
+                        AuthorisationEmail2 = model.AuthorisationEmail2,
+                        AuthorisationEmail3 = model.AuthorisationEmail3,
+                        ClientManagerContact = model.ClientManagerContact,
+                        ClientManagerEmail = model.ClientManagerEmail,
+                        ClientSalesManager = model.ClientSalesManager,
+                        ClientSalesRegEmail = model.ClientSalesRegEmail,
+                        ClientSalesRepContact = model.ClientSalesRepContact,
                     };
 
                     csservice.Create( csSite );
@@ -2214,6 +2237,16 @@ namespace ACT.UI.Controllers
                     ARPMSalesManagerId = site.ARPMSalesManagerId,
                     CLCode = site.CLCode,
 
+                    AuthorisationEmail1 = site.ClientSites?.FirstOrDefault()?.AuthorisationEmail1,
+                    AuthorisationEmail2 = site.ClientSites?.FirstOrDefault()?.AuthorisationEmail2,
+                    AuthorisationEmail3 = site.ClientSites?.FirstOrDefault()?.AuthorisationEmail3,
+
+                    ClientSalesManager = site.ClientSites?.FirstOrDefault()?.ClientSalesManager,
+                    ClientManagerContact = site.ClientSites?.FirstOrDefault()?.ClientManagerContact,
+                    ClientManagerEmail = site.ClientSites?.FirstOrDefault()?.ClientManagerEmail,
+                    ClientSalesRepContact = site.ClientSites?.FirstOrDefault()?.ClientSalesRepContact,
+                    ClientSalesRegEmail = site.ClientSites?.FirstOrDefault()?.ClientSalesRegEmail,
+
                     SiteType = ( site.SiteType.HasValue ? ( SiteType ) site.SiteType : SiteType.All ),
 
 
@@ -2280,7 +2313,7 @@ namespace ACT.UI.Controllers
                         PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
-                        Province = ( address != null ) ? ( Province ) address.Province : Province.All,
+                        ProvinceId = address?.ProvinceId ?? 0,
                         Longitude = address.Longitude,
                         Latitude = address.Latitude,
                     };
@@ -2395,6 +2428,17 @@ namespace ACT.UI.Controllers
                         {
                             cs.Status = ( int ) model.Status;
                             cs.AccountingCode = site.AccountCode;
+                            cs.KAMName = site.ContactName;
+                            cs.KAMContact = site.ContactNo;
+                            cs.KAMEmail = site.ReceivingEmail;
+                            cs.AuthorisationEmail1 = model.AuthorisationEmail1;
+                            cs.AuthorisationEmail2 = model.AuthorisationEmail2;
+                            cs.AuthorisationEmail3 = model.AuthorisationEmail3;
+                            cs.ClientManagerContact = model.ClientManagerContact;
+                            cs.ClientManagerEmail = model.ClientManagerEmail;
+                            cs.ClientSalesManager = model.ClientSalesManager;
+                            cs.ClientSalesRegEmail = model.ClientSalesRegEmail;
+                            cs.ClientSalesRepContact = model.ClientSalesRepContact;
 
                             csservice.Update( cs );
                         }
@@ -2406,6 +2450,17 @@ namespace ACT.UI.Controllers
                                 ClientCustomerId = c.Id,
                                 Status = ( int ) model.Status,
                                 AccountingCode = site.AccountCode,
+                                KAMName = site.ContactName,
+                                KAMContact = site.ContactNo,
+                                KAMEmail = site.ReceivingEmail,
+                                AuthorisationEmail1 = model.AuthorisationEmail1,
+                                AuthorisationEmail2 = model.AuthorisationEmail2,
+                                AuthorisationEmail3 = model.AuthorisationEmail3,
+                                ClientManagerContact = model.ClientManagerContact,
+                                ClientManagerEmail = model.ClientManagerEmail,
+                                ClientSalesManager = model.ClientSalesManager,
+                                ClientSalesRegEmail = model.ClientSalesRegEmail,
+                                ClientSalesRepContact = model.ClientSalesRepContact,
                             };
 
                             csservice.Create( cs );
@@ -2430,6 +2485,17 @@ namespace ACT.UI.Controllers
                         ClientCustomerId = cc.Id,
                         Status = ( int ) model.Status,
                         AccountingCode = site.AccountCode,
+                        KAMName = site.ContactName,
+                        KAMContact = site.ContactNo,
+                        KAMEmail = site.ReceivingEmail,
+                        AuthorisationEmail1 = model.AuthorisationEmail1,
+                        AuthorisationEmail2 = model.AuthorisationEmail2,
+                        AuthorisationEmail3 = model.AuthorisationEmail3,
+                        ClientManagerContact = model.ClientManagerContact,
+                        ClientManagerEmail = model.ClientManagerEmail,
+                        ClientSalesManager = model.ClientSalesManager,
+                        ClientSalesRegEmail = model.ClientSalesRegEmail,
+                        ClientSalesRepContact = model.ClientSalesRepContact,
                     };
 
                     csservice.Create( csSite );
@@ -2514,7 +2580,7 @@ namespace ACT.UI.Controllers
                             Type = ( int ) model.Address.AddressType,
                             Addressline1 = model.Address.AddressLine1,
                             Addressline2 = model.Address.AddressLine2,
-                            Province = ( int ) model.Address.Province,
+                            ProvinceId = model.Address.ProvinceId,
                         };
 
                         aservice.Create( address );
@@ -2528,7 +2594,7 @@ namespace ACT.UI.Controllers
                         address.Type = ( int ) model.Address.AddressType;
                         address.Addressline1 = model.Address.AddressLine1;
                         address.Addressline2 = model.Address.AddressLine2;
-                        address.Province = ( int ) model.Address.Province;
+                        address.ProvinceId = model.Address.ProvinceId;
 
                         aservice.Update( address );
                     }
@@ -2599,7 +2665,7 @@ namespace ACT.UI.Controllers
             }
         }
 
-        // GET: Client/AddSite
+        // GET: Client/ImportSite
         [Requires( PermissionTo.Create )]
         public ActionResult ImportSite()
         {
@@ -2608,7 +2674,7 @@ namespace ACT.UI.Controllers
             return View( model );
         }
 
-        // POST: Client/AddSite
+        // POST: Client/ImportSite
         [HttpPost]
         [Requires( PermissionTo.Create )]
         public ActionResult ImportSite( SiteViewModel model )
@@ -2635,6 +2701,7 @@ namespace ACT.UI.Controllers
             using ( SiteService sservice = new SiteService() )
             using ( RegionService rservice = new RegionService() )
             using ( AddressService aservice = new AddressService() )
+            using ( ProvinceService pservice = new ProvinceService() )
             using ( ClientSiteService csservice = new ClientSiteService() )
             using ( ClientCustomerService ccservice = new ClientCustomerService() )
             using ( TextFieldParser parser = new TextFieldParser( model.SiteImportFile.InputStream ) )
@@ -2861,10 +2928,7 @@ namespace ACT.UI.Controllers
 
                             #region Site Address
 
-                            if ( !Enum.TryParse( province?.Trim().Replace( " ", "" ), out Province prov ) )
-                            {
-                                prov = Province.All;
-                            }
+                            int? provinceId = pservice.GetIdByName( province?.Trim()?.ToLower()?.Replace( " ", "" ) );
 
                             Address a = aservice.Get( s.Id, "Site" );
 
@@ -2878,7 +2942,7 @@ namespace ACT.UI.Controllers
                                     Longitude = xCord,
                                     PostalCode = town,
                                     ObjectType = "Site",
-                                    Province = ( int ) prov,
+                                    ProvinceId = provinceId,
                                     Addressline1 = addressLine1,
                                     Addressline2 = addressLine2,
                                     Status = ( int ) Status.Active,
@@ -2893,7 +2957,7 @@ namespace ACT.UI.Controllers
                                 a.Latitude = yCord;
                                 a.Longitude = xCord;
                                 a.PostalCode = town;
-                                a.Province = ( int ) prov;
+                                a.ProvinceId = provinceId;
                                 a.Addressline1 = addressLine1;
                                 a.Addressline2 = addressLine2;
                                 a.Type = ( int ) AddressType.Postal;
@@ -3147,199 +3211,6 @@ namespace ACT.UI.Controllers
             }
 
             return LinkProducts( new PagingModel(), new CustomSearchModel() );
-        }
-
-        #endregion
-
-
-
-        #region General
-
-        [HttpPost]
-        // GET: /Client/ImportSites
-        public ActionResult ImportSubSites( HttpPostedFileBase postedFile )
-        {
-            if ( postedFile != null )
-            {
-                string fileExtension = Path.GetExtension( postedFile.FileName );
-
-                //Validate uploaded file and return error.
-                if ( fileExtension != ".csv" )
-                {
-                    ViewBag.Message = "Please select the csv file with .csv extension";
-                    return View();
-                }
-
-                try
-                {
-                    string sessClientId = ( Session[ "ClientId" ] != null ? Session[ "ClientId" ].ToString() : null );
-                    int clientID = ( !string.IsNullOrEmpty( sessClientId ) ? int.Parse( sessClientId ) : 0 );
-                    //for subsites to load tehse sites under a main site
-                    string sessSiteId = ( Session[ "SiteId" ] != null ? Session[ "SiteId" ].ToString() : null );
-                    int SiteID = ( !string.IsNullOrEmpty( sessSiteId ) ? int.Parse( sessSiteId ) : 0 );
-
-                    using ( var sreader = new StreamReader( postedFile.InputStream ) )
-                    using ( SiteService siteService = new SiteService() )
-                    using ( ClientSiteService csService = new ClientSiteService() )
-                    using ( TransactionScope scope = new TransactionScope() )
-                    using ( AddressService aservice = new AddressService() )
-                    {
-                        //First line is header. If header is not passed in csv then we can neglect the below line.
-                        string[] headers = sreader.ReadLine().Split( ',' );
-                        //Loop through the records
-                        while ( !sreader.EndOfStream )
-                        {
-                            string[] rows = sreader.ReadLine().Split( ',' );
-
-                            int siteType = 1;
-
-                            string strLatY = rows[ 3 ].ToString();
-                            decimal latitudeY = 0;
-                            try
-                            {
-                                decimal.TryParse( rows[ 3 ].ToString(), out latitudeY );
-                                latitudeY = decimal.Round( latitudeY, 4 );
-                                strLatY = ( latitudeY != 0 ? latitudeY.ToString() : strLatY );
-                            }
-                            catch ( Exception ex )
-                            {
-                                ViewBag.Message = string.Concat( rows[ 3 ].ToString(), " ", ex.Message );
-                            }
-                            string strLngX = rows[ 2 ].ToString();
-                            decimal longitudeX = 0;
-                            try
-                            {
-                                decimal.TryParse( rows[ 2 ].ToString(), out longitudeX );
-                                longitudeX = decimal.Round( longitudeX, 4 );
-                                strLngX = ( longitudeX != 0 ? longitudeX.ToString() : strLngX );
-                            }
-                            catch ( Exception ex )
-                            {
-                                ViewBag.Message = string.Concat( rows[ 3 ].ToString(), " ", ex.Message );
-                            }
-
-                            Site existingSite = siteService.ExistByXYCoords( strLngX, strLatY );
-
-                            #region Validation
-
-                            if ( !string.IsNullOrEmpty( strLngX ) && existingSite != null )
-                            {
-                                //Notify($"Sorry, a Site with the same X Y Coordinates already exists \"{model.XCord}\" already exists!", NotificationType.Error);
-                                //return View(model);
-
-                                //rather than pass back to view, we will create the new site as a subsite of the existing site. 
-                                //Get the existing site first
-                                existingSite = siteService.GetByColumnsWhere( "XCord", strLngX, "YCord", strLatY );
-                                SiteID = existingSite.Id;//This is the existing site retrieved by mapping same X and Y coord, read that into the model.SiteId which makes the new site a child site
-                                siteType = 2;//Mark teh site as a subsite by default
-                            }
-
-                            int regionId = 0;
-                            if ( !string.IsNullOrEmpty( rows[ 16 ].ToString() ) )
-                            {
-                                regionId = int.Parse( rows[ 16 ].ToString() );
-                            }
-                            int provinceId = 0;
-                            string provinceName = "";
-                            if ( !string.IsNullOrEmpty( rows[ 8 ].ToString() ) )
-                            {
-                                int.TryParse( rows[ 8 ].ToString(), out provinceId );
-                                try
-                                {
-                                    if ( provinceId > 0 )
-                                    {
-                                        provinceName = ( ( Province ) provinceId ).GetDisplayText();
-                                    }
-                                }
-                                catch ( Exception ex )
-                                {
-                                    ViewBag.Message = string.Concat( rows[ 8 ].ToString(), " ", ex.Message );
-                                }
-                            }
-                            #region Create Site
-                            Site site = new Site()
-                            {
-                                Name = rows[ 0 ].ToString(),
-                                Description = rows[ 1 ].ToString(),
-                                XCord = strLngX,
-                                YCord = strLatY,
-                                Address = rows[ 4 ].ToString() + " " + rows[ 5 ].ToString() + " " + rows[ 6 ].ToString() + " " + rows[ 7 ].ToString() + " " + provinceName,
-                                PostalCode = rows[ 7 ].ToString(),
-                                ContactName = rows[ 10 ].ToString(),
-                                ContactNo = rows[ 9 ].ToString(),
-                                PlanningPoint = rows[ 11 ].ToString(),
-                                SiteType = siteType,
-                                AccountCode = rows[ 13 ].ToString(),
-                                Depot = rows[ 14 ].ToString(),
-                                SiteCodeChep = rows[ 15 ].ToString(),
-                                Status = ( int ) Status.Pending,
-                                RegionId = regionId,
-                                FinanceContact = rows[ 17 ].ToString(),
-                                FinanceContactNo = rows[ 18 ].ToString(),
-                                ReceivingContact = rows[ 19 ].ToString(),
-                                ReceivingContactNo = rows[ 20 ].ToString(),
-                            };
-                            //For Subsites
-                            if ( SiteID > 0 )
-                            {
-                                site.SiteId = SiteID;
-                            }
-                            site = siteService.Create( site );
-                            #endregion
-
-                            #region Create Address (s)
-
-                            if ( !string.IsNullOrEmpty( rows[ 3 ].ToString() ) )
-                            {
-                                Address address = new Address()
-                                {
-                                    ObjectId = site.Id,
-                                    ObjectType = "Site",
-                                    Town = rows[ 6 ].ToString(),
-                                    Status = ( int ) Status.Active,
-                                    PostalCode = rows[ 7 ].ToString(),
-                                    Type = ( int ) AddressType.Postal,
-                                    Addressline1 = rows[ 4 ].ToString(),
-                                    Addressline2 = rows[ 5 ].ToString(),
-                                    Province = provinceId,
-                                };
-                                aservice.Create( address );
-                            }
-
-                            #endregion
-
-                            //tie Client in Session to New Site
-                            #region Add ClientSite
-                            ClientSite csSite = new ClientSite()
-                            {
-                                ClientCustomerId = clientID,
-                                SiteId = site.Id,
-                                AccountingCode = site.AccountCode,
-                                Status = ( int ) Status.Active
-                            };
-                            csService.Create( csSite );
-                            #endregion
-
-                        }
-                        #endregion
-                        scope.Complete();
-                    }
-
-                }
-                catch ( Exception ex )
-                {
-                    ViewBag.Message = ex.Message;
-                }
-                finally
-                {
-
-                }
-            }
-            else
-            {
-
-            }
-            return RedirectToAction( "ManageSites", "Client" );
         }
 
         #endregion

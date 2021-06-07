@@ -239,15 +239,6 @@ namespace ACT.Core.Models
         /// Can be used to indicate Province
         /// </summary>
         [Display( Name = "Province" )]
-        public Province Province
-        {
-            get; set;
-        }
-
-        /// <summary>
-        /// Can be used to indicate Province
-        /// </summary>
-        [Display( Name = "Province" )]
         public int ProvinceId
         {
             get; set;
@@ -464,11 +455,22 @@ namespace ACT.Core.Models
         {
             get
             {
-                using ( UserService service = new UserService() )
+                using ( UserService uservice = new UserService() )
                 {
-                    RoleType role = service.CurrentUser.RoleType;
+                    RoleType role = uservice.CurrentUser.RoleType;
                     role = role == RoleType.PSP ? role : RoleType.All;
-                    return service.List( true, role );
+                    return uservice.List( true, role );
+                }
+            }
+        }
+
+        public Dictionary<int, string> ProvinceOptions
+        {
+            get
+            {
+                using ( ProvinceService pservice = new ProvinceService() )
+                {
+                    return pservice.List( true );
                 }
             }
         }
@@ -494,8 +496,6 @@ namespace ACT.Core.Models
         public Dictionary<int, string> ProductOptions { get; set; }
 
         public Dictionary<int, string> PSPOptions { get; set; }
-
-        public Dictionary<int, string> ProvinceOptions { get; set; }
 
         public Dictionary<int, string> PSPProductOptions { get; set; }
 
@@ -748,7 +748,6 @@ namespace ACT.Core.Models
         private void SetDefaults()
         {
             this.Status = Status.All;
-            this.Province = Province.All;
             this.RoleType = RoleType.All;
             this.ClientStatus = Status.Active;
             this.DocumentType = DocumentType.None;

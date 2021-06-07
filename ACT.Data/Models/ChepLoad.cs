@@ -77,7 +77,6 @@ namespace ACT.Data.Models
         public virtual ICollection<ChepLoad> ChepLoad1 { get; set; }
         public virtual ChepLoad ChepLoad2 { get; set; }
         public virtual Client Client { get; set; }
-        public virtual ClientSite ClientSite { get; set; }
         public virtual OutstandingReason OutstandingReason { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepLoadChep> ChepLoadCheps { get; set; }
@@ -87,5 +86,6 @@ namespace ACT.Data.Models
         public virtual ICollection<Dispute> Disputes { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Tasks { get; set; }
+        public virtual ClientSite ClientSite { get; set; }
     }
 }

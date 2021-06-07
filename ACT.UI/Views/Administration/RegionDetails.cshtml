@@ -47,10 +47,17 @@
         </div>
 
         <div class="display-label">
+            Country
+        </div>
+        <div class="display-field">
+            @( Model?.Country?.Name )
+        </div>
+
+        <div class="display-label">
             Province
         </div>
         <div class="display-field">
-            @( Model.Province.HasValue ? ( ( Province ) Model.Province ).GetDisplayText() : string.Empty )
+            @( Model?.Province?.Description )
         </div>
 
     </div>

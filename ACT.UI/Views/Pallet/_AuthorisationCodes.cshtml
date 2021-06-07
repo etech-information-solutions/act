@@ -40,9 +40,9 @@
             <th data-name="LoadNumber" data-column="cl.LoadNumber">
                 Shipment #
             </th>
-            <th data-name="ReceiverNumber" data-column="cl.ReceiverNumber">
-                Ref #
-            </th>
+            @*<th data-name="ReceiverNumber" data-column="cl.ReceiverNumber">
+                    Ref #
+                </th>*@
             <th data-name="DeliveryNote" data-column="cl.DeliveryNote">
                 Delivery #
             </th>
@@ -52,9 +52,9 @@
             <th data-name="Vehicle" data-column="v.Registration">
                 Vehicle
             </th>
-            <th data-name="CompanyName" data-column="c.CompanyName">
-                Client
-            </th>
+            @*<th data-name="CompanyName" data-column="c.CompanyName">
+                    Client
+                </th>*@
             <th data-name="FromSiteName" data-column="s1.Description">
                 From Supplier
             </th>
@@ -97,9 +97,9 @@
                     <td>
                         @item.LoadNumber
                     </td>
-                    <td>
-                        @item.ReceiverNumber
-                    </td>
+                    @*<td>
+                            @item.ReceiverNumber
+                        </td>*@
                     <td>
                         @item.DeliveryNote
                     </td>
@@ -109,9 +109,9 @@
                     <td>
                         @item.VehicleRegistration
                     </td>
-                    <td>
-                        @item.ClientName
-                    </td>
+                    @*<td>
+                            @item.ClientName
+                        </td>*@
                     <td>
                         @item.FromSiteName
                     </td>
@@ -120,28 +120,54 @@
                     </td>
                     <td class="purple">
                         @item.AuthoriserName
-                    </td>
-                    <td class="purple">
-                        @(item.AuthorisationDate?.ToString( "yyyy-MM-dd @HH:mm tt" ))
+
+                        @if ( !string.IsNullOrEmpty( item.AuthorisationComment ) )
+                        {
+                            <div style="text-align: center;">
+                                <a data-sticky-one="1" data-target="#authorisationcode-@item.ClientAuthorisationId-comment" data-trigger="mouseover" data-arrow="center-right" data-title="@item.AuthoriserName says:">
+                                    <img alt="" src="@Url.Content("~/Images/chat-on.png")" />
+                                </a>
+                                <div id="authorisationcode-@item.ClientAuthorisationId-comment" class="none">
+                                    @item.AuthorisationComment
+                                </div>
+                            </div>
+                        }
                     </td>
                     <td class="purple">
                         @item.Code
                     </td>
-                    <td width="5%">
-                        @if ( string.IsNullOrEmpty( item.Code ) )
-                        {
-                            @Html.ActionLink( "Generate", "GenerateAuthorisationCode", new { id = item.Id }, new { @class = "add append-search", @data_delete = "1", @data_id = item.Id, @data_target = "#authorisationcodes-" + item.Id + "-item", @data_refresh_target = "#authorisationcodes", @rel = "tipsyE", @title = "Generate authorisation code this load?" } )
-                        }
-                        else
-                        {
-                            @Html.ActionLink( enable, "DeleteAuthorisationCode", new { Id = item.ClientAuthorisationId }, new { @class = "warn append-search", @data_delete = "1", @data_id = item.ClientAuthorisationId, @data_target = "#authorisationcodes-" + item.Id + "-item", @data_refresh_target = "#authorisationcodes", @rel = "tipsyE", @title = enable + " this item?" } )
-                        }
+                    <td class="purple">
+                        @(item.AuthorisationDate?.ToString( "yyyy-MM-dd @HH:mm tt" ))
+                    </td>
+                    <td width="15%">
 
-                        @*<div style="border-top: 1px dashed #7368e3; padding-top: 4px; margin-top: 10px;">
+                        <div style="border-bottom: 1px dashed #ccc; padding-bottom: 5px; margin-bottom: 5px; text-align: center;">
 
-                            @Html.ActionLink( "Details", "EditClientData", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = "#authorisationcodes-" + item.Id + "-item" } )
+                            @if ( string.IsNullOrEmpty( item.Code ) )
+                            {
+                                @Html.ActionLink( "Generate", "GenerateAuthorisationCode", new { id = item.Id }, new { @class = "add append-search", @data_delete = "1", @data_id = item.Id, @data_target = "#authorisationcodes-" + item.Id + "-item", @data_refresh_target = "#authorisationcodes", @rel = "tipsyE", @title = "Generate authorisation code this load?" } )
+                            }
+                            else
+                            {
+                                @Html.ActionLink( "Comment", "EditAuthorisationComment", new { id = item.ClientAuthorisationId }, new { @class = "comment", @data_edit = "1", @data_id = item.Id, @data_target = ".authorisationcodes-" + item.Id + "-item", @rel = "tipsyE", @title = "Update comment for this authorisation?" } )
 
-                        </div>*@
+                                @Html.ActionLink( enable, "DeleteAuthorisationCode", new { Id = item.ClientAuthorisationId }, new { @class = "warn append-search", @data_delete = "1", @data_id = item.ClientAuthorisationId, @data_target = "#authorisationcodes-" + item.Id + "-item", @data_refresh_target = "#authorisationcodes", @rel = "tipsyE", @title = enable + " this item?" } )
+                            }
+
+                        </div>
+
+                        <div style="border-bottom: 1px dashed #ccc; padding-bottom: 5px; margin-bottom: 5px; text-align: center;">
+
+                            @Html.ActionLink( "Supplier From", "SiteContactDetails", new { id = item.ClientSiteId }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = "#authorisationcodes-" + item.Id + "-item" } )
+                            @Html.ActionLink( "Customer To", "SiteContactDetails", new { id = item.ToClientSiteId }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = "#authorisationcodes-" + item.Id + "-item" } )
+
+                        </div>
+
+                        <div style="text-align: center;">
+
+                            @Html.ActionLink( "Transporter", "TransporterContactDetails", new { id = item.TransporterId }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = "#authorisationcodes-" + item.Id + "-item" } )
+
+                        </div>
 
                     </td>
 

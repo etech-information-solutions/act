@@ -578,8 +578,8 @@ namespace ACT.UI.Controllers
                     {
                         #region Create Chep Load
 
-                        cQuery = $"INSERT INTO [dbo].[ChepLoad] ([ClientId],[ClientSiteId],[ChepLoadId],[CreatedOn],[ModifiedOn],[ModifiedBy],[ChepStatus],[TransactionType],[DocketNumber],[OriginalDocketNumber],[UMI],[LocationId],[Location],[OtherPartyId],[OtherParty],[OtherPartyCountry],[EquipmentCode],[Equipment],[Quantity],[Ref],[OtherRef],[BatchRef],[ShipmentDate],[DeliveryDate],[EffectiveDate],[CreateDate],[CreatedBy],[InvoiceNumber],[Reason],[DataSource],[BalanceStatus],[Status],[PostingType],[IsExchange],[IsExtra],[UID]) ";
-                        cQuery = $" {cQuery} VALUES ({model.ClientId},{cs.Id},{( l != null ? l.Id + "" : "NULL" )},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}',{qty},'{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}',{shipmentDate1},{deliveryDate1},{effectiveDate1},{createDate1},'{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) BalanceStatus.NotBalanced},{( int ) rstatus},{( int ) PostingType.Import},{isExchange},{isExtra},'{uid}') ";
+                        cQuery = $"INSERT INTO [dbo].[ChepLoad] ([ClientId],[ClientSiteId],[ChepLoadId],[OutstandingReasonId],[CreatedOn],[ModifiedOn],[ModifiedBy],[ChepStatus],[TransactionType],[DocketNumber],[OriginalDocketNumber],[UMI],[LocationId],[Location],[OtherPartyId],[OtherParty],[OtherPartyCountry],[EquipmentCode],[Equipment],[Quantity],[Ref],[OtherRef],[BatchRef],[ShipmentDate],[DeliveryDate],[EffectiveDate],[CreateDate],[CreatedBy],[InvoiceNumber],[Reason],[DataSource],[BalanceStatus],[Status],[PostingType],[IsExchange],[IsExtra],[UID]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},{cs.Id},{( l != null ? l.Id + "" : "NULL" )},9,'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 5 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}','{load[ 10 ]}','{load[ 11 ]}','{load[ 12 ]}',{qty},'{load[ 14 ]}','{load[ 15 ]}','{load[ 16 ]}',{shipmentDate1},{deliveryDate1},{effectiveDate1},{createDate1},'{load[ 21 ]}','{load[ 22 ]}','{load[ 23 ]}','{load[ 24 ]}',{( int ) BalanceStatus.NotBalanced},{( int ) rstatus},{( int ) PostingType.Import},{isExchange},{isExtra},'{uid}') ";
 
                         #endregion
 
@@ -1047,15 +1047,15 @@ namespace ACT.UI.Controllers
                     ContactNumber = model.ReceiverNumber,
 
                     CustomerAddress = customerAddress,
-                    CustomerProvince = address?.Province,
+                    CustomerProvinceId = address?.ProvinceId,
                     CustomerPostalCode = address?.PostalCode,
 
                     DeliveryAddress = customerAddress,
-                    DeliveryProvince = address?.Province,
+                    DeliveryProvinceId = address?.ProvinceId,
                     DeliveryPostalCode = address?.PostalCode,
 
                     BillingAddress = customerAddress,
-                    BillingProvince = address?.Province,
+                    BillingProvinceId = address?.ProvinceId,
                     BililngPostalCode = address?.PostalCode,
                 };
 
@@ -1094,7 +1094,7 @@ namespace ACT.UI.Controllers
                     PostalCode = address?.PostalCode,
                     Addressline1 = address?.Addressline1,
                     Addressline2 = address?.Addressline2,
-                    Province = ( int ) address?.Province,
+                    ProvinceId = address?.ProvinceId,
                 };
 
                 aservice.Create( invoiceCustomerAddress );
@@ -1111,7 +1111,7 @@ namespace ACT.UI.Controllers
 
         // GET: Pallet/EditClientData/5
         [Requires( PermissionTo.Edit )]
-        public ActionResult EditClientData( int id )
+        public ActionResult EditClientData( int id, int chepLoadId = 0 )
         {
             using ( ImageService iservice = new ImageService() )
             using ( ChepLoadService chservice = new ChepLoadService() )
@@ -1119,75 +1119,85 @@ namespace ACT.UI.Controllers
             {
                 ClientLoad load = clservice.GetById( id );
 
-                if ( load == null )
+                ChepLoad chep = chservice.Get( chepLoadId );
+
+                if ( load == null && chep == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
 
                     return PartialView( "_AccessDenied" );
                 }
 
+                if ( chep != null && load == null )
+                {
+                    load = new ClientLoad() { ReceiverNumber = chep.Ref, ClientId = chep.ClientId, };
+                }
+
                 #region Client Load
 
                 ClientLoadViewModel model = new ClientLoadViewModel()
                 {
-                    Id = load.Id,
                     EditMode = true,
-                    THAN = load.THAN,
-                    LoadDate = load.LoadDate,
-                    ClientId = load.ClientId,
-                    VehicleId = load.VehicleId,
-                    Equipment = load.Equipment,
-                    ReturnQty = load.ReturnQty,
-                    PODNumber = load.PODNumber,
-                    PCNNumber = load.PCNNumber,
-                    PRNNumber = load.PRNNumber,
-                    DebriefQty = load.DebriefQty,
-                    LoadNumber = load.LoadNumber,
-                    NotifyDate = load.NotifyDate,
-                    NewQuantity = load.NewQuantity,
-                    DeliveryNote = load.DeliveryNote,
-                    ClientSiteId = load.ClientSiteId,
-                    PODCommentId = load.PODCommentId,
-                    TransporterId = load.TransporterId,
-                    ReconcileDate = load.ReconcileDate,
-                    AccountNumber = load.AccountNumber,
-                    EffectiveDate = load.EffectiveDate,
-                    AdminMovement = load.AdminMovement,
-                    ChepInvoiceNo = load.ChepInvoiceNo,
-                    ClientSiteIdTo = load.ToClientSiteId,
-                    OutstandingQty = load.OutstandingQty,
-                    ReceiverNumber = load.ReceiverNumber,
+                    THAN = load?.THAN,
+                    Id = load?.Id ?? 0,
+                    LoadDate = load?.LoadDate,
+                    VehicleId = load?.VehicleId,
+                    Equipment = load?.Equipment,
+                    ReturnQty = load?.ReturnQty,
+                    PODNumber = load?.PODNumber,
+                    PCNNumber = load?.PCNNumber,
+                    PRNNumber = load?.PRNNumber,
+                    DebriefQty = load?.DebriefQty,
+                    LoadNumber = load?.LoadNumber,
+                    NotifyDate = load?.NotifyDate,
+                    ClientId = load?.ClientId ?? 0,
+                    NewQuantity = load?.NewQuantity,
+                    DeliveryNote = load?.DeliveryNote,
+                    ClientSiteId = load?.ClientSiteId,
+                    PODCommentId = load?.PODCommentId,
+                    TransporterId = load?.TransporterId,
+                    ReconcileDate = load?.ReconcileDate,
+                    AccountNumber = load?.AccountNumber,
+                    EffectiveDate = load?.EffectiveDate,
+                    AdminMovement = load?.AdminMovement,
+                    ChepInvoiceNo = load?.ChepInvoiceNo,
+                    ClientSiteIdTo = load?.ToClientSiteId,
+                    OutstandingQty = load?.OutstandingQty,
+                    ReceiverNumber = load?.ReceiverNumber,
                     ToClientSiteName = load?.ClientSite1,
                     FromClientSiteName = load?.ClientSite,
-                    CancelledReason = load.CancelledReason,
-                    ReferenceNumber = load.ReferenceNumber,
-                    ClientLoadNotes = load.ClientLoadNotes,
-                    DebriefDocketNo = load.DebriefDocketNo,
-                    OriginalQuantity = load.OriginalQuantity,
+                    CancelledReason = load?.CancelledReason,
+                    ReferenceNumber = load?.ReferenceNumber,
+                    ClientLoadNotes = load?.ClientLoadNotes,
+                    DebriefDocketNo = load?.DebriefDocketNo,
+                    OriginalQuantity = load?.OriginalQuantity,
                     TransporterName = load?.Transporter?.Name,
-                    ClientDescription = load.ClientDescription,
-                    ChepCompensationNo = load.ChepCompensationNo,
-                    Status = ( ReconciliationStatus ) load.Status,
-                    OutstandingReasonId = load.OutstandingReasonId,
+                    ClientDescription = load?.ClientDescription,
+                    ChepCompensationNo = load?.ChepCompensationNo,
+                    Status = ( ReconciliationStatus ) load?.Status,
+                    OutstandingReasonId = load?.OutstandingReasonId,
                     RegionToId = load?.ClientSite1?.Site?.Region?.Id,
                     RegionFromId = load?.ClientSite?.Site?.Region?.Id,
                     VehicleRegistration = load?.Vehicle?.Registration,
-                    ExtendedClientLoad = load.ExtendedClientLoads.FirstOrDefault(),
-                    ReconcileInvoice = load.ReconcileInvoice == true ? YesNo.Yes : YesNo.No,
+                    ExtendedClientLoad = load?.ExtendedClientLoads.FirstOrDefault(),
+                    ReconcileInvoice = load?.ReconcileInvoice == true ? YesNo.Yes : YesNo.No,
 
                     ChepAccountNumberGlid = load?.Client?.ClientCustomers?.FirstOrDefault()?.CustomerNumber,
-                    ClientLoadQuantities = load.ClientLoadQuantities.ToList(),
+                    ClientLoadQuantities = load?.ClientLoadQuantities.ToList(),
                 };
 
                 #endregion
 
-                ViewBag.ClientAuthorisation = load.ClientAuthorisations.FirstOrDefault();
+                ViewBag.ClientAuthorisation = load?.ClientAuthorisations.FirstOrDefault();
 
                 ViewBag.ClientLoads = new List<ClientLoad>() { load };
 
-                List<ChepLoad> cheps = chservice.ListByReference( load.ClientId, load.ReceiverNumber?.Trim() );
+                List<ChepLoad> cheps = chservice.ListByReference( load?.ClientId ?? 0, load?.ReceiverNumber?.Trim() );
 
-                ChepLoad chep = cheps?.FirstOrDefault();
+                if ( chep == null )
+                {
+                    chep = cheps?.FirstOrDefault();
+                }
 
                 #region Client Load Quantities
 
@@ -1198,12 +1208,12 @@ namespace ACT.UI.Controllers
                         new ClientLoadQuantity()
                         {
                             EquipmentCode = chep?.EquipmentCode,
-                            ReturnQty = ( int? ) load.ReturnQty ?? 0,
-                            DebriefQty = ( int? ) load.DebriefQty ?? 0,
-                            OutstandingQty = ( int? ) load.OutstandingQty ?? 0,
-                            AdminMovementQty = ( int? ) load.AdminMovement ?? 0,
-                            OriginalQuantity = ( int? ) load.OriginalQuantity ?? 0,
-                            TransporterLiableQty = ( int? ) load.TransporterLiableQty ?? 0,
+                            ReturnQty = ( int? ) load?.ReturnQty ?? 0,
+                            DebriefQty = ( int? ) load?.DebriefQty ?? 0,
+                            OutstandingQty = ( int? ) load?.OutstandingQty ?? 0,
+                            AdminMovementQty = ( int? ) load?.AdminMovement ?? 0,
+                            OriginalQuantity = ( int? ) load?.OriginalQuantity ?? 0,
+                            TransporterLiableQty = ( int? ) load?.TransporterLiableQty ?? 0,
                         }
                     };
                 }
@@ -1253,7 +1263,7 @@ namespace ACT.UI.Controllers
 
                 #endregion
 
-                List<ClientProduct> cp = new List<ClientProduct>(); // load.Client.ClientProducts.Where( xcp => xcp.Status == ( int ) Status.Active ).ToList();
+                List<ClientProduct> cp = new List<ClientProduct>(); // load?.Client.ClientProducts.Where( xcp => xcp.Status == ( int ) Status.Active ).ToList();
 
                 if ( !cp.NullableAny() )
                 {
@@ -2315,6 +2325,32 @@ namespace ACT.UI.Controllers
             }
 
             Notify( "The selected Client Load POD were successfully updated.", NotificationType.Success );
+
+            return PartialView( "_Notification" );
+        }
+
+        // POST: Pallet/UpdateOutstandingReason/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult UpdateOutstandingReason( int id, int orid )
+        {
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            {
+                ClientLoad cl = clservice.GetById( id );
+
+                if ( cl == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                cl.OutstandingReasonId = orid;
+
+                clservice.Update( cl );
+            }
+
+            Notify( "Outstanding Reason successfully update for the selected load.", NotificationType.Success );
 
             return PartialView( "_Notification" );
         }
@@ -3773,9 +3809,9 @@ namespace ACT.UI.Controllers
                     BililngPostalCode = model.BillingPostalCode,
                     CustomerPostalCode = model.CustomerPostalCode,
                     DeliveryPostalCode = model.DeliveryPostalCode,
-                    BillingProvince = ( int ) model.BillingProvince,
-                    CustomerProvince = ( int ) model.CustomerProvince,
-                    DeliveryProvince = ( int ) model.DeliveryProvince,
+                    BillingProvinceId = model.BillingProvinceId,
+                    CustomerProvinceId = model.CustomerProvinceId,
+                    DeliveryProvinceId = model.DeliveryProvinceId,
                     BillingAddress = $"{model.BillingAddress1}~{model.BillingAddress2}~{model.BillingAddressTown}",
                     DeliveryAddress = $"{model.DeliveryAddress1}~{model.DeliveryAddress2}~{model.DeliveryAddressTown}",
                     CustomerAddress = $"{model.CustomerAddress1}~{model.CustomerAddress2}~{model.CustomerAddressTown}",
@@ -3889,9 +3925,9 @@ namespace ACT.UI.Controllers
                     BillingPostalCode = note.BililngPostalCode,
                     CustomerPostalCode = note.CustomerPostalCode,
                     DeliveryPostalCode = note.DeliveryPostalCode,
-                    BillingProvince = ( Province ) note.BillingProvince,
-                    CustomerProvince = ( Province ) note.CustomerProvince,
-                    DeliveryProvince = ( Province ) note.DeliveryProvince,
+                    BillingProvinceId = note.BillingProvinceId,
+                    CustomerProvinceId = note.CustomerProvinceId,
+                    DeliveryProvinceId = note.DeliveryProvinceId,
 
                     BillingAddress1 = bAddress.Length >= 1 ? bAddress[ 0 ] : string.Empty,
                     BillingAddress2 = bAddress.Length >= 2 ? bAddress[ 1 ] : string.Empty,
@@ -3968,9 +4004,9 @@ namespace ACT.UI.Controllers
                 note.BililngPostalCode = model.BillingPostalCode;
                 note.CustomerPostalCode = model.CustomerPostalCode;
                 note.DeliveryPostalCode = model.DeliveryPostalCode;
-                note.BillingProvince = ( int ) model.BillingProvince;
-                note.CustomerProvince = ( int ) model.CustomerProvince;
-                note.DeliveryProvince = ( int ) model.DeliveryProvince;
+                note.BillingProvinceId = model.BillingProvinceId;
+                note.CustomerProvinceId = model.CustomerProvinceId;
+                note.DeliveryProvinceId = model.DeliveryProvinceId;
                 note.BillingAddress = $"{model.BillingAddress1}~{model.BillingAddress2}~{model.BillingAddressTown}";
                 note.DeliveryAddress = $"{model.DeliveryAddress1}~{model.DeliveryAddress2}~{model.DeliveryAddressTown}";
                 note.CustomerAddress = $"{model.CustomerAddress1}~{model.CustomerAddress2}~{model.CustomerAddressTown}";
@@ -4322,7 +4358,7 @@ namespace ACT.UI.Controllers
                         ch = clservice.GetByDocketNumber( model.OriginalDocketNumber );
                     }
 
-                    model.ChepLoadId = ( ch != null ) ? ch.Id : model.ChepLoadId;
+                    model.ChepLoadId = ( ch != null ) ? ( int? ) ch.Id : null;
                 }
 
                 model.DaysLeft = 0;
@@ -4488,7 +4524,7 @@ namespace ACT.UI.Controllers
                         ch = clservice.GetByDocketNumber( model.OriginalDocketNumber );
                     }
 
-                    model.ChepLoadId = ( ch != null ) ? ch.Id : model.ChepLoadId;
+                    model.ChepLoadId = ( ch != null ) ? ( int? ) ch.Id : null;
                 }
 
                 model.ActionById = ( !model.ActionById.HasValue ) ? CurrentUser.Id : model.ActionById;
@@ -4866,11 +4902,9 @@ namespace ACT.UI.Controllers
                     return PartialView( "_AccessDenied" );
                 }
 
-                code.Status = ( ( ( Status ) code.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+                service.Delete( code );
 
-                service.Update( code );
-
-                Notify( "The selected Authorisation Code was successfully updated.", NotificationType.Success );
+                Notify( "The selected Authorisation Code was successfully deleted.", NotificationType.Success );
 
                 return AuthorisationCodes( new PagingModel(), new CustomSearchModel() );
             }
@@ -4922,13 +4956,21 @@ namespace ACT.UI.Controllers
                 {
                     recipients.Add( cl?.Transporter?.Email );
                 }
-                if ( !string.IsNullOrEmpty( cl?.ClientSite1?.Site?.ReceivingEmail ) )
+                if ( !string.IsNullOrEmpty( cl?.ClientSite1?.AuthorisationEmail1 ) )
                 {
-                    recipients.Add( cl?.ClientSite1?.Site?.ReceivingEmail );
+                    recipients.Add( cl?.ClientSite1?.AuthorisationEmail1 );
                 }
-                if ( !string.IsNullOrEmpty( cl?.ClientSite1?.Site?.User?.Email ) )
+                if ( !string.IsNullOrEmpty( cl?.ClientSite1?.AuthorisationEmail2 ) )
                 {
-                    recipients.Add( cl?.ClientSite1?.Site?.User?.Email );
+                    recipients.Add( cl?.ClientSite1?.AuthorisationEmail2 );
+                }
+                if ( !string.IsNullOrEmpty( cl?.ClientSite1?.AuthorisationEmail3 ) )
+                {
+                    recipients.Add( cl?.ClientSite1?.AuthorisationEmail3 );
+                }
+                if ( !string.IsNullOrEmpty( cl?.ClientSite1?.ClientManagerEmail ) )
+                {
+                    recipients.Add( cl?.ClientSite1?.ClientManagerEmail );
                 }
 
                 if ( recipients.NullableAny() )
@@ -4947,9 +4989,95 @@ namespace ACT.UI.Controllers
                     Mail.Send( email );
                 }
 
-                Notify( "The Authorisation Code was successfully created for the selected Load.", NotificationType.Success );
+                Notify( "The Authorisation Code was successfully created and emailed to the relevant users.", NotificationType.Success );
 
                 return AuthorisationCodes( pm, csm );
+            }
+        }
+
+        public ActionResult SiteContactDetails( int id = 0 )
+        {
+            using ( SiteService sservice = new SiteService() )
+            {
+                Site s = sservice.GetById( id );
+
+                ClientSite cs = s?.ClientSites?.FirstOrDefault() ?? new ClientSite() { };
+
+                return PartialView( "_SiteContactDetails", cs );
+            }
+        }
+
+        public ActionResult TransporterContactDetails( int id = 0 )
+        {
+            using ( TransporterService tservice = new TransporterService() )
+            {
+                Transporter t = tservice.GetById( id );
+
+                return PartialView( "_TransporterContactDetails", t );
+            }
+        }
+
+        // GET: Pallet/EditAuthorisationComment
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditAuthorisationComment( int id )
+        {
+            using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
+            {
+                ClientAuthorisation code = caservice.GetById( id );
+
+                if ( code == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                AuthorisationCodeViewModel model = new AuthorisationCodeViewModel()
+                {
+                    Id = id,
+                    EditMode = true,
+                    Comment = code.Comment
+                };
+
+                return View( model );
+            }
+        }
+
+        // POST: Pallet/EditAuthorisationComment
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditAuthorisationComment( AuthorisationCodeViewModel model )
+        {
+            using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
+            {
+                ClientAuthorisation code = caservice.GetById( model.Id );
+
+                if ( code == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                #region Validation
+
+                if ( string.IsNullOrEmpty( model.Comment ) )
+                {
+                    // Bank already exist!
+                    Notify( $"Please enter a comment and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                #endregion
+
+                code.Comment = model.Comment;
+
+                caservice.Update( code );
+
+                Notify( "Your comment was successfully updated.", NotificationType.Success );
+
+                return AuthorisationCodes( new PagingModel(), new CustomSearchModel() );
             }
         }
 
@@ -5206,7 +5334,8 @@ namespace ACT.UI.Controllers
         // GET: /Pallet/OutstandingPallets
         public ActionResult OutstandingPallets( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
-            using ( ChepLoadService service = new ChepLoadService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( OutstandingReasonService osservice = new OutstandingReasonService() )
             {
                 if ( givecsm )
                 {
@@ -5216,11 +5345,13 @@ namespace ACT.UI.Controllers
                 }
 
                 csm.IsOP = true;
-                csm.BalanceStatus = BalanceStatus.NotBalanced;
-                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
+                //csm.BalanceStatus = BalanceStatus.NotBalanced;
+                //csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
 
-                List<ChepLoadCustomModel> model = service.List1( pm, csm );
-                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+                List<ClientLoadCustomModel> model = clservice.List1( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : clservice.Total1( pm, csm );
+
+                ViewBag.OutstandingReasonOptions = osservice.List( true );
 
                 PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 

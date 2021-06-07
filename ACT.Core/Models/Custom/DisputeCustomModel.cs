@@ -54,5 +54,11 @@ namespace ACT.Core.Models.Custom
         public string DisputeReasonDetails { get; set; }
 
         public decimal? Disputes { get; set; }
+
+        public string SiteName { get; set; }
+        public string ToSiteName { get; set; }
+        public string LoadNumber { get; set; }
+
+        public int? ClientLoadId { get; set; }
     }
 }

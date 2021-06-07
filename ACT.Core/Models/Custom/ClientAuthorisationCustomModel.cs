@@ -69,6 +69,7 @@ namespace ACT.Core.Models.Custom
         public string FromSiteName { get; set; }
         public string ClientName { get; set; }
         public string AuthoriserName { get; set; }
+        public string AuthorisationComment { get; set; }
         public string TransporterName { get; set; }
         public string VehicleRegistration { get; set; }
     }

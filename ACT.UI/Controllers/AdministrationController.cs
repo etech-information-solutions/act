@@ -1151,7 +1151,7 @@ namespace ACT.UI.Controllers
                         Type = ( int ) model.Address.AddressType,
                         Addressline1 = model.Address.AddressLine1,
                         Addressline2 = model.Address.AddressLine2,
-                        Province = ( int ) model.Address.Province,
+                        ProvinceId = model.Address.ProvinceId,
                     };
 
                     aservice.Create( address );
@@ -1407,7 +1407,7 @@ namespace ACT.UI.Controllers
                             Type = ( int ) model.Address.AddressType,
                             Addressline1 = model.Address.AddressLine1,
                             Addressline2 = model.Address.AddressLine2,
-                            Province = ( int ) model.Address.Province,
+                            ProvinceId = model.Address.ProvinceId,
                         };
 
                         aservice.Create( address );
@@ -1419,7 +1419,7 @@ namespace ACT.UI.Controllers
                         address.Type = ( int ) model.Address.AddressType;
                         address.Addressline1 = model.Address.AddressLine1;
                         address.Addressline2 = model.Address.AddressLine2;
-                        address.Province = ( int ) model.Address.Province;
+                        address.ProvinceId = model.Address.ProvinceId;
 
                         aservice.Update( address );
                     }
@@ -1590,7 +1590,8 @@ namespace ACT.UI.Controllers
                         PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
-                        Province = ( address != null ) ? ( Province ) address.Province : Province.All,
+                        ProvinceId = address?.ProvinceId ?? 0,
+                        Province = address?.Province,
                         AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
                     },
                     User = new UserViewModel()
@@ -2837,9 +2838,10 @@ namespace ACT.UI.Controllers
                 {
                     Name = model.Name,
                     PSPId = model.PSPId,
+                    CountryId = model.CountryId,
                     Status = ( int ) model.Status,
+                    ProvinceId = model.ProvinceId,
                     Description = model.Description,
-                    Province = ( int ) model.Province,
                     RegionManagerId = model.RegionManagerId
                 };
 
@@ -2873,10 +2875,11 @@ namespace ACT.UI.Controllers
                     EditMode = true,
                     Name = region.Name,
                     PSPId = region.PSPId,
+                    CountryId = region.CountryId,
+                    ProvinceId = region.ProvinceId,
                     Description = region.Description,
                     Status = ( Status ) region.Status,
                     RegionManagerId = region.RegionManagerId,
-                    Province = ( Province ) region.Province,
                 };
 
                 return View( model );
@@ -2917,9 +2920,10 @@ namespace ACT.UI.Controllers
 
                 region.Name = model.Name;
                 region.PSPId = model.PSPId;
+                region.CountryId = model.CountryId;
+                region.ProvinceId = model.ProvinceId;
                 region.Status = ( int ) model.Status;
                 region.Description = model.Description;
-                region.Province = ( int ) model.Province;
                 region.RegionManagerId = model.RegionManagerId;
 
                 rservice.Update( region );
@@ -4025,19 +4029,16 @@ namespace ACT.UI.Controllers
                 return PartialView( "_RegionCustomSearch", new CustomSearchModel( "Regions" ) );
             }
 
-            int total = 0;
-
-            List<RegionCustomModel> model = new List<RegionCustomModel>();
-
             using ( RegionService service = new RegionService() )
             {
-                model = service.List1( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+                List<RegionCustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_Regions", paging );
             }
-
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
-
-            return PartialView( "_Regions", paging );
         }
 
 

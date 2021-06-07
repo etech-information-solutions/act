@@ -417,7 +417,7 @@ namespace ACT.UI.Controllers
                         Type = ( int ) model.Address.AddressType,
                         Addressline1 = model.Address.AddressLine1,
                         Addressline2 = model.Address.AddressLine2,
-                        Province = ( int ) model.Address.Province,
+                        ProvinceId = model.Address.ProvinceId,
                     };
 
                     aservice.Create( address );

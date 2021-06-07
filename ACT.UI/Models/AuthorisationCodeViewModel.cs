@@ -20,18 +20,22 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string Code { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Authorisation Date" )]
         public DateTime? AuthorisationDate { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Load Number" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string LoadNumber { get; set; }
 
-        [Required]
+        //[Required]
         [Display( Name = "Status" )]
         public Status Status { get; set; }
+
+        [Display( Name = "Comment" )]
+        [StringLength( 250, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
+        public string Comment { get; set; }
 
         public bool EditMode { get; set; }
 

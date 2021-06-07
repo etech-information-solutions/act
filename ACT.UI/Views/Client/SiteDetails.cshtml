@@ -2,7 +2,6 @@
 
 @using ACT.Data.Models;
 @using ACT.Core.Enums;
-@using ACT.Core.Services;
 
 @{
     if ( ViewBag.IncludeLayout == null )
@@ -26,7 +25,7 @@
         </h2>
     }
 
-    <div class="left" style="width: 30%; margin-right: 4%;">
+    <div class="left" style="width: 31%; margin-right: 2%;">
 
         <div class="display-label">
             Name
@@ -114,7 +113,7 @@
 
     </div>
 
-    <div class="left" style="width: 30%; margin-right: 4%;">
+    <div class="left" style="width: 31%; margin-right: 2%;">
 
         <div class="display-label">
             X Coordinate
@@ -209,55 +208,69 @@
 
     </div>
 
-    <div class="left" style="width: 30%;">
+    <div class="left" style="width: 31%;">
 
-        <div class="grouped-area">
-
-            <p>
-                <strong class="uppercase">Addres Details</strong>
-            </p>
-
-            @if ( address != null )
-            {
-                <div class="display-label">
-                    Addres
-                </div>
-                <div class="display-field">
-                    @address.Addressline1
-                </div>
-                <div class="display-field">
-                    @address.Addressline2
-                </div>
-
-                <div class="display-label">
-                    Town/City
-                </div>
-                <div class="display-field">
-                    @address.Town
-                </div>
-
-                <div class="display-label">
-                    Postal Code
-                </div>
-                <div class="display-field">
-                    @address.PostalCode
-                </div>
-
-                <div class="display-label">
-                    Province
-                </div>
-                <div class="display-field">
-                    @(( (Province) address.Province ).GetDisplayText())
-                </div>
-            }
-            else
-            {
-                <div class="message-warn">
-                    This site does not have address details
-                </div>
-            }
-
+        <div class="display-label">
+            Authorisation Email 1
         </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.AuthorisationEmail1 )
+        </div>
+
+        <div class="display-label">
+            Authorisation Email 2
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.AuthorisationEmail2)
+        </div>
+
+        <div class="display-label">
+            Authorisation Email 3
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.AuthorisationEmail3 )
+        </div>
+
+        <div class="display-label">
+            Client Sales Manager
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.ClientSalesManager )
+        </div>
+
+        <div class="display-label">
+            Client Manager Contact
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.ClientManagerContact )
+        </div>
+
+        <div class="display-label">
+            Client Manager Email
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.ClientManagerEmail )
+        </div>
+
+        <div class="display-label">
+            Client Sales Rep Contact
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.ClientSalesRepContact )
+        </div>
+
+        <div class="display-label">
+            Client Sales Rep Email
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.ClientSalesRegEmail )
+        </div>
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    <div class="left" style="width: 45%; margin-right: 3%;">
 
         <div class="grouped-area" style="max-height: 100px; overflow-y: auto;">
 
@@ -295,6 +308,58 @@
                         </li>
                     }
                 </ul>
+            }
+
+        </div>
+
+    </div>
+
+    <div class="left" style="width: 45%;">
+
+        <div class="grouped-area">
+
+            <p>
+                <strong class="uppercase">Addres Details</strong>
+            </p>
+
+            @if ( address != null )
+            {
+                <div class="display-label">
+                    Addres
+                </div>
+                <div class="display-field">
+                    @address.Addressline1
+                </div>
+                <div class="display-field">
+                    @address.Addressline2
+                </div>
+
+                <div class="display-label">
+                    Town/City
+                </div>
+                <div class="display-field">
+                    @address.Town
+                </div>
+
+                <div class="display-label">
+                    Postal Code
+                </div>
+                <div class="display-field">
+                    @address.PostalCode
+                </div>
+
+                <div class="display-label">
+                    Province
+                </div>
+                <div class="display-field">
+                    @(address?.Province?.Description)
+                </div>
+            }
+            else
+            {
+                <div class="message-warn">
+                    This site does not have address details
+                </div>
             }
 
         </div>

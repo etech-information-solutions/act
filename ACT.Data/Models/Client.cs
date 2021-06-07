@@ -27,13 +27,13 @@ namespace ACT.Data.Models
             this.ClientLoads1 = new HashSet<ClientLoad>();
             this.ClientProducts = new HashSet<ClientProduct>();
             this.ClientUsers = new HashSet<ClientUser>();
-            this.DeliveryNotes = new HashSet<DeliveryNote>();
             this.PSPClients = new HashSet<PSPClient>();
             this.SiteAudits = new HashSet<SiteAudit>();
             this.Transporters = new HashSet<Transporter>();
             this.Tasks = new HashSet<Task>();
             this.ChepLoads = new HashSet<ChepLoad>();
             this.ExtendedClientLoads = new HashSet<ExtendedClientLoad>();
+            this.DeliveryNotes = new HashSet<DeliveryNote>();
         }
     
         public int Id { get; set; }
@@ -85,8 +85,6 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientUser> ClientUsers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<DeliveryNote> DeliveryNotes { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PSPClient> PSPClients { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SiteAudit> SiteAudits { get; set; }
@@ -98,5 +96,7 @@ namespace ACT.Data.Models
         public virtual ICollection<ChepLoad> ChepLoads { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ExtendedClientLoad> ExtendedClientLoads { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<DeliveryNote> DeliveryNotes { get; set; }
     }
 }

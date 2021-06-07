@@ -15,6 +15,7 @@ namespace ACT.Data.Models
     public partial class Address
     {
         public int Id { get; set; }
+        public Nullable<int> ProvinceId { get; set; }
         public int ObjectId { get; set; }
         public string ObjectType { get; set; }
         public System.DateTime CreatedOn { get; set; }
@@ -26,8 +27,9 @@ namespace ACT.Data.Models
         public string PostalCode { get; set; }
         public string Longitude { get; set; }
         public string Latitude { get; set; }
-        public int Province { get; set; }
         public int Type { get; set; }
         public int Status { get; set; }
+    
+        public virtual Province Province { get; set; }
     }
 }
