@@ -1,29 +1,27 @@
 ﻿@using ACT.Core.Enums;
-@using ACT.Data.Models; 
-@using ACT.Core.Models; 
+@using ACT.Data.Models;
+@using ACT.Core.Models;
 
 @{
-        string controller = ViewContext.RouteData.Values[ "controller" ].ToString();
+    string controller = ViewContext.RouteData.Values[ "controller" ].ToString();
 
-        Client client = ( ViewBag.SelectedClient != null ) ? ViewBag.SelectedClient : new Client() { CompanyName = "N/A" };
+    Client client = ( ViewBag.SelectedClient != null ) ? ViewBag.SelectedClient : new Client() { CompanyName = "N/A" };
 
-        //UserModel user = ( Request.IsAuthenticated && ViewBag.CurrentUser != null ) ? ( UserModel ) ViewBag.CurrentUser : User.Get();
-
-        //string sessClient = ( HttpContext.Current.Session[ "ClientId" ] != null ? HttpContext.Current.Session[ "ClientId" ].ToString() : "0" );
-    }
+    UserModel user = ( Request.IsAuthenticated && ViewBag.CurrentUser != null ) ? ( UserModel ) ViewBag.CurrentUser : User.Get();
+}
 
 <div class="menu">
-    <ul>
 
+    <ul id="welcome-ul">
         <li class="logz">
             <a href="@Url.Action( "Index", "DashBoard" )">
                 <img alt="ACT Pallet Solutions" src="@Url.Content( "~/images/act-logo.png" )" style="width: 100%;" />
             </a>
         </li>
 
-        @*<li class="welcome">
+        <li class="welcome">
             Welcome <strong>@user.Name</strong>
-        </li>*@
+        </li>
         <li class="welcome" style="font-size: 14px; color: #333;">
             Selected Client:
 
@@ -31,16 +29,9 @@
                 @(client?.CompanyName)
             </span>
         </li>
-        @*@if ( User.Has( PermissionTo.View, PermissionContext.Client ) )
-        {
-            <li class="welcome">
-                Select Client
-                <select id="ClientListAdmin" name="ClientListAdmin"></select>
-                <br />
-                <br />
-            </li>
-        }*@
+    </ul>
 
+    <ul id="menu-ul">
         @if ( User.Has( PermissionTo.View, PermissionContext.DashBoard ) )
         {
             <li class="@(controller.ToLower().Equals( "dashboard" ) ? "current" : "")" data-hot-spot="1" data-c="DashBoard" data-t="">

@@ -665,8 +665,6 @@ namespace ACT.UI.Controllers
                         try
                         {
                             cjservice.Query( cQuery );
-
-                            created++;
                         }
                         catch ( Exception ex )
                         {

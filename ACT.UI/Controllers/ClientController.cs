@@ -3650,7 +3650,7 @@ namespace ACT.UI.Controllers
 
                     count++;
 
-                    if ( load.NullableCount() < 2 )
+                    if ( load.NullableCount() < 2 || string.IsNullOrWhiteSpace( load[ 0 ].Trim() ) )
                     {
                         skipped++;
 

@@ -14,7 +14,7 @@
 
         Stretched: false,
 
-        Resize: function ()
+        ResizeWidth: function ()
         {
             ACT.Menu.MenuBarWidth = 0;
 
@@ -36,6 +36,7 @@
 
             this.Shrink();
         },
+
         Stretch: function ()
         {
             this.MenuBar.find( "> li" ).each( function ()
@@ -50,6 +51,7 @@
 
             this.Stretched = true;/**/
         },
+
         Shrink: function ()
         {
             var avgPieces = parseInt( this.ViewPointWidth / ( this.MenuBarWidth / this.MenuBar.find( "> li" ).length ) );
@@ -97,6 +99,18 @@
             }
 
             this.Shrinked = true;
+        },
+
+        ResizeHeight: function ()
+        {
+            if ( $( window ).outerHeight() > ( $( "#welcome-ul" ).outerHeight() + $( "#menu-ul" ).outerHeight() ) )
+            {
+                $( "#menu-ul" ).css( { "height": "auto" } );
+
+                return;
+            }
+
+            $( "#menu-ul" ).css( { "overflow-y": "auto", "height": ( ( $( window ).outerHeight() - $( "#welcome-ul" ).outerHeight() ) - 20 ) + "px" } );
         }
     }
 } )();
@@ -104,10 +118,15 @@
 
 $( function ()
 {
-    ACT.Menu.Resize();
+    ACT.Menu.ResizeWidth();
+    ACT.Menu.ResizeHeight();
 
     $( window ).resize( function ()
     {
-        ACT.Menu.Resize();
+        setTimeout( function ()
+        {
+            ACT.Menu.ResizeWidth();
+            ACT.Menu.ResizeHeight();
+        }, 1000 );
     } );
 } );
