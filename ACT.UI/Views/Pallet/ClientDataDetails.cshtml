@@ -79,7 +79,16 @@
             OutstandingReason = ec.OutstandingReason,
         };
 
+        Model.ChepRef = ec.Ref;
+        Model.ChepOtherRef = ec.OtherRef;
+        Model.DeliveryDate = ec.DeliveryDate;
+        Model.ChepInvoiceNumber = ec.InvoiceNumber;
+        Model.ChepEffectiveDate = ec.EffectiveDate;
+        Model.PalletReturnDate = ec.PalletReturnDate;
+        Model.PalletReturnSlipNo = ec.PalletReturnSlipNo;
         Model.DocumentType = ( DocumentType ) ec.DocumentType;
+        Model.ChepCustomerThanDocNo = ec.ChepCustomerThanDocNo;
+        Model.WarehouseTransferDocNo = ec.WarehouseTransferDocNo;
     }
 }
 
@@ -359,7 +368,7 @@
                                                         ?.EffectiveDate;
                     }
                     @Html.Raw( returnDate?.ToString( "yyyy/MM/dd" ) ?? "&nbsp;" )*@
-                <input class="date-picker" data-val="true" data-val-date="The field Load Date: must be a date." id="PalletReturnDate" name="PalletReturnDate" placeholder="     /       /       " type="text" value="@(Model.PalletReturnDate?.ToString( "yyyy/MM/dd" ))">
+                <input id="PalletReturnDate" name="PalletReturnDate" class="date-picker" data-val="true" data-val-date="The field Load Date: must be a date." placeholder="     /       /       " type="text" value="@(Model.PalletReturnDate?.ToString( "yyyy/MM/dd" ))">
             </div>
 
             <div class="edit-label">
@@ -462,7 +471,7 @@
                                     ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
 
                                     <td style="width: @width%">
-                                        <input name="ClientLoadQuantities[@cqCount].OriginalQuantity" type="text" value="@(clq?.OriginalQuantity)" />
+                                        <input id="del-qty-@item.Equipment" name="ClientLoadQuantities[@cqCount].OriginalQuantity" type="text" value="@(clq?.OriginalQuantity)" data-update-oqty="1" data-update="#o-qty-@item.Equipment" data-del-qty="#del-qty-@item.Equipment" data-group="#ret-qty-@item.Equipment, #deb-qty-@item.Equipment, #tl-qty-@item.Equipment, #admin-qty-@item.Equipment" />
                                     </td>
 
                                     cqCount++;
@@ -493,7 +502,7 @@
                                     ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
 
                                     <td style="width: @width%">
-                                        <input name="ClientLoadQuantities[@cqCount].ReturnQty" type="text" value="@(clq?.ReturnQty)" />
+                                        <input id="ret-qty-@item.Equipment" name="ClientLoadQuantities[@cqCount].ReturnQty" type="text" value="@(clq?.ReturnQty)" data-update-oqty="1" data-update="#o-qty-@item.Equipment" data-del-qty="#del-qty-@item.Equipment" data-group="#ret-qty-@item.Equipment, #deb-qty-@item.Equipment, #tl-qty-@item.Equipment, #admin-qty-@item.Equipment" />
                                     </td>
 
                                     cqCount++;
@@ -524,7 +533,7 @@
                                     ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
 
                                     <td style="width: @width%">
-                                        <input name="ClientLoadQuantities[@cqCount].DebriefQty" type="text" value="@(clq?.DebriefQty)" />
+                                        <input id="deb-qty-@item.Equipment" name="ClientLoadQuantities[@cqCount].DebriefQty" type="text" value="@(clq?.DebriefQty)" data-update-oqty="1" data-update="#o-qty-@item.Equipment" data-del-qty="#del-qty-@item.Equipment" data-group="#ret-qty-@item.Equipment, #deb-qty-@item.Equipment, #tl-qty-@item.Equipment, #admin-qty-@item.Equipment" />
                                     </td>
 
                                     cqCount++;
@@ -555,7 +564,7 @@
                                     ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
 
                                     <td style="width: @width%">
-                                        <input name="ClientLoadQuantities[@cqCount].TransporterLiableQty" type="text" value="@(clq?.TransporterLiableQty)" />
+                                        <input id="tl-qty-@item.Equipment" name="ClientLoadQuantities[@cqCount].TransporterLiableQty" type="text" value="@(clq?.TransporterLiableQty)" data-update-oqty="1" data-update="#o-qty-@item.Equipment" data-del-qty="#del-qty-@item.Equipment" data-group="#ret-qty-@item.Equipment, #deb-qty-@item.Equipment, #tl-qty-@item.Equipment, #admin-qty-@item.Equipment" />
                                     </td>
 
                                     cqCount++;
@@ -586,7 +595,7 @@
                                     ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
 
                                     <td style="width: @width%">
-                                        <input name="ClientLoadQuantities[@cqCount].AdminMovementQty" type="text" value="@(clq?.AdminMovementQty)" />
+                                        <input id="admin-qty-@item.Equipment" name="ClientLoadQuantities[@cqCount].AdminMovementQty" type="text" value="@(clq?.AdminMovementQty)" data-update-oqty="1" data-update="#o-qty-@item.Equipment" data-del-qty="#del-qty-@item.Equipment" data-group="#ret-qty-@item.Equipment, #deb-qty-@item.Equipment, #tl-qty-@item.Equipment, #admin-qty-@item.Equipment" />
                                     </td>
 
                                     cqCount++;
@@ -617,7 +626,7 @@
                                     ClientLoadQuantity clq = Model.ClientLoadQuantities?.FirstOrDefault( cq => cq?.EquipmentCode?.Trim()?.ToLower() == item.Equipment?.Trim()?.ToLower() );
 
                                     <td style="width: @width%">
-                                        <input name="ClientLoadQuantities[@cqCount].OutstandingQty" type="text" value="@(clq?.OutstandingQty)" />
+                                        <input id="o-qty-@item.Equipment" name="ClientLoadQuantities[@cqCount].OutstandingQty" type="text" value="@(clq?.OutstandingQty)" />
                                     </td>
 
                                     cqCount++;

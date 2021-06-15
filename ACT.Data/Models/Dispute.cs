@@ -57,8 +57,8 @@ namespace ACT.Data.Models
     
         public virtual DisputeReason DisputeReason { get; set; }
         public virtual Product Product1 { get; set; }
+        public virtual ChepLoad ChepLoad { get; set; }
         public virtual User User { get; set; }
         public virtual User User1 { get; set; }
-        public virtual ChepLoad ChepLoad { get; set; }
     }
 }

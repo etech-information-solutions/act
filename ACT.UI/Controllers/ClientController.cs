@@ -3365,13 +3365,13 @@ namespace ACT.UI.Controllers
                         {
                             v = new Vehicle()
                             {
+                                Type = mv.Type,
                                 Make = mv.Make,
                                 //Year = mv.Year,
                                 ObjectId = t.Id,
-                                Model = mv.Model,
-                                Type = ( int ) mv.Type,
                                 //VINNumber = mv.VINNumber,
                                 ObjectType = "Transporter",
+                                FleetNumber = mv.FleetNumber,
                                 Descriptoin = mv.Descriptoin,
                                 Status = ( int ) model.Status,
                                 Registration = mv.Registration,
@@ -3382,12 +3382,12 @@ namespace ACT.UI.Controllers
                         }
                         else
                         {
+                            v.Type = mv.Type;
                             v.Make = mv.Make;
                             //v.Year = mv.Year;
-                            v.Model = mv.Model;
-                            v.Type = ( int ) mv.Type;
                             //v.VINNumber = mv.VINNumber;
                             v.Descriptoin = mv.Descriptoin;
+                            v.FleetNumber = mv.FleetNumber;
                             v.Status = ( int ) model.Status;
                             v.Registration = mv.Registration;
                             //v.EngineNumber = mv.EngineNumber;
@@ -3553,32 +3553,32 @@ namespace ACT.UI.Controllers
                         {
                             v = new Vehicle()
                             {
+                                Type = mv.Type,
                                 Make = mv.Make,
                                 //Year = mv.Year,
                                 ObjectId = t.Id,
-                                Model = mv.Model,
-                                Type = ( int ) mv.Type,
                                 //VINNumber = mv.VINNumber,
                                 ObjectType = "Transporter",
+                                FleetNumber = mv.FleetNumber,
                                 Status = ( int ) model.Status,
                                 Registration = mv.Registration,
                                 //EngineNumber = mv.EngineNumber,
-                                Descriptoin = $"{mv.Make} {mv.Model}",
+                                Descriptoin = $"{mv.Make} {mv.FleetNumber}",
                             };
 
                             vservice.Create( v );
                         }
                         else
                         {
+                            v.Type = mv.Type;
                             v.Make = mv.Make;
                             //v.Year = mv.Year;
-                            v.Model = mv.Model;
-                            v.Type = ( int ) mv.Type;
                             //v.VINNumber = mv.VINNumber;
+                            v.FleetNumber = mv.FleetNumber;
                             v.Status = ( int ) model.Status;
                             v.Registration = mv.Registration;
                             //v.EngineNumber = mv.EngineNumber;
-                            v.Descriptoin = $"{mv.Make} {mv.Model}";
+                            v.Descriptoin = $"{mv.Make} {mv.FleetNumber}";
 
                             vservice.Update( v );
                         }

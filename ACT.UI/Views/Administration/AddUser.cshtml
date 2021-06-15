@@ -107,34 +107,73 @@
 
             </div>
 
-            <div class="grouped-area left" style="width: 46%;">
+            <div class="left" style="width: 46%;">
 
-                <p>
-                    <strong class="uppercase" style="color: #002e70 !important;">LOGIN DETAILS</strong>
-                </p>
+                <div class="grouped-area">
 
-                <div class="edit-label">
-                    @Html.LabelFor( model => model.Email )
-                </div>
-                <div class="edit-field">
-                    @Html.TextBoxFor( model => model.Email, new { @placeholder = "Enter Email Address" } )
-                    @Html.ValidationMessageFor( model => model.Email )
+                    <p>
+                        <strong class="uppercase" style="color: #002e70 !important;">LOGIN DETAILS</strong>
+                    </p>
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.Email )
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor( model => model.Email, new { @placeholder = "Enter Email Address" } )
+                        @Html.ValidationMessageFor( model => model.Email )
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.Password )
+                    </div>
+                    <div class="edit-field">
+                        @Html.PasswordFor( model => model.Password, new { @placeholder = "Enter Password" } )
+                        @Html.ValidationMessageFor( model => model.Password )
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.ConfirmPassword )
+                    </div>
+                    <div class="edit-field">
+                        @Html.PasswordFor( model => model.ConfirmPassword, new { @placeholder = "Confirm Password" } )
+                        @Html.ValidationMessageFor( model => model.ConfirmPassword )
+                    </div>
+
                 </div>
 
-                <div class="edit-label">
-                    @Html.LabelFor( model => model.Password )
-                </div>
-                <div class="edit-field">
-                    @Html.PasswordFor( model => model.Password, new { @placeholder = "Enter Password" } )
-                    @Html.ValidationMessageFor( model => model.Password )
-                </div>
+                <div class="grouped-area">
 
-                <div class="edit-label">
-                    @Html.LabelFor( model => model.ConfirmPassword )
-                </div>
-                <div class="edit-field">
-                    @Html.PasswordFor( model => model.ConfirmPassword, new { @placeholder = "Confirm Password" } )
-                    @Html.ValidationMessageFor( model => model.ConfirmPassword )
+                    @if ( user.RoleType == RoleType.SuperAdmin )
+                    {
+                        <p>
+                            <strong class="uppercase" style="color: #002e70 !important;">CHATS</strong>
+                        </p>
+
+                        <div class="edit-label">
+                            @Html.LabelFor( model => model.CanSendChat )
+                        </div>
+                        <div class="edit-field">
+                            @Html.EnumDropDownFor( model => model.CanSendChat, false, new { @class = "chzn", @style = "width: 98%;" } )
+                            @Html.ValidationMessageFor( model => model.CanSendChat )
+                        </div>
+
+                        <div class="edit-label">
+                            @Html.LabelFor( model => model.CanReceiveChat )
+                        </div>
+                        <div class="edit-field">
+                            @Html.EnumDropDownFor( model => model.CanReceiveChat, false, new { @class = "chzn", @style = "width: 98%;" } )
+                            @Html.ValidationMessageFor( model => model.CanReceiveChat )
+                        </div>
+
+                        <div class="edit-label">
+                            @Html.LabelFor( model => model.OnlineStatus )
+                        </div>
+                        <div class="edit-field">
+                            @Html.EnumDropDownFor( model => model.OnlineStatus, false, new { @class = "chzn", @style = "width: 98%;" } )
+                            @Html.ValidationMessageFor( model => model.OnlineStatus )
+                        </div>
+                    }
+
                 </div>
 
             </div>

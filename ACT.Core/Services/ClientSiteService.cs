@@ -104,7 +104,7 @@ namespace ACT.Core.Services
 
             #endregion
 
-            string query = $"SELECT cs.[Id] AS [TKey], s.[Description] AS [TValue] FROM [dbo].[Site] s LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=(SELECT TOP 1 cs1.[Id] FROM [dbo].[ClientSite] cs1 WHERE cs1.[SiteId]=s.[Id]) WHERE (1=1)";
+            string query = $"SELECT cs.[Id] AS [TKey], s.[Description] AS [TValue] FROM [dbo].[Site] s LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=(SELECT TOP 1 cs1.[Id] FROM [dbo].[ClientSite] cs1 WHERE cs1.[SiteId]=s.[Id]) WHERE (cs.Id IS NOT NULL)";
 
             if ( csm.ClientId > 0 )
             {

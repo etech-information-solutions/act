@@ -71,11 +71,9 @@ namespace ACT.Data.Models
         public virtual DbSet<SiteAudit> SiteAudits { get; set; }
         public virtual DbSet<SiteBilling> SiteBillings { get; set; }
         public virtual DbSet<SiteBudget> SiteBudgets { get; set; }
-        public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
         public virtual DbSet<Task> Tasks { get; set; }
         public virtual DbSet<Token> Tokens { get; set; }
         public virtual DbSet<Transporter> Transporters { get; set; }
-        public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserBroadcast> UserBroadcasts { get; set; }
         public virtual DbSet<UserDocument> UserDocuments { get; set; }
         public virtual DbSet<UserNotification> UserNotifications { get; set; }
@@ -88,7 +86,6 @@ namespace ACT.Data.Models
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<ClientLoadQuantity> ClientLoadQuantities { get; set; }
         public virtual DbSet<ChepLoad> ChepLoads { get; set; }
-        public virtual DbSet<ExtendedClientLoad> ExtendedClientLoads { get; set; }
         public virtual DbSet<ClientLoadHistory> ClientLoadHistories { get; set; }
         public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
         public virtual DbSet<ClientSite> ClientSites { get; set; }
@@ -97,5 +94,11 @@ namespace ACT.Data.Models
         public virtual DbSet<Address> Addresses { get; set; }
         public virtual DbSet<DeliveryNote> DeliveryNotes { get; set; }
         public virtual DbSet<Region> Regions { get; set; }
+        public virtual DbSet<ExtendedClientLoad> ExtendedClientLoads { get; set; }
+        public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<Message> Messages { get; set; }
+        public virtual DbSet<Ticket> Tickets { get; set; }
+        public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
+        public virtual DbSet<User> Users { get; set; }
     }
 }

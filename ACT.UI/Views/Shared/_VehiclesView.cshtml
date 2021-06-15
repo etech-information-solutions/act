@@ -15,7 +15,7 @@
             <tr>
                 <th>#</th>
                 <th>Make</th>
-                <th>Model</th>
+                <th>Fleet No.</th>
                 @*<th>Year</th>
                 <th>Engine #</th>
                 <th>VIN #</th>*@
@@ -40,7 +40,7 @@
                             @b.Make
                         </td>
                         <td>
-                            @b.Model
+                            @b.FleetNumber
                         </td>
                         @*<td>
                             @b.Year
@@ -55,7 +55,7 @@
                             @b.Registration
                         </td>
                         <td>
-                            @( ( ( VehicleType ) b.Type ).GetDisplayText() )
+                            @( b.Type.HasValue ? ( ( VehicleType ) b.Type ).GetDisplayText() : string.Empty )
                         </td>
                     </tr>
 

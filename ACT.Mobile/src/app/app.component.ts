@@ -51,6 +51,12 @@ export class AppComponent implements OnInit
       strict: false
     },
     {
+      title: 'Chats',
+      url: '/chats',
+      icon: 'chatbubbles',
+      strict: false
+    },
+    {
       title: 'Logout',
       url: '/logout',
       icon: 'log-out',
@@ -69,6 +75,8 @@ export class AppComponent implements OnInit
     {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+
+      
     });
   }
 

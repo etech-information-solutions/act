@@ -57,6 +57,11 @@ namespace ACT.Core.Services
             return context.Users.FirstOrDefault( u => ( u.Name.ToLower() == name || u.Name.ToLower().Contains( name ) ) || ( u.Surname.ToLower() == surname || u.Surname.ToLower().Contains( surname ) ) );
         }
 
+        public List<User> ListAvalaibleSupport()
+        {
+            return context.Users.Where( u => u.ReceiveChat ).ToList();
+        }
+
         /// <summary>
         /// Gets a user using the specified name and surname
         /// </summary>
@@ -282,7 +287,7 @@ namespace ACT.Core.Services
         /// <param name="pm"></param>
         /// <param name="csm"></param>
         /// <returns></returns>
-        public List<UserCustomModel> ListCSM( PagingModel pm, CustomSearchModel csm )
+        public List<UserCustomModel> List1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
@@ -388,7 +393,7 @@ namespace ACT.Core.Services
 
             return context.Database.SqlQuery<UserCustomModel>( query, parameters.ToArray() ).ToList();
         }
-
+        
         /// <summary>
         /// Checks if a user with the specified email already exists?
         /// </summary>

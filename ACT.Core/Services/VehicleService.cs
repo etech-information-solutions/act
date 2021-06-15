@@ -205,7 +205,7 @@ namespace ACT.Core.Services
 
             string query = string.Empty;
 
-            query = $"SELECT v.[Id] AS [TKey], v.[Descriptoin] AS [TValue] FROM [dbo].[Vehicle] v WHERE (1=1)";
+            query = $"SELECT v.[Id] AS [TKey], v.[Registration] AS [TValue] FROM [dbo].[Vehicle] v WHERE (1=1)";
 
             if ( objectId > 0 )
             {

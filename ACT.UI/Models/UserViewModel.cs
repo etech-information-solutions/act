@@ -66,9 +66,20 @@ namespace ACT.UI.Models
 
         public RoleType RoleType { get; set; }
 
+        [Display( Name = "Can Use Chats" )]
+        public YesNo CanSendChat { get; set; }
+
+        [Display( Name = "Can Respond To Chats" )]
+        public YesNo CanReceiveChat { get; set; }
+
+        [Display( Name = "Online Chat Status" )]
+        public OnlineStatus OnlineStatus { get; set; }
+
         public bool EditMode { get; set; }
 
         #endregion
+
+
 
         #region Model Options 
 

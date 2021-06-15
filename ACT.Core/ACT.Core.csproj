@@ -73,6 +73,7 @@
     <Compile Include="Attributes\ViewModelAttribute.cs" />
     <Compile Include="Attributes\ViewModelBindingAttribute.cs" />
     <Compile Include="Encryption\Encryption.cs" />
+    <Compile Include="Enums\OnlineStatus.cs" />
     <Compile Include="Enums\DateFormats.cs" />
     <Compile Include="Enums\JobType.cs" />
     <Compile Include="Enums\JournalType.cs" />
@@ -199,6 +200,7 @@
     <Compile Include="Models\JsonCommonModel.cs" />
     <Compile Include="Models\CountModel.cs" />
     <Compile Include="Models\KeyValueModel.cs" />
+    <Compile Include="Models\MessageCustomModel.cs" />
     <Compile Include="Models\OutstandingPalletsModel.cs" />
     <Compile Include="Models\Simple\SimpleOutstandingPallets.cs" />
     <Compile Include="Models\Simple\SimpleBankModel.cs" />
@@ -210,8 +212,12 @@
     <Compile Include="Models\RoleModel.cs" />
     <Compile Include="Models\Simple\SimpleUserModel.cs" />
     <Compile Include="Models\StringDropDownModel.cs" />
+    <Compile Include="Models\TicketCustomModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\MessageService.cs" />
+    <Compile Include="Services\DepartmentService.cs" />
+    <Compile Include="Services\TicketService.cs" />
     <Compile Include="Services\ClientLoadQuantityService.cs" />
     <Compile Include="Services\ClientLoadHistoryService.cs" />
     <Compile Include="Services\CountryService.cs" />

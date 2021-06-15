@@ -49,5 +49,8 @@ namespace ACT.Data.Models
         public Nullable<int> LastClientMonitorCount { get; set; }
         public Nullable<int> ClientContractRenewalReminderMonths { get; set; }
         public Nullable<int> DisputeDaysToResolve { get; set; }
+        public string FirebaseUrl { get; set; }
+        public string FirebaseServerKey { get; set; }
+        public string FirebaseSenderId { get; set; }
     }
 }

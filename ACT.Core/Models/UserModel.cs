@@ -58,6 +58,8 @@ namespace ACT.Core.Models
 
         public string PayRewardsTo { get; set; }
 
+        public string DeviceId { get; set; }
+
 
         public Role Role { get; set; }
 

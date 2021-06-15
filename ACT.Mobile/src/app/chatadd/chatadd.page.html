@@ -1,0 +1,52 @@
+<ion-header [translucent]="true" style="color: #002e70 !important;">
+  <ion-toolbar style="color: #002e70 !important;">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      <img (click)="this.auth.OnShowContact()" alt="Contact" src="../../assets/imgs/contact.png" style="width: 36px;" />
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-icon name="notifications" size="large" (click)="this.auth.GoToPage('notifications')"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content [fullscreen]="true" (ionScroll)="this.auth.OnScroll($event)" [scrollEvents]="true">
+  
+  <!-- fab placed to the top end -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="this.auth.ShowScroll" (click)="this.auth.ScrollToTop();">
+    <ion-fab-button>
+      <ion-icon name="chevron-up"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-item-divider>
+    <ion-label>
+      Chat with us
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item>
+    <ion-label>Department *</ion-label>
+    <ion-select name="DepartmentId" [(ngModel)]="DepartmentId">
+      <ion-select-option *ngFor="let x of this.chatservice.Departments" [value]="x.Id">{{x.Name}}</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label class="required">Message *</ion-label>
+    <ion-textarea type="text" name="Detail" [(ngModel)]="Details" required="required"></ion-textarea>
+  </ion-item>
+
+  <div text-left style="margin-top: 20px; padding: 20px">
+
+    <ion-button (click)="Send()" type="button" shape="round" expand="full" style="--background: #002e70;">
+      Send
+      <ion-icon name="chatbubbles-outline" slot="end"></ion-icon>
+    </ion-button>
+
+  </div>
+
+</ion-content>

@@ -159,6 +159,7 @@
             this.DataControlDoc( $( '*[data-control-doc="1"]' ) );
             this.DataLoadDisputes( $( '*[data-load-disputes="1"]' ) );
             this.DataLoadMovements( $( '*[data-load-movements="1"]' ) );
+            this.DataUpdateOutstandingQty( $( '*[data-update-oqty="1"]' ) );
             this.DataClientLoadJournal( $( '*[data-clientload-journal="1"]' ) );
             this.DataUpdateOutstandingReason( $( '*[data-update-outstanding-reason="1"]' ) );
 
@@ -5932,7 +5933,36 @@
                             ACT.Loader.Hide();
                         } );
                     } );
-            } )
+            } );
+        },
+
+        DataUpdateOutstandingQty: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var group = $( i.attr( "data-group" ) );
+                var update = $( i.attr( "data-update" ) );
+                var delQty = $( i.attr( "data-del-qty" ) );
+
+                i
+                    .unbind( "keyup" )
+                    .bind( "keyup", function ()
+                    {
+                        var s = 0;
+                        var sum = delQty.val() != "" ? delQty.val() : 0;
+
+                        group.each( function ()
+                        {
+                            if ( $( this ).val() == "" || !parseInt( $( this ).val() ) ) return;
+
+                            s += parseInt( $( this ).val() );
+                        } );
+
+                        update.val( ( sum - s ) );
+                    } );
+            } );
         }
     };
 } )();

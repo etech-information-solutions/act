@@ -1,0 +1,83 @@
+<ion-header [translucent]="true" style="color: #002e70 !important;">
+  <ion-toolbar style="color: #002e70 !important;">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      <img (click)="this.auth.OnShowContact()" alt="Contact" src="../../assets/imgs/contact.png" style="width: 36px;" />
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-icon name="notifications" size="large" (click)="this.auth.GoToPage('notifications')"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" (ionScroll)="this.auth.OnScroll($event)" [scrollEvents]="true">
+  
+  <!-- fab placed to the top end -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="this.auth.ShowScroll" (click)="this.auth.ScrollToTop();">
+    <ion-fab-button>
+      <ion-icon name="chevron-up"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-refresher (ionRefresh)="Refresh($event)" slot="fixed">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-item-divider style="margin-bottom: 20px;">
+    <ion-label style="text-transform: uppercase;">
+      Chats
+    </ion-label>
+
+    <ion-icon slot="end" name="add-circle-outline" (click)="Add();" *ngIf="!this.auth.CurrentUser.IsAdmin"></ion-icon>
+  </ion-item-divider>
+
+  <ion-item>
+    
+    <ion-input type="search" name="Query" placeholder="search" [(ngModel)]="Query" (ionChange)="Search()">
+      <ion-icon name="search" slot="start" style="padding-right: 10px;"></ion-icon>
+    </ion-input>
+    
+  </ion-item>
+
+  <p></p>
+
+  <ion-list>
+
+    <div *ngFor="let c of this.chatservice.Chats">
+
+      <ion-item (click)="GoToChat(c.Id)" *ngIf="c != undefined">
+  
+        <ion-label [class.bold]="c.MessageStatus == 0 && c.MessageSenderUserId != this.auth.CurrentUser.Id">
+          
+          <p *ngIf="this.auth.CurrentUser.IsAdmin" style="color: #002e70 !important; text-transform: uppercase;">
+            <b>{{c.OwnerName}} <small style="font-size: 11px !important;">(Client)</small></b>
+          </p>
+          <p *ngIf="!this.auth.CurrentUser.IsAdmin" style="color: #002e70 !important; text-transform: uppercase;">
+            <b>{{c.SupportName}} <small style="font-size: 11px !important;">(Support)</small></b>
+          </p>
+          
+          <span>
+              {{c.Message}}
+          </span>
+  
+          <p style="font-size: 10px !important; margin-top: 5px !important; font-weight: normal !important;">
+            {{this.auth.GetShortDate(c.MessageCreatedOn, 'yyyy/MM/dd')}} @ {{this.auth.GetShortTime(c.MessageCreatedOn)}}
+          </p>
+  
+        </ion-label>
+        
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+  
+      </ion-item>
+
+    </div>
+
+  </ion-list>
+
+  <ion-infinite-scroll threshold="200px" (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>

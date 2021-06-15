@@ -202,7 +202,7 @@ namespace ACT.UI.Controllers
 
                     using ( UserService uservice = new UserService() )
                     {
-                        userModel = uservice.ListCSM( pm, csm );
+                        userModel = uservice.List1( pm, csm );
 
                         if ( userModel != null && userModel.Any() )
                         {
@@ -720,8 +720,6 @@ namespace ACT.UI.Controllers
                 return View( model );
             }
 
-            User user;
-
             using ( UserService uservice = new UserService() )
             using ( RoleService rservice = new RoleService() )
             {
@@ -750,7 +748,7 @@ namespace ACT.UI.Controllers
                 Role role = rservice.GetById( model.RoleId );
 
                 // Create User
-                user = new User()
+                User user = new User()
                 {
                     Type = role.Type,
                     Cell = model.Cell,
@@ -759,8 +757,15 @@ namespace ACT.UI.Controllers
                     Surname = model.Surname,
                     PasswordDate = DateTime.Now,
                     Status = ( int ) model.Status,
-                    Password = uservice.GetSha1Md5String( model.Password )
+                    Password = uservice.GetSha1Md5String( model.Password ),
                 };
+
+                if ( CurrentUser.IsAdmin )
+                {
+                    user.ChatStatus = ( int ) model.OnlineStatus;
+                    user.SendChat = model.CanSendChat.GetBoolValue();
+                    user.ReceiveChat = model.CanReceiveChat.GetBoolValue();
+                }
 
                 #region Link PSP / Client
 
@@ -797,11 +802,11 @@ namespace ACT.UI.Controllers
                 #endregion
 
                 // We're done here..
+
+                Notify( "The User was successfully created.", NotificationType.Success );
+
+                return RedirectToAction( "Users" );
             }
-
-            Notify( "The User was successfully created.", NotificationType.Success );
-
-            return RedirectToAction( "Users" );
         }
 
         //
@@ -809,44 +814,45 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Edit )]
         public ActionResult EditUser( int id )
         {
-            User user;
-
             using ( UserService service = new UserService() )
             {
-                user = service.GetById( id );
+                User user = service.GetById( id );
+
+                if ( user == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                Role role = null;
+
+                if ( user.UserRoles.Any() )
+                {
+                    role = user.UserRoles.FirstOrDefault().Role;
+                }
+
+                UserViewModel model = new UserViewModel()
+                {
+                    Role = role,
+                    Id = user.Id,
+                    EditMode = true,
+                    RoleId = role.Id,
+                    Name = user.Name?.Trim(),
+                    Cell = user.Cell?.Trim(),
+                    Email = user.Email?.Trim(),
+                    Surname = user.Surname?.Trim(),
+                    Status = ( Status ) user.Status,
+                    RoleType = ( RoleType ) user.Type,
+                    OnlineStatus = ( OnlineStatus ) user.ChatStatus,
+                    PSPId = user.PSPUsers.FirstOrDefault()?.PSPId ?? 0,
+                    CanSendChat = user.SendChat ? YesNo.Yes : YesNo.No,
+                    CanReceiveChat = user.ReceiveChat ? YesNo.Yes : YesNo.No,
+                    ClientId = user.ClientUsers.FirstOrDefault()?.ClientId ?? 0
+                };
+
+                return View( model );
             }
-
-            if ( user == null )
-            {
-                Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                return PartialView( "_AccessDenied" );
-            }
-
-            Role role = null;
-
-            if ( user.UserRoles.Any() )
-            {
-                role = user.UserRoles.FirstOrDefault().Role;
-            }
-
-            UserViewModel model = new UserViewModel()
-            {
-                Role = role,
-                Id = user.Id,
-                EditMode = true,
-                RoleId = role.Id,
-                Name = user.Name?.Trim(),
-                Cell = user.Cell?.Trim(),
-                Email = user.Email?.Trim(),
-                Surname = user.Surname?.Trim(),
-                Status = ( Status ) user.Status,
-                RoleType = ( RoleType ) user.Type,
-                PSPId = user.PSPUsers.FirstOrDefault()?.PSPId ?? 0,
-                ClientId = user.ClientUsers.FirstOrDefault()?.ClientId ?? 0
-            };
-
-            return View( model );
         }
 
         //
@@ -862,12 +868,10 @@ namespace ACT.UI.Controllers
                 return View( model );
             }
 
-            User user;
-
             using ( UserService uservice = new UserService() )
             using ( RoleService rservice = new RoleService() )
             {
-                user = uservice.GetById( model.Id );
+                User user = uservice.GetById( model.Id );
 
                 if ( user == null )
                 {
@@ -918,6 +922,9 @@ namespace ACT.UI.Controllers
                 {
                     user.Type = role.Type;
                     user.Status = ( int ) model.Status;
+                    user.ChatStatus = ( int ) model.OnlineStatus;
+                    user.SendChat = model.CanSendChat.GetBoolValue();
+                    user.ReceiveChat = model.CanReceiveChat.GetBoolValue();
 
                     if ( role.Type == ( int ) RoleType.PSP && model.PSPId > 0 && !user.PSPUsers.Any( p => p.PSPId == model.PSPId ) )
                     {
@@ -949,11 +956,11 @@ namespace ACT.UI.Controllers
                 user = uservice.Update( user, model.RoleId );
 
                 #endregion
+
+                Notify( "The selected User's details were successfully updated.", NotificationType.Success );
+
+                return RedirectToAction( "Users" );
             }
-
-            Notify( "The selected User's details were successfully updated.", NotificationType.Success );
-
-            return RedirectToAction( "Users" );
         }
 
         //
@@ -962,11 +969,9 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Delete )]
         public ActionResult DeleteUser( UserViewModel model, PagingModel pm )
         {
-            User user;
-
             using ( UserService service = new UserService() )
             {
-                user = service.GetById( model.Id );
+                User user = service.GetById( model.Id );
 
                 if ( user == null )
                 {
@@ -980,9 +985,9 @@ namespace ACT.UI.Controllers
                 service.Update( user );
 
                 Notify( "The selected User was successfully updated.", NotificationType.Success );
-            }
 
-            return RedirectToAction( "Users" );
+                return RedirectToAction( "Users" );
+            }
         }
 
         #endregion
@@ -2215,7 +2220,6 @@ namespace ACT.UI.Controllers
         }
 
         #endregion
-
 
 
 
@@ -3535,13 +3539,13 @@ namespace ACT.UI.Controllers
                         {
                             v = new Vehicle()
                             {
+                                Type = mv.Type,
                                 Make = mv.Make,
                                 //Year = mv.Year,
                                 ObjectId = t.Id,
-                                Model = mv.Model,
-                                Type = ( int ) mv.Type,
                                 //VINNumber = mv.VINNumber,
                                 ObjectType = "Transporter",
+                                FleetNumber = mv.FleetNumber,
                                 Descriptoin = mv.Descriptoin,
                                 Status = ( int ) model.Status,
                                 Registration = mv.Registration,
@@ -3552,12 +3556,12 @@ namespace ACT.UI.Controllers
                         }
                         else
                         {
+                            v.Type = mv.Type;
                             v.Make = mv.Make;
                             //v.Year = mv.Year;
-                            v.Model = mv.Model;
-                            v.Type = ( int ) mv.Type;
                             //v.VINNumber = mv.VINNumber;
                             v.Descriptoin = mv.Descriptoin;
+                            v.FleetNumber = mv.FleetNumber;
                             v.Status = ( int ) model.Status;
                             v.Registration = mv.Registration;
                             //v.EngineNumber = mv.EngineNumber;
@@ -3723,13 +3727,12 @@ namespace ACT.UI.Controllers
                         {
                             v = new Vehicle()
                             {
+                                Type = mv.Type,
                                 Make = mv.Make,
                                 //Year = mv.Year,
                                 ObjectId = t.Id,
-                                Model = mv.Model,
-                                Type = ( int ) mv.Type,
-                                //VINNumber = mv.VINNumber,
                                 ObjectType = "Transporter",
+                                FleetNumber = mv.FleetNumber,
                                 Status = ( int ) model.Status,
                                 Registration = mv.Registration,
                                 //EngineNumber = mv.EngineNumber,
@@ -3740,11 +3743,11 @@ namespace ACT.UI.Controllers
                         }
                         else
                         {
+                            v.Type = mv.Type;
                             v.Make = mv.Make;
                             //v.Year = mv.Year;
-                            v.Model = mv.Model;
-                            v.Type = ( int ) mv.Type;
                             //v.VINNumber = mv.VINNumber;
+                            v.FleetNumber = mv.FleetNumber;
                             v.Status = ( int ) model.Status;
                             v.Registration = mv.Registration;
                             //v.EngineNumber = mv.EngineNumber;
@@ -3975,19 +3978,15 @@ namespace ACT.UI.Controllers
                 return PartialView( "_UsersCustomSearch", new CustomSearchModel( "Users" ) );
             }
 
-            int total = 0;
-
-            List<UserCustomModel> model;
-
             using ( UserService service = new UserService() )
             {
-                model = service.ListCSM( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+                List<UserCustomModel> model = service.List1( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_Users", paging );
             }
-
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
-
-            return PartialView( "_Users", paging );
         }
 
 

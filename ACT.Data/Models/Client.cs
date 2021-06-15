@@ -32,8 +32,8 @@ namespace ACT.Data.Models
             this.Transporters = new HashSet<Transporter>();
             this.Tasks = new HashSet<Task>();
             this.ChepLoads = new HashSet<ChepLoad>();
-            this.ExtendedClientLoads = new HashSet<ExtendedClientLoad>();
             this.DeliveryNotes = new HashSet<DeliveryNote>();
+            this.ExtendedClientLoads = new HashSet<ExtendedClientLoad>();
         }
     
         public int Id { get; set; }
@@ -95,8 +95,8 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepLoad> ChepLoads { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ExtendedClientLoad> ExtendedClientLoads { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<DeliveryNote> DeliveryNotes { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ExtendedClientLoad> ExtendedClientLoads { get; set; }
     }
 }

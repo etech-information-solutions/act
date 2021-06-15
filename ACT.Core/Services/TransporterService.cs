@@ -272,17 +272,28 @@ namespace ACT.Core.Services
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        public Dictionary<int, string> List( bool v )
+        public Dictionary<int, string> List( bool v, int clientId = 0 )
         {
             Dictionary<int, string> clientOptions = new Dictionary<int, string>();
             List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
 
+            if ( clientId == 0 && SelectedClient != null )
+            {
+                clientId = SelectedClient.Id;
+            }
+
             List<object> parameters = new List<object>()
             {
+                { new SqlParameter( "clientid", clientId ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
             };
 
-            string query = $"SELECT c.Id AS [TKey], c.TradingName AS [TValue] FROM [dbo].[Transporter] c WHERE (1=1)";
+            string query = $"SELECT c.Id AS [TKey], c.Name AS [TValue] FROM [dbo].[Transporter] c WHERE (1=1)";
+
+            if ( clientId > 0 )
+            {
+                query = $"{query} AND (c.ClientId=@clientid)";
+            }
 
             model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();
 

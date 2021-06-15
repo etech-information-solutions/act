@@ -58,6 +58,9 @@
             <th data-name="LastLogin" data-column="LastLogin">
                 Last Login
             </th>
+            <th data-name="Support">
+                Support
+            </th>
             <th data-name="Actions">
                 Actions
             </th>
@@ -137,6 +140,11 @@
                     </td>
                     <td>
                         @item.LastLogin
+                    </td>
+                    <td width="15%">
+                        <b>Can Use Chats:</b> @item.SendChat <br />
+                        <b>Can Respond to Chats:</b> @item.ReceiveChat <br />
+                        <b>Online Status:</b> @( ( ( OnlineStatus ) item.ChatStatus ).GetDisplayText() )
                     </td>
                     <td width="15%">
                         @Html.ActionLink( "Details", "UserDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )

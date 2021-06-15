@@ -69,6 +69,7 @@ export class UserService
 
   // 
   ExitApp: boolean = false;
+  RefreshChats: boolean = false;
   RefreshShipments: boolean = false;
   RefreshSiteAudits: boolean = false;
   RemoveSiteAuditConfirmed: boolean = false;
@@ -1294,9 +1295,9 @@ export class UserService
     return await pop.present();
   }
 
-  async GoToPage( page:string, back: boolean = false )
+  async GoToPage( page:string, back: boolean = false, root: boolean = false )
   {
-    if ( page == 'home' || page == 'login' )
+    if ( page == 'home' || page == 'login' || root )
     {
       this.navCtrl.navigateRoot( page );
     }
@@ -1461,4 +1462,5 @@ export interface iCommonModel
   Id: any;
   Code: any;
   Message: any;
+  Messages: any;
 }

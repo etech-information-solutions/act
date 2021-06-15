@@ -1,11 +1,7 @@
 ﻿@model ClientLoadViewModel
 
-@using ACT.Data.Models;
-@using ACT.Core.Enums;
-@using ACT.Core.Models;
 @using ACT.UI.Models;
-@using ACT.Core.Models.Custom;
-@using ACT.Core.Services;
+@using ACT.Core.Enums;
 
 @{
     if ( ViewBag.IncludeLayout == null )
@@ -80,7 +76,7 @@
                     @Html.LabelFor( model => model.Status )
                 </div>
                 <div class="editor-field">
-                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @data_client_load_status = 1, @data_target= "#cancelled-status-reason", @style = "width: 98%;" } )
+                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @data_client_load_status = 1, @data_target = "#cancelled-status-reason", @style = "width: 98%;" } )
                     @Html.ValidationMessageFor( model => model.Status )
                 </div>
 

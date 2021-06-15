@@ -32,10 +32,6 @@ const routes: Routes = [
     loadChildren: () => import('./notifications/notifications.module').then( m => m.NotificationsPageModule)
   },
   {
-    path: 'chat',
-    loadChildren: () => import('./chat/chat.module').then( m => m.ChatPageModule)
-  },
-  {
     path: 'settings',
     loadChildren: () => import('./settings/settings.module').then( m => m.SettingsPageModule)
   },
@@ -70,6 +66,18 @@ const routes: Routes = [
   {
     path: 'outstandingshipmentdetail',
     loadChildren: () => import('./outstandingshipmentdetail/outstandingshipmentdetail.module').then( m => m.OutstandingshipmentdetailPageModule)
+  },
+  {
+    path: 'chats',
+    loadChildren: () => import('./chats/chats.module').then( m => m.ChatsPageModule)
+  },
+  {
+    path: 'chatdetail',
+    loadChildren: () => import('./chatdetail/chatdetail.module').then( m => m.ChatdetailPageModule)
+  },
+  {
+    path: 'chatadd',
+    loadChildren: () => import('./chatadd/chatadd.module').then( m => m.ChataddPageModule)
   },
 ];
 

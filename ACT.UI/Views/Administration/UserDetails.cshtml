@@ -75,24 +75,57 @@
 
     </div>
 
-    <div class="left grouped-area" style="width: 45%;">
+    <div class="left" style="width: 45%;">
 
-        <p>
-            <strong class="uppercase" style="color: #002e70 !important;">CONTACT DETAILS</strong>
-        </p>
+        <div class="grouped-area">
 
-        <div class="display-label">
-            Email
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.Email )
+            <p>
+                <strong class="uppercase" style="color: #002e70 !important;">CONTACT DETAILS</strong>
+            </p>
+
+            <div class="display-label">
+                Email
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.Email )
+            </div>
+
+            <div class="display-label">
+                Cell
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.Cell )
+            </div>
+
         </div>
 
-        <div class="display-label">
-            Cell
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.Cell )
+        <div class="grouped-area">
+
+            <p>
+                <strong class="uppercase" style="color: #002e70 !important;">CHATS</strong>
+            </p>
+
+            <div class="display-label">
+                Can Use Chats
+            </div>
+            <div class="display-field">
+                @( Model.SendChat )
+            </div>
+
+            <div class="display-label">
+                Can Respond To Chats
+            </div>
+            <div class="display-field">
+                @( Model.ReceiveChat )
+            </div>
+
+            <div class="display-label">
+                Online Chat Status
+            </div>
+            <div class="display-field">
+                @( ( ( OnlineStatus ) Model.ChatStatus ).GetDisplayText() )
+            </div>
+
         </div>
 
     </div>

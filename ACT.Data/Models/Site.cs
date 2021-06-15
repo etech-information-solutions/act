@@ -64,7 +64,6 @@ namespace ACT.Data.Models
         public virtual ICollection<ChepAudit> ChepAudits { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SiteAudit> SiteAudits { get; set; }
-        public virtual User User { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SiteBilling> SiteBillings { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
@@ -75,5 +74,6 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientSite> ClientSites { get; set; }
         public virtual Region Region { get; set; }
+        public virtual User User { get; set; }
     }
 }

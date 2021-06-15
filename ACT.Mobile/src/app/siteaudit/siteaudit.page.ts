@@ -48,7 +48,7 @@ export class SiteauditPage implements OnInit
   {
     if ( this.auth.RefreshSiteAudits )
     {
-      this.auth.RefreshShipments = false;
+      this.auth.RefreshSiteAudits = false;
 
       this.Skip = 0;
       this.SiteAudits = [];

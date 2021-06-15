@@ -59,10 +59,14 @@ namespace ACT.Data.Models
         public bool IsExtra { get; set; }
         public string UID { get; set; }
         public int DocumentType { get; set; }
+        public string PalletReturnSlipNo { get; set; }
+        public string ChepCustomerThanDocNo { get; set; }
+        public string WarehouseTransferDocNo { get; set; }
+        public Nullable<System.DateTime> PalletReturnDate { get; set; }
     
         public virtual Client Client { get; set; }
         public virtual ClientLoad ClientLoad { get; set; }
-        public virtual OutstandingReason OutstandingReason { get; set; }
         public virtual ClientSite ClientSite { get; set; }
+        public virtual OutstandingReason OutstandingReason { get; set; }
     }
 }

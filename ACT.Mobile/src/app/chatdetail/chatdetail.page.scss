@@ -1,0 +1,128 @@
+ion-item * {
+    font-size: 13px !important;
+  }
+  
+.success-message {
+    color: #229c1c;
+    padding: 5px 10px;
+    background-color: #bef2bb;
+}
+
+.warn-message {
+    color: #EBA324;
+    padding: 5px 10px;
+    background-color: #FFE6BA;
+}
+
+.error-message {
+    color: #e80c4d;
+    padding: 5px 10px;
+    background-color: #ffeeee;
+}
+
+.orange {
+    color: #cd982e;
+}
+
+.purple {
+    color: #c3456b;
+}
+
+.unread > * {
+    font-weight: bold !important;
+}
+
+ion-item-divider ion-label {
+    padding: 10px 0;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
+ion-item-divider.ios ion-label {
+    padding: 20px 0;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+ion-item-divider ion-icon {
+    font-size: 24px;
+    padding-right: 10px;
+}
+
+.bold {
+    font-weight: bold !important;
+}
+
+.message-piece {
+    float: right;
+    padding: 5px;
+    font-size: 13px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border-radius: 4px;
+    position: relative;
+    white-space: pre-line;
+    background-color: #d5f7d3;
+    border-bottom: 1px solid #002e70;
+}
+
+.message-piece em {
+    font-size: 12px;
+    color: #6b6e6b;
+    display: block;
+    margin-top: 5px;
+    text-align: right;
+}
+
+.message-piece ion-icon {
+    right: 0;
+    top: -13px;
+    color: #d5f7d3;
+    font-size: 20px;
+    position: absolute;
+}
+
+.message-piece.left {
+    float: left;
+    text-align: left;
+    margin-left: 10px;
+    background-color: #F7F5B3;
+}
+
+.message-piece.left em {
+    text-align: left;
+}
+
+.message-piece.left ion-icon {
+    left: 0;
+    right: auto;
+    color: #F7F5B3;
+}
+
+.reply {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    clear: both;
+    width: 100%;
+    position: fixed;
+    background-color: #e6e6e6;
+    border-top: 1px solid #e6e6e6;
+}
+
+.reply ion-textarea {
+    width: auto;
+    padding: 0 20px;
+    font-size: 12px;
+    border-radius: 30px;
+    background-color: #fff;
+}
+
+.reply textarea {
+    padding: 0 !important;
+}
+
+.reply .send {
+    color: #002e70;
+    font-size: 40px;
+}

@@ -230,6 +230,7 @@ namespace ACT.UI.Models
         #endregion
 
 
+
         #region Model Options
 
         public Dictionary<int, string> ClientOptions
@@ -287,7 +288,7 @@ namespace ACT.UI.Models
 
                 using ( TransporterService service = new TransporterService() )
                 {
-                    return service.List( true );
+                    return service.List( true, ClientId );
                 }
             }/**/
         }

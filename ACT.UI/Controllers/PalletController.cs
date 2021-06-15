@@ -1038,11 +1038,11 @@ namespace ACT.UI.Controllers
                     OrderDate = model.LoadDate,
                     EmailAddress = client.Email,
                     Status = ( int ) Status.Active,
-                    Reference306 = model.LoadNumber,
+                    Reference306 = model.LoadNumber ?? "",
                     CustomerName = client.CompanyName,
-                    InvoiceNumber = model.DeliveryNote,
-                    OrderNumber = model.ReferenceNumber,
-                    ContactNumber = model.ReceiverNumber,
+                    InvoiceNumber = model.DeliveryNote ?? "",
+                    OrderNumber = model.ReferenceNumber ?? "",
+                    ContactNumber = model.ReceiverNumber ?? "",
 
                     CustomerAddress = customerAddress,
                     CustomerProvinceId = address?.ProvinceId,
@@ -1066,12 +1066,12 @@ namespace ACT.UI.Controllers
                 DeliveryNoteLine dnl = new DeliveryNoteLine
                 {
                     Returned = 0,
-                    Product = model.Equipment,
+                    Product = model.Equipment ?? "",
                     DeliveryNoteId = deliveryNote.Id,
-                    Equipment = model.Equipment,
+                    Equipment = model.Equipment ?? "",
                     Delivered = model.NewQuantity,
                     Status = ( int ) Status.Active,
-                    ProductDescription = model.Equipment,
+                    ProductDescription = model.Equipment ?? "",
                     OrderQuantity = model.OriginalQuantity,
                 };
 
@@ -1221,6 +1221,9 @@ namespace ACT.UI.Controllers
                 ViewBag.ChepLoad = chep;
                 ViewBag.ChepLoads = cheps;
 
+                model.DocumentType = DocumentType.THAN;
+
+
                 #region Chep Fields
 
                 if ( chep != null )
@@ -1230,6 +1233,15 @@ namespace ACT.UI.Controllers
                     model.DeliveryDate = chep.DeliveryDate;
                     model.ChepInvoiceNumber = chep.InvoiceNumber;
                     model.ChepEffectiveDate = chep.EffectiveDate;
+
+                    if ( chep.DocumentType > 0 )
+                    {
+                        model.DocumentType = ( DocumentType ) chep.DocumentType;
+                    }
+                }
+                else if ( load?.ReceiverNumber?.StartsWith( "50000" ) == true || load?.ReceiverNumber?.StartsWith( "52" ) == true || load?.ReceiverNumber?.StartsWith( "51" ) == true )
+                {
+                    model.DocumentType = DocumentType.ExchangeCustomer;
                 }
 
                 if ( string.IsNullOrEmpty( model.PalletReturnSlipNo ) )
@@ -1289,12 +1301,12 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Edit )]
         public ActionResult EditClientData( ClientLoadViewModel model )
         {
-            if ( !ModelState.IsValid )
-            {
-                Notify( "Sorry, the selected Client Load was not updated. Please correct all errors and try again.", NotificationType.Error );
+            //if ( !ModelState.IsValid )
+            //{
+            //    Notify( "Sorry, the selected Client Load was not updated. Please correct all errors and try again.", NotificationType.Error );
 
-                return View( model );
-            }
+            //    return View( "ClientDataDetails", model );
+            //}
 
             using ( TransactionScope scope = new TransactionScope() )
             using ( ChepLoadService chservice = new ChepLoadService() )
@@ -1326,7 +1338,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "LoadNumber",
                         OldValue = load.LoadNumber,
-                        NewValue = model.LoadNumber,
+                        NewValue = model.LoadNumber ?? string.Empty,
                     } );
                 }
 
@@ -1337,7 +1349,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "LoadDate",
                         OldValue = load.LoadDate?.ToString(),
-                        NewValue = model.LoadDate?.ToString(),
+                        NewValue = model.LoadDate?.ToString() ?? string.Empty,
                     } );
                 }
 
@@ -1348,7 +1360,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "ClientSiteId",
                         OldValue = load.ClientSiteId?.ToString(),
-                        NewValue = model.ClientSiteId?.ToString(),
+                        NewValue = model.ClientSiteId?.ToString() ?? string.Empty,
                     } );
                 }
 
@@ -1359,7 +1371,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "ToClientSiteId",
                         OldValue = load.ToClientSiteId?.ToString(),
-                        NewValue = model.ClientSiteIdTo?.ToString(),
+                        NewValue = model.ClientSiteIdTo?.ToString() ?? string.Empty,
                     } );
                 }
 
@@ -1370,7 +1382,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "DeliveryNote",
                         OldValue = load.DeliveryNote,
-                        NewValue = model.DeliveryNote,
+                        NewValue = model.DeliveryNote ?? string.Empty,
                     } );
                 }
 
@@ -1381,7 +1393,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "PODNumber",
                         OldValue = load.PODNumber,
-                        NewValue = model.PODNumber,
+                        NewValue = model.PODNumber ?? string.Empty,
                     } );
                 }
 
@@ -1392,7 +1404,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "ChepInvoiceNo",
                         OldValue = load.ChepInvoiceNo,
-                        NewValue = model.ChepInvoiceNumber,
+                        NewValue = model.ChepInvoiceNumber ?? string.Empty,
                     } );
                 }
 
@@ -1403,7 +1415,7 @@ namespace ACT.UI.Controllers
                         FieldName = "Status",
                         ClientLoadId = load.Id,
                         NewValue = model.Status.GetDisplayText(),
-                        OldValue = ( ( ReconciliationStatus ) load.Status ).GetDisplayText(),
+                        OldValue = ( ( ReconciliationStatus ) load.Status ).GetDisplayText() ?? string.Empty,
                     } );
                 }
 
@@ -1414,7 +1426,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "TransporterId",
                         OldValue = load.TransporterId?.ToString(),
-                        NewValue = model.TransporterId?.ToString(),
+                        NewValue = model.TransporterId?.ToString() ?? string.Empty,
                     } );
                 }
 
@@ -1425,7 +1437,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "VehicleId",
                         OldValue = load.VehicleId?.ToString(),
-                        NewValue = model.VehicleId?.ToString(),
+                        NewValue = model.VehicleId?.ToString() ?? string.Empty,
                     } );
                 }
 
@@ -1436,7 +1448,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "ReceiverNumber",
                         OldValue = load.ReceiverNumber,
-                        NewValue = model.ReceiverNumber,
+                        NewValue = model.ReceiverNumber ?? string.Empty,
                     } );
                 }
 
@@ -1447,7 +1459,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "DebriefDocketNo",
                         OldValue = load.DebriefDocketNo,
-                        NewValue = model.DebriefDocketNo,
+                        NewValue = model.DebriefDocketNo ?? string.Empty,
                     } );
                 }
 
@@ -1458,7 +1470,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "PODCommentId",
                         OldValue = load.PODCommentId?.ToString(),
-                        NewValue = model.PODCommentId?.ToString(),
+                        NewValue = model.PODCommentId?.ToString() ?? string.Empty,
                     } );
                 }
 
@@ -1469,7 +1481,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "ClientLoadNotes",
                         OldValue = load.ClientLoadNotes,
-                        NewValue = model.ClientLoadNotes,
+                        NewValue = model.ClientLoadNotes ?? string.Empty,
                     } );
                 }
 
@@ -1480,7 +1492,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "NewQuantity",
                         OldValue = load.NewQuantity?.ToString(),
-                        NewValue = model?.ClientLoadQuantities?.Sum( s => s?.OriginalQuantity )?.ToString(),
+                        NewValue = model?.ClientLoadQuantities?.Sum( s => s?.OriginalQuantity )?.ToString() ?? string.Empty,
                     } );
                 }
 
@@ -1491,7 +1503,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "OriginalQuantity",
                         OldValue = load.NewQuantity?.ToString(),
-                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.OriginalQuantity )?.ToString(),
+                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.OriginalQuantity )?.ToString() ?? string.Empty,
                     } );
                 }
 
@@ -1502,7 +1514,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "ReturnQty",
                         OldValue = load.ReturnQty?.ToString(),
-                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.ReturnQty )?.ToString(),
+                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.ReturnQty )?.ToString() ?? string.Empty,
                     } );
                 }
 
@@ -1513,7 +1525,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "DebriefQty",
                         OldValue = load.DebriefQty?.ToString(),
-                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.DebriefQty )?.ToString(),
+                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.DebriefQty )?.ToString() ?? string.Empty,
                     } );
                 }
 
@@ -1524,7 +1536,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "TransporterLiableQty",
                         OldValue = load.TransporterLiableQty?.ToString(),
-                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.TransporterLiableQty )?.ToString(),
+                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.TransporterLiableQty )?.ToString() ?? string.Empty,
                     } );
                 }
 
@@ -1535,7 +1547,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "AdminMovement",
                         OldValue = load.AdminMovement?.ToString(),
-                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.AdminMovementQty )?.ToString(),
+                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.AdminMovementQty )?.ToString() ?? string.Empty,
                     } );
                 }
 
@@ -1546,7 +1558,7 @@ namespace ACT.UI.Controllers
                         ClientLoadId = load.Id,
                         FieldName = "OutstandingQty",
                         OldValue = load.OutstandingQty?.ToString(),
-                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.OutstandingQty )?.ToString(),
+                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.OutstandingQty )?.ToString() ?? string.Empty,
                     } );
                 }
 
@@ -1684,11 +1696,15 @@ namespace ACT.UI.Controllers
                     ec.OtherRef = model.ChepOtherRef;
                     ec.ClientSiteId = load.ClientSiteId;
                     ec.DeliveryDate = model.DeliveryDate;
-                    ec.ShipmentDate = model.ChepEffectiveDate;
+                    ec.ShipmentDate = model.DeliveryDate;
                     ec.EffectiveDate = model.ChepEffectiveDate;
                     ec.InvoiceNumber = model.ChepInvoiceNumber;
                     ec.DocumentType = ( int ) model.DocumentType;
                     ec.Quantity = ( int? ) load.OriginalQuantity;
+                    ec.PalletReturnDate = model.PalletReturnDate;
+                    ec.PalletReturnSlipNo = model.PalletReturnSlipNo;
+                    ec.ChepCustomerThanDocNo = model.ChepCustomerThanDocNo;
+                    ec.WarehouseTransferDocNo = model.WarehouseTransferDocNo;
 
                     ecservice.Update( ec );
                 }
@@ -1725,15 +1741,19 @@ namespace ACT.UI.Controllers
                         ShipmentDate = model.ChepEffectiveDate,
                         IsPSPPickup = chep?.IsPSPPickup == true,
                         TransactionType = chep?.TransactionType,
-                        EffectiveDate = model.ChepEffectiveDate,
+                        EffectiveDate = model.PalletReturnDate,
                         InvoiceNumber = model.ChepInvoiceNumber,
+                        PalletReturnDate = model.PalletReturnDate,
                         DocumentType = ( int ) model.DocumentType,
                         Quantity = ( int? ) load.OriginalQuantity,
                         OtherPartyCountry = chep?.OtherPartyCountry,
+                        PalletReturnSlipNo = model.PalletReturnSlipNo,
                         ManuallyMatchedUID = chep?.ManuallyMatchedUID,
                         OutstandingReasonId = chep?.OutstandingReasonId,
                         BalanceStatus = ( int ) BalanceStatus.NotBalanced,
                         TransporterLiable = chep?.TransporterLiable == true,
+                        ChepCustomerThanDocNo = model.ChepCustomerThanDocNo,
+                        WarehouseTransferDocNo = model.WarehouseTransferDocNo,
                         ManuallyMatchedLoad = chep?.ManuallyMatchedLoad == true,
                         CreatedBy = $"{CurrentUser.Name} {CurrentUser.Surname}",
                         PostingType = chep?.PostingType ?? ( int ) PostingType.Manual,

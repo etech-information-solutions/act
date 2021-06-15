@@ -492,7 +492,7 @@ namespace ACT.UI.Controllers.API
             {
                 service.CurrentUser = service.GetUser( email );
 
-                return service.ListTiny( new PagingModel() { Take = int.MaxValue, Skip = 0, Query = string.Empty }, new CustomSearchModel() { Status = Status.Active } );
+                return service.ListTiny( new PagingModel() { Take = int.MaxValue, Skip = 0, Sort ="ASC", SortBy = "s.Name", Query = string.Empty }, new CustomSearchModel() { Status = Status.Active } );
             }
         }
 

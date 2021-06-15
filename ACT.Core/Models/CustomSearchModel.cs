@@ -191,6 +191,12 @@ namespace ACT.Core.Models
         }
 
         /// <summary>
+        /// Can be used as a selected Ticket
+        /// </summary>
+        [Display( Name = "Ticket" )]
+        public int TicketId { get; set; }
+
+        /// <summary>
         /// Can be used for a Start date range
         /// </summary>
         [Display( Name = "From Date" )]

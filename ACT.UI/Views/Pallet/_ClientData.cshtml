@@ -97,7 +97,7 @@
                         @count
                     </td>
                     <td>
-                        @item.LoadDate.Value.ToString( "yyyy-MM-dd" )
+                        @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
                     </td>
                     <td>
                         @item.ChepAccountGLIDNo

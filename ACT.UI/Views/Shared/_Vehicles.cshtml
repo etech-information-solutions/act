@@ -14,7 +14,7 @@
         <thead>
             <tr>
                 <th>Make</th>
-                <th>Model</th>
+                <th>Fleet No.</th>
                 @*<th>Year</th>
                 <th>Engine #</th>
                 <th>VIN #</th>*@
@@ -42,25 +42,25 @@
 
                             <input name="Vehicles[@count].Id" type="hidden" value="@b.Id" />
 
-                            <input class="input" name="Vehicles[@count].Make" placeholder="Make" required="required" style="padding: 0 5px;" type="text" value="@b.Make">
+                            <input class="input" name="Vehicles[@count].Make" placeholder="Make" style="padding: 0 5px;" type="text" value="@b.Make">
                         </td>
                         <td>
-                            <input class="input" name="Vehicles[@count].Model" placeholder="Model" required="required" style="padding: 0 5px;" type="text" value="@b.Model">
+                            <input class="input" name="Vehicles[@count].FleetNumber" placeholder="Fleet Number" style="padding: 0 5px;" type="text" value="@b.FleetNumber">
                         </td>
                         @*<td>
-                            <input class="input" name="Vehicles[@count].Year" placeholder="Year" required="required" style="padding: 0 5px;" type="number" value="@b.Year">
+                            <input class="input" name="Vehicles[@count].Year" placeholder="Year" style="padding: 0 5px;" type="number" value="@b.Year">
                         </td>
                         <td>
                             <input class="input" name="Vehicles[@count].EngineNumber" placeholder="Engine #" style="padding: 0 5px;" type="text" value="@b.EngineNumber">
                         </td>
                         <td>
-                            <input class="input" name="Vehicles[@count].VINNumber" placeholder="VIN #" required="required" style="padding: 0 5px;" type="text" value="@b.VINNumber">
+                            <input class="input" name="Vehicles[@count].VINNumber" placeholder="VIN #" style="padding: 0 5px;" type="text" value="@b.VINNumber">
                         </td>*@
                         <td>
-                            <input class="input" name="Vehicles[@count].Registration" placeholder="Reg #" required="required" style="padding: 0 5px;" type="text" value="@b.Registration">
+                            <input class="input" name="Vehicles[@count].Registration" placeholder="Reg #" style="padding: 0 5px;" type="text" value="@b.Registration">
                         </td>
                         <td>
-                            <select class="chzn" name="Vehicles[@count].Type" placeholder="Reg #" required="required" style="width: 87%;">
+                            <select class="chzn" name="Vehicles[@count].Type" placeholder="Reg #" style="width: 87%;">
                                 <option value="">--select</option>
                                 @foreach ( int p in Enum.GetValues( typeof( VehicleType ) ) )
                                 {
@@ -92,7 +92,7 @@
                             <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
                         </a>
 
-                        <input class="input" name="Vehicles[0].Make" placeholder="Make" required="required" style="padding: 0 5px;" type="text" value="">
+                        <input class="input" name="Vehicles[0].Make" placeholder="Make" style="padding: 0 5px;" type="text" value="">
                     </td>
                     <td>
                         <input class="input" name="Vehicles[0].Model" placeholder="Model" style="padding: 0 5px;" type="text" value="">
@@ -110,7 +110,7 @@
                         <input class="input" name="Vehicles[0].Registration" placeholder="Reg #" style="padding: 0 5px;" type="text" value="">
                     </td>
                     <td>
-                        <select class="chzn" name="Vehicles[0].Type" placeholder="Reg #" required="required" style="width: 87%;">
+                        <select class="chzn" name="Vehicles[0].Type" placeholder="Reg #" style="width: 87%;">
                             <option value="">--select</option>
                             @foreach ( int p in Enum.GetValues( typeof( VehicleType ) ) )
                             {
