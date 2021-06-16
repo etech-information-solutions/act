@@ -544,7 +544,7 @@ namespace ACT.Core.Services
         /// Gets a list of the entities available
         /// </summary>
         /// <returns></returns>
-        public virtual List<T> SqlQueryList<T>( string query)
+        public virtual List<T> SqlQueryList<T>( string query )
         {
             return context.Database.SqlQuery<T>( query ).ToList();
         }
@@ -947,6 +947,75 @@ namespace ACT.Core.Services
             string strResponse = ( respose != null ) ? new StreamReader( respose.GetResponseStream() ).ReadToEnd() : string.Empty;
 
             return strResponse;
+        }
+
+        /// <summary>
+        /// Performs a Post request to the specified URL using the specified params
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="headers"></param>
+        /// <param name="content"></param>
+        /// <param name="contentType"></param>
+        /// <param name="accept"></param>
+        /// <param name="preAuthenticate"></param>
+        /// <returns></returns>
+        public string Post( string url, List<string> headers = null, string content = "", string contentType = "", string accept = "", bool preAuthenticate = false )
+        {
+            string responseString;
+
+            try
+            {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls |
+                                                       SecurityProtocolType.Tls11 |
+                                                       SecurityProtocolType.Tls12;
+
+                HttpWebRequest request = ( HttpWebRequest ) WebRequest.Create( url );
+
+                request.Method = "POST";
+                request.Timeout = 1200000;
+
+                if ( headers.NullableAny() )
+                {
+                    foreach ( string h in headers )
+                    {
+                        request.Headers.Add( h );
+                    }
+                }
+
+                if ( preAuthenticate )
+                {
+                    request.PreAuthenticate = true;
+                }
+                if ( !string.IsNullOrEmpty( accept ) )
+                {
+                    request.Accept = accept;
+                }
+                if ( !string.IsNullOrEmpty( contentType ) )
+                {
+                    request.ContentType = contentType;
+                }
+                if ( !string.IsNullOrEmpty( content ) )
+                {
+                    byte[] data = Encoding.ASCII.GetBytes( content );
+
+                    request.ContentLength = data.Length;
+
+                    using ( Stream s = request.GetRequestStream() )
+                    {
+                        s.Write( data, 0, data.Length );
+                    }
+                }
+
+                WebResponse response = ( HttpWebResponse ) request.GetResponse();
+
+                responseString = new StreamReader( response.GetResponseStream() ).ReadToEnd();
+            }
+            catch ( Exception ex )
+            {
+                responseString = "{ \"Code\": \"-1\", \"Message\": \"" + ex.Message + "\"}";
+            }
+
+            return responseString;
         }
 
         public ICollection<T> GetAll()

@@ -60,6 +60,8 @@ namespace ACT.Core.Models
 
         public string DeviceId { get; set; }
 
+        public string DeviceOS { get; set; }
+
 
         public Role Role { get; set; }
 

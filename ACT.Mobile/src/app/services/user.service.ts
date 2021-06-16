@@ -155,6 +155,31 @@ export class UserService
       this.AppVersionCode = v;
     });
   }
+  
+  async UpdateDeviceId( token: any )
+  {
+    // API Call here
+    try
+    {
+      var os = this.IsIOS ? "ios": "andriod";
+
+      var device = `DeviceId=${token}&DeviceOS=${os}&apikey=${this.APIKey}`;
+
+      let httpOptions = 
+      {
+        headers: new HttpHeaders(
+        {
+          "Content-Type": "application/x-www-form-urlencoded"
+        })
+      };
+
+      var resp = await this.http.post<iUserModel>( this.APIUrl + "/api/Chat/UpDateDeviceCode", device, httpOptions ).toPromise();
+    }
+    catch( error )
+    {
+      return;
+    }
+  }
 
   async ShowLoading( message: string = undefined )
   {
@@ -1379,7 +1404,7 @@ export class UserService
     await alert.present();
   }
 
-  async ShowError( text ) 
+  async ShowError( text:string ) 
   {
     let alert = await this.alertCtrl.create(
     {

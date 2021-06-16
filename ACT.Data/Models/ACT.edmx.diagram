@@ -167,7 +167,7 @@
         <AssociationConnector Association="ACTModel.FK_Ticket_Department" />
         <AssociationConnector Association="ACTModel.FK_Message_Ticket" />
         <EntityTypeShape EntityType="ACTModel.SystemConfig" Width="1.5" PointX="11.375" PointY="0.75" />
-        <EntityTypeShape EntityType="ACTModel.User" Width="1.5" PointX="0.75" PointY="70.125" />
+        <EntityTypeShape EntityType="ACTModel.User" Width="1.5" PointX="0.75" PointY="70" />
         <AssociationConnector Association="ACTModel.FK_ClientAuthorisation_User" />
         <AssociationConnector Association="ACTModel.FK_ClientLoad_User" />
         <AssociationConnector Association="ACTModel.FK_ClientLoad_User1" />

@@ -9,6 +9,7 @@ using ACT.Core.Models.Custom;
 using ACT.Core.Services;
 using ACT.Data.Models;
 using System.Transactions;
+using Newtonsoft.Json;
 
 namespace ACT.UI.Controllers.api
 {
@@ -119,13 +120,43 @@ namespace ACT.UI.Controllers.api
                     SenderUserId = model.SenderUserId,
                 };
 
-                mservice.Create( m );
+                m = mservice.Create( m );
 
                 #endregion
 
+                User receiver = uservice.GetById( receiverId ?? 0 );
+
+                var payload = new
+                {
+                    priority = "high",
+                    to = receiver.DeviceId,
+                    content_available = true,
+                    notification = new
+                    {
+                        body = model.Details,
+                        title = $"{uservice.CurrentUser.Name} {uservice.CurrentUser.Surname}",
+                        badge = 1,
+                        sound = "default",
+                    },
+                    data = new
+                    {
+                        TicketId = t.Id,
+                        MessageId = m.Id
+                    }
+                };
+
+                string postbody = JsonConvert.SerializeObject( payload ).ToString();
+
+                List<string> headers = new List<string>()
+                {
+                    { $"Authorization: key={ConfigSettings.SystemRules.FirebaseServerKey}" }, // ServerKey - Key from Firebase cloud messaging server 
+                    { $"Sender: id={ConfigSettings.SystemRules.FirebaseSenderId}" }, // Sender Id - From firebase project setting
+                };
+
+                string resp = uservice.Post( ConfigSettings.SystemRules.FirebaseUrl, headers, postbody, "application/json", "text/json" );
+
+
                 scope.Complete();
-
-
             }
 
             List<TicketCustomModel> tickets = List( model.Email, model.APIKey );
@@ -184,6 +215,7 @@ namespace ACT.UI.Controllers.api
                 }
 
                 u.DeviceId = model.DeviceId;
+                u.DeviceOS = model.DeviceOS;
 
                 uservice.Update( u );
 

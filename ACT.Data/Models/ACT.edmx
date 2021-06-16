@@ -1494,6 +1494,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="SendChat" Type="bit" Nullable="false" />
           <Property Name="ReceiveChat" Type="bit" Nullable="false" />
           <Property Name="DeviceId" Type="varchar(max)" />
+          <Property Name="DeviceOS" Type="varchar(max)" />
         </EntityType>
         <EntityType Name="UserBroadcast">
           <Key>
@@ -5539,7 +5540,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="User" Relationship="ACTModel.FK_ClientLoad_User" FromRole="ClientLoad" ToRole="User" />
           <NavigationProperty Name="User1" Relationship="ACTModel.FK_ClientLoad_User1" FromRole="ClientLoad" ToRole="User" />
           <NavigationProperty Name="User2" Relationship="ACTModel.FK_ClientLoad_User2" FromRole="ClientLoad" ToRole="User" />
-        </EntityType>
+          </EntityType>
         <EntityType Name="Vehicle">
           <Key>
             <PropertyRef Name="Id" />
@@ -6706,7 +6707,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="User" Relationship="ACTModel.FK_Ticket_User" FromRole="Ticket" ToRole="User" />
           <NavigationProperty Name="User1" Relationship="ACTModel.FK_Ticket_User1" FromRole="Ticket" ToRole="User" />
           <NavigationProperty Name="User2" Relationship="ACTModel.FK_Ticket_User2" FromRole="Ticket" ToRole="User" />
-        </EntityType>
+          </EntityType>
         <Association Name="FK_Ticket_Department">
           <End Type="ACTModel.Department" Role="Department" Multiplicity="1" />
           <End Type="ACTModel.Ticket" Role="Ticket" Multiplicity="*" />
@@ -6798,6 +6799,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="SendChat" Type="Boolean" Nullable="false" />
           <Property Name="ReceiveChat" Type="Boolean" Nullable="false" />
           <Property Name="DeviceId" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="DeviceOS" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="ClientAuthorisations" Relationship="ACTModel.FK_ClientAuthorisation_User" FromRole="User" ToRole="ClientAuthorisation" />
           <NavigationProperty Name="ClientLoads" Relationship="ACTModel.FK_ClientLoad_User" FromRole="User" ToRole="ClientLoad" />
           <NavigationProperty Name="ClientLoads1" Relationship="ACTModel.FK_ClientLoad_User1" FromRole="User" ToRole="ClientLoad" />
@@ -8706,6 +8708,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="ACTModel.User">
               <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="DeviceOS" ColumnName="DeviceOS" />
                 <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
                 <ScalarProperty Name="ReceiveChat" ColumnName="ReceiveChat" />
                 <ScalarProperty Name="SendChat" ColumnName="SendChat" />

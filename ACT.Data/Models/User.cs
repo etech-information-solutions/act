@@ -59,6 +59,7 @@ namespace ACT.Data.Models
         public bool SendChat { get; set; }
         public bool ReceiveChat { get; set; }
         public string DeviceId { get; set; }
+        public string DeviceOS { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }

@@ -26,12 +26,13 @@ import { CreatepinPage } from './createpin/createpin.page';
 import { ResetpinconfirmComponent } from './resetpinconfirm/resetpinconfirm.component';
 import { ExitappconfirmComponent } from './exitappconfirm/exitappconfirm.component';
 
-import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
 import { PhotoViewer } from '@ionic-native/photo-viewer/ngx';
 import { PhotoLibrary } from '@ionic-native/photo-library/ngx';
 import { CallNumber } from '@ionic-native/call-number/ngx';
 import { ContactactComponent } from './contactact/contactact.component';
 import { ConfirmdeletesiteauditComponent } from './confirmdeletesiteaudit/confirmdeletesiteaudit.component';
+
+import { FirebaseX } from '@ionic-native/firebase-x/ngx';
 
 @NgModule({
   declarations: [
@@ -71,10 +72,10 @@ import { ConfirmdeletesiteauditComponent } from './confirmdeletesiteaudit/confir
     AppVersion,
     FileOpener,
     FingerprintAIO,
-    LaunchNavigator,
     PhotoViewer,
     PhotoLibrary,
-    CallNumber
+    CallNumber,
+    FirebaseX
   ],
   bootstrap: [AppComponent]
 })
