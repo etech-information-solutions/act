@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { ExitappconfirmComponent } from './exitappconfirm.component';
@@ -7,7 +7,7 @@ describe('ExitappconfirmComponent', () => {
   let component: ExitappconfirmComponent;
   let fixture: ComponentFixture<ExitappconfirmComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ExitappconfirmComponent ],
       imports: [IonicModule.forRoot()]
