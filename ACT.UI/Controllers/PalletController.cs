@@ -1138,6 +1138,7 @@ namespace ACT.UI.Controllers
                     EditMode = true,
                     THAN = load?.THAN,
                     Id = load?.Id ?? 0,
+                    GLID = load?.GLID,
                     LoadDate = load?.LoadDate,
                     VehicleId = load?.VehicleId,
                     Equipment = load?.Equipment,
@@ -1153,6 +1154,7 @@ namespace ACT.UI.Controllers
                     DeliveryNote = load?.DeliveryNote,
                     ClientSiteId = load?.ClientSiteId,
                     PODCommentId = load?.PODCommentId,
+                    DeliveryDate = load?.EffectiveDate,
                     TransporterId = load?.TransporterId,
                     ReconcileDate = load?.ReconcileDate,
                     AccountNumber = load?.AccountNumber,
@@ -1182,6 +1184,13 @@ namespace ACT.UI.Controllers
 
                     ChepAccountNumberGlid = load?.Client?.ClientCustomers?.FirstOrDefault()?.CustomerNumber,
                     ClientLoadQuantities = load?.ClientLoadQuantities.ToList(),
+
+                    ChepCustomerThanDocNo = load?.ChepCustomerThanDocNo,
+                    WarehouseTransferDocNo = load?.WarehouseTransferDocNo,
+                    PalletReturnDate = load?.PalletReturnDate,
+                    PalletReturnSlipNo = load?.PalletReturnSlipNo,
+                    CustomerType = load?.CustomerType,
+
                 };
 
                 #endregion
@@ -1205,12 +1214,12 @@ namespace ACT.UI.Controllers
                     {
                         new ClientLoadQuantity()
                         {
-                            EquipmentCode = chep?.EquipmentCode,
                             ReturnQty = ( int? ) load?.ReturnQty ?? 0,
                             DebriefQty = ( int? ) load?.DebriefQty ?? 0,
                             OutstandingQty = ( int? ) load?.OutstandingQty ?? 0,
                             AdminMovementQty = ( int? ) load?.AdminMovement ?? 0,
                             OriginalQuantity = ( int? ) load?.OriginalQuantity ?? 0,
+                            EquipmentCode = chep?.EquipmentCode ?? load?.EquipmentCode,
                             TransporterLiableQty = ( int? ) load?.TransporterLiableQty ?? 0,
                         }
                     };
@@ -1221,7 +1230,7 @@ namespace ACT.UI.Controllers
                 ViewBag.ChepLoad = chep;
                 ViewBag.ChepLoads = cheps;
 
-                model.DocumentType = DocumentType.THAN;
+                model.DocumentType = ( load?.CustomerType?.ToUpper().Contains( "EXCHANGE" ) == true ) ? DocumentType.ExchangeCustomer : DocumentType.THAN;
 
 
                 #region Chep Fields
@@ -1612,6 +1621,11 @@ namespace ACT.UI.Controllers
                 load.OriginalQuantity = model.ClientLoadQuantities?.Sum( s => s?.OriginalQuantity );
                 load.TransporterLiableQty = model.ClientLoadQuantities?.Sum( s => s?.TransporterLiableQty );
 
+                load.PalletReturnDate = model.PalletReturnDate;
+                load.PalletReturnSlipNo = model.PalletReturnSlipNo;
+                load.ChepCustomerThanDocNo = model.ChepCustomerThanDocNo;
+                load.WarehouseTransferDocNo = model.WarehouseTransferDocNo;
+
                 clservice.Update( load );
 
                 #endregion
@@ -1856,11 +1870,11 @@ namespace ACT.UI.Controllers
 
                     ReconciliationStatus status = ReconciliationStatus.Unreconciled;
 
-                    string uid = clservice.GetSha1Md5String( $"{model.ClientId}{load[ 0 ]}{load[ 2 ]}" );
+                    string uid = clservice.GetSha1Md5String( $"{model.ClientId}{load[ 0 ]}{load[ 2 ]}{load[ 3 ]}{load[ 15 ]}{load[ 13 ]}{load[ 9 ]}" );
 
-                    if ( uid.Length > 150 )
+                    if ( uid.Length > 500 )
                     {
-                        uid = uid.Substring( 0, 150 );
+                        uid = uid.Substring( 0, 500 );
                     }
 
                     DateTime.TryParseExact( load[ 3 ], model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime loadDate );
@@ -1972,7 +1986,7 @@ namespace ACT.UI.Controllers
 
                     if ( site != null && !site.ClientSites.NullableAny() && !string.IsNullOrWhiteSpace( load[ 7 ] ) )
                     {
-                        ClientCustomer cc = ccservice.GetByClient( model.ClientId );
+                        ClientCustomer cc = ccservice.GetByNumber( model.ClientId, load[ 5 ].Trim() );
 
                         if ( cc == null )
                         {
@@ -2026,7 +2040,7 @@ namespace ACT.UI.Controllers
 
                     if ( site2 != null && !site2.ClientSites.NullableAny() && !string.IsNullOrWhiteSpace( load[ 8 ] ) )
                     {
-                        ClientCustomer cc = ccservice.GetByClient( model.ClientId );
+                        ClientCustomer cc = ccservice.GetByNumber( model.ClientId, load[ 5 ].Trim() );
 
                         if ( cc == null )
                         {

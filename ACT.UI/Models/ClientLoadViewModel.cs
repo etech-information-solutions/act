@@ -172,6 +172,8 @@ namespace ACT.UI.Models
         [Display( Name = "Select a Date Format being used in the file your import file" )]
         public DateFormats DateFormats { get; set; }
 
+        public string GLID { get; set; }
+
 
 
         [Display( Name = "Import Loads" )]
@@ -226,6 +228,8 @@ namespace ACT.UI.Models
         public ExtendedClientLoad ExtendedClientLoad { get; set; }
 
         public List<ClientLoadQuantity> ClientLoadQuantities { get; set; }
+
+        public string CustomerType { get; set; }
 
         #endregion
 

@@ -52,5 +52,8 @@ namespace ACT.Data.Models
         public string FirebaseUrl { get; set; }
         public string FirebaseServerKey { get; set; }
         public string FirebaseSenderId { get; set; }
+        public string OneSignalAPIUrl { get; set; }
+        public string OneSignaIAPIKey { get; set; }
+        public string OneSignaIAppId { get; set; }
     }
 }

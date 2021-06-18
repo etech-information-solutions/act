@@ -61,6 +61,11 @@ export class ChatsPage implements OnInit
   {
     var not = await this.chatservice.List( this.Query );
 
+    if ( this.auth.TicketId != undefined && this.auth.TicketId > 0 )
+    {
+      this.GoToChat( this.auth.TicketId );
+    }
+
     /*var useChats = this.chatservice.Chats;
 
     if ( this.Query != "" )
@@ -120,6 +125,8 @@ export class ChatsPage implements OnInit
 
     this.chatservice.ChatId = id;
     this.chatservice.Chat = this.chatservice.Chats[ i ];
+
+    this.auth.TicketId = 0;
 
     this.auth.GoToPage( "chatdetail" );
   }

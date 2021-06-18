@@ -63,6 +63,15 @@ namespace ACT.Core.Models.Custom
         public DateTime? PODCommentDate { get; set; }
         public DateTime? PCNCommentDate { get; set; }
         public DateTime? PRNCommentDate { get; set; }
+        public string DebriefDocketNo { get; set; }
+        public string PalletReturnSlipNo { get; set; }
+        public string ChepCustomerThanDocNo { get; set; }
+        public string WarehouseTransferDocNo { get; set; }
+        public DateTime? PalletReturnDate { get; set; }
+        public string EquipmentCode { get; set; }
+        public string GLID { get; set; }
+        public string CustomerType { get; set; }
+        public string OrderNumber { get; set; }
 
         public int? ImageCount { get; set; }
         public int? DocumentCount { get; set; }

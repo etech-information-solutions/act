@@ -24,6 +24,11 @@ namespace ACT.UI.Controllers
 
         public List<NotificationModel> Notifications = new List<NotificationModel>();
 
+        public StreamWriter LogWriter
+        {
+            get; set;
+        }
+
         /// <summary>
         /// Gets the name of the current controller instance.
         /// </summary>
@@ -73,6 +78,22 @@ namespace ACT.UI.Controllers
             VariableExtension.SetRules();
 
             ViewBag.SystemRules = ConfigSettings.SystemRules;
+        }
+
+        public BaseController( string fileName )
+        {
+            ConfigSettings.SetRules();
+            VariableExtension.SetRules();
+
+            if ( LogWriter == null )
+            {
+                FileStream fs = new FileStream( fileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite );
+
+                LogWriter = new StreamWriter( fs )
+                {
+                    AutoFlush = true
+                };
+            }
         }
 
         public string CurrentUrl

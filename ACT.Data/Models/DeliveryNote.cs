@@ -46,10 +46,10 @@ namespace ACT.Data.Models
     
         public virtual Client Client { get; set; }
         public virtual ClientSite ClientSite { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<DeliveryNoteLine> DeliveryNoteLines { get; set; }
         public virtual Province Province { get; set; }
         public virtual Province Province1 { get; set; }
         public virtual Province Province2 { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<DeliveryNoteLine> DeliveryNoteLines { get; set; }
     }
 }

@@ -201,11 +201,11 @@ namespace ACT.Core.Services
             // Limit to only show Disputes for logged in user
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[Region] r WHERE (r.[Id]=s.[RegionId]) AND (pu.UserId=@userid) AND (r.[PSPId]=pu.[PSPId])) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=sa.[ClientId] AND pu.[UserId]=@userid) ";
             }
             else if ( CurrentUser.RoleType == RoleType.Client )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE (cu.UserId=@userid) AND (EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[SiteId]=s.[Id]))) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=sa.[ClientId] AND cu.[UserId]=@userid) ";
             }
 
             #endregion

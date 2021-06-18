@@ -1,0 +1,67 @@
+﻿@model ClientLoadViewModel
+
+@using ACT.UI.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Old Data Import";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "OldDataImport", "Administration", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#olddataimport", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content("~/images/edit.png")" />
+            <span>Old Data Import</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        <div class="left" style="width: 30%;">
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ClientId )
+            </div>
+            <div class="editor-field">
+                @Html.DropDownListFor( model => model.ClientId, model => Model.ClientOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.ClientId )
+            </div>
+
+            <div class="edit-label">
+                @Html.LabelFor( model => model.DateFormats )
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor( model => model.DateFormats, false, false, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.DateFormats )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.File )
+            </div>
+            <div class="editor-field">
+                @Html.FileUploadFor( model => model.File, new { @class = "input", @required = "required", @placeholder = "Select Import File" } )
+                @Html.ValidationMessageFor( model => model.File )
+            </div>
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+        <p style="margin-bottom: 0;">
+            <input id="save-btn" type="submit" value="Import" />
+
+            <span style="padding: 0 5px;">/</span>
+
+            <a data-refresh="1" data-target="#olddataimport">Cancel</a>
+        </p>
+
+    </div>
+}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+
 using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Core.Models.Custom;
@@ -277,6 +278,11 @@ namespace ACT.Core.Services
         public Region Search( string region, string province )
         {
             return context.Regions.FirstOrDefault( r => r.Name.Trim() == region.Trim() || r.Description == region.Trim() || r.Name.Trim() == province.Trim() || r.Description.Trim() == province.Trim() );
+        }
+
+        public Region GetByCode( string code )
+        {
+            return context.Regions.FirstOrDefault( r => r.Name == code || r.Code == code );
         }
     }
 }

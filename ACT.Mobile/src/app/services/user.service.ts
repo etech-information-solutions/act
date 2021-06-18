@@ -9,6 +9,7 @@ import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-nati
 import { PhotoViewer } from '@ionic-native/photo-viewer/ngx';
 import { ContactactComponent } from '../contactact/contactact.component';
 import { CallNumber } from '@ionic-native/call-number/ngx';
+import { OneSignal } from '@ionic-native/OneSignal/ngx';
 
 @Injectable({ providedIn: 'root' })
 export class UserService
@@ -36,8 +37,8 @@ export class UserService
   APIAuthenticationHeader: any;
 
   APIKey: any = "_12345testing_";
-  APIUrl: any = "http://act.loc/";
-  //APIUrl: any = "http://www.testact.co.za/";
+  //APIUrl: any = "http://act.loc/";
+  APIUrl: any = "http://www.testact.co.za/";
 
   Time: any = [];
 
@@ -88,7 +89,9 @@ export class UserService
 
   ServerResult: any;
 
-  constructor( public http: HttpClient, public fp: FileOpener, public platform: Platform, public storage: Storage, public loadingCtrl: LoadingController, public transfer: FileTransfer, public appVersion: AppVersion, public alertCtrl: AlertController, public imgViewer: PhotoViewer, public popCtrl: PopoverController, public callNumber: CallNumber, public navCtrl: NavController ) 
+  TicketId: any;
+
+  constructor( public http: HttpClient, public fp: FileOpener, public platform: Platform, public storage: Storage, public loadingCtrl: LoadingController, public transfer: FileTransfer, public appVersion: AppVersion, public alertCtrl: AlertController, public imgViewer: PhotoViewer, public popCtrl: PopoverController, public callNumber: CallNumber, public navCtrl: NavController, public oneSignal: OneSignal ) 
   { 
     this.InvoiceStatus = [
       { "key": "Declined", "value": "0" },
@@ -155,15 +158,52 @@ export class UserService
       this.AppVersionCode = v;
     });
   }
+
+  PushNotificationConfig()
+  {
+    if ( !this.platform.is( "cordova" ) )
+    {
+      return;
+    }
+
+    this.oneSignal.startInit( this.Rules.OneSignaIAppId, this.Rules.FirebaseSenderId );
+
+    this.oneSignal.inFocusDisplaying( this.oneSignal.OSInFocusDisplayOption.None );
+
+    this.oneSignal.handleNotificationReceived().subscribe( data =>
+    {
+      //alert( JSON.stringify( data.payload ) );
+    });
+
+    this.oneSignal.handleNotificationOpened().subscribe( data =>
+    {
+      this.TicketId = data.notification.payload.additionalData.TicketId;
+
+      this.GoToPage( "chats", false, true );
+    });
+
+    this.oneSignal.endInit();
+
+    this.oneSignal.getIds().then( identity =>
+    {
+      this.UpdateDeviceId( identity.userId );
+    });
+  }
   
   async UpdateDeviceId( token: any )
   {
+    if ( this.CurrentUser == undefined )
+    {
+      this.ShowError("USER NOT SET");
+      return;
+    }
+
     // API Call here
     try
     {
-      var os = this.IsIOS ? "ios": "andriod";
+      var os = this.IsIOS ? "ios" : "andriod";
 
-      var device = `DeviceId=${token}&DeviceOS=${os}&apikey=${this.APIKey}`;
+      var device = `Id=${this.CurrentUser.Id}&DeviceId=${token}&DeviceOS=${os}&apikey=${this.APIKey}`;
 
       let httpOptions = 
       {
@@ -177,6 +217,8 @@ export class UserService
     }
     catch( error )
     {
+      this.ShowError(JSON.stringify(error));
+
       return;
     }
   }

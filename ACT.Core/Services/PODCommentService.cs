@@ -39,5 +39,15 @@ namespace ACT.Core.Services
 
             return options;
         }
+
+        /// <summary>
+        /// Gets a POD Comment using the comment specified
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <returns></returns>
+        public PODComment GetByComment( string comment )
+        {
+            return context.PODComments.FirstOrDefault( p => p.Comment == comment );
+        }
     }
 }

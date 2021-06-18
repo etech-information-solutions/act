@@ -32,7 +32,8 @@ import { CallNumber } from '@ionic-native/call-number/ngx';
 import { ContactactComponent } from './contactact/contactact.component';
 import { ConfirmdeletesiteauditComponent } from './confirmdeletesiteaudit/confirmdeletesiteaudit.component';
 
-import { FirebaseX } from '@ionic-native/firebase-x/ngx';
+//import { Firebase } from '@ionic-native/firebase/ngx';
+import { OneSignal } from '@ionic-native/OneSignal/ngx';
 
 @NgModule({
   declarations: [
@@ -75,7 +76,8 @@ import { FirebaseX } from '@ionic-native/firebase-x/ngx';
     PhotoViewer,
     PhotoLibrary,
     CallNumber,
-    FirebaseX
+    OneSignal,
+    //Firebase
   ],
   bootstrap: [AppComponent]
 })

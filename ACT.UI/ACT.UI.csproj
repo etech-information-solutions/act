@@ -707,6 +707,7 @@
     <Content Include="Views\Pallet\_SiteContactDetails.cshtml" />
     <Content Include="Views\Pallet\_TransporterContactDetails.cshtml" />
     <Content Include="Views\Pallet\EditAuthorisationComment.cshtml" />
+    <Content Include="Views\Administration\OldDataImport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

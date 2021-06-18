@@ -100,7 +100,7 @@
                         @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
                     </td>
                     <td>
-                        @item.ChepAccountGLIDNo
+                        @( item.ChepAccountGLIDNo ?? item.GLID )
                     </td>
                     <td>
                         @item.SiteName

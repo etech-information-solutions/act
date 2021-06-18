@@ -785,6 +785,21 @@ namespace ACT.Core.Services
                             WHERE
 	                            (c.[Id]=ch.[ClientId])";
 
+            // WHERE
+
+            #region WHERE
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=ch.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=ch.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
             // Custom Search
 
             #region Custom Search
@@ -856,6 +871,21 @@ namespace ACT.Core.Services
 	                        LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
                          WHERE
 	                        (1=1)";
+
+            // WHERE
+
+            #region WHERE
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=ch.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=ch.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
 
             // Custom Search
 

@@ -207,14 +207,15 @@
             <div class="display-field">
                 @*@Html.Raw( ( !string.IsNullOrWhiteSpace( ch?.LocationId ) ? ch?.LocationId?.Trim() : "&nbsp;" ) )*@
                 @*@Html.Raw( cl?.Client?.ClientCustomers?.FirstOrDefault()?.CustomerNumber ?? "&nbsp;" )*@
-                &nbsp;
+
+                @Html.Raw( !string.IsNullOrWhiteSpace( Model.GLID ) ? Model.GLID : "&nbsp;" )
             </div>
 
             <div class="edit-label">
                 Delivery Date:
             </div>
             <div class="edit-field chep-field">
-                <input class="date-picker" data-val="true" data-val-date="The field Load Date: must be a date." id="DeliveryDate" name="DeliveryDate" placeholder="     /       /       " type="text" value="@(ch?.DeliveryDate?.ToString( "yyyy/MM/dd" ))">
+                <input class="date-picker" data-val="true" data-val-date="The field Load Date: must be a date." id="DeliveryDate" name="DeliveryDate" placeholder="     /       /       " type="text" value="@(( ch?.DeliveryDate ?? Model?.DeliveryDate )?.ToString( "yyyy/MM/dd" ))">
             </div>
 
             <div class="edit-label">
@@ -656,7 +657,7 @@
                 @{
                     string ltype = "THAN";
 
-                    if ( Model.ReceiverNumber?.StartsWith( "50000" ) == true || Model.ReceiverNumber?.StartsWith( "52" ) == true || Model.ReceiverNumber?.StartsWith( "51" ) == true )
+                    if ( Model?.CustomerType?.ToUpper()?.Contains( "EXCHANGE" ) == true || Model.ReceiverNumber?.StartsWith( "50000" ) == true || Model.ReceiverNumber?.StartsWith( "52" ) == true || Model.ReceiverNumber?.StartsWith( "51" ) == true )
                     {
                         ltype = "PCN";
                     }

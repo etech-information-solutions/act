@@ -31,6 +31,8 @@ export class HomePage implements OnInit
 
   async ngOnInit() 
   {
+    this.auth.PushNotificationConfig();
+
     await this.ListOutstandingPalletsPerClient();
     await this.ListOutstandingPalletsPerSite();
   }

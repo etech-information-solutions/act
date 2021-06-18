@@ -10,6 +10,7 @@ using Microsoft.VisualBasic.FileIO;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Transactions;
@@ -3966,6 +3967,467 @@ namespace ACT.UI.Controllers
 
 
 
+        #region Old Client Load Import
+
+        // POST: Administration/OldDataImport
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult OldDataImport( ClientLoadViewModel model )
+        {
+            if ( model.File == null )
+            {
+                Notify( "Please select a file to upload and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            int line = 0,
+                count = 0,
+                errors = 0,
+                skipped = 0,
+                created = 0,
+                updated = 0,
+                errorDocId = 0;
+
+            string cQuery, uQuery;
+
+            List<string> errs = new List<string>();
+
+            using ( SiteService sservice = new SiteService() )
+            using ( UserService uservice = new UserService() )
+            using ( RegionService rservice = new RegionService() )
+            using ( VehicleService vservice = new VehicleService() )
+            using ( ProvinceService pservice = new ProvinceService() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( PODCommentService podservice = new PODCommentService() )
+            using ( TransporterService tservice = new TransporterService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
+            using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
+            using ( TextFieldParser parser = new TextFieldParser( model.File.InputStream ) )
+            {
+                parser.Delimiters = new string[] { "," };
+
+                while ( true )
+                {
+                    string[] load = parser.ReadFields();
+
+                    if ( load == null )
+                    {
+                        break;
+                    }
+
+                    line++;
+
+                    if ( line == 1 ) continue;
+
+                    cQuery = uQuery = string.Empty;
+
+                    count++;
+
+                    if ( load.NullableCount() < 2 )
+                    {
+                        skipped++;
+
+                        continue;
+                    }
+
+                    load = load.ToSQLSafe();
+
+                    string date = load[ 0 ]?.Trim(),
+                           palletReturnDate = load[ 1 ]?.Trim(),
+                           equipmentCode = load[ 2 ]?.Trim(),
+                           glid = load[ 3 ]?.Trim(),
+                           supplierFrom = load[ 4 ]?.Trim(), // FromSite
+                           loadNumber = load[ 5 ]?.Trim(),
+                           customerType = load[ 6 ]?.Trim(),
+                           accountingCode = load[ 7 ]?.Trim(),
+                           customerTo = load[ 8 ]?.Trim(), // ToSite
+                           regionFrom = load[ 9 ]?.Trim(),
+                           provinceFrom = load[ 10 ]?.Trim(),
+                           pcn = load[ 11 ]?.Trim(),
+                           orderNumber = load[ 12 ]?.Trim(),
+                           pod = load[ 13 ]?.Trim(),
+                           doc = load[ 14 ]?.Trim(),
+                           deliveryNoteNumber = load[ 15 ]?.Trim(),
+                           deliveredQty = load[ 16 ]?.Trim(),
+                           returnedQty = load[ 17 ]?.Trim(),
+                           outstandingQty = load[ 18 ]?.Trim(),
+                           podComments = load[ 19 ]?.Trim(),
+                           transporterName = load[ 20 ]?.Trim(),
+                           reg = load[ 21 ]?.Trim(),
+                           palletReturnSlipNo = load[ 22 ]?.Trim(),
+                           customerThan = load[ 23 ]?.Trim(),
+                           depotThan = load[ 24 ]?.Trim(),
+                           clientLoadNotes = load[ 25 ]?.Trim(),
+                           authorizerName = load[ 26 ]?.Trim(),
+                           authorizationCode = load[ 27 ]?.Trim();
+
+                    int.TryParse( deliveredQty.Split( '.' )[ 0 ], out int qty );
+
+                    int.TryParse( returnedQty.Split( '.' )[ 0 ], out int returnQty );
+
+                    int.TryParse( outstandingQty.Split( '.' )[ 0 ], out int outstandQty );
+
+                    string uid = clservice.GetSha1Md5String( $"{model.ClientId}{deliveryNoteNumber}{date}{loadNumber}{transporterName}{reg}" );
+
+                    if ( uid.Length > 500 )
+                    {
+                        uid = uid.Substring( 0, 500 );
+                    }
+
+                    DateTime.TryParseExact( date, model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime loadDate );
+
+                    DateTime.TryParseExact( date, model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime deliveryDate );
+
+                    string returnDate = "NULL";
+
+                    if ( DateTime.TryParseExact( palletReturnDate, model.DateFormats.GetDisplayText(), CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime prd ) )
+                    {
+                        returnDate = $"'{prd}'";
+                    }
+
+                    int? clId = clservice.GetIdByUID( uid );
+
+                    #region Region
+
+                    Region region = rservice.GetByCode( regionFrom );
+
+                    #endregion
+
+                    #region POD Comment
+
+                    PODComment podC = podservice.GetByComment( podComments );
+
+                    string podid = podC != null ? podC.Id + "" : "NULL";
+
+                    #endregion
+
+                    #region Transporter
+
+                    int? t = tservice.GetIdByClientAndName( model.ClientId, transporterName );
+
+                    if ( ( t == null || t <= 0 ) && !string.IsNullOrWhiteSpace( transporterName ) )
+                    {
+                        #region Create Transporter
+
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[Transporter]([ClientId],[CreatedOn],[ModifiedOn],[ModifiedBy],[Name],[TradingName],[Status]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{transporterName}','{transporterName}',{( int ) Status.Active}) ";
+
+                        #endregion
+
+                        try
+                        {
+                            tservice.Query( cQuery );
+
+                            t = tservice.GetIdByClientAndName( model.ClientId, transporterName );
+                        }
+                        catch ( Exception ex )
+                        {
+                            errs.Add( ex.ToString() );
+                        }
+                    }
+
+                    #endregion
+
+                    string tid = t != null ? t + "" : "NULL";
+
+                    #region Vehicle
+
+                    int? v = vservice.GetIdByRegistrationNumber( reg, "Transporter" );
+
+                    if ( ( v == null || v <= 0 ) && !string.IsNullOrWhiteSpace( reg ) )
+                    {
+                        #region Create Vehicle
+
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[Vehicle]([ObjectId],[CreatedOn],[ModifiedOn],[ModifiedBy],[Descriptoin],[Registration],[ObjectType],[Type],[Status]) ";
+                        cQuery = $" {cQuery} VALUES ({tid},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{reg}','{reg}','Transporter',{( int ) VehicleType.Pickup},{( int ) Status.Active}) ";
+
+                        #endregion
+
+                        try
+                        {
+                            vservice.Query( cQuery );
+
+                            v = vservice.GetIdByRegistrationNumber( reg, "Transporter" );
+                        }
+                        catch ( Exception ex )
+                        {
+                            errs.Add( ex.ToString() );
+                        }
+                    }
+
+                    #endregion
+
+                    string vid = v != null ? v + "" : "NULL";
+
+                    #region Client Site 1
+
+                    ClientSite cs1 = null;
+                    Site site = sservice.GetByClientAndName( model.ClientId, supplierFrom );
+
+                    if ( site == null && !string.IsNullOrWhiteSpace( supplierFrom ) )
+                    {
+                        site = new Site()
+                        {
+                            Name = supplierFrom,
+                            RegionId = region?.Id,
+                            Description = supplierFrom,
+                            Status = ( int ) Status.Active,
+                        };
+
+                        site = sservice.Create( site );
+                    }
+
+                    if ( site != null && !site.ClientSites.NullableAny() && !string.IsNullOrWhiteSpace( supplierFrom ) )
+                    {
+                        ClientCustomer cc = ccservice.GetByNumber( model.ClientId, accountingCode );
+
+                        if ( cc == null )
+                        {
+                            cc = new ClientCustomer()
+                            {
+                                ClientId = model.ClientId,
+                                CustomerName = customerTo,
+                                Status = ( int ) Status.Active,
+                                CustomerNumber = accountingCode,
+                                CustomerTown = provinceFrom,
+                            };
+
+                            cc = ccservice.Create( cc );
+                        }
+
+                        cs1 = new ClientSite()
+                        {
+                            GLIDNo = glid,
+                            SiteId = site.Id,
+                            ClientCustomerId = cc.Id,
+                            Status = ( int ) Status.Active,
+                            AccountingCode = accountingCode,
+                            ClientSiteCode = accountingCode,
+                            ClientCustomerNumber = accountingCode,
+                        };
+
+                        cs1 = csservice.Create( cs1 );
+                    }
+                    else if ( site != null && !string.IsNullOrWhiteSpace( supplierFrom ) )
+                    {
+                        cs1 = site.ClientSites.FirstOrDefault();
+                    }
+
+                    #endregion
+
+                    #region Client Site 2
+
+                    ClientSite cs2 = null;
+                    Site site2 = sservice.GetByClientAndName( model.ClientId, customerTo );
+
+                    if ( site2 == null && !string.IsNullOrWhiteSpace( customerTo ) )
+                    {
+                        site2 = new Site()
+                        {
+                            Name = customerTo,
+                            Description = customerTo,
+                            Status = ( int ) Status.Active,
+                        };
+
+                        site2 = sservice.Create( site2 );
+                    }
+
+                    if ( site2 != null && !site2.ClientSites.NullableAny() && !string.IsNullOrWhiteSpace( customerTo ) )
+                    {
+                        ClientCustomer cc = ccservice.GetByNumber( model.ClientId, accountingCode );
+
+                        if ( cc == null )
+                        {
+                            cc = new ClientCustomer()
+                            {
+                                ClientId = model.ClientId,
+                                Status = ( int ) Status.Active,
+                                CustomerName = customerTo,
+                                CustomerNumber = accountingCode,
+                                CustomerTown = accountingCode,
+                            };
+
+                            cc = ccservice.Create( cc );
+                        }
+
+                        cs2 = new ClientSite()
+                        {
+                            GLIDNo = glid,
+                            SiteId = site2.Id,
+                            ClientCustomerId = cc.Id,
+                            Status = ( int ) Status.Active,
+                            AccountingCode = accountingCode,
+                            ClientSiteCode = accountingCode,
+                            ClientCustomerNumber = accountingCode,
+                        };
+
+                        cs2 = csservice.Create( cs2 );
+                    }
+                    else if ( site2 != null && !string.IsNullOrWhiteSpace( customerTo ) )
+                    {
+                        cs2 = site2.ClientSites.FirstOrDefault();
+                    }
+
+                    #endregion
+
+                    string cs1id = cs1 != null ? cs1.Id + "" : "NULL";
+                    string cs2id = cs2 != null ? cs2.Id + "" : "NULL";
+
+                    if ( clId == null || clId <= 0 )
+                    {
+                        #region Create Client Load
+
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[ClientLoad]([ClientId],[ClientSiteId],[ToClientSiteId],[VehicleId],[TransporterId],[OutstandingReasonId],[PODCommentId],[CreatedOn],[ModifiedOn],[ModifiedBy],[LoadNumber],[LoadDate],[EffectiveDate],[NotifyDate],[AccountNumber],[ClientDescription],[DeliveryNote],[OriginalQuantity],[NewQuantity],[ReturnQty],[OutstandingQty],[PODNumber],[PCNNumber],[Status],[PostingType],[THAN],[PODStatus],[InvoiceStatus],[UID],[ChepCustomerThanDocNo],[WarehouseTransferDocNo],[EquipmentCode],[GLID],[CustomerType],[OrderNumber],[ReferenceNumber],[DocNumber],[PalletReturnSlipNo],[ClientLoadNotes]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},{cs1id},{cs2id},{vid},{tid},9,{podid},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{loadNumber}','{loadDate}','{loadDate}','{loadDate}','{accountingCode}','{customerTo}','{deliveryNoteNumber}',{qty},{qty},{returnQty},{outstandQty},'{pod}','{pcn}',{( int ) ReconciliationStatus.Unreconciled},{( int ) PostingType.Import},'{customerThan}',0,0,'{uid}','{customerThan}','{depotThan}','{equipmentCode}','{glid}','{customerType}','{orderNumber}','{orderNumber}','{doc}','{palletReturnSlipNo}','{clientLoadNotes}') ";
+
+                        #endregion
+
+                        try
+                        {
+                            clservice.Query( cQuery );
+
+                            created++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+
+                            errs.Add( ex.ToString() );
+                        }
+                    }
+                    else
+                    {
+                        #region Update Client Load
+
+                        uQuery = $@"{uQuery} UPDATE [dbo].[ClientLoad] SET
+                                                    [ModifiedOn]='{DateTime.Now}',
+                                                    [ModifiedBy]='{CurrentUser.Email}',
+                                                    [VehicleId]={vid},
+                                                    [ClientSiteId]={cs1id},
+                                                    [ToClientSiteId]={cs2id},
+                                                    [TransporterId]={tid},
+                                                    [PODCommentId]={podid},
+                                                    [LoadNumber]='{loadNumber}',
+                                                    [LoadDate]='{loadDate}',
+                                                    [EffectiveDate]='{deliveryDate}',
+                                                    [NotifyDate]='{deliveryDate}',
+                                                    [PalletReturnDate]={returnDate},
+                                                    [AccountNumber]='{accountingCode}',
+                                                    [ClientDescription]='{customerTo}',
+                                                    [DeliveryNote]='{deliveryNoteNumber}',
+                                                    [OriginalQuantity]={qty},
+                                                    [NewQuantity]={qty},
+                                                    [ReturnQty]={returnQty},
+                                                    [OutstandingQty]={outstandQty},
+                                                    [PODNumber]='{pod}',
+                                                    [PCNNumber]='{pcn}',
+                                                    [THAN]='{customerThan}',
+                                                    [ChepCustomerThanDocNo]='{customerThan}',
+                                                    [WarehouseTransferDocNo]='{depotThan}',
+                                                    [EquipmentCode]='{equipmentCode}',
+                                                    [GLID]='{glid}',
+                                                    [CustomerType]='{customerType}',
+                                                    [OrderNumber]='{orderNumber}',
+                                                    [ReferenceNumber]='{orderNumber}',
+                                                    [DocNumber]='{doc}',
+                                                    [PalletReturnSlipNo]='{palletReturnSlipNo}',
+                                                    [ClientLoadNotes]='{clientLoadNotes}'
+                                                WHERE
+                                                    [Id]={clId}";
+
+                        #endregion
+
+                        try
+                        {
+                            clservice.Query( uQuery );
+
+                            updated++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+
+                            errs.Add( ex.ToString() );
+                        }
+                    }
+
+                    #region Client Authorisation
+
+                    if ( !string.IsNullOrWhiteSpace( authorizationCode ) && !string.IsNullOrWhiteSpace( authorizerName ) )
+                    {
+                        ClientAuthorisation ca = caservice.GetByCode( authorizationCode );
+
+                        if ( ca == null )
+                        {
+                            clId = clId.HasValue ? clId : clservice.GetIdByUID( uid );
+
+                            // User
+                            User user = uservice.GetByMaybeNameOrSurname( authorizerName );
+
+                            if ( user == null )
+                            {
+                                user = new User()
+                                {
+                                    Name = authorizerName,
+                                    Surname = authorizerName,
+                                    Email = authorizerName,
+                                    Cell = string.Empty,
+                                    Password = string.Empty,
+                                    PasswordDate = DateTime.Now,
+                                    Status = ( int ) Status.Active,
+                                    Type = ( int ) RoleType.PSP,
+
+                                };
+
+                                user = uservice.Create( user );
+                            }
+
+                            ca = new ClientAuthorisation()
+                            {
+                                UserId = user.Id,
+                                Code = authorizationCode,
+                                LoadNumber = loadNumber,
+                                ClientLoadId = clId.Value,
+                                Status = ( int ) Status.Active,
+                                AuthorisationDate = DateTime.Now,
+                            };
+
+                            ca = caservice.Create( ca );
+                        }
+                    }
+
+                    #endregion
+                }
+
+                cQuery = string.Empty;
+                uQuery = string.Empty;
+
+                if ( errs.NullableAny() )
+                {
+                    errorDocId = LogImportErrors( errs, model.ClientId );
+                }
+            }
+
+            AutoReconcileLoads( model.ClientId );
+
+            string resp = $"{created} loads were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.";
+
+            if ( errs.NullableAny() && errorDocId > 0 )
+            {
+                resp = $"{resp} <a href='/Pallet/ViewDocument/{errorDocId}' target='_blank'>Click here</a> to view the erros.";
+            }
+
+            Notify( resp, NotificationType.Success );
+
+            return OldDataImport();
+        }
+
+        #endregion
+
+
+
         #region Partial Views
 
         //
@@ -4206,7 +4668,7 @@ namespace ACT.UI.Controllers
         }
 
         //
-        // GET: /Client/ManageTransporters
+        // GET: /Administration/ManageTransporters
         public ActionResult ManageTransporters( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
         {
             ViewBag.ViewName = "ManageTransporters";
@@ -4231,6 +4693,15 @@ namespace ACT.UI.Controllers
 
                 return PartialView( "_ManageTransporters", paging );
             }
+        }
+
+        // GET: Administration/OldDataImport
+        [Requires( PermissionTo.Create )]
+        public ActionResult OldDataImport()
+        {
+            ClientLoadViewModel model = new ClientLoadViewModel() { EditMode = true };
+
+            return View( model );
         }
 
         #endregion

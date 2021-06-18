@@ -5,8 +5,6 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { UserService } from './services/user.service';
 
-import { FirebaseX } from '@ionic-native/firebase-x/ngx';
-
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -66,7 +64,7 @@ export class AppComponent implements OnInit
     }
   ];
 
-  constructor( private platform: Platform, private splashScreen: SplashScreen, private statusBar: StatusBar, public auth: UserService, public firebase: FirebaseX )
+  constructor( private platform: Platform, private splashScreen: SplashScreen, private statusBar: StatusBar, public auth: UserService )
   {
     this.initializeApp();
   }
@@ -77,28 +75,6 @@ export class AppComponent implements OnInit
     {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
-
-      // Get token
-      this.firebase.getToken().then( token =>
-      {
-        this.auth.UpdateDeviceId( token );
-
-        alert( token );
-      }).catch( err =>
-      {
-        alert( err );
-      });
-
-
-      // Handle received notification
-      this.firebase.onMessageReceived().subscribe( n =>
-      {
-        alert(n);
-
-      }, err =>
-      {
-        alert( err );
-      });
     });
   }
 
@@ -106,9 +82,9 @@ export class AppComponent implements OnInit
   {
     const path = window.location.pathname.split('/')[1];
 
-    if (path !== undefined)
+    if ( path !== undefined )
     {
-      this.selectedIndex = this.appPages.findIndex(page => page.title.toLowerCase() === path.toLowerCase());
+      this.selectedIndex = this.appPages.findIndex( page => page.title.toLowerCase() === path.toLowerCase() );
     }
   }
 }

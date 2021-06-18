@@ -473,5 +473,15 @@ namespace ACT.Core.Services
 
             return base.Update( user );
         }
+
+        /// <summary>
+        /// Tries to find a user by name or surname from the specified string:mame
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public User GetByMaybeNameOrSurname( string name )
+        {
+            return context.Users.FirstOrDefault( u => name.Contains( u.Name ) || name.Contains( u.Surname ) );
+        }
     }
 }

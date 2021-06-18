@@ -65,8 +65,8 @@ namespace ACT.Data.Models
         public Nullable<System.DateTime> PalletReturnDate { get; set; }
     
         public virtual Client Client { get; set; }
-        public virtual ClientLoad ClientLoad { get; set; }
         public virtual ClientSite ClientSite { get; set; }
         public virtual OutstandingReason OutstandingReason { get; set; }
+        public virtual ClientLoad ClientLoad { get; set; }
     }
 }

@@ -80,7 +80,6 @@ namespace ACT.Data.Models
         public virtual DbSet<UserRole> UserRoles { get; set; }
         public virtual DbSet<UserTask> UserTasks { get; set; }
         public virtual DbSet<PSPPeriod> PSPPeriods { get; set; }
-        public virtual DbSet<ClientLoad> ClientLoads { get; set; }
         public virtual DbSet<Vehicle> Vehicles { get; set; }
         public virtual DbSet<ChepLoadJournal> ChepLoadJournals { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
@@ -89,8 +88,6 @@ namespace ACT.Data.Models
         public virtual DbSet<ClientLoadHistory> ClientLoadHistories { get; set; }
         public virtual DbSet<ClientAuthorisation> ClientAuthorisations { get; set; }
         public virtual DbSet<ClientSite> ClientSites { get; set; }
-        public virtual DbSet<Country> Countries { get; set; }
-        public virtual DbSet<Province> Provinces { get; set; }
         public virtual DbSet<Address> Addresses { get; set; }
         public virtual DbSet<DeliveryNote> DeliveryNotes { get; set; }
         public virtual DbSet<Region> Regions { get; set; }
@@ -98,7 +95,10 @@ namespace ACT.Data.Models
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<Message> Messages { get; set; }
         public virtual DbSet<Ticket> Tickets { get; set; }
-        public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
+        public virtual DbSet<ClientLoad> ClientLoads { get; set; }
+        public virtual DbSet<Country> Countries { get; set; }
+        public virtual DbSet<Province> Provinces { get; set; }
     }
 }
