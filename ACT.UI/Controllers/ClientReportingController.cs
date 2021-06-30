@@ -33,11 +33,13 @@ namespace ACT.UI.Controllers
         // GET: /Administration/Export
         public FileContentResult Export( PagingModel pm, CustomSearchModel csm, string type = "disputes" )
         {
-            string csv = "";
+            string csv = string.Empty;
             string filename = string.Format( "{0}-{1}.csv", type.ToUpperInvariant(), DateTime.Now.ToString( "yyyy_MM_dd_HH_mm" ) );
 
             pm.Skip = 0;
             pm.Take = int.MaxValue;
+
+            int count = 0;
 
             switch ( type )
             {
@@ -45,36 +47,37 @@ namespace ACT.UI.Controllers
 
                     #region Disputes
 
-                    csv = string.Format( "Account Number,TDN Number,Raised Date,Docket Number,Reference,Action By,Resolved On,Resolved By,Other Party,Sender,Receiver,Declarer,Dispute Email,Product,Dispute Status,Equipment,Quantity,Reason fo Dispute {0}", Environment.NewLine );
+                    csv = string.Format( "Effective Date,Account Number,TDN Number,Raised Date,Docket Number,Reference,Action By,Resolved On,Resolved By,Other Party,Sender,Receiver,Declarer,Dispute Email,Product,Dispute Status,Equipment,Quantity,Reason fo Dispute {0}", Environment.NewLine );
 
                     using ( DisputeService dservice = new DisputeService() )
                     {
                         List<DisputeCustomModel> disputes = dservice.List1( pm, csm );
 
-                        if ( disputes != null && disputes.Any() )
+                        if ( disputes.NullableAny() )
                         {
                             foreach ( DisputeCustomModel item in disputes )
                             {
-                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18} {19}",
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19} {20}",
                                                     csv,
-                                                    item.ChepLoadAccountNumber,
-                                                    item.TDNNumber,
-                                                    item.CreatedOn,
-                                                    item.DocketNumber,
-                                                    item.Reference,
-                                                    item.ActionUser,
-                                                    item.ResolvedOn,
-                                                    item.ResolvedUser,
-                                                    item.OtherParty,
-                                                    item.Sender,
-                                                    item.Receiver,
-                                                    item.Declarer,
-                                                    item.DisputeEmail,
-                                                    item.Product,
-                                                    item.Status,
-                                                    item.Equipment,
-                                                    item.Quantity,
-                                                    item.DisputeReasonDetails,
+                                                    "\"" + item.EffectiveDate + "\"",
+                                                    "\"" + item.ChepLoadAccountNumber + "\"",
+                                                    "\"" + item.TDNNumber + "\"",
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.DocketNumber + "\"",
+                                                    "\"" + item.Reference + "\"",
+                                                    "\"" + item.ActionUser + "\"",
+                                                    "\"" + item.ResolvedOn + "\"",
+                                                    "\"" + item.ResolvedUser + "\"",
+                                                    "\"" + item.OtherParty + "\"",
+                                                    "\"" + item.Sender + "\"",
+                                                    "\"" + item.Receiver + "\"",
+                                                    "\"" + item.Declarer + "\"",
+                                                    "\"" + item.DisputeEmail + "\"",
+                                                    "\"" + item.Product + "\"",
+                                                    "\"" + item.Status + "\"",
+                                                    "\"" + item.Equipment + "\"",
+                                                    "\"" + item.Quantity + "\"",
+                                                    "\"" + item.DisputeReasonDetails + "\"",
                                                     Environment.NewLine );
                             }
                         }
@@ -100,19 +103,19 @@ namespace ACT.UI.Controllers
                             {
                                 csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} {14}",
                                                     csv,
-                                                    item.CreatedOn,
-                                                    item.SiteName,
-                                                    item.Equipment,
-                                                    item.ChepStockBalance,
-                                                    item.NotInvoiceIn,
-                                                    item.NotInvoiceOut,
-                                                    item.ReqAdjustment,
-                                                    item.NotMCCIn,
-                                                    item.NotMCCOut,
-                                                    item.MccBalance,
-                                                    item.SuspendITL,
-                                                    item.SuspendMCC,
-                                                    item.AdjustedInvBalance,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.SiteName + "\"",
+                                                    "\"" + item.Equipment + "\"",
+                                                    "\"" + item.ChepStockBalance + "\"",
+                                                    "\"" + item.NotInvoiceIn + "\"",
+                                                    "\"" + item.NotInvoiceOut + "\"",
+                                                    "\"" + item.ReqAdjustment + "\"",
+                                                    "\"" + item.NotMCCIn + "\"",
+                                                    "\"" + item.NotMCCOut + "\"",
+                                                    "\"" + item.MccBalance + "\"",
+                                                    "\"" + item.SuspendITL + "\"",
+                                                    "\"" + item.SuspendMCC + "\"",
+                                                    "\"" + item.AdjustedInvBalance + "\"",
                                                     Environment.NewLine );
                             }
                         }
@@ -130,28 +133,113 @@ namespace ACT.UI.Controllers
 
                     using ( SiteAuditService dservice = new SiteAuditService() )
                     {
-                        List<SiteAuditCustomModel> siteAudits = dservice.List1( pm, csm );
+                        List<SiteAuditCustomModel> audits = dservice.List1( pm, csm );
 
-                        if ( siteAudits != null && siteAudits.Any() )
+                        if ( audits.NullableAny() )
                         {
-                            foreach ( SiteAuditCustomModel item in siteAudits )
+                            foreach ( SiteAuditCustomModel item in audits )
                             {
                                 csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11} {12}",
                                                     csv,
-                                                    item.CreatedOn,
-                                                    item.AuditDate,
-                                                    item.SiteName,
-                                                    item.Equipment,
-                                                    item.PalletsOutstanding,
-                                                    item.PalletsCounted,
-                                                    item.WriteoffPallets,
-                                                    item.CustomerName,
-                                                    item.RepName,
-                                                    item.PalletAuditor,
-                                                    item.Status,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.AuditDate + "\"",
+                                                    "\"" + item.SiteName + "\"",
+                                                    "\"" + item.Equipment + "\"",
+                                                    "\"" + item.PalletsOutstanding + "\"",
+                                                    "\"" + item.PalletsCounted + "\"",
+                                                    "\"" + item.WriteoffPallets + "\"",
+                                                    "\"" + item.CustomerName + "\"",
+                                                    "\"" + item.RepName + "\"",
+                                                    "\"" + item.PalletAuditor + "\"",
+                                                    "\"" + item.Status + "\"",
                                                     Environment.NewLine );
                             }
                         }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "outstandingpallets":
+
+                    #region Outstanding Pallets
+
+                    List<OutstandingPalletsModel> items = GetOutstandingPallets( pm, csm );
+
+                    DateTime minYear = items.NullableAny() ? items.Min( m => m.MinYear ) : DateTime.Now;
+
+                    csv = "Client,Reason,0-30 Days,31-60 Days,61-90 Days,91-120 Days,121-183 Days,184-270 Days,271-365 Days";
+
+                    if ( minYear.Year != DateTime.Now.Year )
+                    {
+                        for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
+                        {
+                            csv = $"{csv},{i}";
+                        }
+                    }
+
+                    csv = $"{csv},Grand Total {Environment.NewLine}";
+
+                    if ( items.NullableAny() )
+                    {
+                        count = 0;
+
+                        foreach ( OutstandingPalletsModel item in items )
+                        {
+                            csv = $"{csv} {item.ClientLoad.ClientName},,,,,,,";
+
+                            if ( minYear.Year != DateTime.Now.Year )
+                            {
+                                for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
+                                {
+                                    csv = $"{csv},";
+                                }
+                            }
+
+                            csv = $"{csv},{Environment.NewLine}";
+
+                            foreach ( OutstandingReasonModel osr in item.OutstandingReasons )
+                            {
+                                csv = $"{csv},{osr.Description},{osr.To30Days},{osr.To60Days},{osr.To90Days},{osr.To120Days},{osr.To183Days},{osr.To270Days},{osr.To365Days}";
+
+                                if ( minYear.Year != DateTime.Now.Year )
+                                {
+                                    for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
+                                    {
+                                        csv = $"{csv},{osr.PreviousYears?.FirstOrDefault( y => y.Year == i )?.Total}";
+                                    }
+                                }
+
+                                csv = $"{csv},{osr.GrandTotal} {Environment.NewLine}";
+                            }
+
+                            csv = $"{csv}{Environment.NewLine},Total,{item.GrandTotal.To30Days},{item.GrandTotal.To60Days},{item.GrandTotal.To90Days},{item.GrandTotal.To120Days},{item.GrandTotal.To183Days},{item.GrandTotal.To270Days},{item.GrandTotal.To365Days}";
+
+                            if ( minYear.Year != DateTime.Now.Year )
+                            {
+                                for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
+                                {
+                                    csv = $"{csv},{item.GrandTotal?.PreviousYears?.FirstOrDefault( y => y.Year == i )?.Total}";
+                                }
+                            }
+
+                            csv = $"{csv},{item.GrandTotal.GrandTotal} {Environment.NewLine}{Environment.NewLine}";
+
+                            count++;
+                        }
+
+                        csv = $"{csv}{Environment.NewLine}{Environment.NewLine},Grand Total,{items.Sum( s => s.GrandTotal.To30Days )},{items.Sum( s => s.GrandTotal.To60Days )},{items.Sum( s => s.GrandTotal.To90Days )},{items.Sum( s => s.GrandTotal.To120Days )},{items.Sum( s => s.GrandTotal.To183Days )},{items.Sum( s => s.GrandTotal.To270Days )},{items.Sum( s => s.GrandTotal.To365Days )}";
+
+                        if ( minYear.Year != DateTime.Now.Year )
+                        {
+                            for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
+                            {
+                                csv = $"{csv},{items.SelectMany( m => m.GrandTotal?.PreviousYears?.Where( w => w.Year == i ) ).Sum( s => s.Total )}";
+                            }
+                        }
+
+                        csv = $"{csv},{items.Sum( s => s.GrandTotal.GrandTotal )}";
                     }
 
                     #endregion
@@ -166,25 +254,34 @@ namespace ACT.UI.Controllers
 
                     using ( ClientLoadService dservice = new ClientLoadService() )
                     {
+                        if ( !csm.FromDate.HasValue )
+                        {
+                            csm.FromDate = DateTime.Now.AddMonths( -1 );
+                        }
+                        if ( !csm.ToDate.HasValue )
+                        {
+                            csm.ToDate = DateTime.Now;
+                        }
+
                         List<ClientLoadCustomModel> clientload = dservice.List1( pm, csm );
 
-                        if ( clientload != null && clientload.Any() )
+                        if ( clientload.NullableAny() )
                         {
                             foreach ( ClientLoadCustomModel item in clientload )
                             {
                                 csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11} {12}",
                                                     csv,
-                                                    item.LoadDate,
-                                                    item.EffectiveDate,
-                                                    item.NotifyDate,
-                                                    item.DocketNumber,
-                                                    item.PostingType,
-                                                    item.ClientDescription,
-                                                    item.ReferenceNumber,
-                                                    item.Equipment,
-                                                    item.PODNumber,
-                                                    item.PCNNumber,
-                                                    item.PRNNumber,
+                                                    "\"" + item.LoadDate + "\"",
+                                                    "\"" + item.EffectiveDate + "\"",
+                                                    "\"" + item.NotifyDate + "\"",
+                                                    "\"" + item.DocketNumber + "\"",
+                                                    "\"" + item.PostingType + "\"",
+                                                    "\"" + item.ClientDescription + "\"",
+                                                    "\"" + item.ReferenceNumber + "\"",
+                                                    "\"" + item.Equipment + "\"",
+                                                    "\"" + item.PODNumber + "\"",
+                                                    "\"" + item.PCNNumber + "\"",
+                                                    "\"" + item.PRNNumber + "\"",
                                                     Environment.NewLine );
                             }
                         }
@@ -194,29 +291,118 @@ namespace ACT.UI.Controllers
 
                     break;
 
-                case "exceptions":
+                case "topoustandingcustomers":
 
-                    #region Exceptions
+                    #region Top Oustanding Customers
 
-                    csv = string.Format( "Site,Sub-site,Load Date,Exception {0}", Environment.NewLine );
+                    csv = $"Client, Region, Site, Reason, Total {Environment.NewLine}";
 
-                    using ( ClientLoadService dservice = new ClientLoadService() )
+                    csm.BalanceStatus = BalanceStatus.NotBalanced;
+                    csm.ReconciliationStatus = ReconciliationStatus.Reconciled;
+
+                    List<OutstandingPalletsModel> toc = GetOustandingCustomers( pm, csm );
+
+                    if ( toc.NullableAny() )
                     {
-                        csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
-
-                        List<ClientLoadCustomModel> clientload = dservice.List1( pm, csm );
-
-                        if ( clientload != null && clientload.Any() )
+                        foreach ( OutstandingPalletsModel item in toc )
                         {
-                            foreach ( ClientLoadCustomModel item in clientload )
+                            csv = $"{csv} {item.ClientLoad.ClientName},,,,{item.Total} {Environment.NewLine}";
+
+                            foreach ( OutstandingRegionModel r in item.Regions )
                             {
-                                csv = string.Format( "{0} {1},{2},{3} {12}",
-                                                    csv,
-                                                    item.SiteName,
-                                                    item.SubSiteName,
-                                                    item.LoadDate,
-                                                    item.OutstandingReason,
-                                                    Environment.NewLine );
+                                csv = $"{csv},{r.Name},,,{r.Total} {Environment.NewLine}";
+
+                                foreach ( OutstandingSiteModel s in r.Sites )
+                                {
+                                    csv = $"{csv},{s.Name},,,{s.Total} {Environment.NewLine}";
+
+                                    foreach ( OutstandingReasonModel o in s.OutstandingReasons )
+                                    {
+                                        csv = $"{csv},,,{o.Description},{o.Total} {Environment.NewLine}";
+                                    }
+                                }
+                            }
+
+                            csv = $"{csv}{Environment.NewLine}TOTAL,,,,{item.Total} {Environment.NewLine}{Environment.NewLine}";
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "podoutstanding":
+
+                    #region POD Outstanding
+
+                    csv = $"Load Date,Created,Client,Transporter,Vehicle,Docket Number,Ref,Other Ref,Equipment,Invoice Number,Transaction Type, Quantity,Outstanding Reason {Environment.NewLine}";
+
+                    using ( ChepLoadService chservice = new ChepLoadService() )
+                    {
+                        csm.IsPODOutstanding = true;
+                        csm.BalanceStatus = BalanceStatus.NotBalanced;
+                        csm.ReconciliationStatus = ReconciliationStatus.Reconciled;
+
+                        List<ChepLoadCustomModel> cheploads = chservice.List1( pm, csm );
+
+                        if ( cheploads.NullableAny() )
+                        {
+                            foreach ( ChepLoadCustomModel item in cheploads )
+                            {
+                                csv = $"{csv}\"{item.ShipmentDate}\",\"{item.CreateDate}\",\"{item.ClientName}\",\"{item.TransporterName}\",\"{item.VehicleRegistration}\",\"{item.DocketNumber}\",\"{item.CorrectedRef ?? item.Ref}\",\"{item.CorrectedOtherRef ?? item.OtherRef}\",\"{item.Equipment}\",\"{item.InvoiceNumber}\",\"{item.TransactionType}\",\"{item.Quantity}\",\"{item.OutstandingReason}\" {Environment.NewLine}";
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "transporterliablereport":
+
+                    #region Transporter Liable Report
+
+                    csv = $"Load Date,Created,Client,Transporter,Vehicle,Docket Number,Ref,Other Ref,Equipment,Invoice Number,Transaction Type, Quantity,Outstanding Reason {Environment.NewLine}";
+
+                    using ( ChepLoadService chservice = new ChepLoadService() )
+                    {
+                        csm.IsPODOutstanding = true;
+                        csm.IsTransporterLiable = true;
+                        csm.BalanceStatus = BalanceStatus.NotBalanced;
+                        csm.ReconciliationStatus = ReconciliationStatus.Reconciled;
+
+                        List<ChepLoadCustomModel> cheploads = chservice.List1( pm, csm );
+
+                        if ( cheploads.NullableAny() )
+                        {
+                            foreach ( ChepLoadCustomModel item in cheploads )
+                            {
+                                csv = $"{csv}\"{item.ShipmentDate}\",\"{item.CreateDate}\",\"{item.ClientName}\",\"{item.TransporterName}\",\"{item.VehicleRegistration}\",\"{item.DocketNumber}\",\"{item.CorrectedRef ?? item.Ref}\",\"{item.CorrectedOtherRef ?? item.OtherRef}\",\"{item.Equipment}\",\"{item.InvoiceNumber}\",\"{item.TransactionType}\",\"{item.Quantity}\",\"{item.OutstandingReason}\" {Environment.NewLine}";
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "disputesresolved":
+
+                    #region Disputes Resolved
+
+                    csv = $"Effective Date,Original Docket Number,Docket Number,Ref,Other Ref,TDN,Quantity,Action By, Status,Reason {Environment.NewLine}";
+
+                    using ( DisputeService dservice = new DisputeService() )
+                    {
+                        csm.DisputeStatus = DisputeStatus.Resolved;
+
+                        List<DisputeCustomModel> disputes = dservice.List1( pm, csm );
+
+                        if ( disputes.NullableAny() )
+                        {
+                            foreach ( DisputeCustomModel item in disputes )
+                            {
+                                //csv = $"{csv}\"{item.ShipmentDate}\",\"{item.CreateDate}\",\"{item.ClientName}\",\"{item.TransporterName}\",\"{item.VehicleRegistration}\",\"{item.DocketNumber}\",\"{item.CorrectedRef ?? item.Ref}\",\"{item.CorrectedOtherRef ?? item.OtherRef}\",\"{item.Equipment}\",\"{item.InvoiceNumber}\",\"{item.TransactionType}\",\"{item.Quantity}\",\"{item.OutstandingReason}\" {Environment.NewLine}";
                             }
                         }
                     }

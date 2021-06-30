@@ -14,7 +14,7 @@
 
 @Html.Partial( "_Notification" )
 
-@using ( Html.BeginForm( "OldDataImport", "Administration", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#olddataimport", @class = "custom-validate", @style = "width: auto;" } ) )
+@using ( Html.BeginForm( "ProcessOldDataImport", "Administration", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#olddataimport", @class = "custom-validate", @style = "width: auto;" } ) )
 {
     <div id="edit-item">
 

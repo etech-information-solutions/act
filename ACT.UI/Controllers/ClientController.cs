@@ -35,9 +35,9 @@ namespace ACT.UI.Controllers
 
         //
         // GET: /Administration/Export
-        public FileContentResult Export( PagingModel pm, CustomSearchModel csm, string type = "configurations" )
+        public FileContentResult Export( PagingModel pm, CustomSearchModel csm, string type = "clients" )
         {
-            string csv = "";
+            string csv = string.Empty;
             string filename = string.Format( "{0}-{1}.csv", type.ToUpperInvariant(), DateTime.Now.ToString( "yyyy_MM_dd_HH_mm" ) );
 
             pm.Skip = 0;
@@ -49,46 +49,43 @@ namespace ACT.UI.Controllers
 
                     #region Clients
 
-                    csv = string.Format( "Date Created, Company Name, Trading As, Reg #, Description, Chep reference, Status, Service Required, Type of Pallet Use, Other Type of Pallet Use, Company Type, PSP, VAT Number, BBBEE Level, Contact Person, Contact Number, Contact Email, Administrator, Administrator Email, Financial Person, Financial Person Email {0}", Environment.NewLine );
-
-                    List<ClientCustomModel> clients = new List<ClientCustomModel>();
-
                     using ( ClientService service = new ClientService() )
                     {
-                        clients = service.List1( pm, csm );
-                    }
+                        csv = string.Format( "Date Created, Company Name, Trading As, Reg #, Description, Chep reference, Status, Service Required, Type of Pallet Use, Other Type of Pallet Use, Company Type, PSP, VAT Number, BBBEE Level, Contact Person, Contact Number, Contact Email, Administrator, Administrator Email, Financial Person, Financial Person Email {0}", Environment.NewLine );
 
-                    if ( clients != null && clients.Any() )
-                    {
-                        foreach ( ClientCustomModel item in clients )
+                        List<ClientCustomModel> clients = service.List1( pm, csm );
+
+                        if ( clients.NullableAny() )
                         {
-                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21} {22}",
-                                                csv,
-                                                item.CreatedOn,
-                                                item.CompanyName,
-                                                item.TradingAs,
-                                                item.CompanyRegistrationNumber,
-                                                item.Description,
-                                                item.ChepReference,
-                                                ( ( Status ) item.Status ).GetDisplayText(),
-                                                ( ( ServiceType ) item.ServiceRequired ).GetDisplayText(),
-                                                ( ( TypeOfPalletUse ) item.PalletType ).GetDisplayText(),
-                                                item.PalletTypeOther,
-                                                ( ( CompanyType ) item.CompanyType ).GetDisplayText(),
-                                                ( item.PSPName ?? item.PSPCompanyName ),
-                                                item.VATNumber,
-                                                item.BBBEELevel,
-                                                item.ContactPerson,
-                                                item.ContactNumber,
-                                                item.Email,
-                                                item.AdminPerson,
-                                                item.AdminEmail,
-                                                item.FinancialPerson,
-                                                item.FinPersonEmail,
-                                                Environment.NewLine );
+                            foreach ( ClientCustomModel item in clients )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21} {22}",
+                                                    csv,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.CompanyName + "\"",
+                                                    "\"" + item.TradingAs + "\"",
+                                                    "\"" + item.CompanyRegistrationNumber + "\"",
+                                                    "\"" + item.Description + "\"",
+                                                    "\"" + item.ChepReference + "\"",
+                                                    "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
+                                                    "\"" + ( ( ServiceType ) item.ServiceRequired ).GetDisplayText() + "\"",
+                                                    "\"" + ( ( TypeOfPalletUse ) item.PalletType ).GetDisplayText() + "\"",
+                                                    "\"" + item.PalletTypeOther + "\"",
+                                                    "\"" + ( ( CompanyType ) item.CompanyType ).GetDisplayText() + "\"",
+                                                    "\"" + ( item.PSPName ?? item.PSPCompanyName ) + "\"",
+                                                    "\"" + item.VATNumber + "\"",
+                                                    "\"" + item.BBBEELevel + "\"",
+                                                    "\"" + item.ContactPerson + "\"",
+                                                    "\"" + item.ContactNumber + "\"",
+                                                    "\"" + item.Email + "\"",
+                                                    "\"" + item.AdminPerson + "\"",
+                                                    "\"" + item.AdminEmail + "\"",
+                                                    "\"" + item.FinancialPerson + "\"",
+                                                    "\"" + item.FinPersonEmail + "\"",
+                                                    Environment.NewLine );
+                            }
                         }
                     }
-
 
                     #endregion
 
@@ -98,14 +95,14 @@ namespace ACT.UI.Controllers
 
                     #region Manage Sites
 
-                    csv = string.Format( "Date Created, Name, Description, X Coord, Y Coord, Address Line 1, Address Line 2, Town, Province, Postal Code, Contact Name, Contact No, Finance Contact, Finance No., Receiver Contact, Receiver No., Planning Point, Depot, Chep Site Code, Site Type, Status {0}", Environment.NewLine );
-
                     using ( SiteService service = new SiteService() )
                     using ( AddressService aservice = new AddressService() )
                     {
+                        csv = string.Format( "Date Created, Name, Description, X Coord, Y Coord, Address Line 1, Address Line 2, Town, Province, Postal Code, Contact Name, Contact No, Finance Contact, Finance No., Receiver Contact, Receiver No., Planning Point, Depot, Chep Site Code, Site Type, Status {0}", Environment.NewLine );
+
                         List<SiteCustomModel> sites = service.List1( pm, csm );
 
-                        if ( sites != null && sites.Any() )
+                        if ( sites.NullableAny() )
                         {
                             foreach ( SiteCustomModel item in sites )
                             {
@@ -113,27 +110,27 @@ namespace ACT.UI.Controllers
 
                                 csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21} {22}",
                                                     csv,
-                                                    item.CreatedOn,
-                                                    item.Name,
-                                                    item.Description,
-                                                    item.XCord,
-                                                    item.YCord,
-                                                    address?.Addressline1,
-                                                    address?.Addressline2,
-                                                    address?.Town,
-                                                    ( address != null ? address.Province.Description : string.Empty ),
-                                                    item.PostalCode,
-                                                    item.ContactName,
-                                                    item.ContactNo,
-                                                    item.FinanceContact,
-                                                    item.FinanceContactNo,
-                                                    item.ReceivingContact,
-                                                    item.ReceivingContactNo,
-                                                    item.PlanningPoint,
-                                                    item.Depot,
-                                                    item.SiteCodeChep,
-                                                    ( ( item.SiteType.HasValue ) ? ( ( SiteType ) item.SiteType ).GetDisplayText() : string.Empty ),
-                                                    ( ( Status ) item.Status ).GetDisplayText(),
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.Name + "\"",
+                                                    "\"" + item.Description + "\"",
+                                                    "\"" + item.XCord + "\"",
+                                                    "\"" + item.YCord + "\"",
+                                                    "\"" + address?.Addressline1 + "\"",
+                                                    "\"" + address?.Addressline2 + "\"",
+                                                    "\"" + address?.Town + "\"",
+                                                    "\"" + ( address != null ? address.Province.Description : string.Empty ) + "\"",
+                                                    "\"" + item.PostalCode + "\"",
+                                                    "\"" + item.ContactName + "\"",
+                                                    "\"" + item.ContactNo + "\"",
+                                                    "\"" + item.FinanceContact + "\"",
+                                                    "\"" + item.FinanceContactNo + "\"",
+                                                    "\"" + item.ReceivingContact + "\"",
+                                                    "\"" + item.ReceivingContactNo + "\"",
+                                                    "\"" + item.PlanningPoint + "\"",
+                                                    "\"" + item.Depot + "\"",
+                                                    "\"" + item.SiteCodeChep + "\"",
+                                                    "\"" + ( ( item.SiteType.HasValue ) ? ( ( SiteType ) item.SiteType ).GetDisplayText() : string.Empty ) + "\"",
+                                                    "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
                                                     Environment.NewLine );
                             }
                         }
@@ -147,38 +144,34 @@ namespace ACT.UI.Controllers
 
                     #region Link Products
 
-                    csv = string.Format( "Id, ClientId, Company Name, ProductId, Product Name, Product Description, Active Date, HireRate, LostRate, IssueRate, PassonRate, PassonDays, Status {0}", Environment.NewLine );
-
-                    List<ClientProductCustomModel> product = new List<ClientProductCustomModel>();
-
                     using ( ClientProductService service = new ClientProductService() )
                     {
-                        product = service.List1( pm, csm );
-                    }
+                        csv = string.Format( "Date Created, Client, Name, Description, Active Date, Hire Rate, Lost Rate, Issue Rate, Passon Rate, Passon Days, Rate Type, Status {0}", Environment.NewLine );
 
-                    if ( product != null && product.Any() )
-                    {
-                        foreach ( ClientProductCustomModel item in product )
+                        List<ClientProductCustomModel> product = service.List1( pm, csm );
+
+                        if ( product.NullableAny() )
                         {
-                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} {14}",
-                                                csv,
-                                                item.Id,
-                                                item.ClientId,
-                                                item.ClientName,
-                                                item.ProductId,
-                                                item.ProductName,
-                                                item.ProductDescription,
-                                                item.ActiveDate,
-                                                item.Rate,
-                                                item.LostRate,
-                                                item.IssueRate,
-                                                item.PassonRate,
-                                                item.PassonDays,
-                                                ( Status ) ( int ) item.Status,
-                                                Environment.NewLine );
+                            foreach ( ClientProductCustomModel item in product )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12} {13}",
+                                                    csv,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.ClientName + "\"",
+                                                    "\"" + item.ProductName + "\"",
+                                                    "\"" + item.ProductDescription + "\"",
+                                                    "\"" + item.ActiveDate + "\"",
+                                                    "\"" + item.Rate + "\"",
+                                                    "\"" + item.LostRate + "\"",
+                                                    "\"" + item.IssueRate + "\"",
+                                                    "\"" + item.PassonRate + "\"",
+                                                    "\"" + item.PassonDays + "\"",
+                                                    "\"" + ( ( RateType ) item.RateType ).GetDisplayText() + "\"",
+                                                    "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
+                                                    Environment.NewLine );
+                            }
                         }
                     }
-
 
                     #endregion
 
@@ -200,11 +193,11 @@ namespace ACT.UI.Controllers
                             {
                                 csv = string.Format( "{0} {1},{2},{3},{4},{5} {6}",
                                                     csv,
-                                                    item.CreatedOn,
-                                                    item.Name,
-                                                    item.Description,
-                                                    item.ClientCount,
-                                                    ( ( Status ) item.Status ).GetDisplayText(),
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.Name + "\"",
+                                                    "\"" + item.Description + "\"",
+                                                    "\"" + item.ClientCount + "\"",
+                                                    "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
                                                     Environment.NewLine );
                             }
                         }
@@ -232,7 +225,7 @@ namespace ACT.UI.Controllers
                             {
                                 csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} {14}",
                                                     csv,
-                                                    item.CreatedOn,
+                                                    "\"" + item.CreatedOn + "\"",
                                                     "\"" + item.ClientName + "\"",
                                                     "\"" + item.KPIDescription + "\"",
                                                     "\"" + item.OutstandingPallets + "\"",
@@ -243,8 +236,45 @@ namespace ACT.UI.Controllers
                                                     "\"" + item.MonthlyCost + "\"",
                                                     "\"" + item.Weight + "\"",
                                                     "\"" + item.TargetAmount + "\"",
-                                                    ( ( TargetPeriod ) item.TargetPeriod ).GetDisplayText(),
-                                                    ( ( Status ) item.Status ).GetDisplayText(),
+                                                    "\"" + ( ( TargetPeriod ) item.TargetPeriod ).GetDisplayText() + "\"",
+                                                    "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "managetransporters":
+
+                    #region Manage Transporters
+
+                    using ( TransporterService service = new TransporterService() )
+                    {
+                        csv = string.Format( "Date Created, Client, Name, Trading Name, Registration Number, Contact Name, Contact Number, Email, Supplier Code, Client Transporter Code, Chep Client Transporter Code, Status {0}", Environment.NewLine );
+
+                        List<TransporterCustomModel> transporters = service.List1( pm, csm );
+
+                        if ( transporters.NullableAny() )
+                        {
+                            foreach ( TransporterCustomModel item in transporters )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12} {13}",
+                                                    csv,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.ClientName + "\"",
+                                                    "\"" + item.Name + "\"",
+                                                    "\"" + item.TradingName + "\"",
+                                                    "\"" + item.RegistrationNumber + "\"",
+                                                    "\"" + item.ContactName + "\"",
+                                                    "\"" + item.ContactNumber + "\"",
+                                                    "\"" + item.Email + "\"",
+                                                    "\"" + item.SupplierCode + "\"",
+                                                    "\"" + item.ClientTransporterCode + "\"",
+                                                    "\"" + item.ChepClientTransporterCode + "\"",
+                                                    "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
                                                     Environment.NewLine );
                             }
                         }

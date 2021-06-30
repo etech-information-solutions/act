@@ -3972,7 +3972,7 @@ namespace ACT.UI.Controllers
         // POST: Administration/OldDataImport
         [HttpPost]
         [Requires( PermissionTo.Create )]
-        public ActionResult OldDataImport( ClientLoadViewModel model )
+        public ActionResult ProcessOldDataImport( ClientLoadViewModel model )
         {
             if ( model.File == null )
             {
@@ -4701,7 +4701,7 @@ namespace ACT.UI.Controllers
         {
             ClientLoadViewModel model = new ClientLoadViewModel() { EditMode = true };
 
-            return View( model );
+            return View( "OldDataImport", model );
         }
 
         #endregion

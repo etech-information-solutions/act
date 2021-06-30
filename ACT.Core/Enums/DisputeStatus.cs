@@ -8,7 +8,7 @@ namespace ACT.Core.Enums
     {
         [UiIgnoreEnumValue]
         [StringEnumDisplayText( "All" )]
-        All = 0,
+        All = -1,
 
         [StringEnumDisplayText( "Active" )]
         Active = 1, 

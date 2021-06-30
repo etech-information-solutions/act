@@ -38,6 +38,9 @@
             <th data-name="AuditDate" data-column="sa.AuditDate">
                 Audit Date
             </th>
+            <th data-name="Site" data-column="s.Name">
+                Site
+            </th>
             <th data-name="Equipment" data-column="sa.Equipment">
                 Equipment
             </th>
@@ -90,6 +93,9 @@
                     </td>
                     <td>
                         @(item.AuditDate.HasValue ? item.AuditDate.Value.ToString( "yyyy-MM-dd" ) : "")
+                    </td>
+                    <td>
+                        @item.SiteName
                     </td>
                     <td>
                         @item.Equipment
