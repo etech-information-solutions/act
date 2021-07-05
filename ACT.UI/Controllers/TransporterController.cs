@@ -24,6 +24,116 @@ namespace ACT.UI.Controllers
             return View();
         }
 
+
+        #region Exports
+
+        //
+        // GET: /Finance/Export
+        public FileContentResult Export( PagingModel pm, CustomSearchModel csm, string type = "outstandingreport" )
+        {
+            string csv = "";
+            string filename = string.Format( "{0}-{1}.csv", type.ToUpperInvariant(), DateTime.Now.ToString( "yyyy_MM_dd_HH_mm" ) );
+
+            pm.Skip = 0;
+            pm.Take = int.MaxValue;
+
+            int count = 0;
+
+            switch ( type )
+            {
+                case "outstandingreports":
+
+                    #region Outstanding Pallets
+
+                    List<OutstandingPalletsModel> items = GetOutstandingPallets( pm, csm );
+
+                    DateTime minYear = items.NullableAny() ? items.Min( m => m.MinYear ) : DateTime.Now;
+
+                    csv = "Client,Reason,0-30 Days,31-60 Days,61-90 Days,91-120 Days,121-183 Days,184-270 Days,271-365 Days";
+
+                    if ( minYear.Year != DateTime.Now.Year )
+                    {
+                        for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
+                        {
+                            csv = $"{csv},{i}";
+                        }
+                    }
+
+                    csv = $"{csv},Grand Total {Environment.NewLine}";
+
+                    if ( items.NullableAny() )
+                    {
+                        count = 0;
+
+                        foreach ( OutstandingPalletsModel item in items )
+                        {
+                            csv = $"{csv} {item.ClientLoad.ClientName},,,,,,,";
+
+                            if ( minYear.Year != DateTime.Now.Year )
+                            {
+                                for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
+                                {
+                                    csv = $"{csv},";
+                                }
+                            }
+
+                            csv = $"{csv},{Environment.NewLine}";
+
+                            foreach ( OutstandingReasonModel osr in item.OutstandingReasons )
+                            {
+                                csv = $"{csv},{osr.Description},{osr.To30Days},{osr.To60Days},{osr.To90Days},{osr.To120Days},{osr.To183Days},{osr.To270Days},{osr.To365Days}";
+
+                                if ( minYear.Year != DateTime.Now.Year )
+                                {
+                                    for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
+                                    {
+                                        csv = $"{csv},{osr.PreviousYears?.FirstOrDefault( y => y.Year == i )?.Total}";
+                                    }
+                                }
+
+                                csv = $"{csv},{osr.GrandTotal} {Environment.NewLine}";
+                            }
+
+                            csv = $"{csv}{Environment.NewLine},Total,{item.GrandTotal.To30Days},{item.GrandTotal.To60Days},{item.GrandTotal.To90Days},{item.GrandTotal.To120Days},{item.GrandTotal.To183Days},{item.GrandTotal.To270Days},{item.GrandTotal.To365Days}";
+
+                            if ( minYear.Year != DateTime.Now.Year )
+                            {
+                                for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
+                                {
+                                    csv = $"{csv},{item.GrandTotal?.PreviousYears?.FirstOrDefault( y => y.Year == i )?.Total}";
+                                }
+                            }
+
+                            csv = $"{csv},{item.GrandTotal.GrandTotal} {Environment.NewLine}{Environment.NewLine}";
+
+                            count++;
+                        }
+
+                        csv = $"{csv}{Environment.NewLine}{Environment.NewLine},Grand Total,{items.Sum( s => s.GrandTotal.To30Days )},{items.Sum( s => s.GrandTotal.To60Days )},{items.Sum( s => s.GrandTotal.To90Days )},{items.Sum( s => s.GrandTotal.To120Days )},{items.Sum( s => s.GrandTotal.To183Days )},{items.Sum( s => s.GrandTotal.To270Days )},{items.Sum( s => s.GrandTotal.To365Days )}";
+
+                        if ( minYear.Year != DateTime.Now.Year )
+                        {
+                            for ( int i = DateTime.Now.AddYears( -1 ).Year; i >= minYear.Year; i-- )
+                            {
+                                csv = $"{csv},{items.SelectMany( m => m.GrandTotal?.PreviousYears?.Where( w => w.Year == i ) ).Sum( s => s.Total )}";
+                            }
+                        }
+
+                        csv = $"{csv},{items.Sum( s => s.GrandTotal.GrandTotal )}";
+                    }
+
+                    #endregion
+
+                    break;
+            }
+
+            return File( new System.Text.UTF8Encoding().GetBytes( csv ), "text/csv", filename );
+        }
+
+        #endregion
+
+
+
         //-------------------------------------------------------------------------------------
 
         // GET: Transporter/EditClientLoad/5

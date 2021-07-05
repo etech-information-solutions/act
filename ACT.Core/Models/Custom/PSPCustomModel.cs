@@ -8,8 +8,8 @@ namespace ACT.Core.Models.Custom
     public partial class PSPCustomModel
     {
         public int Id { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime ModifiedOn { get; set; }
+        public System.DateTime CreatedOn { get; set; }
+        public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public string CompanyRegistrationNumber { get; set; }
         public string CompanyName { get; set; }
@@ -24,6 +24,14 @@ namespace ACT.Core.Models.Custom
         public string DeclinedReason { get; set; }
         public int ServiceRequired { get; set; }
         public int Status { get; set; }
+        public string AdminPerson { get; set; }
+        public string FinPersonEmail { get; set; }
+        public Nullable<int> PalletType { get; set; }
+        public string PalletTypeOther { get; set; }
+        public string BBBEELevel { get; set; }
+        public Nullable<int> CompanyType { get; set; }
+        public Nullable<int> NumberOfLostPallets { get; set; }
+        public Nullable<int> ProvinceId { get; set; }
 
 
         public int UserCount { get; set; }

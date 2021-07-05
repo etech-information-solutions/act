@@ -46,23 +46,23 @@ namespace ACT.UI.Controllers
                     {
                         List<PSPBillingCustomModel> billing = bservice.List1( pm, csm );
 
-                        if ( billing != null && billing.Any() )
+                        if ( billing.NullableAny() )
                         {
                             foreach ( PSPBillingCustomModel item in billing )
                             {
                                 csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11} {12}",
                                                     csv,
-                                                    item.StatementDate,
-                                                    item.StatementNumber,
-                                                    item.CreatedOn,
-                                                    item.PSPName,
-                                                    item.ProductName,
-                                                    item.PaymentAmount,
-                                                    item.InvoiceAmount,
-                                                    item.TaxAmount,
-                                                    item.PaymentDate,
-                                                    item.ReferenceNumber,
-                                                    item.NominatedAccount,
+                                                    "\"" + item.StatementDate + "\"",
+                                                    "\"" + item.StatementNumber + "\"",
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.PSPName + "\"",
+                                                    "\"" + item.ProductName + "\"",
+                                                    "\"" + item.PaymentAmount + "\"",
+                                                    "\"" + item.InvoiceAmount + "\"",
+                                                    "\"" + item.TaxAmount + "\"",
+                                                    "\"" + item.PaymentDate + "\"",
+                                                    "\"" + item.ReferenceNumber + "\"",
+                                                    "\"" + item.NominatedAccount + "\"",
                                                     Environment.NewLine );
                             }
                         }
@@ -77,6 +77,8 @@ namespace ACT.UI.Controllers
         }
 
         #endregion
+
+
 
         #region Partial Views
 

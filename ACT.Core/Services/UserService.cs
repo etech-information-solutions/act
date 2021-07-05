@@ -20,7 +20,7 @@ namespace ACT.Core.Services
         }
 
         /// <summary>
-        /// Gets a user using the specified id
+        /// Gets a user using the specified id 
         /// </summary>
         /// <param name="id">Id of the user to be fetched</param>
         /// <returns></returns>
@@ -393,7 +393,7 @@ namespace ACT.Core.Services
 
             return context.Database.SqlQuery<UserCustomModel>( query, parameters.ToArray() ).ToList();
         }
-        
+
         /// <summary>
         /// Checks if a user with the specified email already exists?
         /// </summary>

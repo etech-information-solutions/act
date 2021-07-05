@@ -22,6 +22,8 @@ namespace ACT.Core.Models.Custom
         public int ChatStatus { get; set; }
         public bool SendChat { get; set; }
         public bool ReceiveChat { get; set; }
+        public string DeviceId { get; set; }
+        public string DeviceOS { get; set; }
 
         public int? RoleId { get; set; }
         public string RoleName { get; set; }

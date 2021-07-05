@@ -53,7 +53,7 @@ namespace ACT.Core.Services
                                 COUNT(cl.Id) AS [Total]
                              FROM
                                 [dbo].[ClientLoad] cl
-                                LEFT OUTER JOIN [dbo].[ClientAuthorisation] ca ON ca.[LoadNumber]=cl.[LoadNumber]
+                                LEFT OUTER JOIN [dbo].[ClientAuthorisation] ca ON cl.[Id]=ca.[ClientLoadId]
                                 LEFT OUTER JOIN [dbo].[User] u ON u.[Id]=ca.[UserId]
                                 LEFT OUTER JOIN [dbo].[Vehicle] v ON v.[Id]=cl.[VehicleId]
                                 LEFT OUTER JOIN [dbo].[Transporter] t ON t.[Id]=cl.[TransporterId]
@@ -214,7 +214,7 @@ namespace ACT.Core.Services
                                 u.Name + ' ' + u.Surname AS [AuthoriserName]
                              FROM
                                 [dbo].[ClientLoad] cl
-                                LEFT OUTER JOIN [dbo].[ClientAuthorisation] ca ON ca.[LoadNumber]=cl.[LoadNumber]
+                                LEFT OUTER JOIN [dbo].[ClientAuthorisation] ca ON cl.[Id]=ca.[ClientLoadId]
                                 LEFT OUTER JOIN [dbo].[User] u ON u.[Id]=ca.[UserId]
                                 LEFT OUTER JOIN [dbo].[Vehicle] v ON v.[Id]=cl.[VehicleId]
                                 LEFT OUTER JOIN [dbo].[Transporter] t ON t.[Id]=cl.[TransporterId]

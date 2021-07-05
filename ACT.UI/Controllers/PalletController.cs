@@ -46,40 +46,34 @@ namespace ACT.UI.Controllers
 
             switch ( type )
             {
-                case "disputes":
+                case "clientdata":
 
-                    #region Disputes
+                    #region Client Data
 
-                    csv = string.Format( "Account Number,TDN Number,Raised Date,Docket Number,Reference,Action By,Resolved On,Resolved By,Other Party,Sender,Receiver,Declarer,Dispute Email,Product,Dispute Status,Equipment,Quantity,Reason fo Dispute {0}", Environment.NewLine );
+                    csv = string.Format( "Load Date,CHEP Account/GLID Number,Supplier From,Shipment Number,Customer To,Quantity,Comment,Status,Transporter,Vehicle,Invoice Number {0}", Environment.NewLine );
 
-                    using ( DisputeService dservice = new DisputeService() )
+                    using ( ClientLoadService clservice = new ClientLoadService() )
                     {
-                        List<DisputeCustomModel> disputes = dservice.List1( pm, csm );
+                        List<ClientLoadCustomModel> clientloads = clservice.List1( pm, csm );
 
-                        if ( disputes != null && disputes.Any() )
+                        if ( clientloads.NullableAny() )
                         {
-                            foreach ( DisputeCustomModel item in disputes )
+                            foreach ( ClientLoadCustomModel item in clientloads )
                             {
-                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18} {19}",
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12} {13}",
                                                     csv,
-                                                    item.ChepLoadAccountNumber,
-                                                    item.TDNNumber,
-                                                    item.CreatedOn,
-                                                    item.DocketNumber,
-                                                    item.Reference,
-                                                    item.ActionUser,
-                                                    item.ResolvedOn,
-                                                    item.ResolvedUser,
-                                                    item.OtherParty,
-                                                    item.Sender,
-                                                    item.Receiver,
-                                                    item.Declarer,
-                                                    item.DisputeEmail,
-                                                    item.Product,
-                                                    item.Status,
-                                                    item.Equipment,
-                                                    item.Quantity,
-                                                    item.DisputeReasonDetails,
+                                                    "\"" + item.ClientName + "\"",
+                                                    "\"" + item.LoadDate + "\"",
+                                                    "\"" + ( item.ChepAccountGLIDNo ?? item.GLID ) + "\"",
+                                                    "\"" + item.SiteName + "\"",
+                                                    "\"" + item.LoadNumber + "\"",
+                                                    "\"" + item.ToSiteName + "\"",
+                                                    "\"" + item.NewQuantity + "\"",
+                                                    "\"" + item.PODComment + "\"",
+                                                    "\"" + ( ( ReconciliationStatus ) item.Status ).GetDisplayText() + "\"",
+                                                    "\"" + item.TransporterName + "\"",
+                                                    "\"" + item.VehicleRegistration + "\"",
+                                                    "\"" + item.InvoiceNumber + "\"",
                                                     Environment.NewLine );
                             }
                         }
@@ -89,6 +83,241 @@ namespace ACT.UI.Controllers
 
                     break;
 
+                case "outstandingpallets":
+
+                    #region Outstanding POD's
+
+                    csv = string.Format( "Load Date,CHEP Account/GLID Number,Supplier From,Shipment Number,Customer To,Quantity,Comment,Status,Transporter,Vehicle,Invoice Number {0}", Environment.NewLine );
+
+                    using ( ClientLoadService clservice = new ClientLoadService() )
+                    {
+                        csm.IsOP = true;
+
+                        List<ClientLoadCustomModel> clientloads = clservice.List1( pm, csm );
+
+                        if ( clientloads.NullableAny() )
+                        {
+                            foreach ( ClientLoadCustomModel item in clientloads )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12} {13}",
+                                                    csv,
+                                                    "\"" + item.ClientName + "\"",
+                                                    "\"" + item.LoadDate + "\"",
+                                                    "\"" + ( item.ChepAccountGLIDNo ?? item.GLID ) + "\"",
+                                                    "\"" + item.SiteName + "\"",
+                                                    "\"" + item.LoadNumber + "\"",
+                                                    "\"" + item.ToSiteName + "\"",
+                                                    "\"" + item.NewQuantity + "\"",
+                                                    "\"" + item.PODComment + "\"",
+                                                    "\"" + ( ( ReconciliationStatus ) item.Status ).GetDisplayText() + "\"",
+                                                    "\"" + item.TransporterName + "\"",
+                                                    "\"" + item.VehicleRegistration + "\"",
+                                                    "\"" + item.InvoiceNumber + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "authorisationcodes":
+
+                    #region Authorisation Codes
+
+                    csv = string.Format( "Client,Load Date,Delivery Number,Supplier From,Shipment Number,Customer To,Quantity,Transporter,Vehicle,Authoriser,Authorisation Code,Authorisation Date {0}", Environment.NewLine );
+
+                    using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
+                    {
+                        List<ClientAuthorisationCustomModel> authCodes = caservice.List1( pm, csm );
+
+                        if ( authCodes.NullableAny() )
+                        {
+                            foreach ( ClientAuthorisationCustomModel item in authCodes )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12} {13}",
+                                                    csv,
+                                                    "\"" + item.ClientName + "\"",
+                                                    "\"" + item.LoadDate + "\"",
+                                                    "\"" + item.DeliveryNote + "\"",
+                                                    "\"" + item.FromSiteName + "\"",
+                                                    "\"" + item.LoadNumber + "\"",
+                                                    "\"" + item.ToSiteName + "\"",
+                                                    "\"" + item.NewQuantity + "\"",
+                                                    "\"" + item.TransporterName + "\"",
+                                                    "\"" + item.VehicleRegistration + "\"",
+                                                    "\"" + item.AuthoriserName + "\"",
+                                                    "\"" + item.AuthorisationDate + "\"",
+                                                    "\"" + item.Code + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "disputes":
+
+                    #region Disputes
+
+                    csv = string.Format( "Effective Date,Supplier From,Shipment Number,Customer To,Account Number,TDN Number,Raised Date,Docket Number,Reference,Action By,Resolved On,Resolved By,Other Party,Sender,Receiver,Declarer,Dispute Email,Product,Dispute Status,Equipment,Quantity,Reason fo Dispute {0}", Environment.NewLine );
+
+                    using ( DisputeService dservice = new DisputeService() )
+                    {
+                        List<DisputeCustomModel> disputes = dservice.List1( pm, csm );
+
+                        if ( disputes.NullableAny() )
+                        {
+                            foreach ( DisputeCustomModel item in disputes )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{22} {23}",
+                                                    csv,
+                                                    "\"" + item.EffectiveDate + "\"",
+                                                    "\"" + item.SiteName + "\"",
+                                                    "\"" + item.LoadNumber + "\"",
+                                                    "\"" + item.ToSiteName + "\"",
+                                                    "\"" + item.ChepLoadAccountNumber + "\"",
+                                                    "\"" + item.TDNNumber + "\"",
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.DocketNumber + "\"",
+                                                    "\"" + item.Reference + "\"",
+                                                    "\"" + item.ActionUser + "\"",
+                                                    "\"" + item.ResolvedOn + "\"",
+                                                    "\"" + item.ResolvedUser + "\"",
+                                                    "\"" + item.OtherParty + "\"",
+                                                    "\"" + item.Sender + "\"",
+                                                    "\"" + item.Receiver + "\"",
+                                                    "\"" + item.Declarer + "\"",
+                                                    "\"" + item.DisputeEmail + "\"",
+                                                    "\"" + item.Product + "\"",
+                                                    "\"" + $"{( ( DisputeStatus ) item.Status ).GetDisplayText()} {"by " + item.ResolvedUser} {"on " + item.ResolvedOn}" + "\"",
+                                                    "\"" + item.Equipment + "\"",
+                                                    "\"" + item.Quantity + "\"",
+                                                    "\"" + item.DisputeReasonDetails + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "deliverynotes":
+
+                    #region Delivery Notes
+
+                    csv = string.Format( "Date Created,Client,Site,Customer,Reference Number,Order Number,Contact Number,Contact Email,Reference 306,Ordered Quantity,Delivered Quantity,Returned Quantity,Status {0}", Environment.NewLine );
+
+                    using ( DeliveryNoteService dservice = new DeliveryNoteService() )
+                    {
+                        List<DeliveryNoteCustomModel> notes = dservice.List1( pm, csm );
+
+                        if ( notes.NullableAny() )
+                        {
+                            foreach ( DeliveryNoteCustomModel item in notes )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} {14}",
+                                                    csv,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.ClientName + "\"",
+                                                    "\"" + item.SiteName + "\"",
+                                                    "\"" + item.CustomerName + "\"",
+                                                    "\"" + item.InvoiceNumber + "\"",
+                                                    "\"" + item.OrderNumber + "\"",
+                                                    "\"" + item.ContactNumber + "\"",
+                                                    "\"" + item.EmailAddress + "\"",
+                                                    "\"" + item.Reference306 + "\"",
+                                                    "\"" + item.OrderedCountCount + "\"",
+                                                    "\"" + item.DeliveredCountCount + "\"",
+                                                    "\"" + item.ReturnedCountCount + "\"",
+                                                    "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "siteaudits":
+
+                    #region Site Audits
+
+                    csv = string.Format( "Date Created, Audit Date,Site,Customer,Sales Rep,Pallet Auditor,Equipment,Outstanding Pallets,Counted Pallets,Written Off Pallets {0}", Environment.NewLine );
+
+                    using ( SiteAuditService saservice = new SiteAuditService() )
+                    {
+                        List<SiteAuditCustomModel> audits = saservice.List1( pm, csm );
+
+                        if ( audits.NullableAny() )
+                        {
+                            foreach ( SiteAuditCustomModel item in audits )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
+                                                    csv,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.AuditDate + "\"",
+                                                    "\"" + item.SiteName + "\"",
+                                                    "\"" + item.CustomerName + "\"",
+                                                    "\"" + item.RepName + "\"",
+                                                    "\"" + item.PalletAuditor + "\"",
+                                                    "\"" + item.Equipment + "\"",
+                                                    "\"" + item.PalletsOutstanding + "\"",
+                                                    "\"" + item.PalletsCounted + "\"",
+                                                    "\"" + item.WriteoffPallets + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "poolingagentdata":
+
+                    #region Chep Loads
+
+                    csv = string.Format( "Effective Date,Delivery Date,Supplier From,Other Party Id,Other Party,Reference Number,Other Reference Number,Transaction Type,Equipment Code,Equipment,Quantity,Invoice Number,Docket Number,Original Docket Number,Status {0}", Environment.NewLine );
+
+                    using ( ChepLoadService chservice = new ChepLoadService() )
+                    {
+                        List<ChepLoadCustomModel> chepLoads = chservice.List1( pm, csm );
+
+                        if ( chepLoads.NullableAny() )
+                        {
+                            foreach ( ChepLoadCustomModel item in chepLoads )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15} {16}",
+                                                    csv,
+                                                    "\"" + item.EffectiveDate + "\"",
+                                                    "\"" + item.DeliveryDate + "\"",
+                                                    "\"" + item.Location + "\"",
+                                                    "\"" + item.OtherPartyId + "\"",
+                                                    "\"" + item.OtherParty + "\"",
+                                                    "\"" + item.Ref + "\"",
+                                                    "\"" + item.OtherRef + "\"",
+                                                    "\"" + item.TransactionType + "\"",
+                                                    "\"" + item.EquipmentCode + "\"",
+                                                    "\"" + item.Equipment + "\"",
+                                                    "\"" + item.Quantity + "\"",
+                                                    "\"" + item.InvoiceNumber + "\"",
+                                                    "\"" + item.DocketNumber + "\"",
+                                                    "\"" + item.OriginalDocketNumber + "\"",
+                                                    "\"" + ( ( ReconciliationStatus ) item.Status ).GetDisplayText() + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
             }
 
             return File( new System.Text.UTF8Encoding().GetBytes( csv ), "text/csv", filename );

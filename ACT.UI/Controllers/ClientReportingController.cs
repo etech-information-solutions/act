@@ -74,7 +74,7 @@ namespace ACT.UI.Controllers
                                                     "\"" + item.Declarer + "\"",
                                                     "\"" + item.DisputeEmail + "\"",
                                                     "\"" + item.Product + "\"",
-                                                    "\"" + item.Status + "\"",
+                                                    "\"" + $"{( ( DisputeStatus ) item.Status ).GetDisplayText()} {"by " + item.ResolvedUser} {"on " + item.ResolvedOn}" + "\"",
                                                     "\"" + item.Equipment + "\"",
                                                     "\"" + item.Quantity + "\"",
                                                     "\"" + item.DisputeReasonDetails + "\"",
@@ -390,7 +390,7 @@ namespace ACT.UI.Controllers
 
                     #region Disputes Resolved
 
-                    csv = $"Effective Date,Original Docket Number,Docket Number,Ref,Other Ref,TDN,Quantity,Action By, Status,Reason {Environment.NewLine}";
+                    csv = string.Format( "Effective Date,Account Number,TDN Number,Raised Date,Docket Number,Reference,Action By,Resolved On,Resolved By,Other Party,Sender,Receiver,Declarer,Dispute Email,Product,Dispute Status,Equipment,Quantity,Reason fo Dispute {0}", Environment.NewLine );
 
                     using ( DisputeService dservice = new DisputeService() )
                     {
@@ -402,7 +402,81 @@ namespace ACT.UI.Controllers
                         {
                             foreach ( DisputeCustomModel item in disputes )
                             {
-                                //csv = $"{csv}\"{item.ShipmentDate}\",\"{item.CreateDate}\",\"{item.ClientName}\",\"{item.TransporterName}\",\"{item.VehicleRegistration}\",\"{item.DocketNumber}\",\"{item.CorrectedRef ?? item.Ref}\",\"{item.CorrectedOtherRef ?? item.OtherRef}\",\"{item.Equipment}\",\"{item.InvoiceNumber}\",\"{item.TransactionType}\",\"{item.Quantity}\",\"{item.OutstandingReason}\" {Environment.NewLine}";
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19} {20}",
+                                                    csv,
+                                                    "\"" + item.EffectiveDate + "\"",
+                                                    "\"" + item.ChepLoadAccountNumber + "\"",
+                                                    "\"" + item.TDNNumber + "\"",
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.DocketNumber + "\"",
+                                                    "\"" + item.Reference + "\"",
+                                                    "\"" + item.ActionUser + "\"",
+                                                    "\"" + item.ResolvedOn + "\"",
+                                                    "\"" + item.ResolvedUser + "\"",
+                                                    "\"" + item.OtherParty + "\"",
+                                                    "\"" + item.Sender + "\"",
+                                                    "\"" + item.Receiver + "\"",
+                                                    "\"" + item.Declarer + "\"",
+                                                    "\"" + item.DisputeEmail + "\"",
+                                                    "\"" + item.Product + "\"",
+                                                    "\"" + $"{( ( DisputeStatus ) item.Status ).GetDisplayText()} {"by " + item.ResolvedUser} {"on " + item.ResolvedOn}" + "\"",
+                                                    "\"" + item.Equipment + "\"",
+                                                    "\"" + item.Quantity + "\"",
+                                                    "\"" + item.DisputeReasonDetails + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "collectionsreport":
+
+                    #region Collections Report
+
+                    csv = $"Load Date,Created,Client,Transporter,Vehicle,Docket Number,Ref,Other Ref,Equipment,Invoice Number,Transaction Type,Quantity,Outstanding Reason {Environment.NewLine}";
+
+                    using ( ChepLoadService chservice = new ChepLoadService() )
+                    {
+                        csm.IsPSPPickUp = true;
+                        csm.BalanceStatus = BalanceStatus.NotBalanced;
+                        csm.ReconciliationStatus = ReconciliationStatus.Reconciled;
+
+                        List<ChepLoadCustomModel> cheploads = chservice.List1( pm, csm );
+
+                        if ( cheploads.NullableAny() )
+                        {
+                            foreach ( ChepLoadCustomModel item in cheploads )
+                            {
+                                csv = $"{csv}\"{item.ShipmentDate}\",\"{item.CreateDate}\",\"{item.ClientName}\",\"{item.TransporterName}\",\"{item.VehicleRegistration}\",\"{item.DocketNumber}\",\"{item.CorrectedRef ?? item.Ref}\",\"{item.CorrectedOtherRef ?? item.OtherRef}\",\"{item.Equipment}\",\"{item.InvoiceNumber}\",\"{item.TransactionType}\",\"{item.Quantity}\",\"{item.OutstandingReason}\" {Environment.NewLine}";
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "authorisationstats":
+
+                    #region Authorisation Stats
+
+                    csv = $"Client,Total {Environment.NewLine}";
+
+                    using ( ClientAuthorisationService service = new ClientAuthorisationService() )
+                    {
+                        pm.Sort = pm.SortBy == "CreatedOn" ? "ASC" : pm.Sort;
+                        pm.SortBy = pm.SortBy == "CreatedOn" ? "c.CompanyName" : pm.SortBy;
+
+                        List<CountModel> stats = service.ListStats( pm, csm );
+
+                        if ( stats.NullableAny() )
+                        {
+                            foreach ( CountModel item in stats )
+                            {
+                                csv = $"{csv}\"{item.Description}\",\"{item.Total}\" {Environment.NewLine}";
                             }
                         }
                     }
@@ -1043,7 +1117,7 @@ namespace ACT.UI.Controllers
 
                     return PartialView( "_DisputesCustomSearch", new CustomSearchModel( "Disputes" ) );
                 }
-;
+
                 csm.DisputeStatus = DisputeStatus.Resolved;
 
                 List<DisputeCustomModel> model = service.List1( pm, csm );

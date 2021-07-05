@@ -27,7 +27,7 @@ namespace ACT.Core.Services
         {
             return context.PSPs.Any( p => p.CompanyRegistrationNumber == registrationNumber );
         }
-
+        
         public int Total1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )

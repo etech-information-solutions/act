@@ -43,34 +43,35 @@ namespace ACT.UI.Controllers
 
             switch ( type )
             {
-                case "roles":
+                case "users":
 
-                    #region Roles
+                    #region Manage Users
 
-                    csv = string.Format( "Name, Type, Dashboard, Administration, Finance, Clients, Customers, Products, Pallets {0}", Environment.NewLine );
+                    csv = string.Format( "Date Created, Name, Status, Role, Email, Cell, Last Login, Can use Chats, Can Respond to Chats, Online Status {0}", Environment.NewLine );
 
-                    List<Role> roles = new List<Role>();
-
-                    using ( RoleService service = new RoleService() )
+                    using ( UserService uservice = new UserService() )
                     {
-                        roles = service.List( pm, csm );
-                    }
+                        List<UserCustomModel> users = uservice.List1( pm, csm );
 
-                    if ( roles != null && roles.Any() )
-                    {
-                        foreach ( Role item in roles )
+                        if ( users.NullableAny() )
                         {
-                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8} {9}",
-                                                csv,
-                                                item.Name,
-                                                item.DashBoard,
-                                                item.Administration,
-                                                item.Finance,
-                                                item.Client,
-                                                item.Customer,
-                                                item.Product,
-                                                item.Pallet,
-                                                Environment.NewLine );
+                            foreach ( UserCustomModel item in users )
+                            {
+                                Status status = ( Status ) item.Status;
+
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9} {10}",
+                                                    csv,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.Name + " " + item.Surname + "\"",
+                                                    "\"" + status.GetDisplayText() + "\"",
+                                                    "\"" + item.RoleName + "\"",
+                                                    "\"" + item.Email + "\"",
+                                                    "\"" + item.Cell + "\"",
+                                                    "\"" + item.SendChat + "\"",
+                                                    "\"" + item.ReceiveChat + "\"",
+                                                    "\"" + ( ( OnlineStatus ) item.ChatStatus ).GetDisplayText() + "\"",
+                                                    Environment.NewLine );
+                            }
                         }
                     }
 
@@ -78,40 +79,142 @@ namespace ACT.UI.Controllers
 
                     break;
 
-                case "systemconfig":
+                case "psps":
 
-                    #region System Config
+                    #region PSPs
 
-                    csv = string.Format( "System Contact Email,Finance Contact Email,Activation Email,Correspondence Email,System Contact Number,System Contact Address,Invoice Run Day,Auto Logoff,Auto Logoff Seconds,Password Change, Images Location, Documents Location,App Download Url,Website Url {0}", Environment.NewLine );
+                    csv = string.Format( "Date Created, Company Name, VAT Number, Contact Person, Email, Cell,Financial Person,Financial Person Email,Admin Person, Admin Email, Service Required, Status, Declined Reason,Type of Pallet Use, BBBEE Level,Company Type,Number Of Lost Pallets {0}", Environment.NewLine );
 
-                    List<SystemConfig> items = new List<SystemConfig>();
-
-                    using ( SystemConfigService service = new SystemConfigService() )
+                    using ( PSPService pservice = new PSPService() )
                     {
-                        items = service.List( pm, csm );
+                        List<PSPCustomModel> psps = pservice.List1( pm, csm );
+
+                        if ( psps.NullableAny() )
+                        {
+                            foreach ( PSPCustomModel item in psps )
+                            {
+                                PSPClientStatus status = ( PSPClientStatus ) item.Status;
+
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17} {18}",
+                                                    csv,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.CompanyName + "\"",
+                                                    "\"" + item.VATNumber + "\"",
+                                                    "\"" + item.ContactPerson + "\"",
+                                                    "\"" + item.Email + "\"",
+                                                    "\"" + item.ContactNumber + "\"",
+                                                    "\"" + item.FinancialPerson + "\"",
+                                                    "\"" + item.FinPersonEmail + "\"",
+                                                    "\"" + item.AdminPerson + "\"",
+                                                    "\"" + item.AdminEmail + "\"",
+                                                    "\"" + ( ( ServiceType ) item.ServiceRequired ).GetDisplayText() + "\"",
+                                                    "\"" + status.GetDisplayText() + "\"",
+                                                    "\"" + item.DeclinedReason + "\"",
+                                                    "\"" + ( item.PalletType.HasValue ? ( ( TypeOfPalletUse ) item.PalletType ).GetDisplayText() : item.PalletTypeOther ) + "\"",
+                                                    "\"" + item.BBBEELevel + "\"",
+                                                    "\"" + ( item.CompanyType.HasValue ? ( ( CompanyType ) item.CompanyType ).GetDisplayText() : string.Empty ) + "\"",
+                                                    "\"" + item.NumberOfLostPallets + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
                     }
 
-                    if ( items != null && items.Any() )
+                    #endregion
+
+                    break;
+
+                case "regions":
+
+                    #region Regions
+
+                    csv = string.Format( "PSP, Name, Description, Country, Province, Regional Manager, Regional Manager Email, Status {0}", Environment.NewLine );
+
+                    using ( RegionService service = new RegionService() )
                     {
-                        foreach ( SystemConfig item in items )
+                        List<RegionCustomModel> regions = service.List1( pm, csm );
+
+                        if ( regions.NullableAny() )
                         {
-                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
-                                                csv,
-                                                item.SystemContactEmail,
-                                                item.FinancialContactEmail,
-                                                item.ActivationEmail,
-                                                item.CorrespondenceEmail,
-                                                item.ContactNumber,
-                                                item.Address,
-                                                item.InvoiceRunDay,
-                                                item.AutoLogoff,
-                                                item.LogoffSeconds,
-                                                item.PasswordChange,
-                                                item.ImagesLocation,
-                                                item.DocumentsLocation,
-                                                item.AppDownloadUrl,
-                                                item.WebsiteUrl,
-                                                Environment.NewLine );
+                            foreach ( RegionCustomModel item in regions )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8} {9}",
+                                                    csv,
+                                                    "\"" + item.PSPName + "\"",
+                                                    "\"" + item.Name + "\"",
+                                                    "\"" + item.Description + "\"",
+                                                    "\"" + item.CountryName + "\"",
+                                                    "\"" + item.ProvinceName + "\"",
+                                                    "\"" + item.RegionManagerName + "\"",
+                                                    "\"" + item.RegionManagerEmail + "\"",
+                                                    "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "managetransporters":
+
+                    #region Manage Transporters
+
+                    using ( TransporterService service = new TransporterService() )
+                    {
+                        csv = string.Format( "Date Created, Client, Name, Trading Name, Registration Number, Contact Name, Contact Number, Email, Supplier Code, Client Transporter Code, Chep Client Transporter Code, Status {0}", Environment.NewLine );
+
+                        List<TransporterCustomModel> transporters = service.List1( pm, csm );
+
+                        if ( transporters.NullableAny() )
+                        {
+                            foreach ( TransporterCustomModel item in transporters )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12} {13}",
+                                                    csv,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.ClientName + "\"",
+                                                    "\"" + item.Name + "\"",
+                                                    "\"" + item.TradingName + "\"",
+                                                    "\"" + item.RegistrationNumber + "\"",
+                                                    "\"" + item.ContactName + "\"",
+                                                    "\"" + item.ContactNumber + "\"",
+                                                    "\"" + item.Email + "\"",
+                                                    "\"" + item.SupplierCode + "\"",
+                                                    "\"" + item.ClientTransporterCode + "\"",
+                                                    "\"" + item.ChepClientTransporterCode + "\"",
+                                                    "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "products":
+
+                    #region Products
+
+                    using ( ProductService service = new ProductService() )
+                    {
+                        csv = string.Format( "Date Created, Name, Description, Status {0}", Environment.NewLine );
+
+                        List<ProductCustomModel> product = service.List1( pm, csm );
+
+                        if ( product.NullableAny() )
+                        {
+                            foreach ( ProductCustomModel item in product )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4} {5}",
+                                                    csv,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.Name + "\"",
+                                                    "\"" + item.Description + "\"",
+                                                    "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
+                                                    Environment.NewLine );
+                            }
                         }
                     }
 
@@ -125,32 +228,30 @@ namespace ACT.UI.Controllers
 
                     csv = string.Format( "Date, Activity, User, Action Table, Action, Controller, Comments, Image Before, Image After, Browser {0}", Environment.NewLine );
 
-                    List<AuditLogCustomModel> auditModel = new List<AuditLogCustomModel>();
-
                     using ( AuditLogService service = new AuditLogService() )
                     {
-                        auditModel = service.List( pm, csm );
-                    }
+                        List<AuditLogCustomModel> audits = service.List( pm, csm );
 
-                    if ( auditModel != null && auditModel.Any() )
-                    {
-                        foreach ( AuditLogCustomModel item in auditModel )
+                        if ( audits.NullableAny() )
                         {
-                            ActivityTypes activity = ( ActivityTypes ) item.Type;
+                            foreach ( AuditLogCustomModel item in audits )
+                            {
+                                ActivityTypes activity = ( ActivityTypes ) item.Type;
 
-                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
-                                                csv,
-                                                item.CreatedOn,
-                                                activity.GetDisplayText(),
-                                                item.User.Name + " " + item.User.Surname,
-                                                item.ActionTable,
-                                                item.Action,
-                                                item.Controller,
-                                                "\"" + item.Comments + "\"",
-                                                "\"" + ( item.BeforeImage ?? "" ).Replace( '"', ' ' ) + "\"",
-                                                "\"" + ( item.BeforeImage ?? "" ).Replace( '"', ' ' ) + "\"",
-                                                "\"" + ( item.Browser ?? "" ) + "\"",
-                                                Environment.NewLine );
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10} {11}",
+                                                    csv,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + activity.GetDisplayText() + "\"",
+                                                    "\"" + item.User.Name + " " + item.User.Surname + "\"",
+                                                    "\"" + item.ActionTable + "\"",
+                                                    "\"" + item.Action + "\"",
+                                                    "\"" + item.Controller + "\"",
+                                                    "\"" + item.Comments + "\"",
+                                                    "\"" + ( item.BeforeImage ?? "" ).Replace( '"', ' ' ) + "\"",
+                                                    "\"" + ( item.AfterImage ?? "" ).Replace( '"', ' ' ) + "\"",
+                                                    "\"" + ( item.Browser ?? "" ) + "\"",
+                                                    Environment.NewLine );
+                            }
                         }
                     }
 
@@ -164,70 +265,24 @@ namespace ACT.UI.Controllers
 
                     csv = string.Format( "Date Created, Start Date, End Date, Status, xRead, Message {0}", Environment.NewLine );
 
-                    List<Broadcast> broadcasts = new List<Broadcast>();
-
                     using ( BroadcastService service = new BroadcastService() )
                     {
-                        broadcasts = service.List( pm, csm );
-                    }
+                        List<Broadcast> broadcasts = service.List( pm, csm );
 
-                    if ( broadcasts != null && broadcasts.Any() )
-                    {
-                        foreach ( Broadcast item in broadcasts )
+                        if ( broadcasts.NullableAny() )
                         {
-                            Status status = ( Status ) item.Status;
-
-                            csv = string.Format( "{0} {1},{2},{3},{4},{5},{6} {7}",
-                                                csv,
-                                                item.CreatedOn,
-                                                item.StartDate,
-                                                item.EndDate,
-                                                status.GetDisplayText(),
-                                                item.UserBroadcasts.Count,
-                                                item.Message,
-                                                Environment.NewLine );
-                        }
-                    }
-
-                    #endregion
-
-                    break;
-
-                case "users":
-
-                    #region Manage Users
-
-                    csv = string.Format( "Date Created, Name, Status, Role, Email, Cell {0}", Environment.NewLine );
-
-                    List<UserCustomModel> userModel = new List<UserCustomModel>();
-
-                    using ( UserService uservice = new UserService() )
-                    {
-                        userModel = uservice.List1( pm, csm );
-
-                        if ( userModel != null && userModel.Any() )
-                        {
-                            foreach ( UserCustomModel item in userModel )
+                            foreach ( Broadcast item in broadcasts )
                             {
                                 Status status = ( Status ) item.Status;
 
-                                Role role = new Role() { Name = "~/~", Type = -1 };
-
-
-                                //if ( item.UserRoles.Any() )
-                                //{
-                                //    role = item.UserRoles.FirstOrDefault().Role;
-                                //}
-
-                                //RoleType roleType = ( RoleType ) role.Type;
-
-                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6} {7}", csv,
-                                                    item.CreatedOn.ToString( "yyyy/MM/dd" ),
-                                                    item.Name + " " + item.Surname,
-                                                    status.GetDisplayText(),
-                                                    item.RoleName,
-                                                    item.Email,
-                                                    item.Cell,
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6} {7}",
+                                                    csv,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.StartDate + "\"",
+                                                    "\"" + item.EndDate + "\"",
+                                                    "\"" + status.GetDisplayText() + "\"",
+                                                    "\"" + item.UserBroadcasts.Count + "\"",
+                                                    "\"" + item.Message + "\"",
                                                     Environment.NewLine );
                             }
                         }
@@ -237,33 +292,102 @@ namespace ACT.UI.Controllers
 
                     break;
 
-                case "banks":
+                case "roles":
 
-                    #region Banks
+                    #region Roles
 
-                    csv = string.Format( "Date Created, Name, Description, Code, Status {0}", Environment.NewLine );
+                    csv = string.Format( "Name, Type, Dashboard, Administration, Finance, Clients, Customers, Products, Pallets {0}", Environment.NewLine );
 
-                    List<Bank> banks = new List<Bank>();
-
-                    using ( BankService service = new BankService() )
+                    using ( RoleService service = new RoleService() )
                     {
-                        banks = service.List( pm, csm );
+                        List<Role> roles = service.List( pm, csm );
+
+                        if ( roles.NullableAny() )
+                        {
+                            foreach ( Role item in roles )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9} {10}",
+                                                    csv,
+                                                    "\"" + item.Name + "\"",
+                                                    "\"" + ( ( RoleType ) item.Type ).GetDisplayText() + "\"",
+                                                    "\"" + item.DashBoard + "\"",
+                                                    "\"" + item.Administration + "\"",
+                                                    "\"" + item.Finance + "\"",
+                                                    "\"" + item.Client + "\"",
+                                                    "\"" + item.Customer + "\"",
+                                                    "\"" + item.Product + "\"",
+                                                    "\"" + item.Pallet + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
                     }
 
-                    if ( banks != null && banks.Any() )
-                    {
-                        foreach ( Bank item in banks )
-                        {
-                            Status status = ( Status ) ( item.Status );
+                    #endregion
 
-                            csv = string.Format( "{0} {1},{2},{3},{4},{5} {6}",
-                                                csv,
-                                                item.CreatedOn.ToString( "yyyy/MM/dd" ),
-                                                item.Name,
-                                                item.Description,
-                                                item.Code,
-                                                status.GetDisplayText(),
-                                                Environment.NewLine );
+                    break;
+
+                case "systemconfig":
+
+                    #region System Config
+
+                    csv = string.Format( "System Contact Email,Finance Contact Email,Activation Email,Correspondence Email,System Contact Number,System Contact Address,Invoice Run Day,Auto Logoff,Auto Logoff Seconds,Password Change, Images Location, Documents Location,App Download Url,Website Url {0}", Environment.NewLine );
+
+                    using ( SystemConfigService service = new SystemConfigService() )
+                    {
+                        List<SystemConfig> items = service.List( pm, csm );
+
+                        if ( items != null && items.Any() )
+                        {
+                            foreach ( SystemConfig item in items )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14} {15}",
+                                                    csv,
+                                                    "\"" + item.SystemContactEmail + "\"",
+                                                    "\"" + item.FinancialContactEmail + "\"",
+                                                    "\"" + item.ActivationEmail + "\"",
+                                                    "\"" + item.CorrespondenceEmail + "\"",
+                                                    "\"" + item.ContactNumber + "\"",
+                                                    "\"" + item.Address + "\"",
+                                                    "\"" + item.InvoiceRunDay + "\"",
+                                                    "\"" + item.AutoLogoff + "\"",
+                                                    "\"" + item.LogoffSeconds + "\"",
+                                                    "\"" + item.PasswordChange + "\"",
+                                                    "\"" + item.ImagesLocation + "\"",
+                                                    "\"" + item.DocumentsLocation + "\"",
+                                                    "\"" + item.AppDownloadUrl + "\"",
+                                                    "\"" + item.WebsiteUrl + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "declinereasons":
+
+                    #region Decline Reasons
+
+                    csv = string.Format( "Date Created, Description, Status {0}", Environment.NewLine );
+
+                    using ( DeclineReasonService service = new DeclineReasonService() )
+                    {
+                        List<DeclineReason> declineReasons = service.List( pm, csm );
+
+                        if ( declineReasons != null && declineReasons.Any() )
+                        {
+                            foreach ( DeclineReason item in declineReasons )
+                            {
+                                Status status = ( Status ) ( item.Status );
+
+                                csv = string.Format( "{0} {1},{2},{3} {4}",
+                                                    csv,
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.Description + "\"",
+                                                    "\"" + status.GetDisplayText() + "\"",
+                                                    Environment.NewLine );
+                            }
                         }
                     }
 
@@ -4463,19 +4587,15 @@ namespace ACT.UI.Controllers
                 return PartialView( "_PSPCustomSearch", new CustomSearchModel( "PSPs" ) );
             }
 
-            int total = 0;
-
-            List<PSPCustomModel> model = new List<PSPCustomModel>();
-
             using ( PSPService service = new PSPService() )
             {
-                model = service.List1( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+                List<PSPCustomModel> model = service.List1( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_PSPs", paging );
             }
-
-            PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
-
-            return PartialView( "_PSPs", paging );
         }
 
 
@@ -4652,19 +4772,15 @@ namespace ACT.UI.Controllers
         // POST || GET: /Administration/DeclineReasons
         public ActionResult DeclineReasons( PagingModel pm, CustomSearchModel csm )
         {
-            int total = 0;
-
-            List<DeclineReason> model = new List<DeclineReason>();
-
             using ( DeclineReasonService service = new DeclineReasonService() )
             {
-                model = service.List( pm, csm );
-                total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total( pm, csm );
+                List<DeclineReason> model = service.List( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( ( object ) model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_DeclineReasons", paging );
             }
-
-            PagingExtension paging = PagingExtension.Create( ( object ) model, total, pm.Skip, pm.Take, pm.Page );
-
-            return PartialView( "_DeclineReasons", paging );
         }
 
         //
