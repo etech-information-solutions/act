@@ -1,0 +1,27 @@
+﻿
+@model KPIReportFilterModel
+
+@using ACT.Core.Models.Filter
+
+<div id="kpi-report-filters" class="status-filters">
+
+    <strong class="block grey">KPI Reports</strong>
+
+    <span data-filter="1" data-use="-1" data-type="PODPerUser" data-showing="PODPerUser" data-target="#main-content" data-loaded="0" data-list-loaded="1" class="total filter @( Model.Showing == "PODPerUser" ? "current" : "" )" style="width: 23%;">
+        POD Per User Count: <b>@Model.PODPerUser</b>
+    </span>
+
+    <span data-filter="1" data-use="0" data-type="PODUploadLog" data-showing="PODUploadLog" data-target="#main-content" data-loaded="0" data-list-loaded="0" class="active filter @( Model.Showing == "PODUploadLog" ? "current" : "" )" style="width: 23%;">
+        Granular POD Upload Log: <b>@Model.PODUploadLog</b>
+    </span>
+    <span data-filter="1" data-use="1" data-type="AuthorizationCodeAudit" data-showing="AuthorizationCodeAudit" data-target="#main-content" data-loaded="0" data-list-loaded="0" class="inactive filter @( Model.Showing == "AuthorizationCodeAudit" ? "current" : "" )" style="width: 23%;">
+        Authorization Codes Audit: <b>@Model.AuthorizationCodeAudit</b>
+    </span>
+    <span data-filter="1" data-use="4" data-type="AuditLogPerUser" data-showing="AuditLogPerUser" data-target="#main-content" data-loaded="0" data-list-loaded="0" class="ad-incomplete filter @( Model.Showing == "AuditLogPerUser" ? "current" : "" )" style="width: 25%; margin-right: 0;">
+        Audit Log Per User: <b>@Model.AuditLogPerUser</b>
+    </span>
+
+    <em class="block clear"></em>
+    <em class="border"></em>
+
+</div>

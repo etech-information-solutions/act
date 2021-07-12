@@ -8,6 +8,8 @@
     Client client = ( ViewBag.SelectedClient != null ) ? ViewBag.SelectedClient : new Client() { CompanyName = "N/A" };
 
     UserModel user = ( Request.IsAuthenticated && ViewBag.CurrentUser != null ) ? ( UserModel ) ViewBag.CurrentUser : User.Get();
+
+    Dictionary<int, string> clientOptions = ViewBag.ClientOptions;
 }
 
 <div class="menu">
@@ -23,11 +25,25 @@
             Welcome <strong>@user.Name</strong>
         </li>
         <li class="welcome" style="font-size: 14px; color: #333;">
-            Selected Client:
 
-            <span id="sc-m" class="block" style="border-top: 1px dashed #fff; padding-top: 3px; margin-top: 3px; color: #012d71;">
-                @(client?.CompanyName)
-            </span>
+            <span style="margin-bottom: 10px; display: block;">Selected Client: <em id="s-c-loader"></em></span>
+
+            <select data-select-client="1" class="chzn" style="width: 100%;">
+                <option>--select</option>
+                @if ( clientOptions != null )
+                {
+                    foreach ( KeyValuePair<int, string> item in clientOptions )
+                    {
+                        string sel = ( item.Key == client?.Id ) ? "selected=selected" : "";
+
+                        <option value="@item.Key" @sel>@item.Value</option>
+                    }
+                }
+            </select>
+
+            @*<span id="sc-m" class="block" style="border-top: 1px dashed #fff; padding-top: 3px; margin-top: 3px; color: #012d71;">
+                    @(client?.CompanyName)
+                </span>*@
         </li>
     </ul>
 

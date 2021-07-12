@@ -1162,5 +1162,469 @@ namespace ACT.Core.Services
 
             return context.ClientLoads.Where( cl => cl.ReceiverNumber.Trim() == reference.Trim() || cl.ReceiverNumber == otherRef.Trim() ).ToList();
         }
+
+
+
+        /// <summary>
+        /// Gets a total number of PODs Per User Count
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public int PODPerUserCountTotal( PagingModel pm, CustomSearchModel csm )
+        {
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
+            {
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
+            }
+
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmUserId", csm.UserId ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+            };
+
+            #endregion
+
+            string query = @"SELECT
+	                            TOP 1 COUNT(1) OVER() AS [Total]
+                             FROM
+	                            [dbo].[ClientLoad] cl
+	                            INNER JOIN [dbo].[User] u ON u.[Id]=cl.[PODCommentById]";
+
+            // WHERE
+
+            #region WHERE
+
+            query = $"{query} WHERE (1=1)";
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.UserId > 0 )
+            {
+                query = $"{query} AND (u.[Id]=@csmUserId)";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (cl.[PODCommentDate] >= @csmFromDate AND cl.[PODCommentDate] <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (cl.[PODCommentDate]>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (cl.[PODCommentDate]<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
+            {
+                query = string.Format( @"{0} AND (u.[Cell] LIKE '%{1}%' OR
+                                                  u.[Name] LIKE '%{1}%' OR
+                                                  u.[Email] LIKE '%{1}%' OR
+                                                  u.[Surname] LIKE '%{1}%'
+                                                 ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            // GROUP BY
+
+            query = $@"{query} GROUP BY
+	                              cl.[PODCommentById],
+	                              u.[Name] + ' ' + u.[Surname],
+	                              CAST(cl.[PODCommentDate] AS DATE)";
+
+            CountModel model = context.Database.SqlQuery<CountModel>( query, parameters.ToArray() ).FirstOrDefault();
+
+            return model.Total;
+        }
+
+        /// <summary>
+        /// Gets a list of PODs Per User Count
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public List<PODPerUserModel> ListPODPerUser( PagingModel pm, CustomSearchModel csm )
+        {
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
+            {
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
+            }
+
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmUserId", csm.UserId ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+            };
+
+            #endregion
+
+            string query = @"SELECT
+	                            COUNT(cl.[Id]) AS [PODsUploaded],
+	                            u.[Name] + ' ' + u.[Surname] AS [UserName],
+	                            CAST(cl.[PODCommentDate] AS DATE) AS [UploadDate]
+                             FROM
+	                            [dbo].[ClientLoad] cl
+	                            INNER JOIN [dbo].[User] u ON u.[Id]=cl.[PODCommentById]";
+
+            // WHERE
+
+            #region WHERE
+
+            query = $"{query} WHERE (1=1)";
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.UserId > 0 )
+            {
+                query = $"{query} AND (u.[Id]=@csmUserId)";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (cl.[PODCommentDate] >= @csmFromDate AND cl.[PODCommentDate] <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (cl.[PODCommentDate]>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (cl.[PODCommentDate]<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
+            {
+                query = string.Format( @"{0} AND (u.[Cell] LIKE '%{1}%' OR
+                                                  u.[Name] LIKE '%{1}%' OR
+                                                  u.[Email] LIKE '%{1}%' OR
+                                                  u.[Surname] LIKE '%{1}%'
+                                                 ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            // GROUP BY
+
+            query = $@"{query} GROUP BY
+	                              cl.[PODCommentById],
+	                              u.[Name] + ' ' + u.[Surname],
+	                              CAST(cl.[PODCommentDate] AS DATE)";
+
+            // ORDER
+
+            query = $"{query} ORDER BY u.[Name] + ' ' + u.[Surname] ASC, {pm.SortBy} {pm.Sort}";
+
+            // SKIP, TAKE
+
+            query = $"{query} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ";
+
+            return context.Database.SqlQuery<PODPerUserModel>( query, parameters.ToArray() ).ToList();
+        }
+
+
+
+        /// <summary>
+        /// Gets a total number of Granular POD Upload Logs
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public int PODUploadLogTotal( PagingModel pm, CustomSearchModel csm )
+        {
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
+            {
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
+            }
+
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmUserId", csm.UserId ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+            };
+
+            #endregion
+
+            string query = @"SELECT
+	                            COUNT(cl.[Id]) AS [Total]
+                            FROM
+	                            [dbo].[ClientLoad] cl
+	                            INNER JOIN [dbo].[User] u ON u.[Id]=cl.[PODCommentById]
+	                            LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=cl.[ToClientSiteId]
+	                            LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]";
+
+            // WHERE
+
+            #region WHERE
+
+            query = $"{query} WHERE (1=1)";
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.UserId > 0 )
+            {
+                query = $"{query} AND (u.[Id]=@csmUserId)";
+            }
+            if ( csm.SiteId > 0 )
+            {
+                query = $"{query} AND (s.[Id]=@csmSiteId)";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (cl.[PODCommentDate] >= @csmFromDate AND cl.[PODCommentDate] <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (cl.[PODCommentDate]>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (cl.[PODCommentDate]<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
+            {
+                query = string.Format( @"{0} AND (u.[Cell] LIKE '%{1}%' OR
+                                                  u.[Name] LIKE '%{1}%' OR
+                                                  u.[Email] LIKE '%{1}%' OR
+                                                  u.[Surname] LIKE '%{1}%' OR
+                                                  cl.[LoadNumber] LIKE '%{1}%' OR
+                                                  cl.[DeliveryNote] LIKE '%{1}%' OR
+                                                  s.[Name] LIKE '%{1}%'
+                                                 ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            CountModel model = context.Database.SqlQuery<CountModel>( query, parameters.ToArray() ).FirstOrDefault();
+
+            return model.Total;
+        }
+
+        /// <summary>
+        /// Gets a list of Granular POD Upload Logs
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public List<PODUploadLogModel> ListPODUploadLog( PagingModel pm, CustomSearchModel csm )
+        {
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
+            {
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
+            }
+
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmUserId", csm.UserId ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+            };
+
+            #endregion
+
+            string query = @"SELECT
+	                            cl.[Id],
+	                            cl.[LoadDate],
+	                            cl.[LoadNumber],
+	                            cl.[DeliveryNote],
+	                            cl.[PODCommentDate],
+	                            s.[Name] AS [ToSiteName],
+	                            u.[Name] + ' ' + u.[Surname] AS [UserName],
+	                            [PODLinks] = STUFF((
+						                            SELECT 
+							                            (',' + CAST(i.[Id] AS VARCHAR))
+						                            FROM
+							                            [dbo].[Image] i
+						                            WHERE
+							                            i.[ObjectType]='PODNumber' AND
+							                            i.[ObjectId]=cl.[Id]
+						                            FOR XML PATH('')
+						                            ), 1, 1, '' )
+                            FROM
+	                            [dbo].[ClientLoad] cl
+	                            INNER JOIN [dbo].[User] u ON u.[Id]=cl.[PODCommentById]
+	                            LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=cl.[ToClientSiteId]
+	                            LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]";
+
+            // WHERE
+
+            #region WHERE
+
+            query = $"{query} WHERE (1=1)";
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.UserId > 0 )
+            {
+                query = $"{query} AND (u.[Id]=@csmUserId)";
+            }
+            if ( csm.SiteId > 0 )
+            {
+                query = $"{query} AND (s.[Id]=@csmSiteId)";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (cl.[PODCommentDate] >= @csmFromDate AND cl.[PODCommentDate] <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (cl.[PODCommentDate]>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (cl.[PODCommentDate]<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
+            {
+                query = string.Format( @"{0} AND (u.[Cell] LIKE '%{1}%' OR
+                                                  u.[Name] LIKE '%{1}%' OR
+                                                  u.[Email] LIKE '%{1}%' OR
+                                                  u.[Surname] LIKE '%{1}%' OR
+                                                  cl.[LoadNumber] LIKE '%{1}%' OR
+                                                  cl.[DeliveryNote] LIKE '%{1}%' OR
+                                                  s.[Name] LIKE '%{1}%'
+                                                 ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            // ORDER
+
+            query = $"{query} ORDER BY u.[Name] + ' ' + u.[Surname] ASC, {pm.SortBy} {pm.Sort}";
+
+            // SKIP, TAKE
+
+            query = $"{query} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ";
+
+            return context.Database.SqlQuery<PODUploadLogModel>( query, parameters.ToArray() ).ToList();
+        }
     }
 }

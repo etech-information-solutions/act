@@ -73,6 +73,7 @@
     <Compile Include="Attributes\ViewModelAttribute.cs" />
     <Compile Include="Attributes\ViewModelBindingAttribute.cs" />
     <Compile Include="Encryption\Encryption.cs" />
+    <Compile Include="Enums\FilterType.cs" />
     <Compile Include="Enums\OnlineStatus.cs" />
     <Compile Include="Enums\DateFormats.cs" />
     <Compile Include="Enums\JobType.cs" />
@@ -138,6 +139,7 @@
     <Compile Include="Interfaces\IPermission.cs" />
     <Compile Include="Interfaces\IRole.cs" />
     <Compile Include="Interfaces\IUser.cs" />
+    <Compile Include="Models\ClientLoadAuditLogModel.cs" />
     <Compile Include="Models\Custom\ChepLoadChepCustomModel.cs" />
     <Compile Include="Models\Custom\ChepLoadJournalCustomModel.cs" />
     <Compile Include="Models\Custom\ClientCustomerCustomModel.cs" />
@@ -169,6 +171,7 @@
     <Compile Include="Models\Custom\DeliveryNoteLineCustomModel.cs" />
     <Compile Include="Models\Custom\DisputeCustomModel.cs" />
     <Compile Include="Models\Custom\DocumentCustomModel.cs" />
+    <Compile Include="Models\Custom\ExtendedClientLoadCustomModel.cs" />
     <Compile Include="Models\Custom\GroupCustomModel.cs" />
     <Compile Include="Models\Custom\ImageCustomModel.cs" />
     <Compile Include="Models\Custom\InvoiceCustomModel.cs" />
@@ -197,11 +200,16 @@
     <Compile Include="Models\Custom\UserCustomModel.cs" />
     <Compile Include="Models\Custom\VehicleCustomModel.cs" />
     <Compile Include="Models\DashBoardModel.cs" />
+    <Compile Include="Models\Filter\BaseFilterModel.cs" />
+    <Compile Include="Models\Filter\KPIReportFilterModel.cs" />
     <Compile Include="Models\JsonCommonModel.cs" />
     <Compile Include="Models\CountModel.cs" />
     <Compile Include="Models\KeyValueModel.cs" />
     <Compile Include="Models\MessageCustomModel.cs" />
     <Compile Include="Models\OutstandingPalletsModel.cs" />
+    <Compile Include="Models\AuthorizationCodeAuditModel.cs" />
+    <Compile Include="Models\PODUploadLogModel.cs" />
+    <Compile Include="Models\PODPerUserModel.cs" />
     <Compile Include="Models\Simple\SimpleOutstandingPallets.cs" />
     <Compile Include="Models\Simple\SimpleBankModel.cs" />
     <Compile Include="Models\CustomSearchModel.cs" />

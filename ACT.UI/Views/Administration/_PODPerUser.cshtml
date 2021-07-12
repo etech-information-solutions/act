@@ -1,0 +1,71 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Models;
+
+@Html.Partial( "_Notification" )
+
+@{
+    int count = Model.Start;
+    List<PODPerUserModel> items = ( List<PODPerUserModel> ) Model.Items;
+
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_PODPerUser";
+}
+
+@if ( !items.NullableAny() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no POD Per User Count available matching your search criteria.
+    </div>
+}
+
+<table id="pod-per-user-count-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#pod-per-user-count-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="UserName" data-column="UserName">
+                User Name
+            </th>
+            <th data-name="PODsUploaded" data-column="PODsUploaded">
+                PODs Uploaded
+            </th>
+            <th data-name="UploadDate" data-column="UploadDate">
+                Upload Date
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( items.NullableAny() )
+        {
+            foreach ( PODPerUserModel item in items )
+            {
+                <tr id="tr-@item.UserName-@item.UploadDate.Ticks-pod-per-user" class="tr-@item.UserName-@item.UploadDate.Ticks-pod-per-user">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.UserName
+                    </td>
+                    <td>
+                        @item.PODsUploaded
+                    </td>
+                    <td>
+                        @item.UploadDate.ToString( "dd/MM/yyyy" )
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )

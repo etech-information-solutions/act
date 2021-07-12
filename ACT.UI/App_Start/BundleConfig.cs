@@ -61,6 +61,7 @@ namespace ACT.UI
                 "~/Content/menu.css",
                 "~/Content/modal.css",
                 "~/Content/table.css",
+                "~/Content/filter.css",
                 "~/Content/ap-tabs.css",
                 "~/Content/ap-tabs.css",
                 "~/Content/select2.css",

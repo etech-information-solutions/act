@@ -451,6 +451,8 @@ namespace ACT.Core.Models
         public string OriginalDocketNumber { get; set; }
         public bool IncludeUserBroadCasts { get; set; }
 
+        public string KPIReportFilterType { get; set; }
+
         #endregion
 
 
@@ -465,10 +467,13 @@ namespace ACT.Core.Models
                 {
                     RoleType role = uservice.CurrentUser.RoleType;
                     role = role == RoleType.PSP ? role : RoleType.All;
+
                     return uservice.List( true, role );
                 }
             }
         }
+
+        public Dictionary<int, string> User1Options { get; set; }
 
         public Dictionary<int, string> ProvinceOptions
         {
@@ -512,6 +517,8 @@ namespace ACT.Core.Models
         public Dictionary<int, string> VehicleOptions { get; set; }
 
         public Dictionary<int, string> ClientSiteOptions { get; set; }
+
+        public Dictionary<int, string> PODCommentOptions { get; set; }
 
         public Dictionary<int, string> OutstandingReasonOptions { get; set; }
 
@@ -735,6 +742,43 @@ namespace ACT.Core.Models
                     {
                         SiteOptions = sservice.List( true );
                         ClientOptions = cservice.List( true );
+                    }
+
+                    break;
+
+                case "PODPerUser":
+                case "PODUploadLog":
+
+                    using ( UserService uservice = new UserService() )
+                    {
+                        User1Options = uservice.List( true, RoleType.All );
+                    }
+
+                    break;
+
+                case "AuthorizationCodeAudit":
+
+                    using ( UserService uservice = new UserService() )
+                    using ( TransporterService tservice = new TransporterService() )
+                    {
+                        TransporterOptions = tservice.List( true );
+                        User1Options = uservice.List( true, RoleType.All );
+                    }
+
+                    break;
+                case "AuditLogPerUser":
+
+                    using ( UserService uservice = new UserService() )
+                    using ( ClientService cservice = new ClientService() )
+                    using ( VehicleService vservice = new VehicleService() )
+                    using ( PODCommentService pcservice = new PODCommentService() )
+                    using ( TransporterService tservice = new TransporterService() )
+                    {
+                        ClientOptions = cservice.List( true );
+                        VehicleOptions = vservice.List( true );
+                        PODCommentOptions = pcservice.List( true );
+                        TransporterOptions = tservice.List( true );
+                        User1Options = uservice.List( true, RoleType.All );
                     }
 
                     break;

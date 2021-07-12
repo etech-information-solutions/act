@@ -233,6 +233,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\calendar.gif" />
     <Content Include="Content\checkbox.css" />
+    <Content Include="Content\filter.css" />
     <Content Include="Content\fixedHeader.dataTables.min.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
@@ -708,6 +709,15 @@
     <Content Include="Views\Pallet\_TransporterContactDetails.cshtml" />
     <Content Include="Views\Pallet\EditAuthorisationComment.cshtml" />
     <Content Include="Views\Administration\OldDataImport.cshtml" />
+    <Content Include="Views\Administration\_KPIReportFilter.cshtml" />
+    <Content Include="Views\Administration\_PODPerUser.cshtml" />
+    <Content Include="Views\Shared\_PODPerUserCustomSearch.cshtml" />
+    <Content Include="Views\Administration\_PODUploadLog.cshtml" />
+    <Content Include="Views\Shared\_PODUploadLogCustomSearch.cshtml" />
+    <Content Include="Views\Administration\_AuthorizationCodeAudit.cshtml" />
+    <Content Include="Views\Shared\_AuthorizationCodeAuditLogCustomSearch.cshtml" />
+    <Content Include="Views\Administration\_AuditLogPerUser.cshtml" />
+    <Content Include="Views\Shared\_AuditLogPerUserCustomSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

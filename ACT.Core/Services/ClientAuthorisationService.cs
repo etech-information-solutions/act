@@ -499,5 +499,271 @@ namespace ACT.Core.Services
         {
             return context.ClientAuthorisations.Include( "User" ).FirstOrDefault( d => d.LoadNumber == loadNumber );
         }
+
+
+
+        /// <summary>
+        /// Gets a total number of Authorization Codes Audits
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public int AuthorizationCodeAuditTotal( PagingModel pm, CustomSearchModel csm )
+        {
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
+            {
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
+            }
+
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmUserId", csm.UserId ) },
+                { new SqlParameter( "csmTransporterId", csm.TransporterId ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+            };
+
+            #endregion
+
+            string query = @"SELECT
+	                            COUNT(ca.[Id]) AS [Total]
+                            FROM
+	                            [dbo].[ClientAuthorisation] ca
+	                            INNER JOIN [dbo].[User] u1 ON u1.[Id]=ca.[UserId]
+	                            INNER JOIN [dbo].[ClientLoad] cl ON cl.[Id]=ca.[ClientLoadId]
+	                            LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=cl.[ToClientSiteId]
+	                            LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
+	                            LEFT OUTER JOIN [dbo].[Transporter] t ON t.[Id]=cl.[TransporterId]
+	                            LEFT OUTER JOIN [dbo].[User] u2 ON u2.[Email]=cl.[ModifiedBy]";
+
+            // WHERE
+
+            #region WHERE
+
+            query = $"{query} WHERE (1=1)";
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.UserId > 0 )
+            {
+                query = $"{query} AND (u1.[Id]=@csmUserId)";
+            }
+            if ( csm.SiteId > 0 )
+            {
+                query = $"{query} AND (s.[Id]=@csmSiteId)";
+            }
+            if ( csm.TransporterId > 0 )
+            {
+                query = $"{query} AND (t.[Id]=@csmTransporterId)";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (ca.[AuthorisationDate] >= @csmFromDate AND ca.[AuthorisationDate] <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (ca.[AuthorisationDate]>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (ca.[AuthorisationDate]<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
+            {
+                query = string.Format( @"{0} AND (u1.[Cell] LIKE '%{1}%' OR
+                                                  u1.[Name] LIKE '%{1}%' OR
+                                                  u1.[Email] LIKE '%{1}%' OR
+                                                  u1.[Surname] LIKE '%{1}%' OR
+                                                  u2.[Cell] LIKE '%{1}%' OR
+                                                  u2.[Name] LIKE '%{1}%' OR
+                                                  u2.[Email] LIKE '%{1}%' OR
+                                                  u2.[Surname] LIKE '%{1}%' OR
+                                                  cl.[LoadNumber] LIKE '%{1}%' OR
+                                                  cl.[DeliveryNote] LIKE '%{1}%' OR
+                                                  cl.[ClientDescription] LIKE '%{1}%' OR
+                                                  ca.[Code] LIKE '%{1}%' OR
+                                                  s.[Name] LIKE '%{1}%' OR
+                                                  t.[Name] LIKE '%{1}%'
+                                                 ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            CountModel model = context.Database.SqlQuery<CountModel>( query, parameters.ToArray() ).FirstOrDefault();
+
+            return model.Total;
+        }
+
+        /// <summary>
+        /// Gets a list of Authorization Codes Audits
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public List<AuthorizationCodeAuditModel> ListAuthorizationCodeAudit( PagingModel pm, CustomSearchModel csm )
+        {
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
+            {
+                csm.ToDate = csm.ToDate?.AddDays( 1 );
+            }
+
+            // Parameters
+
+            #region Parameters
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "skip", pm.Skip ) },
+                { new SqlParameter( "take", pm.Take ) },
+                { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmUserId", csm.UserId ) },
+                { new SqlParameter( "csmTransporterId", csm.TransporterId ) },
+                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+            };
+
+            #endregion
+
+            string query = @"SELECT
+	                            ca.[Id],
+	                            cl.[LoadDate],
+	                            cl.[LoadNumber],
+	                            cl.[DeliveryNote],
+	                            s.[Name] AS [ToSiteName],
+	                            t.[Name] AS [TransporterName],
+                                ca.[Code] AS [AuthorisationCode],
+                                cl.[ClientDescription] AS [CustomerName],
+                                ca.[AuthorisationDate] AS [AuthorisationDate],
+	                            u1.[Name] + ' ' + u1.[Surname] AS [AuthorizerName],
+	                            u2.[Name] + ' ' + u2.[Surname] AS [LastEditedByName]
+                            FROM
+	                            [dbo].[ClientAuthorisation] ca
+	                            INNER JOIN [dbo].[User] u1 ON u1.[Id]=ca.[UserId]
+	                            INNER JOIN [dbo].[ClientLoad] cl ON cl.[Id]=ca.[ClientLoadId]
+	                            LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[Id]=cl.[ToClientSiteId]
+	                            LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs.[SiteId]
+	                            LEFT OUTER JOIN [dbo].[Transporter] t ON t.[Id]=cl.[TransporterId]
+	                            LEFT OUTER JOIN [dbo].[User] u2 ON u2.[Email]=cl.[ModifiedBy]";
+
+            // WHERE
+
+            #region WHERE
+
+            query = $"{query} WHERE (1=1)";
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cl.[ClientId] AND pu.[UserId]=@userid) ";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.[ClientId]=cl.[ClientId] AND cu.[UserId]=@userid) ";
+            }
+
+            #endregion
+
+            // Custom Search
+
+            #region Custom Search
+
+            if ( csm.UserId > 0 )
+            {
+                query = $"{query} AND (u1.[Id]=@csmUserId)";
+            }
+            if ( csm.SiteId > 0 )
+            {
+                query = $"{query} AND (s.[Id]=@csmSiteId)";
+            }
+            if ( csm.TransporterId > 0 )
+            {
+                query = $"{query} AND (t.[Id]=@csmTransporterId)";
+            }
+
+            if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
+            {
+                query = $"{query} AND (ca.[AuthorisationDate] >= @csmFromDate AND ca.[AuthorisationDate] <= @csmToDate) ";
+            }
+            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            {
+                if ( csm.FromDate.HasValue )
+                {
+                    query = $"{query} AND (ca.[AuthorisationDate]>=@csmFromDate) ";
+                }
+                if ( csm.ToDate.HasValue )
+                {
+                    query = $"{query} AND (ca.[AuthorisationDate]<=@csmToDate) ";
+                }
+            }
+
+            #endregion
+
+            // Normal Search
+
+            #region Normal Search
+
+            if ( !string.IsNullOrEmpty( csm.Query ) )
+            {
+                query = string.Format( @"{0} AND (u1.[Cell] LIKE '%{1}%' OR
+                                                  u1.[Name] LIKE '%{1}%' OR
+                                                  u1.[Email] LIKE '%{1}%' OR
+                                                  u1.[Surname] LIKE '%{1}%' OR
+                                                  u2.[Cell] LIKE '%{1}%' OR
+                                                  u2.[Name] LIKE '%{1}%' OR
+                                                  u2.[Email] LIKE '%{1}%' OR
+                                                  u2.[Surname] LIKE '%{1}%' OR
+                                                  cl.[LoadNumber] LIKE '%{1}%' OR
+                                                  cl.[DeliveryNote] LIKE '%{1}%' OR
+                                                  cl.[ClientDescription] LIKE '%{1}%' OR
+                                                  ca.[Code] LIKE '%{1}%' OR
+                                                  s.[Name] LIKE '%{1}%' OR
+                                                  t.[Name] LIKE '%{1}%'
+                                                 ) ", query, csm.Query.Trim() );
+            }
+
+            #endregion
+
+            // ORDER
+
+            query = $"{query} ORDER BY {pm.SortBy} {pm.Sort}";
+
+            // SKIP, TAKE
+
+            query = $"{query} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ";
+
+            return context.Database.SqlQuery<AuthorizationCodeAuditModel>( query, parameters.ToArray() ).ToList();
+        }
     }
 }

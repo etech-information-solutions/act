@@ -18,7 +18,8 @@
 
             <span style="padding-right: 5px;">Show</span>
 
-            <select id="data-page-length" data-page-length="1" data-target="#item-list" data-url="@Request.RawUrl">
+            <select id="data-page-length" data-page-length="1" data-target="#@action" data-url="@Request.RawUrl">
+                <option value="10">10</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
                 <option value="500">500</option>

@@ -375,7 +375,7 @@ namespace ACT.UI.Controllers
                     {
                         List<DeclineReason> declineReasons = service.List( pm, csm );
 
-                        if ( declineReasons != null && declineReasons.Any() )
+                        if ( declineReasons.NullableAny() )
                         {
                             foreach ( DeclineReason item in declineReasons )
                             {
@@ -386,6 +386,184 @@ namespace ACT.UI.Controllers
                                                     "\"" + item.CreatedOn + "\"",
                                                     "\"" + item.Description + "\"",
                                                     "\"" + status.GetDisplayText() + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "podperuser":
+
+                    #region POD Per User
+
+                    csv = string.Format( "User Name, PODs Uploaded, Upload Date {0}", Environment.NewLine );
+
+                    using ( ClientLoadService clservice = new ClientLoadService() )
+                    {
+                        pm.Sort = ( pm.SortBy == "CreatedOn" ) ? "DESC" : pm.Sort;
+                        pm.SortBy = ( pm.SortBy == "CreatedOn" ) ? "UploadDate" : pm.SortBy;
+
+                        List<PODPerUserModel> podsPerUser = clservice.ListPODPerUser( pm, csm );
+
+                        if ( podsPerUser.NullableAny() )
+                        {
+                            foreach ( PODPerUserModel item in podsPerUser )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3} {4}",
+                                                    csv,
+                                                    "\"" + item.UserName + "\"",
+                                                    "\"" + item.PODsUploaded + "\"",
+                                                    "\"" + item.UploadDate.ToString( "dd/MM/yyyy" ) + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "poduploadlog":
+
+                    #region POD Upload Log
+
+                    csv = string.Format( "User Name, Load Number, Deliver Note Number, Site, Upload Date Time, POD Download Link (s) {0}", Environment.NewLine );
+
+                    using ( ClientLoadService clservice = new ClientLoadService() )
+                    {
+                        pm.Sort = ( pm.SortBy == "CreatedOn" ) ? "DESC" : pm.Sort;
+                        pm.SortBy = ( pm.SortBy == "CreatedOn" ) ? "PODCommentDate" : pm.SortBy;
+
+                        List<PODUploadLogModel> podUploadLog = clservice.ListPODUploadLog( pm, csm );
+
+                        if ( podUploadLog.NullableAny() )
+                        {
+                            foreach ( PODUploadLogModel item in podUploadLog )
+                            {
+                                string[] podLinks = item.PODLinks?.Split( ',' );
+
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6} {7}",
+                                                    csv,
+                                                    "\"" + item.UserName + "\"",
+                                                    "\"" + item.LoadNumber + "\"",
+                                                    "\"" + item.DeliveryNote + "\"",
+                                                    "\"" + item.ToSiteName + "\"",
+                                                    "\"" + item.PODCommentDate.ToString( "dd/MM/yyyy HH:mm:ss" ) + "\"",
+                                                    "\"" + string.Join( ", ", podLinks.Select( s => $"{CurrentUrl}/Account/ViewImage/{s}" ) ) + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "authorizationcodeaudit":
+
+                    #region Authorization Code Audit
+
+                    csv = string.Format( "Pallet Auth Code,Pallet Auth By,Load Edited By User Name,Event Date,Load Number,Delivery Note Number,Customer,Transporter,Site {0}", Environment.NewLine );
+
+                    using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
+                    {
+                        pm.Sort = ( pm.SortBy == "CreatedOn" ) ? "DESC" : pm.Sort;
+                        pm.SortBy = ( pm.SortBy == "CreatedOn" ) ? "u1.[Name] + ' ' + u1.[Surname]" : pm.SortBy;
+
+                        List<AuthorizationCodeAuditModel> authLog = caservice.ListAuthorizationCodeAudit( pm, csm );
+
+                        if ( authLog.NullableAny() )
+                        {
+                            foreach ( AuthorizationCodeAuditModel item in authLog )
+                            {
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9} {10}",
+                                                    csv,
+                                                    "\"" + item.AuthorisationCode + "\"",
+                                                    "\"" + item.AuthorizerName + "\"",
+                                                    "\"" + item.LastEditedByName + "\"",
+                                                    "\"" + item.AuthorisationDate.ToString( "dd/MM/yyyy HH:mm:ss" ) + "\"",
+                                                    "\"" + item.LoadNumber + "\"",
+                                                    "\"" + item.DeliveryNote + "\"",
+                                                    "\"" + item.CustomerName + "\"",
+                                                    "\"" + item.TransporterName + "\"",
+                                                    "\"" + item.ToSiteName + "\"",
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "auditlogperuser":
+
+                    #region Audit Log Per User
+
+                    csv = string.Format( "Enquiry Log User,User Role,Event Date,Load ID,Pallet Date,GLID,Supplier,Load Number,Document Type,Customer,Region From,Region To,PCN,Other Reference,Transporter Order Number,Comment,Transporter,Transporter Number,Truck Reg,Truck Number,Pallet Return Note,Pallet Transfer Hire Note,Pallet Notes,Debtors Code,Site,Pallet Authorization By,Pallet Authorization Code,Load Type,Pallet Return Date,Delivery Note,Invoice Number,Customer Order Number,Delivery Date,Customer Acc Num,Sales Order Number,Load Sheet Number,ACT Ctrl Doc Num,Act Return Control Number,GRV Number,Depot STO Number,GRV Date {0}", Environment.NewLine );
+
+                    using ( AuditLogService alservice = new AuditLogService() )
+                    {
+                        pm.Sort = ( pm.SortBy == "CreatedOn" ) ? "DESC" : pm.Sort;
+                        pm.SortBy = ( pm.SortBy == "CreatedOn" ) ? "u1.[Name] + ' ' + u1.[Surname]" : pm.SortBy;
+
+                        List<ClientLoadAuditLogModel> clientLoadAudits = alservice.ListClientLoadAuditLogPerUser( pm, csm );
+
+                        if ( clientLoadAudits.NullableAny() )
+                        {
+                            foreach ( ClientLoadAuditLogModel item in clientLoadAudits )
+                            {
+                                string loadType = "THAN";
+
+                                if ( item.ClientLoad?.CustomerType?.ToUpper()?.Contains( "EXCHANGE" ) == true || item.ClientLoad?.ReceiverNumber?.StartsWith( "50000" ) == true || item.ClientLoad?.ReceiverNumber?.StartsWith( "52" ) == true || item.ClientLoad?.ReceiverNumber?.StartsWith( "51" ) == true )
+                                {
+                                    loadType = "PCN";
+                                }
+                                else if ( item?.ExtendedClientLoad?.Id > 0 && ( DocumentType ) item?.ExtendedClientLoad?.DocumentType == DocumentType.ACTControlDoc )
+                                {
+                                    loadType = "OTHER";
+                                }
+
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29},{30},{31},{32},{33},{34},{35} {36}",
+                                                    csv,
+                                                    "\"" + item.AuditUserName + "\"",
+                                                    "\"" + item.AuditUserRole + "\"",
+                                                    "\"" + item.AuditLogCreatedOn?.ToString( "dd/MM/yyyy HH:mm:ss" ) + "\"",
+                                                    "\"" + item.ClientLoad?.Id + "\"",
+                                                    "\"" + item.ClientLoad?.EffectiveDate?.ToString( "dd/MM/yyyy HH:mm:ss" ) + "\"",
+                                                    "\"" + item.ClientLoad?.GLID + "\"",
+                                                    "\"" + item.FromSiteName + "\"",
+                                                    "\"" + item.ClientLoad?.LoadNumber + "\"",
+                                                    "\"" + ( ( item.ExtendedClientLoad != null && item.ExtendedClientLoad?.DocumentType > -1 ? ( DocumentType ) item.ExtendedClientLoad?.DocumentType : DocumentType.None ).GetDisplayText() ) + "\"",
+                                                    "\"" + item.ClientLoad?.ClientDescription + "\"",
+                                                    "\"" + item.FromRegionCode + "\"",
+                                                    "\"" + item.ToRegionCode + "\"",
+                                                    "\"" + item.ClientLoad?.PCNNumber + "\"",
+                                                    "\"" + item.ExtendedClientLoad?.OtherRef + "\"",
+                                                    "",
+                                                    "\"" + item.PODComment + "\"",
+                                                    "\"" + item.TransporterName + "\"",
+                                                    "\"" + item.TransporterNumber + "\"",
+                                                    "\"" + item.VehicleRegistration + "\"",
+                                                    "\"" + item.VehicleFleetNumber + "\"",
+                                                    "\"" + item.ExtendedClientLoad?.PalletReturnSlipNo + "\"",
+                                                    "",
+                                                    "\"" + item.ClientLoad?.ClientLoadNotes + "\"",
+                                                    "\"" + item.DebtorsCode + "\"",
+                                                    "\"" + item.ToSiteName + "\"",
+                                                    "\"" + item.AuthorizerName + "\"",
+                                                    "\"" + item.AuthorizationCode + "\"",
+                                                    "\"" + loadType + "\"",
+                                                    "\"" + item.ExtendedClientLoad?.PalletReturnDate?.ToString( "dd/MM/yyyy HH:mm:ss" ) + "\"",
+                                                    "\"" + item.ClientLoad?.DeliveryNote + "\"",
+                                                    "\"" + item.ClientLoad?.PODNumber + "\"",
+                                                    "\"" + item.ExtendedClientLoad?.Ref + "\"",
+                                                    "\"" + item.ExtendedClientLoad?.DeliveryDate?.ToString( "dd/MM/yyyy HH:mm:ss" ) + "\"",
+                                                    "\"" + item.CustomerAccountNumber + "\"",
+                                                    "\"" + item.ClientLoad?.ReferenceNumber + "\"",
                                                     Environment.NewLine );
                             }
                         }
@@ -4818,6 +4996,182 @@ namespace ACT.UI.Controllers
             ClientLoadViewModel model = new ClientLoadViewModel() { EditMode = true };
 
             return View( "OldDataImport", model );
+        }
+
+        //
+        // GET: /Administration/PODPerUser
+        public ActionResult PODPerUser( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            ViewBag.ViewName = "PODPerUser";
+
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "PODPerUser";
+
+                return PartialView( "_PODPerUserCustomSearch", new CustomSearchModel( "PODPerUser" ) );
+            }
+
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            {
+                pm.Sort = ( pm.SortBy == "CreatedOn" ) ? "DESC" : pm.Sort;
+                pm.SortBy = ( pm.SortBy == "CreatedOn" ) ? "UploadDate" : pm.SortBy;
+
+                List<PODPerUserModel> model = clservice.ListPODPerUser( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : clservice.PODPerUserCountTotal( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_PODPerUser", paging );
+            }
+        }
+
+        //
+        // GET: /Administration/PODUploadLog
+        public ActionResult PODUploadLog( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            ViewBag.ViewName = "PODUploadLog";
+
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "PODUploadLog";
+
+                return PartialView( "_PODUploadLogCustomSearch", new CustomSearchModel( "PODUploadLog" ) );
+            }
+
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            {
+                pm.Sort = ( pm.SortBy == "CreatedOn" ) ? "DESC" : pm.Sort;
+                pm.SortBy = ( pm.SortBy == "CreatedOn" ) ? "PODCommentDate" : pm.SortBy;
+
+                List<PODUploadLogModel> model = clservice.ListPODUploadLog( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : clservice.PODUploadLogTotal( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_PODUploadLog", paging );
+            }
+        }
+
+        //
+        // GET: /Administration/AuthorizationCodeAudit
+        public ActionResult AuthorizationCodeAudit( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            ViewBag.ViewName = "AuthorizationCodeAudit";
+
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "AuthorizationCodeAudit";
+
+                return PartialView( "_AuthorizationCodeAuditLogCustomSearch", new CustomSearchModel( "AuthorizationCodeAudit" ) );
+            }
+
+            using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
+            {
+                pm.Sort = ( pm.SortBy == "CreatedOn" ) ? "DESC" : pm.Sort;
+                pm.SortBy = ( pm.SortBy == "CreatedOn" ) ? "u1.[Name] + ' ' + u1.[Surname]" : pm.SortBy;
+
+                List<AuthorizationCodeAuditModel> model = caservice.ListAuthorizationCodeAudit( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : caservice.AuthorizationCodeAuditTotal( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_AuthorizationCodeAudit", paging );
+            }
+        }
+
+        //
+        // GET: /Administration/AuditLogPerUser
+        public ActionResult AuditLogPerUser( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            ViewBag.ViewName = "AuditLogPerUser";
+
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "AuditLogPerUser";
+
+                return PartialView( "_AuditLogPerUserCustomSearch", new CustomSearchModel( "AuditLogPerUser" ) );
+            }
+
+            using ( AuditLogService alservice = new AuditLogService() )
+            {
+                pm.Sort = ( pm.SortBy == "CreatedOn" ) ? "DESC" : pm.Sort;
+                pm.SortBy = ( pm.SortBy == "CreatedOn" ) ? "u1.[Name] + ' ' + u1.[Surname]" : pm.SortBy;
+
+                List<ClientLoadAuditLogModel> model = alservice.ListClientLoadAuditLogPerUser( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : alservice.ClientLoadAuditLogPerUserTotal( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_AuditLogPerUser", paging );
+            }
+        }
+
+        //
+        // GET: /Administration/KPIReportFilterTotal
+        public int KPIReportFilterTotal( PagingModel pm, CustomSearchModel csm )
+        {
+            int total = 0;
+
+            switch ( csm.KPIReportFilterType )
+            {
+                case "PODPerUser":
+
+                    #region PODs Per User Count
+
+                    using ( ClientLoadService clservice = new ClientLoadService() )
+                    {
+                        total = clservice.PODPerUserCountTotal( pm, csm );
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "PODUploadLog":
+
+                    #region Granular POD Upload Log
+
+                    using ( ClientLoadService clservice = new ClientLoadService() )
+                    {
+                        total = clservice.PODUploadLogTotal( pm, csm );
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "AuthorizationCodeAudit":
+
+                    #region Authorization Codes Audit
+
+                    using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
+                    {
+                        total = caservice.AuthorizationCodeAuditTotal( pm, csm );
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "AuditLogPerUser":
+
+                    #region Audit Log Per User
+
+                    using ( AuditLogService alservice = new AuditLogService() )
+                    {
+                        total = alservice.ClientLoadAuditLogPerUserTotal( pm, csm );
+                    }
+
+                    #endregion
+
+                    break;
+            }
+
+            return total;
         }
 
         #endregion

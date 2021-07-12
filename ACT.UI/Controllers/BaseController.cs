@@ -78,6 +78,11 @@ namespace ACT.UI.Controllers
             VariableExtension.SetRules();
 
             ViewBag.SystemRules = ConfigSettings.SystemRules;
+
+            using ( ClientService cservice = new ClientService() )
+            {
+                ViewBag.ClientOptions = cservice.List( true );
+            }
         }
 
         public BaseController( string fileName )

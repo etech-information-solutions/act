@@ -28,10 +28,16 @@
                 transition: all 0.4s ease-in 0s;
             }
 
-            .menu ul li.current, .menu ul li:hover {
-                background: #f5f5f5;
-                border-left: 2px solid #ff1e12;
-            }
+                .menu ul li a.select2-choice {
+                    font-size: 11px;
+                    font-weight: normal;
+                    text-transform: none;
+                }
+
+                .menu ul li.current, .menu ul li:hover {
+                    background: #f5f5f5;
+                    border-left: 2px solid #ff1e12;
+                }
 
                 .menu ul li.current a, .menu ul li a:hover {
                     color: #002e70;

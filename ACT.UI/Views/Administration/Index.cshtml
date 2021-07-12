@@ -1,6 +1,6 @@
 ﻿
-@using ACT.Core.Enums;
 @using ACT.Core.Models;
+@using ACT.Core.Models.Filter;
 
 @{
     ViewBag.Title = "Administration";
@@ -30,15 +30,15 @@
         </li>
 
         @*@if (user.IsAdmin)
-        {*@
+            {*@
         <li data-hot-spot="1" data-c="Administration" data-t="Products" class="none">
             <a data-ap-tab="1" data-target="#products" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Products">Products</a>
         </li>
         @*}*@
 
         @*<li data-hot-spot="1" data-c="Administration" data-t="Clients" class="none">
-            <a data-ap-tab="1" data-target="#clients" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Clients">Clients</a>
-        </li>*@
+                <a data-ap-tab="1" data-target="#clients" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Clients">Clients</a>
+            </li>*@
 
         <li data-hot-spot="1" data-c="Administration" data-t="AuditLog" class="none">
             <a data-ap-tab="1" data-target="#auditlog" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="AuditLog">Audit Log</a>
@@ -67,6 +67,13 @@
             <a data-ap-tab="1" data-target="#olddataimport" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="OldDataImport">Old Data Import</a>
         </li>
 
+        @if ( user.IsAdmin || user.IsPSPAdmin )
+        {
+            <li data-hot-spot="1" data-c="Administration" data-t="PODPerUser" class="none">
+                <a data-ap-tab="1" data-target="#podperuser" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PODPerUser">KPI Reports</a>
+            </li>
+        }
+
         <li class="last"></li>
     </ul>
 
@@ -80,6 +87,7 @@
 
 
         <div id="products" class="da-tab none" data-load-url="Products"> </div>
+
         @if ( user.IsAdmin )
         {
             <div id="roles" class="da-tab none" data-load-url="Roles"> </div>
@@ -101,7 +109,16 @@
 
         <div id="olddataimport" class="da-tab none" data-load-url="OldDataImport"> </div>
 
+        @if ( user.IsAdmin || user.IsPSPAdmin )
+        {
+            @Html.Partial( "_KPIReportFilter", new KPIReportFilterModel() )
+
+            <div id="podperuser" class="da-tab none kpi-reports-data" data-load-url="PODPerUser"> </div>
+            <div id="poduploadlog" class="da-tab none kpi-reports-data" data-load-url="PODUploadLog"> </div>
+            <div id="authorizationcodeaudit" class="da-tab none kpi-reports-data" data-load-url="AuthorizationCodeAudit"> </div>
+            <div id="auditlogperuser" class="da-tab none kpi-reports-data" data-load-url="AuditLogPerUser"> </div>
+        }
+
     </div>
 
 </div>
-

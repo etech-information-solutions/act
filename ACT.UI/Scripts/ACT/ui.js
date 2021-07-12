@@ -27,6 +27,8 @@
 
         PageStayAliveTimer: [],
 
+        PageKPIReportsTimer: [],
+
         SelectedItems: [],
 
         PageErrorOcurred: false,
@@ -149,7 +151,8 @@
             this.DataClientLoadStatus( $( '*[data-client-load-status="1"]' ) );
 
             // Body Keypress
-            this.DataSetClient( $( window ), 113 );
+            this.DataSelectClient( $( window ), 113 );
+            this.DataSetClient( $( '*[data-select-client="1"]' ) );
 
 
             // Client Load Buttons
@@ -166,6 +169,9 @@
             // Chep Load Buttons
             this.DataChepLoadJournal( $( '*[data-chepload-journal="1"]' ) );
             this.DataChepLoadShipment( $( '*[data-chepload-shipment="1"]' ) );
+
+            // KPI Reports
+            this.DataFilter( $( '*[data-filter="1"]' ) );
 
             if ( window.location.search !== "" && !$( "tr.edit" ).length && $( ".dataTable" ).length && !ACT.UI.PageViewIdProcessed )
             {
@@ -405,6 +411,16 @@
                         holder.find( ">div.current" ).css( "display", "none" );
 
                         i.addClass( "current" );
+
+                        if ( i.attr( "data-target" ) == "#podperuser" || i.attr( "data-target" ) == "#poduploadlog" || i.attr( "data-target" ) == "#authorizationcodeaudit" || i.attr( "data-target" ) == "#auditlogperuser" )
+                        {
+                            $( "#kpi-report-filters" ).css( "display", "block" );
+                        }
+                        else
+                        {
+                            $( ".kpi-reports-data" ).css( "display", "none" );
+                            $( "#kpi-report-filters" ).css( "display", "none" );
+                        }
 
                         if ( target.find( "table.fixedHeader-floating" ).length > 0 )
                         {
@@ -3611,7 +3627,7 @@
                 title = "Bank Account Details Validation";
                 msg = "<p>";
                 msg += " Please wait whilst we validate the provided Bank Account details...";
-                msg += ' <img id="loader" class="apcloud-loader" src="' + imgurl + '/images/loader.gif" alt="" style="margin: 0 5px;" />';
+                msg += ' <img id="loader" class="ACT-loader" src="' + imgurl + '/images/loader.gif" alt="" style="margin: 0 5px;" />';
                 msg += "</p>";
 
                 var d = { accountNo: acc.val(), branchCode: bcode.val(), accountType: accType.val() };
@@ -5510,7 +5526,7 @@
 
         DataSettingClient: false,
 
-        DataSetClient: function ( sender, code )
+        DataSelectClient: function ( sender, code )
         {
             sender.bind( "keydown", function ( e )
             {
@@ -5584,6 +5600,26 @@
                     } );
 
                 }, 1000 );
+            } );
+        },
+
+        DataSetClient: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        ACT.Loader.Show( $( "#s-c-loader" ), true );
+
+                        $( "<div />" ).load( siteurl + "/SetClient", { id: $( this ).val() }, function ()
+                        {
+                            window.location.reload();
+                        } );
+                    } );
             } );
         },
 
@@ -5963,6 +5999,127 @@
                         update.val( ( sum - s ) );
                     } );
             } );
-        }
+        },
+
+        DataFilter: function ( sender )
+        {
+            if ( typeof ( window.location.hash ) === 'undefined' && $( ".ap-tabs" ).length )
+            {
+                window.location.hash = $( '[data-ap-tab="1"]:first' ).attr( "data-target" );
+            }
+
+            var hash = window.location.hash != "" ? window.location.hash.replace( "#", "" ) : "podperuser";
+
+            if ( hash != "podperuser" && hash != "poduploadlog" && hash != "authorizationcodeaudit" && hash != "auditlogperuser" )
+            {
+                return;
+            }
+
+            var papa = sender.first().parent();
+
+            if ( !papa.is( ":visible" ) )
+            {
+                papa.slideDown( 900 );
+            }
+
+            params = ACT.UI.GetCustomSearchParams( hash );
+
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var loaded = i.attr( "data-loaded" );
+
+                if ( loaded == "1" ) return;
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        window.location.hash = i.attr( "data-type" ).toLowerCase();
+
+                        sender.removeClass( "current" );
+
+                        i.addClass( "current" );
+
+                        var left = i.position().left + ( i.outerWidth() / 2 );
+
+                        papa.css( "background", "url('" + imgurl + "/Images/arrow-top.png') no-repeat " + left + "px bottom" );
+
+                        if ( i.attr( "data-list-loaded" ) == "1" )
+                        {
+                            $( ".kpi-reports-data" ).css( "display", "none" );
+                            $( "#" + i.attr( "data-type" ).toLowerCase() ).fadeIn( 900 );
+
+                            return;
+                        }
+
+                        ACT.UI.LoadFilter( i, $( "#" + i.attr( "data-type" ).toLowerCase() ), params );
+                    } );
+
+                if ( loaded === "1" ) return;
+
+                i.attr( "data-loaded", "1" );
+
+                ACT.UI.LoadFilterTotal( i, params );
+            } );
+
+            clearTimeout( ACT.UI.PageKPIReportsTimer );
+
+            ACT.UI.PageKPIReportsTimer = setTimeout( function ()
+            {
+                var active = papa.find( ".current" );
+
+                if ( !active.length )
+                {
+                    sender.first().addClass( "current" );
+
+                    active = sender.first();
+                }
+
+                if ( !active.length )
+                {
+                    return;
+                }
+
+                var left = active.position().left + ( active.outerWidth() / 2 );
+
+                papa.css( "background", "url('" + imgurl + "/Images/arrow-top.png') no-repeat " + left + "px bottom" );
+            }, 1000 );
+        },
+
+        LoadFilter: function ( sender, target, params )
+        {
+            ACT.Loader.Show( sender.find( "b" ), true );
+
+            target.load( siteurl + sender.attr( "data-type" ), params, function ()
+            {
+                sender.attr( "data-list-loaded", 1 );
+
+                $( ".kpi-reports-data" ).css( "display", "none" );
+                $( "#" + sender.attr( "data-type" ).toLowerCase() ).fadeIn( 900, function ()
+                {
+                    ACT.Loader.Hide();
+                    ACT.Init.Start( true );
+                } );
+
+            } );
+        },
+
+        LoadFilterTotal: function ( sender, params )
+        {
+            if ( !sender.find( ".spinning" ).length )
+            {
+                var loader = "<img class='spinning' src='" + imgurl + "/Images/loader.gif' style='margin: 0px 0px -1px 3%;' />";
+
+                sender.find( "b" ).text( "" ).append( loader );
+            }
+
+            params.KPIReportFilterType = sender.attr( "data-type" );
+
+            sender.find( "b" ).load( siteurl + "/KPIReportFilterTotal", params, function ()
+            {
+            } );
+        },
     };
 } )();

@@ -1,0 +1,107 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Models;
+
+@Html.Partial( "_Notification" )
+
+@{
+    int count = Model.Start;
+    List<AuthorizationCodeAuditModel> items = ( List<AuthorizationCodeAuditModel> ) Model.Items;
+
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_AuthorizationCodeAudit";
+}
+
+@if ( !items.NullableAny() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Authorization Codes Audits available matching your search criteria.
+    </div>
+}
+
+<table id="authorization-code-audit-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#authorization-code-audit-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="AuthorisationCode" data-column="AuthorisationCode">
+                Pallet Auth Code
+            </th>
+            <th data-name="AuthorizerName" data-column="AuthorizerName">
+                Pallet Auth By
+            </th>
+            <th data-name="LastEditedByName" data-column="LastEditedByName">
+                Load Edited By User Name
+            </th>
+            <th data-name="AuthorisationDate" data-column="AuthorisationDate">
+                Event Date
+            </th>
+            <th data-name="LoadNumber" data-column="LoadNumber">
+                Load #
+            </th>
+            <th data-name="DeliveryNote" data-column="DeliveryNote">
+                Delivery Note #
+            </th>
+            <th data-name="CustomerName" data-column="CustomerName">
+                Customer
+            </th>
+            <th data-name="TransporterName" data-column="TransporterName">
+                Transporter
+            </th>
+            <th data-name="ToSiteName" data-column="ToSiteName">
+                Site
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( items.NullableAny() )
+        {
+            foreach ( AuthorizationCodeAuditModel item in items )
+            {
+                <tr id="tr-@item.Id-authorization-code-audit" class="tr-@item.Id-authorization-code-audit">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.AuthorisationCode
+                    </td>
+                    <td>
+                        @item.AuthorizerName
+                    </td>
+                    <td>
+                        @item.LastEditedByName
+                    </td>
+                    <td>
+                        @item.AuthorisationDate.ToString( "dd/MM/yyyy @ HH:mm:ss" )
+                    </td>
+                    <td>
+                        @item.LoadNumber
+                    </td>
+                    <td>
+                        @item.DeliveryNote
+                    </td>
+                    <td>
+                        @item.CustomerName
+                    </td>
+                    <td>
+                        @item.TransporterName
+                    </td>
+                    <td>
+                        @item.ToSiteName
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )

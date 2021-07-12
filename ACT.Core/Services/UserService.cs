@@ -133,9 +133,6 @@ namespace ACT.Core.Services
         public Dictionary<int, string> List( bool simple = true, RoleType roleType = RoleType.All )
         {
             Dictionary<int, string> userOptions = new Dictionary<int, string>();
-            List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
-
-            List<object> parameters = new List<object>();
 
             string query = string.Empty;
 
@@ -156,7 +153,7 @@ namespace ACT.Core.Services
                 query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE u.Id=cu.UserId AND cu.ClientId IN({string.Join( ",", CurrentUser.Clients.Select( s => s.Id ) )})) ";
             }
 
-            model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();
+            List<IntStringKeyValueModel> model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim() ).ToList();
 
             if ( model != null && model.Any() )
             {

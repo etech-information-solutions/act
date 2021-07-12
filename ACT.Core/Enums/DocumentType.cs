@@ -6,7 +6,7 @@ namespace ACT.Core.Enums
     [StringEnum]
     public enum DocumentType
     {
-        [StringEnumDisplayText( "None" )]
+        [StringEnumDisplayText( "N/A" )]
         None = -1,
 
         [StringEnumDisplayText( "ACT Control Doc" )]
