@@ -78,11 +78,6 @@ namespace ACT.UI.Controllers
             VariableExtension.SetRules();
 
             ViewBag.SystemRules = ConfigSettings.SystemRules;
-
-            using ( ClientService cservice = new ClientService() )
-            {
-                ViewBag.ClientOptions = cservice.List( true );
-            }
         }
 
         public BaseController( string fileName )
@@ -116,7 +111,7 @@ namespace ACT.UI.Controllers
         {
             if ( Request.IsAuthenticated )
             {
-                this.CurrentUser = this.GetUser( User.Identity.Name );
+                CurrentUser = GetUser( User.Identity.Name );
             }
         }
 
@@ -153,11 +148,16 @@ namespace ACT.UI.Controllers
                 {
                     try
                     {
-                        this.InitCurrentUser();
+                        InitCurrentUser();
                     }
                     catch ( Exception ex )
                     {
 
+                    }
+
+                    using ( ClientService cservice = new ClientService() )
+                    {
+                        ViewBag.ClientOptions = cservice.List( true );
                     }
                 }
 
