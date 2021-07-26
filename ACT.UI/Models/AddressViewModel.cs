@@ -65,8 +65,6 @@ namespace ACT.UI.Models
         {
             get
             {
-                if ( !EditMode ) return null;
-
                 using ( ProvinceService pservice = new ProvinceService() )
                 {
                     return pservice.List( true );

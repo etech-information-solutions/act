@@ -50,7 +50,7 @@ namespace ACT.UI.Controllers
 
                     #region Client Data
 
-                    csv = string.Format( "Load Date,CHEP Account/GLID Number,Supplier From,Shipment Number,Customer To,Quantity,Comment,Status,Transporter,Vehicle,Invoice Number {0}", Environment.NewLine );
+                    csv = string.Format( "Client,Load Date,CHEP Account/GLID Number,Supplier From,Shipment Number,Customer To,Quantity,Comment,Status,Transporter,Vehicle,Invoice Number {0}", Environment.NewLine );
 
                     using ( ClientLoadService clservice = new ClientLoadService() )
                     {

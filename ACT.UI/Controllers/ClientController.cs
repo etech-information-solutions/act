@@ -1996,7 +1996,7 @@ namespace ACT.UI.Controllers
                 EditMode = true,
                 Clients = new List<ClientCustomer>(),
                 SiteBudgets = new List<SiteBudget>(),
-                Address = new AddressViewModel()
+                Address = new AddressViewModel() { EditMode = true }
             };
 
             return View( model );
@@ -2282,6 +2282,7 @@ namespace ACT.UI.Controllers
 
                     Clients = new List<ClientCustomer>(),
                     SiteBudgets = new List<SiteBudget>(),
+                    Address = new AddressViewModel() { EditMode = true },
                     ClientId = site.ClientSites.FirstOrDefault()?.ClientCustomer?.ClientId ?? 0,
                 };
 
