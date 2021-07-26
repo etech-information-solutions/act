@@ -17,21 +17,53 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public ClientSite()
         {
-            this.ClientAuthorisations = new HashSet<ClientAuthorisation>();
+            this.ChepLoads = new HashSet<ChepLoad>();
+            this.ChepLoadJournals = new HashSet<ChepLoadJournal>();
+            this.DeliveryNotes = new HashSet<DeliveryNote>();
+            this.ExtendedClientLoads = new HashSet<ExtendedClientLoad>();
+            this.ClientLoads = new HashSet<ClientLoad>();
+            this.ClientLoads1 = new HashSet<ClientLoad>();
         }
     
         public int Id { get; set; }
-        public int ClientId { get; set; }
+        public int ClientCustomerId { get; set; }
         public int SiteId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public string AccountingCode { get; set; }
         public int Status { get; set; }
+        public string GLIDNo { get; set; }
+        public Nullable<int> SiteType { get; set; }
+        public string KAMName { get; set; }
+        public string KAMContact { get; set; }
+        public string KAMEmail { get; set; }
+        public string ClientSalesManager { get; set; }
+        public string ClientManagerContact { get; set; }
+        public string ClientManagerEmail { get; set; }
+        public string ClientSalesRep { get; set; }
+        public string ClientSalesRepContact { get; set; }
+        public string ClientSalesRegEmail { get; set; }
+        public string ClientCustomerNumber { get; set; }
+        public string LiquorLicenceNumber { get; set; }
+        public string ClientSiteCode { get; set; }
+        public string AuthorisationEmail1 { get; set; }
+        public string AuthorisationEmail2 { get; set; }
+        public string AuthorisationEmail3 { get; set; }
     
-        public virtual Client Client { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
+        public virtual ICollection<ChepLoad> ChepLoads { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChepLoadJournal> ChepLoadJournals { get; set; }
+        public virtual ClientCustomer ClientCustomer { get; set; }
         public virtual Site Site { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<DeliveryNote> DeliveryNotes { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ExtendedClientLoad> ExtendedClientLoads { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoad> ClientLoads { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoad> ClientLoads1 { get; set; }
     }
 }

@@ -1,0 +1,61 @@
+﻿@model CustomSearchModel
+
+@using ACT.Core.Models
+
+@Html.Partial( "_Notification" )
+
+<p>
+    You can uncheck laods you would like to exclude from the manually matched laods below and click Save Changes.
+</p>
+
+<div id="chep-loads" class="left" style="width: 52%; margin-right: 1%; color: #848484;">
+
+    <div style="padding: 10px; border: 1px solid #cacaca; text-transform: uppercase; position: relative; background: #eee; border-bottom: 0; border-top-left-radius: 4px; border-top-right-radius: 4px;">
+
+        <div class="left" style="margin-top: 8px;">
+            Pooling Loads <span id="sel-count">(@( ( ( PagingExtension ) ViewBag.ChepLoads ).Total ))</span> <span id="loader"></span>
+        </div>
+
+        <div class="clear"></div>
+    </div>
+
+    <div id="chep-loads-data" class="list-data">
+
+        @Html.Partial( "_ManuallyReconciledChepLoads", ( PagingExtension ) ViewBag.ChepLoads )
+
+    </div>
+
+</div>
+
+<div id="client-loads" class="right" style="width: 46%; color: #848484;">
+
+    <div style="padding: 10px; border: 1px solid #cacaca; text-transform: uppercase; position: relative; background: #eee; border-bottom: 0; border-top-left-radius: 4px; border-top-right-radius: 4px;">
+
+        <div class="left" style="margin-top: 8px;">
+            Client Loads <span id="sel-count">(@( ( ( PagingExtension ) ViewBag.ClientLoads ).Total ))</span> <span id="loader"></span>
+        </div>
+
+        <div class="clear"></div>
+    </div>
+
+    <div id="client-loads-data" class="list-data">
+
+        @Html.Partial( "_ManuallyReconciledClientLoads", ( PagingExtension ) ViewBag.ClientLoads )
+
+    </div>
+
+</div>
+
+<div class="clear">&nbsp;</div>
+
+<p>
+    <button class="auto-recon manual-recon" data-chep="#chep-loads" data-client="#client-loads" data-manual-recon="1" data-uid="@Model.ManuallyMatchedUID" style="display: inline-block;">
+        Save Changes
+    </button>
+
+    <span style="padding: 0 10px;">/</span>
+
+    <a onclick="ACT.Modal.Close();">
+        Cancel
+    </a>
+</p>

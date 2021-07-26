@@ -18,7 +18,7 @@
 @{
     UserModel user = User.Get();
 
-    Int32 count = Model.Start;
+    int count = Model.Start;
     List<PSPCustomModel> items = ( List<PSPCustomModel> ) Model.Items;
 }
 
@@ -92,8 +92,8 @@
                 PSPClientStatus status = ( PSPClientStatus ) item.Status;
                 ServiceType serviceType = ( ServiceType ) item.ServiceRequired;
 
-                String enable = status == PSPClientStatus.Verified ? "Disable" : "Enable";
-                String active = status == PSPClientStatus.Verified ? "active" : status == PSPClientStatus.Unverified ? "pending" : "inactive";
+                string enable = status == PSPClientStatus.Verified ? "Disable" : "Enable";
+                string active = status == PSPClientStatus.Verified ? "active" : status == PSPClientStatus.Unverified ? "pending" : "inactive";
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
@@ -164,8 +164,7 @@
                         @if ( status == PSPClientStatus.Unverified && user.IsAdmin )
                         {
                             <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
-                                @Html.ActionLink( "Approve", "ApprovePSP", new { id = item.Id, returnView = "PSPs" }, new { @class = "approve", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                                @Html.ActionLink( "Decline", "DeclinePSP", new { id = item.Id, returnView = "PSPs" }, new { @class = "decline", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                                @Html.ActionLink( "Approve / Decline", "ApproveDeclinePSP", new { id = item.Id, returnView = "PSPs" }, new { @class = "approve", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
                             </div>
                         }
 
@@ -199,7 +198,7 @@
                                 </div>
                             }
 
-                            @if ( status != PSPClientStatus.Unverified && user.IsAdmin )
+                            @if ( status != PSPClientStatus.Unverified )
                             {
                                 @Html.ActionLink( "Config", "PSPConfig", new { id = item.Id, returnView = "PSPs" }, new { @class = "setting", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
                             }

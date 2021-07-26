@@ -1,0 +1,165 @@
+﻿@model List<ClientBudget>
+
+@using ACT.Data.Models;
+
+
+@Html.Partial( "_Notification" )
+
+<div class="editor-label" style="margin-bottom: 10px;">
+
+    <p>
+        <strong class="uppercase">Budgets</strong>
+    </p>
+
+</div>
+
+<div class="editor-field">
+
+    <table id="client-budget-table" class="da-table">
+
+        <thead>
+            <tr>
+                <th>Budget Year</th>
+                <th>Total</th>
+                <th>Jan</th>
+                <th>Feb</th>
+                <th>Mar</th>
+                <th>Apr</th>
+                <th>May</th>
+                <th>Jun</th>
+                <th>Jul</th>
+                <th>Aug</th>
+                <th>Sep</th>
+                <th>Oct</th>
+                <th>Nov</th>
+                <th>Dec</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @if ( Model.NullableAny() )
+            {
+                int count = 0;
+
+                foreach ( ClientBudget b in Model )
+                {
+                    decimal? total = b.Total > 0 ? b.Total : b.January + b.February + b.March + b.April + b.May + b.June + b.July + b.August + b.September + b.October + b.November + b.December;
+
+                    <tr id="row-line-@count" class="add-more-row">
+                        <td style="position: relative;">
+                            @if ( ( count + 1 ) == Model.Count )
+                            {
+                                <a data-add-one-more="1" data-target="#row-line-0" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                                    <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                                </a>
+                            }
+
+                            <input name="ClientBudgets[@count].Id" type="hidden" value="@b.Id" />
+                            <input class="input" name="ClientBudgets[@count].BudgetYear" placeholder="E.g 2020" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@b.BudgetYear">
+                        </td>
+                        <td>
+                            <input class="input" name="ClientBudgets[@count].Total" title="Changing this value will override values from Jan - Dec" placeholder="E.g 34900" required="required" data-budget-total="1" data-target=".el-input-@b.Id" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( total ?? 0, 0 )">
+                        </td>
+                        <td>
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].January" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.January ?? 0, 0 )">
+                        </td>
+                        <td>
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].February" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.February ?? 0, 0 )">
+                        </td>
+                        <td>
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].March" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.March ?? 0, 0 )">
+                        </td>
+                        <td>
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].April" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.April ?? 0, 0 )">
+                        </td>
+                        <td>
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].May" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.May ?? 0, 0 )">
+                        </td>
+                        <td>
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].June" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.June ?? 0, 0 )">
+                        </td>
+                        <td>
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].July" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.July ?? 0, 0 )">
+                        </td>
+                        <td>
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].August" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.August ?? 0, 0 )">
+                        </td>
+                        <td>
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].September" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.September ?? 0, 0 )">
+                        </td>
+                        <td>
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].October" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.October ?? 0, 0 )">
+                        </td>
+                        <td>
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].November" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.November ?? 0, 0 )">
+                        </td>
+                        <td>
+                            <input class="input el-input-@b.Id" name="ClientBudgets[@count].December" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="@Math.Round( b.December ?? 0, 0 )">
+                        </td>
+                        <td>
+                            @Html.ActionLink( "Remove", "DeleteClientBudget", new { id = b.Id }, new { @class = "del", @data_delete = "1", @data_id = b.Id, @data_target = "#row-line-" + count, @data_refresh_target = "#client-budget", @rel = "tipsyE", @title = "Remove this item?" } )
+                        </td>
+                    </tr>
+
+                    count++;
+                }
+            }
+            else
+            {
+                <tr id="row-line-0" class="add-more-row">
+                    <td style="position: relative;">
+                        <a data-add-one-more="1" data-target="#row-line-0" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                            <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                        </a>
+                        <input class="input" name="ClientBudgets[0].BudgetYear" placeholder="E.g 2020" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td>
+                        <input class="input" name="ClientBudgets[0].Total" data-budget-total="1" data-target=".el-input" placeholder="E.g 10090" title="Changing this value will override values from Jan - Dec" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td>
+                        <input class="input el-input" name="ClientBudgets[0].January" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td>
+                        <input class="input el-input" name="ClientBudgets[0].February" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td>
+                        <input class="input el-input" name="ClientBudgets[0].March" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td>
+                        <input class="input el-input" name="ClientBudgets[0].April" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td>
+                        <input class="input el-input" name="ClientBudgets[0].May" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td>
+                        <input class="input el-input" name="ClientBudgets[0].June" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td>
+                        <input class="input el-input" name="ClientBudgets[0].July" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td>
+                        <input class="input el-input" name="ClientBudgets[0].August" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td>
+                        <input class="input el-input" name="ClientBudgets[0].September" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td>
+                        <input class="input el-input" name="ClientBudgets[0].October" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td>
+                        <input class="input el-input" name="ClientBudgets[0].November" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td>
+                        <input class="input el-input" name="ClientBudgets[0].December" placeholder="E.g 10" required="required" style="padding: 0 5px; width: 87%;" type="number" value="">
+                    </td>
+                    <td></td>
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

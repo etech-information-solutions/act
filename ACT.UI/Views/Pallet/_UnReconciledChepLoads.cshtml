@@ -1,0 +1,125 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.Target = "#chep-loads-data";
+    ViewBag.Url = Url.Action( "UnReconciledChepLoads", new { ReconciliationStatus = ReconciliationStatus.Unreconciled } );
+
+    int count = Model.Start;
+    List<ChepLoadCustomModel> items = ( List<ChepLoadCustomModel> ) Model.Items;
+}
+
+<table id="pool-table" class="da-table small fixed-headerx" data-fixed-header-target="#pooling-agent-loads" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="Check">
+                <input type="checkbox" data-r-p-c="1" data-check=".chep-loads-check" data-sel="#chep-loads" data-compare="#client-loads" />
+            </th>
+            <th data-name="Reference">
+                Ref #
+            </th>
+            <th data-name="Other Reference">
+                Other Ref #
+            </th>
+            <th data-name="DocketNumber">
+                Docket #
+            </th>
+            <th data-name="LoadDate">
+                Load Date
+            </th>
+            @*<th data-name="EffectiveDate">
+                Effective Date
+            </th>*@
+            <th data-name="Quantity">
+                Qty
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items.NullableAny() )
+        {
+            foreach ( var item in items )
+            {
+                <tr id="chep-@item.Id-item" class="chep-@item.Id-item">
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        <input type="checkbox" class="chep-loads-check" data-r-c="1" data-id="@item.Id" data-qty="@item.Quantity" data-sel="#chep-loads" data-compare="#client-loads" />
+                    </td>
+                    <td>
+                        @(item.CorrectedRef ?? item.Ref)
+
+                        @if ( !string.IsNullOrEmpty( item.CorrectedRef ) )
+                        {
+                            <a rel="tipsyW" title="Manually corrected, was: @item.Ref">
+                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
+                            </a>
+                        }
+
+                    </td>
+                    <td>
+                        @(item.CorrectedOtherRef ?? item.OtherRef)
+
+                        @if ( !string.IsNullOrEmpty( item.CorrectedOtherRef ) )
+                        {
+                            <a rel="tipsyW" title="Manually corrected, was: @item.OtherRef">
+                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @item.DocketNumber
+
+                        @if ( item.VersionCount > 1 )
+                        {
+                            <a data-load-version="1" data-docket="@item.DocketNumber" class="block" rel="tipysE" title="+@item.VersionCount versions of this load, click to view all versions..">
+                                <small>+@item.VersionCount versions</small>
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @(item.ShipmentDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    @*<td>
+                        @(item.EffectiveDate?.ToString( "yyyy-MM-dd" ))
+                    </td>*@
+                    <td>
+                        @item.Quantity
+                    </td>
+                    <td>
+
+                        @*@Html.ActionLink( "Edit", "EditUnReconciledChepLoad", new { id = item.Id }, new { @class = "edit", @style = "margin-left: 0;", @data_details = "1", @data_id = item.Id, @data_target = ".chep-" + item.Id + "-item" } )*@
+
+                        @Html.ActionLink( " ", "ChepLoadComments", new { id = item.Id }, new { @class = "chat", @rel = "tipsyS", @title = "View Comments", @data_details = "1", @data_id = item.Id, @data_target = ".chep-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( " ", "ChepLoadDocuments", new { id = item.Id }, new { @class = "docs", @rel = "tipsyS", @title = "View Documents", @data_details = "1", @data_id = item.Id, @data_target = ".chep-" + item.Id + "-item", @style = "margin-right: 0;" } )
+
+                    </td>
+                </tr>
+
+                count++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="7">
+                    There are no records to display
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_TinyPaging" )

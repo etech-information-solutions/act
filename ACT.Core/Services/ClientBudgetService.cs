@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using ACT.Data.Models;
 
 namespace ACT.Core.Services
@@ -8,6 +9,11 @@ namespace ACT.Core.Services
         public ClientBudgetService()
         {
 
+        }
+
+        public ClientBudget GetByPSPId(int id)
+        {
+            return context.ClientBudgets.FirstOrDefault(b => b.ClientId == id);
         }
     }
 }

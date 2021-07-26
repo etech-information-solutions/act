@@ -1,0 +1,28 @@
+﻿@model List<AgeOfOutstandingPallets>
+
+@using ACT.Core.Models
+
+@{
+    string items = "[";
+
+    foreach ( AgeOfOutstandingPallets item in Model )
+    {
+        items += "{\"name\": \"" + item.DurationName + "\", \"y\": " + item.Oustanding + "},";
+    }
+
+    items = items.Remove( items.Trim().Length - 1 );
+
+    items += "]";
+}
+
+<script type="text/javascript">
+
+    var aopItems = JSON.parse( '@items'.replace( /&quot;/g, '"' ) );
+
+    //console.log( items );
+
+    setTimeout(function ()
+    {
+        ACT.UI.AgeOfOutstandingPallets( "aop-graph", aopItems );
+    }, '500');
+</script>

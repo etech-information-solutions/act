@@ -14,7 +14,14 @@ namespace ACT.Data.Models
     
     public partial class Transporter
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Transporter()
+        {
+            this.ClientLoads = new HashSet<ClientLoad>();
+        }
+    
         public int Id { get; set; }
+        public Nullable<int> ClientId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -23,6 +30,14 @@ namespace ACT.Data.Models
         public string Email { get; set; }
         public string TradingName { get; set; }
         public string RegistrationNumber { get; set; }
+        public string ContactName { get; set; }
+        public string SupplierCode { get; set; }
+        public string ClientTransporterCode { get; set; }
+        public string ChepClientTransporterCode { get; set; }
         public int Status { get; set; }
+    
+        public virtual Client Client { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoad> ClientLoads { get; set; }
     }
 }

@@ -1,0 +1,46 @@
+﻿@model Client
+
+@using ACT.Data.Models;
+
+
+<div id="item-details" class="item-details" style="width: auto;">
+
+    <h2>
+        <img alt="" src="@Url.Content( "~/images/info.png" )" />
+        <span>Client Users (@Model.ClientUsers.Count)</span>
+    </h2>
+
+    <ul class="list">
+        @foreach ( User item in Model.ClientUsers.Select( s => s.User ) )
+        {
+            <li>
+                <a data-quick-link="1" data-target="#users" data-id="@item.Id">
+                    @item.Name  @item.Surname
+                </a>
+            </li>
+        }
+    </ul>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <p>
+            @Html.ActionLink( "Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+
+            @if ( ViewBag.IncludeLayout == null )
+            {
+                <span style="padding: 0 5px;">/</span>
+                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Close</a>
+            }
+        </p>
+    }
+
+    @if ( ViewBag.IncludeLayout != null )
+    {
+        <div class="back-to-list">
+            @Html.ActionLink( "Back to List", "Index" )
+        </div>
+    }
+
+</div>

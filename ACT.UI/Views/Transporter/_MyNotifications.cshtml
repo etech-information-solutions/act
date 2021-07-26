@@ -1,0 +1,82 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ViewName = "_MyNotifications";
+
+    UserModel user = User.Get();
+}
+
+@Html.Partial( "_Notification" )
+
+@{
+    int count = Model.Start;
+    List<BroadcastCustomModel> items = ( List<BroadcastCustomModel> ) Model.Items;
+}
+
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Notifications available matching your search criteria.
+    </div>
+}
+
+<table id="_MyNotifications-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#_MyNotifications-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="CreatedOn" data-column="b.CreatedOn">
+                Notification Date
+            </th>
+            <th data-name="Status">
+                Status
+            </th>
+            <th data-name="Message">
+                Message
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                string active = ( item.UserBroadcasts.Any( ub => ub.UserId == user.Id ) ) ? "active" : "inactive";
+                string enable = ( !item.UserBroadcasts.Any( ub => ub.UserId == user.Id ) ) ? "Mark as read" : "Mark as unread";
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd @ HH:mm tt" )
+                    </td>
+                    <td>
+                        @(( item.UserBroadcasts.Any( ub => ub.UserId == user.Id ) ) ? "Read" : "Unread")
+                    </td>
+                    <td width="65%">
+                        @item.Message
+                    </td>
+                    <td width="10%">
+                        @Html.ActionLink( enable, "UpdateNotification", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#mynotifications", @rel = "tipsyE", @title = enable + "?" } )
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+@Html.Partial( "_Paging" )

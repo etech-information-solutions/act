@@ -3,13 +3,16 @@
 @using ACT.Data.Models;
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
+
+
 
 @{
     ViewBag.ShowExport = true;
     ViewBag.ShowCustom = true;
-    ViewBag.ShowQuickStructure = true;
 
-    ViewBag.ViewName = "_ClientList";
+    ViewBag.ViewName = "LinkProducts";
 
     UserModel user = User.Get();
 }
@@ -19,44 +22,59 @@
 
 
 @{
-    Int32 count = Model.Start;
-    List<User> items = ( List<User> ) Model.Items;
+    int count = Model.Start;
+    List<ClientProductCustomModel> items = ( List<ClientProductCustomModel> ) Model.Items;
 }
 
 
 @if ( Model == null || !items.Any() )
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
-        There are no Users  available matching your search criteria.
+        There are no Client Products available matching your search criteria.
     </div>
 }
 
 <p>
-    @Html.ActionLink( "Add User", "AddUser", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new user?", @data_edit = "1", @data_id = 0, @data_target = "#users" } )
+    @Html.ActionLink( "Add", "AddProduct", new { }, new { @class = "add", @rel = "tipsyS", @title = "Link a product to a client?", @data_edit = "1", @data_id = 0, @data_target = "#linkproducts" } )
+
     <span class="loader"></span>
 </p>
 
-
-<table id="users-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#users-table_wrapper" data-starting-point=".ap-tabs ul">
+<table id="products-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#products-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
             <th data-name="Count">
                 #
             </th>
-            <th data-name="Name" data-column="Name">
+            <th data-name="CreatedOn" data-column="cp.CreatedOn">
+                Created
+            </th>
+            <th data-name="ClientName" data-column="c.CompanyName">
+                Client
+            </th>
+            <th data-name="Name" data-column="p.Name">
                 Name
             </th>
-            <th data-name="Cell" data-column="Cell">
-                Contact
+            <th data-name="ProductDescription" data-column="cp.ProductDescription">
+                Description
             </th>
-            <th data-name="Status" data-column="Status">
+            <th data-name="HireRate" data-column="cp.HireRate">
+                Hire Rate
+            </th>
+            <th data-name="IssueRate" data-column="cp.IssueRate">
+                Issue Rate
+            </th>
+            <th data-name="LostRate" data-column="cp.LostRate">
+                Lost Rate
+            </th>
+            <th data-name="PassonRate" data-column="cp.PassonRate">
+                Pass-on Cost
+            </th>
+            <th data-name="RateType" data-column="cp.RateType">
+                Rate Type
+            </th>
+            <th data-name="Status" data-column="cp.Status">
                 Status
-            </th>
-            <th data-name="Type" data-column="Type">
-                Role
-            </th>
-            <th data-name="LastLogin" data-column="LastLogin">
-                Last Login
             </th>
             <th data-name="Actions">
                 Actions
@@ -67,61 +85,66 @@
     <tbody>
         @if ( Model != null && items != null && items.Count() > 0 )
         {
-            foreach ( var item in items )
+            foreach ( ClientProductCustomModel item in items )
             {
                 Status status = ( Status ) item.Status;
+                RateType rateType = ( RateType ) item.RateType;
 
-                Role role = new Role() { Name = "~/~", Type = -1 };
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
-                if ( item.UserRoles.Any() )
-                {
-                    role = item.UserRoles.FirstOrDefault().Role;
-                }
-                
-                RoleType roleType = ( RoleType ) role.Type;
+                <tr id="linkproducts-@item.Id-item" class="linkproducts-@item.Id-item @active">
 
-                String active = status.Equals( Status.Active ) ? "active" : "inactive";
-                String enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
-
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
-
-                    <td width="1%">
+                    <td>
                         @count
                     </td>
-                    <td style="width: 15%;">
-                        @item.Name @item.Surname <br />
-                        <i><a href="mailto:@item.Email">@item.Email</a></i>
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
 
-                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="User">
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="ClientProduct">
                             <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
                             <span></span>
                         </a>
                     </td>
                     <td>
-                        @item.Cell
+                        @item.ClientName
+                    </td>
+                    <td>
+                        @item.ProductName
+                    </td>
+                    <td width="15%">
+                        @item.ProductDescription
+                    </td>
+                    <td>
+                        R @item.Rate
+                    </td>
+                    <td>
+                        R @item.IssueRate
+                    </td>
+                    <td>
+                        R @item.LostRate
+                    </td>
+                    <td>
+                        R @item.PassonRate
+                    </td>
+                    <td>
+                        @rateType.GetDisplayText()
                     </td>
                     <td>
                         @status.GetDisplayText()
                     </td>
-                    <td>
-                        @roleType.GetDisplayText()
-                    </td>
-                    <td>
-                        @item.LastLogin
-                    </td>
                     <td width="15%">
-                        @Html.ActionLink( "Details", "UserDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
 
-                        @Html.ActionLink( "Edit", "EditUser", new { id = item.Id, returnView = "Users" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink( "Details", "ProductDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".linkproducts-" + item.Id + "-item" } )
 
-                        @if ( user.Email != item.Email )
-                        {
-                            @Html.ActionLink( enable, "DeleteUser", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#users", @rel = "tipsyE", @title = enable + " this item?" } )
-                        }
+                        @Html.ActionLink( "Edit", "EditProduct", new { id = item.Id, returnView = "LinkProducts" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".linkproducts-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( enable, "DeleteProduct", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#linkproducts-" + item.Id + "-item", @data_refresh_target = "#linkproducts", @rel = "tipsyE", @title = enable + " this item?" } )
+
                     </td>
 
                 </tr>
-                
+
                 count++;
             }
         }
@@ -129,6 +152,6 @@
 
 </table>
 
-@*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
+@*@Html.Partial( "_LinkProductCustomSearch", new ACT.Core.Models.CustomSearchModel( "LinkProduct" ) )*@
 
 @Html.Partial( "_Paging" )

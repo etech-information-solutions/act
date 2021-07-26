@@ -1,0 +1,60 @@
+﻿@model ChepLoadViewModel
+
+@using ACT.UI.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Edit Pooling Load";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "EditUnReconciledChepLoad", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#chep-loads-data", @class = "custom-validate", @style = "width: auto;", id = "editpoolingagentdata" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content("~/images/edit.png")" />
+            <span>Edit Pooling Load</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        @Html.HiddenFor( model => model.Id )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="editor-label ">
+                @Html.LabelFor( model => model.Reference )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Reference, new { @class = "input", @placeholder = "Please Complete Reference" } )
+                @Html.ValidationMessageFor( model => model.Reference )
+            </div>
+
+            <div class="editor-label ">
+                @Html.LabelFor( model => model.OtherRef )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.OtherRef, new { @class = "input", @placeholder = "Please Complete Other Ref" } )
+                @Html.ValidationMessageFor( model => model.OtherRef )
+            </div>
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+        <p>
+            <input id="save-btn" type="submit" value="Update" />
+            <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+        </p>
+
+    </div>
+}
+
+

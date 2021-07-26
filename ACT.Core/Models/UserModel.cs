@@ -34,6 +34,8 @@ namespace ACT.Core.Models
 
         public string TaxNumber { get; set; }
 
+        public string Pin { get; set; }
+
         public bool IsSAId { get; set; }
 
         public DateTime? DateOfBirth { get; set; }
@@ -48,11 +50,17 @@ namespace ACT.Core.Models
 
         public bool IsAdmin { get; set; }
 
+        public bool IsPSPAdmin { get; set; }
+
         public string SelfieUrl { get; set; }
 
         public string IdPassportUrl { get; set; }
 
         public string PayRewardsTo { get; set; }
+
+        public string DeviceId { get; set; }
+
+        public string DeviceOS { get; set; }
 
 
         public Role Role { get; set; }
@@ -62,6 +70,10 @@ namespace ACT.Core.Models
         public RoleModel RoleModel { get; set; }
 
         public List<Role> Roles { get; set; }
+
+        public List<PSP> PSPs { get; set; }
+
+        public List<Client> Clients { get; set; }
 
         #endregion
 

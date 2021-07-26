@@ -1,0 +1,173 @@
+﻿
+@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+    ViewBag.ViewName = "_Exceptions";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@{
+    int count = Model.Start;
+    List<ClientLoadCustomModel> items = ( List<ClientLoadCustomModel> ) Model.Items;
+}
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Exceptions available matching your search criteria.
+    </div>
+}
+
+<table id="exceptions-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#exceptions-table_wrapper" data-starting-point=".ap-tabs ul">
+
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="SiteName" data-column="s.Description">
+                Site
+            </th>
+            <th data-name="SubSiteName" data-column="s1.Description">
+                Sub-Site
+            </th>
+            <th data-name="LoadDate" data-column="cl.LoadDate">
+                Load Date
+            </th>
+            <th data-name="Exception" data-column="otr.Description">
+                Exception
+            </th>
+            <th data-name="OldestException">
+                Oldest Exception
+            </th>
+            <th data-name="JournalCount" data-column="JournalCount">
+                Journals
+            </th>
+            <th data-name="TaskCount" data-column="TaskCount">
+                Tasks
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            int siteCount = 0;
+
+            List<int?> siteIds = new List<int?>();
+
+            foreach ( var item in items )
+            {
+                if ( !siteIds.Any( s => s == item.SiteId ) )
+                {
+                    siteCount = 0;
+                    siteIds.Add( item.SiteId );
+
+                    if ( siteIds.Count > 1 )
+                    {
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    }
+                }
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @if ( siteCount == 0 )
+                        {
+                            <span>@item.SiteName</span>
+                        }
+                    </td>
+                    <td>
+                        @item.SubSiteName
+                    </td>
+                    <td>
+                        @(( item.LoadDate ?? item.CreatedOn ).ToString( "yyyy-MM-dd" ))
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Dispute">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.OutstandingReason
+                    </td>
+                    <td>
+                        @if ( siteCount == 0 )
+                        {
+                            <span>@(items.Where( s => s.SiteId == item.SiteId )?.OrderBy( o => o.LoadDate )?.FirstOrDefault()?.OutstandingReason)</span>
+                        }
+                    </td>
+                    <td>
+                        @if ( item.JournalCount > 0 )
+                        {
+                            @Html.ActionLink( item.JournalCount.ToString(), "ExceptionDetails", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyE", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        }
+                    </td>
+                    <td>
+                        @if ( item.TaskCount > 0 )
+                        {
+                            @Html.ActionLink( item.TaskCount.ToString(), "ExceptionDetails", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyE", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        }
+                    </td>
+                    <td width="8%">
+
+                        @if ( item.Documents.NullableAny() )
+                        {
+                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                                <a class="docs" data-sticky-one="1" data-target="#supporting-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Documents">
+                                    Docs
+                                </a>
+                                <div id="supporting-@item.Id-docs" class="none">
+                                    <ul class="list">
+                                        @foreach ( var d in item.Documents.Where( s => s.Status == ( Int32 ) Status.Active ) )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "ClientReporting", new { @id = d.Id } )" target="_blank">
+                                                    @d.Name (@d.Type)
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        }
+
+                        @Html.ActionLink( "Details", "ExceptionDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                    </td>
+
+                </tr>
+
+                count++;
+                siteCount++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_ExceptionsCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
+
+@Html.Partial( "_Paging" )

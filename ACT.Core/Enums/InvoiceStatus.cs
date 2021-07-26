@@ -10,16 +10,10 @@ namespace ACT.Core.Enums
         [StringEnumDisplayText( "All" )]
         All = -1,
 
-        [StringEnumDisplayText( "Declined" )]
-        Declined = 0,
+        [StringEnumDisplayText( "N/A" )]
+        NA = 0,
 
-        [StringEnumDisplayText( "Paid" )]
-        Paid = 1,
-
-        [StringEnumDisplayText( "Processing" )]
-        Processing = 2,
-
-        [UiIgnoreEnumValue]
-        Processed = 3
+        [StringEnumDisplayText( "Updated" )]
+        Updated = 1,
     }
 }

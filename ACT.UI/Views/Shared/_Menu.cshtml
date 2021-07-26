@@ -1,15 +1,20 @@
-﻿@using ACT.Core.Enums
+﻿@using ACT.Core.Enums;
+@using ACT.Data.Models;
+@using ACT.Core.Models;
 
 @{
     string controller = ViewContext.RouteData.Values[ "controller" ].ToString();
 
-    var user = ( Request.IsAuthenticated && ViewBag.CurrentUser != null ) ? ( ACT.Core.Models.UserModel ) ViewBag.CurrentUser : User.Get();
+    Client client = ( ViewBag.SelectedClient != null ) ? ViewBag.SelectedClient : new Client() { CompanyName = "N/A" };
+
+    UserModel user = ( Request.IsAuthenticated && ViewBag.CurrentUser != null ) ? ( UserModel ) ViewBag.CurrentUser : User.Get();
+
+    Dictionary<int, string> clientOptions = ViewBag.ClientOptions;
 }
 
 <div class="menu">
 
-    <ul>
-
+    <ul id="welcome-ul">
         <li class="logz">
             <a href="@Url.Action( "Index", "DashBoard" )">
                 <img alt="ACT Pallet Solutions" src="@Url.Content( "~/images/act-logo.png" )" style="width: 100%;" />
@@ -19,11 +24,34 @@
         <li class="welcome">
             Welcome <strong>@user.Name</strong>
         </li>
+        <li class="welcome" style="font-size: 14px; color: #333;">
 
+            <span style="margin-bottom: 10px; display: block;">Selected Client: <em id="s-c-loader"></em></span>
+
+            <select data-select-client="1" class="chzn" style="width: 100%;">
+                <option>--select</option>
+                @if ( clientOptions != null )
+                {
+                    foreach ( KeyValuePair<int, string> item in clientOptions )
+                    {
+                        string sel = ( item.Key == client?.Id ) ? "selected=selected" : "";
+
+                        <option value="@item.Key" @sel>@item.Value</option>
+                    }
+                }
+            </select>
+
+            @*<span id="sc-m" class="block" style="border-top: 1px dashed #fff; padding-top: 3px; margin-top: 3px; color: #012d71;">
+                    @(client?.CompanyName)
+                </span>*@
+        </li>
+    </ul>
+
+    <ul id="menu-ul">
         @if ( User.Has( PermissionTo.View, PermissionContext.DashBoard ) )
         {
-            <li class="@(controller.ToLower().Equals( "dashboard" ) ? "current" : "")" data-hot-spot="1" data-c="Dashboard" data-t="">
-                <a rel="tipsyW" title="Dashboard" href="@Url.Action( "Index", "Dashboard" )">
+            <li class="@(controller.ToLower().Equals( "dashboard" ) ? "current" : "")" data-hot-spot="1" data-c="DashBoard" data-t="">
+                <a rel="tipsyW" title="DashBoard" href="@Url.Action( "Index", "DashBoard" )">
                     <span>Dashboard</span>
                 </a>
             </li>
@@ -33,25 +61,16 @@
         {
             <li data-hot-spot="1" data-c="Client" data-t="" class="@(controller.ToLower().Equals( "client" ) ? "current" : "")">
                 <a rel="tipsyW" title="Clients" href="@Url.Action( "Index", "Client" )">
-                    <span>Clients</span>
+                    <span>Client Management</span>
                 </a>
             </li>
         }
 
-        @if ( User.Has( PermissionTo.View, PermissionContext.Customer ) )
+        @if ( User.Has( PermissionTo.View, PermissionContext.Client ) )
         {
-            <li data-hot-spot="1" data-c="Customer" data-t="" class="@(controller.ToLower().Equals( "customer" ) ? "current" : "")">
-                <a rel="tipsyW" title="Customers" href="@Url.Action( "Index", "Customer" )">
-                    <span>Customers</span>
-                </a>
-            </li>
-        }
-
-        @if ( User.Has( PermissionTo.View, PermissionContext.Product ) )
-        {
-            <li data-hot-spot="1" data-c="Product" data-t="" class="@(controller.ToLower().Equals( "product" ) ? "current" : "")">
-                <a rel="tipsyW" title="Products" href="@Url.Action( "Index", "Product" )">
-                    <span>Products</span>
+            <li class="first @(controller.ToLower().Equals( "clientreporting" ) ? "current" : "")" data-hot-spot="1" data-c="ClientReporting" data-t="">
+                <a rel="tipsyW" title="Client Reporting" href="@Url.Action( "Index", "ClientReporting" )">
+                    <span>Client Reporting</span>
                 </a>
             </li>
         }
@@ -60,16 +79,7 @@
         {
             <li data-hot-spot="1" data-c="Pallet" data-t="" class="@(controller.ToLower().Equals( "pallet" ) ? "current" : "")">
                 <a rel="tipsyW" title="Pallets" href="@Url.Action( "Index", "Pallet" )">
-                    <span>Pallets</span>
-                </a>
-            </li>
-        }
-
-        @if ( User.Has( PermissionTo.View, PermissionContext.Finance ) )
-        {
-            <li class="first @(controller.ToLower().Equals( "finance" ) ? "current" : "")" data-hot-spot="1" data-c="Finance" data-t="">
-                <a rel="tipsyW" title="Finance" href="@Url.Action( "Index", "Finance" )">
-                    <span>Finance</span>
+                    <span>Pallet Management</span>
                 </a>
             </li>
         }
@@ -83,16 +93,25 @@
             </li>
         }
 
-        @if ( User.Has( PermissionTo.View, PermissionContext.Reports ) )
+        @if ( User.Has( PermissionTo.View, PermissionContext.Finance ) )
         {
-            <li data-hot-spot="1" data-c="Report" data-t="" class="@(controller.ToLower().Equals( "report" ) ? "current" : "")">
-                <a rel="tipsyW" title="Reports" href="@Url.Action( "Index", "Report" )">
-                    <span>Reports</span>
+            <li data-hot-spot="1" data-c="Finance" data-t="" class="@(controller.ToLower().Equals( "finance" ) ? "current" : "")">
+                <a rel="tipsyW" title="Finance" href="@Url.Action( "Index", "Finance" )">
+                    <span>Finance</span>
                 </a>
             </li>
         }
 
-        <li style="border-top: 5px solid #f5f5f5; border-bottom: 5px solid #f5f5f5;">
+        @if ( User.Has( PermissionTo.View, PermissionContext.Transporter ) )
+        {
+            <li data-hot-spot="1" data-c="Transporter" data-t="" class="@(controller.ToLower().Equals( "transporter" ) ? "current" : "")">
+                <a rel="tipsyW" title="Transporter" href="@Url.Action( "Index", "Transporter" )">
+                    <span>Transporter</span>
+                </a>
+            </li>
+        }
+
+        <li style="border-top: 5px solid #f5f5f5; border-bottom: 5px solid #f5f5f5; margin-top: 5px;">
             <a class="red-bg" href="@Url.Action( "LogOff", "Account" )" style="padding: 10px 20px;">
                 LOGOUT
             </a>
@@ -101,7 +120,5 @@
     </ul>
 
     <div class="clear"></div>
-
-
 
 </div>

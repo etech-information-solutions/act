@@ -1,0 +1,70 @@
+﻿.status-filters {
+    display: none;
+    font-size: 12px;
+    font-weight: bold;
+    padding-top: 10px;
+    position: relative;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #000;
+    transition: all 0.4s ease-in 0s;
+}
+
+    .status-filters strong {
+        padding-bottom: 10px;
+    }
+
+    .status-filters span.current, .status-filters span:hover {
+        border-bottom: 1px solid #fff;
+        box-shadow: 0 6px 6px -2px #222;
+    }
+
+    .status-filters span {
+        width: 12%;
+        float: left;
+        color: #ffffff;
+        display: block;
+        padding: 8px 0;
+        cursor: pointer;
+        margin-right: 2%;
+        text-align: center;
+        border-radius: 4px;
+        box-shadow: 0 6px 6px -2px #222;
+    }
+
+        .status-filters span.last {
+            margin: 0;
+        }
+
+        .status-filters span.total {
+            background: #012d71;
+        }
+
+        .status-filters span.admins {
+            background: #fc4071;
+        }
+
+        .status-filters span.exco {
+            background: #f658e2;
+        }
+
+        .status-filters span.region {
+            background: #B6B437;
+        }
+
+        .status-filters span.branch {
+            background: #e18a67;
+        }
+
+        .status-filters span.active {
+            background: #3796B6;
+        }
+
+        .status-filters span.inactive {
+            background: #31E10C;
+        }
+
+        .status-filters span.ad-incomplete {
+            background: #F708D2;
+        }

@@ -1,0 +1,120 @@
+<ion-header [translucent]="true" style="color: #002e70 !important;">
+  <ion-toolbar style="color: #002e70 !important;">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      <img (click)="this.auth.OnShowContact()" alt="Contact" src="../../assets/imgs/contact.png" style="width: 36px;" />
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-icon name="notifications" size="large" (click)="this.auth.GoToPage('notifications')"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content [fullscreen]="true" (ionScroll)="this.auth.OnScroll($event)" [scrollEvents]="true">
+
+  <ion-refresher (ionRefresh)="Refresh($event)" slot="fixed">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  
+  <!-- fab placed to the top end -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="this.auth.ShowScroll" (click)="this.auth.ScrollToTop();">
+    <ion-fab-button>
+      <ion-icon name="chevron-up"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-item-divider>
+    <ion-label>
+      App Details
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item>
+    <ion-label>App Name</ion-label>
+    <ion-label class="required">{{this.auth.AppName}}</ion-label>
+  </ion-item>
+
+  <ion-item lines="none">
+    <ion-label>App Version</ion-label>
+    <ion-label class="required">{{this.auth.AppVersion}}</ion-label>
+  </ion-item>
+
+  <ion-item-divider>
+    <ion-label>
+      My Details
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item lines="none">
+    <ion-label>You Signed Up On</ion-label>
+    <ion-label class="required">{{this.auth.GetShortDate(this.auth.CurrentUser.CreatedOn)}}</ion-label>
+  </ion-item>
+
+  <ion-item lines="none" style="margin: 20px 0;">
+
+    <ion-avatar style="width: 100px; height: 100px;">
+      <img [src]="this.SelfieUrl" (click)="this.auth.OpenImage(this.SelfieUrl)" />
+    </ion-avatar>
+
+    <ion-icon name="camera" (click)="PresentPhotoOptions(true)" style="padding-left: 15px;"></ion-icon>
+    
+  </ion-item>
+
+  <ion-item-divider margin-top>
+    <ion-label>
+      Your Details
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item>
+    <ion-label class="required" floating>* Name</ion-label>
+    <ion-input type="text" name="Name" [(ngModel)]="Name" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label class="required" floating>* Surname</ion-label>
+    <ion-input type="text" name="Surname" [(ngModel)]="Surname" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item-divider>
+    <ion-label>
+      Contact Details
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item>
+    <ion-label class="required" floating>* Cell Number</ion-label>
+    <ion-input type="tel" pattern="[0-9]*" name="Cell" [(ngModel)]="Cell" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item lines="none">
+    <ion-label class="required" floating>* Email Address</ion-label>
+    <ion-input type="email" name="email" [(ngModel)]="Email" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <p>
+      You have read and agreed with the <a (click)="ShowTnC()">Ts and Cs</a>?
+    </p>
+  </ion-item>
+  
+  <ion-item class="tc">
+    <ion-label style="padding-left: 5px;">
+      I Agree the Terms & Conditions!
+    </ion-label>
+    <ion-toggle [(ngModel)]="AcceptTnC"></ion-toggle>
+  </ion-item>
+
+  <div text-left style="margin: 30px 0; padding: 20px">
+
+    <ion-button (click)="Update()" type="button" shape="round" expand="full" style="--background: #002e70;">
+      Save
+      <ion-icon name="flame" slot="end"></ion-icon>
+    </ion-button>
+
+  </div>
+
+</ion-content>

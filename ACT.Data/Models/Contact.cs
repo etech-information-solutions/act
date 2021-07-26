@@ -25,6 +25,7 @@ namespace ACT.Data.Models
         public string ContactIdNo { get; set; }
         public string ContactCell { get; set; }
         public string ContactEmail { get; set; }
+        public Nullable<int> JobTitle { get; set; }
         public int Status { get; set; }
     }
 }

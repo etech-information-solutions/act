@@ -1,5 +1,5 @@
 
-.modal
+.modal_act
 {
     top: 0px;
     left: 0px;
@@ -110,11 +110,8 @@
 
 .btns
 {
-    left: 0;
-    bottom: 0;
-    width: 100%;
     display: none;
     padding: 10px 0;
-    position: absolute;
+    margin-top: 20px;
     border-top: 1px solid #877241;
 }

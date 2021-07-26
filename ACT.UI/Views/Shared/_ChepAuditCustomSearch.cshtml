@@ -1,0 +1,75 @@
+﻿@model ACT.Core.Models.CustomSearchModel
+
+<!--
+    This is a sample custom search view. You'll need to create your own view depending on the page where the custom search is needed.
+    E.g _PRCustomSearch for the Payment Requisition page or _UserCustomSearch for the Manage User page and build the view with the necessary fields which
+    must already exist in the ACT.Core.Models.CustomSearchModel, the model that's passed. If a field is missing from this model, please add it and likewise
+    add a comment on that property, as already done on ther properties. MAKE SURE you're not adding a property already added (that could be named differently).
+    -->
+
+@{
+    string vn = ( ( string ) ViewBag.ViewName ?? "" );
+    string action = vn.Replace( "_", "" );
+}
+
+<div id="custom-search" class="custom-search">
+
+    <div id="search-query" class="search-query">
+
+        @using ( Ajax.BeginForm( action, new { }, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = action.ToLower(), OnBegin = "ACT.UI.BeginCustomSearch($('#sticky-one form'), true);", OnComplete = "ACT.UI.CompleteCustomSearch();" }, new { @style = "width: auto; padding: 0;" } ) )
+        {
+            <div class="editor-label">
+                @Html.LabelFor( model => model.SiteId )
+            </div>
+            <div class="editor-field">
+                @Html.DropDownListFor( model => model.SiteId, model => model.SiteOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="left" style="width: 49%; margin-right: 1%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.FromDate )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.FromDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " } )
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 49%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.ToDate )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.ToDate, new { @class = "date-picker", @style = "width: 87%;", @placeholder = "     /       /       " } )
+                </div>
+
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.Query )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Query, new { @placeholder = "Search Text", @style = "width: 86%;" } )
+                <a rel="tipsyE" title="..search by any other field">
+                    <img alt="" src="@Url.Content( "~/Images/info.png" )" style="vertical-align: middle;" />
+                </a>
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+            <p style="margin-bottom: 0px;">
+                <input id="ReturnView" name="ReturnView" value="_@action" type="hidden" />
+                <input id="save-btn" type="submit" value="Search" data-custom-search="1" data-target="#@action.ToLower()" />
+                <input id="Controller" name="Controller" value="@ViewContext.RouteData.Values[ "controller" ]" type="hidden" />
+            </p>
+        }
+
+    </div>
+
+</div>

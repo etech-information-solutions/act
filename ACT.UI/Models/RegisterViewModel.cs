@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+
 using ACT.Core.Enums;
 using ACT.Core.Services;
 using ACT.Data.Models;
@@ -14,7 +15,11 @@ namespace ACT.UI.Models
         public int Id { get; set; }
 
         [Display( Name = "Name of Service Provider" )]
-        public int PSPId { get; set; }
+        public int? PSPId { get; set; }
+
+        [Display( Name = "Name of OTHER Service Provider" )]
+        [StringLength( 200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string PSPName { get; set; }
 
         [Required]
         [Display( Name = "Company Name" )]
@@ -61,13 +66,31 @@ namespace ACT.UI.Models
         [Display( Name = "Service Required" )]
         public ServiceType ServiceType { get; set; }
 
+        [Required]
+        [Display( Name = "Type of Pallet Use" )]
+        public TypeOfPalletUse TypeOfPalletUse { get; set; }
+
+        [Display( Name = "Your Type of Pallet Use" )]
+        public string OtherTypeOfPalletUse { get; set; }
+
+        [Required]
+        [Display( Name = "Company Type" )]
+        public CompanyType CompanyType { get; set; }
+
         [Display( Name = "Estimated Loads Per Month" )]
         public EstimatedLoadViewModel EstimatedLoad { get; set; }
 
         public AddressViewModel Address { get; set; }
 
-        [Display( Name = "Company Registration File" )]
-        public FileViewModel RegistrationFile { get; set; }
+        [Display( Name = "Files" )]
+        public List<FileViewModel> Files { get; set; }
+
+        [Display( Name = "BBBEE Level" )]
+        [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
+        public string BBBEELevel { get; set; }
+
+        [Display( Name = "Number Of Pallets Lost" )]
+        public int? NumberOfLostPallets { get; set; }
 
         [Display( Name = "I accept the Terms and Conditions" )]
         public bool IsAccpetedTC { get; set; }

@@ -18,16 +18,17 @@ namespace ACT.Data.Models
         public Site()
         {
             this.ChepAudits = new HashSet<ChepAudit>();
-            this.ClientSites = new HashSet<ClientSite>();
             this.SiteAudits = new HashSet<SiteAudit>();
             this.SiteBillings = new HashSet<SiteBilling>();
-            this.Site1 = new HashSet<Site>();
             this.SiteBudgets = new HashSet<SiteBudget>();
+            this.Site1 = new HashSet<Site>();
+            this.ClientSites = new HashSet<ClientSite>();
         }
     
         public int Id { get; set; }
         public Nullable<int> SiteId { get; set; }
         public Nullable<int> RegionId { get; set; }
+        public Nullable<int> ARPMSalesManagerId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -36,6 +37,7 @@ namespace ACT.Data.Models
         public string XCord { get; set; }
         public string YCord { get; set; }
         public string Address { get; set; }
+        public string Town { get; set; }
         public string PostalCode { get; set; }
         public string ContactNo { get; set; }
         public string ContactName { get; set; }
@@ -45,20 +47,33 @@ namespace ACT.Data.Models
         public string Depot { get; set; }
         public string SiteCodeChep { get; set; }
         public int Status { get; set; }
+        public string FinanceContact { get; set; }
+        public string FinanceContactNo { get; set; }
+        public string ReceivingContact { get; set; }
+        public string ReceivingContactNo { get; set; }
+        public string DepotManager { get; set; }
+        public string DepotManagerContact { get; set; }
+        public string FinanceEmail { get; set; }
+        public string ReceivingEmail { get; set; }
+        public string DepotManagerEmail { get; set; }
+        public Nullable<int> Province { get; set; }
+        public string LocationNumber { get; set; }
+        public string CLCode { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepAudit> ChepAudits { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientSite> ClientSites { get; set; }
-        public virtual Region Region { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SiteAudit> SiteAudits { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SiteBilling> SiteBillings { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SiteBudget> SiteBudgets { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Site> Site1 { get; set; }
         public virtual Site Site2 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SiteBudget> SiteBudgets { get; set; }
+        public virtual ICollection<ClientSite> ClientSites { get; set; }
+        public virtual Region Region { get; set; }
+        public virtual User User { get; set; }
     }
 }

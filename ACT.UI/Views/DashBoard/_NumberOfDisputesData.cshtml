@@ -1,0 +1,119 @@
+﻿
+@model List<DisputeCustomModel>
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+
+@Html.Partial( "_Notification" )
+
+@if ( !Model.NullableAny() )
+{
+    <div class="message-warn" style="margin-bottom: 20px;">
+        There are no Disputes available matching your search criteria.
+    </div>
+}
+
+<table id="disputes-table" class="da-table">
+
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th>
+                Account #
+            </th>
+            <th>
+                TDN
+            </th>
+            <th>
+                Raised Date
+            </th>
+            <th>
+                Docket #
+            </th>
+            <th>
+                Ref
+            </th>
+            <th>
+                Action By
+            </th>
+            <th>
+                Other Party
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+                Equipment
+            </th>
+            <th>
+                Quantity
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model.NullableAny() )
+        {
+            int count = 1;
+
+            foreach ( var item in Model )
+            {
+                DisputeStatus status = ( DisputeStatus ) item.Status;
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.ChepLoadAccountNumber
+                    </td>
+                    <td>
+                        @item.TDNNumber
+                    </td>
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
+                    </td>
+                    <td>
+                        @item.DocketNumber
+                    </td>
+                    <td>
+                        @item.Reference
+                    </td>
+                    <td>
+                        @item.ActionUser
+                    </td>
+                    <td>
+                        @item.OtherParty
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+
+                        @if ( ( status == DisputeStatus.Resolved || status == DisputeStatus.Cancelled ) && !string.IsNullOrWhiteSpace( item.ResolvedUser ) )
+                        {
+                            <strong class="block">By @item.ResolvedUser</strong>
+
+                            if ( item.ResolvedOn.HasValue )
+                            {
+                                <small class="block">on @item.ResolvedOn.Value.ToString( "yyyy-MM-dd HH:mm" )</small>
+                            }
+                        }
+                    </td>
+                    <td>
+                        @item.Equipment
+                    </td>
+                    <td>
+                        @item.Quantity
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>

@@ -1,0 +1,79 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums; 
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.Target = "#client-loads-data";
+    ViewBag.Url = Url.Action( "UnReconciledClientLoads", new { ReconciliationStatus = ReconciliationStatus.Unreconciled } );
+
+    int count = Model.Start;
+    List<ClientLoadCustomModel> items = ( List<ClientLoadCustomModel> ) Model.Items;
+}
+
+<table id="client-table" class="da-table small fixed-headerx" data-fixed-header-target="#client-loads" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="Check">
+                <input type="checkbox" data-r-p-c="1" data-check=".client-loads-check" data-sel="#client-loads" data-compare="#chep-loads" />
+            </th>
+            <th data-name="LoadDate">
+                Load Date
+            </th>
+            <th data-name="DeliveryNote">
+                Delivery Note #
+            </th>
+            <th data-name="ReceiverNumber">
+                Ref #
+            </th>
+            <th data-name="OriginalQuantity">
+                Qty
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items.NullableAny() )
+        {
+            foreach ( var item in items )
+            {
+                <tr id="tr-@item.Id-item" class="client-@item.Id-item">
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        <input type="checkbox" class="client-loads-check" data-r-c="1" data-id="@item.Id" data-qty="@item.OriginalQuantity" data-sel="#client-loads" data-compare="#chep-loads" checked="checked" />
+                    </td>
+                    <td>
+                        @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @item.DeliveryNote
+                    </td>
+                    <td>
+                        @item.ReceiverNumber
+                    </td>
+                    <td>
+                        @item.OriginalQuantity
+                    </td>
+                </tr>
+
+                count++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6">
+                    There are no records to display
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_TinyPaging" )

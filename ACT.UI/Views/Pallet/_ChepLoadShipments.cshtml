@@ -1,0 +1,62 @@
+﻿@model List<ChepLoad>
+
+@using ACT.Data.Models;
+@using ACT.Core.Services; 
+
+@{
+    ClientLoadService clservice = new ClientLoadService();
+}
+
+<table id="chep-shipments-table" class="da-table small" style="color: #000;">
+
+    <thead>
+        <tr>
+            <th>Docket Number</th>
+            <th>Reference</th>
+            <th>Other Reference</th>
+            <th>Load Number</th>
+            <th>Qty</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @if ( Model.NullableAny() )
+        {
+            int count = 0;
+
+            foreach ( ChepLoad item in Model )
+            {
+                List<ClientLoad> cl = clservice.ListByChepRefOtherRef( item.Ref, item.OtherRef );
+
+                <tr>
+                    <td>
+                        @item.DocketNumber
+                    </td>
+                    <td>
+                        @item.Ref
+                    </td>
+                    <td>
+                        @item.OtherRef
+                    </td>
+                    <td>
+                        @Html.Raw( string.Join( "<br />", cl?.Select( s => s?.LoadNumber ) ) )
+                    </td>
+                    <td>
+                        @Html.Raw( string.Join( "<br />", cl?.Select( s => s?.OriginalQuantity ) ) )
+                    </td>
+                </tr>
+
+                count++;
+            }
+        }
+
+    </tbody>
+
+</table>
+
+<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px;">&nbsp;</div>
+
+<p>
+    <a onclick="ACT.Modal.Close();">Close</a>
+</p>

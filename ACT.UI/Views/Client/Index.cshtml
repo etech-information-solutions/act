@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = "Client";
 
-    //UserModel user = User.Get();
+    UserModel user = User.Get();
 }
 
 
@@ -11,26 +11,29 @@
 
     <ul>
 
-        <li data-hot-spot="1" data-c="Client" data-t="ClientList">
-            <a data-ap-tab="1" data-target="#clientlist" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientList">Client List</a>
+        <li data-hot-spot="1" data-c="Client" data-t="Clients" class="none">
+            <a data-ap-tab="1" data-target="#clients" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Clients">Client</a>
         </li>
-        <li data-hot-spot="1" data-c="Client" data-t="ClientGroups">
-            <a data-ap-tab="1" data-target="#clientgoups" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientGroups">Client Groups</a>
+        <li data-hot-spot="1" data-c="Client" data-t="ClientKPI" class="none">
+            <a data-ap-tab="1" data-target="#clientkpi" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientKPI">Client KPI</a>
         </li>
-        <li data-hot-spot="1" data-c="Client" data-t="ManageSites">
-            <a data-ap-tab="1" data-target="#managesites" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ManageSites">Manage Sites</a>
+        @if ( user.IsAdmin )
+        {
+            <li data-hot-spot="1" data-c="Client" data-t="Groups" class="none">
+                <a data-ap-tab="1" data-target="#clientgroups" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientGroups">Client Groups</a>
+            </li>
+        }
+        <li data-hot-spot="1" data-c="Client" data-t="ManageSites" class="none">
+            <a data-ap-tab="1" data-target="#managesites" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ManageSites">Client Sites</a>
         </li>
-        <li data-hot-spot="1" data-c="Client" data-t="Subsites">
+        @*<li data-hot-spot="1" data-c="Client" data-t="Subsites" class="none">
             <a data-ap-tab="1" data-target="#subsites" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Subsites">Sub-sites</a>
-        </li>
-        <li data-hot-spot="1" data-c="Client" data-t="LinkProducts">
+        </li>*@
+        <li data-hot-spot="1" data-c="Client" data-t="LinkProducts" class="none">
             <a data-ap-tab="1" data-target="#linkproducts" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="LinkProducts">Link Products</a>
         </li>
-        <li data-hot-spot="1" data-c="Client" data-t="ManageTransporters">
-            <a data-ap-tab="1" data-target="#managetransporters" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ManageTransporters">Manage Transporters</a>
-        </li>
-        <li data-hot-spot="1" data-c="Client" data-t="AwaitingActivation">
-            <a data-ap-tab="1" data-target="#awaitingactivation" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="AwaitingActivation">Awaiting Activation</a>
+        <li data-hot-spot="1" data-c="Client" data-t="ManageTransporters" class="none">
+            <a data-ap-tab="1" data-target="#managetransporters" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ManageTransporters">Client Transporters</a>
         </li>
 
         <li class="last"></li>
@@ -40,9 +43,14 @@
 
     <div id="tab-data" class="tab-data">
 
-        <div id="clientlist" class="da-tab none" data-load-url="ClientList"> </div>
+        <div id="clients" class="da-tab none" data-load-url="Clients"> </div>
 
-        <div id="clientgoups" class="da-tab none" data-load-url="ClientGroups"> </div>
+        <div id="clientkpi" class="da-tab none" data-load-url="ClientKPI"> </div>
+
+        @if ( user.IsAdmin )
+        {
+            <div id="clientgroups" class="da-tab none" data-load-url="ClientGroups"> </div>
+        }
 
         <div id="managesites" class="da-tab none" data-load-url="ManageSites"> </div>
 
@@ -51,10 +59,6 @@
         <div id="linkproducts" class="da-tab none" data-load-url="LinkProducts"> </div>
 
         <div id="managetransporters" class="da-tab none" data-load-url="ManageTransporters"> </div>
-
-        <div id="awaitingactivation" class="da-tab none" data-load-url="AwaitingActivation"> </div>
     </div>
 
 </div>
-
-@*@Html.Partial(_ClientHeader)*@

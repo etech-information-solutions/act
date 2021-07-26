@@ -1,0 +1,69 @@
+﻿@model List<JournalViewModel>
+
+@using ACT.UI.Models
+@using ACT.Core.Enums
+
+
+
+<table id="client-journals-table" class="da-table small" style="color: #000;">
+
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Qty</th>
+            <th>In/Out?</th>
+            <th>THAN</th>
+            <th>Type</th>
+            <th>Journal File</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @if ( Model.NullableAny() )
+        {
+            int count = 0;
+
+            foreach ( JournalViewModel item in Model )
+            {
+                <tr>
+                    <td width="30%">
+                        @item.PostingDescription
+                    </td>
+                    <td>
+                        @item.PostingQuantity
+                    </td>
+                    <td>
+                        @item.InOutInd
+                    </td>
+                    <td>
+                        @item.THAN
+                    </td>
+                    <td>
+                        @item.JournalType
+                    </td>
+                    <td width="20%">
+                        @if ( item.Documents.NullableAny( s => s.Status == ( Int32 ) Status.Active ) )
+                        {
+                            <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Pallet", new { @id = item.Documents.FirstOrDefault().Id } )" target="_blank">
+                                <img alt="" src="@Url.Content( "~/Images/download.png" )" />
+
+                                @item.Documents.FirstOrDefault().Name (@item.Documents.FirstOrDefault().Type)
+                            </a>
+                        }
+                    </td>
+                </tr>
+
+                count++;
+            }
+        }
+
+    </tbody>
+
+</table>
+
+<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px;">&nbsp;</div>
+
+<p>
+    <a onclick="ACT.Modal.Close();">Close</a>
+</p>

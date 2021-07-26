@@ -17,6 +17,12 @@ namespace ACT.UI.Models
         [Display( Name = "Role" )]
         public int RoleId { get; set; }
 
+        [Display( Name = "PSP" )]
+        public int? PSPId { get; set; }
+
+        [Display( Name = "Client" )]
+        public int? ClientId { get; set; }
+
         public Role Role { get; set; }
 
         [Required]
@@ -48,15 +54,32 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ConfirmPassword { get; set; }
 
+        public string Pin { get; set; }
+
+        public string ConfirmPin { get; set; }
 
 
-        [Required]
+
+        //[Required]
         [Display( Name = "Status" )]
         public Status Status { get; set; }
+
+        public RoleType RoleType { get; set; }
+
+        [Display( Name = "Can Use Chats" )]
+        public YesNo CanSendChat { get; set; }
+
+        [Display( Name = "Can Respond To Chats" )]
+        public YesNo CanReceiveChat { get; set; }
+
+        [Display( Name = "Online Chat Status" )]
+        public OnlineStatus OnlineStatus { get; set; }
 
         public bool EditMode { get; set; }
 
         #endregion
+
+
 
         #region Model Options 
 
@@ -67,6 +90,32 @@ namespace ACT.UI.Models
                 using ( RoleService service = new RoleService() )
                 {
                     return service.List();
+                }
+            }
+        }
+
+        public Dictionary<int, string> PSPOptions
+        {
+            get
+            {
+                using ( PSPService pservice = new PSPService() )
+                {
+                    return pservice.List( true );
+                }
+            }
+        }
+        public Dictionary<int, string> ClientOptions
+        {
+            get
+            {
+                using ( ClientService cservice = new ClientService() )
+                {
+                    if ( cservice.SelectedClient != null )
+                    {
+                        ClientId = cservice.SelectedClient.Id;
+                    }
+
+                    return cservice.List( true );
                 }
             }
         }

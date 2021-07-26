@@ -1,0 +1,83 @@
+﻿@model PagingExtension
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
+@using ACT.UI.Models;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_Exceptions";
+}
+
+
+@Html.Partial( "_Notification" )
+
+
+@{
+    UserModel user = User.Get();
+
+    int count = Model.Start;
+    //List<PADViewModel> items = (List<PADViewModel>)Model.Items;
+
+    //PADService cservice = new PADService();
+
+
+}
+
+<table id="exceptions-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#exceptions-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th>
+                Status
+            </th>
+            <th>
+                Agent Client Name
+            </th>
+            <th>
+                Load Date
+            </th>
+            <th>
+                Eff Date
+            </th>
+            <th>
+                Del Note
+            </th>
+            <th>
+                Cust #
+            </th>
+            <th>
+                Product
+            </th>
+            <th>
+                Shipment No
+            </th>
+            <th>
+                Issue note
+            </th>
+            <th>
+                PCN
+            </th>
+            <th>
+                THAN
+            </th>
+            <th>
+                Qty
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )

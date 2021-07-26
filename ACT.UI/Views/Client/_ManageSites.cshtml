@@ -8,40 +8,35 @@
 @{
     ViewBag.ShowExport = true;
     ViewBag.ShowCustom = true;
-    ViewBag.ShowQuickStructure = true;
 
     ViewBag.ViewName = "_ManageSites";
 
     UserModel user = User.Get();
 }
 
-
-@Html.Partial("_Notification")
-
+@Html.Partial( "_Notification" )
 
 @{
-    Int32 count = Model.Start;
-    List<Site> items = (List<Site>)Model.Items;
+    int count = Model.Start;
+    List<SiteCustomModel> items = ( List<SiteCustomModel> ) Model.Items;
 }
 
-
-@if (Model == null || !items.Any())
+@if ( Model == null || !items.Any() )
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
         There are no Sites available matching your search criteria.
     </div>
 }
 
-    <p>
-        @Html.DropDownList("Client", (IEnumerable
-        <SelectListItem>)ViewData["ClientList"])
-        @Html.ActionLink("Add Site", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#sites" })
-        <label for="file">Browse:</label>
-        <input type="file" name="sitesfile" id="sitesfile" />
-        <input type="submit" value="Import Sites"/>
-        <span class="loader"></span>
-    </p>
+<p>
+    @Html.ActionLink( "Add", "AddSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#managesites" } )
 
+    <span style="padding: 0 5px;">|</span>
+
+    @Html.ActionLink( "Import", "ImportSite", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import new sites?", @data_edit = "1", @data_id = 0, @data_target = "#managesites" } )
+
+    <span class="loader"></span>
+</p>
 
 <table id="sites-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#sites-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
@@ -49,122 +44,189 @@
             <th data-name="Count">
                 #
             </th>
-            <th data-name="RegionId" data-column="RegionId">
+            <th data-name="CreatedOn" data-column="s.CreatedOn">
+                Date
+            </th>
+            @*<th data-name="ClientName" data-column="c.CompanyName">
+                Client
+            </th>*@
+            <th data-name="RegionName" data-column="r.Name">
                 Region
             </th>
-            <th data-name="Name" data-column="Name">
-                Site Name
+            <th data-name="SiteName" data-column="s.Name">
+                Name
             </th>
-            <th data-name="XCord" data-column="XCord">
-                Site X Coordinate
+            <th data-name="Coordinates">
+                Coordinates
             </th>
-            <th data-name="YCord" data-column="YCord">
-                Site Y Coordinate
+            <th data-name="ContactNo" data-column="s.ContactNo">
+                Contact
             </th>
-            <th data-name="Address" data-column="Address">
-                Site Address
+            <th data-name="Address" data-column="s.FinanceContact">
+                Finance
             </th>
-            <th data-name="PostalCode" data-column="PostalCode">
-                Postal Code
+            <th data-name="PostalCode" data-column="s.ReceivingContact">
+                Receiver
             </th>
-            <th data-name="ContactNo" data-column="ContactNo">
-                Contact Number
-            </th>
-            <th data-name="ContactName" data-column="ContactName">
-                Contact Name
-            </th>
-            <th data-name="PlanningPoint" data-column="PlanningPoint">
+            <th data-name="PlanningPoint" data-column="s.PlanningPoint">
                 Planning Point
             </th>
-            <th data-name="SiteType" data-column="SiteType">
+            <th data-name="SiteType" data-column="s.SiteType">
                 Site Type
             </th>
-            <th data-name="SiteBudgets" data-column="SiteBudgets">
-                Subsites Budget
+            <th data-name="Counts">
+
             </th>
-            @*<th data-name="Actions">
+            <th data-name="Actions">
                 Actions
-            </th>*@
+            </th>
         </tr>
     </thead>
 
     <tbody>
-        @if (Model != null && items != null && items.Count() > 0)
+        @if ( Model != null && items != null && items.Count() > 0 )
         {
-            foreach (var item in items)
+            foreach ( SiteCustomModel item in items )
             {
-                //Status status = (Status)item.Status;
+                Status status = ( Status ) item.Status;
 
-                //Role role = new Role() { Name = "~/~", Type = -1 };
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
-                //if (item.UserRoles.Any())
-                //{
-                //    role = item.UserRoles.FirstOrDefault().Role;
-                //}
+                string italic = item.SiteId.HasValue ? "italic" : "";
 
-                //RoleType roleType = (RoleType)role.Type;
+                string siteTypeName = ( item.SiteType != null ) ? ( ( SiteType ) item.SiteType ).GetDisplayText() : "N/A";
 
-                //String active = status.Equals(Status.Active) ? "active" : "inactive";
-                //String enable = status.Equals(Status.Active) ? "Disable" : "Enable";
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active @italic">
 
-        <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
 
-            <td width="1%">
-                @count
-            </td>
-            <td style="width: 15%;">
-                @item.RegionId
-            </td>
-            <td>
-                @item.Name
-            </td>
-            <td>
-                @item.XCord
-            </td>
-            <td>
-                @item.YCord
-            </td>
-            <td>
-                @item.Address
-            </td>
-            <td>
-                @item.PostalCode
-            </td>
-            <td>
-                @item.ContactNo
-            </td>
-            <td>
-                @item.ContactName
-            </td>
-            <td>
-                @item.PlanningPoint
-            </td>
-            <td>
-                @item.SiteType
-            </td>
-            <td>
-                @*@item.SiteBudgets*@
-            </td>
-            @*<td width="15%">
-            @Html.ActionLink("Details", "UserDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Site">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    @*<td>
+                        @item.ClientName
+                    </td>*@
+                    <td>
+                        @item.RegionName
+                    </td>
+                    <td>
+                        @item.Name
 
-            @Html.ActionLink("Edit", "EditUser", new { id = item.Id, returnView = "Users" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+                        @if ( item.SiteId.HasValue )
+                        {
+                            <a class="block" rel="tipsyE" title="I am a sub-site">
+                                <img alt="" src="@Url.Content( "~/Images/sub.png" )" style="max-width: 22px;" />
+                                <span></span>
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @item.XCord,@item.YCord
+                    </td>
+                    <td>
+                        @item.ContactName <br />
+                        @item.ContactNo
+                    </td>
+                    <td>
+                        @item.FinanceContact <br />
+                        @item.FinanceContactNo
+                    </td>
+                    <td>
+                        @item.ReceivingContact <br />
+                        @item.ReceivingContactNo
+                    </td>
+                    <td>
+                        @item.PlanningPoint
+                    </td>
+                    <td>
+                        @siteTypeName
+                    </td>
+                    <td width="8%">
+                        <ul class="list">
+                            <li>
+                                <a data-sticky-one="1" data-target="#site-@item.Id-subsites" data-trigger="mouseover" data-arrow="center-right" data-title="Subsites">
+                                    @item.SubSiteCount Subsites
+                                </a>
 
-            @if (user.Email != item.Email)
-            {
-                @Html.ActionLink(enable, "DeleteUser", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#users", @rel = "tipsyE", @title = enable + " this item?" })
-            }
-        </td>*@
+                                <div id="site-@item.Id-subsites" class="none">
+                                    @if ( item.SubSites.NullableAny() )
+                                    {
+                                        <ul class="list">
+                                            @foreach ( string ss in item.SubSites )
+                                            {
+                                                <li style="line-height: 20px;">
+                                                    @ss
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <div class="message-warn">
+                                            This Site has no sub-sites linked
+                                        </div>
+                                    }
+                                </div>
 
-        </tr>
+                            </li>
+                            <li>
+                                <a data-sticky-one="1" data-target="#site-@item.Id-clients" data-trigger="mouseover" data-arrow="center-right" data-title="Customers">
+                                    @item.ClientCount Customers
+                                </a>
+
+                                <div id="site-@item.Id-clients" class="none">
+                                    @if ( item.Clients.NullableAny() )
+                                    {
+                                        <ul class="list">
+                                            @foreach ( string c in item.Clients )
+                                            {
+                                                <li style="line-height: 20px;">
+                                                    @c
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <div class="message-warn">
+                                            This site has no clients linked
+                                        </div>
+                                    }
+                                </div>
+                            </li>
+                            @*<li>
+                                @Html.ActionLink( item.BudgetCount + " Budgets", "SiteDetails", new { id = item.Id }, new { @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            </li>*@
+                        </ul>
+                    </td>
+
+                    <td width="9%">
+
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                            @Html.ActionLink( "Details", "SiteDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item", @style = "margin-left: 0;" } )
+
+                            @Html.ActionLink( "Edit", "EditSite", new { id = item.Id, returnView = "ManageSites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        </div>
+
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                            @Html.ActionLink( enable, "DeleteSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managesites", @rel = "tipsyE", @title = enable + " this item?", @style = "margin-left: 0;" } )
+                        </div>
+                    </td>
+                </tr>
 
                 count++;
             }
         }
+
     </tbody>
 
 </table>
 
-@*@Html.Partial( "_UserCustomSearch", new ACT.Core.Models.CustomSearchModel( "User" ) )*@
-
-@Html.Partial("_Paging")
+@Html.Partial( "_Paging" )

@@ -13,9 +13,7 @@ namespace ACT.UI.Mvc
     {
         protected override void HandleUnauthorizedRequest( AuthorizationContext filterContext )
         {
-            BaseController controller = filterContext.Controller as BaseController;
-
-            if ( controller != null )
+            if ( filterContext.Controller is BaseController controller )
             {
                 controller.HandleUnauthorizedUserRequest( filterContext );
             }

@@ -35,5 +35,25 @@ namespace ACT.Data.Models
         public string WebsiteUrl { get; set; }
         public string PlatformTnCDocumentUrl { get; set; }
         public string ClientTnCDocumentUrl { get; set; }
+        public Nullable<System.TimeSpan> DisputeMonitorTime { get; set; }
+        public string DisputeMonitorInterval { get; set; }
+        public string DisputeMonitorPath { get; set; }
+        public bool DisputeMonitorEnabled { get; set; }
+        public Nullable<System.DateTime> LastDisputeMonitorRun { get; set; }
+        public Nullable<int> LastDisputeMonitorCount { get; set; }
+        public Nullable<System.TimeSpan> ClientMonitorTime { get; set; }
+        public string ClientMonitorInterval { get; set; }
+        public string ClientMonitorPath { get; set; }
+        public bool ClientMonitorEnabled { get; set; }
+        public Nullable<System.DateTime> LastClientMonitorRun { get; set; }
+        public Nullable<int> LastClientMonitorCount { get; set; }
+        public Nullable<int> ClientContractRenewalReminderMonths { get; set; }
+        public Nullable<int> DisputeDaysToResolve { get; set; }
+        public string FirebaseUrl { get; set; }
+        public string FirebaseServerKey { get; set; }
+        public string FirebaseSenderId { get; set; }
+        public string OneSignalAPIUrl { get; set; }
+        public string OneSignaIAPIKey { get; set; }
+        public string OneSignaIAppId { get; set; }
     }
 }

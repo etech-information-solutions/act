@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data.Entity.Validation;
-using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
 using System.Threading;
+
 using ACT.Core.Enums;
-using ACT.Core.Extension;
 using ACT.Core.Models;
 using ACT.Mailer;
 using ACT.Monitor.Monitors;
@@ -17,11 +15,10 @@ namespace ACT.Monitor
     public partial class Monitor : ServiceBase
     {
         //private System.Timers.Timer DinnerMonitorTimer;
-        private System.Timers.Timer RebateMonitorTimer;
 
-        private Timer MemberTimer;
-        private Timer RefundTimer;
-        private Timer BillingTimer;
+        private Timer ClientTimer;
+
+        private Timer DisputeTimer;
 
         private StreamWriter Writer;
 
@@ -60,9 +57,8 @@ namespace ACT.Monitor
                 Writer.WriteLine( $"========================   SERVICE STARTED @ {DateTime.Now}   ========================" );
 
                 // Start independent Timers
-                //this.ConfigureTimers( Timers.MemberMonitorTimer );
-                //this.ConfigureTimers( Timers.RefundMonitorTimer );
-                //this.ConfigureTimers( Timers.BillingMonitorTimer );
+                this.ConfigureTimers( Timers.ClientMonitorTimer );
+                this.ConfigureTimers( Timers.DisputeMonitorTimer );
 
                 // Polls are in seconds, so we multiply by 1000 to convert seconds to milliseconds
                 //this.DinnerMonitorTimer = new System.Timers.Timer( ( ( ( double ) ConfigSettings.SystemRules.DinnerMonitorPoll ) * 1000 ) );  // 300000 milliseconds = 5 Minutes 60000 milliseconds = 1 Minute
@@ -98,13 +94,8 @@ namespace ACT.Monitor
                     //    DinnerMonitorTimer = null;
                     //}
 
-                    //if ( RebateMonitorTimer != null )
-                    //{
-                    //    RebateMonitorTimer.Stop();
-                    //    RebateMonitorTimer = null;
-                    //}
+                    //Fire an E - mail for RED ALERT
 
-                    // Fire an E-mail for RED ALERT
                     List<string> receivers = new List<string>
                     {
                         "msimwaba@gmail.com"
@@ -114,7 +105,7 @@ namespace ACT.Monitor
                     {
                         Recipients = receivers,
                         Body = "<p>THE <b>ACT MONITOR (Windows Service)</b> HAS BEEN STOPPED! PLEASE RECTIFY IMMEDIATELY...</p><p>You can safely ignore this e-mail but you'll be held responsible for customer unsatisfictory!</p><p>Best Regards<br /> ACT Team</p>",
-                        From = "support@testACT.co.za",
+                        From = "support@testact.co.za",
                         Subject = "ACT MONITOR HAS BEEN STOPPED!"
                     };
 
@@ -207,295 +198,175 @@ namespace ACT.Monitor
             }
         }
 
-        private void RebateMonitorTimer_Elapsed( object sender, System.Timers.ElapsedEventArgs e )
-        {
-            try
-            {
-                //if ( RebateMonitor.IsRunning )
-                //{
-                //    return;
-                //}
-
-                //ConfigSettings.SetRules();
-
-                //ArchiveLog( ConfigSettings.SystemRules.RebateMonitorExportPath.Replace( "\\Export", "" ), 10.0 );
-
-                //using ( StreamWriter writer = new StreamWriter( string.Format( "{0}\\log.log", ConfigSettings.SystemRules.RebateMonitorExportPath.Replace( "\\Export", "" ) ), true ) )
-                //{
-                //    try
-                //    {
-                //        writer.AutoFlush = true;
-
-                //        writer.WriteLine();
-                //        writer.WriteLine( string.Format( "BEGIN REBATE MONITOR @ {0}   ========================", DateTime.Now ) );
-
-                //        bool done = RebateMonitor.Run( writer );
-
-                //        writer.WriteLine();
-                //        writer.WriteLine( string.Format( "END REBATE MONITOR @ {0}   ========================", DateTime.Now ) );
-                //    }
-                //    catch ( Exception ex )
-                //    {
-                //        BaseMonitor.Error( writer, ex, "RebateMonitorTimer_Elapsed" );
-                //    }
-
-                //    writer.Flush();
-                //}
-            }
-            catch ( Exception ex )
-            {
-                BaseMonitor.Error( Writer, ex, "RebateMonitorTimer_Elapsed" );
-            }
-        }
-
 
 
         private void ConfigureTimers( Timers timer )
         {
-            //int dueTime;
+            int dueTime;
 
-            //DateTime scheduledTime;
-            //TimeSpan timeSpan, span;
+            DateTime scheduledTime;
+            TimeSpan timeSpan, span;
 
-            //switch ( timer )
-            //{
-            //    case Timers.MemberMonitorTimer:
+            switch ( timer )
+            {
+                case Timers.ClientMonitorTimer:
 
-            //        #region Member Monitor Timer
+                    #region Member Monitor Timer
 
-            //        MemberTimer = new Timer( new TimerCallback( MemberTimerCallback ) );
+                    ClientTimer = new Timer( new TimerCallback( ClientTimerCallback ) );
 
-            //        //Set the Default Time.
-            //        scheduledTime = DateTime.MinValue;
+                    //Set the Default Time.
+                    scheduledTime = DateTime.MinValue;
 
-            //        //Get the Scheduled Time from AppSettings.
-            //        span = ConfigSettings.SystemRules.MemberInfoMonitorTime.Value;
-            //        scheduledTime = DateTime.Parse( $"{span.Hours}:{span.Minutes}:{span.Seconds}" );
+                    //Get the Scheduled Time from AppSettings.
+                    span = ConfigSettings.SystemRules.ClientMonitorTime.Value;
+                    scheduledTime = DateTime.Parse( $"{span.Hours}:{span.Minutes}:{span.Seconds}" );
 
-            //        if ( DateTime.Now > scheduledTime )
-            //        {
-            //            //If Scheduled Time is passed set Schedule for the next day.
-            //            scheduledTime = scheduledTime.AddDays( 1 );
-            //        }
+                    if ( DateTime.Now > scheduledTime )
+                    {
+                        //If Scheduled Time is passed set Schedule for the next day.
+                        scheduledTime = scheduledTime.AddDays( 1 );
+                    }
 
-            //        Writer.WriteLine();
-            //        Writer.WriteLine( "Member Info Monitor Scheduled Time: {0}", scheduledTime );
+                    Writer.WriteLine();
+                    Writer.WriteLine( "Client Monitor Scheduled Time: {0}", scheduledTime );
 
-            //        timeSpan = scheduledTime.Subtract( DateTime.Now );
+                    timeSpan = scheduledTime.Subtract( DateTime.Now );
 
-            //        Writer.WriteLine();
-            //        Writer.WriteLine( "Member Info Monitor Time Span: {0}", timeSpan );
+                    Writer.WriteLine();
+                    Writer.WriteLine( "Client Monitor Time Span: {0}", timeSpan );
 
-            //        //Get the difference in Minutes between the Scheduled and Current Time.
-            //        dueTime = Convert.ToInt32( timeSpan.TotalMilliseconds );
+                    //Get the difference in Minutes between the Scheduled and Current Time.
+                    dueTime = Convert.ToInt32( timeSpan.TotalMilliseconds );
 
-            //        Writer.WriteLine();
-            //        Writer.WriteLine( "Member Info Monitor Due Time: {0}", dueTime );
+                    Writer.WriteLine();
+                    Writer.WriteLine( "Client Monitor Due Time: {0}", dueTime );
 
-            //        // Change the Timer's Due Time.
-            //        MemberTimer.Change( dueTime, Timeout.Infinite );
+                    // Change the Timer's Due Time.
+                    ClientTimer.Change( dueTime, Timeout.Infinite );
 
-            //        #endregion
+                    #endregion
 
-            //        break;
+                    break;
 
-            //    case Timers.BillingMonitorTimer:
+                case Timers.DisputeMonitorTimer:
 
-            //        #region Billing Monitor Timer
+                    #region Member Monitor Timer
 
-            //        BillingTimer = new Timer( new TimerCallback( BillingTimerCallback ) );
+                    DisputeTimer = new Timer( new TimerCallback( DisputeTimerCallback ) );
 
-            //        //Set the Default Time.
-            //        scheduledTime = DateTime.MinValue;
+                    //Set the Default Time.
+                    scheduledTime = DateTime.MinValue;
 
-            //        //Get the Scheduled Time from AppSettings.
-            //        span = ConfigSettings.SystemRules.MemberBillingMonitorTime.Value;
-            //        scheduledTime = DateTime.Parse( $"{span.Hours}:{span.Minutes}:{span.Seconds}" );
+                    //Get the Scheduled Time from AppSettings.
+                    span = ConfigSettings.SystemRules.DisputeMonitorTime.Value;
+                    scheduledTime = DateTime.Parse( $"{span.Hours}:{span.Minutes}:{span.Seconds}" );
 
-            //        if ( DateTime.Now > scheduledTime )
-            //        {
-            //            //If Scheduled Time is passed set Schedule for the next day.
-            //            scheduledTime = scheduledTime.AddDays( 1 );
-            //        }
+                    if ( DateTime.Now > scheduledTime )
+                    {
+                        //If Scheduled Time is passed set Schedule for the next day.
+                        scheduledTime = scheduledTime.AddDays( 1 );
+                    }
 
-            //        Writer.WriteLine();
-            //        Writer.WriteLine( "Billing Monitor Scheduled Time: {0}", scheduledTime );
+                    Writer.WriteLine();
+                    Writer.WriteLine( "Dispute Monitor Scheduled Time: {0}", scheduledTime );
 
-            //        timeSpan = scheduledTime.Subtract( DateTime.Now );
+                    timeSpan = scheduledTime.Subtract( DateTime.Now );
 
-            //        Writer.WriteLine();
-            //        Writer.WriteLine( "Billing Monitor Time Span: {0}", timeSpan );
+                    Writer.WriteLine();
+                    Writer.WriteLine( "Dispute Monitor Time Span: {0}", timeSpan );
 
-            //        //Get the difference in Minutes between the Scheduled and Current Time.
-            //        dueTime = Convert.ToInt32( timeSpan.TotalMilliseconds );
+                    //Get the difference in Minutes between the Scheduled and Current Time.
+                    dueTime = Convert.ToInt32( timeSpan.TotalMilliseconds );
 
-            //        Writer.WriteLine();
-            //        Writer.WriteLine( "Billing Monitor Due Time: {0}", dueTime );
+                    Writer.WriteLine();
+                    Writer.WriteLine( "Dispute Monitor Due Time: {0}", dueTime );
 
-            //        // Change the Timer's Due Time.
-            //        BillingTimer.Change( dueTime, Timeout.Infinite );
+                    // Change the Timer's Due Time.
+                    DisputeTimer.Change( dueTime, Timeout.Infinite );
 
-            //        #endregion
+                    #endregion
 
-            //        break;
-
-            //    case Timers.RefundMonitorTimer:
-
-            //        #region Refund Monitor Timer
-
-            //        RefundTimer = new Timer( new TimerCallback( RefundTimerCallback ) );
-
-            //        //Set the Default Time.
-            //        scheduledTime = DateTime.MinValue;
-
-            //        //Get the Scheduled Time from AppSettings.
-            //        span = ConfigSettings.SystemRules.RefundMonitorTime.Value;
-            //        scheduledTime = DateTime.Parse( $"{span.Hours}:{span.Minutes}:{span.Seconds}" );
-
-            //        if ( DateTime.Now > scheduledTime )
-            //        {
-            //            //If Scheduled Time is passed set Schedule for the next day.
-            //            scheduledTime = scheduledTime.AddDays( 1 );
-            //        }
-
-            //        Writer.WriteLine();
-            //        Writer.WriteLine( "Refund Monitor Scheduled Time: {0}", scheduledTime );
-
-            //        timeSpan = scheduledTime.Subtract( DateTime.Now );
-
-            //        Writer.WriteLine();
-            //        Writer.WriteLine( "Refund Monitor Time Span: {0}", timeSpan );
-
-            //        //Get the difference in Minutes between the Scheduled and Current Time.
-            //        dueTime = Convert.ToInt32( timeSpan.TotalMilliseconds );
-
-            //        Writer.WriteLine();
-            //        Writer.WriteLine( "Refund Monitor Due Time: {0}", dueTime );
-
-            //        // Change the Timer's Due Time.
-            //        RefundTimer.Change( dueTime, Timeout.Infinite );
-
-            //        #endregion
-
-            //        break;
-            //}
+                    break;
+            }
         }
 
 
 
-        public void MemberTimerCallback( object e )
+        public void ClientTimerCallback( object e )
         {
             try
             {
-                //ConfigSettings.SetRules();
+                ConfigSettings.SetRules();
 
-                //ArchiveLog( ConfigSettings.SystemRules.MemberInfoMonitorPath, 10.0 );
+                ArchiveLog( ConfigSettings.SystemRules.ClientMonitorPath, 10.0 );
 
-                //using ( StreamWriter writer = new StreamWriter( $"{ConfigSettings.SystemRules.MemberInfoMonitorPath}\\log.log", true ) )
-                //{
-                //    writer.AutoFlush = true;
+                using ( StreamWriter writer = new StreamWriter( $"{ConfigSettings.SystemRules.ClientMonitorPath}\\log.log", true ) )
+                {
+                    writer.AutoFlush = true;
 
-                //    try
-                //    {
-                //        writer.WriteLine();
-                //        writer.WriteLine( $"BEGIN Member Info MONITOR @ {DateTime.Now}   ========================" );
+                    try
+                    {
+                        writer.WriteLine();
+                        writer.WriteLine( $"BEGIN Client MONITOR @ {DateTime.Now}   ========================" );
 
-                //        DinnerMonitor.RunMemberInfo( writer );
+                        ClientMonitor.Run( writer );
 
-                //        writer.WriteLine();
-                //        writer.WriteLine( $"END Member Info MONITOR @ {DateTime.Now}   ========================" );
-                //    }
-                //    catch ( Exception ex )
-                //    {
-                //        BaseMonitor.Error( writer, ex, "MemberTimerCallback" );
-                //    }
-                //}
+                        writer.WriteLine();
+                        writer.WriteLine( $"END Client MONITOR @ {DateTime.Now}   ========================" );
+                    }
+                    catch ( Exception ex )
+                    {
+                        BaseMonitor.Error( writer, ex, "ClientTimerCallback" );
+                    }
+                }
             }
             catch ( Exception ex )
             {
-                BaseMonitor.Error( Writer, ex, "MemberTimerCallback" );
+                BaseMonitor.Error( Writer, ex, "ClientTimerCallback" );
             }
 
             // Reset Timer
-            ConfigureTimers( Timers.MemberMonitorTimer );
+            ConfigureTimers( Timers.ClientMonitorTimer );
         }
 
 
 
-        public void BillingTimerCallback( object e )
+        public void DisputeTimerCallback( object e )
         {
             try
             {
-                //ConfigSettings.SetRules();
+                ConfigSettings.SetRules();
 
-                //ArchiveLog( ConfigSettings.SystemRules.MemberBillingMonitorPath, 10.0 );
+                ArchiveLog( ConfigSettings.SystemRules.DisputeMonitorPath, 10.0 );
 
-                //using ( StreamWriter writer = new StreamWriter( $"{ConfigSettings.SystemRules.MemberBillingMonitorPath}\\log.log", true ) )
-                //{
-                //    writer.AutoFlush = true;
+                using ( StreamWriter writer = new StreamWriter( $"{ConfigSettings.SystemRules.DisputeMonitorPath}\\log.log", true ) )
+                {
+                    writer.AutoFlush = true;
 
-                //    try
-                //    {
-                //        writer.WriteLine();
-                //        writer.WriteLine( $"BEGIN Member Billing MONITOR @ {DateTime.Now}   ========================" );
+                    try
+                    {
+                        writer.WriteLine();
+                        writer.WriteLine( $"BEGIN Dispute MONITOR @ {DateTime.Now}   ========================" );
 
-                //        DinnerMonitor.RunMemberBilling( writer );
+                        DisputeMonitor.Run( writer );
 
-                //        writer.WriteLine();
-                //        writer.WriteLine( $"END Member Billing MONITOR @ {DateTime.Now}   ========================" );
-                //    }
-                //    catch ( Exception ex )
-                //    {
-                //        BaseMonitor.Error( writer, ex, "BillingTimerCallback" );
-                //    }
-                //}
+                        writer.WriteLine();
+                        writer.WriteLine( $"END Dispute MONITOR @ {DateTime.Now}   ========================" );
+                    }
+                    catch ( Exception ex )
+                    {
+                        BaseMonitor.Error( writer, ex, "DisputeTimerCallback" );
+                    }
+                }
             }
             catch ( Exception ex )
             {
-                BaseMonitor.Error( Writer, ex, "BillingTimerCallback" );
+                BaseMonitor.Error( Writer, ex, "DisputeTimerCallback" );
             }
 
             // Reset Timer
-            ConfigureTimers( Timers.BillingMonitorTimer );
-        }
-
-
-
-        public void RefundTimerCallback( object e )
-        {
-            try
-            {
-                //ConfigSettings.SetRules();
-
-                //ArchiveLog( ConfigSettings.SystemRules.RefundMonitorPath, 10.0 );
-
-                //using ( StreamWriter writer = new StreamWriter( $"{ConfigSettings.SystemRules.RefundMonitorPath}\\log.log", true ) )
-                //{
-                //    writer.AutoFlush = true;
-
-                //    try
-                //    {
-                //        writer.WriteLine();
-                //        writer.WriteLine( $"BEGIN Refund MONITOR @ {DateTime.Now}   ========================" );
-
-                //        DinnerMonitor.Export( writer );
-
-                //        writer.WriteLine();
-                //        writer.WriteLine( $"END Refund MONITOR @ {DateTime.Now}   ========================" );
-                //    }
-                //    catch ( Exception ex )
-                //    {
-                //        BaseMonitor.Error( writer, ex, "RefundTimerCallback" );
-                //    }
-                //}
-            }
-            catch ( Exception ex )
-            {
-                BaseMonitor.Error( Writer, ex, "RefundTimerCallback" );
-            }
-
-            // Reset Timer
-            ConfigureTimers( Timers.RefundMonitorTimer );
+            ConfigureTimers( Timers.DisputeMonitorTimer );
         }
     }
 }

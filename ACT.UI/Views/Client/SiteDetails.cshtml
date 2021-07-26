@@ -1,0 +1,486 @@
+﻿@model Site
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Site Details";
+
+    Address address = ViewBag.Address;
+}
+
+
+<div id="item-details" class="item-details" style="width: auto;">
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <h2>
+            <img alt="" src="@Url.Content( "~/images/info.png" )" />
+            <span>Site Details</span>
+        </h2>
+    }
+
+    <div class="left" style="width: 31%; margin-right: 2%;">
+
+        <div class="display-label">
+            Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Name )
+        </div>
+
+        <div class="display-label">
+            Description
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Description )
+        </div>
+
+        <div class="display-label">
+            Region
+        </div>
+        <div class="display-field">
+            @( Model.Region?.Description )
+        </div>
+
+        <div class="display-label">
+            ARPM Sales Manager
+        </div>
+        <div class="display-field">
+            @( Model.User?.Name ) @( Model.User?.Surname )
+        </div>
+
+        <div class="display-label">
+            Status
+        </div>
+        <div class="display-field">
+            @( ( ( Status ) Model.Status ).GetDisplayText() )
+        </div>
+
+        <div class="display-label">
+            Site Type
+        </div>
+        <div class="display-field">
+            @( Model.SiteType.HasValue ? ( ( SiteType ) Model.SiteType ).GetDisplayText() : string.Empty )
+        </div>
+
+        <div class="display-label">
+            Account Code
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.AccountCode )
+        </div>
+
+        <div class="display-label">
+            Customer No/Debtor Code
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.ClientCustomer?.CustomerNumber )
+        </div>
+
+        <div class="display-label">
+            Planning Point/Code
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.PlanningPoint )
+        </div>
+
+        <div class="display-label">
+            Depot Code
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Depot )
+        </div>
+
+        <div class="display-label">
+            Chep GLID No
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.SiteCodeChep )
+        </div>
+
+        <div class="display-label">
+            Location Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.LocationNumber )
+        </div>
+
+    </div>
+
+    <div class="left" style="width: 31%; margin-right: 2%;">
+
+        <div class="display-label">
+            X Coordinate
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.XCord )
+        </div>
+
+        <div class="display-label">
+            Y Coordinate
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.YCord )
+        </div>
+
+        <div class="display-label">
+            Contact Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ContactName )
+        </div>
+
+        <div class="display-label">
+            Contact Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ContactNo )
+        </div>
+
+        <div class="display-label">
+            Finance Contact Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.FinanceContact )
+        </div>
+
+        <div class="display-label">
+            Finance Contact Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.FinanceContactNo )
+        </div>
+
+        <div class="display-label">
+            Finance Email Address
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.FinanceEmail )
+        </div>
+
+        <div class="display-label">
+            Receiving Contact Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ReceivingContact )
+        </div>
+
+        <div class="display-label">
+            Receiving Contact Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ReceivingContactNo )
+        </div>
+
+        <div class="display-label">
+            Receiving Email Address
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ReceivingEmail )
+        </div>
+
+        <div class="display-label">
+            Depot Manager Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.DepotManager )
+        </div>
+
+        <div class="display-label">
+            Depot Manager Contact Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.DepotManagerContact )
+        </div>
+
+        <div class="display-label">
+            Depot Manager Email Address
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.DepotManagerEmail )
+        </div>
+
+    </div>
+
+    <div class="left" style="width: 31%;">
+
+        <div class="display-label">
+            Authorisation Email 1
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.AuthorisationEmail1 )
+        </div>
+
+        <div class="display-label">
+            Authorisation Email 2
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.AuthorisationEmail2)
+        </div>
+
+        <div class="display-label">
+            Authorisation Email 3
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.AuthorisationEmail3 )
+        </div>
+
+        <div class="display-label">
+            Client Sales Manager
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.ClientSalesManager )
+        </div>
+
+        <div class="display-label">
+            Client Manager Contact
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.ClientManagerContact )
+        </div>
+
+        <div class="display-label">
+            Client Manager Email
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.ClientManagerEmail )
+        </div>
+
+        <div class="display-label">
+            Client Sales Rep Contact
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.ClientSalesRepContact )
+        </div>
+
+        <div class="display-label">
+            Client Sales Rep Email
+        </div>
+        <div class="display-field">
+            @( Model.ClientSites?.FirstOrDefault()?.ClientSalesRegEmail )
+        </div>
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    <div class="left" style="width: 45%; margin-right: 3%;">
+
+        <div class="grouped-area" style="max-height: 100px; overflow-y: auto;">
+
+            <p>
+                <strong class="uppercase">Sub Sites (@Model.Site1.NullableCount())</strong>
+            </p>
+
+            @if ( Model.Site1.NullableAny() )
+            {
+                <ul class="list">
+                    @foreach ( Site s in Model.Site1 )
+                    {
+                        <li>
+                            @s.Name
+                        </li>
+                    }
+                </ul>
+            }
+
+        </div>
+
+        <div class="grouped-area" style="max-height: 170px; overflow-y: auto;">
+
+            <p>
+                <strong class="uppercase">Customers (@Model.ClientSites.NullableCount())</strong>
+            </p>
+
+            @if ( Model.ClientSites.NullableAny() )
+            {
+                <ul class="list">
+                    @foreach ( ClientCustomer c in Model.ClientSites.Select( s => s.ClientCustomer ) )
+                    {
+                        <li>
+                            @c.CustomerName
+                        </li>
+                    }
+                </ul>
+            }
+
+        </div>
+
+    </div>
+
+    <div class="left" style="width: 45%;">
+
+        <div class="grouped-area">
+
+            <p>
+                <strong class="uppercase">Addres Details</strong>
+            </p>
+
+            @if ( address != null )
+            {
+                <div class="display-label">
+                    Addres
+                </div>
+                <div class="display-field">
+                    @address.Addressline1
+                </div>
+                <div class="display-field">
+                    @address.Addressline2
+                </div>
+
+                <div class="display-label">
+                    Town/City
+                </div>
+                <div class="display-field">
+                    @address.Town
+                </div>
+
+                <div class="display-label">
+                    Postal Code
+                </div>
+                <div class="display-field">
+                    @address.PostalCode
+                </div>
+
+                <div class="display-label">
+                    Province
+                </div>
+                <div class="display-field">
+                    @(address?.Province?.Description)
+                </div>
+            }
+            else
+            {
+                <div class="message-warn">
+                    This site does not have address details
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    @*<div id="budgets">
+
+            <div class="display-label" style="margin-bottom: 10px;">
+                Budgets (@Model.SiteBudgets.NullableCount())
+            </div>
+
+            <div class="display-field">
+
+                <table id="sitebudget-table" class="da-table" style="border-bottom: 0;">
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Year</th>
+                            <th>Total</th>
+                            <th>Jan</th>
+                            <th>Feb</th>
+                            <th>Mar</th>
+                            <th>Apr</th>
+                            <th>May</th>
+                            <th>Jun</th>
+                            <th>Jul</th>
+                            <th>Aug</th>
+                            <th>Sep</th>
+                            <th>Oct</th>
+                            <th>Nov</th>
+                            <th>Dec</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if ( Model.SiteBudgets.NullableAny() )
+                        {
+                            int count = 1;
+
+                            foreach ( SiteBudget b in Model.SiteBudgets )
+                            {
+                                decimal? total = b.Total > 0 ? b.Total : b.January + b.February + b.March + b.April + b.May + b.June + b.July + b.August + b.September + b.October + b.November + b.December;
+
+                                <tr>
+                                    <td width="1%">
+                                        @count
+                                    </td>
+                                    <td>
+                                        <b>@b.BudgetYear</b>
+                                    </td>
+                                    <td>
+                                        <b>@Math.Round( total ?? 0, 0 )</b>
+                                    </td>
+                                    <td>
+                                        @b.January
+                                    </td>
+                                    <td>
+                                        @b.February
+                                    </td>
+                                    <td>
+                                        @b.March
+                                    </td>
+                                    <td>
+                                        @b.April
+                                    </td>
+                                    <td>
+                                        @b.May
+                                    </td>
+                                    <td>
+                                        @b.June
+                                    </td>
+                                    <td>
+                                        @b.July
+                                    </td>
+                                    <td>
+                                        @b.August
+                                    </td>
+                                    <td>
+                                        @b.September
+                                    </td>
+                                    <td>
+                                        @b.October
+                                    </td>
+                                    <td>
+                                        @b.November
+                                    </td>
+                                    <td>
+                                        @b.December
+                                    </td>
+                                </tr>
+
+                                count++;
+                            }
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>*@
+
+    <p>
+        @Html.ActionLink( "Edit", "EditSite", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+
+        @if ( ViewBag.IncludeLayout == null )
+        {
+            <span style="padding: 0 5px;">/</span>
+            <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
+        }
+    </p>
+
+    @if ( ViewBag.IncludeLayout != null )
+    {
+        <div class="back-to-list">
+            @Html.ActionLink( "Back to List", "Index" )
+        </div>
+    }
+
+</div>

@@ -1,0 +1,128 @@
+﻿
+@model List<ChepLoadCustomModel>
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+<div style="max-height: 800px; overflow-x: auto;">
+
+
+    @Html.Partial( "_Notification" )
+
+    @if ( !Model.NullableAny() )
+    {
+        <div class="message-warn" style="margin-bottom: 20px;">
+            There are no Outstanding Pallets available matching your search criteria.
+        </div>
+    }
+
+    <table id="ageofoutstandingpallets-table" class="da-table">
+
+        <thead>
+            <tr>
+                <th>
+                    #
+                </th>
+                <th>
+                    Load Date
+                </th>
+                <th>
+                    Load #
+                </th>
+                <th>
+                    Docket #
+                </th>
+                <th>
+                    Client
+                </th>
+                <th>
+                    Ref #
+                </th>
+                <th>
+                    Other Ref #
+                </th>
+                <th>
+                    Quantity
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Balanced
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if ( Model.NullableAny() )
+            {
+                int count = 1;
+
+                foreach ( var item in Model )
+                {
+                    BalanceStatus balanceStatus = ( BalanceStatus ) item.BalanceStatus;
+                    ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
+
+                    <tr>
+                        <td width="1%">
+                            @count
+                        </td>
+                        <td>
+                            @(( item.ShipmentDate ?? item.CreatedOn ).ToString( "yyyy-MM-dd" ))
+                        </td>
+                        <td>
+                            @item.LoadNumber
+                        </td>
+                        <td>
+                            @item.DocketNumber
+
+                            @if ( item.VersionCount > 1 )
+                            {
+                                <a data-load-version="1" data-docket="@item.DocketNumber" class="block" rel="tipysE" title="+@item.VersionCount versions of this load, click to view all versions..">
+                                    <small>+@item.VersionCount versions</small>
+                                </a>
+                            }
+                        </td>
+                        <td>
+                            @item.ClientName
+                        </td>
+                        <td>
+                            @(item.CorrectedRef ?? item.Ref)
+
+                            @if ( !string.IsNullOrEmpty( item.CorrectedRef ) )
+                            {
+                                <a rel="tipsyW" title="Manually corrected, was: @item.Ref">
+                                    <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
+                                </a>
+                            }
+                        </td>
+                        <td>
+                            @(item.CorrectedOtherRef ?? item.OtherRef)
+
+                            @if ( !string.IsNullOrEmpty( item.CorrectedOtherRef ) )
+                            {
+                                <a rel="tipsyW" title="Manually corrected, was: @item.OtherRef">
+                                    <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
+                                </a>
+                            }
+                        </td>
+                        <td>
+                            @item.Quantity
+                        </td>
+                        <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
+                            @status.GetDisplayText()
+                        </td>
+                        <td class="@(balanceStatus == BalanceStatus.Balanced ? "active" : "inactive")">
+                            @balanceStatus.GetDisplayText()
+                        </td>
+
+                    </tr>
+
+                    count++;
+                }
+            }
+        </tbody>
+
+    </table>
+
+</div>

@@ -8,12 +8,12 @@ namespace ACT.Core.Models.Custom
         public int Id { get; set; }
         public int ObjectId { get; set; }
         public string ObjectType { get; set; }
-        public System.DateTime CreatedOn { get; set; }
-        public System.DateTime ModifiedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public string Make { get; set; }
         public string Model { get; set; }
-        public Nullable<int> Year { get; set; }
+        public int? Year { get; set; }
         public string EngineNumber { get; set; }
         public string VINNumber { get; set; }
         public string Registration { get; set; }

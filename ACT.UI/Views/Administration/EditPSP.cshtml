@@ -10,6 +10,8 @@
     }
 
     ViewBag.Title = "Edit";
+
+    string logoUrl = ( Model.Files.NullableAny( d => d.Name.ToLower() == "logo" ) ) ? Url.Action( "ViewDocument", new { id = Model.Files.FirstOrDefault( d => d.Name.ToLower() == "logo" ).Id } ) : Url.Content( "~/Images/no-preview.png" );
 }
 
 
@@ -28,237 +30,380 @@
 
         @Html.HiddenFor( model => model.Id )
 
-        <div id="item-details" class="item-details" style="width: auto;">
+        <div class="left" style="width: 30%; margin-right: 2%;">
 
-            <div class="left" style="width: 48%; margin-right: 4%;">
+            <div class="editor-field" style="text-align: center; margin-bottom: 20px; border: 1px dashed #ddd; padding: 5px 10px;">
 
-                <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.CompanyName )
-                </div>
+                <label for="Files-0-File">
+                    Company Logo <br />
+                    <a href="@logoUrl" target="_blank">
+                        <img class="image-preview" style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
+                    </a>
+                </label>
 
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" } )
-                    @Html.ValidationMessageFor( model => model.CompanyName )
-                </div>
-
-                <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.TradingAs )
-                </div>
-
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.TradingAs, new { @class = "input", @placeholder = "Enter Company Trading Name" } )
-                    @Html.ValidationMessageFor( model => model.TradingAs )
-                </div>
-
-                <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.VATNumber )
-                </div>
-
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.VATNumber, new { @class = "input", @placeholder = "Enter VAT Number" } )
-                    @Html.ValidationMessageFor( model => model.VATNumber )
-                </div>
-
-                <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.Description )
-                </div>
-
-                <div class="editor-field">
-                    @Html.TextAreaFor( model => model.Description, new { @class = "input", @style = "height: 81px; width: 93%;", @placeholder = "Briefely describe this PSP" } )
-                    @Html.ValidationMessageFor( model => model.Description )
-                </div>
-
-                <div class="editor-label uppercase" style="margin-bottom: 10px;">
-                    @Html.LabelFor( model => model.ServiceType )
-                </div>
-
-                <div class="editor-field">
-                    @foreach ( int k in Enum.GetValues( typeof( ServiceType ) ) )
-                    {
-                        ServiceType serviceType = ( ServiceType ) k;
-
-                        if ( k < 0 || serviceType == ServiceType.ManageOwnPallets || serviceType == ServiceType.ProvidePalletManagement )
-                        {
-                            continue;
-                        }
-
-                        string desc = ( ( ServiceType ) k ).GetDisplayText();
-
-                        string chk = ( serviceType == Model.ServiceType ) ? "checked=checked" : string.Empty;
-
-                        <label class="block" for="ServiceType-@k">
-
-                            <input id="ServiceType-@k" name="ServiceType" type="radio" value="@k" data-service-type="1" data-target="#psp-list" @chk />
-
-                            @desc
-
-                        </label>
-                        <div></div>
-                    }
-                    @Html.ValidationMessageFor( model => model.ServiceType )
-                </div>
+                <p class="company-files">
+                    <input id="Files-0-File" name="Files[0].File" type="file" value="" data-val-file="1" data-increment="1" data-upload-image="1" class="input" />
+                    <input id="Files-0-Name" name="Files[0].Name" type="hidden" value="Logo" />
+                    <input id="Files-0-Description" name="Files[0].Description" class="input" type="hidden" value="Company Logo" />
+                </p>
 
             </div>
 
-            <div class="left" style="width: 48%;">
-
-                <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.CompanyRegistrationNumber )
-                </div>
-
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Company Registration Number" } )
-                    @Html.ValidationMessageFor( model => model.CompanyRegistrationNumber )
-                </div>
-
-                <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.RegistrationFile )
-                </div>
-
-                <div class="editor-field" style="margin-bottom: 10px;">
-
-                    @if ( Model.RegistrationFile != null && Model.RegistrationFile.Id > 0 )
-                    {
-                        @Html.HiddenFor( model => model.RegistrationFile.Id )
-
-                        <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
-
-                            <a target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = Model.RegistrationFile.Id } )">
-                                <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
-
-                                @Model.RegistrationFile.Name (@Model.RegistrationFile.Extension)
-                            </a>
-
-                        </div>
-                    }
-
-                    <input id="RegistrationFile.File" name="RegistrationFile.File" type="file" value="" required="required" data-val-file="1" class="input" />
-                    <input id="RegistrationFile.Name" name="RegistrationFile.Name" type="hidden" value="Company Registration File" />
-                    <input id="RegistrationFile.Description" name="RegistrationFile.Description" class="input" type="hidden" value="Company Registration File" />
-
-                    @Html.ValidationMessageFor( model => model.RegistrationFile )
-
-                </div>
-
-                <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.ContactPerson )
-                </div>
-
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Person's Full Name" } )
-                    @Html.ValidationMessageFor( model => model.ContactPerson )
-                </div>
-
-                <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.ContactNumber )
-                </div>
-
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" } )
-                    @Html.ValidationMessageFor( model => model.ContactNumber )
-                </div>
-
-                <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.EmailAddress )
-                </div>
-
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.EmailAddress, new { @class = "input", @placeholder = "Enter Email Address" } )
-                    @Html.ValidationMessageFor( model => model.EmailAddress )
-                </div>
-
-                <div class="editor-label uppercase">
-                    @Html.LabelFor( model => model.AdminEmail )
-                </div>
-
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.AdminEmail, new { @class = "input", @placeholder = "Enter Administrator Email Address" } )
-                    @Html.ValidationMessageFor( model => model.AdminEmail )
-                </div>
-
-            </div>
-
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
-
-            <div class="editor-label" style="margin-bottom: 10px;">
-                @Html.LabelFor( model => model.PSPBudget )
+            <div class="editor-label">
+                @Html.LabelFor( model => model.CompanyName )
             </div>
 
             <div class="editor-field">
+                @Html.TextBoxFor( model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" } )
+                @Html.ValidationMessageFor( model => model.CompanyName )
+            </div>
 
-                @Html.HiddenFor( model => model.PSPBudget.Id )
+            <div class="editor-label">
+                @Html.LabelFor( model => model.TradingAs )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.TradingAs, new { @class = "input", @placeholder = "Enter Trading As details" } )
+                @Html.ValidationMessageFor( model => model.TradingAs )
+            </div>
 
-                <table id="PSPBudget-table" class="da-table" style="border-bottom: 0;">
+            <div class="editor-label">
+                @Html.LabelFor( model => model.Description )
+            </div>
 
-                    <thead>
-                        <tr>
-                            <th>Jan</th>
-                            <th>Feb</th>
-                            <th>Mar</th>
-                            <th>Apr</th>
-                            <th>May</th>
-                            <th>Jun</th>
-                            <th>Jul</th>
-                            <th>Aug</th>
-                            <th>Sep</th>
-                            <th>Oct</th>
-                            <th>Nov</th>
-                            <th>Dec</th>
-                        </tr>
-                    </thead>
+            <div class="editor-field">
+                @Html.TextAreaFor( model => model.Description, new { @class = "input", @style = "height: 82px;", @placeholder = "Briefely describe your business" } )
+                @Html.ValidationMessageFor( model => model.Description )
+            </div>
 
-                    <tbody>
-                        <tr>
-                            <td>
-                                @Html.TextBoxFor( model => model.PSPBudget.January, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 10" } )
-                            </td>
-                            <td>
-                                @Html.TextBoxFor( model => model.PSPBudget.February, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 20" } )
-                            </td>
-                            <td>
-                                @Html.TextBoxFor( model => model.PSPBudget.March, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 30" } )
-                            </td>
-                            <td>
-                                @Html.TextBoxFor( model => model.PSPBudget.April, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 40" } )
-                            </td>
-                            <td>
-                                @Html.TextBoxFor( model => model.PSPBudget.May, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 50" } )
-                            </td>
-                            <td>
-                                @Html.TextBoxFor( model => model.PSPBudget.June, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 60" } )
-                            </td>
-                            <td>
-                                @Html.TextBoxFor( model => model.PSPBudget.July, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 70" } )
-                            </td>
-                            <td>
-                                @Html.TextBoxFor( model => model.PSPBudget.August, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 80" } )
-                            </td>
-                            <td>
-                                @Html.TextBoxFor( model => model.PSPBudget.September, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 45" } )
-                            </td>
-                            <td>
-                                @Html.TextBoxFor( model => model.PSPBudget.October, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 15" } )
-                            </td>
-                            <td>
-                                @Html.TextBoxFor( model => model.PSPBudget.November, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 25" } )
-                            </td>
-                            <td>
-                                @Html.TextBoxFor( model => model.PSPBudget.December, new { @class = "input", @type = "number", @style = "padding: 0 5px; width: 87%;", @placeholder = "E.g 35" } )
-                            </td>
-                        </tr>
-                    </tbody>
+            <div class="edit-label">
+                @Html.LabelFor( model => model.Status )
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.Status )
+            </div>
 
-                </table>
+            <div class="editor-label" style="margin: 0 0 10px 0;">
+                @Html.LabelFor( model => model.ServiceType )
+            </div>
+
+            <div class="editor-field">
+                @foreach ( int k in Enum.GetValues( typeof( ServiceType ) ) )
+                {
+                    if ( k > 2 || k < 0 )
+                    {
+                        continue;
+                    }
+
+                    ServiceType st = ( ( ServiceType ) k );
+
+                    string desc = st.GetDisplayText();
+
+                    string sel = ( st == Model.ServiceType ) ? "checked=checked" : "";
+
+                    <label class="block" for="ServiceType-@k">
+
+                        <input id="ServiceType-@k" name="ServiceType" type="radio" value="@k" @sel data-service-type="1" data-target="#psp-list" />
+
+                        @desc
+
+                    </label>
+                    <div></div>
+                }
+            </div>
+
+            <div class="edit-label" style="margin-top: 15px;">
+                @Html.LabelFor( model => model.CompanyType )
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor( model => model.CompanyType, false, true, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.CompanyType )
+            </div>
+
+        </div>
+
+        <div class="left" style="width: 25%; margin-right: 2%;">
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.CompanyRegistrationNumber )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" } )
+                @Html.ValidationMessageFor( model => model.CompanyRegistrationNumber )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.VATNumber )
+            </div>
+
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.VATNumber, new { @class = "input", @data_input_show = "1", @data_target = "#vat-file-upload", @placeholder = "Enter your VAT Number" } )
+                @Html.ValidationMessageFor( model => model.VATNumber )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.BBBEELevel )
+            </div>
+
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.BBBEELevel, new { @class = "input", @data_input_show = "1", @data_target = "#bbbee-file-upload", @placeholder = "Enter your BBBEE Level" } )
+                @Html.ValidationMessageFor( model => model.BBBEELevel )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ContactPerson )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" } )
+                @Html.ValidationMessageFor( model => model.ContactPerson )
+            </div>
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ContactNumber )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" } )
+                @Html.ValidationMessageFor( model => model.ContactNumber )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.EmailAddress )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.EmailAddress, new { @class = "input", @placeholder = "Enter Email Address", type = "email" } )
+                @Html.ValidationMessageFor( model => model.EmailAddress )
+            </div>
+
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.AdminPerson )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.AdminPerson, new { @class = "input", @placeholder = "Enter Administrator Name" } )
+                @Html.ValidationMessageFor( model => model.AdminPerson )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.AdminEmail )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.AdminEmail, new { @class = "input", @placeholder = "Enter Administrator Email Address", type = "email" } )
+                @Html.ValidationMessageFor( model => model.AdminEmail )
+            </div>
+
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.FinancialPerson )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.FinancialPerson, new { @class = "input", @placeholder = "Enter Financial Person Name" } )
+                @Html.ValidationMessageFor( model => model.FinancialPerson )
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.FinPersonEmail )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.FinPersonEmail, new { @class = "input", @placeholder = "Enter Financial Person Email Address", type = "email" } )
+                @Html.ValidationMessageFor( model => model.FinPersonEmail )
+            </div>
+
+            <div class="editor-label uppercase" style="margin-bottom: 10px;">
+                @Html.LabelFor( model => model.TypeOfPalletUse )
+            </div>
+
+            <div class="editor-field">
+                @foreach ( int k in Enum.GetValues( typeof( TypeOfPalletUse ) ) )
+                {
+                    if ( k < 0 )
+                    {
+                        continue;
+                    }
+
+                    TypeOfPalletUse topu = ( ( TypeOfPalletUse ) k );
+
+                    string desc = topu.GetDisplayText();
+
+                    string sel = ( topu == Model.TypeOfPalletUse ) ? "checked=checked" : "";
+
+                    <label class="block" for="TypeOfPalletUse-@k">
+
+                        <input id="TypeOfPalletUse-@k" name="TypeOfPalletUse" type="radio" value="@k" @sel data-pallet-use="1" data-target="#other-pallet-use" />
+
+                        @desc
+
+                    </label>
+                    <div></div>
+                }
+            </div>
+
+            <div id="other-pallet-use" class="@(Model.TypeOfPalletUse == TypeOfPalletUse.Other ? "block": "none")" style="margin-top: 15px;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.OtherTypeOfPalletUse )
+                </div>
+
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.OtherTypeOfPalletUse, new { @class = "input", @placeholder = "Enter your Type of Pallet Use" } )
+                    @Html.ValidationMessageFor( model => model.OtherTypeOfPalletUse )
+                </div>
 
             </div>
 
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+        </div>
 
-            <p>
-                <strong class="uppercase">Address Details</strong>
-            </p>
+        <div class="left" style="width: 41%;">
 
-            <div class="left" style="width: 48%; margin-right: 4%;">
+            <div class="editor-label">
+                <label for="RegistrationFile">Company Registration File</label>
+            </div>
+
+            <div class="editor-field" style="margin-bottom: 17px;">
+
+                <input id="RegistrationFile" name="Files[1].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
+                <input name="Files[1].Name" type="hidden" value="CompanyRegistrationFile" />
+                <input name="Files[1].Description" class="input" type="hidden" value="Company Registration File" />
+
+                @if ( Model.Files.NullableAny( f => f.Name == "CompanyRegistrationFile" ) )
+                {
+                    FileViewModel d = Model.Files.FirstOrDefault( f => f.Name == "CompanyRegistrationFile" );
+
+                    <span id="RegistrationFile-span" class="right" style="border: 1px dashed #ddd; padding: 4px;">
+
+                        <a target="_blank" href="@Url.Action( "ViewDocument", new { @id = d.Id } )" rel="tipsyE" title="View current Company Registration File?">
+                            <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+
+                            @d.Description (@d.Extension)
+                        </a>
+
+                        @if ( ViewBag.DisplayOnly == null )
+                        {
+                            <a data-delete-file="1" data-self-destruct="1" data-target="#RegistrationFile-span" data-id="@d.Id" href="@Url.Action( "DeletePSPDocument", new { @id = d.Id } )" rel="tipsyE" title="Delete this file?" style="float: right; margin-left: 10px; padding-left: 5px; border-left: 1px dashed #ddd;">
+                                <img alt="delete" src="@Url.Content( "~/images/delete.png" )" />
+                            </a>
+                        }
+
+                    </span>
+                }
+
+            </div>
+
+            <div id="vat-file-upload" class="@(!string.IsNullOrEmpty( Model.VATNumber ) ? "block" : "none")">
+
+                <div class="editor-label">
+                    <label for="VATRegistrationFile">VAT Registration File</label>
+                </div>
+
+                <div class="editor-field" style="margin-bottom: 17px;">
+
+                    <input id="VATRegistrationFile" name="Files[2].File" type="file" value="" @( !string.IsNullOrEmpty( Model.VATNumber ) && !Model.Files.NullableAny( f => f.Name == "VATRegistrationFile" ) ? "required=required" : "" ) data-val-file="1" class="input" style="width: 40%;" />
+                    <input name="Files[2].Name" type="hidden" value="VATRegistrationFile" />
+                    <input name="Files[2].Description" class="input" type="hidden" value="VAT Registration File" />
+
+                    @if ( Model.Files.NullableAny( f => f.Name == "VATRegistrationFile" ) )
+                    {
+                        FileViewModel d = Model.Files.FirstOrDefault( f => f.Name == "VATRegistrationFile" );
+
+                        <span id="VATRegistrationFile-span" class="right" style="border: 1px dashed #ddd; padding: 4px;">
+
+                            <a target="_blank" href="@Url.Action( "ViewDocument", new { @id = d.Id } )" rel="tipsyE" title="View current VAT Registration File?">
+                                <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+
+                                @d.Description (@d.Extension)
+                            </a>
+
+                            @if ( ViewBag.DisplayOnly == null )
+                            {
+                                <a data-delete-file="1" data-self-destruct="1" data-target="#VATRegistrationFile-span" data-enforce-required="#VATRegistrationFile" data-check-against="#VATNumber" data-id="@d.Id" href="@Url.Action( "DeletePSPDocument", new { @id = d.Id } )" rel="tipsyE" title="Delete this file?" style="float: right; margin-left: 10px; padding-left: 5px; border-left: 1px dashed #ddd;">
+                                    <img alt="delete" src="@Url.Content( "~/images/delete.png" )" />
+                                </a>
+                            }
+
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+            <div id="bbbee-file-upload" class="@(!string.IsNullOrEmpty( Model.BBBEELevel ) ? "block" : "none")">
+
+                <div class="editor-label">
+                    <label for="BBBEELevelFile">BBBEE Level Certificate</label>
+                </div>
+
+                <div class="editor-field" style="margin-bottom: 17px;">
+
+                    <input id="BBBEELevelFile" name="Files[3].File" type="file" value="" @( !string.IsNullOrEmpty( Model.BBBEELevel ) && !Model.Files.NullableAny( f => f.Name == "BBBEELevelCertificate" ) ? "required=required" : "" ) data-val-file="1" class="input" style="width: 40%;" />
+                    <input name="Files[3].Name" type="hidden" value="BBBEELevelCertificate" />
+                    <input name="Files[3].Description" class="input" type="hidden" value="BBBEE Level Certificate" />
+
+                    @if ( Model.Files.NullableAny( f => f.Name == "BBBEELevelCertificate" ) )
+                    {
+                        FileViewModel d = Model.Files.FirstOrDefault( f => f.Name == "BBBEELevelCertificate" );
+
+                        <span id="BBBEELevelFile-span" class="right" style="border: 1px dashed #ddd; padding: 4px;">
+
+                            <a target="_blank" href="@Url.Action( "ViewDocument", new { @id = d.Id } )" rel="tipsyE" title="View current BBBEE Level Certificate?">
+                                <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+
+                                @d.Description (@d.Extension)
+                            </a>
+
+                            @if ( ViewBag.DisplayOnly == null )
+                            {
+                                <a data-delete-file="1" data-self-destruct="1" data-target="#BBBEELevelFile-span" data-enforce-required="#BBBEELevelFile" data-check-against="#BBBEELevel" data-id="@d.Id" href="@Url.Action( "DeletePSPDocument", new { @id = d.Id } )" rel="tipsyE" title="Delete this file?" style="float: right; margin-left: 10px; padding-left: 5px; border-left: 1px dashed #ddd;">
+                                    <img alt="delete" src="@Url.Content( "~/images/delete.png" )" />
+                                </a>
+                            }
+
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+            <div class="editor-label">
+                <label for="SignedPSPContractFile">Signed PSP Contract Document</label>
+            </div>
+
+            <div class="editor-field" style="margin-bottom: 20px;">
+
+                <input id="SignedPSPContractFile" name="Files[4].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
+                <input name="Files[4].Name" type="hidden" value="SignedPSPContractFile" />
+                <input name="Files[4].Description" class="input" type="hidden" value="Signed PSP Contract File" />
+
+                @if ( Model.Files.NullableAny( f => f.Name == "SignedPSPContractFile" ) )
+                {
+                    FileViewModel d = Model.Files.FirstOrDefault( f => f.Name == "SignedPSPContractFile" );
+
+                    <span class="right" style="border: 1px dashed #ddd; padding: 4px;">
+
+                        <a target="_blank" href="@Url.Action( "ViewDocument", new { @id = d.Id } )" rel="tipsyE" title="View current Signed PSP Contract File?">
+                            <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+
+                            @d.Description (@d.Extension)
+                        </a>
+
+                        @if ( ViewBag.DisplayOnly == null )
+                        {
+                            <a data-delete-file="1" data-self-destruct="1" data-target="#PSP-documents" data-id="@d.Id" href="@Url.Action( "DeletePSPDocument", new { @id = d.Id } )" rel="tipsyE" title="Delete this file?" style="float: right; margin-left: 10px; padding-left: 5px; border-left: 1px dashed #ddd;">
+                                <img alt="delete" src="@Url.Content( "~/images/delete.png" )" />
+                            </a>
+                        }
+
+                    </span>
+                }
+
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="grouped-area">
+
+                <p>
+                    <strong class="uppercase">Address Details</strong>
+                </p>
 
                 @Html.HiddenFor( model => model.Address.Id )
                 @Html.HiddenFor( model => model.Address.AddressType )
@@ -269,6 +414,11 @@
                 <div class="editor-field">
                     @Html.TextBoxFor( model => model.Address.AddressLine1, new { @class = "input", @placeholder = "Enter Company Address Line 1" } )
                     @Html.ValidationMessageFor( model => model.Address.AddressLine1 )
+                </div>
+
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter Company Address Line 2" } )
+                    @Html.ValidationMessageFor( model => model.Address.AddressLine2 )
                 </div>
 
                 <div class="editor-label">
@@ -287,58 +437,56 @@
                     @Html.ValidationMessageFor( model => model.Address.PostCode )
                 </div>
 
-            </div>
-
-            <div class="left" style="width: 48%;">
-
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.Address.AddressLine2 )
+                    @Html.LabelFor( model => model.Address.ProvinceId )
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter Company Address Line 2" } )
-                    @Html.ValidationMessageFor( model => model.Address.AddressLine2 )
-                </div>
-
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.Address.Province )
-                </div>
-                <div class="editor-field">
-
-                    <select id="Address.Province" name="Address.Province" class="chzn" required="required" style="width: 100%;">
-                        <option value="">-- select</option>
-                        @foreach ( int p in Enum.GetValues( typeof( Province ) ) )
-                        {
-                            Province province = ( Province ) p;
-
-                            string text = province.GetDisplayText();
-
-                            if ( text.ToLower() == "all" )
-                            {
-                                continue;
-                            }
-
-                            string sel = ( province == Model.Address.Province ) ? "selected=selected" : string.Empty;
-
-                            <option value="@p" @sel>@text</option>
-                        }
-                    </select>
-
-                    @Html.ValidationMessageFor( model => model.Address.Province )
+                    @Html.DropDownListFor( model => model.Address.ProvinceId, model => Model.Address.ProvinceOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.Address.ProvinceId )
                 </div>
 
             </div>
-
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
-
-            <p>
-                <input id="save-btn" type="submit" value="Save" />
-
-                <span style="padding: 0 5px;">/</span>
-
-                <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
-            </p>
 
         </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
+
+        <div id="psp-budget">
+
+            @Html.Partial( "_PSPBudgets", Model.PSPBudgets )
+
+        </div>
+
+        <div style="width: 32%; margin-top: 20px;">
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.NumberOfLostPallets )
+            </div>
+
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.NumberOfLostPallets, new { @class = "input", @placeholder = "Enter Number Of Lost Pallets" } )
+                @Html.ValidationMessageFor( model => model.NumberOfLostPallets )
+            </div>
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
+
+        <div id="psp-client">
+
+            @Html.Partial( "_PSPClients", Model.PSPClients )
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+        <p>
+            <input id="save-btn" type="submit" value="Save" />
+
+            <span style="padding: 0 5px;">/</span>
+
+            <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+        </p>
 
     </div>
 }

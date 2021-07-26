@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.ComponentModel.DataAnnotations;
+using ACT.Core.Enums;
 
 namespace ACT.UI.Models
 {
@@ -71,6 +72,24 @@ namespace ACT.UI.Models
         [Display( Name = "Client Correspondence Name" )]
         [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ClientCorrespondenceName { get; set; }
+
+        [Display(Name = "Import Email Host")]
+        [StringLength(100, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        public string ImportEmailHost { get; set; }
+
+        [Display(Name = "Import Email Username")]
+        [StringLength(100, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        public string ImportEmailUsername { get; set; }
+
+        [Display(Name = "Import Email Password")]
+        [StringLength(50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        public string ImportEmailPassword { get; set; }
+
+        [Display(Name = "Import Email Port")]
+        public int? ImportEmailPort { get; set; }
+
+        [Display( Name = "Import Use SSL" )]
+        public YesNo ImportUseSSL { get; set; }
 
         #endregion
 

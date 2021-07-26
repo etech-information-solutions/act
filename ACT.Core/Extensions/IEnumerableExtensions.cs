@@ -131,19 +131,17 @@ namespace System
 
             list.Sort(delegate (T a, T b)
            {
-
                object aVal = sortProperty.GetValue(a, null);
                object bVal = sortProperty.GetValue(b, null);
 
                //what about Nullable<T>?
-               IComparable aComp = aVal as IComparable;
 
-               if ((aComp != null))
+               if ( ( aVal is IComparable aComp ) )
                {
                    try
                    {
-                       int cc = aComp.CompareTo(bVal);
-                       if (!ascending)
+                       int cc = aComp.CompareTo( bVal );
+                       if ( !ascending )
                        {
                            cc *= -1;
                        }

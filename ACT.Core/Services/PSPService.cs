@@ -27,7 +27,7 @@ namespace ACT.Core.Services
         {
             return context.PSPs.Any( p => p.CompanyRegistrationNumber == registrationNumber );
         }
-
+        
         public int Total1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
@@ -269,6 +269,44 @@ namespace ACT.Core.Services
             }
 
             return model;
+        }
+
+        /// <summary>
+        /// Gets a list of clients
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public Dictionary<int, string> List( bool v )
+        {
+            Dictionary<int, string> pspOptions = new Dictionary<int, string>();
+            List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+            };
+
+            string query = $"SELECT p.Id AS [TKey], p.CompanyName AS [TValue] FROM [dbo].[PSP] p WHERE (1=1)";
+
+            if ( !CurrentUser.IsAdmin )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu WHERE pu.UserId=@userid AND pu.PSPId=p.Id)";
+            }
+
+            model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();
+
+            if ( model != null && model.Any() )
+            {
+                foreach ( var k in model )
+                {
+                    if ( pspOptions.Keys.Any( x => x == k.TKey ) )
+                        continue;
+
+                    pspOptions.Add( k.TKey, ( k.TValue ?? "" ).Trim() );
+                }
+            }
+
+            return pspOptions;
         }
     }
 }

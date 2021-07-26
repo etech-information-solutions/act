@@ -1,0 +1,18 @@
+﻿
+@model Dictionary<int, string>
+
+@if ( !Model.NullableAny() )
+{
+    <p>&nbsp;</p>
+
+    return;
+}
+
+<ul class="list">
+    @foreach ( KeyValuePair<int, string> item in Model )
+    {
+        <li data-id="@item.Key">
+            @item.Value
+        </li>
+    }
+</ul>

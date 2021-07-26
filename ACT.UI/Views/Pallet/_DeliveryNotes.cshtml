@@ -1,0 +1,183 @@
+﻿
+@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+    ViewBag.ViewName = "_DeliveryNotes";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@{
+    int count = Model.Start;
+    List<DeliveryNoteCustomModel> items = ( List<DeliveryNoteCustomModel> ) Model.Items;
+}
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Delivery Notes available matching your search criteria.
+    </div>
+}
+
+<p>
+    @Html.ActionLink( "Add Delivery Note", "AddDeliveryNote", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Delivery Note?", @data_edit = "1", @data_id = 0, @data_target = "#deliverynotes" } )
+    <span class="loader"></span>
+</p>
+
+<table id="deliverynotes-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#deliverynotes-table_wrapper" data-starting-point=".ap-tabs ul">
+
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="CreatedOn" data-column="d.CreatedOn">
+                Date Created
+            </th>
+            <th data-name="ClientName" data-column="c.CompanyName">
+                Client
+            </th>
+            <th data-name="SiteName" data-column="s.Name">
+                Site
+            </th>
+            <th data-name="CustomerName" data-column="s.CustomerName">
+                Customer
+            </th>
+            <th data-name="InvoiceNumber" data-column="d.InvoiceNumber">
+                Ref #
+            </th>
+            <th data-name="OrderNumber" data-column="d.OrderNumber">
+                Order #
+            </th>
+            <th data-name="Contact">
+                Contact
+            </th>
+            <th data-name="Reference306" data-column="d.Reference306">
+                Ref 306
+            </th>
+            <th data-name="Status" data-column="OrderedCountCount">
+                Ordered
+            </th>
+            <th data-name="Status" data-column="DeliveredCountCount">
+                Delivered
+            </th>
+            <th data-name="Status" data-column="ReturnedCountCount">
+                Returned
+            </th>
+            <th data-name="Status" data-column="d.Status">
+                Status
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                Status status = ( Status ) item.Status;
+
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="DeliveryNote">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.ClientName
+                    </td>
+                    <td>
+                        @item.SiteName
+                    </td>
+                    <td>
+                        @item.CustomerName
+                    </td>
+                    <td>
+                        @item.InvoiceNumber
+                    </td>
+                    <td>
+                        @item.OrderNumber
+
+                        @if ( item.OrderDate.HasValue )
+                        {
+                            <i>on @item.OrderDate.Value.ToString( "yyyy-MM-dd" )</i>
+                        }
+                    </td>
+                    <td>
+                        <ul class="list">
+                            <li>@item.EmailAddress</li>
+                            <li>@item.ContactNumber</li>
+                        </ul>
+                    </td>
+                    <td>
+                        @item.Reference306
+                    </td>
+                    <td>
+                        @item.OrderedCountCount
+                    </td>
+                    <td>
+                        @item.DeliveredCountCount
+                    </td>
+                    <td>
+                        @item.ReturnedCountCount
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+                    </td>
+                    <td width="10%" style="text-align: center;">
+
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                            @Html.ActionLink( "Details", "DeliveryNoteDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                            @Html.ActionLink( "Edit", "EditDeliveryNote", new { id = item.Id, returnView = "Banks" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        </div>
+
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                            @Html.ActionLink( enable, "DeleteDeliveryNote", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#deliverynotes", @rel = "tipsyE", @title = enable + " this item?" } )
+
+                        </div>
+
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                            @Html.ActionLink( "Email", "EmailDeliveryNote", new { id = item.Id }, new { @class = "email", @data_email_delivery_note = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#deliverynotes", @rel = "tipsyE", @title = "Email this Delivery Note?" } )
+
+                            @Html.ActionLink( "Print", "PrintDeliveryNote", new { id = item.Id }, new { @class = "print", @target = "_blank", @data_print_delivery_note = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#deliverynotes", @rel = "tipsyE", @title = "Print this Delivery Note?" } )
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_DeliveryNotesCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
+
+@Html.Partial( "_Paging" )

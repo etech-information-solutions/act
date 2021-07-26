@@ -1,0 +1,128 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+    ViewBag.ViewName = "_Regions";
+
+    UserModel user = User.Get();
+}
+
+
+@Html.Partial( "_Notification" )
+
+@{
+    int count = Model.Start;
+    List<RegionCustomModel> items = ( List<RegionCustomModel> ) Model.Items;
+}
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Regions available matching your search criteria.
+    </div>
+}
+
+<p>
+    @Html.ActionLink( "Add Region", "AddRegion", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Region?", @data_edit = "1", @data_id = 0, @data_target = "#regions" } )
+    <span class="loader"></span>
+</p>
+
+<table id="regions-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#regions-table_wrapper" data-starting-point=".ap-tabs ul">
+
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="PSPId" data-column="PSPId">
+                PSP
+            </th>
+            <th data-name="Name" data-column="Name">
+                Name
+            </th>
+            <th data-name="Description" data-column="Description">
+                Description
+            </th>
+            <th data-name="Country" data-column="c.Name">
+                Country
+            </th>
+            <th data-name="Province" data-column="pv.Description">
+                Province
+            </th>
+            <th data-name="RegionalManagerId" data-column="RegionalManagerId">
+                Regional Manager
+            </th>
+            <th data-name="Status" data-column="Status">
+                Status
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                Status status = ( Status ) item.Status;
+
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td width="17%">
+                        @item.PSPName
+                    </td>
+                    <td>
+                        @item.Name
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Region">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.Description
+                    </td>
+                    <td>
+                        @( item.CountryName )
+                    </td>
+                    <td>
+                        @( item.ProvinceName )
+                    </td>
+                    <td>
+                        @item.RegionManagerName
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+                    </td>
+                    <td width="17%">
+                        @Html.ActionLink( "Details", "RegionDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( "Edit", "EditRegion", new { id = item.Id, returnView = "Regions" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink( enable, "DeleteRegion", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#regions", @rel = "tipsyE", @title = enable + " this item?" } )
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_RegionCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
+
+@Html.Partial( "_Paging" )

@@ -1,0 +1,44 @@
+﻿@model Transporter
+
+
+@using ACT.Data.Models;
+
+<div id="item-details" class="item-details" style="width: auto;">
+
+    <h2>
+        <img alt="" src="@Url.Content( "~/images/info.png" )" />
+        <span>Contact Details</span>
+    </h2>
+
+    <div class="left" style="width: 31%;">
+
+        <div class="display-label">
+            Contact Name
+        </div>
+        <div class="display-field">
+            @( Model?.ContactName )
+        </div>
+
+        <div class="display-label">
+            Contact Number
+        </div>
+        <div class="display-field">
+            @( Model?.ContactNumber )
+        </div>
+
+        <div class="display-label">
+            Contact Email
+        </div>
+        <div class="display-field">
+            @( Model?.Email )
+        </div>
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    <p>
+        <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
+    </p>
+
+</div>

@@ -1,0 +1,153 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_ClientData";
+}
+
+
+@Html.Partial( "_Notification" )
+
+
+@{
+    int count = Model.Start;
+
+    List<ClientLoadCustomModel> items = ( List<ClientLoadCustomModel> ) Model.Items;
+}
+
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Client Load Entries available matching your search criteria.
+    </div>
+}
+
+<p>
+    @Html.ActionLink( "Add", "AddClientData", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add Manual Client Data?", @data_edit = "1", @data_id = 0, @data_target = "#clientdata" } )
+
+    <span style="padding: 0 5px;">|</span>
+
+    @Html.ActionLink( "Import", "ImportClientData", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import Client Data?", @data_edit = "1", @data_id = 0, @data_target = "#clientdata" } )
+
+    <span class="loader"></span>
+</p>
+
+<table id="ClientData-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#ClientData-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="LoadDate" data-column="cl.LoadDate">
+                Load Date
+            </th>
+            <th data-name="Client" data-column="ch.LocationId">
+                Chep Account/GLID #
+            </th>
+            <th data-name="FromSite" data-column="s.Description">
+                Supplier From
+            </th>
+            <th data-name="LoadNumber" data-column="cl.LoadNumber">
+                Shipment #
+            </th>
+            <th data-name="ToSite" data-column="s2.Description">
+                Customer To
+            </th>
+            <th data-name="OriginalQuantity" data-column="cl.OriginalQuantity">
+                Qty
+            </th>
+            <th data-name="PODComment" data-column="pc.Comment">
+                Comment
+            </th>
+            <th data-name="Status" data-column="cl.Status">
+                Status
+            </th>
+            <th data-name="Transporter" data-column="t.Name">
+                Transporter
+            </th>
+            <th data-name="Vehicle" data-column="v.Registration">
+                Vehicle
+            </th>
+            <th data-name="InvoiceNumber" data-column="ch.InvoiceNumber">
+                Invoice #
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
+
+                string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
+
+                <tr id="clientdata-@item.Id-item" class="clientdata-@item.Id-item ">
+                    <td>
+                        @count
+                    </td>
+                    <td>
+                        @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @( item.ChepAccountGLIDNo ?? item.GLID )
+                    </td>
+                    <td>
+                        @item.SiteName
+                    </td>
+                    <td>
+                        @item.LoadNumber
+                    </td>
+                    <td>
+                        @item.ToSiteName
+                    </td>
+                    <td>
+                        @item.OriginalQuantity
+                    </td>
+                    <td>
+                        @item.PODComment
+                    </td>
+                    <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
+                        @status
+                    </td>
+                    <td>
+                        @item.TransporterName
+                    </td>
+                    <td>
+                        @item.VehicleRegistration
+                    </td>
+                    <td>
+                        @item.InvoiceNumber
+                    </td>
+                    <td width="5%">
+
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                            @Html.ActionLink( "Details", "EditClientData", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
+
+                        </div>
+
+                        @*<span>
+                            @Html.ActionLink( "Journals", "ClientLoadJournals", new { id = item.Id, edit = false }, new { @class = "reports", @rel = "tipsyS", @title = "View Journals", @style = "padding-left: 28px; margin-left: 0; background-position-y: center;", @data_clientload_journal = "1", @data_id = item.Id } )
+                        </span>*@
+
+                    </td>
+                </tr>
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )

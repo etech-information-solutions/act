@@ -1,4 +1,5 @@
-﻿( function ()
+﻿
+( function ()
 {
     ACT.UI = {
 
@@ -26,19 +27,21 @@
 
         PageStayAliveTimer: [],
 
+        PageKPIReportsTimer: [],
+
         SelectedItems: [],
 
         PageErrorOcurred: false,
 
         PageViewIdProcessed: false,
 
-        DocumentTypes: ["pdf", "doc", "docx", "gif", "jpg", "jpeg", "png", "bmp", "tif", "tiff"],
+        DocumentTypes: ["pdf", "doc", "docx", "gif", "jpg", "jpeg", "png", "bmp", "tif", "tiff", "csv", "xls", "xlsx"],
 
         SAIDRegex: /^(((\d{2}((0[13578]|1[02])(0[1-9]|[12]\d|3[01])|(0[13456789]|1[012])(0[1-9]|[12]\d|30)|02(0[1-9]|1\d|2[0-8])))|([02468][048]|[13579][26])0229))(( |-)(\d{4})( |-)([01]8((( |-)\d{1})|\d{1}))|(\d{4}[01]8\d{1}))/g,
 
         Start: function ()
         {
-            //this.DataSideBar($('*[data-side-bar="1"]'));
+            this.DataGraphs( $( '*[data-graph="1"]' ) );
 
             var dt = ( $( '#tab-data>div:visible' ).length ) ? $( '#tab-data>div:visible' ) : ( $( '#collapse>div:visible' ).length ) ? $( '#collapse>div:visible' ) : ( $( "#list" ).length ) ? $( "#list" ) : $( ".graphs" ).length ? $( ".graphs" ) : $( '#item-list' );
 
@@ -61,7 +64,9 @@
             this.DataModal( $( '*[data-modal="1"]' ) );
             this.DataAjaxForm( $( '*[data-ajax-form="1"]' ) );
             this.DataShowHide( $( '*[data-show-hide="1"]' ) );
+            this.DataInputShow( $( '*[data-input-show="1"]' ) );
             this.DataStickyOne( $( '*[data-sticky-one="1"]' ) );
+            this.DataDeleteFile( $( '*[data-delete-file="1"]' ) );
             this.DataAddOneMore( $( '*[data-add-one-more="1"]' ) );
             this.DataDelOneMore( $( '*[data-del-one-more="1"]' ) );
             this.DataDeleteImage( $( '*[data-delete-image="1"]' ) );
@@ -70,17 +75,34 @@
 
             // Table CRUD Operations
             this.DataEdit( $( '*[data-edit="1"]' ) );
+            this.DataRole( $( '*[data-Role="1"]' ) );
             this.DataCancel( $( '*[data-cancel="1"]' ) );
             this.DataDelete( $( '*[data-delete="1"]' ) );
             this.DataDetails( $( '*[data-details="1"]' ) );
             this.DataAuditLog( $( '*[data-audit-log="1"]' ) );
+            this.DataAutoRecon( $( '*[data-auto-recon="1"]' ) );
             this.DataFormSubit( $( '*[data-form-submit="1"]' ) );
             this.DataCancelItem( $( '*[data-cancel-item="1"]' ) );
+            this.DataApproveDeclinePSP( $( '*[data-approve-decline-psp="1"]' ) );
+            this.DataReconcileLoadsSearch( $( '*[data-reconcile-loads-search="1"]' ) );
+            this.DataReconcileInvoicesSearch( $( '*[data-reconcile-invoices-search="1"]' ) );
+            this.DataReconcileLoadsDragDrop( $( '.recon-draggable' ), $( '.recon-droppable' ) );
+            this.DataReconcileInvoicesDragDrop( $( '.invoice-draggable' ), $( '.invoice-droppable' ) );
+
+            this.DataReconcileCheck( $( '[data-r-c="1"]' ) );
+            this.DataReconcileParentCheck( $( '[data-r-p-c="1"]' ) );
+
+            this.DataManualRecon( $( '[data-manual-recon="1"]' ) );
+            this.DataManualReconed( $( '[data-manual-reconed="1"]' ) );
+
+            this.DataLoadExtra( $( '[data-load-extra="1"]' ) );
+            this.DataLoadVersion( $( '[data-load-version="1"]' ) );
 
 
             // Table Quick Links Operations
             this.DataStep( $( '*[data-step="1"]' ) );
             this.DataCollapse( $( '*[data-collapse="1"]' ) );
+            this.DataInputSearch( $( '*[data-input-search="1"]' ) );
             this.DataCheckOptions( $( '*[data-check-options="1"]' ) );
 
             // PR Create / Edit
@@ -102,7 +124,54 @@
 
             // Sign Up
             this.DataDOB( $( '*[data-dob="1"]' ) );
+            this.DataPSPReg( $( '*[data-psp-reg="1"]' ) );
+            this.DataPalletUse( $( '*[data-pallet-use="1"]' ) );
             this.DataServiceType( $( '*[data-service-type="1"]' ) );
+            this.DataBudgetTotal( $( '*[data-budget-total="1"]' ) );
+            this.DataBudgetSum( $( '*[data-budget-sum="1"]' ) );
+
+            // Dashboard / Graphs
+            this.DataGSSite( $( '*[data-gs-site="1"]' ) );
+            this.DataGSRegion( $( '*[data-gs-region="1"]' ) );
+
+            this.DataGSData( $( '[data-gs-data="1"]' ) );
+            this.DataGSearch( $( '*[data-g-search="1"]' ) ); // Search button on Dashboard
+
+            // Delivery Note
+            this.DataDNClient( $( '*[data-dn-client="1"]' ) );
+            this.DataCopyAddress( $( '*[data-copy-address="1"]' ) );
+            this.DataEmailDeliveryNote( $( '*[data-email-delivery-note="1"]' ) );
+
+            // Disputes
+            this.DataDisputeStatus( $( '*[data-dispute-status="1"]' ) );
+            this.DataDisputeChepLoad( $( '*[data-dispute-chepload="1"]' ) );
+
+            // Client Management
+            this.DataLinkProduct( $( '*[data-link-product="1"]' ) );
+            this.DataClientLoadStatus( $( '*[data-client-load-status="1"]' ) );
+
+            // Body Keypress
+            this.DataSelectClient( $( window ), 113 );
+            this.DataSetClient( $( '*[data-select-client="1"]' ) );
+
+
+            // Client Load Buttons
+            this.DataViewPOD( $( '*[data-view-pod="1"]' ) );
+            this.DataUploadPOD( $( '*[data-upload-pod="1"]' ) );
+            this.DataReturnDoc( $( '*[data-return-doc="1"]' ) );
+            this.DataControlDoc( $( '*[data-control-doc="1"]' ) );
+            this.DataLoadDisputes( $( '*[data-load-disputes="1"]' ) );
+            this.DataLoadMovements( $( '*[data-load-movements="1"]' ) );
+            this.DataUpdateOutstandingQty( $( '*[data-update-oqty="1"]' ) );
+            this.DataClientLoadJournal( $( '*[data-clientload-journal="1"]' ) );
+            this.DataUpdateOutstandingReason( $( '*[data-update-outstanding-reason="1"]' ) );
+
+            // Chep Load Buttons
+            this.DataChepLoadJournal( $( '*[data-chepload-journal="1"]' ) );
+            this.DataChepLoadShipment( $( '*[data-chepload-shipment="1"]' ) );
+
+            // KPI Reports
+            this.DataFilter( $( '*[data-filter="1"]' ) );
 
             if ( window.location.search !== "" && !$( "tr.edit" ).length && $( ".dataTable" ).length && !ACT.UI.PageViewIdProcessed )
             {
@@ -132,7 +201,7 @@
                 }
             }
 
-            this.AutoLogOff(lgt);
+            this.AutoLogOff( lgt );
             this.DataStayAlive();
 
 
@@ -180,16 +249,16 @@
                         target.animate( {
                             "width": width
                         }, 1000, function ()
-                            {
+                        {
 
-                            } );
+                        } );
 
                         content.animate( {
                             "marginLeft": width
                         }, 1000, function ()
-                            {
+                        {
 
-                            } );
+                        } );
                     } );
 
                 if ( clicked === "0" )
@@ -303,6 +372,8 @@
 
         DataStayAlive: function ()
         {
+            if ( !authenticated ) return false;
+
             clearTimeout( ACT.UI.PageStayAliveTimer );
 
             ACT.UI.PageStayAliveTimer = setTimeout( function ()
@@ -340,6 +411,16 @@
                         holder.find( ">div.current" ).css( "display", "none" );
 
                         i.addClass( "current" );
+
+                        if ( i.attr( "data-target" ) == "#podperuser" || i.attr( "data-target" ) == "#poduploadlog" || i.attr( "data-target" ) == "#authorizationcodeaudit" || i.attr( "data-target" ) == "#auditlogperuser" )
+                        {
+                            $( "#kpi-report-filters" ).css( "display", "block" );
+                        }
+                        else
+                        {
+                            $( ".kpi-reports-data" ).css( "display", "none" );
+                            $( "#kpi-report-filters" ).css( "display", "none" );
+                        }
 
                         if ( target.find( "table.fixedHeader-floating" ).length > 0 )
                         {
@@ -864,61 +945,61 @@
                     "padding": "20px 0",
                     "filter": "alpha(opacity=100)"
                 }, 1200, function ()
+                {
+                    i.parent().prepend( spinner );
+
+                    group.addClass( "not-allowed" );
+                    target.find( ".partial-results" ).stop().load( url, { skip: ACT.UI.PageSkip, PRId: ACT.UI.PageViewId, BudgetYear: by }, function ( r, s, xhr )
                     {
-                        i.parent().prepend( spinner );
-
-                        group.addClass( "not-allowed" );
-                        target.find( ".partial-results" ).stop().load( url, { skip: ACT.UI.PageSkip, PRId: ACT.UI.PageViewId, BudgetYear: by }, function ( r, s, xhr )
+                        if ( s === "error" )
                         {
-                            if ( s === "error" )
-                            {
-                                ACT.Modal.Open( xhr.responseText, xhr.statusText, false, ACT.Init.Start() );
+                            ACT.Modal.Open( xhr.responseText, xhr.statusText, false, ACT.Init.Start() );
 
-                                return;
-                            }
+                            return;
+                        }
 
-                            var table = $( this ).find( "table.datatable-numberpaging" );
+                        var table = $( this ).find( "table.datatable-numberpaging" );
 
-                            // Tables Excused...
-                            if ( table.find( "tbody tr td" ).length > 1 )
-                            {
-                                var sort = table.hasClass( "sort" );
+                        // Tables Excused...
+                        if ( table.find( "tbody tr td" ).length > 1 )
+                        {
+                            var sort = table.hasClass( "sort" );
 
-                                table.dataTable( {
-                                    bPaginate: false,
-                                    bSort: false,
-                                    iDisplayLength: 50,
-                                    //"fixedHeader": {
-                                    //    header: table.hasClass( "fixed-table" )
-                                    //},
-                                    "fnDrawCallback": function ()
-                                    {
-                                        ACT.UI.Start();
-                                    }
-                                } );
-                            }
-
-                            $( this ).stop().animate( {
-                                "opacity": "1",
-                                "width": "100%",
-                                "filter": "alpha(opacity=100)"
-                            }, 1200, function ()
+                            table.dataTable( {
+                                bPaginate: false,
+                                bSort: false,
+                                iDisplayLength: 50,
+                                //"fixedHeader": {
+                                //    header: table.hasClass( "fixed-table" )
+                                //},
+                                "fnDrawCallback": function ()
                                 {
+                                    ACT.UI.Start();
+                                }
+                            } );
+                        }
 
-                                } );
+                        $( this ).stop().animate( {
+                            "opacity": "1",
+                            "width": "100%",
+                            "filter": "alpha(opacity=100)"
+                        }, 1200, function ()
+                        {
 
-                            target.find( ".partial-loading" ).remove();
-
-                            i.attr( "data-rendered", 1 );
-                            i.parent().find( ".spinner" ).stop().fadeOut( 1000, function () { $( this ).remove(); } );
-
-                            ACT.Init.Start( true );
-                            ACT.UI.DataTablesOverride( target );
-                            ACT.UI.DataPRSum( $( '*[data-pr-sum="1"]' ) );
-
-                            group.removeClass( "not-allowed" );
                         } );
+
+                        target.find( ".partial-loading" ).remove();
+
+                        i.attr( "data-rendered", 1 );
+                        i.parent().find( ".spinner" ).stop().fadeOut( 1000, function () { $( this ).remove(); } );
+
+                        ACT.Init.Start( true );
+                        ACT.UI.DataTablesOverride( target );
+                        ACT.UI.DataPRSum( $( '*[data-pr-sum="1"]' ) );
+
+                        group.removeClass( "not-allowed" );
                     } );
+                } );
 
                 count++;
             } );
@@ -1168,6 +1249,57 @@
             } );
         },
 
+        DataDeleteFile: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        ACT.Loader.Show( i, true );
+
+                        var load = target;
+
+                        var selfDestruct = ( typeof ( i.attr( "data-self-destruct" ) ) !== 'undefined' );
+
+                        if ( selfDestruct )
+                        {
+                            load = $( "<div/>" );
+                        }
+
+                        load.load( i.attr( "href" ), { id: id, selfDestruct: selfDestruct }, function ()
+                        {
+                            ACT.Init.PluginInit( target );
+
+                            if ( selfDestruct )
+                            {
+                                target.hide( 900, function ()
+                                {
+                                    $( this ).remove();
+                                } );
+                            }
+
+                            if ( typeof ( i.attr( "data-enforce-required" ) ) && typeof ( i.attr( "data-check-against" ) ) && $( i.attr( "data-check-against" ) ).val() !== "" )
+                            {
+                                $( i.attr( "data-enforce-required" ) ).attr( "required", "required" );
+                            }
+
+                            ACT.Loader.Hide();
+                        } );
+
+                        $( ".tipsy" ).remove();
+
+                        return false;
+                    } );
+            } );
+        },
+
         DataUploadImage: function ( sender )
         {
             var img = $( ".image-preview:visible" );
@@ -1176,12 +1308,26 @@
             {
                 var i = $( this );
 
+                var target = i.parent().find( i.attr( "data-upload-target" ) );
+
+                if ( !target.length )
+                {
+                    target = $( i.attr( "data-upload-target" ) );
+                }
+
+                img = target.length > 0 ? target : img;
+
                 i
                     .unbind( "change" )
                     .bind( "change", function ()
                     {
                         if ( this.files && this.files[0] )
                         {
+                            if ( this.files[0].type.split( "/" )[0] != "image" )
+                            {
+                                return;
+                            }
+
                             var reader = new FileReader();
 
                             reader.onload = function ( e )
@@ -1228,6 +1374,44 @@
             } );
         },
 
+        DataInputShow: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "keyup" )
+                    .bind( "keyup", function ()
+                    {
+                        if ( $( this ).val().trim() !== "" )
+                        {
+                            if ( target.is( ":visible" ) ) return;
+
+                            target.show( 1000, function ()
+                            {
+                                ACT.UI.DataHighlightFields( target );
+
+                                //target.find( "input:visible" ).attr( "required", "required" );
+                            } );
+                        }
+                        else
+                        {
+                            if ( !target.is( ":visible" ) ) return;
+
+                            target.hide( 1000, function ()
+                            {
+                                ACT.UI.DataHighlightFields( target );
+
+                                target.find( "input" ).removeAttr( "required", "required" );
+                            } );
+                        }
+                    } );
+            } );
+        },
+
         DataAddOneMore: function ( sender )
         {
             // Add one more image kiara@sheenah1
@@ -1236,6 +1420,7 @@
                 var i = $( this );
 
                 var target = $( i.attr( 'data-target' ) );
+                var tclone = $( i.attr( 'data-clone-target' ) );
                 var autoIncrement = i.attr( 'data-auto-increment' );
 
                 i.unbind( 'click' );
@@ -1247,15 +1432,24 @@
 
                     if ( target.is( "tr" ) )
                     {
-                        var papa = target.parent();
+                        let parent = target.parent();
 
-                        clone = papa.find( ".add-more-row:first" ).clone();
+                        clone = parent.find( ".add-more-row:first" ).clone();
+
+                        let newId
+                        let newElementId = parent.find( ".add-more-row:last" ).attr( 'id' ).replace( /\d+/g, ( m, k ) =>
+                        {
+                            newId = parseInt( m ) + 1
+                            return newId
+                        } )
+                        clone.attr( 'id', newElementId )
+
                         var inputs = clone.find( '.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea' );
 
                         inputs.each( function ()
                         {
                             $( this ).val( "" );
-
+                            $( this ).attr( "value", "" )
                             if ( $( this ).is( "select" ) )
                             {
                                 $( this ).find( "option" ).removeAttr( "selected" );
@@ -1268,33 +1462,38 @@
                         clone.find( '[data-rb="1"]' ).text( '-/-' );
                         clone.find( '[data-pr-amount="1"]' ).css( 'width', '88%' );
 
-                        total = papa.find( ".add-more-row" ).length;
+                        total = parent.find( ".add-more-row" ).length;
 
-                        html = clone.html().replace( /\[0]/g, "[" + total + "]" ).replace( /\-0-/g, "-" + total + "-" );
+                        html = clone.html().replace( /\[0]/g, "[" + total + "]" ).replace( /\-0/g, "-" + total );
                         clone.html( html );
+
+                        let del = clone.find( '.del' )
+                        del.attr( 'data-target', '#' + newElementId )
+                        del.attr( 'href', 'javascript:;' )
+                        del.removeClass( 'none' )
 
                         clone.find( '.slick-counter' ).html( '' );
                         clone.find( '.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea' ).val( "" );
-
+                        clone.attr( "unsaved", "1" )
                         ACT.UI.RecreatePlugins( clone );
 
-                        clone.insertAfter( papa.find( ".add-more-row:last" ) );
-
-                        clone.find( 'a[data-add-one-more="1"]' ).fadeOut( 1200, function ()
+                        clone.insertAfter( parent.find( ".add-more-row:last" ) );
+                        clone.find( '.input:first' ).focus()
+                        clone.find( 'a[data-add-one-more="1"]' ).fadeOut( 600, function ()
                         {
                             $( this ).remove();
                         } );
 
-                        papa.find( 'a[data-add-one-more="1"]' ).fadeOut( 1200, function ()
+                        parent.find( 'a[data-add-one-more="1"]' ).fadeOut( 600, function ()
                         {
                             var f = clone.find( "td:first" ).children( ":first" );
-                            $( this ).insertBefore( f ).fadeIn( 1200 );
+                            $( this ).insertBefore( f ).fadeIn( 600 );
                         } );
                     }
                     else
                     {
                         // Get clone instance as a jquery object
-                        clone = target.children().first().clone();
+                        clone = tclone.length ? tclone.clone() : target.children().first().clone();
 
                         // Check if this clone needs auto incrementing for it's element id or name
                         if ( autoIncrement !== undefined && autoIncrement === "1" )
@@ -1319,12 +1518,28 @@
                             } );
                         }
 
+                        if ( clone.find( 'img[reset-src]' ) )
+                        {
+                            clone.find( 'img[reset-src]' ).each( function ()
+                            {
+                                $( this ).attr( "src", $( this ).attr( "reset-src" ) );
+                            } );
+                        }
+
                         // Append clone to the defined target like so:
                         clone.appendTo( target );
                     }
 
+                    if ( $( i.attr( "data-increment-val" ) ).length > 0 )
+                    {
+                        $( i.attr( "data-increment-val" ) ).each( function ( indx )
+                        {
+                            ACT.UI.DataIndex( $( this ).find( "input,textarea,select" ), indx );
+                        } );
+                    }
+
                     // Restart JT JS DOM
-                    //ACT.Init.Start();
+                    ACT.Init.Start( true );
 
                     return false;
                 } );
@@ -1491,19 +1706,36 @@
 
         GetCustomSearchParams: function ( t )
         {
+            if ( t === "" ) return [];
+
+            if ( !ACT.UI[t] )
+            {
+                ACT.UI[t] = [];
+            }
+
             // Params
             var params = {
                 Skip: ACT.UI[t].PageSkip || ACT.UI.PageSkip || 0,
                 Take: ACT.UI[t].PageLength || ACT.UI.PageLength || 50,
                 Page: ACT.UI[t].PageNumber || ACT.UI.PageNumber || 0,
-                Sort: ACT.UI[t].PageSort || ACT.UI.PageSort || "ASC",
-                SortBy: ACT.UI[t].PageSortBy || ACT.UI.PageSortBy || "Id",
+                Sort: ACT.UI[t].PageSort || ACT.UI.PageSort || "DESC",
+                SortBy: ACT.UI[t].PageSortBy || ACT.UI.PageSortBy || "CreatedOn",
                 UserId: ACT.UI[t].PageUserId || ACT.UI.PageUserId || 0,
-                Status: ACT.UI[t].PageStatus || ACT.UI.PageStatus || 0,
-                PSPClientStatus: ACT.UI[t].PagePSPClientStatus || ACT.UI.PagePSPClientStatus || 0,
+                Status: ACT.UI[t].PageStatus || ACT.UI.PageStatus || -1,
+                DisputeStatus: ACT.UI[t].PageDisputeStatus || ACT.UI.PageDisputeStatus || -1,
+                BalanceStatus: ACT.UI[t].PageBalanceStatus || ACT.UI.PageBalanceStatus || -1,
+                PSPClientStatus: ACT.UI[t].PagePSPClientStatus || ACT.UI.PagePSPClientStatus || -1,
+                ReconciliationStatus: ACT.UI[t].PageReconciliationStatus || ACT.UI.PageReconciliationStatus || -1,
+                SiteId: ACT.UI[t].PageSiteId || ACT.UI.PageSiteId || 0,
                 ClientId: ACT.UI[t].PageClientId || ACT.UI.PageClientId || 0,
+                RegionId: ACT.UI[t].PageRegionId || ACT.UI.PageRegionId || 0,
                 ProductId: ACT.UI[t].PageProductId || ACT.UI.PageProductId || 0,
+                TransporterId: ACT.UI[t].PageTransporterId || ACT.UI.PageTransporterId || 0,
+                PSPProductId: ACT.UI[t].PageProductId || ACT.UI.PagePSPProductId || 0,
                 CampaignId: ACT.UI[t].PageCampaignId || ACT.UI.PageCampaignId || 0,
+                VehicleId: ACT.UI[t].PageVehicleId || ACT.UI.PageVehicleId || 0,
+                DisputeReasonId: ACT.UI[t].PageDisputeReasonId || ACT.UI.PageDisputeReasonId || 0,
+                OutstandingReasonId: ACT.UI[t].PageOutstandingReasonId || ACT.UI.PageOutstandingReasonId || 0,
                 SelectedItems: ACT.UI[t].SelectedItems || ACT.UI.SelectedItems || [],
                 FromDate: ACT.UI[t].PageFromDate || ACT.UI.PageFromDate || "",
                 ToDate: ACT.UI[t].PageToDate || ACT.UI.PageToDate || "",
@@ -1538,14 +1770,24 @@
             ACT.UI[t].PageSkip = ACT.UI.PageSkip = 0;
             ACT.UI[t].PageNumber = ACT.UI.PageNumber = 1;
             ACT.UI[t].PageLength = ACT.UI.PageLength = 50;
-            ACT.UI[t].PageSort = ACT.UI.PageSort = "ASC";
-            ACT.UI[t].PageSortBy = ACT.UI.PageSortBy = "Id";
+            ACT.UI[t].PageSort = ACT.UI.PageSort = "DESC";
+            ACT.UI[t].PageSortBy = ACT.UI.PageSortBy = "CreatedOn";
             ACT.UI[t].PageUserId = ACT.UI.PageUserId = 0;
+            ACT.UI[t].PageSiteId = ACT.UI.PageSiteId = 0;
+            ACT.UI[t].PageStatus = ACT.UI.PageStatusId = -1;
             ACT.UI[t].PageClientId = ACT.UI.PageClientId = 0;
+            ACT.UI[t].PageRegionId = ACT.UI.PageRegionId = 0;
             ACT.UI[t].PageProductId = ACT.UI.PageProductId = 0;
+            ACT.UI[t].PagePSPProductId = ACT.UI.PagePSPProductId = 0;
             ACT.UI[t].PageCampaignId = ACT.UI.PageCampaignId = 0;
-            ACT.UI[t].PageStatus = ACT.UI.PageStatusId = 0;
-            ACT.UI[t].PagePSPClientStatus = ACT.UI.PagePSPClientStatus = 0;
+            ACT.UI[t].PageTransporterId = ACT.UI.PageTransporterId = 0;
+            ACT.UI[t].PageVehicleId = ACT.UI.PageVehicleId = 0;
+            ACT.UI[t].PageDisputeReasonId = ACT.UI.PageDisputeReasonId = 0;
+            ACT.UI[t].PageOutstandingReasonId = ACT.UI.PageOutstandingReasonId = 0;
+            ACT.UI[t].PageDisputeStatus = ACT.UI.PageDisputeStatus = -1;
+            ACT.UI[t].PageBalanceStatus = ACT.UI.PageBalanceStatus = -1;
+            ACT.UI[t].PagePSPClientStatus = ACT.UI.PagePSPClientStatus = -1;
+            ACT.UI[t].PageReconciliationStatus = ACT.UI.PageReconciliationStatus = -1;
             ACT.UI[t].SelectedItems = ACT.UI.SelectedItems = [];
             ACT.UI[t].PageFromDate = ACT.UI.PageFromDate = "";
             ACT.UI[t].PageToDate = ACT.UI.PageToDate = "";
@@ -1615,13 +1857,13 @@
                     "opacity": "0.1",
                     "filter": "alpha(opacity=10)"
                 }, 1000, function ()
-                    {
-                        $( this ).css( "background", "#ffffff" ).animate(
-                            {
-                                "opacity": "1",
-                                "filter": "alpha(opacity=100)"
-                            }, 1000 );
-                    } );
+                {
+                    $( this ).css( "background", "#ffffff" ).animate(
+                        {
+                            "opacity": "1",
+                            "filter": "alpha(opacity=100)"
+                        }, 1000 );
+                } );
         },
 
         DataPartialImages: function ( sender )
@@ -1834,6 +2076,42 @@
         DeleteFix: function ( sender, target, refresh )
         {
             var url = sender.attr( "href" );
+            let parent = target.parent();
+            if ( target.attr( "unsaved" ) == "1" )
+            {
+
+                // clone add more button
+                let clone = parent.find( 'a[data-add-one-more="1"]' ).clone()
+
+                //remove line
+                target.remove()
+
+                siblings = parent.find( ".add-more-row" );
+
+
+                //Update all input names for forms to work
+                siblings.each( ( i, _sibling ) =>
+                {
+                    sibling = $( _sibling )
+                    sibling.find( '.input, input[type="hidden"], input[type="text"], input[type="password"], select, textarea' ).each( ( i, input ) =>
+                    {
+                        $( input ).attr( "value", input.value )
+                    } )
+                    html = sibling.html().replace( /\[\d+]/g, "[" + i + "]" )
+                    sibling.html( html )
+                } )
+
+                // insert cloned button on last line
+                row = parent.find( ".add-more-row:last" )
+                let f = row.find( "td:first" ).children( ":first" );
+                clone.insertBefore( f ).fadeIn( 600 );
+                ACT.Init.Start( true );
+                return false
+            }
+            else
+            {
+                //save unsaved dom elements to memory
+            }
 
             var columns = $( 'table.datatable-numberpaging tbody tr:nth-child(1) td' ).length;
             var row = '<tr class="edit ' + target.attr( 'class' ) + '"><td colspan="' + columns + '"><span></span></td></tr>';
@@ -1869,16 +2147,20 @@
                     .unbind( "click" )
                     .bind( "click", function ()
                     {
-                        target.animate(
-                            {
-                                "width": "0",
-                                "height": "0",
-                                "opacity": "0",
-                                "filter": "alpha(opacity=0)"
-                            }, 700, function ()
+                        if ( target.length > 0 )
+                        {
+
+                            target.animate(
+                                {
+                                    "width": "0",
+                                    "height": "0",
+                                    "opacity": "0",
+                                    "filter": "alpha(opacity=0)"
+                                }, 700, function ()
                             {
                                 remove.remove();
                             } );
+                        } else remove.remove();
 
                         return false;
                     } );
@@ -1932,6 +2214,7 @@
             sender.each( function ()
             {
                 var i = $( this );
+
                 var papa = i.parent();
                 var total = papa.find( ".pr-total" );
 
@@ -2365,49 +2648,55 @@
 
                 // 4. Page Navigation (Indexing)
                 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                var navigation = [];
 
-                var navigation = i.find( "#page-navigation" );
-
-                var next_cntr = navigation.find( "#data-page-nav-next" );
-                var previous_cntr = navigation.find( "#data-page-nav-previous" );
-
-                if ( !i.find( ".dataTables_wrapper #page-navigation" ).length )
+                i.find( ".page-navigation" ).each( function ()
                 {
-                    i.find( ".dataTables_wrapper" ).append( navigation );
-                }
+                    var ng = navigation = $( this );
 
-                next_cntr.add( previous_cntr ).each( function ()
-                {
-                    var n = $( this );
+                    var next_cntr = ng.find( "#data-page-nav-next" );
+                    var previous_cntr = ng.find( "#data-page-nav-previous" );
 
-                    n
-                        .unbind( "click" )
-                        .bind( "click", function ()
-                        {
-                            if ( n.hasClass( "inactive" ) ) return;
+                    if ( !i.find( ".dataTables_wrapper #page-navigation" ).length )
+                    {
+                        i.find( ".dataTables_wrapper" ).append( ng );
+                    }
 
-                            var skip = parseInt( n.attr( "data-skip" ) );
-                            var page = parseInt( n.attr( "data-page" ) );
+                    next_cntr.add( previous_cntr ).each( function ()
+                    {
+                        var n = $( this );
 
-                            ACT.UI[t].PageSkip = skip;
-                            ACT.UI[t].PageNumber = page;
+                        var tg = ( ng.attr( "data-is-tiny" ) == "1" ) ? $( ng.attr( "data-target" ) ) : i;
 
-                            var url = ( siteurl + navigation.attr( "data-url" ) ).split( '?' )[0].replace( siteurl, "" );
-
-                            if ( ACT.UI[t].IsCustomSearch )
+                        n
+                            .unbind( "click" )
+                            .bind( "click", function ()
                             {
-                                return ACT.UI.DataDoCustomSearch( n, i, url, ACT.UI.AfterSort );
-                            }
+                                if ( n.hasClass( "inactive" ) ) return;
 
-                            var params = ACT.UI.GetCustomSearchParams( t );
+                                var skip = parseInt( n.attr( "data-skip" ) );
+                                var page = parseInt( n.attr( "data-page" ) );
 
-                            params.Page = page;
-                            params.Skip = skip;
-                            params.Take = ACT.UI[t].PageLength;
-                            params.Query = ACT.UI[t].PageSearch;
+                                ACT.UI[t].PageSkip = skip;
+                                ACT.UI[t].PageNumber = page;
 
-                            ACT.UI.Get( n, i, url, params, ACT.UI.AfterSort, true );
-                        } );
+                                var url = ( siteurl + ng.attr( "data-url" ) ).split( '?' )[0].replace( siteurl, "" );
+
+                                if ( ACT.UI[t].IsCustomSearch )
+                                {
+                                    return ACT.UI.DataDoCustomSearch( n, tg, url, ACT.UI.AfterSort );
+                                }
+
+                                var params = ACT.UI.GetCustomSearchParams( t );
+
+                                params.Page = page;
+                                params.Skip = skip;
+                                params.Take = ACT.UI[t].PageLength;
+                                params.Query = ACT.UI[t].PageSearch;
+
+                                ACT.UI.Get( n, tg, url, params, ACT.UI.AfterSort, true );
+                            } );
+                    } );
                 } );
 
                 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2511,7 +2800,7 @@
 
                 // 7. Fixed Header
                 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                
+
                 var table = i.find( "table" );
                 var target = $( table.attr( "data-fixed-header-target" ) );
 
@@ -2543,24 +2832,6 @@
                             var header = target.find( "table.fixedHeader-floating" );
 
                             ACT.UI.ShowFixedHeader( header, table );
-
-                            /*var scrolled = $( document ).scrollTop();
-
-                            if ( scrolled > ( spHeight + 22 ) )
-                            {
-                                header.find( "th" ).each( function ()
-                                {
-                                    $( this )
-                                        .removeAttr( "style" )
-                                        .css( "width", table.find( 'th[data-name="' + $( this ).attr( "data-name" ) + '"]' ).width() );
-                                } );
-
-                                header.css( { "display": "block", "width": table.outerWidth() } );
-                            }
-                            else if ( scrolled < ( spHeight + 22 ) && header.is( ":visible" ) )
-                            {
-                                header.css( "display", "none" );
-                            }*/
                         } );
                 }
 
@@ -2651,12 +2922,33 @@
                 var q = "", h = "";
                 q += "Custom search for: ";
 
+                if ( ACT.UI[t].PagePSPId && ACT.UI[t].PagePSPId !== 0 )
+                {
+                    h += "PSP: <b>" + sender.find( 'select#PSPId:first option[value="' + ACT.UI[t].PagePSPId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ PSP: <a style='color: #69f95a;'>" + sender.find( 'select#PSPId:first option[value="' + ACT.UI[t].PagePSPId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#PSPId' ).val( ACT.UI[t].PagePSPId );
+                }
                 if ( ACT.UI[t].PageUserId && ACT.UI[t].PageUserId !== 0 )
                 {
                     h += "User: <b>" + sender.find( 'select#UserId:first option[value="' + ACT.UI[t].PageUserId + '"]' ).text() + "</b>~";
                     q += " <b class='italic'>[ User: <a style='color: #69f95a;'>" + sender.find( 'select#UserId:first option[value="' + ACT.UI[t].PageUserId + '"]' ).text() + "</a> ]</b> ";
 
                     sender.find( 'select#UserId' ).val( ACT.UI[t].PageUserId );
+                }
+                if ( ACT.UI[t].PageSiteId && ACT.UI[t].PageSiteId !== 0 )
+                {
+                    h += "Site: <b>" + sender.find( 'select#SiteId:first option[value="' + ACT.UI[t].PageSiteId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Site: <a style='color: #69f95a;'>" + sender.find( 'select#SiteId:first option[value="' + ACT.UI[t].PageSiteId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#SiteId' ).val( ACT.UI[t].PageSiteId );
+                }
+                if ( ACT.UI[t].PageRegionId && ACT.UI[t].PageRegionId !== 0 )
+                {
+                    h += "Region: <b>" + sender.find( 'select#RegionId:first option[value="' + ACT.UI[t].PageRegionId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Region: <a style='color: #69f95a;'>" + sender.find( 'select#RegionId:first option[value="' + ACT.UI[t].PageRegionId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#RegionId' ).val( ACT.UI[t].PageRegionId );
                 }
                 if ( ACT.UI[t].PageClientId && ACT.UI[t].PageClientId !== 0 )
                 {
@@ -2665,12 +2957,26 @@
 
                     sender.find( 'select#ClientId' ).val( ACT.UI[t].PageClientId );
                 }
+                if ( ACT.UI[t].PageTransporterId && ACT.UI[t].PageTransporterId !== 0 )
+                {
+                    h += "Transporter: <b>" + sender.find( 'select#TransporterId:first option[value="' + ACT.UI[t].PageTransporterId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Transporter: <a style='color: #69f95a;'>" + sender.find( 'select#TransporterId:first option[value="' + ACT.UI[t].PageTransporterId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#TransporterId' ).val( ACT.UI[t].PageTransporterId );
+                }
                 if ( ACT.UI[t].PageProductId && ACT.UI[t].PageProductId !== 0 )
                 {
                     h += "Product: <b>" + sender.find( 'select#ProductId:first option[value="' + ACT.UI[t].PageProductId + '"]' ).text() + "</b>~";
                     q += " <b class='italic'>[ Product: <a style='color: #69f95a;'>" + sender.find( 'select#ProductId:first option[value="' + ACT.UI[t].PageProductId + '"]' ).text() + "</a> ]</b> ";
 
                     sender.find( 'select#ProductId' ).val( ACT.UI[t].PageProductId );
+                }
+                if ( ACT.UI[t].PagePSPProductId && ACT.UI[t].PagePSPProductId !== 0 )
+                {
+                    h += "PSP Product: <b>" + sender.find( 'select#PSPProductId:first option[value="' + ACT.UI[t].PagePSPProductId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ PSP Product: <a style='color: #69f95a;'>" + sender.find( 'select#PSPProductId:first option[value="' + ACT.UI[t].PagePSPProductId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#PSPProductId' ).val( ACT.UI[t].PageProductId );
                 }
                 if ( ACT.UI[t].PageCampaignId && ACT.UI[t].PageCampaignId !== 0 )
                 {
@@ -2679,16 +2985,58 @@
 
                     sender.find( 'select#CampaignId' ).val( ACT.UI[t].PageCampaignId );
                 }
-                if ( ACT.UI[t].PageStatus && ACT.UI[t].PageStatus !== 0 )
+                if ( ACT.UI[t].PageVehicleId && ACT.UI[t].PageVehicleId !== 0 )
                 {
-                    h += "User: <b>" + sender.find( 'select#Status:first option[value="' + ACT.UI[t].PageStatus + '"]' ).text() + "</b>~";
+                    h += "Vehicle: <b>" + sender.find( 'select#VehicleId:first option[value="' + ACT.UI[t].PageVehicleId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Vehicle: <a style='color: #69f95a;'>" + sender.find( 'select#VehicleId:first option[value="' + ACT.UI[t].PageVehicleId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#VehicleId' ).val( ACT.UI[t].PageVehicleId );
+                }
+                if ( ACT.UI[t].PageDisputeReasonId && ACT.UI[t].PageDisputeReasonId !== 0 )
+                {
+                    h += "Dispute Reason: <b>" + sender.find( 'select#DisputeReasonId:first option[value="' + ACT.UI[t].PageDisputeReasonId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Dispute Reason: <a style='color: #69f95a;'>" + sender.find( 'select#DisputeReasonId:first option[value="' + ACT.UI[t].PageDisputeReasonId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#DisputeReasonId' ).val( ACT.UI[t].PageDisputeReasonId );
+                }
+                if ( ACT.UI[t].PageOutstandingReasonId && ACT.UI[t].PageOutstandingReasonId !== 0 )
+                {
+                    h += "Outstanding Reason: <b>" + sender.find( 'select#OutstandingReasonId:first option[value="' + ACT.UI[t].PageOutstandingReasonId + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Outstanding Reason: <a style='color: #69f95a;'>" + sender.find( 'select#OutstandingReasonId:first option[value="' + ACT.UI[t].PageOutstandingReasonId + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#OutstandingReasonId' ).val( ACT.UI[t].PageOutstandingReasonId );
+                }
+                if ( ACT.UI[t].PageStatus && ACT.UI[t].PageStatus !== -1 )
+                {
+                    h += "Status: <b>" + sender.find( 'select#Status:first option[value="' + ACT.UI[t].PageStatus + '"]' ).text() + "</b>~";
                     q += " <b class='italic'>[ Status: <a style='color: #69f95a;'>" + sender.find( 'select#Status:first option[value="' + ACT.UI[t].PageStatus + '"]' ).text() + "</a> ]</b> ";
 
                     sender.find( 'select#Status' ).val( ACT.UI[t].PageStatus );
                 }
-                if ( ACT.UI[t].PagePSPClientStatus && ACT.UI[t].PagePSPClientStatus !== 0 )
+                if ( ACT.UI[t].PageReconciliationStatus && ACT.UI[t].PageReconciliationStatus !== -1 )
                 {
-                    h += "User: <b>" + sender.find( 'select#PSPClientStatus:first option[value="' + ACT.UI[t].PagePSPClientStatus + '"]' ).text() + "</b>~";
+                    h += "Reconciliation Status: <b>" + sender.find( 'select#ReconciliationStatus:first option[value="' + ACT.UI[t].PageReconciliationStatus + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Reconciliation Status: <a style='color: #69f95a;'>" + sender.find( 'select#ReconciliationStatus:first option[value="' + ACT.UI[t].PageReconciliationStatus + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#ReconciliationStatus' ).val( ACT.UI[t].PageReconciliationStatus );
+                }
+                if ( ACT.UI[t].PageBalanceStatus && ACT.UI[t].PageBalanceStatus !== -1 )
+                {
+                    h += "Balance Status: <b>" + sender.find( 'select#BalanceStatus:first option[value="' + ACT.UI[t].PageBalanceStatus + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Balance Status: <a style='color: #69f95a;'>" + sender.find( 'select#BalanceStatus:first option[value="' + ACT.UI[t].PageBalanceStatus + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#BalanceStatus' ).val( ACT.UI[t].PageBalanceStatus );
+                }
+                if ( ACT.UI[t].PageDisputeStatus && ACT.UI[t].PageDisputeStatus !== -1 )
+                {
+                    h += "Dispute Status: <b>" + sender.find( 'select#DisputeStatus:first option[value="' + ACT.UI[t].PageDisputeStatus + '"]' ).text() + "</b>~";
+                    q += " <b class='italic'>[ Dispute Status: <a style='color: #69f95a;'>" + sender.find( 'select#DisputeStatus:first option[value="' + ACT.UI[t].PageDisputeStatus + '"]' ).text() + "</a> ]</b> ";
+
+                    sender.find( 'select#DisputeStatus' ).val( ACT.UI[t].PageDisputeStatus );
+                }
+                if ( ACT.UI[t].PagePSPClientStatus && ACT.UI[t].PagePSPClientStatus !== -1 )
+                {
+                    h += "Status: <b>" + sender.find( 'select#PSPClientStatus:first option[value="' + ACT.UI[t].PagePSPClientStatus + '"]' ).text() + "</b>~";
                     q += " <b class='italic'>[ Status: <a style='color: #69f95a;'>" + sender.find( 'select#PSPClientStatus:first option[value="' + ACT.UI[t].PagePSPClientStatus + '"]' ).text() + "</a> ]</b> ";
 
                     sender.find( 'select#PSPClientStatus' ).val( ACT.UI[t].PagePSPClientStatus );
@@ -2908,6 +3256,69 @@
                 cntr = form.find( '[name="IsAccpetedTC"]' );
 
                 err += "One last critical thing, please click here to Accept our Terms & Conditions for signing up with <b>ACT Pallet Solutions</b>.";
+            }
+
+            // 6. Validate Approve/Decline PSP Status is selected?
+            if ( valid && form.find( '#ApproveDeclinePSPClientStatus' ).length && form.find( '#ApproveDeclinePSPClientStatus' ).val() === "" )
+            {
+                valid = false;
+
+                direction = "center-left";
+                cntr = form.find( 'div#s2id_ApproveDeclinePSPClientStatus' );
+
+                err += "Please select a Status for this PSP/Client application to utilize ACT Pallet Solutions.";
+            }
+
+            // 7. Validate Approve/Decline PSP Status is selected?
+            if ( valid && form.find( '#ApproveDeclinePSPClientStatus' ).length && form.find( '#DeclineReason' ).length && form.find( '#ApproveDeclinePSPClientStatus' ).val() === "2" && form.find( '#DeclineReason' ).val() === "" )
+            {
+                valid = false;
+
+                direction = "center-right";
+                cntr = form.find( 'div#s2id_DeclineReason' );
+
+                err += "Please select a reason to why you're declining this PSP/Client application to utilize ACT Pallet Solutions.";
+            }
+
+            // 7. Validate all user login details are supplied if PSP/Client is verified
+            if ( valid && form.find( '#ApproveDeclinePSPClientStatus' ).length && form.find( '#user-details' ).length && form.find( '#ApproveDeclinePSPClientStatus' ).val() === "1" )
+            {
+                form.find( '#user-details input:visible' ).each( function ()
+                {
+                    if ( $( this ).val() === "" )
+                    {
+                        valid = false;
+
+                        direction = "center-right";
+                        cntr = $( this );
+
+                        err += "Please enter/select a value for this field to proceed!";
+
+                        return false;
+                    }
+                } );
+            }
+
+            // 8. Password match ConfirmPassword
+            if ( valid && form.find( '#Password' ).length && form.find( '#ConfirmPassword' ).length && form.find( '#Password' ).val() !== form.find( '#ConfirmPassword' ).val() )
+            {
+                valid = false;
+
+                direction = "center-right";
+                cntr = form.find( '#ConfirmPassword' );
+
+                err += "Password does not match";
+            }
+
+            // 8. Password match ConfirmPassword
+            if ( valid && form.find( '#User_Password' ).length && form.find( '#User_ConfirmPassword' ).length && form.find( '#User_Password' ).val() !== form.find( '#User_ConfirmPassword' ).val() )
+            {
+                valid = false;
+
+                direction = "center-right";
+                cntr = form.find( '#User_ConfirmPassword' );
+
+                err += "Password does not match";
             }
 
 
@@ -3139,6 +3550,11 @@
             {
                 var i = $( this );
 
+                if ( i.is( ":hidden" ) )
+                {
+                    return;
+                }
+
                 var id = i.attr( "id" );
                 var max = parseInt( i.attr( "data-val-length-max" ) );
 
@@ -3211,7 +3627,7 @@
                 title = "Bank Account Details Validation";
                 msg = "<p>";
                 msg += " Please wait whilst we validate the provided Bank Account details...";
-                msg += ' <img id="loader" class="apcloud-loader" src="' + imgurl + '/images/loader.gif" alt="" style="margin: 0 5px;" />';
+                msg += ' <img id="loader" class="ACT-loader" src="' + imgurl + '/images/loader.gif" alt="" style="margin: 0 5px;" />';
                 msg += "</p>";
 
                 var d = { accountNo: acc.val(), branchCode: bcode.val(), accountType: accType.val() };
@@ -3274,7 +3690,7 @@
 
         DataGetBroadcast: function ()
         {
-            if ( ACT.UI.PageBroadcast ) return;
+            if ( ACT.UI.PageBroadcast || !authenticated ) return;
 
             ACT.UI.PageBroadcast = 1;
 
@@ -3499,6 +3915,7 @@
             } );
         },
 
+
         DataServiceType: function ( sender )
         {
             var cTnC = $( "#ClientTnCDocumentUrl" ).val(),
@@ -3511,27 +3928,163 @@
                 var i = $( this );
 
                 var v = i.val();
-                var t = $( i.attr( "data-target" ) );
+                var target = $( i.attr( "data-target" ) );
 
                 i
                     .unbind( "click" )
                     .bind( "click", function ()
                     {
-                        if ( v === "1" || v === "2" )
+                        if ( v === "4" )
                         {
-                            t.show( 900 );
+                            target.show( 900, function ()
+                            {
+                                target.find( "select,input:visible" ).each( function ()
+                                {
+                                    if ( $( this ).hasClass( "select2-input" ) ) return;
+
+                                    $( this ).attr( "required", "required" );
+                                } );
+                            } );
 
                             tncLink.attr( "href", cTnC );
                         }
                         else
                         {
-                            t.hide( 900 );
+                            target.hide( 900, function ()
+                            {
+                                target.find( "select,input" ).removeAttr( "required" );
+                            } );
 
                             tncLink.attr( "href", pTnC );
                         }
                     } );
             } );
         },
+
+        DataPalletUse: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var v = i.val();
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( v === "3" )
+                        {
+                            target.show( 900, function ()
+                            {
+                                ACT.UI.DataHighlightFields( target );
+
+                                target.find( "input:visible" ).attr( "required", "required" );
+                            } );
+                        }
+                        else
+                        {
+                            target.hide( 900, function ()
+                            {
+                                target.find( "input" ).removeAttr( "required" );
+                            } );
+                        }
+                    } );
+            } );
+        },
+
+        DataPSPReg: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() === "-1" )
+                        {
+                            target.show( 900, function ()
+                            {
+                                ACT.UI.DataHighlightFields( target );
+
+                                target.find( "input:visible" ).attr( "required", "required" );
+                            } );
+                        }
+                        else
+                        {
+                            target.hide( 900, function ()
+                            {
+                                target.find( "input" ).removeAttr( "required" );
+                            } );
+                        }
+                    } );
+            } );
+        },
+
+        DataBudgetTotal: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                // <td>    // <tr>
+                var target = i.parent().parent().find( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        var t = $( this ).val();
+
+                        if ( !parseInt( t ) ) return;
+
+                        var total = parseInt( t );
+
+                        var shares = ( total / target.length ).toFixed( 0 );
+
+                        target.each( function ()
+                        {
+                            $( this ).val( shares );
+                            $( this ).attr( "value", shares );
+                            ACT.UI.DataHighlightFields( $( this ).parent() );
+                        } );
+                    } );
+            } );
+        },
+
+        DataBudgetSum: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                // <td>    // <tr>
+                var target = i.parent().parent().find( i.attr( "data-target" ) )
+                var source = i.parent().parent().find( i.attr( "data-source" ) )
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        let sum = 0
+                        source.each( function ( i, t )
+                        {
+                            sum += parseInt( t.value )
+                        } );
+
+                        if ( sum > 0 )
+                        {
+                            target.val( sum )
+                            target.attr( "value", sum )
+                        }
+                    } );
+            } );
+        },
+
 
         DataAuditLog: function ( sender )
         {
@@ -3566,6 +4119,2007 @@
                         } );
                     } );
             } );
-        }
+        },
+
+        DataApproveDeclinePSP: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var activeTarget = $( i.attr( "data-active-target" ) );
+                var rejectedTarget = $( i.attr( "data-rejected-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() === "1" )
+                        {
+                            //
+                            rejectedTarget.css( "display", "none" );
+                            activeTarget.show( 900 );
+                        }
+                        else if ( $( this ).val() === "2" )
+                        {
+                            //
+                            activeTarget.css( "display", "none" );
+                            rejectedTarget.show( 900 );
+                        }
+                        else if ( $( this ).val() === "" )
+                        {
+                            //
+                            activeTarget.hide( 900 );
+                            rejectedTarget.hide( 900 );
+                        }
+                    } );
+            } );
+        },
+
+        DataRole: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var pspOptions = $( i.attr( "data-psp" ) );
+                var clientOptions = $( i.attr( "data-client" ) );
+
+                var pspRoleIds = JSON.parse( i.attr( "data-psp-role-ids" ) );
+                var clienntRoleId = i.attr( "data-client-role-id" );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( pspRoleIds.find( id => id == $( this ).val() ) )
+                        {
+                            clientOptions.css( "display", "none" );
+                            pspOptions.show( 1000 );
+                        }
+                        else if ( clienntRoleId === $( this ).val() )
+                        {
+                            pspOptions.css( "display", "none" );
+                            clientOptions.show( 1000 );
+                        }
+                        else
+                        {
+                            pspOptions.hide( 1000 );
+                            clientOptions.hide( 1000 );
+                        }
+                    } );
+            } );
+        },
+
+        DataGraphs: function ( sender, params )
+        {
+            var i = sender.parent().find( 'div[data-loaded="0"]' ).first();
+
+            if ( !i.length )
+            {
+                setTimeout( function ()
+                {
+                    $( ".gs-data" ).show( 1000 );
+                }, 4000 );
+
+                return;
+            }
+
+            i.html( "" );
+            i.append( "<div id='loader' />" );
+
+            function LoadNext()
+            {
+                i.attr( "data-loaded", 1 );
+
+                ACT.UI.DataGraphs( sender, params );
+            }
+
+            if ( typeof ( params ) === 'undefined' )
+            {
+                params = {};
+            }
+
+            ACT.UI.Get( i.find( "#loader" ), i, siteurl + "/" + i.attr( "data-type" ), params, LoadNext(), true, true );
+        },
+
+        AgeOfOutstandingPallets: function ( sender, months )
+        {
+            Highcharts.chart( sender, {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Age Of Outstanding Pallets'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.y:.0f}</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b style="color:{point.color};">{point.name}</b>: <span style="color:{point.color};">{point.y:.0f}</span>'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'NO. OF OUTSTANDING PALLETS',
+                    colorByPoint: true,
+                    data: months
+                }]
+            } );
+        },
+
+        AgeOfOutstandingPOD: function ( sender, months )
+        {
+            Highcharts.chart( sender, {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Age Of Outstanding PODs'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.y:.0f}</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b style="color:{point.color};">{point.name}</b>: <span style="color:{point.color};">{point.y:.0f}</span>'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'NO. OF OUTSTANDING PODs',
+                    colorByPoint: true,
+                    data: months
+                }]
+            } );
+        },
+
+        LoadsPerMonth: function ( sender, months, series )
+        {
+            Highcharts.chart( sender, {
+                title: {
+                    text: 'Loads Per Month'
+                },
+                xAxis: {
+                    categories: months
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Total'
+                    },
+                    stackLabels: {
+                        enabled: true
+                    }
+                },
+                legend: {
+                    x: 0,
+                    y: 5,
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        dataLabels: {
+                            enabled: true
+                        }
+                    }
+                },
+                series: series
+            } );
+        },
+
+        AuthorisationCodesPerMonth: function ( sender, months, series )
+        {
+            Highcharts.chart( sender, {
+                chart: {
+                    marginBottom: 70
+                },
+                title: {
+                    text: 'Authorisations Per Month'
+                },
+                xAxis: {
+                    categories: months
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Total'
+                    },
+                    stackLabels: {
+                        enabled: true
+                    }
+                },
+                legend: {
+                    x: 0,
+                    y: 5,
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                },
+                tooltip: {
+                    headerFormat: '<b>{point.x}</b><br/>',
+                    pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        dataLabels: {
+                            enabled: true
+                        }
+                    }
+                },
+                series: series
+            } );
+        },
+
+        NumberOfPalletsManaged: function ( sender, months, series )
+        {
+            Highcharts.chart( sender, {
+                chart: {
+                    type: 'line'
+                },
+                title: {
+                    text: 'Number Of Pallets Managed'
+                },
+                xAxis: {
+                    categories: months
+                },
+                yAxis: {
+                    title: {
+                        text: 'Pallets'
+                    }
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        }
+                    },
+                    series: {
+                        label: {
+                            connectorAllowed: false
+                        }
+                    }
+                },
+                series: series,
+
+                responsive: {
+                    rules: [{
+                        chartOptions: {
+                            legend: {
+                                layout: 'horizontal',
+                                align: 'center',
+                                verticalAlign: 'bottom'
+                            }
+                        }
+                    }]
+                }
+            } );
+        },
+
+        NumberOfDisputes: function ( sender, months, series )
+        {
+            Highcharts.chart( sender, {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Number Of Disputes'
+                },
+                xAxis: {
+                    categories: months
+                },
+                yAxis: {
+                    title: {
+                        text: 'Disputes'
+                    }
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        }
+                    }
+                },
+                series: series
+            } );
+        },
+
+        DataGSRegion: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        ACT.Loader.Show( $( 'label[for="SiteId"]' ), true );
+
+                        $( "select#SiteId" ).parent().load( siteurl + "GetHtmlSiteList", { regionId: $( this ).val() }, function ()
+                        {
+                            ACT.UI.DataHighlightFields( $( "select#SiteId" ).parent() );
+
+                            ACT.UI.DataGSSite( $( '*[data-gs-site="1"]' ) );
+
+                            $( "select#SiteId" ).change();
+
+                            ACT.Init.PluginInit( $( "select#SiteId" ).parent() );
+                        } );
+                    } );
+            } );
+        },
+
+        DataGSSite: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        var siteIds = "";
+
+                        // Only set siteIds if no site is selected..
+
+                        if ( $( this ).val() === "" )
+                        {
+                            $( this ).find( "option" ).each( function ( x )
+                            {
+                                if ( $( this ).attr( "value" ) === "" ) return;
+
+                                if ( x > 0 )
+                                {
+                                    siteIds += "&";
+                                }
+
+                                siteIds += "siteIds=" + $( this ).attr( "value" );
+                            } );
+                        }
+
+                        $( "select#ClientId" ).parent().load( siteurl + "GetHtmlClientList?" + siteIds, { siteId: $( this ).val() }, function ()
+                        {
+                            ACT.Loader.Hide();
+
+                            ACT.UI.DataHighlightFields( $( "select#ClientId" ).parent() );
+
+                            ACT.Init.PluginInit( $( "select#ClientId" ).parent() );
+                        } );
+                    } );
+            } );
+        },
+
+        DataGSearch: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var filters = $( i.attr( "data-filters" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        // These params should match the ACT.Core/Models/CustomSearchModel.cs
+
+                        var params = ACT.UI.GetDashSearchParams( filters );
+
+                        $( ".gs-data" ).css( "display", "none" );
+                        $( '*[data-graph="1"]' ).attr( "data-loaded", 0 );
+
+                        ACT.UI.DataGraphs( $( '*[data-graph="1"]' ), params );
+                    } );
+            } );
+        },
+
+        GetDashSearchParams: function ( filters )
+        {
+            return {
+                GiveData: false,
+                SiteId: filters.find( "#SiteId" ).val(),
+                ClientId: filters.find( "#ClientId" ).val(),
+                RegionId: filters.find( "#RegionId" ).val(),
+                ToDate: filters.find( '[name="ToDate"]' ).val(),
+                FromDate: filters.find( '[name="FromDate"]' ).val()
+            };
+        },
+
+        DataGSData: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var type = i.attr( "data-type" );
+                var arrow = i.attr( "data-arrow" );
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var loaded = i.attr( "data-loaded" );
+
+                        if ( loaded === "1" )
+                        {
+                            $( ".sticky-frame" ).css( { "width": ( $( "#item-list" ).outerWidth() - 60 ), "max-width": ( $( "#item-list" ).outerWidth() - 60 ) } );
+
+                            ACT.Sticky.Show( i, "Data", target.html(), [], arrow );
+
+                            return;
+                        }
+
+                        var params = ACT.UI.GetDashSearchParams( $( "#gs-search-fields" ) );
+
+                        params.GiveData = true;
+
+                        ACT.Loader.Show( i.find( "i" ) );
+
+                        target.load( siteurl + "/" + type, params, function ( data )
+                        {
+                            $( ".sticky-frame" ).css( { "width": ( $( "#item-list" ).outerWidth() - 60 ), "max-width": ( $( "#item-list" ).outerWidth() - 60 ) } );
+
+                            ACT.Sticky.Show( i, "Data", data, ACT.Loader.Hide(), arrow );
+
+                            i.attr( "data-loaded", "1" );
+
+                            //ACT.Loader.Hide();
+                        } );
+                    } );
+            } );
+        },
+
+
+
+        DataDNClient: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() === "" )
+                        {
+                            return;
+                        }
+
+                        ACT.Loader.Show( $( '[for="' + i.attr( "id" ) + '"]' ), true );
+
+                        $( "#site-options" ).load( siteurl + "GetClientSites", { clientId: $( this ).val() }, function ()
+                        {
+                            $( "#site-options" ).show( 900 );
+                        } );
+
+                        $( "#vehicle-options" ).load( siteurl + "GetClientVehicles", { clientId: $( this ).val() }, function ()
+                        {
+                            $( "#vehicle-options" ).show( 900 );
+
+                            ACT.Loader.Hide();
+                            ACT.Init.PluginInit( $( "#site-options" ).add( $( this ) ) );
+                        } );
+                    } );
+            } );
+        },
+
+        DataCopyAddress: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var to = $( i.attr( "data-to" ) );
+                var from = $( i.attr( "data-from" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( !$( this ).is( ":checked" ) )
+                        {
+                            return;
+                        }
+
+                        from.find( '[data-field]' ).each( function ()
+                        {
+                            to.find( '[data-field="' + $( this ).attr( "data-field" ) + '"]' ).val( $( this ).val() );
+                        } );
+                    } );
+            } );
+        },
+
+        DataEmailDeliveryNote: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var title = i.attr( "original-title" );
+                        var message = '<p style="margin-top: 10px;">Please enter an e-mail address below to continue.</p>';
+
+                        message += '<p>';
+                        message += '  Email Address:<br />';
+                        message += '  <input id="email" name="email" value="" type="text" placeholder="Enter E-mail Address" />';
+                        message += '</p>';
+
+                        message += '<p>';
+                        message += '  Subject of the Email:<br />';
+                        message += '  <textarea id="subject" name="subject" placeholder="Enter Subject of the Email" style="width: 95%; height: auto;"></textarea>';
+                        message += '</p>';
+
+                        /*message += '<p style="padding-bottom: 5px; border-bottom: 1px dashed #ddd;">';
+                        message += '  Message for the Email Recipient:<br />';
+                        message += '  <textarea id="message" name="message" placeholder="Enter Message for the Email Recipient" style="width: 95%;"></textarea>';
+                        message += '</p>';*/
+
+                        message += '<p>';
+                        message += '  <input id="yes-btn" value="Send" type="button" class="btn-yes" />';
+                        message += '  <span style="padding: 0 5px;">/</span>';
+                        message += '  <input id="no-btn" value="Cancel" type="button" class="btn-no" />';
+                        message += '</p>';
+
+                        ACT.Sticky.Show( i, title, message, [], "center-right" );
+
+                        var no = ACT.Sticky.StickyOne.find( "#no-btn" );
+                        var yes = ACT.Sticky.StickyOne.find( "#yes-btn" );
+
+                        no
+                            .unbind( "click" )
+                            .bind( "click", function ()
+                            {
+                                ACT.Sticky.Hide();
+                            } );
+
+                        yes
+                            .unbind( "click" )
+                            .bind( "click", function ()
+                            {
+                                var valid = true;
+
+                                var email = ACT.Sticky.StickyOne.find( "#email" );
+                                var subject = ACT.Sticky.StickyOne.find( "#subject" );
+                                //var message = ACT.Sticky.StickyOne.find( "#message" );
+
+                                if ( email.val().trim() == '' )
+                                {
+                                    valid = false;
+                                    email.addClass( 'invalid' ).focus();
+                                }
+                                if ( subject.val().trim() == '' )
+                                {
+                                    valid = false;
+                                    subject.addClass( 'invalid' ).focus();
+                                }
+
+                                if ( !valid )
+                                {
+                                    return false;
+                                }
+
+                                ACT.Loader.Show( yes, true );
+
+                                $.post( siteurl + "/EmailDeliveryNote", { id: id, email: email.val(), subject: subject.val()/*, message: message.val()*/ }, function ( data )
+                                {
+                                    var d = $( "<div/>" ).html( data );
+
+                                    ACT.Loader.Hide();
+                                    ACT.Sticky.Show( i, d.find( ".title" ).text(), d.find( ".message" ).html(), [], "center-right" );
+                                } );
+                            } );
+
+                        return false;
+                    } );
+            } );
+        },
+
+
+        DataDisputeStatus: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() !== "1" )
+                        {
+                            target.show( 900 );
+                        }
+                        else
+                        {
+                            target.hide( 900 );
+                        }
+                    } );
+            } );
+        },
+
+        DataDisputeChepLoad: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() !== "" )
+                        {
+                            // Get Chep
+
+                            $.ajax( {
+                                url: siteurl + "/GetChepLoad",
+                                type: "POST",
+                                data: JSON.stringify( { ChepLoadId: $( this ).val() } ),
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json",
+                                error: function ( e )
+                                {
+
+                                },
+                                success: function ( s )
+                                {
+                                    $( "#Equipment" ).val( s.Equipment.trim() ).attr( "readonly", "readonly" );
+                                    $( "#EquipmentCode" ).val( s.EquipmentCode.trim() ).attr( "readonly", "readonly" );
+                                    $( "#DocketNumber" ).val( s.DocketNumber.trim() ).attr( "readonly", "readonly" );
+                                    $( "#OriginalDocketNumber" ).val( s.OriginalDocketNumber.trim() ).attr( "readonly", "readonly" );
+                                    $( "#Reference" ).val( s.Ref.trim() ).attr( "readonly", "readonly" );
+                                    $( "#OtherReference" ).val( s.OtherRef.trim() ).attr( "readonly", "readonly" );
+                                    $( "#OtherParty" ).val( s.OtherParty.trim() ).attr( "readonly", "readonly" );
+                                    $( "#Location" ).val( s.Location.trim() ).attr( "readonly", "readonly" );
+                                    $( "#LocationId" ).val( s.LocationId.trim() ).attr( "readonly", "readonly" );
+
+                                    $( '[name="EffectiveDate"]' ).val( s.EffectiveDate ).attr( "readonly", "readonly" );
+                                    $( '[name="ShipDate"]' ).val( s.ShipmentDate ).attr( "readonly", "readonly" );
+                                    $( '[name="DeliveryDate"]' ).val( s.DeliveryDate ).attr( "readonly", "readonly" );
+
+                                    $( "#TransactionType" ).val( s.TransactionType.trim() ).attr( "readonly", "readonly" );
+                                    $( "#DataSource" ).val( s.DataSource.trim() ).attr( "readonly", "readonly" );
+
+                                    ACT.UI.DataHighlightFields( target.parent() );
+                                }
+                            } );
+                        }
+                        else
+                        {
+                            target.val( "" ).removeAttr( "readonly" );
+
+                            ACT.UI.DataHighlightFields( target.parent() );
+                        }
+                    } );
+            } );
+        },
+
+        DataLinkProduct: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() == "" )
+                        {
+                            target.find( 'select:visible' ).val( "" );
+                            target.find( 'input[type="text"]:visible' )
+                                .add( 'input[name="ActiveDate"]:visible' )
+                                .add( "#Description" )
+                                .val( "" );
+
+                            return;
+                        }
+
+                        var d = { id: $( this ).val() };
+
+                        $.ajax( {
+                            url: siteurl + "/GetProduct?id=" + $( this ).val(),
+                            type: "POST",
+                            data: JSON.stringify( d ),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            error: function ( e )
+                            {
+
+                            },
+                            success: function ( p )
+                            {
+                                if ( p.Id > 0 )
+                                {
+                                    $( "#LostRate:visible" ).val( p.LostRate );
+                                    $( "#HireRate:visible" ).val( p.HireRate );
+                                    $( "#IssueRate:visible" ).val( p.IssueRate );
+                                    $( "#Description:visible" ).val( p.Description );
+                                    $( 'input[name="ActiveDate"]:visible' ).val( p.CreatedOn );
+                                }
+                                else
+                                {
+                                    target.find( 'select:visible' ).val( "" );
+                                    target.find( 'input[type="text"]:visible' )
+                                        .add( 'input[name="ActiveDate"]:visible' )
+                                        .add( "#Description" )
+                                        .val( "" );
+                                }
+                            }
+                        } );
+                    } );
+            } )
+        },
+
+
+
+        DataReconcileLoadsDragDrop: function ( draggable, droppable )
+        {
+
+        },
+
+        DataSearchChepLoads: function ( target )
+        {
+            var q = target.find( "#Query" ).val();
+            var update = target.find( ".list-data" );
+
+            var params = ACT.UI.GetCustomSearchParams( window.location.hash.replace( "#", "" ) );
+
+            params.Query = q;
+
+            ACT.Loader.Show( target.find( "#loader" ), true );
+
+            update.load( siteurl + "/UnReconciledChepLoads", params, function ()
+            {
+                ACT.Loader.Hide();
+
+                ACT.Init.Start();
+            } );
+        },
+
+        DataSearchClientLoads: function ( target )
+        {
+            var q = target.find( "#Query" ).val();
+            var update = target.find( ".list-data" );
+
+            var params = ACT.UI.GetCustomSearchParams( window.location.hash.replace( "#", "" ) );
+
+            params.Query = q;
+
+            ACT.Loader.Show( target.find( "#loader" ), true );
+
+            update.load( siteurl + "/UnReconciledClientLoads", params, function ()
+            {
+                ACT.Loader.Hide();
+
+                ACT.Init.Start();
+            } );
+        },
+
+        DataReconcileLoadsSearch: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                var chepLoads = $( i.attr( "data-chep-loads" ) );
+                var clientLoads = $( i.attr( "data-client-loads" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var hash = window.location.hash.replace( "#", "" );
+
+                        if ( !ACT.UI[hash] )
+                        {
+                            ACT.UI[hash] = [];
+                        }
+
+                        ACT.UI[hash].PageToDate = target.find( '[name="ToDate"]' ).val();
+                        ACT.UI[hash].PageClientId = target.find( '[name="ClientId"]' ).val();
+                        ACT.UI[hash].PageFromDate = target.find( '[name="FromDate"]' ).val();
+
+                        ACT.UI.DataSearchChepLoads( chepLoads );
+                        ACT.UI.DataSearchClientLoads( clientLoads );
+                    } );
+            } );
+        },
+
+
+
+        DataReconcileInvoicesDragDrop: function ( draggable, droppable )
+        {
+            draggable.draggable();
+            droppable.droppable( {
+                hoverClass: "drop-hover",
+                drop: function ( event, ui )
+                {
+                    var dragId = ui.draggable.attr( "data-cid" );
+                    var dragLoad = ui.draggable.attr( "data-load-number" );
+                    var dragParent = $( ui.draggable.attr( "data-parent" ) );
+                    var dragQty = parseFloat( ui.draggable.attr( "data-qty" ) );
+
+                    var dropId = $( this ).attr( "data-cid" );
+                    var dropLoad = $( this ).attr( "data-load-number" );
+                    var dropParent = $( $( this ).attr( "data-parent" ) );
+                    var dropQty = parseFloat( $( this ).attr( "data-qty" ) );
+
+                    var msg = "";
+
+                    msg += "<p>Are you sure you would like to reconcile an Invoice with <b>Load # " + dragLoad + "</b> with a Client Load with <b>Load # " + dropLoad + "</b>?</p>";
+
+                    if ( dragQty != dropQty )
+                    {
+                        msg += "<p><img src='" + imgurl + "/Images/warn.png' style='max-height: 20px;' /> <b>Please Note:</b> The quantities for the loads you are about to reconcile are not the same!</p>";
+                    }
+
+                    msg += "<p>This process is permanent and cannot be reversed!</p>";
+                    msg += "<p style='border-top: 1px solid #fff; padding-top: 10px; margin: 15px 0; text-align: center;'>";
+                    msg += "    <input id='btnYes' type='button' value='YES!' class='btn-yes' />";
+                    msg += "    <span style='padding: 0 5px;'>/</span>";
+                    msg += "    <input id='btnNo' type='button' value='No..' class='btn-no' />";
+                    msg += "</p>";
+
+                    var close = $( ACT.Modal.Container ).find( '#modalClose' );
+
+                    close.css( "display", "none" );
+
+                    ACT.Modal.Open( msg, title, false );
+
+                    setTimeout( function ()
+                    {
+                        var btnNo = $( ACT.Modal.Container ).find( '#btnNo' );
+                        var btnYes = $( ACT.Modal.Container ).find( '#btnYes' );
+
+                        btnYes
+                            .unbind( "click" )
+                            .bind( "click", function ()
+                            {
+                                ACT.Loader.Show( btnYes.parent().find( "span" ), true );
+
+                                $( "<div/>" ).load( siteurl + "/ReconcileInvoice", { iid: dragId, clid: dropId }, function ( d )
+                                {
+                                    var i = $( this );
+
+                                    $( ACT.Modal.Container ).find( '#modal-body' ).html( d );
+                                    $( ACT.Modal.Container ).find( '#modal-body .notification' ).slideDown( 900 );
+
+                                    if ( i.find( ".message-success" ) )
+                                    {
+                                        ACT.UI.DataSearchInvoices( dragParent );
+                                        ACT.UI.DataSearchInvoiceClientLoads( dropParent );
+
+                                        close.css( "display", "block" );
+                                    }
+                                    else
+                                    {
+                                        ui.draggable.css( { "left": 0, "top": 0 } );
+
+                                        ACT.Loader.Hide();
+                                    }
+                                } );
+                            } );
+
+                        btnNo
+                            .unbind( "click" )
+                            .bind( "click", function ()
+                            {
+                                ui.draggable.css( { "left": 0, "top": 0 } );
+
+                                ACT.Modal.Close();
+                            } );
+
+                    }, '1000' );
+                }
+            } );
+        },
+
+        DataSearchInvoices: function ( target )
+        {
+            var q = target.find( "#Query" ).val();
+            var update = target.find( ".list-data" );
+
+            var params = ACT.UI.GetCustomSearchParams( window.location.hash.replace( "#", "" ) );
+
+            params.Query = q;
+
+            ACT.Loader.Show( target.find( "#loader" ), true );
+
+            update.load( siteurl + "/Invoices", params, function ()
+            {
+                ACT.Loader.Hide();
+
+                ACT.Init.Start();
+            } );
+        },
+
+        DataSearchInvoiceClientLoads: function ( target )
+        {
+            var q = target.find( "#Query" ).val();
+            var update = target.find( ".list-data" );
+
+            var params = ACT.UI.GetCustomSearchParams( window.location.hash.replace( "#", "" ) );
+
+            params.Query = q;
+
+            ACT.Loader.Show( target.find( "#loader" ), true );
+
+            update.load( siteurl + "/InvoiceClientLoads", params, function ()
+            {
+                ACT.Loader.Hide();
+
+                ACT.Init.Start();
+            } );
+        },
+
+        DataReconcileInvoicesSearch: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                var invoices = $( i.attr( "data-invoices" ) );
+                var clientLoads = $( i.attr( "data-client-loads" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var hash = window.location.hash.replace( "#", "" );
+
+                        if ( !ACT.UI[hash] )
+                        {
+                            ACT.UI[hash] = [];
+                        }
+
+                        ACT.UI[hash].PageToDate = target.find( '[name="ToDate"]' ).val();
+                        ACT.UI[hash].PageClientId = target.find( '[name="ClientId"]' ).val();
+                        ACT.UI[hash].PageFromDate = target.find( '[name="FromDate"]' ).val();
+
+                        ACT.UI.DataSearchInvoices( invoices );
+                        ACT.UI.DataSearchInvoiceClientLoads( clientLoads );
+                    } );
+            } );
+        },
+
+        DataAutoRecon: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var type = i.attr( "data-type" );
+                var title = i.attr( "data-title" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var msg = "<p id='ar-msg'>Please wait for the reconcilliation process to complete...</p>";
+                        msg += ACT.Loader.Html;
+
+                        ACT.Modal.Open( msg, title, false );
+
+                        var close = $( ACT.Modal.Container ).find( '#modalClose' );
+
+                        close.css( "display", "none" );
+
+                        var msg = $( ACT.Modal.Container ).find( '#ar-msg' );
+
+                        if ( type == "loads" )
+                        {
+                            ACT.UI.DataAutoReconcileLoads( close, msg );
+                        }
+                        else
+                        {
+                            ACT.UI.DataAutoReconcileInvoices( close, msg );
+                        }
+                    } );
+            } );
+        },
+
+        DataAutoReconcileLoads: function ( close, msg )
+        {
+            ACT.Loader.Show();
+
+            $( "<div />" ).load( siteurl + "/AutoReconcileLoads", {}, function ( d )
+            {
+                window.location.reload();
+            } );
+        },
+
+        DataAutoReconcileInvoices: function ( close, msg )
+        {
+            ACT.Loader.Show();
+
+            $( "<div />" ).load( siteurl + "/AutoReconcileInvoices", {}, function ( d )
+            {
+                window.location.reload();
+            } );
+        },
+
+        DataClientLoadStatus: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var target = $( i.attr( "data-target" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).val() == "4" )
+                        {
+                            target.slideDown( 900, function ()
+                            {
+                                target.find( "input.input" ).attr( "required", "required" );
+                            } );
+
+                            ACT.UI.DataHighlightFields( target );
+                        }
+                        else
+                        {
+                            target.slideUp( 900, function ()
+                            {
+                                target.find( "input.input" ).removeAttr( "required" );
+                            } );
+                        }
+                    } );
+            } );
+        },
+
+        DataReconcileCheck: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var sel = $( i.attr( "data-sel" ) );
+                var compare = $( i.attr( "data-compare" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).is( ":checked" ) )
+                        {
+                            ACT.UI.DataShowManualRecon( sel, compare );
+                        }
+                        else
+                        {
+                            ACT.UI.DataShowManualRecon( sel, compare );
+                        }
+                    } );
+            } );
+        },
+
+        DataReconcileParentCheck: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var check = $( i.attr( "data-check" ) );
+
+                var sel = $( i.attr( "data-sel" ) );
+                var compare = $( i.attr( "data-compare" ) );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        if ( $( this ).is( ":checked" ) )
+                        {
+                            check.prop( "checked", true ).attr( "checked", "checked" );
+
+                            ACT.UI.DataShowManualRecon( sel, compare );
+                        }
+                        else
+                        {
+                            check.prop( "checked", false ).removeAttr( "checked" );
+
+                            ACT.UI.DataShowManualRecon( sel, compare );
+                        }
+                    } );
+            } );
+        },
+
+        DataShowManualRecon: function ( sel, compare )
+        {
+            var selL = sel.find( 'input[type="checkbox"]:checked' ).length;
+            var compareL = compare.find( 'input[type="checkbox"]:checked' ).length;
+
+            selL = ( sel.find( 'input[data-r-p-c="1"]' ).is( ":checked" ) && selL > 0 ) ? selL - 1 : selL;
+            compareL = ( compare.find( 'input[data-r-p-c="1"]' ).is( ":checked" ) && compareL > 0 ) ? compareL - 1 : compareL;
+
+            sel.find( "#sel-count" ).text( " (" + selL + ")" );
+            compare.find( "#sel-count" ).text( " (" + compareL + ")" );
+
+            if ( !selL || !compareL )
+            {
+                $( ".manual-recon" ).fadeOut( 1200 );
+            }
+            else
+            {
+                $( ".manual-recon" ).fadeIn( 1200 );
+            }
+        },
+
+        DataManualRecon: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var uid = i.attr( "data-uid" );
+                var title = i.attr( "data-title" );
+
+                var chep = $( i.attr( "data-chep" ) );
+                var client = $( i.attr( "data-client" ) );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var selL = chep.find( 'input[type="checkbox"]:checked' ).length;
+                        var compareL = client.find( 'input[type="checkbox"]:checked' ).length;
+
+                        selL = ( chep.find( 'input[data-r-p-c="1"]' ).is( ":checked" ) && selL > 0 ) ? selL - 1 : selL;
+                        compareL = ( client.find( 'input[data-r-p-c="1"]' ).is( ":checked" ) && compareL > 0 ) ? compareL - 1 : compareL;
+
+                        var chepQty = 0,
+                            clientQty = 0;
+
+                        var chepIds = [],
+                            clientIds = [];
+
+                        chep.find( 'input[type="checkbox"]:checked' ).each( function ()
+                        {
+                            chepIds.push( $( this ).attr( "data-id" ) );
+                            chepQty += parseFloat( $( this ).attr( "data-qty" ) );
+                        } );
+
+                        client.find( 'input[type="checkbox"]:checked' ).each( function ()
+                        {
+                            clientIds.push( $( this ).attr( "data-id" ) );
+                            clientQty += parseFloat( $( this ).attr( "data-qty" ) );
+                        } );
+
+                        var msg = "";
+
+                        msg += "<p>Are you sure you would like to reconcile the " + selL + " selected Pooling Loads with the " + compareL + " selected Client Loads?</p>";
+
+                        if ( chepQty != clientQty )
+                        {
+                            msg += "<p><img src='" + imgurl + "/Images/warn.png' style='max-height: 20px;' /> <b>Please Note:</b> The quantities for the loads you are about to reconcile are not the same!</p>";
+                        }
+
+                        msg += "<p>This process is permanent and cannot be reversed!</p>";
+                        msg += "<p style='border-top: 1px solid #fff; padding-top: 10px; margin: 15px 0; text-align: center;'>";
+                        msg += "    <input id='btnYes' type='button' value='YES!' class='btn-yes' />";
+                        msg += "    <span style='padding: 0 5px;'>/</span>";
+                        msg += "    <input id='btnNo' type='button' value='No..' class='btn-no' />";
+                        msg += "</p>";
+
+                        var close = $( ACT.Modal.Container ).find( '#modalClose' );
+
+                        close.css( "display", "none" );
+
+                        if ( uid != "" )
+                        {
+                            // Manual Update
+                            $( ACT.Modal.Container ).removeAttr( "style" );
+                            $( ACT.Modal.Container ).find( ".modalContent" ).removeAttr( "style" );
+                        }
+
+                        ACT.Modal.Open( msg, title, false );
+
+                        setTimeout( function ()
+                        {
+                            var btnNo = $( ACT.Modal.Container ).find( '#btnNo' );
+                            var btnYes = $( ACT.Modal.Container ).find( '#btnYes' );
+
+                            btnYes
+                                .unbind( "click" )
+                                .bind( "click", function ()
+                                {
+                                    ACT.Loader.Show( btnYes.parent().find( "span" ), true );
+
+                                    $( "<div />" ).load( siteurl + "/ReconcileLoad", { chepIds: chepIds, clientIds: clientIds, uid: uid }, function ( d )
+                                    {
+                                        var x = $( this );
+
+                                        $( ACT.Modal.Container ).find( '#modal-body' ).html( d );
+                                        $( ACT.Modal.Container ).find( '#modal-body .notification' ).slideDown( 900 );
+
+                                        if ( x.find( ".message-success" ) )
+                                        {
+                                            if ( uid != "" )
+                                            {
+                                                $( 'a[data-refresh="1"]' ).click();
+                                            }
+                                            else
+                                            {
+                                                ACT.UI.DataSearchChepLoads( chep );
+                                                ACT.UI.DataSearchClientLoads( client );
+
+                                                chep.find( "#sel-count" ).text( " (0)" );
+                                                client.find( "#sel-count" ).text( " (0)" );
+
+                                                $( ".manual-recon" ).fadeOut( 1200 );
+                                            }
+
+                                            close.css( "display", "block" );
+                                        }
+                                        else
+                                        {
+                                            ACT.Loader.Hide();
+                                        }
+                                    } );
+                                } );
+
+                            btnNo
+                                .unbind( "click" )
+                                .bind( "click", function ()
+                                {
+                                    ACT.Modal.Close();
+                                } );
+
+                        }, '1000' );
+                    } );
+            } );
+        },
+
+        DataManualReconed: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var uid = i.attr( "data-uid" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var msg = '<p>Please wait whilst we retrieve the list of manually reconciled loads for the selected item...</p><p style="text-align: center;"><img src="' + imgurl + '/images/loader.gif" /></p>';
+
+                        ACT.Modal.Open( msg, "Manually Reconciled Loads", false );
+
+                        $( "<div />" ).load( siteurl + "/ManuallyReconciledLoads", { ManuallyMatchedUID: uid }, function ( d )
+                        {
+                            ACT.Modal.Close();
+
+                            setTimeout( function ()
+                            {
+                                $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", ( $( "body" ).outerWidth() - 20 ) );
+
+                                ACT.Modal.Open( d, "Manually Reconciled Loads", false );
+
+                                setTimeout( function ()
+                                {
+                                    ACT.Init.Start( true );
+                                }, 2000 );
+                            }, 1000 );
+                        } );
+                    } );
+            } );
+        },
+
+        DataLoadExtra: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var docketNumber = i.attr( "data-docket-number" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var msg = '<p>Please wait whilst we retrieve the original reconciled and balanced load for the selected extra transaction...</p><p style="text-align: center;"><img src="' + imgurl + '/images/loader.gif" /></p>';
+
+                        ACT.Modal.Open( msg, "Extra Chep Load", false );
+
+                        $( "<div />" ).load( siteurl + "/ExtraChepLoads", { DocketNumber: docketNumber }, function ( d )
+                        {
+                            //ACT.Modal.Close();
+
+                            var di = $( this );
+
+                            setTimeout( function ()
+                            {
+                                di.find( "table" ).css( "color", "#354052" );
+
+                                $( ACT.Modal.Container ).find( "#modal-body" ).html( di.html() );
+                                $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", ( $( "body" ).outerWidth() - 20 ) );
+                                $( '.modalContainer' ).center();
+
+                                //ACT.Modal.Open( di.html(), "Extra Chep Load", false );
+
+                                setTimeout( function ()
+                                {
+                                    ACT.Init.PluginInit( $( ACT.Modal.Container ) );
+                                }, 2000 );
+                            }, 1000 );
+                        } );
+                    } );
+            } );
+        },
+
+        DataLoadVersion: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var versions = i.attr( "data-versions" );
+                var docketNumber = i.attr( "data-docket-number" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        var msg = '<p>Please wait whilst we retrieve ' + versions + ' versions of the selected load...</p><p style="text-align: center;"><img src="' + imgurl + '/images/loader.gif" /></p>';
+
+                        ACT.Modal.Open( msg, "Chep Load Versions (" + versions + ")", false );
+
+                        $( "<div />" ).load( siteurl + "/ChepLoadVersions", { OriginalDocketNumber: docketNumber }, function ( d )
+                        {
+                            ACT.Modal.Close();
+
+                            setTimeout( function ()
+                            {
+                                $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", ( $( "body" ).outerWidth() - 20 ) );
+
+                                ACT.Modal.Open( d, "Chep Load Versions (" + versions + ")", false );
+
+                                setTimeout( function ()
+                                {
+                                    ACT.Init.Start( true );
+                                }, 2000 );
+                            }, 1000 );
+                        } );
+                    } );
+            } );
+        },
+
+        DataSettingClient: false,
+
+        DataSelectClient: function ( sender, code )
+        {
+            sender.bind( "keydown", function ( e )
+            {
+                e = ( e ) ? e : window.event;
+
+                var charCode = ( e.which ) ? e.which : e.keyCode;
+
+                if ( charCode != code ) return;
+
+                if ( ACT.UI.DataSettingClient && $( ACT.Modal.Container ).is( ":visible" ) ) return false;
+
+                e.preventDefault();
+
+                var title = "Set Client";
+                var msg = '<p>Please wait whilst we fetch a list of clients you can work on today...</p>' + ACT.Loader.Html;
+
+                ACT.Modal.Open( msg, title, false, [] );
+
+                setTimeout( function ()
+                {
+                    //ACT.Loader.Show( [] );
+
+                    if ( ACT.UI.DataSettingClient && $( ACT.Modal.Container ).is( ":visible" ) ) return false;
+
+                    ACT.UI.DataSettingClient = true;
+
+                    $( "<div />" ).load( siteurl + "/GetClients", {}, function ( d )
+                    {
+                        //ACT.Loader.Hide();
+
+                        $( this ).find( '[for="ClientId"]' ).html( "Select Client" ).css( { "display": "block", "margin-bottom": "5px", "text-transform": "uppercase" } );
+
+                        var html = $( this ).html();
+
+                        html = "<p>Please select a client you would like to work on and click Submit to proceed:</p>" + html;
+
+                        var body = $( ACT.Modal.Container ).find( "#modal-body" );
+
+                        $( ACT.Modal.Container ).find( '#btns' ).css( "display", "block" );
+
+                        body.html( html );
+
+                        ACT.Init.PluginInit( body );
+
+                        // Submit button click 
+                        var sel = $( ACT.Modal.Container ).find( '#ClientId' );
+                        var btn = $( ACT.Modal.Container ).find( '#btnConfirm' );
+
+                        btn
+                            .unbind( "click" )
+                            .bind( "click", function ()
+                            {
+                                $( ACT.Modal.Container ).find( '#s2id_ClientId' ).removeClass( "input-validation-error " );
+
+                                ACT.Loader.Show( btn, true );
+
+                                $( "<div />" ).load( siteurl + "/SetClient", { id: sel.val() }, function ()
+                                {
+                                    body.find( ".notification" ).remove();
+                                    $( this ).find( ".notification" ).css( "margin-top", "0" );
+
+                                    $( "#sc-m" ).text( sel.find( "option:selected" ).text() );
+
+                                    body.prepend( $( this ).html() );
+
+                                    ACT.Init.Start( false );
+
+                                    ACT.Loader.Hide();
+                                } );
+                            } );
+                    } );
+
+                }, 1000 );
+            } );
+        },
+
+        DataSetClient: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                i
+                    .unbind( "change" )
+                    .bind( "change", function ()
+                    {
+                        ACT.Loader.Show( $( "#s-c-loader" ), true );
+
+                        $( "<div />" ).load( siteurl + "/SetClient", { id: $( this ).val() }, function ()
+                        {
+                            window.location.reload();
+                        } );
+                    } );
+            } );
+        },
+
+        DataViewPOD: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( i.hasClass( "disabled" ) )
+                        {
+                            return;
+                        }
+
+                        ACT.Loader.Show( i.find( "#loader" ), true );
+
+                        $( "<div />" ).load( siteurl + "/ViewPOD", { id: id }, function ( d )
+                        {
+                            ACT.Modal.Open( d, "View POD", false, [] );
+
+                            setTimeout( function ()
+                            {
+                                ACT.Init.Start( true );
+
+                            }, 1000 );
+
+                            ACT.Loader.Hide();
+                        } );
+                    } );
+            } );
+        },
+
+        DataUploadPOD: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( i.hasClass( "disabled" ) )
+                        {
+                            return;
+                        }
+
+                        ACT.Loader.Show( i.find( "#loader" ), true );
+
+                        $( "<div />" ).load( siteurl + "/UploadPOD", { id: id }, function ( d )
+                        {
+                            ACT.Modal.Open( d, "Upload POD", false, [] );
+
+                            setTimeout( function ()
+                            {
+                                ACT.Init.Start( true );
+
+                                var btn = $( ACT.Modal.Container ).find( "#save-btn" );
+                                var form = $( ACT.Modal.Container ).find( "#upload-load-pod" );
+
+                                btn.bind( "click", function ()
+                                {
+                                    form.submit();
+                                } );
+
+                            }, 1000 );
+
+                            ACT.Loader.Hide();
+                        } );
+                    } );
+            } );
+        },
+
+        DataReturnDoc: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( i.hasClass( "disabled" ) )
+                        {
+                            return;
+                        }
+
+
+                    } );
+            } );
+        },
+
+        DataControlDoc: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( i.hasClass( "disabled" ) )
+                        {
+                            return;
+                        }
+
+
+                    } );
+            } );
+        },
+
+        DataLoadDisputes: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( i.hasClass( "disabled" ) )
+                        {
+                            return;
+                        }
+
+
+                    } );
+            } );
+        },
+
+        DataLoadMovements: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        if ( i.hasClass( "disabled" ) )
+                        {
+                            return;
+                        }
+
+
+                    } );
+            } );
+        },
+
+        DataClientLoadJournal: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        ACT.Loader.Show( i.parent(), true );
+
+                        $( "<div />" ).load( siteurl + "/ClientLoadJournals", { id: id, edit: false }, function ( d )
+                        {
+                            var width = ( 70 / 100 ) * $( window ).outerWidth();
+
+                            $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", width );
+
+                            ACT.Modal.Open( d, "Client Load Journals", false, [] );
+
+                            setTimeout( function ()
+                            {
+                                ACT.Init.PluginInit( $( ACT.Modal.Container ) );
+
+                            }, 1000 );
+
+                            ACT.Loader.Hide();
+                        } );
+
+                        return false;
+                    } );
+            } );
+        },
+
+        DataChepLoadJournal: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var docketnumber = i.attr( "data-docketnumber" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        ACT.Loader.Show( i.parent(), true );
+
+                        $( "<div />" ).load( siteurl + "/ChepLoadJournals", { OriginalDocketNumber: docketnumber }, function ( d )
+                        {
+                            var width = ( 90 / 100 ) * $( window ).outerWidth();
+
+                            $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", width );
+
+                            ACT.Modal.Open( d, "Chep Load Journals", false, [] );
+
+                            setTimeout( function ()
+                            {
+                                ACT.Init.PluginInit( $( ACT.Modal.Container ) );
+
+                            }, 1000 );
+
+                            ACT.Loader.Hide();
+                        } );
+
+                        return false;
+                    } );
+            } );
+        },
+
+        DataChepLoadShipment: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "data-id" );
+                var clientid = i.attr( "data-clientid" );
+                var reference = i.attr( "data-reference" );
+                var otherreference = i.attr( "data-otherreference" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        ACT.Loader.Show( i.parent(), true );
+
+                        $( "<div />" ).load( siteurl + "/ChepLoadShipments", { id: id, clientid: clientid, reference: reference, otherreference: otherreference }, function ( d )
+                        {
+                            var width = ( 60 / 100 ) * $( window ).outerWidth();
+
+                            $( ACT.Modal.Container ).find( ".modalContent" ).css( "width", width );
+
+                            ACT.Modal.Open( d, "Chep Load Related Shipments", false, [] );
+
+                            setTimeout( function ()
+                            {
+                                ACT.Init.PluginInit( $( ACT.Modal.Container ) );
+
+                            }, 1000 );
+
+                            ACT.Loader.Hide();
+                        } );
+
+                        return false;
+                    } );
+            } );
+        },
+
+        DataInputSearch: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var id = i.attr( "id" );
+                var cid = i.attr( "data-cid" );
+                var url = i.attr( "data-url" );
+                var update = $( i.attr( "data-update" ) );
+
+                var top = i.offset().top;
+
+                var width = i.outerWidth();
+                var height = i.outerHeight();
+
+                i
+                    .unbind( "keyup" )
+                    .bind( "keyup", function ()
+                    {
+                        clearTimeout( ACT.UI.PageSearchTimer );
+
+                        var q = $( this ).val().trim();
+
+                        ACT.UI.PageSearchTimer = setTimeout( function ()
+                        {
+                            $( "<div />" ).load( url, { Query: q, ClientId: cid, Skip: 0, Take: 50, Page: 0 }, function ( d )
+                            {
+                                var did = id + "-search-results";
+                                var div = "<div id='" + did + "' class='search-results' style='width: " + ( width - 21 ) + "px; top: " + height + "px;'>" + d + "</div>";
+
+                                i.parent().find( "#" + did ).remove();
+
+                                i.parent().append( div );
+
+                                $( "#" + did ).css( "display", "block" );
+
+                                ACT.Init.Start( true );
+                            } );
+                        }, 700 );
+                    } );
+            } );
+        },
+
+        DataUpdateOutstandingReason: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+                var id = i.attr( "data-id" );
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        ACT.Loader.Show( i.parent().find( "#loader" ) );
+
+                        $( "<div />" ).load( siteurl + "UpdateOutstandingReason", { id: id, orid: $( this ).val() }, function ( d )
+                        {
+                            ACT.Modal.Open( $( this ).html(), "Update Outstanding Reason", false, [] );
+
+                            setTimeout( function ()
+                            {
+                                $( ACT.Modal.Container ).find( ".notification" ).stop().slideDown( 700 );
+                            }, 900 );
+
+                            ACT.Loader.Hide();
+                        } );
+                    } );
+            } );
+        },
+
+        DataUpdateOutstandingQty: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var group = $( i.attr( "data-group" ) );
+                var update = $( i.attr( "data-update" ) );
+                var delQty = $( i.attr( "data-del-qty" ) );
+
+                i
+                    .unbind( "keyup" )
+                    .bind( "keyup", function ()
+                    {
+                        var s = 0;
+                        var sum = delQty.val() != "" ? delQty.val() : 0;
+
+                        group.each( function ()
+                        {
+                            if ( $( this ).val() == "" || !parseInt( $( this ).val() ) ) return;
+
+                            s += parseInt( $( this ).val() );
+                        } );
+
+                        update.val( ( sum - s ) );
+                    } );
+            } );
+        },
+
+        DataFilter: function ( sender )
+        {
+            if ( typeof ( window.location.hash ) === 'undefined' && $( ".ap-tabs" ).length )
+            {
+                window.location.hash = $( '[data-ap-tab="1"]:first' ).attr( "data-target" );
+            }
+
+            var hash = window.location.hash != "" ? window.location.hash.replace( "#", "" ) : "podperuser";
+
+            if ( hash != "podperuser" && hash != "poduploadlog" && hash != "authorizationcodeaudit" && hash != "auditlogperuser" )
+            {
+                return;
+            }
+
+            var papa = sender.first().parent();
+
+            if ( !papa.is( ":visible" ) )
+            {
+                papa.slideDown( 900 );
+            }
+
+            params = ACT.UI.GetCustomSearchParams( hash );
+
+            sender.each( function ()
+            {
+                var i = $( this );
+
+                var loaded = i.attr( "data-loaded" );
+
+                if ( loaded == "1" ) return;
+
+                i
+                    .unbind( "click" )
+                    .bind( "click", function ()
+                    {
+                        window.location.hash = i.attr( "data-type" ).toLowerCase();
+
+                        sender.removeClass( "current" );
+
+                        i.addClass( "current" );
+
+                        var left = i.position().left + ( i.outerWidth() / 2 );
+
+                        papa.css( "background", "url('" + imgurl + "/Images/arrow-top.png') no-repeat " + left + "px bottom" );
+
+                        if ( i.attr( "data-list-loaded" ) == "1" )
+                        {
+                            $( ".kpi-reports-data" ).css( "display", "none" );
+                            $( "#" + i.attr( "data-type" ).toLowerCase() ).fadeIn( 900 );
+
+                            return;
+                        }
+
+                        ACT.UI.LoadFilter( i, $( "#" + i.attr( "data-type" ).toLowerCase() ), params );
+                    } );
+
+                if ( loaded === "1" ) return;
+
+                i.attr( "data-loaded", "1" );
+
+                ACT.UI.LoadFilterTotal( i, params );
+            } );
+
+            clearTimeout( ACT.UI.PageKPIReportsTimer );
+
+            ACT.UI.PageKPIReportsTimer = setTimeout( function ()
+            {
+                var active = papa.find( ".current" );
+
+                if ( !active.length )
+                {
+                    sender.first().addClass( "current" );
+
+                    active = sender.first();
+                }
+
+                if ( !active.length )
+                {
+                    return;
+                }
+
+                var left = active.position().left + ( active.outerWidth() / 2 );
+
+                papa.css( "background", "url('" + imgurl + "/Images/arrow-top.png') no-repeat " + left + "px bottom" );
+            }, 1000 );
+        },
+
+        LoadFilter: function ( sender, target, params )
+        {
+            ACT.Loader.Show( sender.find( "b" ), true );
+
+            target.load( siteurl + sender.attr( "data-type" ), params, function ()
+            {
+                sender.attr( "data-list-loaded", 1 );
+
+                $( ".kpi-reports-data" ).css( "display", "none" );
+                $( "#" + sender.attr( "data-type" ).toLowerCase() ).fadeIn( 900, function ()
+                {
+                    ACT.Loader.Hide();
+                    ACT.Init.Start( true );
+                } );
+
+            } );
+        },
+
+        LoadFilterTotal: function ( sender, params )
+        {
+            if ( !sender.find( ".spinning" ).length )
+            {
+                var loader = "<img class='spinning' src='" + imgurl + "/Images/loader.gif' style='margin: 0px 0px -1px 3%;' />";
+
+                sender.find( "b" ).text( "" ).append( loader );
+            }
+
+            params.KPIReportFilterType = sender.attr( "data-type" );
+
+            sender.find( "b" ).load( siteurl + "/KPIReportFilterTotal", params, function ()
+            {
+            } );
+        },
     };
 } )();

@@ -1,0 +1,182 @@
+﻿@model Product
+
+@using ACT.Core.Enums
+@using ACT.Data.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Details";
+
+    List<Document> documents = ViewBag.Documents;
+}
+
+@if ( ViewBag.IncludeLayout != null )
+{
+    <h2>
+        <img alt="" src="@Url.Content( "~/images/info.png" )" />
+        <span>Product Details</span>
+    </h2>
+}
+
+<div id="item-details" class="item-details" style="width: auto;">
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <h2>
+            <img alt="" src="@Url.Content( "~/images/info.png" )" />
+            <span>Product Details</span>
+        </h2>
+    }
+
+    <div class="left" style="width: 48%; margin-right: 4%;">
+
+        <div class="display-label">
+            Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Name )
+        </div>
+
+        <div class="display-label">
+            Description
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Description )
+        </div>
+
+        <div class="display-label">
+            Status
+        </div>
+        <div class="display-field">
+            @(( ( Status ) Model.Status ).GetDisplayText())
+        </div>
+
+        @if ( documents != null && documents.Any() )
+        {
+            <div class="display-label">
+                Product/Service Documentation
+            </div>
+            <div class="display-field">
+
+                @foreach ( Document d in documents )
+                {
+                    <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
+                        <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+
+                        @d.Name (@d.Type)
+                    </a>
+                }
+
+            </div>
+        }
+
+        @*@if ( Model.PSPProducts.Any() )
+        {
+            <div class="grouped-area">
+
+                <p>
+                    <strong style="color: #002e70; text-transform: uppercase;">PSPs (@Model.PSPProducts.Count)</strong>
+                </p>
+
+                <ul class="list">
+                    @foreach ( PSPProduct p in Model.PSPProducts )
+                    {
+                        <li>
+                            <a data-quick-link="1" data-target="#psps" data-id="@p.PSPId">
+                                @p.PSP.CompanyName
+                            </a>
+                        </li>
+                    }
+                </ul>
+
+            </div>
+        }*@
+
+    </div>
+
+    <div class="left" style="width: 48%;">
+
+        <p style="margin-bottom: 5px;">
+            <strong style="color: #002e70; text-transform: uppercase;">Product Price Options (@Model.ProductPrices.Count)</strong>
+        </p>
+
+        @if ( Model.ProductPrices.NullableAny() )
+        {
+            int i = 0;
+
+            <ul>
+                @foreach ( ProductPrice p in Model.ProductPrices )
+                {
+                    <li class="grouped-area">
+
+                        <div class="display-label">
+                            <label>Option</label>
+                        </div>
+                        <div class="display-field">
+                            @(( ( ProductPriceType ) p.Type ).GetDisplayText())
+                        </div>
+
+                        <div class="display-label">
+                            <label>Rate</label>
+                        </div>
+                        <div class="display-field">
+                            @p.Rate
+                        </div>
+
+                        <div class="display-label">
+                            <label>Rate Unit</label>
+                        </div>
+                        <div class="display-field">
+                            @p.RateUnit
+                        </div>
+
+                        <div class="display-label">
+                            <label>Start Date</label>
+                        </div>
+                        <div class="display-field">
+                            @(p.FromDate.HasValue ? p.FromDate.Value.ToString( "yyyy-MM-dd" ) : "-/-")
+                        </div>
+
+                        <div class="display-label">
+                            <label>Status</label>
+                        </div>
+                        <div class="display-field">
+                            @(( ( Status ) p.Status ).GetDisplayText())
+                        </div>
+
+                    </li>
+
+                    i++;
+                }
+            </ul>
+        }
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <p>
+            @Html.ActionLink( "Edit", "EditProduct", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+
+            @if ( ViewBag.IncludeLayout == null )
+            {
+                <span style="padding: 0 5px;">/</span>
+                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
+            }
+        </p>
+    }
+
+    @if ( ViewBag.IncludeLayout != null )
+    {
+        <div class="back-to-list">
+            @Html.ActionLink( "Back to List", "Index" )
+        </div>
+    }
+
+</div>

@@ -20,7 +20,7 @@ namespace ACT.Data.Models
         public int ActionType { get; set; }
         public System.DateTime CreatedOn { get; set; }
     
-        public virtual User User { get; set; }
         public virtual Document Document { get; set; }
+        public virtual User User { get; set; }
     }
 }

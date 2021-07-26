@@ -17,15 +17,23 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Client()
         {
-            this.ClientKPIs = new HashSet<ClientKPI>();
-            this.ClientLoads = new HashSet<ClientLoad>();
-            this.ClientProducts = new HashSet<ClientProduct>();
-            this.ClientSites = new HashSet<ClientSite>();
-            this.ClientUsers = new HashSet<ClientUser>();
-            this.DeliveryNotes = new HashSet<DeliveryNote>();
-            this.PSPClients = new HashSet<PSPClient>();
-            this.Tasks = new HashSet<Task>();
+            this.ChepLoadJournals = new HashSet<ChepLoadJournal>();
             this.ClientBudgets = new HashSet<ClientBudget>();
+            this.ClientChepAccounts = new HashSet<ClientChepAccount>();
+            this.ClientCustomers = new HashSet<ClientCustomer>();
+            this.ClientGroups = new HashSet<ClientGroup>();
+            this.ClientKPIs = new HashSet<ClientKPI>();
+            this.ClientProducts = new HashSet<ClientProduct>();
+            this.ClientUsers = new HashSet<ClientUser>();
+            this.PSPClients = new HashSet<PSPClient>();
+            this.SiteAudits = new HashSet<SiteAudit>();
+            this.Transporters = new HashSet<Transporter>();
+            this.Tasks = new HashSet<Task>();
+            this.ChepLoads = new HashSet<ChepLoad>();
+            this.DeliveryNotes = new HashSet<DeliveryNote>();
+            this.ExtendedClientLoads = new HashSet<ExtendedClientLoad>();
+            this.ClientLoads = new HashSet<ClientLoad>();
+            this.ClientLoads1 = new HashSet<ClientLoad>();
         }
     
         public int Id { get; set; }
@@ -45,24 +53,50 @@ namespace ACT.Data.Models
         public string DeclinedReason { get; set; }
         public int ServiceRequired { get; set; }
         public int Status { get; set; }
+        public string AdminPerson { get; set; }
+        public string FinPersonEmail { get; set; }
+        public string ChepReference { get; set; }
+        public Nullable<int> PalletType { get; set; }
+        public string PalletTypeOther { get; set; }
+        public string BBBEELevel { get; set; }
+        public Nullable<int> CompanyType { get; set; }
+        public string PSPName { get; set; }
+        public Nullable<int> NumberOfLostPallets { get; set; }
+        public bool IsChepClient { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ChepLoadJournal> ChepLoadJournals { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientBudget> ClientBudgets { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientChepAccount> ClientChepAccounts { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientCustomer> ClientCustomers { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientGroup> ClientGroups { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientKPI> ClientKPIs { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientLoad> ClientLoads { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientProduct> ClientProducts { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientSite> ClientSites { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientUser> ClientUsers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<DeliveryNote> DeliveryNotes { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PSPClient> PSPClients { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SiteAudit> SiteAudits { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Transporter> Transporters { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Tasks { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ClientBudget> ClientBudgets { get; set; }
+        public virtual ICollection<ChepLoad> ChepLoads { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<DeliveryNote> DeliveryNotes { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ExtendedClientLoad> ExtendedClientLoads { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoad> ClientLoads { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientLoad> ClientLoads1 { get; set; }
     }
 }

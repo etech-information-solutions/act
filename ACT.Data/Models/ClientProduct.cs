@@ -23,21 +23,26 @@ namespace ACT.Data.Models
         public int Id { get; set; }
         public int ClientId { get; set; }
         public int ProductId { get; set; }
+        public int PSPId { get; set; }
         public System.DateTime CreatedOn { get; set; }
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public string ProductDescription { get; set; }
         public Nullable<System.DateTime> ActiveDate { get; set; }
-        public Nullable<decimal> HireRate { get; set; }
+        public Nullable<decimal> Rate { get; set; }
         public Nullable<decimal> LostRate { get; set; }
         public Nullable<decimal> IssueRate { get; set; }
         public Nullable<decimal> PassonRate { get; set; }
         public Nullable<int> PassonDays { get; set; }
         public int Status { get; set; }
+        public string Equipment { get; set; }
+        public string AccountingCode { get; set; }
+        public int RateType { get; set; }
     
-        public virtual Client Client { get; set; }
+        public virtual PSP PSP { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientProductMonthly> ClientProductMonthlies { get; set; }
-        public virtual PSPProduct PSPProduct { get; set; }
+        public virtual Product Product { get; set; }
+        public virtual Client Client { get; set; }
     }
 }

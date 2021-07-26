@@ -108,6 +108,7 @@ div span.strike {
 }
 
 .italic {
+    color: #7368e3;
     font-style: italic;
 }
 
@@ -115,6 +116,10 @@ div span.strike {
     color: #fff;
     background: #ff1e12 !important;
 }
+
+    .red-bg .display-field {
+        background: #ff1e12 !important;
+    }
 
 .green-bg {
     color: #002e70;
@@ -303,7 +308,7 @@ input[type="button"], input[type="submit"], .btn {
         color: #000;
     }
 
-input[type="text"], input[type="number"], input[type="file"], input[type="password"], textarea, select {
+input[type="text"], input[type="number"], input[type="file"], input[type="password"], input[type="email"], textarea, select {
     width: 92%;
     height: 28px;
     color: #000000;
@@ -358,8 +363,13 @@ input[disabled="disabled"], input[disabled="true"], input[data-always-disabled="
 }
 
 
-table tr.inactive {
+table tr.inactive, table td.inactive, li.inactive {
     background-color: #FFE6BA !important;
+}
+
+
+table td.active {
+    background-color: #c0ee8d !important;
 }
 
 

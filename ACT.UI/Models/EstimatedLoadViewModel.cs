@@ -9,32 +9,36 @@ namespace ACT.UI.Models
     {
         public int Id { get; set; }
 
-        public Nullable<int> ObjectId { get; set; }
+        public int? ObjectId { get; set; }
 
         public string ObjectType { get; set; }
 
-        public Nullable<int> January { get; set; }
+        public int BudgetYear { get; set; }
 
-        public Nullable<int> February { get; set; }
+        public int Total { get; set; }
 
-        public Nullable<int> March { get; set; }
+        public decimal? January { get; set; }
 
-        public Nullable<int> April { get; set; }
+        public decimal? February { get; set; }
 
-        public Nullable<int> May { get; set; }
+        public decimal? March { get; set; }
 
-        public Nullable<int> June { get; set; }
+        public decimal? April { get; set; }
 
-        public Nullable<int> July { get; set; }
+        public decimal? May { get; set; }
 
-        public Nullable<int> August { get; set; }
+        public decimal? June { get; set; }
 
-        public Nullable<int> September { get; set; }
+        public decimal? July { get; set; }
 
-        public Nullable<int> October { get; set; }
+        public decimal? August { get; set; }
 
-        public Nullable<int> November { get; set; }
+        public decimal? September { get; set; }
 
-        public Nullable<int> December { get; set; }
+        public decimal? October { get; set; }
+
+        public decimal? November { get; set; }
+
+        public decimal? December { get; set; }
     }
 }

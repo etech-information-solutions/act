@@ -1,0 +1,151 @@
+﻿@model ACT.UI.Models.ClientKPIViewModel
+
+@using ACT.Core.Enums;
+
+@{
+    /**/
+
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Edit Client KPI";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "EditKPI", "Client", FormMethod.Post, new { @data_ajax_form = "1", @data_target = "#clientkpi", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content( "~/images/edit.png" )" />
+            <span>Edit KPI</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        @Html.HiddenFor( model => model.Id )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="left" style="width: 47%; margin-right: 4%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.ClientId )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.ClientId, model => Model.ClientOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.ClientId )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.KPIDescription )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.KPIDescription, new { @class = "input", @placeholder = "Enter KPI Description" } )
+                    @Html.ValidationMessageFor( model => model.KPIDescription )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.OutstandingPallets )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.OutstandingPallets, new { @class = "input", @placeholder = "Enter Outstanding Pallets" } )
+                    @Html.ValidationMessageFor( model => model.OutstandingPallets )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Disputes )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Disputes, new { @class = "input", @placeholder = "Enter Disputes" } )
+                    @Html.ValidationMessageFor( model => model.Disputes )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Passons )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Passons, new { @class = "input", @placeholder = "Enter Passons" } )
+                    @Html.ValidationMessageFor( model => model.Passons )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.ResolveDays )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.ResolveDays, new { @class = "input", @placeholder = "Enter Resolve Days" } )
+                    @Html.ValidationMessageFor( model => model.ResolveDays )
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 47%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.OutstandingDays )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.OutstandingDays, new { @class = "input", @placeholder = "Enter Outstanding Days" } )
+                    @Html.ValidationMessageFor( model => model.OutstandingDays )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.MonthlyCost )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.MonthlyCost, new { @class = "input", @placeholder = "Enter Monthly Cost" } )
+                    @Html.ValidationMessageFor( model => model.MonthlyCost )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.Weight )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.Weight, new { @class = "input", @placeholder = "Enter Weighted %" } )
+                    @Html.ValidationMessageFor( model => model.Weight )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.TargetAmount )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.TargetAmount, new { @class = "input", @placeholder = "Enter Target Amount" } )
+                    @Html.ValidationMessageFor( model => model.TargetAmount )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.TargetPeriod )
+                </div>
+                <div class="edit-field">
+                    @Html.EnumDropDownFor( model => model.TargetPeriod, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.TargetPeriod )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Status )
+                </div>
+                <div class="edit-field">
+                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.Status )
+                </div>
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+            </p>
+
+        </div>
+
+    </div>
+}

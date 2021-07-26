@@ -23,8 +23,8 @@ namespace ACT.Data.Models
         public Nullable<int> RateUnit { get; set; }
         public Nullable<System.DateTime> FromDate { get; set; }
         public int Status { get; set; }
+        public int Type { get; set; }
     
         public virtual Product Product { get; set; }
-        public virtual PSPBilling PSPBilling { get; set; }
     }
 }

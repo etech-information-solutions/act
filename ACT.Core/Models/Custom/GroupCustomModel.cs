@@ -1,4 +1,6 @@
 
+using System.Collections.Generic;
+
 namespace ACT.Core.Models.Custom
 {
     public partial class GroupCustomModel
@@ -10,5 +12,9 @@ namespace ACT.Core.Models.Custom
         public string Name { get; set; }
         public string Description { get; set; }
         public int Status { get; set; }
+
+        public int ClientCount { get; set; }
+
+        public List<string> Clients { get; set; }
     }
 }

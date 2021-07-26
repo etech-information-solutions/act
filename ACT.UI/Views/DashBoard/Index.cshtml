@@ -1,0 +1,126 @@
+﻿@using ACT.Core.Models
+
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+<div class="graph-search grouped-area">
+
+    <b class="title">
+        Custom Search:
+        <span id="gs-loader"></span>
+    </b>
+
+    @Html.Partial( "_DashBoardCustomSearch", new CustomSearchModel( "DashBoard" ) )
+
+    <a class="do-search" rel="tipsyE" title="Filter dashboard data?" data-g-search="1" data-filters="#gs-search-fields" data-loader="#gs-loader">
+        SEARCH
+    </a>
+
+</div>
+
+<div class="graphs" style="margin-top: 10px; text-align: center;">
+
+    <div class="grouped-area left" style="width: 46%; margin-right: 1%; position: relative;">
+
+        <div id="aop-graph" data-graph="1" data-loaded="0" data-type="AgeOfOutstandingPallets">
+
+        </div>
+
+        <a class="gs-data gs-left" rel="tipsyE" title="View Data?" data-gs-data="1" data-loaded="0" data-arrow="top-left" data-target="#aop-graph-data" data-type="AgeOfOutstandingPallets">
+            <i class="fa fa-database"></i>
+        </a>
+
+        <div id="aop-graph-data" class="none"></div>
+
+    </div>
+
+    <div class="grouped-area right" style="width: 46%; position: relative;">
+
+        <div id="pod-graph" data-graph="1" data-loaded="0" data-type="AgeOfOutstandingPOD">
+
+        </div>
+
+        <a class="gs-data" rel="tipsyE" title="View Data?" data-gs-data="1" data-loaded="0" data-arrow="top-right" data-target="#pod-graph-data" data-type="AgeOfOutstandingPOD">
+            <i class="fa fa-database"></i>
+        </a>
+
+        <div id="pod-graph-data" class="none"></div>
+
+    </div>
+
+    <div class="clear"></div>
+
+    <div class="grouped-area left" style="width: 46%; margin-right: 1%; position: relative;">
+
+        <div id="npm-graph" data-graph="1" data-loaded="0" data-type="NumberOfPalletsManaged">
+
+        </div>
+
+        <a class="gs-data gs-left" rel="tipsyE" title="View Data?" data-gs-data="1" data-loaded="0" data-arrow="top-left" data-target="#npm-graph-data" data-type="NumberOfPalletsManaged">
+            <i class="fa fa-database"></i>
+        </a>
+
+        <div id="npm-graph-data" class="none"></div>
+
+    </div>
+
+    <div class="grouped-area right" style="width: 46%; position: relative;">
+
+        <div id="lpm-graph" data-graph="1" data-loaded="0" data-type="LoadsPerMonth">
+
+        </div>
+
+        <a class="gs-data" rel="tipsyE" title="View Data?" data-gs-data="1" data-loaded="0" data-arrow="top-right" data-target="#aop-graph-data" data-type="LoadsPerMonth">
+            <i class="fa fa-database"></i>
+        </a>
+
+        <div id="lpm-graph-data" class="none"></div>
+
+    </div>
+
+    <div class="clear"></div>
+
+    @*<div class="grouped-area left" style="width: 46%; margin-right: 1%;">
+
+            <p>
+                <strong>KPI MEASUREMENT</strong>
+            </p>
+
+            <div id="kpi-graph" data-graph="1" data-loaded="0" data-type="KPIMeasurement">
+
+            </div>
+
+        </div>*@
+
+    <div class="grouped-area left" style="width: 46%; margin-right: 1%; position: relative;">
+
+        <div id="ac-graph" data-graph="1" data-loaded="0" data-type="AuthorisationCodes">
+
+        </div>
+
+        <a class="gs-data gs-left" rel="tipsyE" title="View Data?" data-gs-data="1" data-arrow="top-left" data-loaded="0" data-target="#ac-graph-data" data-type="AuthorisationCodes">
+            <i class="fa fa-database"></i>
+        </a>
+
+        <div id="ac-graph-data" class="none"></div>
+
+    </div>
+
+    <div class="grouped-area right" style="width: 46%; position: relative;">
+
+        <div id="nod-graph" data-graph="1" data-loaded="0" data-type="NumberOfDisputes">
+
+        </div>
+
+        <a class="gs-data" rel="tipsyE" title="View Data?" data-gs-data="1" data-arrow="top-right" data-loaded="0" data-target="#nod-graph-data" data-type="NumberOfDisputes">
+            <i class="fa fa-database"></i>
+        </a>
+
+        <div id="nod-graph-data" class="none"></div>
+
+    </div>
+
+    <div class="clear"></div>
+
+</div>

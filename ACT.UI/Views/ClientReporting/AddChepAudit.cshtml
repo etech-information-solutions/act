@@ -1,0 +1,154 @@
+﻿@model ACT.UI.Models.ChepAuditViewModel
+
+@using ACT.Data.Models
+@using ACT.Core.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Add ChepAudit";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "AddChepAudit", "ClientReporting", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#chepaudit", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content( "~/images/add.png" )" />
+            <span>Add a Chep Audit Report</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="left" style="width: 48%; margin-right: 2%;">
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.SiteId )
+                </div>
+                <div class="edit-field">
+                    @Html.DropDownListFor( model => model.SiteId, model => Model.SiteOptions, s => s.Key, s => s.Value, false, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.SiteId )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Equipment )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Equipment, new { @placeholder = "Enter Equipment" } )
+                    @Html.ValidationMessageFor( model => model.Equipment )
+                </div>
+
+                <div class="editor-label uppercase">
+                    @Html.LabelFor( model => model.AuditReportFile )
+                </div>
+
+                <div class="editor-field" style="margin-bottom: 10px;">
+
+                    <input id="AuditReportFile.File" name="AuditReportFile.File" type="file" value="" required="required" data-val-file="1" class="input" />
+                    <input id="AuditReportFile.Name" name="AuditReportFile.Name" type="hidden" value="AuditReport" />
+                    <input id="AuditReportFile.Description" name="AuditReportFile.Description" class="input" type="hidden" value="Audit Report File" />
+
+                    @Html.ValidationMessageFor( model => model.AuditReportFile )
+
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 48%;">
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.ChepStockBalance )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.ChepStockBalance, new { @placeholder = "Enter Stock Balance" } )
+                    @Html.ValidationMessageFor( model => model.ChepStockBalance )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.NotInvoiceIn )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.NotInvoiceIn, new { @placeholder = "Enter Invoice In" } )
+                    @Html.ValidationMessageFor( model => model.NotInvoiceIn )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.NotInvoiceOut )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.NotInvoiceOut, new { @placeholder = "Enter Invoice Out" } )
+                    @Html.ValidationMessageFor( model => model.NotInvoiceOut )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.ReqAdjustment )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.ReqAdjustment, new { @placeholder = "Enter Req Adjustment" } )
+                    @Html.ValidationMessageFor( model => model.ReqAdjustment )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.NotMCCIn )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.NotMCCIn, new { @placeholder = "Enter MCC In" } )
+                    @Html.ValidationMessageFor( model => model.NotMCCIn )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.NotMCCOut )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.NotMCCOut, new { @placeholder = "Enter MCC Out" } )
+                    @Html.ValidationMessageFor( model => model.NotMCCOut )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.MccBalance )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.MccBalance, new { @placeholder = "Enter MCC Balance" } )
+                    @Html.ValidationMessageFor( model => model.MccBalance )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.SuspendITL )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.SuspendITL, new { @placeholder = "Enter Suspend ITL" } )
+                    @Html.ValidationMessageFor( model => model.SuspendITL )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.AdjustedInvBalance )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.AdjustedInvBalance, new { @placeholder = "Enter Adjusted Invoice Balance" } )
+                    @Html.ValidationMessageFor( model => model.AdjustedInvBalance )
+                </div>
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-refresh="1" data-target="#chepaudit">Cancel</a>
+            </p>
+
+        </div>
+
+    </div>
+}

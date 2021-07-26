@@ -1,0 +1,103 @@
+﻿@model ClientLoadViewModel
+
+@using ACT.UI.Models;
+
+@{
+    string preview = Url.Content( "~/Images/no-preview.png" );
+}
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "UploadLoadPOD", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#modal-body", @style = "width: auto;", id = "upload-load-pod" } ) )
+{
+
+    @Html.ValidationSummary( true )
+
+    @Html.HiddenFor( model => model.Id )
+
+    <div class="editor-label ">
+        @Html.LabelFor( model => model.PODNumber )
+    </div>
+    <div class="editor-field">
+        @Html.TextBoxFor( model => model.PODNumber, new { @class = "input", @placeholder = "Please Complete", @required = "required" } )
+        @Html.ValidationMessageFor( model => model.PODNumber )
+    </div>
+
+    <div class="editor-label">
+        @Html.LabelFor( model => model.PODCommentId )
+    </div>
+    <div class="editor-field">
+        @Html.DropDownListFor( model => model.PODCommentId, model => Model.PODCommentOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @required = "required", @style = "width: 98%;" } )
+        @Html.ValidationMessageFor( model => model.PODCommentId )
+    </div>
+
+    <div class="editor-label" style="margin-bottom: 5px;">
+        POD Snapshots:
+    </div>
+
+    <div id="pod-snapshots" style="border-top: 1px dashed #ddd; padding-top: 10px; margin: 10px 0;">
+
+        @if ( !Model.Files.NullableAny() )
+        {
+            <div id="pod-snapshot-clone-0" class="editor-field data-increment" style="text-align: center; border: 1px dashed #ddd; padding: 10px; width: 40%; display: inline-block; margin-right: 10px; margin-bottom: 10px; vertical-align: top;">
+
+                <label>
+                    <a href="@preview" target="_blank">
+                        <img class="preview" src="@preview" reset-src="@preview" style="display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="" />
+                    </a>
+                </label>
+
+                <input name="Files[0].File" type="file" value="" class="input" data-upload-image="1" data-increment="1" data-upload-target=".preview" />
+                <input name="Files[0].Name" type="hidden" value="PODNumber" />
+
+            </div>
+        }
+        else
+        {
+            int icount = 0;
+
+            foreach ( FileViewModel f in Model.Files )
+            {
+                bool isImage = new List<string>() { ".jpg", ".jpeg", ".png", ".tiff", ".gif", ".bmp", ".raw" }.Contains( f?.Extension?.ToLower() );
+
+                <div id="pod-snapshot-clone-@icount" class="editor-field data-increment" style="text-align: center; border: 1px dashed #ddd; padding: 10px; width: 40%; display: inline-block; margin-right: 10px;  margin-bottom: 10px; vertical-align: top;">
+
+                    <label>
+                        <a href="@Url.Action( "ViewImage", new { id = f.Id } )" target="_blank">
+                            @if ( isImage )
+                            {
+                                <img class="preview" src="@Url.Action( "ViewImage", new { id = f.Id } )"  reset-src="@preview" style="display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="" />
+                            }
+                            else
+                            {
+                                <span>
+                                    <img alt="" src="@Url.Content( "~/Images/download.png" )" /> @f.Description (@f.Extension)
+                                </span>
+                            }
+                        </a>
+                    </label>
+
+                    <input name="Files[@icount].File" type="file" value="" class="input" data-upload-image="1" data-increment="1" data-upload-target=".preview" />
+                    <input name="Files[@icount].Name" type="hidden" value="PODNumber" />
+
+                </div>
+
+                icount++;
+            }
+        }
+
+    </div>
+
+    <p style="margin-bottom: 0; border-top: 1px dashed #ccc; padding-top: 10px;">
+        <a data-add-one-more="1" data-auto-increment="1" data-target="#pod-snapshots" data-clone-target="#pod-snapshot-clone-0" data-increment-val=".data-increment" rel="tipsyW" title="Add another snapshot?">
+            <img alt="Add" src="@Url.Content( "~/Images/add.png" )" /> Add another snapshot?
+        </a>
+    </p>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 10px;">&nbsp;</div>
+
+    <p>
+        <input id="save-btn" type="submit" value="Update" />
+        <span style="padding: 0 5px;">/</span> <a onclick="ACT.Modal.Close();">Cancel</a>
+    </p>
+}

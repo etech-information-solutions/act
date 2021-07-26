@@ -1,0 +1,69 @@
+﻿@model List<PSPClient>
+
+@using ACT.Data.Models;
+
+
+@Html.Partial( "_Notification" )
+
+<div class="editor-label" style="margin-bottom: 10px;">
+
+    <p>
+        <strong class="uppercase">Clients (@Model.NullableCount())</strong>
+    </p>
+
+</div>
+
+<div class="editor-field">
+
+    <table id="psp-client-table" class="da-table">
+
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Contact</th>
+                <th>Chep Reference</th>
+                <th>Finance Account Code</th>
+                <th>Contract Renewal Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @if ( Model.NullableAny() )
+            {
+                int count = 0;
+
+                foreach ( PSPClient b in Model )
+                {
+                    <tr id="row-psp-client-@count">
+                        <td style="position: relative;">
+                            <input name="PSPClients[@count].Id" type="hidden" value="@b.Id" />
+                            @b.Client.CompanyName
+                        </td>
+                        <td>
+                            @b.Client.ContactPerson (@b.Client.ContactNumber / @b.Client.Email)
+                        </td>
+                        <td>
+                            @b.Client.ChepReference
+                        </td>
+                        <td>
+                            <input class="input" name="PSPClients[@count].FinAccountingCode" placeholder="Enter Finance Accounting Code" style="padding: 0 5px; width: 87%;" type="text" value="@b.FinAccountingCode">
+                        </td>
+                        <td>
+                            <input class="input date-picker" name="PSPClients[@count].ContractRenewalDate" placeholder="Select Contract Renewal Date" style="padding: 0 5px; width: 87%;" type="text" value="@b.ContractRenewalDate">
+                        </td>
+                        <td>
+                            @Html.ActionLink( "Remove", "DeletePSPClient", new { id = b.Id }, new { @class = "del", @data_delete = "1", @data_id = b.Id, @data_target = "#row-psp-client-" + count, @data_refresh_target = "#psp-client", @rel = "tipsyE", @title = "Remove this item?" } )
+                        </td>
+                    </tr>
+
+                    count++;
+                }
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

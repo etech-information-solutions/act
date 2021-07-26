@@ -128,6 +128,52 @@
 
                 </div>
 
+                <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+                <div class="left" style="width: 48%; margin-right: 4%;">
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.ImportEmailHost )
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor( model => model.ImportEmailHost, new { @placeholder = "Enter Import Email Host" } )
+                        @Html.ValidationMessageFor( model => model.ImportEmailHost )
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.ImportEmailUsername )
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor( model => model.ImportEmailUsername, new { @placeholder = "Enter Import Email Username" } )
+                        @Html.ValidationMessageFor( model => model.ImportEmailUsername )
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.ImportEmailPassword )
+                    </div>
+                    <div class="edit-field">
+                        @Html.PasswordFor( model => model.ImportEmailPassword, new { @placeholder = "Enter Import Email Password" } )
+                        @Html.ValidationMessageFor( model => model.ImportEmailPassword )
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.ImportEmailPort )
+                    </div>
+                    <div class="edit-field">
+                        @Html.PasswordFor( model => model.ImportEmailPort, new { @placeholder = "Enter Import Email Port" } )
+                        @Html.ValidationMessageFor( model => model.ImportEmailPort )
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor( model => model.ImportUseSSL )
+                    </div>
+                    <div class="edit-field">
+                        @Html.EnumDropDownFor( model => model.ImportUseSSL, false, new { @class = "chzn", @style = "width: 96%;" } )
+                        @Html.ValidationMessageFor( model => model.ImportUseSSL )
+                    </div>
+
+                </div>
+
                 <div class="clear"></div>
 
             </div>

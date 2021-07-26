@@ -1,0 +1,147 @@
+﻿@model TransporterViewModel
+
+@using ACT.Core.Enums;
+@using ACT.UI.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Edit Transporter";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "EditTransporter", "Client", FormMethod.Post, new { @data_ajax_form = "1", @data_target = "#managetransporters", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content("~/images/edit.png")" />
+            <span>Edit Transporter</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        @Html.HiddenFor( model => model.Id )
+
+        <div class="left" style="width: 25%; margin-right: 2%;">
+
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ClientId )
+            </div>
+            <div class="editor-field">
+                @Html.DropDownListFor( model => model.ClientId, model => Model.ClientOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @required = "required", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.ClientId )
+            </div>
+
+            <div class="editor-label">
+                Name
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Name, new { @class = "input", @placeholder = "Enter Transporter Name" } )
+                @Html.ValidationMessageFor( model => model.Name )
+            </div>
+
+            <div class="editor-label">
+                Trading Name
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.TradingName, new { @class = "input", @placeholder = "Enter Transporter Trading Name" } )
+                @Html.ValidationMessageFor( model => model.TradingName )
+            </div>
+
+            <div class="editor-label">
+                Registrtion #
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.RegistrationNumber, new { @class = "input", @data_transporter_reg = "1", @placeholder = "Enter Transporter Registration Number" } )
+                @Html.ValidationMessageFor( model => model.RegistrationNumber )
+            </div>
+
+            <div class="editor-label">
+                Supplier Code
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.SupplierCode, new { @class = "input", @placeholder = "Enter Transporter Supplier Code" } )
+                @Html.ValidationMessageFor( model => model.SupplierCode )
+            </div>
+
+            <div class="editor-label">
+                Transporter Client Code
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ClientTransporterCode, new { @class = "input", @placeholder = "Enter Transporter Client Code" } )
+                @Html.ValidationMessageFor( model => model.ClientTransporterCode )
+            </div>
+
+            <div class="editor-label">
+                Transporter Chep Code
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ChepClientTransporterCode, new { @class = "input", @placeholder = "Enter Transporter Chep Code" } )
+                @Html.ValidationMessageFor( model => model.ChepClientTransporterCode )
+            </div>
+
+            <div class="editor-label">
+                Email
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.Email, new { @class = "input", @placeholder = "Enter Transporter Email" } )
+                @Html.ValidationMessageFor( model => model.Email )
+            </div>
+
+            <div class="editor-label">
+                Contact Name
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ContactName, new { @class = "input", @placeholder = "Enter Transporter Contact Person Name" } )
+                @Html.ValidationMessageFor( model => model.ContactName )
+            </div>
+
+            <div class="editor-label">
+                Contact Number
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Transporter Contact Number" } )
+                @Html.ValidationMessageFor( model => model.ContactNumber )
+            </div>
+
+            <div class="edit-label">
+                @Html.LabelFor( model => model.Status )
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
+                @Html.ValidationMessageFor( model => model.Status )
+            </div>
+
+        </div>
+
+        <div class="left" style="width: 73%;">
+
+            <div id="contact-list">
+                @Html.Partial( "_Contacts", Model.Contacts )
+            </div>
+            <div id="vehicle-list">
+                @Html.Partial( "_Vehicles", Model.Vehicles )
+            </div>
+
+        </div>
+
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+
+        <p>
+            <input id="save-btn" type="submit" value="Save" />
+
+            <span style="padding: 0 5px;">/</span>
+
+            <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+        </p>
+
+
+    </div>
+}

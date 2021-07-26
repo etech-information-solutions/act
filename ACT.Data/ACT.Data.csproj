@@ -93,6 +93,15 @@
     <Compile Include="Models\ChepLoad.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ChepLoadChep.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ChepLoadJournal.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ChepLoadOLD.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Client.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
@@ -100,6 +109,12 @@
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ClientBudget.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ClientChepAccount.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ClientCustomer.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ClientGroup.cs">
@@ -112,6 +127,12 @@
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ClientLoad.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ClientLoadHistory.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ClientLoadQuantity.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ClientProduct.cs">
@@ -132,6 +153,9 @@
     <Compile Include="Models\Contact.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Country.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\DeclineReason.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
@@ -141,13 +165,22 @@
     <Compile Include="Models\DeliveryNoteLine.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Department.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Dispute.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DisputeReason.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Document.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\EstimatedLoad.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ExtendedClientLoad.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Group.cs">
@@ -162,13 +195,25 @@
     <Compile Include="Models\Journal.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Message.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Notification.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\OutstandingReason.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\PODComment.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Product.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ProductPrice.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Province.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\PSP.cs">
@@ -184,6 +229,9 @@
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\PSPConfig.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\PSPPeriod.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\PSPProduct.cs">
@@ -214,6 +262,9 @@
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Task.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Ticket.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Token.cs">

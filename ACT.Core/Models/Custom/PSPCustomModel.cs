@@ -24,6 +24,14 @@ namespace ACT.Core.Models.Custom
         public string DeclinedReason { get; set; }
         public int ServiceRequired { get; set; }
         public int Status { get; set; }
+        public string AdminPerson { get; set; }
+        public string FinPersonEmail { get; set; }
+        public Nullable<int> PalletType { get; set; }
+        public string PalletTypeOther { get; set; }
+        public string BBBEELevel { get; set; }
+        public Nullable<int> CompanyType { get; set; }
+        public Nullable<int> NumberOfLostPallets { get; set; }
+        public Nullable<int> ProvinceId { get; set; }
 
 
         public int UserCount { get; set; }

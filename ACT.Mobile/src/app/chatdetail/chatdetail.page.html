@@ -1,0 +1,75 @@
+<ion-header [translucent]="true" style="color: #002e70 !important;">
+  <ion-toolbar style="color: #002e70 !important;">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      <img (click)="this.auth.OnShowContact()" alt="Contact" src="../../assets/imgs/contact.png" style="width: 36px;" />
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-icon name="notifications" size="large" (click)="this.auth.GoToPage('notifications')"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" (ionScroll)="this.auth.OnScroll($event)" [scrollEvents]="true">
+
+  <ion-item-divider>
+    <ion-label *ngIf="this.auth.CurrentUser.IsAdmin">
+      Chat <small>with {{this.chatservice.Chat.OwnerName}} - {{this.chatservice.Chat.DepartmentName}}</small>
+    </ion-label>
+    <ion-label *ngIf="!this.auth.CurrentUser.IsAdmin">
+      Chat <small>with {{this.chatservice.Chat.SupportName}} - {{this.chatservice.Chat.DepartmentName}}</small>
+    </ion-label>
+  </ion-item-divider>
+
+  <p>
+    &nbsp;
+  </p>
+
+  <div style="margin-bottom: 100px;">
+
+    <p *ngFor="let m of this.chatservice.Chat.Messages" style="margin-top: 0px;">
+  
+      <span class="message-piece" [class.left]="m.IsSupport">
+        <ion-icon name="caret-up-outline"></ion-icon>
+  
+        {{m.Details}} <br/>
+  
+        <em>
+          {{this.auth.GetShortDate(m.CreatedOn, 'yyyy/MM/dd')}} @ {{this.auth.GetShortTime(m.CreatedOn)}}
+        </em>
+      </span>
+  
+      <span style="clear: both; display: block;"></span>
+  
+    </p>
+
+    <div style="clear: both;"></div>
+
+  </div>
+
+  <div class="reply">
+
+    <ion-grid>
+
+      <ion-row>
+  
+        <ion-col size="11">
+  
+          <ion-textarea auto-grow="translucent" type="text" name="Detail" [(ngModel)]="Details" required="required"></ion-textarea>
+          
+        </ion-col>
+        <ion-col size="1" style="display: flex; justify-content: flex-end; align-items: flex-end;">
+    
+          <ion-icon class="send" name="send" (click)="Send();"></ion-icon>
+          
+        </ion-col>
+  
+      </ion-row>
+
+    </ion-grid>
+
+  </div>
+
+</ion-content>

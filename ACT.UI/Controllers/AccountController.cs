@@ -97,14 +97,15 @@ namespace ACT.UI.Controllers
         {
             switch ( roleType )
             {
-                case RoleType.Client:
+                case RoleType.Transporter:
 
-                    return RedirectToAction( "Index", "Client" );
+                    return RedirectToAction( "Index", "Transporter" );
 
                 case RoleType.PSP:
+                case RoleType.Client:
                 case RoleType.SuperAdmin:
 
-                    return RedirectToAction( "Index", "Administration" );
+                    return RedirectToAction( "Index", "DashBoard" );
             }
 
             return LogOff();
@@ -197,13 +198,6 @@ namespace ACT.UI.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Register( RegisterViewModel model )
         {
-            PSP psp;
-            User user;
-            Client client;
-
-            int objectId;
-            string objectType;
-
             using ( PSPService pservice = new PSPService() )
             using ( UserService uservice = new UserService() )
             using ( RoleService rservice = new RoleService() )
@@ -213,16 +207,23 @@ namespace ACT.UI.Controllers
             using ( DocumentService dservice = new DocumentService() )
             using ( EstimatedLoadService eservice = new EstimatedLoadService() )
             {
+                PSP psp;
+                User user;
+                Client client;
+
+                int objectId;
+                string objectType;
+
                 model.PSPOptions = pservice.List();
 
                 if ( !ModelState.IsValid )
                 {
-                    Notify( "The supplied information is invalid. Please try again.", NotificationType.Error );
+                    Notify( "The supplied information is not complete. Please try again.", NotificationType.Error );
 
                     return View( model );
                 }
 
-                bool isClient = ( model.ServiceType == ServiceType.ManageOwnPallets || model.ServiceType == ServiceType.ProvidePalletManagement );
+                bool isClient = ( model.ServiceType == ServiceType.RequirePalletManagement || model.ServiceType == ServiceType.HaveCompany );
 
                 #region Validations
 
@@ -263,17 +264,25 @@ namespace ACT.UI.Controllers
 
                     client = new Client()
                     {
+                        PSPName = model.PSPName,
                         Email = model.EmailAddress,
                         TradingAs = model.TradingAs,
                         VATNumber = model.VATNumber,
+                        BBBEELevel = model.BBBEELevel,
                         AdminEmail = model.AdminEmail,
                         CompanyName = model.CompanyName,
                         Description = model.Description,
+                        AdminPerson = model.ContactPerson,
+                        FinPersonEmail = model.EmailAddress,
                         ContactPerson = model.ContactPerson,
                         ContactNumber = model.ContactNumber,
                         FinancialPerson = model.ContactPerson,
+                        CompanyType = ( int ) model.CompanyType,
+                        PalletType = ( int ) model.TypeOfPalletUse,
                         Status = ( int ) PSPClientStatus.Unverified,
                         ServiceRequired = ( int ) model.ServiceType,
+                        PalletTypeOther = model.OtherTypeOfPalletUse,
+                        NumberOfLostPallets = model.NumberOfLostPallets,
                         CompanyRegistrationNumber = model.CompanyRegistrationNumber,
 
                     };
@@ -282,12 +291,12 @@ namespace ACT.UI.Controllers
                     {
                         client.PSPClients.Add( new PSPClient()
                         {
-                            PSPId = model.PSPId,
                             ClientId = client.Id,
                             CreatedOn = DateTime.Now,
+                            PSPId = model.PSPId.Value,
                             ModifiedOn = DateTime.Now,
                             ModifiedBy = model.AdminEmail,
-
+                            Status = ( int ) Status.Active,
                         } );
                     }
 
@@ -297,10 +306,10 @@ namespace ACT.UI.Controllers
                     {
                         UserId = user.Id,
                         ClientId = client.Id,
-                        Status = user.Status,
                         CreatedOn = DateTime.Now,
                         ModifiedOn = DateTime.Now,
                         ModifiedBy = model.AdminEmail,
+                        Status = ( int ) Status.Active,
 
                     } );
 
@@ -318,14 +327,21 @@ namespace ACT.UI.Controllers
                         Email = model.EmailAddress,
                         TradingAs = model.TradingAs,
                         VATNumber = model.VATNumber,
+                        BBBEELevel = model.BBBEELevel,
                         AdminEmail = model.AdminEmail,
                         CompanyName = model.CompanyName,
                         Description = model.Description,
+                        AdminPerson = model.ContactPerson,
                         ContactPerson = model.ContactPerson,
                         ContactNumber = model.ContactNumber,
+                        FinPersonEmail = model.EmailAddress,
                         FinancialPerson = model.ContactPerson,
+                        CompanyType = ( int ) model.CompanyType,
+                        PalletType = ( int ) model.TypeOfPalletUse,
                         Status = ( int ) PSPClientStatus.Unverified,
                         ServiceRequired = ( int ) model.ServiceType,
+                        PalletTypeOther = model.OtherTypeOfPalletUse,
+                        NumberOfLostPallets = model.NumberOfLostPallets,
                         CompanyRegistrationNumber = model.CompanyRegistrationNumber,
 
                     };
@@ -336,10 +352,10 @@ namespace ACT.UI.Controllers
                     {
                         PSPId = psp.Id,
                         UserId = user.Id,
-                        Status = user.Status,
                         CreatedOn = DateTime.Now,
                         ModifiedOn = DateTime.Now,
-                        ModifiedBy = model.AdminEmail
+                        ModifiedBy = model.AdminEmail,
+                        Status = ( int ) Status.Active,
                     } );
 
                     objectId = psp.Id;
@@ -365,6 +381,7 @@ namespace ACT.UI.Controllers
                     {
                         ObjectId = objectId,
                         ObjectType = objectType,
+                        BudgetYear = model.EstimatedLoad.BudgetYear,
                         January = model.EstimatedLoad.January,
                         February = model.EstimatedLoad.February,
                         March = model.EstimatedLoad.March,
@@ -377,7 +394,7 @@ namespace ACT.UI.Controllers
                         October = model.EstimatedLoad.October,
                         November = model.EstimatedLoad.November,
                         December = model.EstimatedLoad.December,
-
+                        Total = model.EstimatedLoad.Total,
                     };
 
                     load = eservice.Create( load );
@@ -400,7 +417,7 @@ namespace ACT.UI.Controllers
                         Type = ( int ) model.Address.AddressType,
                         Addressline1 = model.Address.AddressLine1,
                         Addressline2 = model.Address.AddressLine2,
-                        Province = ( int ) model.Address.Province,
+                        ProvinceId = model.Address.ProvinceId,
                     };
 
                     aservice.Create( address );
@@ -411,7 +428,7 @@ namespace ACT.UI.Controllers
 
                 #region Any Uploads
 
-                if ( model.RegistrationFile != null )
+                if ( model.Files.NullableAny( f => f.File != null ) )
                 {
                     // Create folder
                     string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/{objectType}/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/" );
@@ -423,24 +440,35 @@ namespace ACT.UI.Controllers
 
                     string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
 
-                    Document doc = new Document()
+                    foreach ( FileViewModel f in model.Files.Where( f => f.File != null ) )
                     {
-                        ObjectId = objectId,
-                        ObjectType = objectType,
-                        Status = ( int ) Status.Active,
-                        Name = model.RegistrationFile.Name,
-                        Category = model.RegistrationFile.Name,
-                        Title = model.RegistrationFile.File.FileName,
-                        Size = model.RegistrationFile.File.ContentLength,
-                        Description = model.RegistrationFile.Description,
-                        Type = Path.GetExtension( model.RegistrationFile.File.FileName ),
-                        Location = $"{objectType}/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/{now}-{model.RegistrationFile.File.FileName}"
-                    };
+                        Document doc = new Document()
+                        {
+                            ObjectId = objectId,
+                            ObjectType = objectType,
+                            Status = ( int ) Status.Active,
+                            Name = f.Name,
+                            Category = f.Name,
+                            Title = f.File.FileName,
+                            Size = f.File.ContentLength,
+                            Description = f.Description,
+                            Type = Path.GetExtension( f.File.FileName ),
+                            Location = $"{objectType}/{model.CompanyName.Trim()}-{model.CompanyRegistrationNumber.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/{now}-{f.File.FileName}"
+                        };
 
-                    dservice.Create( doc );
+                        dservice.Create( doc );
 
-                    string fullpath = Path.Combine( path, $"{now}-{model.RegistrationFile.File.FileName}" );
-                    model.RegistrationFile.File.SaveAs( fullpath );
+                        string fullpath = Path.Combine( path, $"{now}-{f.File.FileName}" );
+
+                        try
+                        {
+                            f.File.SaveAs( fullpath );
+                        }
+                        catch ( Exception ex )
+                        {
+
+                        }
+                    }
                 }
 
                 #endregion

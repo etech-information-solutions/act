@@ -1,0 +1,24 @@
+﻿@model ObjectDocumentsViewModel
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.UI.Models;
+
+@if (Model.objDocuments != null && Model.objDocuments.Count() > 0)
+{
+    foreach (Document companyFile in Model.objDocuments.Where(s => s.Status == (Int32)Status.Active))
+    {
+        @Html.HiddenFor(model => companyFile.Id)
+
+        <div style="border: 1px dashed #002e70; border-radius: 4px; padding: 4px; margin-bottom: 20px; width: 94%;">
+
+            <a target="_blank" href="@Url.Action("ViewDocument", Model.objType, new { @id = companyFile.Id })">
+                <img alt="download" src="@Url.Content("~/Images/download.png")" style="margin-bottom: 2px;" />
+
+                @companyFile.Name (@companyFile.Type)
+            </a>
+
+        </div>
+
+    }
+}

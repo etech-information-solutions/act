@@ -1,0 +1,70 @@
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688
+System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model) in D:\act.co.za\ACT\ACT.UI\Controllers\ClientController.cs:line 2688

@@ -1,0 +1,49 @@
+﻿@model List<NumberOfPalletsManaged>
+
+@using ACT.Core.Models
+
+@{
+    string monthNames = "[";
+
+    foreach ( NumberOfPalletsManaged item in Model )
+    {
+        monthNames += $"\"{item.MonthName}\",";
+    }
+
+    monthNames = monthNames.Remove( monthNames.Trim().Length - 1 );
+    monthNames += "]";
+
+    string reconciled = "{\"name\": \"Reconciled\", \"data\": [",
+           unreconciled = "{\"name\": \"Unreconciled\", \"data\": [",
+           total = "{\"name\": \"Total\", \"data\": [";
+
+    for ( int i = 0; i < Model.Count; i++ )
+    {
+        reconciled += ( Model[ i ].Reconciled ?? 0 ) + ",";
+        unreconciled += ( Model[ i ].Unreconciled ?? 0 ) + ",";
+        total += ( Model[ i ].Total ?? 0 ) + ",";
+    }
+
+    reconciled = reconciled.Remove( reconciled.Trim().Length - 1 );
+    reconciled += "]}";
+
+    unreconciled = unreconciled.Remove( unreconciled.Trim().Length - 1 );
+    unreconciled += "]}";
+
+    total = total.Remove( total.Trim().Length - 1 );
+    total += "]}";
+
+    string series = $"[{reconciled},{unreconciled},{total}]";
+}
+
+<script type="text/javascript">
+
+    var npmSeries = JSON.parse( '@series'.replace( /&quot;/g, '"' ) );
+    var npmMonthNames = JSON.parse( '@monthNames'.replace( /&quot;/g, '"' ) );
+
+    setTimeout(function ()
+    {
+        ACT.UI.NumberOfPalletsManaged( "npm-graph", npmMonthNames, npmSeries );
+    }, '500');
+</script>
+

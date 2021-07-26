@@ -1,0 +1,75 @@
+﻿@using ACT.Core.Models;
+
+@{
+    ViewBag.Title = "Pallet";
+
+    UserModel user = User.Get();
+}
+
+
+<div class="ap-tabs">
+
+    <ul>
+        <li data-hot-spot="1" data-c="Pallet" data-t="ClientData" class="none">
+            <a data-ap-tab="1" data-target="#clientdata" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ClientData">Client Loads</a>
+        </li>
+        <li data-hot-spot="1" data-c="Pallet" data-t="ReconcileLoads" class="none">
+            <a data-ap-tab="1" data-target="#reconcileloads" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ReconcileLoads">Unreconciled Loads</a>
+        </li>
+
+        <li data-hot-spot="1" data-c="Pallet" data-t="ReconcileInvoices" class="none">
+            <a data-ap-tab="1" data-target="#reconcileinvoices" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="ReconcileInvoices">Reconcile Invoices</a>
+        </li>
+        <li data-hot-spot="1" data-c="Pallet" data-t="OutstandingPallets" class="none">
+            <a data-ap-tab="1" data-target="#outstandingpallets" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="OutstandingPallets">Outstanding POD’s</a>
+        </li>
+        <li data-hot-spot="1" data-c="Pallet" data-t="AuthorisationCodes" class="none">
+            <a data-ap-tab="1" data-target="#authorisationcodes" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="AuthorisationCodes">Authorisations</a>
+        </li>
+        <li data-hot-spot="1" data-c="Pallet" data-t="Disputes" class="none">
+            <a data-ap-tab="1" data-target="#disputes" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Disputes">Disputes</a>
+        </li>
+        <li data-hot-spot="1" data-c="Pallet" data-t="DeliveryNotes" class="none">
+            <a data-ap-tab="1" data-target="#deliverynotes" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="DeliveryNotes">Delivery Notes</a>
+        </li>
+        <li data-hot-spot="1" data-c="Pallet" data-t="SiteAudits" class="none">
+            <a data-ap-tab="1" data-target="#siteaudits" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="SiteAudits">Site Audit</a>
+        </li>
+        @if ( user.IsAdmin || user.IsPSPAdmin )
+        {
+            <li data-hot-spot="1" data-c="Pallet" data-t="PoolingAgentData" class="none">
+                <a data-ap-tab="1" data-target="#poolingagentdata" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PoolingAgentData">Pooling Loads</a>
+            </li>
+        }
+        <li class="last"></li>
+    </ul>
+
+
+
+    <div id="tab-data" class="tab-data">
+
+        <div id="clientdata" class="da-tab none" data-load-url="ClientData"> </div>
+
+        <div id="reconcileloads" class="da-tab none" data-load-url="ReconcileLoads"> </div>
+
+        <div id="reconcileinvoices" class="da-tab none" data-load-url="ReconcileInvoices"> </div>
+
+        <div id="outstandingpallets" class="da-tab none" data-load-url="OutstandingPallets"> </div>
+
+        <div id="exceptions" class="da-tab none" data-load-url="Exceptions"> </div>
+
+        <div id="authorisationcodes" class="da-tab none" data-load-url="AuthorisationCodes"> </div>
+
+        <div id="deliverynotes" class="da-tab none" data-load-url="DeliveryNotes"> </div>
+
+        <div id="disputes" class="da-tab none" data-load-url="Disputes"> </div>
+
+        <div id="siteaudits" class="da-tab none" data-load-url="SiteAudits"> </div>
+
+        @if ( user.IsAdmin || user.IsPSPAdmin )
+        {
+            <div id="poolingagentdata" class="da-tab none" data-load-url="PoolingAgentData"> </div>
+        }
+    </div>
+
+</div>

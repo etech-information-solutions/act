@@ -1,0 +1,153 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_ClientKPI";
+}
+
+
+@Html.Partial( "_Notification" )
+
+
+@{
+    UserModel user = User.Get();
+
+    int count = Model.Start;
+    List<ClientKPICustomModel> items = ( List<ClientKPICustomModel> ) Model.Items;
+}
+
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Client KPIs available matching your search criteria.
+    </div>
+}
+
+@if ( user.IsAdmin || user.IsPSPAdmin )
+{
+    <p>
+        @Html.ActionLink( "Add", "AddKPI", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Client KPI?", @data_edit = "1", @data_id = 0, @data_target = "#clientkpi" } )
+        <span class="loader"></span>
+    </p>
+}
+
+<table id="client-kpi-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#client-kpi-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="CreatedOn" data-column="k.CreatedOn">
+                Created
+            </th>
+            <th data-name="CompanyName" data-column="c.CompanyName">
+                Client
+            </th>
+            <th data-name="Description" data-column="k.Description">
+                Description
+            </th>
+            <th data-name="DescriptionPallets" data-column="k.OutstandingPallets">
+                Outstanding Pallets
+            </th>
+            <th data-name="Description" data-column="k.Disputes">
+                Disputes
+            </th>
+            <th data-name="DaysOutstanding" data-column="k.OutstandingDays">
+                Outstanding Days
+            </th>
+            <th data-name="Weight" data-column="k.Weight">
+                Weighted %
+            </th>
+            <th data-name="TargetAmount" data-column="k.TargetAmount">
+                Target Amount
+            </th>
+            <th data-name="TargetPeriod" data-column="k.TargetPeriod">
+                Target Period
+            </th>
+            <th data-name="Status" data-column="k.Status">
+                Status
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( ClientKPICustomModel item in items )
+            {
+                Status status = ( Status ) item.Status;
+
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
+
+                string targetPeriod = ( item.TargetPeriod != null ? ( ( ( TargetPeriod ) item.TargetPeriod ).GetDisplayText() ) : "" );
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="ClientKPI">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.ClientName
+                    </td>
+                    <td>
+                        @item.KPIDescription
+                    </td>
+                    <td>
+                        @item.OutstandingPallets
+                    </td>
+                    <td>
+                        @item.Disputes
+                    </td>
+                    <td>
+                        @item.OutstandingDays
+                    </td>
+                    <td>
+                        @item.Weight
+                    </td>
+                    <td>
+                        @item.TargetAmount
+                    </td>
+                    <td>
+                        @targetPeriod
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+                    </td>
+
+                    <td width="15%">
+                        @Html.ActionLink( "Details", "KPIDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( "Edit", "EditKPI", new { id = item.Id, returnView = "ClientKPI" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( enable, "DeleteKPI", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientkpi", @rel = "tipsyE", @title = enable + " this item?" } )
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )

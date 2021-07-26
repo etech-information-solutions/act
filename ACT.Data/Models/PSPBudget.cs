@@ -20,19 +20,20 @@ namespace ACT.Data.Models
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public int BudgetYear { get; set; }
-        public Nullable<int> January { get; set; }
-        public Nullable<int> February { get; set; }
-        public Nullable<int> March { get; set; }
-        public Nullable<int> April { get; set; }
-        public Nullable<int> May { get; set; }
-        public Nullable<int> June { get; set; }
-        public Nullable<int> July { get; set; }
-        public Nullable<int> August { get; set; }
-        public Nullable<int> September { get; set; }
-        public Nullable<int> October { get; set; }
-        public Nullable<int> November { get; set; }
-        public Nullable<int> December { get; set; }
+        public Nullable<decimal> January { get; set; }
+        public Nullable<decimal> February { get; set; }
+        public Nullable<decimal> March { get; set; }
+        public Nullable<decimal> April { get; set; }
+        public Nullable<decimal> May { get; set; }
+        public Nullable<decimal> June { get; set; }
+        public Nullable<decimal> July { get; set; }
+        public Nullable<decimal> August { get; set; }
+        public Nullable<decimal> September { get; set; }
+        public Nullable<decimal> October { get; set; }
+        public Nullable<decimal> November { get; set; }
+        public Nullable<decimal> December { get; set; }
         public Nullable<int> Status { get; set; }
+        public Nullable<decimal> Total { get; set; }
     
         public virtual PSP PSP { get; set; }
     }

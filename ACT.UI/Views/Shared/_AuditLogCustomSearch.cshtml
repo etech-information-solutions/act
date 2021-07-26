@@ -2,8 +2,8 @@
 
 
 @{
-    String vn = ( ( String ) ViewBag.ViewName ?? "" );
-    String action = vn.Replace( "_", "" );
+    string vn = ( ( string ) ViewBag.ViewName ?? "" );
+    string action = vn.Replace( "_", "" );
 }
 
 <div id="custom-search" class="custom-search">
@@ -17,7 +17,7 @@
                     @Html.LabelFor( model => model.UserId )
                 </div>
                 <div class="editor-field">
-                    @Html.DropDownListFor( model => model.UserId, model => model.UserOptions, u => u.Id, u => u.Name + " " + u.Surname, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.DropDownListFor( model => model.UserId, model => model.UserOptions, u => u.Key, u => u.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
                 </div>
             </div>
 

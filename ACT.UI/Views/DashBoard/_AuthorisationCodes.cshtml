@@ -1,0 +1,45 @@
+﻿
+@model List<AuthorisationCodes>
+
+@using ACT.Core.Models
+
+@{
+    string monthNames = "[";
+
+    foreach ( AuthorisationCodes item in Model )
+    {
+        monthNames += $"\"{item.MonthName}\",";
+    }
+
+    monthNames = monthNames.Remove( monthNames.Trim().Length - 1 );
+    monthNames += "]";
+
+    string loads = "{\"type\": \"column\", \"name\": \"Loads\", \"data\": [",
+           codes = "{\"type\": \"column\", \"name\": \"Authorisation Codes\", \"data\": [";
+
+    for ( int i = 0; i < Model.Count; i++ )
+    {
+        loads += Model[ i ].Loads + ",";
+        codes += Model[ i ].Codes + ",";
+    }
+
+    loads = loads.Remove( loads.Trim().Length - 1 );
+    loads += "]}";
+
+    codes = codes.Remove( codes.Trim().Length - 1 );
+    codes += "]}";
+
+    string series = $"[{loads},{codes}]";
+}
+
+<script type="text/javascript">
+
+    var authSeries = JSON.parse( '@series'.replace( /&quot;/g, '"' ) );
+    var authMonthNames = JSON.parse( '@monthNames'.replace( /&quot;/g, '"' ) );
+
+    setTimeout(function ()
+    {
+        ACT.UI.AuthorisationCodesPerMonth( "ac-graph", authMonthNames, authSeries );
+    }, '500');
+</script>
+

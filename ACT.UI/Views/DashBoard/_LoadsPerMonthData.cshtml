@@ -1,0 +1,112 @@
+﻿
+@model List<ClientLoadCustomModel>
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+<div style="max-height: 800px; overflow-x: auto;">
+
+
+    @Html.Partial( "_Notification" )
+
+    @if ( Model.NullableAny() )
+    {
+        <div class="notification message-warn" style="margin-bottom: 20px;">
+            There are no Loads available matching your search criteria.
+        </div>
+    }
+
+    <table id="loadspermonth-table" class="da-table">
+
+        <thead>
+            <tr>
+                <th>
+                    #
+                </th>
+                <th>
+                    Client
+                </th>
+                <th>
+                    Site
+                </th>
+                <th>
+                    Load
+                </th>
+                <th>
+                    Trading Partner
+                </th>
+                <th>
+                    Ref #
+                </th>
+                <th>
+                    Receiver #
+                </th>
+                <th>
+                    Equipment
+                </th>
+                <th>
+                    Quantity
+                </th>
+                <th>
+                    Outstanding
+                </th>
+                <th>
+                    Acc #
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if ( Model.NullableAny() )
+            {
+                int count = 1;
+
+                foreach ( var item in Model )
+                {
+                    <tr>
+                        <td width="1%">
+                            @count
+                        </td>
+                        <td>
+                            @item.ClientName
+                        </td>
+                        <td>
+                            @item.SiteName
+                        </td>
+                        <td>
+                            <span class="block">Date: @(( item.LoadDate ?? item.CreatedOn ).ToString( "yyyy-MM-dd" ))</span>
+                            <span class="block">Number: @item.LoadNumber</span>
+                        </td>
+                        <td>
+                            @item.ClientDescription
+                        </td>
+                        <td>
+                            @item.ReferenceNumber
+                        </td>
+                        <td>
+                            @item.ReceiverNumber
+                        </td>
+                        <td>
+                            @item.Equipment
+                        </td>
+                        <td>
+                            @Math.Round( item.NewQuantity ?? 0, 0 )
+                        </td>
+                        <td>
+                            <span class="block">Qty: @item.OutstandingQty</span>
+                            <span class="block">Reason: @item.OutstandingReason</span>
+                        </td>
+                        <td>
+                            @item.AccountNumber
+                        </td>
+
+                    </tr>
+
+                    count++;
+                }
+            }
+        </tbody>
+
+    </table>
+
+</div>

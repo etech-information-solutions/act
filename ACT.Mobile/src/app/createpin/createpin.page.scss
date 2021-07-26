@@ -1,0 +1,50 @@
+ion-item, item-label {
+    font-size: 13px !important;
+}
+
+ion-content {
+    padding: 0 20px;;
+}
+
+.pin {
+    padding: 0;
+    list-style-type: none !important;
+}
+
+.pin li {
+    display: inline !important;
+    padding-left: 4px !important;
+    text-align: center !important;
+}
+
+.number li {
+    width: 33% !important;
+    text-align: center !important;
+    display: inline-block !important;
+    background-color: #ffffff !important;
+}
+
+.pin li img {
+    display: inline !important;
+}
+
+.success-message {
+    color: #229c1c;
+    padding: 5px 20px;
+    font-size: 13px !important;
+    background-color: #bef2bb;
+  }
+  
+  .warn-message {
+    color: #EBA324;
+    padding: 5px 20px;
+    font-size: 13px !important;
+    background-color: #FFE6BA;
+  }
+  
+  .error-message {
+    color: #e80c4d;
+    padding: 5px 20px;
+    font-size: 13px !important;
+    background-color: #ffeeee;
+  }

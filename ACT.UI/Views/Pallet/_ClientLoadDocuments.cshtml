@@ -1,0 +1,79 @@
+﻿@model List<Document>
+
+@using ACT.Data.Models
+
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "UpdateClientLoadDocuments", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#tr-edit > td", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div class="editor-label" style="margin-bottom: 10px;">
+
+        <p>
+            <strong class="uppercase">Client Load Documents (@Model.NullableCount())</strong>
+        </p>
+
+    </div>
+
+    <div class="editor-field">
+
+        <table id="client-load-documents-table" class="da-table small">
+
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if ( Model.NullableAny() )
+                {
+                    int count = 0;
+
+                    foreach ( Document d in Model )
+                    {
+                        <tr>
+                            <td>
+                                <a rel="tipsyW" title="View File?" class="download" href="@Url.Action( "ViewDocument", "Pallet", new { @id = d.Id } )" target="_blank">
+                                    @d.Name (@d.Type)
+                                </a>
+                            </td>
+                            <td width="10%">
+                                @Html.ActionLink( "Remove", "DeleteClientLoadDocument", new { id = d.Id }, new { @class = "del", @data_delete = "1", @data_id = d.Id, @data_target = "#row-line-" + count, @data_refresh_target = "#tr-edit > td", @rel = "tipsyE", @title = "Remove this item?" } )
+                            </td>
+                        </tr>
+
+                        count++;
+                    }
+                }
+
+                <tr id="row-line-0" class="add-more-row">
+                    <td colspan="2" style="position: relative;">
+                        <a data-add-one-more="1" data-target="#row-line-0" rel="tipsyW" title="Add another line?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                            <img alt="Add" src="@Url.Content( "~/Images/add.png" )" />
+                        </a>
+
+                        <input name="ClientLoadDocuments[0].Title" type="hidden" value="Client Load File" />
+                        <input name="ClientLoadDocuments[0].Description" type="hidden" value="Client Load File" />
+
+                        <input name="ClientLoadDocuments[0].File" type="file" placeholder="Client Load File" />
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px;">&nbsp;</div>
+
+        <p>
+            <input id="save-btn" type="submit" value="Save" />
+            <input name="ClientLoadId" type="hidden" value="@ViewBag.Id" />
+            <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+        </p>
+
+    </div>
+}

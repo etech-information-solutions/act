@@ -1,0 +1,180 @@
+﻿@model PagingExtension
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+    ViewBag.ViewName = "_Products";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@{
+    int count = Model.Start;
+    List<ProductCustomModel> items = ( List<ProductCustomModel> ) Model.Items;
+}
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Products available matching your search criteria.
+    </div>
+}
+
+<p>
+    @Html.ActionLink( "Add Product", "AddProduct", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Product?", @data_edit = "1", @data_id = 0, @data_target = "#products" } )
+    <span class="loader"></span>
+</p>
+
+<table id="products-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#products-table_wrapper" data-starting-point=".ap-tabs ul">
+
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="Name" data-column="Name">
+                Name
+            </th>
+            <th data-name="Description" data-column="Description">
+                Description
+            </th>
+            <th data-name="Status" data-column="Status">
+                Status
+            </th>
+            <th data-name="ProductPriceCount">
+                Prices
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                Status status = ( Status ) item.Status;
+
+                string active = status.Equals( Status.Active ) ? "active" : "inactive";
+                string enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+
+                List<ProductPrice> prices = new List<ProductPrice>();
+
+                string hrate = "";
+                string irate = "";
+                string lrate = "";
+                string pocost = "";
+
+                using ( ProductPriceService aservice = new ProductPriceService() )
+                {
+                    prices = aservice.ListByColumnWhere( "ProductId", item.Id );
+
+                    if ( prices != null )
+                    {
+                        foreach ( ProductPrice price in prices )
+                        {
+                            switch ( price.Type )
+                            {
+                                case ( int ) ProductPriceType.Hire:
+
+                                    hrate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+
+                                    break;
+
+                                case ( int ) ProductPriceType.Issue:
+
+                                    irate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+
+                                    break;
+                                case ( int ) ProductPriceType.Lost:
+
+                                    lrate = price.RateUnit.ToString() + " @ " + price.Rate.ToString();
+
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.Name
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Product">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.Description
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+                    </td>
+                    <td>
+                        Hire @hrate<br />
+
+                        Issue @irate<br />
+
+                        Lost @lrate<br />
+
+                        Passon @pocost
+
+                        @if ( item.ProductPriceCount > 0 )
+                        {
+                            @Html.ActionLink( item.ProductPriceCount.ToString(), "ProductDetails", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        }
+                    </td>
+                    <td width="17%">
+                        @Html.ActionLink( "Details", "ProductDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( "Edit", "EditProduct", new { id = item.Id, returnView = "Products" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        @Html.ActionLink( enable, "DeleteProduct", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#products", @rel = "tipsyE", @title = enable + " this item?" } )
+
+                        @if ( item.Documents != null && item.Documents.Any( s => s.Status == ( Int32 ) Status.Active ) )
+                        {
+                            <div style="border-top: 1px dashed #7368e3; padding-top: 8px; margin-top: 10px;">
+                                <a class="docs" data-sticky-one="1" data-target="#supporting-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Supporting Documents">
+                                    Docs
+                                </a>
+                                <div id="supporting-@item.Id-docs" class="none">
+                                    <ul class="list">
+                                        @foreach ( var d in item.Documents.Where( s => s.Status == ( Int32 ) Status.Active ) )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )" target="_blank">
+                                                    @d.Name (@d.Type)
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                            </div>
+                        }
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_ProductCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
+
+@Html.Partial( "_Paging" )

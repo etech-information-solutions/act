@@ -10,11 +10,11 @@ using System.Web.Script.Serialization;
 using ACT.Core.Models;
 using ACT.Core.Helpers;
 using System.Text.RegularExpressions;
-using ACT.Core.Extension;
 using System.Net;
 using ACT.Mailer;
 using ACT.UI.Models;
 using ACT.Core.Models.Custom;
+using System.Web;
 
 namespace ACT.UI.Controllers
 {
@@ -23,6 +23,11 @@ namespace ACT.UI.Controllers
         private string _currentController = null;
 
         public List<NotificationModel> Notifications = new List<NotificationModel>();
+
+        public StreamWriter LogWriter
+        {
+            get; set;
+        }
 
         /// <summary>
         /// Gets the name of the current controller instance.
@@ -75,6 +80,22 @@ namespace ACT.UI.Controllers
             ViewBag.SystemRules = ConfigSettings.SystemRules;
         }
 
+        public BaseController( string fileName )
+        {
+            ConfigSettings.SetRules();
+            VariableExtension.SetRules();
+
+            if ( LogWriter == null )
+            {
+                FileStream fs = new FileStream( fileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite );
+
+                LogWriter = new StreamWriter( fs )
+                {
+                    AutoFlush = true
+                };
+            }
+        }
+
         public string CurrentUrl
         {
             get
@@ -90,7 +111,7 @@ namespace ACT.UI.Controllers
         {
             if ( Request.IsAuthenticated )
             {
-                this.CurrentUser = this.GetUser( User.Identity.Name );
+                CurrentUser = GetUser( User.Identity.Name );
             }
         }
 
@@ -104,6 +125,11 @@ namespace ACT.UI.Controllers
             using ( UserService service = new UserService() )
             {
                 UserModel user = service.GetUser( email );
+
+                if ( service.SelectedClient != null )
+                {
+                    ViewBag.SelectedClient = service.SelectedClient;
+                }
 
                 return user;
             }
@@ -122,11 +148,16 @@ namespace ACT.UI.Controllers
                 {
                     try
                     {
-                        this.InitCurrentUser();
+                        InitCurrentUser();
                     }
                     catch ( Exception ex )
                     {
 
+                    }
+
+                    using ( ClientService cservice = new ClientService() )
+                    {
+                        ViewBag.ClientOptions = cservice.List( true );
                     }
                 }
 
@@ -179,47 +210,34 @@ namespace ACT.UI.Controllers
                     {
                         case "DashBoard":
 
-                            filterContext.Result = RedirectToAction( "Index", "Campaign" );
-
-                            break;
-
-                        case "Campaign":
-
-                            filterContext.Result = RedirectToAction( "Index", "Dinner" );
-
-                            break;
-
-                        case "Dinner":
-
-                            filterContext.Result = RedirectToAction( "Index", "TradingPartner" );
-
-                            break;
-
-                        case "TradingPartner":
-
-                            filterContext.Result = RedirectToAction( "Index", "Member" );
-
-                            break;
-
-                        case "Member":
-
                             filterContext.Result = RedirectToAction( "Index", "Client" );
 
                             break;
 
                         case "Client":
 
-                            filterContext.Result = RedirectToAction( "Index", "Reward" );
+                            filterContext.Result = RedirectToAction( "Index", "ClientReporting" );
 
                             break;
 
-                        case "Reward":
+                        case "ClientReporting":
+
+                            filterContext.Result = RedirectToAction( "Index", "Pallet" );
+
+                            break;
+
+                        case "Pallet":
 
                             filterContext.Result = RedirectToAction( "Index", "Administration" );
 
                             break;
 
-                        case "Report":
+                        case "Administration":
+
+                            filterContext.Result = RedirectToAction( "Index", "Finance" );
+
+                            break;
+
                         default:
 
                             Notifications.Add( new NotificationModel() { Message = "Please note, you were signed out from your previous session due to time-out", Type = NotificationType.Error } );
@@ -484,29 +502,62 @@ namespace ACT.UI.Controllers
         }
 
         /// <summary>
+        /// Gets a ChepLoad using the specified bankId and returns a JSON representation. More fields can be added when need be
+        /// </summary>
+        /// <param name="bankId"></param>
+        /// <returns></returns>
+        public JsonResult GetChepLoad( int chepLoadId = 0 )
+        {
+            using ( ChepLoadService service = new ChepLoadService() )
+            {
+                ChepLoad chepLoad = service.GetById( chepLoadId );
+
+                return new JsonResult()
+                {
+                    Data = new
+                    {
+                        chepLoad.Id,
+                        chepLoad.Equipment,
+                        chepLoad.DocketNumber,
+                        chepLoad.OriginalDocketNumber,
+                        chepLoad.Ref,
+                        chepLoad.OtherRef,
+                        chepLoad.OtherParty,
+                        chepLoad.EquipmentCode,
+                        chepLoad.Location,
+                        chepLoad.LocationId,
+                        chepLoad.TransactionType,
+                        chepLoad.DataSource,
+                        EffectiveDate = chepLoad.EffectiveDate?.ToString( "yyyy/MM/dd" ),
+                        ShipmentDate = chepLoad.ShipmentDate?.ToString( "yyyy/MM/dd" ),
+                        DeliveryDate = chepLoad.DeliveryDate?.ToString( "yyyy/MM/dd" ),
+                    }
+                };
+            }
+        }
+
+        /// <summary>
         /// Gets a client using the specified clientId and returns a JSON representation. More fields can be added when need be
         /// </summary>
         /// <param name="clientId"></param>
         /// <returns></returns>
         public JsonResult GetClient( int clientId = 0 )
         {
-            Client client;
-
-            string logoPath = "~/Images/no-preview.png";
-
             using ( ClientService service = new ClientService() )
             {
-                client = service.GetById( clientId );
-            }
+                string logoPath = "~/Images/no-preview.png";
 
-            return new JsonResult()
-            {
-                Data = new
+                Client client = service.GetById( clientId );
+
+                return new JsonResult()
                 {
-                    Id = client.Id,
-                    Logo = logoPath
-                }
-            };
+                    Data = new
+                    {
+                        Id = client.Id,
+                        Logo = logoPath
+                    }
+                };
+            }
         }
 
         //
@@ -619,7 +670,7 @@ namespace ACT.UI.Controllers
                     return Redirect( d.Url );
                 }
 
-                return File( path, System.Web.MimeMapping.GetMimeMapping( path ) );
+                return File( path, MimeMapping.GetMimeMapping( path ) );
             }
         }
 
@@ -656,7 +707,902 @@ namespace ACT.UI.Controllers
                     return Redirect( d.Url );
                 }
 
-                return File( path, System.Web.MimeMapping.GetMimeMapping( path ), Path.GetFileName( path ) );
+                return File( path, MimeMapping.GetMimeMapping( path ), Path.GetFileName( path ) );
+            }
+        }
+
+        //
+        // GET: /Image/ViewImage/5
+        public ActionResult ViewImage( int id )
+        {
+            using ( ImageService service = new ImageService() )
+            {
+                Image i = service.GetById( id );
+
+                if ( i == null )
+                    return PartialView( "_AccessDenied" );
+
+                string path = Server.MapPath( string.Format( "{0}/{1}", VariableExtension.SystemRules.ImagesLocation, i.Location ) );
+
+                return File( path, MimeMapping.GetMimeMapping( path ) );
+            }
+        }
+
+        //
+        // GET: /Image/DownloadImage/5
+        public ActionResult DownloadImage( int id )
+        {
+            using ( ImageService service = new ImageService() )
+            {
+                Image d = service.GetById( id );
+
+                if ( d == null )
+                    return PartialView( "_AccessDenied" );
+
+                string path = Server.MapPath( string.Format( "{0}/{1}", VariableExtension.SystemRules.ImagesLocation, d.Location ) );
+
+                return File( path, MimeMapping.GetMimeMapping( path ), Path.GetFileName( path ) );
+            }
+        }
+
+        //
+        // POST: /Document/DeleteImage/5
+        public ActionResult DeleteImage( int id )
+        {
+            using ( ImageService service = new ImageService() )
+            {
+                Image i = service.GetById( id );
+
+                if ( i == null )
+                    return PartialView( "_AccessDenied" );
+
+                string path = Server.MapPath( string.Format( "{0}/{1}", VariableExtension.SystemRules.ImagesLocation, i.Location ) );
+                string folder = Path.GetDirectoryName( path );
+
+                service.Delete( i );
+
+                if ( System.IO.File.Exists( path ) )
+                {
+                    System.IO.File.Delete( path );
+                }
+
+                if ( Directory.Exists( folder ) && Directory.GetFiles( folder )?.Length <= 0 )
+                {
+                    Directory.Delete( folder );
+                }
+            }
+
+            return PartialView( "_Empty" );
+        }
+
+        //
+        // Returns a general list of all active clients allowed in the current context to be selected from
+        public ActionResult GetClients()
+        {
+            return PartialView( "_ClientList", new CustomSearchModel( "SetClient" ) );
+        }
+
+        public ActionResult SetClient( int? id )
+        {
+            using ( ClientService cservice = new ClientService() )
+            {
+                Client c = cservice.GetById( id ?? 0 );
+
+                if ( c == null )
+                {
+                    ContextExtensions.RemoveCachedUserData( "SEL_client" );
+
+                    Notify( "Your default set working client has successfully been removed.", NotificationType.Success );
+
+                    return PartialView( "_Notification" );
+                }
+
+                ContextExtensions.CacheUserData( "SEL_client", c );
+
+                Notify( "The selected Client was successfully set.", NotificationType.Success );
+
+                return PartialView( "_Notification" );
+            }
+        }
+
+        public JsonResult RemoveFile( int? id = null, string utype = null, string uname = null )
+        {
+            int docId = ( id != null ? ( int ) id : 0 );
+            if ( docId > 0 )
+            {
+                using ( DocumentService docservice = new DocumentService() )
+                {
+
+                    Document rDoc = docservice.GetById( docId );
+                    rDoc.Status = ( int ) Status.Inactive;
+                    docservice.Update( rDoc );
+                }
+                return Json( data: "True", behavior: JsonRequestBehavior.AllowGet );
+            }
+            else
+            {
+                return Json( data: "Error", behavior: JsonRequestBehavior.AllowGet );
+            }
+
+        }
+
+        public JsonResult Upload( int? id = null, string utype = null, string uname = null )
+        {
+            FileViewModel nfv = new FileViewModel();
+            for ( int i = 0; i < Request.Files.Count; i++ )
+            {
+                HttpPostedFileBase file = Request.Files[ i ]; //Uploaded file
+                                                              //Use the following properties to get file's name, size and MIMEType
+                int fileSize = file.ContentLength;
+                string fileName = file.FileName;
+                string mimeType = file.ContentType;
+                Stream fileContent = file.InputStream;
+                //To save file, use SaveAs method
+                //file.SaveAs(Server.MapPath("~/") + fileName); //File will be saved in application root
+
+                // int clientid = 0;//clientId
+
+                if ( fileName != null )
+                {
+                    // Create folder
+                    string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/{utype}/{id}/" );
+
+                    if ( !Directory.Exists( path ) )
+                    {
+                        Directory.CreateDirectory( path );
+                    }
+
+                    string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+                    using ( DocumentService dservice = new DocumentService() )
+                    {
+                        Document doc = new Document()
+                        {
+                            ObjectId = id,//should be null for client adds, so we can update it later
+                            ObjectType = utype,
+                            Status = ( int ) Status.Active,
+                            Name = fileName,
+                            Category = utype + " Document",
+                            Title = utype + " Document",
+                            Size = fileSize,
+                            Description = utype + " Document",
+                            Type = mimeType,
+                            Location = $"{utype}/{id}/{now}-{id}-{fileName}"
+                        };
+
+                        dservice.Create( doc );
+
+                        string fullpath = Path.Combine( path, $"{now}-{id}-{fileName}" );
+                        file.SaveAs( fullpath );
+
+                        nfv.Description = doc.Description;
+                        nfv.Extension = mimeType;
+                        nfv.Location = doc.Location;
+                        nfv.Name = fileName;
+                        nfv.Id = doc.Id;
+
+                    }
+                }
+            }
+
+            //return Json("Uploaded " + Request.Files.Count + " files");
+            return Json( nfv, JsonRequestBehavior.AllowGet );
+        }
+
+        public ActionResult ListFiles( string objId, string objType )
+        {
+            ObjectDocumentsViewModel model = new ObjectDocumentsViewModel();
+            if ( !string.IsNullOrEmpty( objType ) && !string.IsNullOrEmpty( objId ) )
+            {
+                string controllerObjectType = objType;
+                switch ( objType )
+                {
+                    case "ChepLoad":
+                        controllerObjectType = "Pallet";
+                        break;
+                    case "ClientLoad":
+                        controllerObjectType = "Pallet";
+                        break;
+                    default:
+                        break;
+                }
+                using ( DocumentService docservice = new DocumentService() )
+                {
+                    List<Document> docList = new List<Document>();
+                    int oId = int.Parse( objId );
+                    docList = docservice.List( oId, objType );
+
+                    model.objDocuments = docList;
+                    model.objId = oId;
+                    model.objType = controllerObjectType;
+                }
+            }
+            return PartialView( "_ListDocuments", model );
+        }
+
+        public ActionResult ListFilesTable( string objId, string objType )
+        {
+            ObjectDocumentsViewModel model = new ObjectDocumentsViewModel();
+            if ( !string.IsNullOrEmpty( objType ) && !string.IsNullOrEmpty( objId ) )
+            {
+                string controllerObjectType = objType;
+                switch ( objType )
+                {
+                    case "ChepLoad":
+                        controllerObjectType = "Pallet";
+                        break;
+                    case "ClientLoad":
+                        controllerObjectType = "Pallet";
+                        break;
+                    default:
+                        break;
+                }
+                using ( DocumentService docservice = new DocumentService() )
+                {
+                    List<Document> docList = new List<Document>();
+                    int oId = int.Parse( objId );
+                    docList = docservice.List( oId, objType );
+
+                    model.objDocuments = docList;
+                    model.objId = oId;
+                    model.objType = controllerObjectType;
+                }
+            }
+            return PartialView( "_ListDocumentsTable", model );
+        }
+
+        public ActionResult GetHtmlSiteList( int regionId = 0 )
+        {
+            using ( SiteService sservice = new SiteService() )
+            {
+                Dictionary<int, string> siteOptions = sservice.List( true, regionId );
+
+                return PartialView( "_Sites", new CustomSearchModel() { SiteOptions = siteOptions } ); // Views/Dashboard/_Sites
+            }
+        }
+
+        public ActionResult GetHtmlClientList( List<int> siteIds = null, int siteId = 0 )
+        {
+            using ( ClientService sservice = new ClientService() )
+            {
+                Dictionary<int, string> clientOptions = sservice.List( true, siteId, siteIds );
+
+                return PartialView( "_Clients", new CustomSearchModel() { ClientOptions = clientOptions } ); // Views/Dashboard/_Sites
+            }
+        }
+
+        public ActionResult GetClientSites( int clientId )
+        {
+            using ( ClientSiteService sservice = new ClientSiteService() )
+            {
+                Dictionary<int, string> siteOptions = sservice.List( true, new PagingModel(), new CustomSearchModel() { ClientId = clientId } );
+
+                return PartialView( "_Sites", new DeliveryNoteViewModel() { SiteOptions = siteOptions } ); // Views/Pallet/_Sites
+            }
+        }
+
+        public ActionResult GetClientVehicles( int clientId )
+        {
+            using ( VehicleService vservice = new VehicleService() )
+            {
+                Dictionary<int, string> vehicleOptions = vservice.List( true, clientId, "Client" );
+
+                return PartialView( "_Vehicles", new DeliveryNoteViewModel() { VehicleOptions = vehicleOptions } ); // Views/Pallet/_Vehicles
+            }
+        }
+
+        /// <summary>
+        /// Gets a product using the specified bankId and returns a JSON representation. More fields can be added when need be
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public JsonResult GetProduct( int id = 0 )
+        {
+            using ( ProductService service = new ProductService() )
+            {
+                Product p = service.GetById( id );
+
+                if ( p == null )
+                {
+                    return new JsonResult()
+                    {
+                        Data = new { Id = 0 }
+                    };
+                }
+
+                List<ProductPrice> prices = p.ProductPrices.ToList();
+
+                return new JsonResult()
+                {
+                    Data = new
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Description = p.Description,
+                        CreatedOn = p.CreatedOn.ToString( "yyyy/MM/dd" ),
+                        LostRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Lost && pp.Status == ( int ) Status.Active )?.Rate,
+                        IssueRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Issue && pp.Status == ( int ) Status.Active )?.Rate,
+                        HireRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Hire && pp.Status == ( int ) Status.Active )?.Rate,
+                    }
+                };
+            }
+        }
+
+        public int AnalyseAutoReconcile( string type )
+        {
+            int total = 0;
+
+            if ( type == "loads" )
+            {
+                total = GetAutoReconcilliableLoadTotal();
+            }
+            else if ( type == "invoices" )
+            {
+                total = GetAutoReconcilliableInvoiceTotal();
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Gets the total number of loads that can automatically be reconcilled
+        /// </summary>
+        /// <returns></returns>
+        public int GetAutoReconcilliableLoadTotal()
+        {
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            {
+                return clservice.GetAutoReconcilliableLoadTotal();
+            }
+        }
+
+        /// <summary>
+        /// Auto reconciles Client/Chep loads with matching references
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult AutoReconcileLoads( int clientId = 0 )
+        {
+            using ( ChepLoadService chservice = new ChepLoadService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            {
+                if ( clientId == 0 && chservice.SelectedClient != null )
+                {
+                    clientId = chservice.SelectedClient.Id;
+                }
+
+                int count = 0;
+                string q = string.Empty;
+
+                #region Client & Chep Load
+
+                List<ClientLoad> clLoads = clservice.GetAutoReconcilliableLoads( clientId );
+
+                if ( clLoads.NullableAny() )
+                {
+                    foreach ( ClientLoad l in clLoads )
+                    {
+                        List<ChepLoadCustomModel> cheps = chservice.ListClientLoadMatch( l.ReceiverNumber?.Trim(), clientId );
+
+                        if ( !cheps.NullableAny() ) continue;
+
+                        int sum = cheps.Sum( s => s.Quantity ?? 0 );
+
+                        if ( sum == 0 )
+                        {
+                            q = $"UPDATE [dbo].[ClientLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id={l.Id};";
+
+                            clservice.Query( q );
+
+                            // Complete recon
+                            q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) BalanceStatus.Balanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+
+                            chservice.Query( q );
+                        }
+                        else if ( sum > 0 )
+                        {
+                            q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) BalanceStatus.NotBalanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+
+                            chservice.Query( q );
+                        }
+                        else if ( sum < 0 )
+                        {
+                            q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Unreconciled},[BalanceStatus]={( int ) BalanceStatus.NotBalanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE [ManuallyMatchedLoad]=0 AND Id IN({string.Join( ",", cheps.Select( s => s.Id ) )});";
+
+                            chservice.Query( q );
+                        }
+
+                        count++;
+                    }
+                }
+
+                #endregion
+
+                #region Chep Load Only
+
+                List<ChepLoadCustomModel> chs1 = new List<ChepLoadCustomModel>(),
+                                          removeCH = new List<ChepLoadCustomModel>();
+
+                List<ChepLoadCustomModel> chLoads = chservice.List1( new PagingModel() { Take = int.MaxValue }, new CustomSearchModel() { BalanceStatus = BalanceStatus.NotBalanced } );
+
+                if ( chLoads.NullableAny() )
+                {
+                    foreach ( ChepLoadCustomModel item in chLoads )
+                    {
+                        if ( removeCH.NullableAny( r => r.Id == item.Id ) ) continue;
+
+                        q = $"SELECT ch.[Id], ch.[Quantity] FROM [dbo].[ChepLoad] ch WHERE ch.[Id] != {item.Id} AND (LTRIM(RTRIM(ch.[Ref]))='{item.DocketNumber?.Trim()}' OR LTRIM(RTRIM(ch.[Ref]))='{item.Ref?.Trim()}' OR LTRIM(RTRIM(ch.[Ref]))='{item.OtherRef?.Trim()}' OR LTRIM(RTRIM(ch.[OtherRef]))='{item.OtherRef?.Trim()}');";
+
+                        chs1 = chservice.SqlQueryList<ChepLoadCustomModel>( q );
+
+                        if ( !chs1.NullableAny() ) continue;
+
+                        if ( ( chs1.Sum( s => s.Quantity ) + item.Quantity ) != 0 ) continue;
+
+                        chs1.Add( item );
+
+                        q = $"UPDATE [dbo].[ChepLoad] SET [Status]={( int ) ReconciliationStatus.Reconciled},[BalanceStatus]={( int ) BalanceStatus.Balanced},[ModifiedOn]='{DateTime.Now}',[ModifiedBy]='{CurrentUser?.Email}' WHERE Id IN({string.Join( ",", chs1.Select( s => s.Id ) )});";
+
+                        chservice.Query( q );
+
+                        removeCH.AddRange( chLoads.Where( r => chs1.Select( s => s.Id ).Contains( r.Id ) ) );
+
+                        count++;
+                    }
+                }
+
+                #endregion
+
+                Notify( $"{count} loads were successfully reconcilled.", NotificationType.Success );
+            }
+
+            return PartialView( "_Empty" );
+        }
+
+        /// <summary>
+        /// Gets the total number of invoice that can automatically be reconcilled
+        /// </summary>
+        /// <returns></returns>
+        public int GetAutoReconcilliableInvoiceTotal()
+        {
+            using ( InvoiceService iservice = new InvoiceService() )
+            {
+                return iservice.GetAutoReconcilliableInvoiceTotal();
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of outstanding pallets
+        /// </summary>
+        /// <returns></returns>
+        public List<OutstandingPalletsModel> GetOutstandingPallets( PagingModel pm, CustomSearchModel csm, string email = "" )
+        {
+            using ( ChepLoadService chservice = new ChepLoadService() )
+            {
+                if ( !string.IsNullOrWhiteSpace( email ) || chservice.CurrentUser == null )
+                {
+                    chservice.CurrentUser = chservice.GetUser( email );
+                }
+
+                csm.BalanceStatus = BalanceStatus.NotBalanced;
+
+                List<OutstandingPalletsModel> resp = new List<OutstandingPalletsModel>();
+
+                pm.Skip = 0;
+                pm.Sort = "ASC";
+                pm.Take = int.MaxValue;
+                pm.SortBy = "c.CompanyName";
+
+                List<ChepLoadCustomModel> model = chservice.List1( pm, csm );
+
+                if ( !model.NullableAny() )
+                {
+                    return resp;
+                }
+
+                List<int?> clientIds = new List<int?>();
+
+                DateTime minYear = model.NullableAny() ? model.Min( m => m.ShipmentDate ) ?? DateTime.Now : DateTime.Now;
+
+                foreach ( ChepLoadCustomModel item in model )
+                {
+                    if ( clientIds.Any( c => c == item.ClientId ) ) continue;
+
+                    clientIds.Add( item.ClientId );
+
+                    OutstandingPalletsModel m = new OutstandingPalletsModel()
+                    {
+                        ClientLoad = item,
+                        MinYear = minYear,
+                        OutstandingReasons = GetOutstandingReasons( item.ClientId, model ),
+                        GrandTotal = new OutstandingReasonModel()
+                        {
+                            Description = "Grand Total",
+                            To30Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -30 ).Date && c.ShipmentDate?.Date <= DateTime.Now.Date ) ),
+                            To60Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -60 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -31 ).Date ) ),
+                            To90Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -90 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -61 ).Date ) ),
+                            To120Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -120 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -91 ).Date ) ),
+                            To183Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -183 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -121 ).Date ) ),
+                            To270Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -270 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -184 ).Date ) ),
+                            To365Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -365 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -271 ).Date ) ),
+                            GrandTotal = model.Count( c => c.ClientId == item.ClientId ),
+                            PreviousYears = GetGrandPreviousYears( item.ClientId, model ),
+                        }
+                    };
+
+                    resp.Add( m );
+                }
+
+                return resp;
+            }
+        }
+
+        /// <summary>
+        /// Gets outstanding previous years for the specified client
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public List<PreviousYear> GetGrandPreviousYears( int clientId, List<ChepLoadCustomModel> model )
+        {
+            List<PreviousYear> py = new List<PreviousYear>();
+
+            DateTime minYear = model.Min( m => m.ShipmentDate ) ?? DateTime.Now;
+
+            if ( minYear.Year == DateTime.Now.Year )
+            {
+                return py;
+            }
+
+            int minus1Year = DateTime.Now.AddYears( -1 ).Year;
+
+            py.Add( new PreviousYear()
+            {
+                Year = minus1Year,
+                Total = model.Count( c => c.ClientId == clientId && ( c.ShipmentDate?.Date >= new DateTime( DateTime.Now.AddYears( -1 ).Year, 1, 1 ) && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -366 ).Date ) )
+            } );
+
+            if ( minus1Year == minYear.Year )
+            {
+                return py;
+            }
+
+            for ( int i = ( minus1Year - 1 ); i >= minYear.Year; i-- )
+            {
+                py.Add( new PreviousYear()
+                {
+                    Year = i,
+                    Total = model.Count( c => c.ClientId == clientId && ( c.ShipmentDate?.Date >= new DateTime( i, 1, 1 ) && c.ShipmentDate?.Date <= new DateTime( i, 12, 31 ) ) )
+                } );
+            }
+
+            return py;
+        }
+
+        /// <summary>
+        /// Gets a list of outstanding reasons
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        public List<OutstandingReasonModel> GetOutstandingReasons( int clientId, List<ChepLoadCustomModel> items )
+        {
+            List<string> outstandingIds = new List<string>();
+
+            List<OutstandingReasonModel> outstandingReasons = new List<OutstandingReasonModel>();
+
+            foreach ( ChepLoadCustomModel item in items )
+            {
+                if ( item.ClientId != clientId ) continue;
+
+                if ( outstandingIds.Any( c => c == item.OutstandingReasonId + "-" + clientId ) ) continue;
+
+                outstandingIds.Add( item.OutstandingReasonId + "-" + clientId );
+
+                OutstandingReasonModel r = new OutstandingReasonModel()
+                {
+                    Description = item.OutstandingReason ?? "-N/A-",
+                    To30Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -30 ).Date && c.ShipmentDate?.Date <= DateTime.Now.Date ) ),
+                    To60Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -60 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -31 ).Date ) ),
+                    To90Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -90 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -61 ).Date ) ),
+                    To120Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -120 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -91 ).Date ) ),
+                    To183Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -183 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -121 ).Date ) ),
+                    To270Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -270 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -184 ).Date ) ),
+                    To365Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -365 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -271 ).Date ) ),
+                    GrandTotal = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId ),
+                    PreviousYears = GetOutstandingPreviousYears( clientId, item.OutstandingReasonId, items ),
+                };
+
+                outstandingReasons.Add( r );
+            }
+
+            return outstandingReasons;
+        }
+
+        /// <summary>
+        /// Gets outstanding previous years for the specified client and outstanding reason
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="outstandingReasonId"></param>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        private List<PreviousYear> GetOutstandingPreviousYears( int clientId, int? outstandingReasonId, List<ChepLoadCustomModel> items )
+        {
+            List<PreviousYear> py = new List<PreviousYear>();
+
+            DateTime minYear = items.Min( m => m.ShipmentDate ) ?? DateTime.Now;
+
+            if ( minYear.Year == DateTime.Now.Year )
+            {
+                return py;
+            }
+
+            int minus1Year = DateTime.Now.AddYears( -1 ).Year;
+
+            py.Add( new PreviousYear()
+            {
+                Year = minus1Year,
+                Total = items.Count( c => c.ClientId == clientId && c.OutstandingReasonId == outstandingReasonId && ( c.ShipmentDate?.Date >= new DateTime( DateTime.Now.AddYears( -1 ).Year, 1, 1 ) && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -366 ).Date ) )
+            } );
+
+            if ( minus1Year == minYear.Year )
+            {
+                return py;
+            }
+
+            for ( int i = ( minus1Year - 1 ); i >= minYear.Year; i-- )
+            {
+                py.Add( new PreviousYear()
+                {
+                    Year = i,
+                    Total = items.Count( c => c.ClientId == clientId && c.OutstandingReasonId == outstandingReasonId && ( c.ShipmentDate?.Date >= new DateTime( i, 1, 1 ) && c.ShipmentDate?.Date <= new DateTime( i, 12, 31 ) ) )
+                } );
+            }
+
+            return py;
+        }
+
+        /// <summary>
+        /// Automatically reconciles all unreconcilled invoices
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult AutoReconcileInvoices()
+        {
+            using ( InvoiceService iservice = new InvoiceService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( ClientInvoiceService ciservice = new ClientInvoiceService() )
+            {
+                List<Invoice> invoices = iservice.ListUnReconciledInvoices();
+
+                if ( !invoices.NullableAny() ) return PartialView( "_Empty" );
+
+                foreach ( Invoice i in invoices )
+                {
+                    List<ClientLoad> clientLoads = clservice.ListByColumnWhere( "LoadNumber", i.LoadNumber );
+
+                    if ( clientLoads.NullableAny() )
+                    {
+                        foreach ( ClientLoad item in clientLoads )
+                        {
+                            item.ReconcileInvoice = true;
+                            item.ChepInvoiceNo = i.Number;
+                            item.InvoiceStatus = ( int ) InvoiceStatus.Updated;
+
+                            clservice.Update( item );
+
+                            ClientInvoice ci = new ClientInvoice()
+                            {
+                                InvoiceId = i.Id,
+                                ClientLoadId = item.Id,
+                                Status = ( int ) Status.Active,
+                            };
+
+                            ciservice.Create( ci );
+                        }
+                    }
+                }
+
+                Notify( $"{invoices.Count} invoices were successfully reconcilled.", NotificationType.Success );
+            }
+
+            return PartialView( "_Empty" );
+        }
+
+        /// <summary>
+        /// Logs any errors in the specified params
+        /// </summary>
+        /// <param name="errors"></param>
+        /// <param name="r"></param>
+        /// <returns></returns>
+        public int LogImportErrors( List<string> errors, int r )
+        {
+            Document doc;
+
+            // Create folder
+            string path = Server.MapPath( $"~/{VariableExtension.SystemRules.DocumentsLocation}/Errors/{r}/" );
+
+            if ( !Directory.Exists( path ) )
+            {
+                Directory.CreateDirectory( path );
+            }
+
+            string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
+
+            string fileName = $"{path}{now}-Import-Errors.txt";
+
+            using ( StreamWriter sw = new StreamWriter( fileName, true ) )
+            using ( DocumentService dservice = new DocumentService() )
+            {
+                foreach ( string e in errors )
+                {
+                    sw.WriteLine( e );
+                }
+
+                doc = new Document()
+                {
+                    Size = 0,
+                    Type = "txt",
+                    ObjectId = r,
+                    ObjectType = "Error",
+                    Status = ( int ) Status.Active,
+                    Name = "Import Errors",
+                    Title = "Import Errors",
+                    Category = "Import Errors",
+                    Description = "Import Errors",
+                    Location = $"Errors/{r}/{now}-Import-Errors.txt",
+                };
+
+                doc = dservice.Create( doc );
+            }
+
+            return doc.Id;
+        }
+
+        /// <summary>
+        /// Gets a list of customers with outstanding pallets
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public List<OutstandingPalletsModel> GetOustandingCustomers( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( ChepLoadService clservice = new ChepLoadService() )
+            {
+                List<ChepLoadCustomModel> loads = clservice.ListTopOustandingCustomers( pm, csm );
+
+                List<OutstandingPalletsModel> model = new List<OutstandingPalletsModel>();
+
+                if ( loads.NullableAny() )
+                {
+                    foreach ( ChepLoadCustomModel item in loads )
+                    {
+                        if ( model.NullableAny( m => m.ClientLoad.ClientId == item.ClientId ) ) continue;
+
+                        OutstandingPalletsModel o = new OutstandingPalletsModel()
+                        {
+                            ClientLoad = item,
+                            Total = loads.Count( l => l.ClientId == item.ClientId ),
+                            Regions = GetOutstandingRegions( loads.Where( l => l.ClientId == item.ClientId ).ToList() )
+                        };
+
+                        model.Add( o );
+                    }
+                }
+
+
+                return model;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of regions with outstanding pallets
+        /// </summary>
+        /// <param name="loads"></param>
+        /// <returns></returns>
+        public List<OutstandingRegionModel> GetOutstandingRegions( List<ChepLoadCustomModel> loads )
+        {
+            List<OutstandingRegionModel> regions = new List<OutstandingRegionModel>();
+
+            if ( !loads.NullableAny() ) return regions;
+
+            List<string> regionIds = new List<string>();
+
+            foreach ( ChepLoadCustomModel item in loads )
+            {
+                if ( regionIds.NullableAny( r => r == item.RegionName ) ) continue;
+
+                regionIds.Add( item.RegionName );
+
+                OutstandingRegionModel reg = new OutstandingRegionModel()
+                {
+                    Name = item.RegionName,
+                    Total = loads.Count( l => l.RegionName == item.RegionName ),
+                    Sites = GetOutstandingSites( loads.Where( l => l.RegionName == item.RegionName ).ToList() ),
+                };
+
+                regions.Add( reg );
+            }
+
+            return regions;
+        }
+
+        /// <summary>
+        /// Gets a list of client sites with outstanding pallets
+        /// </summary>
+        /// <param name="loads"></param>
+        /// <returns></returns>
+        public List<OutstandingSiteModel> GetOutstandingSites( List<ChepLoadCustomModel> loads )
+        {
+            List<OutstandingSiteModel> sites = new List<OutstandingSiteModel>();
+
+            if ( !loads.NullableAny() ) return sites;
+
+            List<int?> siteIds = new List<int?>();
+
+            foreach ( ChepLoadCustomModel item in loads )
+            {
+                if ( siteIds.NullableAny( r => r == item.ClientSiteId ) ) continue;
+
+                siteIds.Add( item.ClientSiteId );
+
+                OutstandingSiteModel s = new OutstandingSiteModel()
+                {
+                    Name = item.SiteName,
+                    Total = loads.Count( l => l.ClientSiteId == item.ClientSiteId ),
+                    OutstandingReasons = GetOutstandingReasons1( loads.Where( l => l.ClientSiteId == item.ClientSiteId ).ToList() ),
+                };
+
+                sites.Add( s );
+            }
+
+            return sites;
+        }
+
+        /// <summary>
+        /// Gets a list of outstanding reasons with outstanding pallets
+        /// </summary>
+        /// <param name="loads"></param>
+        /// <returns></returns>
+        public List<OutstandingReasonModel> GetOutstandingReasons1( List<ChepLoadCustomModel> loads )
+        {
+            List<OutstandingReasonModel> outstandingReasons = new List<OutstandingReasonModel>();
+
+            if ( !loads.NullableAny() ) return outstandingReasons;
+
+            List<int?> outstandingReasonIds = new List<int?>();
+
+            foreach ( ChepLoadCustomModel item in loads )
+            {
+                if ( outstandingReasonIds.NullableAny( r => r == item.OutstandingReasonId ) ) continue;
+
+                outstandingReasonIds.Add( item.OutstandingReasonId );
+
+                OutstandingReasonModel s = new OutstandingReasonModel()
+                {
+                    Description = item.OutstandingReason,
+                    Total = loads.Count( l => l.OutstandingReasonId == item.OutstandingReasonId ),
+                };
+
+                outstandingReasons.Add( s );
+            }
+
+            return outstandingReasons;
+        }
+
+        /// <summary>
+        /// Gets a list of client sites using the specified params
+        /// </summary>
+        /// <param name="pm"></param>
+        /// <param name="csm"></param>
+        /// <returns></returns>
+        public ActionResult SearchClientSites( PagingModel pm, CustomSearchModel csm )
+        {
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            {
+                pm.Sort = "ASC";
+                pm.SortBy = "s.Name";
+
+                Dictionary<int, string> results = csservice.List( true, pm, csm );
+
+                return PartialView( "_ClientSiteResults", results );
             }
         }
 

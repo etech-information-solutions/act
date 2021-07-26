@@ -1,0 +1,85 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Models.Custom;
+
+@{
+    int count = Model.Start;
+    List<InvoiceCustomModel> items = ( List<InvoiceCustomModel> ) Model.Items;
+}
+
+<table id="invoice-table" class="da-table small fixed-headerx" data-fixed-header-target="#invoice-table" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th>
+                #
+            </th>
+            <th>
+                Invoice #
+            </th>
+            <th>
+                Invoice Date
+            </th>
+            <th>
+                Qty
+            </th>
+            <th>
+                Amount
+            </th>
+            <th>
+                Load #
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items.NullableAny() )
+        {
+            foreach ( var item in items )
+            {
+                <tr id="invoice-@item.Id-item" class="invoice-@item.Id-item invoice-draggable" data-cid="@item.Id" data-qty="@item.Quantity" data-load-number="@item.LoadNumber" data-parent="#invoices">
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.Number
+                    </td>
+                    <td>
+                        @(item.Date?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @item.Quantity
+                    </td>
+                    <td>
+                        @item.Amount
+                    </td>
+                    <td>
+                        @item.LoadNumber
+                    </td>
+                    <td width="10%">
+
+                        @Html.ActionLink( " ", "InvoiceComments", new { id = item.Id }, new { @class = "chat", @rel = "tipsyS", @title = "View Comments", @data_details = "1", @data_id = item.Id, @data_target = ".invoice-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( " ", "InvoiceDocuments", new { id = item.Id }, new { @class = "docs", @rel = "tipsyE", @title = "View Documents", @data_details = "1", @data_id = item.Id, @data_target = ".invoice-" + item.Id + "-item", @style = "margin-right: 0;" } )
+
+                    </td>
+                </tr>
+
+                count++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="7">
+                    There are no records to display
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_TinyPaging" )

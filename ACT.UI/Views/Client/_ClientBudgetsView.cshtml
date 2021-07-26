@@ -1,0 +1,120 @@
+﻿@model Client
+
+@using ACT.Core.Enums;
+@using ACT.Data.Models;
+
+@{
+    int count = 1;
+}
+
+<div id="item-details" class="item-details" style="width: auto;">
+
+    <h2>
+        <img alt="" src="@Url.Content( "~/images/info.png" )" />
+        <span>Client Budget</span>
+    </h2>
+
+    <table id="client-budget-table" class="da-table">
+
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Year</th>
+                <th>Total</th>
+                <th>Jan</th>
+                <th>Feb</th>
+                <th>Mar</th>
+                <th>Apr</th>
+                <th>May</th>
+                <th>Jun</th>
+                <th>Jul</th>
+                <th>Aug</th>
+                <th>Sep</th>
+                <th>Oct</th>
+                <th>Nov</th>
+                <th>Dec</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach ( ClientBudget b in Model.ClientBudgets )
+            {
+                decimal? total = b.Total > 0 ? b.Total : b.January + b.February + b.March + b.April + b.May + b.June + b.July + b.August + b.September + b.October + b.November + b.December;
+
+                <tr>
+                    <td>
+                        @count
+                    </td>
+                    <td>
+                        @b.BudgetYear
+                    </td>
+                    <td>
+                        <b>@Math.Round( total ?? 0, 0 )</b>
+                    </td>
+                    <td>
+                        @b.January
+                    </td>
+                    <td>
+                        @b.February
+                    </td>
+                    <td>
+                        @b.March
+                    </td>
+                    <td>
+                        @b.April
+                    </td>
+                    <td>
+                        @b.May
+                    </td>
+                    <td>
+                        @b.June
+                    </td>
+                    <td>
+                        @b.July
+                    </td>
+                    <td>
+                        @b.August
+                    </td>
+                    <td>
+                        @b.September
+                    </td>
+                    <td>
+                        @b.October
+                    </td>
+                    <td>
+                        @b.November
+                    </td>
+                    <td>
+                        @b.December
+                    </td>
+                </tr>
+
+                count++;
+            }
+        </tbody>
+
+    </table>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <p>
+            @Html.ActionLink( "Edit", "EditClient", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+
+            @if ( ViewBag.IncludeLayout == null )
+            {
+                <span style="padding: 0 5px;">/</span>
+                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Close</a>
+            }
+        </p>
+    }
+
+    @if ( ViewBag.IncludeLayout != null )
+    {
+        <div class="back-to-list">
+            @Html.ActionLink( "Back to List", "Index" )
+        </div>
+    }
+
+</div>

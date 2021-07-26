@@ -1,0 +1,167 @@
+﻿
+@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+    ViewBag.ViewName = "_ClientAudit";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@{
+    int count = Model.Start;
+    List<SiteAuditCustomModel> items = ( List<SiteAuditCustomModel> ) Model.Items;
+}
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Client Audit Reports available matching your search criteria.
+    </div>
+}
+
+<table id="clientaudit-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#clientaudit-table_wrapper" data-starting-point=".ap-tabs ul">
+
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="CreatedOn" data-column="sa.CreatedOn">
+                Date Created
+            </th>
+            <th data-name="AuditDate" data-column="sa.AuditDate">
+                Audit Date
+            </th>
+            <th data-name="Site" data-column="s.Name">
+                Site
+            </th>
+            <th data-name="Equipment" data-column="sa.Equipment">
+                Equipment
+            </th>
+            <th data-name="PalletsOutstanding" data-column="sa.PalletsOutstanding">
+                Outstanding Pallets
+            </th>
+            <th data-name="PalletsCounted" data-column="sa.PalletsCounted">
+                Pallets Counted
+            </th>
+            <th data-name="WriteoffPallets" data-column="sa.WriteoffPallets">
+                Writeoff Pallets
+            </th>
+            <th data-name="CustomerName" data-column="sa.CustomerName">
+                Customer Name
+            </th>
+            <th data-name="OtherParty" data-column="sa.RepName">
+                Rep Name
+            </th>
+            <th data-name="PalletAuditor" data-column="sa.PalletAuditor">
+                Pallet Auditor
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                Status status = ( Status ) item.Status;
+
+                string enable = status == Status.Active ? "Disable" : "Enable";
+                string active = status == Status.Active ? "active" : "inactive";
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Dispute">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @(item.AuditDate.HasValue ? item.AuditDate.Value.ToString( "yyyy-MM-dd" ) : "")
+                    </td>
+                    <td>
+                        @item.SiteName
+                    </td>
+                    <td>
+                        @item.Equipment
+                    </td>
+                    <td>
+                        @(Math.Round( item.PalletsOutstanding ?? 0, 0 ))
+                    </td>
+                    <td>
+                        @(Math.Round( item.PalletsCounted ?? 0, 0 ))
+                    </td>
+                    <td>
+                        @(Math.Round( item.WriteoffPallets ?? 0, 0 ))
+                    </td>
+                    <td>
+                        @item.CustomerName
+
+                        @if ( item.CustomerSignature != null && item.CustomerSignature.Length > 0 )
+                        {
+                            <i>
+                                @Html.ActionLink( "View Signature", "ClientAuditDetails", new { id = item.Id }, new { @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            </i>
+                        }
+                    </td>
+                    <td>
+                        @item.RepName
+
+                        @if ( item.RepSignature != null && item.RepSignature.Length > 0 )
+                        {
+                            <i>
+                                @Html.ActionLink( "View Signature", "ClientAuditDetails", new { id = item.Id }, new { @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            </i>
+                        }
+                    </td>
+                    <td>
+                        @item.PalletAuditor
+
+                        @if ( item.PalletAuditorSign != null && item.PalletAuditorSign.Length > 0 )
+                        {
+                            <i>
+                                @Html.ActionLink( "View Signature", "ClientAuditDetails", new { id = item.Id }, new { @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            </i>
+                        }
+                    </td>
+                    <td width="4%">
+
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                            @if ( item.ReportDocumentId.HasValue )
+                            {
+                                <a class="docs" href="@Url.Action( "ViewDocument", "ClientReporting", new { @id = item.ReportDocumentId } )" target="_blank">
+                                    View Audit Report
+                                </a>
+                            }
+                        </div>
+
+                        @Html.ActionLink( "Details", "ClientAuditDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_ClientAuditCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
+
+@Html.Partial( "_Paging" )

@@ -28,17 +28,23 @@ namespace ACT.UI
                         "~/Scripts/Plugins/jquery.fancybox.js",
                         //"~/Scripts/Plugins/jquery.dataTables.js",
                         "~/Scripts/Plugins/jquery.placeholder.js",
-                        "~/Scripts/Plugins/jquery.dataTables.min.js"/*,
+                        "~/Scripts/Plugins/jquery.dataTables.min.js",
+                        "~/Scripts/Plugins/dataTables.select.min.js",
+                        "~/Scripts/Plugins/toastr.min.js",
+                        "~/Scripts/Plugins/moment.js",
+                        "~/Scripts/Plugins/jquery.modal.min.js"
+                        /*,
                         "~/Scripts/Plugins/dataTables.fixedHeader.min.js"*/ ) );
 
             bundles.Add( new ScriptBundle( "~/bundles/ACT" ).Include(
                         "~/Scripts/ACT/act.js",
+                        "~/Scripts/ACT/menu.js",
                         "~/Scripts/ACT/ui.js",
                         "~/Scripts/ACT/modal.js",
                         "~/Scripts/ACT/loader.js",
                         "~/Scripts/ACT/stickyone.js",
                         "~/Scripts/ACT/validation.js",
-                        "~/Scripts/ACT/startup.js" ) );
+                        "~/Scripts/ACT/startup.js") );
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at https://modernizr.com to pick only the tests you need.
@@ -55,6 +61,7 @@ namespace ACT.UI
                 "~/Content/menu.css",
                 "~/Content/modal.css",
                 "~/Content/table.css",
+                "~/Content/filter.css",
                 "~/Content/ap-tabs.css",
                 "~/Content/ap-tabs.css",
                 "~/Content/select2.css",
@@ -62,7 +69,9 @@ namespace ACT.UI
                 "~/Content/stickyone.css",
                 "~/Content/font-awesome.css",
                 "~/Content/jquery.fancybox.css",
-                "~/Content/fixedHeader.dataTables.min.css" ) );
+                "~/Content/fixedHeader.dataTables.min.css",
+                "~/Content/toastr.min.css",
+                "~/Content/jquery.modal.min.css") );
 
             bundles.Add( new StyleBundle( "~/Content/jqueryui" ).Include( "~/Content/jquery-ui-1.10.4.custom.css" ) );
         }

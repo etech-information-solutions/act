@@ -1,13 +1,14 @@
 ﻿@model PagingExtension
 
-@using ACT.Data.Models;
+@using ACT.Core.Models.Custom;
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
 
 @{
     ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
     ViewBag.ViewName = "_Broadcasts";
-    
+
     UserModel user = User.Get();
 }
 
@@ -15,8 +16,8 @@
 @Html.Partial( "_Notification" )
 
 @{
-    Int32 count = Model.Start;
-    List<Broadcast> items = ( List<Broadcast> ) Model.Items;
+    int count = Model.Start;
+    List<BroadcastCustomModel> items = ( List<BroadcastCustomModel> ) Model.Items;
 }
 
 @if ( Model == null || !items.Any() )
@@ -40,6 +41,9 @@
             </th>
             <th data-name="CreatedOn" data-column="CreatedOn">
                 Date
+            </th>
+            <th data-name="Owner">
+                Owner
             </th>
             <th data-name="StartDate" data-column="StartDate">
                 Starts
@@ -69,8 +73,8 @@
             {
                 Status status = ( Status ) item.Status;
 
-                String active = status.Equals( Status.Active ) ? "active" : "inactive";
-                String enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
@@ -85,6 +89,20 @@
                             <span></span>
                         </a>
                     </td>
+                    <td width="10%">
+                        @if ( !string.IsNullOrEmpty( item.PSPName ) )
+                        {
+                            <b>@item.PSPName</b>
+                        }
+                        else if ( !string.IsNullOrEmpty( item.ClientName ) )
+                        {
+                            <b>@item.ClientName</b>
+                        }
+                        else
+                        {
+                            <span>General</span>
+                        }
+                    </td>
                     <td>
                         @item.StartDate.ToString( "yyyy/MM/dd" )
                     </td>
@@ -95,7 +113,7 @@
                         @status.GetDisplayText()
                     </td>
                     <td>
-                        @item.UserBroadcasts.Count
+                        @item.XRead
                     </td>
                     <td width="40%" style="line-height: 15px;">
                         @Html.Raw( item.Message.Replace( "\n", "<br />" ) )
@@ -108,7 +126,7 @@
                     </td>
 
                 </tr>
-                
+
                 count++;
             }
         }

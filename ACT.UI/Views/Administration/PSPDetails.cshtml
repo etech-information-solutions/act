@@ -11,8 +11,11 @@
 
     ViewBag.Title = "Details";
 
+
     Address address = ViewBag.Address;
     List<Document> documents = ViewBag.Documents;
+
+    string logoUrl = ( documents.NullableAny( d => d.Name.ToLower() == "logo" ) ) ? Url.Action( "ViewDocument", new { id = documents.FirstOrDefault( d => d.Name.ToLower() == "logo" ).Id } ) : Url.Content( "~/Images/no-preview.png" );
 }
 
 @if ( ViewBag.IncludeLayout != null )
@@ -33,13 +36,15 @@
         </h2>
     }
 
-    <div class="left" style="width: 48%; margin-right: 4%;">
+    <div class="left" style="width: 30%; margin-right: 4%;">
 
-        <div class="display-label">
-            Company Name
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.CompanyName )
+        <div class="display-field" style="text-align: center;">
+
+            <a href="@logoUrl" target="_blank">
+                <img style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
+            </a>
+
+            <strong class="block uppercase">@Html.DisplayFor( model => model.CompanyName )</strong>
         </div>
 
         <div class="display-label">
@@ -50,34 +55,10 @@
         </div>
 
         <div class="display-label">
-            VAT Number
-        </div>
-        <div class="display-field">
-            @Html.DisplayFor( model => model.VATNumber )
-        </div>
-
-        <div class="display-label">
             Company Registration Number
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.CompanyRegistrationNumber )
-        </div>
-
-        <div class="display-label">
-            Company Registration File
-        </div>
-        <div class="display-field">
-            @if ( documents != null && documents.Any() )
-            {
-                foreach ( Document d in documents )
-                {
-                    <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Administration", new { @id = d.Id } )">
-                        <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
-
-                        @d.Name (@d.Type)
-                    </a>
-                }
-            }
         </div>
 
         <div class="display-label">
@@ -87,9 +68,58 @@
             @Html.DisplayFor( model => model.Description )
         </div>
 
+        <div class="display-label">
+            Status
+        </div>
+        <div class="display-field">
+            @( ( ( PSPClientStatus ) Model.Status ).GetDisplayText() )
+        </div>
+
+        <div class="display-label">
+            Service Required
+        </div>
+        <div class="display-field">
+            @( ( ( ServiceType ) Model.ServiceRequired ).GetDisplayText() )
+        </div>
+
+        <div class="display-label">
+            Type of Pallet Use
+        </div>
+        <div class="display-field">
+            @( ( ( TypeOfPalletUse ) Model.PalletType ).GetDisplayText() )
+
+            @if ( ( ( TypeOfPalletUse ) Model.PalletType ) == TypeOfPalletUse.Other && !string.IsNullOrEmpty( Model.PalletTypeOther ) )
+            {
+                <i class="block bold" style="border-top: 1px solid #ddd; padding-top: 5px;">
+                    @Model.PalletTypeOther
+                </i>
+            }
+        </div>
+
+        <div class="display-label">
+            Company Type
+        </div>
+        <div class="display-field">
+            @( ( ( CompanyType ) Model.CompanyType ).GetDisplayText() )
+        </div>
+
     </div>
 
-    <div class="left" style="width: 48%;">
+    <div class="left" style="width: 30%; margin-right: 4%;">
+
+        <div class="display-label">
+            VAT Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.VATNumber )
+        </div>
+
+        <div class="display-label">
+            BBBEE Level
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.BBBEELevel )
+        </div>
 
         <div class="display-label">
             Contact Person
@@ -106,39 +136,139 @@
         </div>
 
         <div class="display-label">
-            Email Address
+            Contact Email
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.Email )
         </div>
 
         <div class="display-label">
-            Admin Email Address
+            Administrator
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.AdminPerson )
+        </div>
+
+        <div class="display-label">
+            Administrator Email
         </div>
         <div class="display-field">
             @Html.DisplayFor( model => model.AdminEmail )
         </div>
 
         <div class="display-label">
-            Service Required
+            Financial Person
         </div>
         <div class="display-field">
-            @(( ( ServiceType ) Model.ServiceRequired ).GetDisplayText())
+            @Html.DisplayFor( model => model.FinancialPerson )
+        </div>
+
+        <div class="display-label">
+            Financial Email
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.FinPersonEmail )
         </div>
 
     </div>
 
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+    <div class="left" style="width: 30%;">
 
-    <div class="display-label">
-        Estimated Load Per Month
+        <div class="display-label">
+            Uploaded Documents
+        </div>
+
+        <div class="display-field">
+
+            @if ( documents.NullableAny( d => d.Name?.ToLower() != "logo" ) )
+            {
+                <ul class="list">
+                    @foreach ( Document d in documents.Where( d => d.Name?.ToLower() != "logo" ) )
+                    {
+                        <li style="background: none;">
+                            <a target="_blank" href="@Url.Action( "ViewDocument", "PSP", new { @id = d.Id } )">
+                                <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+
+                                @d.Description (@d.Type)
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <div class="message-warn">
+                    @Html.ActionLink( "Click here", "EditPSP", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } ) to add Documents
+                </div>
+            }
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+        @if ( address != null )
+        {
+            <div class="grouped-area">
+
+                <p>
+                    <strong class="uppercase">Addres Details</strong>
+                </p>
+
+                <div class="display-label">
+                    Addres
+                </div>
+                <div class="display-field">
+                    @address.Addressline1
+                </div>
+                <div class="display-field">
+                    @address.Addressline2
+                </div>
+
+                <div class="display-label">
+                    Town/City
+                </div>
+                <div class="display-field">
+                    @address.Town
+                </div>
+
+                <div class="display-label">
+                    Postal Code
+                </div>
+                <div class="display-field">
+                    @address.PostalCode
+                </div>
+
+                <div class="display-label">
+                    Province
+                </div>
+                <div class="display-field">
+                    @(address?.Province?.Description)
+                </div>
+
+            </div>
+        }
+
     </div>
-    <div class="display-field">
 
-        <table id="PSPBudget-table" class="da-table" style="border-bottom: 0;">
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    <div class="display-label" style="margin-bottom: 10px;">
+
+        <p>
+            <strong class="uppercase">Budgets (@Model.PSPBudgets.NullableCount())</strong>
+        </p>
+
+    </div>
+
+    <div class="display-field" style="width: auto;">
+
+        <table id="PSP-budget-table" class="da-table" style="border-bottom: 0;">
 
             <thead>
                 <tr>
+                    <td>#</td>
+                    <th><b>Year</b></th>
+                    <th><b>Total</b></th>
                     <th>Jan</th>
                     <th>Feb</th>
                     <th>Mar</th>
@@ -155,105 +285,145 @@
             </thead>
 
             <tbody>
-                <tr>
-                    <td>
-                        @Model.PSPBudgets.FirstOrDefault().January
-                    </td>
-                    <td>
-                        @Model.PSPBudgets.FirstOrDefault().February
-                    </td>
-                    <td>
-                        @Model.PSPBudgets.FirstOrDefault().March
-                    </td>
-                    <td>
-                        @Model.PSPBudgets.FirstOrDefault().April
-                    </td>
-                    <td>
-                        @Model.PSPBudgets.FirstOrDefault().May
-                    </td>
-                    <td>
-                        @Model.PSPBudgets.FirstOrDefault().June
-                    </td>
-                    <td>
-                        @Model.PSPBudgets.FirstOrDefault().July
-                    </td>
-                    <td>
-                        @Model.PSPBudgets.FirstOrDefault().August
-                    </td>
-                    <td>
-                        @Model.PSPBudgets.FirstOrDefault().September
-                    </td>
-                    <td>
-                        @Model.PSPBudgets.FirstOrDefault().October
-                    </td>
-                    <td>
-                        @Model.PSPBudgets.FirstOrDefault().November
-                    </td>
-                    <td>
-                        @Model.PSPBudgets.FirstOrDefault().December
-                    </td>
-                </tr>
+                @if ( Model.PSPBudgets.NullableAny() )
+                {
+                    int count = 1;
+
+                    foreach ( PSPBudget b in Model.PSPBudgets )
+                    {
+                        decimal? total = b.Total > 0 ? b.Total : b.January + b.February + b.March + b.April + b.May + b.June + b.July + b.August + b.September + b.October + b.November + b.December;
+
+                        <tr>
+                            <td width="1%">
+                                @count
+                            </td>
+                            <td>
+                                <b>@b.BudgetYear</b>
+                            </td>
+                            <td>
+                                <b>@Math.Round( total ?? 0, 0 )</b>
+                            </td>
+                            <td>
+                                @b.January
+                            </td>
+                            <td>
+                                @b.February
+                            </td>
+                            <td>
+                                @b.March
+                            </td>
+                            <td>
+                                @b.April
+                            </td>
+                            <td>
+                                @b.May
+                            </td>
+                            <td>
+                                @b.June
+                            </td>
+                            <td>
+                                @b.July
+                            </td>
+                            <td>
+                                @b.August
+                            </td>
+                            <td>
+                                @b.September
+                            </td>
+                            <td>
+                                @b.October
+                            </td>
+                            <td>
+                                @b.November
+                            </td>
+                            <td>
+                                @b.December
+                            </td>
+                        </tr>
+
+                        count++;
+                    }
+                }
             </tbody>
 
         </table>
 
     </div>
 
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+    <div style="width: 30%; margin-top: 20px;">
 
-    @if ( address != null )
-    {
-        <div class="left" style="width: 48%; margin-right: 4%;">
-
-            <div class="display-label">
-                Address Line 1
-            </div>
-            <div class="display-field">
-                @address.Addressline1
-            </div>
-
-            <div class="display-label">
-                Town
-            </div>
-            <div class="display-field">
-                @address.Town
-            </div>
-
-            <div class="display-label">
-                Postal Code
-            </div>
-            <div class="display-field">
-                @address.PostalCode
-            </div>
-
+        <div class="display-label">
+            Number Of Pallets Lost
+        </div>
+        <div class="display-field">
+            @Model.NumberOfLostPallets
         </div>
 
-        <div class="left" style="width: 48%;">
+    </div>
 
-            <div class="display-label">
-                Address Line 2
-            </div>
-            <div class="display-field">
-                @address.Addressline2
-            </div>
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
 
-            <div class="display-label">
-                Province
-            </div>
-            <div class="display-field">
-                @(( ( Province ) address.Province ).GetDisplayText())
-            </div>
+    <div class="display-label" style="margin-bottom: 10px;">
 
-        </div>
-    }
-    else
-    {
-        <div class="message-warn">
-            No address details found. Please edit and add address details.
-        </div>
-    }
+        <p>
+            <strong class="uppercase">Clients (@Model.PSPClients.NullableCount())</strong>
+        </p>
 
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+    </div>
+
+    <div class="display-field" style="width: auto;">
+
+        <table id="PSP-client-table" class="da-table">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Client</th>
+                    <th>Contact</th>
+                    <th>Chep Reference</th>
+                    <th>Finance Accounting Code</th>
+                    <th>Contract Renewal Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if ( Model.PSPClients.NullableAny() )
+                {
+                    int count = 1;
+
+                    foreach ( PSPClient b in Model.PSPClients )
+                    {
+                        <tr>
+                            <td>
+                                @count
+                            </td>
+                            <td>
+                                @b.Client.CompanyName
+                            </td>
+                            <td>
+                                @b.Client.ContactPerson (@b.Client.ContactNumber / @b.Client.Email)
+                            </td>
+                            <td>
+                                @b.Client.ChepReference
+                            </td>
+                            <td>
+                                @b.FinAccountingCode
+                            </td>
+                            <td>
+                                @(b.ContractRenewalDate?.ToString( "yyyy-MM-dd" ))
+                            </td>
+                        </tr>
+
+                        count++;
+                    }
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
 
     @if ( ViewBag.IncludeLayout == null )
     {

@@ -8,15 +8,13 @@ using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
-using System.Transactions;
 using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Data.Models;
 using ACT.Core.Interfaces;
-using ACT.Core.Extension;
 using System.IO;
 using System.Net;
-using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace ACT.Core.Services
 {
@@ -26,11 +24,23 @@ namespace ACT.Core.Services
 
         internal ACTEntities context = new ACTEntities();
 
-        private UserModel _currentUser;
-
         public int ItemId { get; set; }
 
-        public SystemConfig Config
+        /// <summary>
+        /// Used to store Client currently selected by the logged in user
+        /// </summary>
+        public Client SelectedClient
+        {
+            get
+            {
+                return ( Client ) ContextExtensions.GetCachedUserData( "SEL_client" );
+            }
+        }
+
+        /// <summary>
+        /// Used to store the System Configuration
+        /// </summary>
+        public SystemConfig SystemConfig
         {
             get
             {
@@ -49,26 +59,33 @@ namespace ACT.Core.Services
         /// <summary>
         /// Currently logged in user
         /// </summary>
+        private UserModel currentUser;
         public UserModel CurrentUser
         {
             get
             {
+                if ( currentUser != null ) return currentUser;
+
                 if ( HttpContext.Current == null )
                     return null;
-                //return new UserModel() { Id = 1 };
 
-                string email = ( _currentUser != null && !string.IsNullOrEmpty( _currentUser.Email ) ) ? _currentUser.Email : HttpContext.Current.User.Identity.Name;
+                string email = HttpContext.Current.User.Identity.Name;
 
-                UserModel user = ContextExtensions.GetCachedUserData( email ) as UserModel;
+                if ( string.IsNullOrEmpty( email ) )
+                    return null;
 
-                if ( user == null )
+                if ( !( ContextExtensions.GetCachedUserData( email ) is UserModel user ) )
                 {
                     user = GetUser( email );
                 }
 
-                _currentUser = user ?? new UserModel() { Id = 0 };
+                currentUser = user ?? new UserModel() { Id = 0 };
 
-                return _currentUser;
+                return currentUser;
+            }
+            set
+            {
+                currentUser = value;
             }
         }
 
@@ -79,6 +96,8 @@ namespace ACT.Core.Services
 
         public BaseService()
         {
+            context.Database.CommandTimeout = 600; // Minimun set to 10 minutes
+
             context.Configuration.LazyLoadingEnabled = false;
             context.Configuration.ProxyCreationEnabled = false;
         }
@@ -89,7 +108,7 @@ namespace ACT.Core.Services
         /// <param name="email">Email Address of the user to be fetched</param>
         /// <param name="password">Password of the user to be fetched</param>
         /// <returns></returns>
-        public UserModel Login( string email, string password )
+        public UserModel Login( string email, string password, bool resetPin = false )
         {
             if ( string.IsNullOrEmpty( email ) || string.IsNullOrEmpty( password ) ) return null;
 
@@ -101,11 +120,13 @@ namespace ACT.Core.Services
                       where
                       (
                         u.Email.Trim() == email.Trim() &&
+                        u.Password == password &&
                         u.Status == ( int ) Status.Active
                       )
                       select new UserModel()
                       {
                           Id = u.Id,
+                          Pin = u.Pin,
                           Cell = u.Cell,
                           Name = u.Name,
                           Email = u.Email,
@@ -114,11 +135,18 @@ namespace ACT.Core.Services
                           Status = ( Status ) u.Status,
                           RoleType = ( RoleType ) u.Type,
                           DisplayName = u.Name + " " + u.Surname,
+
                           NiceCreatedOn = u.CreatedOn,
                           IsAdmin = u.UserRoles.Any( ur => ur.Role.Administration ),
+
                           Roles = u.UserRoles.Select( ur => ur.Role )
                                              .OrderByDescending( r => r.Id )
-                                             .ToList()
+                                             .ToList(),
+                          PSPs = u.PSPUsers.Select( p => p.PSP ).ToList(),
+                          Clients = u.ClientUsers.Select( c => c.Client ).ToList(),
+                          SelfieUrl = context.Images
+                                             .Where( a => a.ObjectId == u.Id && a.ObjectType == "User" && a.Name.ToLower() == "selfie" )
+                                             .Select( s => SystemConfig.ImagesLocation + "//" + s.Location ).FirstOrDefault(),
                       } ).FirstOrDefault();
 
             if ( model != null )
@@ -126,12 +154,17 @@ namespace ACT.Core.Services
                 // Get roles
                 model = this.ConfigRoles( model );
 
-                //User user = context.Users.FirstOrDefault( u => u.Id == model.Id );
+                User user = context.Users.FirstOrDefault( u => u.Id == model.Id );
 
-                //user.LastLogin = DateTime.Now;
+                if ( resetPin )
+                {
+                    user.Pin = null;
+                }
 
-                //context.Entry( user ).State = EntityState.Modified;
-                //context.SaveChanges();
+                user.LastLogin = DateTime.Now;
+
+                context.Entry( user ).State = EntityState.Modified;
+                context.SaveChanges();
 
                 ContextExtensions.CacheUserData( model.Email, model );
             }
@@ -159,6 +192,7 @@ namespace ACT.Core.Services
                       select new UserModel()
                       {
                           Id = u.Id,
+                          Pin = u.Pin,
                           Cell = u.Cell,
                           Name = u.Name,
                           Email = u.Email,
@@ -167,11 +201,18 @@ namespace ACT.Core.Services
                           Status = ( Status ) u.Status,
                           RoleType = ( RoleType ) u.Type,
                           DisplayName = u.Name + " " + u.Surname,
+
                           NiceCreatedOn = u.CreatedOn,
                           IsAdmin = u.UserRoles.Any( ur => ur.Role.Administration ),
+
                           Roles = u.UserRoles.Select( ur => ur.Role )
                                              .OrderByDescending( r => r.Id )
-                                             .ToList()
+                                             .ToList(),
+                          PSPs = u.PSPUsers.Select( p => p.PSP ).ToList(),
+                          Clients = u.ClientUsers.Select( c => c.Client ).ToList(),
+                          SelfieUrl = context.Images
+                                             .Where( a => a.ObjectId == u.Id && a.ObjectType == "User" && a.Name.ToLower() == "selfie" )
+                                             .Select( s => SystemConfig.ImagesLocation + "//" + s.Location ).FirstOrDefault(),
                       } ).FirstOrDefault();
 
 
@@ -199,6 +240,7 @@ namespace ACT.Core.Services
             model.Role = r;
             model.RoleType = ( RoleType ) r.Type;
             model.IsAdmin = ( r.Type == ( int ) RoleType.SuperAdmin );
+            model.IsPSPAdmin = ( r.Type == ( int ) RoleType.PSP );
 
             RoleModel role = new RoleModel()
             {
@@ -239,6 +281,20 @@ namespace ACT.Core.Services
             model.RoleModel = role;
 
             return model;
+        }
+
+        /// <summary>
+        /// Gets a user using the specified pin
+        /// </summary>
+        /// <param name="pin"></param>
+        /// <returns></returns>
+        public UserModel GetByPin( string pin, string email )
+        {
+            pin = GetSha1Md5String( pin );
+
+            User user = context.Users.FirstOrDefault( u => u.Pin == pin && u.Email == email );
+
+            return ( user != null ) ? GetUser( user.Email ) : null;
         }
 
 
@@ -450,6 +506,9 @@ namespace ACT.Core.Services
                 new[] { itemParameter }
                 );
 
+            context.Configuration.LazyLoadingEnabled = true;
+            context.Configuration.ProxyCreationEnabled = true;
+
             T item = context.Set<T>().Where( whereExpression ).FirstOrDefault();
 
             using ( ACTEntities db = new ACTEntities() )
@@ -482,15 +541,48 @@ namespace ACT.Core.Services
         }
 
         /// <summary>
+        /// Gets a list of the entities available
+        /// </summary>
+        /// <returns></returns>
+        public virtual List<T> SqlQueryList<T>( string query )
+        {
+            return context.Database.SqlQuery<T>( query ).ToList();
+        }
+
+        /// <summary>
         /// Gets the maximum value in the generic T in the specified column
         /// </summary>
         /// <param name="column"></param>
         /// <returns></returns>
-        public virtual object Max( string column )
+        public virtual string MaxString( string column )
         {
             return context.Set<T>()
                           .SelectString( column )
                           .Max();
+        }
+
+        /// <summary>
+        /// Gets the minimum value in the generic T in the specified column
+        /// </summary>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        public virtual string MinString( string column )
+        {
+            return context.Set<T>()
+                          .SelectString( column )
+                          .Min();
+        }
+
+        /// <summary>
+        /// Gets the minimum value in the generic T in the specified column
+        /// </summary>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        public virtual DateTime? MinDateTime( string column )
+        {
+            return context.Set<T>()
+                          .SelectDateTime( column )
+                          .Min();
         }
 
         /// <summary>
@@ -615,6 +707,74 @@ namespace ACT.Core.Services
                           .FirstOrDefault();
         }
 
+        /// <summary>
+        /// Gets a list of [select] for the specified table by generic T
+        /// If the constraint column is defined then we'll apply it
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public List<T> ListByColumnWhere( string column = "", object value = null )
+        {
+            return context.Set<T>()
+                          .Where( ColumnWhere( column, value ) )
+                          .Distinct()
+                          .ToList();
+        }
+
+        /// <summary>
+        /// Gets a list of [select] for the specified table by generic T
+        /// If the constraint column is defined then we'll apply it
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public List<T> ListByColumnsWhere( string column = "", object value = null, string column2 = "", object value2 = null )
+        {
+            return context.Set<T>()
+                            .Where( ColumnWhere( column, value ) )
+                            .Where( ColumnWhere( column2, value2 ) )
+                          .Distinct()
+                          .ToList();
+        }
+
+        /// <summary>
+        /// Gets a list of [select] for the specified table by generic T
+        /// If the constraint column is defined then we'll apply it
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public T GetByColumnWhere( string column = "", object value = null )
+        {
+            return context.Set<T>()
+                          .Where( ColumnWhere( column, value ) )
+                          .Distinct()
+                          .FirstOrDefault();
+        }
+
+        /// <summary>
+        /// A bit of a hack but relevant
+        /// Gets a list of [select] for the specified table by generic T
+        /// If the constraint column is defined then we'll apply it
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="value"></param>
+        /// <param name="column2"></param>
+        /// <param name="value2"></param>/// 
+        /// <returns></returns>
+        public T GetByColumnsWhere( string column = "", object value = null, string column2 = "", object value2 = null )
+        {
+            if ( !string.IsNullOrEmpty( column ) && !string.IsNullOrEmpty( column2 ) )
+            {
+                return context.Set<T>()
+                              .Where( ColumnWhere( column, value ) )
+                              .Where( ColumnWhere( column2, value2 ) )
+                              .Distinct()
+                              .FirstOrDefault();
+            }
+            else return null;
+        }
 
 
         /// <summary>
@@ -624,18 +784,13 @@ namespace ACT.Core.Services
         /// <returns></returns>
         public virtual bool Delete( T item )
         {
-            using ( TransactionScope scope = new TransactionScope() )
+            if ( !context.ChangeTracker.Entries<T>().Any( e => e.Entity == item ) )
             {
-                if ( !context.ChangeTracker.Entries<T>().Any( e => e.Entity == item ) )
-                {
-                    context.Set<T>().Attach( item );
-                }
-
-                context.Set<T>().Remove( item );
-                context.SaveChanges();
-
-                scope.Complete();
+                context.Set<T>().Attach( item );
             }
+
+            context.Set<T>().Remove( item );
+            context.SaveChanges();
 
             using ( AuditLogService service = new AuditLogService() )
             {
@@ -652,8 +807,6 @@ namespace ACT.Core.Services
         /// <returns></returns>
         public virtual T Create( T item, bool track = true )
         {
-            System.Reflection.PropertyInfo[] properties = item.GetType().GetProperties();
-
             // Tracking
             if ( track )
             {
@@ -725,7 +878,7 @@ namespace ACT.Core.Services
         {
             string number = string.Empty;
 
-            // Reduce 
+            // Reduce
             if ( max < 10 )
             {
                 number = string.Format( "{0}00000000{1}", prefix, max );
@@ -794,6 +947,125 @@ namespace ACT.Core.Services
             string strResponse = ( respose != null ) ? new StreamReader( respose.GetResponseStream() ).ReadToEnd() : string.Empty;
 
             return strResponse;
+        }
+
+        /// <summary>
+        /// Performs a Post request to the specified URL using the specified params
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="headers"></param>
+        /// <param name="content"></param>
+        /// <param name="contentType"></param>
+        /// <param name="accept"></param>
+        /// <param name="preAuthenticate"></param>
+        /// <returns></returns>
+        public string Post( string url, List<string> headers = null, string content = "", string contentType = "", string accept = "", bool preAuthenticate = false )
+        {
+            string responseString;
+
+            try
+            {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls |
+                                                       SecurityProtocolType.Tls11 |
+                                                       SecurityProtocolType.Tls12;
+
+                HttpWebRequest request = ( HttpWebRequest ) WebRequest.Create( url );
+
+                request.Method = "POST";
+                request.Timeout = 1200000;
+
+                if ( headers.NullableAny() )
+                {
+                    foreach ( string h in headers )
+                    {
+                        request.Headers.Add( h );
+                    }
+                }
+
+                if ( preAuthenticate )
+                {
+                    request.PreAuthenticate = true;
+                }
+                if ( !string.IsNullOrEmpty( accept ) )
+                {
+                    request.Accept = accept;
+                }
+                if ( !string.IsNullOrEmpty( contentType ) )
+                {
+                    request.ContentType = contentType;
+                }
+                if ( !string.IsNullOrEmpty( content ) )
+                {
+                    byte[] data = Encoding.ASCII.GetBytes( content );
+
+                    request.ContentLength = data.Length;
+
+                    using ( Stream s = request.GetRequestStream() )
+                    {
+                        s.Write( data, 0, data.Length );
+                    }
+                }
+
+                WebResponse response = ( HttpWebResponse ) request.GetResponse();
+
+                responseString = new StreamReader( response.GetResponseStream() ).ReadToEnd();
+            }
+            catch ( Exception ex )
+            {
+                responseString = "{ \"Code\": \"-1\", \"Message\": \"" + ex.Message + "\"}";
+            }
+
+            return responseString;
+        }
+
+        public ICollection<T> GetAll()
+        {
+            return context.Set<T>().ToList();
+        }
+
+        public async Task<ICollection<T>> GetAllAsync()
+        {
+            return await context.Set<T>().ToListAsync();
+        }
+
+        public T Get( int id )
+        {
+            return context.Set<T>().Find( id );
+        }
+
+        public async Task<T> GetAsync( int id )
+        {
+            return await context.Set<T>().FindAsync( id );
+        }
+
+        public T Find( Expression<Func<T, bool>> match )
+        {
+            return context.Set<T>().SingleOrDefault( match );
+        }
+
+        public async Task<T> FindAsync( Expression<Func<T, bool>> match )
+        {
+            return await context.Set<T>().SingleOrDefaultAsync( match );
+        }
+
+        public ICollection<T> FindAll( Expression<Func<T, bool>> match )
+        {
+            return context.Set<T>().Where( match ).ToList();
+        }
+
+        public async Task<ICollection<T>> FindAllAsync( Expression<Func<T, bool>> match )
+        {
+            return await context.Set<T>().Where( match ).ToListAsync();
+        }
+
+        public int Count()
+        {
+            return context.Set<T>().Count();
+        }
+
+        public async Task<int> CountAsync()
+        {
+            return await context.Set<T>().CountAsync();
         }
 
         public void Dispose()

@@ -1,0 +1,157 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Data.Models;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_OutstandingPallets";
+}
+
+
+@Html.Partial( "_Notification" )
+
+
+@{
+    UserModel user = User.Get();
+
+    int count = Model.Start;
+    List<ClientLoadCustomModel> items = ( List<ClientLoadCustomModel> ) Model.Items;
+}
+
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Outstanding Pallets Entries available matching your search criteria.
+    </div>
+}
+
+<table id="OutstandingPallets-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#OutstandingPallets-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="LoadDate" data-column="cl.LoadDate">
+                Load Date
+            </th>
+            <th data-name="Client" data-column="ch.LocationId">
+                Chep Account/GLID #
+            </th>
+            <th data-name="FromSite" data-column="s.Description">
+                Supplier From
+            </th>
+            <th data-name="LoadNumber" data-column="cl.LoadNumber">
+                Shipment #
+            </th>
+            <th data-name="ToSite" data-column="s2.Description">
+                Customer To
+            </th>
+            <th data-name="OriginalQuantity" data-column="cl.OriginalQuantity">
+                Qty
+            </th>
+            <th data-name="PODComment" data-column="pc.Comment">
+                Comment
+            </th>
+            <th data-name="Status" data-column="cl.Status">
+                Status
+            </th>
+            <th data-name="Transporter" data-column="t.Name">
+                Transporter
+            </th>
+            <th data-name="Vehicle" data-column="v.Registration">
+                Vehicle
+            </th>
+            <th data-name="InvoiceNumber" data-column="ch.InvoiceNumber">
+                Invoice #
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( items.NullableAny() )
+        {
+            Dictionary<int, string> outstandingReasons = ViewBag.OutstandingReasonOptions;
+
+            foreach ( var item in items )
+            {
+                ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
+
+                string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
+
+                <tr id="OutstandingPallets-@item.Id-item" class="OutstandingPallets-@item.Id-item ">
+                    <td>
+                        @count
+                    </td>
+                    <td>
+                        @item.LoadDate.Value.ToString( "yyyy-MM-dd" )
+                    </td>
+                    <td>
+                        @item.ChepAccountGLIDNo
+                    </td>
+                    <td>
+                        @item.SiteName
+                    </td>
+                    <td>
+                        @item.LoadNumber
+                    </td>
+                    <td>
+                        @item.ToSiteName
+                    </td>
+                    <td>
+                        @item.OriginalQuantity
+                    </td>
+                    <td>
+                        <select class="chzn" data-update-outstanding-reason="1" data-id="@item.Id" style="width: 100%;">
+                            <option>Select...</option>
+                            @foreach ( KeyValuePair<int,string> or in outstandingReasons )
+                            {
+                                string sel = ( or.Key == item.OutstandingReasonId ) ? "selected=selected" : "";
+
+                                <option value="@or.Key" @sel>@or.Value</option>
+                            }
+                        </select>
+                        <span id="loader"></span>
+                    </td>
+                    <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
+                        @status
+                    </td>
+                    <td>
+                        @item.TransporterName
+                    </td>
+                    <td>
+                        @item.VehicleRegistration
+                    </td>
+                    <td>
+                        @item.InvoiceNumber
+                    </td>
+                    <td width="5%">
+
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                            @Html.ActionLink( "Details", "EditClientData", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".OutstandingPallets-" + item.Id + "-item" } )
+
+                        </div>
+
+                        @*<span>
+                                @Html.ActionLink( "Journals", "ClientLoadJournals", new { id = item.Id, edit = false }, new { @class = "reports", @rel = "tipsyS", @title = "View Journals", @style = "padding-left: 28px; margin-left: 0; background-position-y: center;", @data_clientload_journal = "1", @data_id = item.Id } )
+                            </span>*@
+
+                    </td>
+                </tr>
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )

@@ -1,0 +1,175 @@
+﻿@model ClientProduct
+
+@using ACT.Core.Enums
+@using ACT.Data.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Details";
+
+    List<Document> documents = ViewBag.Documents;
+}
+
+@if ( ViewBag.IncludeLayout != null )
+{
+    <h2>
+        <img alt="" src="@Url.Content( "~/images/info.png" )" />
+        <span>Client Product Details</span>
+    </h2>
+}
+
+<div id="item-details" class="item-details" style="width: auto;">
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <h2>
+            <img alt="" src="@Url.Content( "~/images/info.png" )" />
+            <span>Client Product Details</span>
+        </h2>
+    }
+
+    <div class="left" style="width: 48%; margin-right: 4%;">
+
+        <div class="display-label">
+            Status
+        </div>
+        <div class="display-field">
+            @(( ( Status ) Model.Status ).GetDisplayText())
+        </div>
+
+        <div class="display-label">
+            Client
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Client.CompanyName )
+        </div>
+
+        <div class="display-label">
+            Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Product.Name )
+        </div>
+
+        <div class="display-label">
+            Description
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.ProductDescription )
+        </div>
+
+        <div class="display-label">
+            Active Date
+        </div>
+        <div class="display-field">
+            @( Model.ActiveDate.Value.ToString( "yyyy/MM/dd" ) )
+        </div>
+
+        @if ( documents != null && documents.Any() )
+        {
+            <div class="display-label">
+                Original Product/Service Documentation
+            </div>
+            <div class="display-field">
+
+                @foreach ( Document d in documents )
+                {
+                    <a class="block" target="_blank" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )">
+                        <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+
+                        @d.Name (@d.Type)
+                    </a>
+                }
+
+            </div>
+        }
+
+    </div>
+
+    <div class="left" style="width: 48%;">
+
+        <div class="display-label">
+            Hire Rate
+        </div>
+        <div class="display-field">
+            R @Model.Rate
+        </div>
+
+        <div class="display-label">
+            Lost Rate
+        </div>
+        <div class="display-field">
+            R @Model.LostRate
+        </div>
+
+        <div class="display-label">
+            Issue Rate
+        </div>
+        <div class="display-field">
+            R @Model.IssueRate
+        </div>
+
+        <div class="display-label">
+            Passon Rate
+        </div>
+        <div class="display-field">
+            R @Model.PassonRate
+        </div>
+
+        <div class="display-label">
+            Passon Days
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.PassonDays )
+        </div>
+
+        <div class="display-label">
+            Equipment
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.Equipment )
+        </div>
+
+        <div class="display-label">
+            Accounting Code
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.AccountingCode )
+        </div>
+
+        <div class="display-label">
+            Rate Type
+        </div>
+        <div class="display-field">
+            @(( ( RateType ) Model.RateType ).GetDisplayText())
+        </div>
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <p>
+            @Html.ActionLink( "Edit", "EditProduct", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+
+            @if ( ViewBag.IncludeLayout == null )
+            {
+                <span style="padding: 0 5px;">/</span>
+                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
+            }
+        </p>
+    }
+
+    @if ( ViewBag.IncludeLayout != null )
+    {
+        <div class="back-to-list">
+            @Html.ActionLink( "Back to List", "Index" )
+        </div>
+    }
+
+</div>

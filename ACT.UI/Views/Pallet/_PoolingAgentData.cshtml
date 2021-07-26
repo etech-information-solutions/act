@@ -1,0 +1,222 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_PoolingAgentData";
+}
+
+
+@Html.Partial( "_Notification" )
+
+
+@{
+    UserModel user = User.Get();
+
+    int count = Model.Start;
+    List<ChepLoadCustomModel> items = ( List<ChepLoadCustomModel> ) Model.Items;
+}
+
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Pooling Agent Load Entries available matching your search criteria.
+    </div>
+}
+
+<p>
+    @Html.ActionLink( "Import", "ImportPoolingAgentData", new { IsExchange = false }, new { @class = "csv", @rel = "tipsyS", @title = "Import Chep loads?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" } )
+
+    <span style="padding: 0 5px;">|</span>
+
+    @Html.ActionLink( "Import Exchange Load", "ImportPoolingAgentData", new { IsExchange = true }, new { @class = "csv", @rel = "tipsyS", @title = "Import Exchange Loads?", @data_edit = "1", @data_id = 0, @data_target = "#poolingagentdata" } )
+
+    <span class="loader"></span>
+</p>
+
+<table id="pad-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#pad-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="EffectiveDate" data-column="cl.EffectiveDate">
+                Effective Date
+            </th>
+            <th data-name="DeliveryDate" data-column="cl.DeliveryDate">
+                Delivery Date
+            </th>
+            <th data-name="Location" data-column="cl.Location">
+                Supplier From
+            </th>
+            <th data-name="Otherpartyid" data-column="cl.OtherpartyId">
+                Customer To
+            </th>
+            <th data-name="Ref" data-column="cl.Ref">
+                Ref
+            </th>
+            <th data-name="OtherRef" data-column="cl.OtherRef">
+                Other Ref
+            </th>
+            <th data-name="TransactionType" data-column="cl.TransactionType">
+                Transaction Type
+            </th>
+            <th data-name="Equipment" data-column="cl.Equipment">
+                Equipment
+            </th>
+            <th data-name="Quantity" data-column="cl.Quantity">
+                Qty
+            </th>
+            <th data-name="InvoiceNumber" data-column="cl.InvoiceNumber">
+                Invoice #
+            </th>
+            <th data-name="DocketNumber" data-column="cl.DocketNumber">
+                Docket #
+            </th>
+            <th data-name="Status" data-column="cl.Status">
+                Status
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                PostingType postingType = ( PostingType ) item.PostingType;
+                BalanceStatus balanceStatus = ( BalanceStatus ) item.BalanceStatus;
+                ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
+
+                string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
+
+                <tr id="poolingagentdata-@item.Id-item" class="poolingagentdata-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @(item.EffectiveDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @(item.DeliveryDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @item.Location
+                    </td>
+                    <td>
+                        @item.OtherPartyId, @item.OtherParty
+                    </td>
+                    <td>
+                        @(item.CorrectedRef ?? item.Ref)
+
+                        @if ( !string.IsNullOrEmpty( item.CorrectedRef ) )
+                        {
+                            <a rel="tipsyW" title="Manually corrected, was: @item.Ref">
+                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @(item.CorrectedOtherRef ?? item.OtherRef)
+
+                        @if ( !string.IsNullOrEmpty( item.CorrectedOtherRef ) )
+                        {
+                            <a rel="tipsyW" title="Manually corrected, was: @item.OtherRef">
+                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @item.TransactionType
+                    </td>
+                    <td>
+                        @item.Equipment
+                    </td>
+                    <td>
+                        @item.Quantity
+                    </td>
+                    <td>
+                        @item.InvoiceNumber
+                    </td>
+                    <td>
+                        @item.DocketNumber
+
+                        @if ( item.VersionCount > 1 || item.IsExtra )
+                        {
+                            <div style="border-top: 1px dashed #7368e3; padding-top: 5px; margin-top: 10px;">
+                                @if ( item.IsExtra && item.ChepLoadId.HasValue )
+                                {
+                                    <a data-load-extra="1" data-docket-number="@item.DocketNumber" class="block" rel="tipysE" title="This trx was added to a reconciled and balanced load, click to view original load..">
+                                        <img src="@Url.Content( "~/Images/extra.png" )" width="20" />
+                                    </a>
+                                }
+                                @if ( item.VersionCount > 1 )
+                                {
+                                    <a data-load-version="1" data-docket-number="@item.DocketNumber" data-versions="@item.VersionCount" class="block" rel="tipysW" title="+@item.VersionCount versions of this load, click to view all versions..">
+                                        <img src="@Url.Content( "~/Images/version.png" )" width="20" />
+                                    </a>
+                                }
+                            </div>
+
+                        }
+                    </td>
+                    <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
+                        @status.GetDisplayText()
+
+                        @if ( item.ManuallyMatchedLoad )
+                        {
+                            <a data-manual-reconed="1" data-uid="@item.ManuallyMatchedUID" rel="tipsyE" title="This load was manually reconciled, click for more details...">
+                                <img src="@Url.Content( "~/Images/clients.png" )" width="20" />
+                            </a>
+                        }
+                    </td>
+                    <td width="10%">
+
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                            @Html.ActionLink( " ", "ChepLoadShipments", new { id = item.Id, clientId = item.ClientId, reference = ( item.Ref ?? item.OtherRef ), otherreference = ( item.OtherRef ?? item.Ref ), edit = false }, new { @class = "matched", @rel = "tipsyE", @title = "View Related Shipments?", @style = "padding-left: 28px; margin-left: 0; margin-right: 20%;", @data_chepload_shipment = "1", @data_id = item.Id, @data_clientid = item.ClientId, @data_reference = ( item.Ref ?? item.OtherRef ), @data_otherreference = ( item.OtherRef ?? item.Ref ) } )
+
+                            @Html.ActionLink( "Details", "PoolingAgentDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".poolingagentdata-" + item.Id + "-item" } )
+
+                        </div>
+
+                        <span>
+                            @Html.ActionLink( "Journals", "ChepLoadJournals", new { DocketNumber = item.DocketNumber, edit = false }, new { @class = "reports", @rel = "tipsyE", @title = "View Journals", @style = "padding-left: 28px; margin-left: 0; background-position-y: center;", @data_chepload_journal = "1", @data_docketnumber = item.DocketNumber } )
+                        </span>
+
+                        @*@Html.ActionLink( "Allocate", "AllocatePoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".poolingagentdata-" + item.Id + "-item" } )*@
+
+                        @if ( postingType == PostingType.Manual )
+                        {
+                            @*<div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                                @Html.ActionLink( "Edit", "EditPoolingAgentData", new { id = item.Id, returnView = "PoolingAgentData" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".poolingagentdata-" + item.Id + "-item", @style = "margin-right: 0;" } )
+
+                                @Html.ActionLink( enable, "DeletePoolingAgentData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#poolingagentdata-" + item.Id + "-item", @data_refresh_target = "#poolingagentdata", @rel = "tipsyE", @title = enable + " this item?", @style = "margin-left: 0;" } )
+
+                            </div>*@
+                        }
+
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )
+

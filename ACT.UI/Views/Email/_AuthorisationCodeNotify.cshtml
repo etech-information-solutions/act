@@ -1,0 +1,109 @@
+﻿
+@model ClientAuthorisation
+
+@using ACT.Data.Models;
+
+@{
+    if ( VariableExtension.SystemRules == null )
+    {
+        VariableExtension.SetRules();
+    }
+
+    string absoluteUrlBase = Request.Url.Scheme + "://" + Request.Url.Host + ( Request.Url.IsDefaultPort ? "" : ":" + Request.Url.Port );
+}
+
+<table cellspacing="0" cellpadding="10" width="100%" style="width: 100%; font-size: 11px; margin: 0 auto; background-color: #fff; font-family: Helvetica, 'Segoe UI', Verdana, Sans-Serif;">
+
+    <tbody>
+        <tr>
+            <td width="30%"></td>
+            <td width="40%" style="font-size: 40px; margin-top: 40px; text-align: center;">
+                ACT Pallet Solutions
+            </td>
+            <td width="30%"></td>
+        </tr>
+        <tr>
+            <td height="20" colspan="3"></td>
+        </tr>
+        <tr>
+            <td width="20%"></td>
+            <td width="60%">
+                Hi,
+            </td>
+            <td width="20%"></td>
+        </tr>
+        <tr>
+            <td width="20%"></td>
+            <td width="60%">
+                <p>
+                    The following transportation has been authorised:
+                </p>
+            </td>
+            <td width="20%"></td>
+        </tr>
+        <tr>
+            <td width="20%"></td>
+            <td width="60%">
+                <ul>
+                    <li>
+                        Authorised By: <b>@(Model?.User?.Name) @(Model?.User?.Surname) (@(Model?.User?.Cell)/@(Model?.User?.Email))</b>
+                    </li>
+                    <li>
+                        Authorisation Code: <b>@(Model?.Code)</b>
+                    </li>
+                    <li>
+                        Authorisation Date: <b>@(Model?.AuthorisationDate.ToString( "yyyy-MM-dd @HH:mm tt" ))</b>
+                    </li>
+                    <li>
+                        Client: <b>@(Model?.ClientLoad?.Client?.CompanyName)</b>
+                    </li>
+                    <li>
+                        Transporter: <b>@(Model?.ClientLoad?.Transporter?.TradingName) (@(Model?.ClientLoad?.Transporter?.ContactNumber)/@(Model?.ClientLoad?.Transporter?.Email))</b>
+                    </li>
+                    <li>
+                        Vehicle: <b>@(Model?.ClientLoad?.Vehicle.Registration))</b>
+                    </li>
+                    <li>
+                        From Supplier: <b>@(Model?.ClientLoad?.ClientSite?.Site?.Description)) (Contact: @(Model?.ClientLoad?.ClientSite?.Site?.ReceivingContact) / @(Model?.ClientLoad?.ClientSite?.Site?.ReceivingContactNo) / @(Model?.ClientLoad?.ClientSite?.Site?.ReceivingEmail))</b>
+                    </li>
+                    <li>
+                        Customer To: <b>@(Model?.ClientLoad?.ClientSite1?.Site?.Description)) (Contact: @(Model?.ClientLoad?.ClientSite1?.Site?.ReceivingContact) / @(Model?.ClientLoad?.ClientSite1?.Site?.ReceivingContactNo) / @(Model?.ClientLoad?.ClientSite1?.Site?.ReceivingEmail))</b>
+                    </li>
+                    <li>
+                        Load Date: <b>@(Model?.ClientLoad?.LoadDate?.ToString( "yyyy/MM/dd" ))</b>
+                    </li>
+                    <li>
+                        Load Number: <b>@(Model?.ClientLoad?.LoadNumber))</b>
+                    </li>
+                    <li>
+                        Receiver Number: <b>@(Model?.ClientLoad?.ReceiverNumber))</b>
+                    </li>
+                    <li>
+                        Delivery Note Number: <b>@(Model?.ClientLoad?.DeliveryNote))</b>
+                    </li>
+                </ul>
+            </td>
+            <td width="20%"></td>
+        </tr>
+        <tr>
+            <td width="20%"></td>
+            <td width="60%">
+                <p>
+                    Support Email: <a href="mailto:@VariableExtension.SystemRules.SystemContactEmail">@VariableExtension.SystemRules.SystemContactEmail</a>
+                </p>
+            </td>
+            <td width="20%"></td>
+        </tr>
+    </tbody>
+
+    <tfoot>
+        <tr>
+            <td width="20%"></td>
+            <td width="60%" style="text-align: left; color: #aaa;">
+                <i>@DateTime.Now.Year Copyright &copy; | ACT Pallet Solutions. All Rights Reserved</i>
+            </td>
+            <td width="20%"></td>
+        </tr>
+    </tfoot>
+
+</table>

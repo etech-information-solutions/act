@@ -17,8 +17,10 @@ namespace ACT.Data.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Product()
         {
+            this.ClientProducts = new HashSet<ClientProduct>();
+            this.Disputes = new HashSet<Dispute>();
             this.ProductPrices = new HashSet<ProductPrice>();
-            this.PSPBillings = new HashSet<PSPBilling>();
+            this.PSPProducts = new HashSet<PSPProduct>();
             this.SiteBillings = new HashSet<SiteBilling>();
         }
     
@@ -31,9 +33,13 @@ namespace ACT.Data.Models
         public int Status { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientProduct> ClientProducts { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Dispute> Disputes { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ProductPrice> ProductPrices { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<PSPBilling> PSPBillings { get; set; }
+        public virtual ICollection<PSPProduct> PSPProducts { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SiteBilling> SiteBillings { get; set; }
     }

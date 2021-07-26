@@ -1,0 +1,189 @@
+<ion-header [translucent]="true" style="color: #002e70 !important;">
+  <ion-toolbar style="color: #002e70 !important;">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      <img (click)="this.auth.OnShowContact()" alt="Contact" src="../../assets/imgs/contact.png" style="width: 36px;" />
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-icon name="notifications" size="large" (click)="this.auth.GoToPage('notifications')"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content [fullscreen]="true" (ionScroll)="this.auth.OnScroll($event)" [scrollEvents]="true">
+  
+  <!-- fab placed to the top end -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="this.auth.ShowScroll" (click)="this.auth.ScrollToTop();">
+    <ion-fab-button>
+      <ion-icon name="chevron-up"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-item-divider>
+    <ion-label>
+      Site Audit Details
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item>
+    <ion-label>Date Created</ion-label>
+    <ion-label class="required ion-text-right">{{this.auth.GetShortDate(this.auth.SiteAudit.CreatedOn, 'yyyy/MM/dd')}}</ion-label>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>Audit Date *</ion-label>
+    <ion-datetime displayFormat="YYYY/DD/MM" name="AuditDate" [(ngModel)]="AuditDate" required="required"></ion-datetime>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>Site *</ion-label>
+    <ion-select name="SiteId" [(ngModel)]="SiteId">
+      <ion-select-option *ngFor="let x of this.auth.Sites" [value]="x.Id">{{x.Name}}</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>Client *</ion-label>
+    <ion-select name="ClientId" [(ngModel)]="ClientId">
+      <ion-select-option *ngFor="let x of this.auth.Clients" [value]="x.Id">{{x.CompanyName}}</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label class="required">Equipment *</ion-label>
+    <ion-input type="text" name="Equipment" [(ngModel)]="Equipment" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label class="required">Outstanding Pallets *</ion-label>
+    <ion-input type="text" name="PalletsOutstanding" [(ngModel)]="PalletsOutstanding" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label class="required">Counted Pallets *</ion-label>
+    <ion-input type="text" name="PalletsCounted" [(ngModel)]="PalletsCounted" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item lines="none">
+    <ion-label class="required">Written off Pallets *</ion-label>
+    <ion-input type="text" name="WriteoffPallets" [(ngModel)]="WriteoffPallets" required="required"></ion-input>
+  </ion-item>
+
+  <ion-item-divider margin-top>
+    <ion-label>
+      Customer Details
+    </ion-label> 
+  </ion-item-divider>
+
+  <ion-item>
+    <ion-label class="required">Full Name *</ion-label>
+    <ion-input type="text" name="CustomerName" [(ngModel)]="CustomerName" required="required"></ion-input>
+  </ion-item>
+
+  <ion-grid>
+
+    <ion-row>
+      <ion-col size="10">
+        <ion-label class="required">Signature *</ion-label>
+      </ion-col>
+      <ion-col size="2">&nbsp;</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="11" style="background-color: #f6fbff;">
+        <canvas #CustomerSignature height="200" style="touch-action: none;"></canvas>
+        <img [src]="this.CustomerSignatureUrl" *ngIf="this.CustomerSignatureUrl != undefined" style="height: 100%; position: absolute;z-index: 5; top: 0; width: 100%;" />
+      </ion-col>
+      <ion-col size="1">
+        <ion-icon name="trash-outline" (click)="ClearPad(1)"></ion-icon>
+      </ion-col>
+    </ion-row>
+
+  </ion-grid>
+
+  <ion-item-divider style="margin-top: 20px;">
+    <ion-label>
+      Sales Rep Details
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item>
+    <ion-label class="required">Full Name *</ion-label>
+    <ion-input type="text" name="RepName" [(ngModel)]="RepName" required="required"></ion-input>
+  </ion-item>
+
+  <ion-grid>
+
+    <ion-row>
+      <ion-col size="10">
+        <ion-label class="required">Signature *</ion-label>
+      </ion-col>
+      <ion-col size="2">&nbsp;</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="11" style="background-color: #f6fbff;">
+        <canvas #RepSignature height="200" style="touch-action: none;"></canvas>
+        <img [src]="this.RepSignatureUrl" *ngIf="this.RepSignatureUrl != undefined" style="height: 100%; position: absolute;z-index: 5; top: 0; width: 100%;" />
+      </ion-col>
+      <ion-col size="1">
+        <ion-icon name="trash-outline" (click)="ClearPad(2)"></ion-icon>
+      </ion-col>
+    </ion-row>
+
+  </ion-grid>
+
+  <ion-item-divider style="margin-top: 20px;">
+    <ion-label>
+      Pallet Auditor Details
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item>
+    <ion-label class="required">Full Name *</ion-label>
+    <ion-input type="text" name="PalletAuditor" [(ngModel)]="PalletAuditor" required="required"></ion-input>
+  </ion-item>
+
+  <ion-grid>
+
+    <ion-row>
+      <ion-col size="10">
+        <ion-label class="required">Signature *</ion-label>
+      </ion-col>
+      <ion-col size="2">&nbsp;</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="11" style="background-color: #f6fbff;">
+        <canvas #PalletAuditorSign height="200" style="touch-action: none;"></canvas>
+        <img [src]="this.PalletAuditorSignUrl" *ngIf="this.PalletAuditorSignUrl != undefined" style="height: 100%; position: absolute;z-index: 5; top: 0; width: 100%;" />
+      </ion-col>
+      <ion-col size="1">
+        <ion-icon name="trash-outline" (click)="ClearPad(3)"></ion-icon>
+      </ion-col>
+    </ion-row>
+
+  </ion-grid>
+
+  <div text-left style="margin-top: 20px; padding: 20px">
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6">
+          <ion-button (click)="Update()" type="button" shape="round" expand="full" style="--background: #002e70;">
+            Update
+            <ion-icon name="save-outline" slot="end"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col size="6">
+          <ion-button (click)="Delete()" type="button" color="warning" shape="round" expand="full">
+            Delete
+            <ion-icon name="trash-outline" slot="end"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+  </div>
+
+</ion-content>

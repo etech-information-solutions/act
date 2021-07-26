@@ -1,0 +1,127 @@
+﻿
+@model List<ClientAuthorisationCustomModel>
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+<div style="max-height: 800px; overflow-x: auto;">
+
+
+    @Html.Partial( "_Notification" )
+
+    @if ( !Model.NullableAny() )
+    {
+        <div class="message-warn" style="margin-bottom: 20px;">
+            There are no Authorisation Codes available matching your search criteria.
+        </div>
+    }
+
+    <table id="authorisationcodes-table" class="da-table">
+
+        <thead>
+            <tr>
+                <th>
+                    #
+                </th>
+                <th>
+                    Load Date
+                </th>
+                <th>
+                    Load #
+                </th>
+                <th>
+                    Ref #
+                </th>
+                <th>
+                    Delivery #
+                </th>
+                <th>
+                    Transporter
+                </th>
+                <th>
+                    Vehicle
+                </th>
+                <th>
+                    Client
+                </th>
+                <th>
+                    From Site
+                </th>
+                <th>
+                    To Site
+                </th>
+                <th>
+                    Authoriser
+                </th>
+                <th>
+                    Auth Code
+                </th>
+                <th>
+                    Auth Date
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if ( Model.NullableAny() )
+            {
+                int count = 1;
+
+                foreach ( var item in Model )
+                {
+                    Status status = ( Status ) ( item.Status ?? 1 );
+
+                    string active = ( status == Status.Active ) ? "active" : "inactive";
+
+                    <tr id="authorisationcodes-@item.Id-item" class="authorisationcodes-@item.Id-item @active">
+
+                        <td width="1%">
+                            @count
+                        </td>
+                        <td>
+                            @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
+                        </td>
+                        <td>
+                            @item.LoadNumber
+                        </td>
+                        <td>
+                            @item.ReceiverNumber
+                        </td>
+                        <td>
+                            @item.DeliveryNote
+                        </td>
+                        <td>
+                            @item.TransporterName
+                        </td>
+                        <td>
+                            @item.VehicleRegistration
+                        </td>
+                        <td>
+                            @item.ClientName
+                        </td>
+                        <td>
+                            @item.FromSiteName
+                        </td>
+                        <td>
+                            @item.ToSiteName
+                        </td>
+                        <td>
+                            @item.AuthoriserName
+                        </td>
+                        <td>
+                            @(item.AuthorisationDate?.ToString( "yyyy-MM-dd @HH:mm t" ))
+                        </td>
+                        <td>
+                            @item.Code
+                        </td>
+
+                    </tr>
+
+                    count++;
+                }
+            }
+        </tbody>
+
+    </table>
+
+</div>

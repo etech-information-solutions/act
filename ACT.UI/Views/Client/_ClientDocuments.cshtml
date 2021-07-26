@@ -1,0 +1,39 @@
+﻿@model List<FileViewModel>
+
+@using ACT.UI.Models
+
+@if ( !Model.NullableAny( d => d.Name?.ToLower() != "logo" ) )
+{
+    return;
+}
+
+<div class="grouped-area">
+
+    <div class="editor-field">
+
+        <ul class="list">
+            @foreach ( FileViewModel d in Model.Where( d => d.Name?.ToLower() != "logo" ) )
+            {
+                <li id="file-@d.Id" style="background: none;">
+
+                    <a target="_blank" href="@Url.Action( "ViewDocument", new { @id = d.Id } )">
+                        <img alt="download" src="@Url.Content( "~/Images/download.png" )" style="margin-bottom: 2px;" />
+
+                        @d.Description (@d.Extension)
+                    </a>
+
+                    @if ( ViewBag.DisplayOnly == null )
+                    {
+                        <a data-delete-file="1" data-target="#client-documents" data-id="@d.Id" href="@Url.Action( "DeleteClientDocument", new { @id = d.Id } )" rel="tipsyE" title="Delete this file?" style="float: right;">
+                            <img alt="delete" src="@Url.Content( "~/images/delete.png" )" />
+                        </a>
+                    }
+
+                    <div class="clear"></div>
+                </li>
+            }
+        </ul>
+
+    </div>
+
+</div>

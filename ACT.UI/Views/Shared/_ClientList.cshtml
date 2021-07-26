@@ -1,0 +1,10 @@
+﻿@model CustomSearchModel
+
+@using ACT.Core.Models;
+
+<div class="editor-label">
+    @Html.LabelFor( model => model.ClientId )
+</div>
+<div class="editor-field">
+    @Html.DropDownListFor( model => model.ClientId, model => model.ClientOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+</div>

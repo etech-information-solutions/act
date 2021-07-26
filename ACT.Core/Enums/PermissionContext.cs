@@ -35,9 +35,9 @@ namespace ACT.Core.Enums
         [PermissionContextSupports( PermissionTo.View | PermissionTo.Create | PermissionTo.Edit | PermissionTo.Delete )]
         Client,
 
-        [PermissionPrerequisite( PermissionTo.View, PermissionContext.Reward )]
+        [PermissionPrerequisite( PermissionTo.View, PermissionContext.Transporter )]
         [PermissionContextSupports( PermissionTo.View | PermissionTo.Create | PermissionTo.Edit | PermissionTo.Delete )]
-        Reward,
+        Transporter,
 
         [PermissionPrerequisite( PermissionTo.View, PermissionContext.Reports )]
         [PermissionContextSupports( PermissionTo.View | PermissionTo.Create | PermissionTo.Edit | PermissionTo.Delete )]

@@ -1,0 +1,50 @@
+<ion-header [translucent]="true" style="color: #002e70 !important;">
+  <ion-toolbar style="color: #002e70 !important;">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      <img (click)="this.auth.OnShowContact()" alt="Contact" src="../../assets/imgs/contact.png" style="width: 36px;" />
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-icon name="notifications" size="large" (click)="this.auth.GoToPage('notifications')"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" style="font-size: 13px;">
+
+  <ion-item-divider style="margin-bottom: 20px;">
+    <ion-label style="text-transform: uppercase;">
+      Outstanding Pallets Per Client
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-grid>
+    <ion-row style="border-bottom: 1px solid #ddd; text-transform: uppercase; font-size: 12px;">
+      <ion-col>
+        <b style="color: #002e70 !important;">Client</b>
+      </ion-col>
+      <ion-col class="ion-text-center">
+        <b style="color: #002e70 !important;">Outstanding</b>
+      </ion-col>
+      <ion-col class="ion-text-center">
+        <b style="color: #002e70 !important;">> 30 Days</b>
+      </ion-col>
+    </ion-row>
+    
+    <ion-row *ngFor="let x of this.auth.OutstandingPalletsPerClient" style="border-bottom: 1px solid #ededed; padding: 10px 0; font-size: 12px;">
+      <ion-col>
+        {{x.ClientName}}
+      </ion-col>
+      <ion-col class="ion-text-center">
+        {{x.Total}}
+      </ion-col>
+      <ion-col class="ion-text-center">
+        {{x.Past30}}
+      </ion-col>
+    </ion-row>
+
+  </ion-grid>
+
+</ion-content>

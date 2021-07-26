@@ -10,7 +10,7 @@
         VariableExtension.SetRules();
     }
 
-    bool isClient = ( Model.ServiceType == ServiceType.ManageOwnPallets || Model.ServiceType == ServiceType.ProvidePalletManagement );
+    bool isClient = ( Model.ServiceType == ServiceType.RequirePalletManagement || Model.ServiceType == ServiceType.HaveCompany );
 
     Guid? token = ( ViewBag.Token != null ) ? ( Guid? ) ViewBag.Token : null;
 

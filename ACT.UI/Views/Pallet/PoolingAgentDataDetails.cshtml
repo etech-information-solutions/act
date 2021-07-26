@@ -1,0 +1,213 @@
+﻿@model ChepLoad
+
+@using ACT.Data.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Details";
+}
+
+@if ( ViewBag.IncludeLayout != null )
+{
+    <h2>
+        <img alt="" src="@Url.Content( "~/images/info.png" )" />
+        <span>Load Details</span>
+    </h2>
+}
+
+<div id="item-details" class="item-details load-view" style="width: auto;">
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <h2>
+            <img alt="" src="@Url.Content( "~/images/info.png" )" />
+            <span>Load Details</span>
+        </h2>
+    }
+
+    <div class="left" style="width: 41%; margin-right: 3%;">
+
+        <div class="edit-label">
+            Client
+        </div>
+        <div class="display-field">
+            @Html.Raw( Model?.Client?.CompanyName ?? "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            TransactionType
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.TransactionType ) ? Model?.TransactionType : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Docket Number
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.DocketNumber ) ? Model?.DocketNumber : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Original DocketNumber
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.OriginalDocketNumber ) ? Model?.OriginalDocketNumber : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Location Id
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.LocationId ) ? Model?.LocationId : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Location
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.Location ) ? Model?.Location : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Other Party Id
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.OtherPartyId ) ? Model?.OtherPartyId : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Other Party
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.OtherParty ) ? Model?.OtherParty : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Other Party Country
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.OtherPartyCountry ) ? Model?.OtherPartyCountry : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Equipment
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.Equipment ) ? Model?.Equipment : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Quantity
+        </div>
+        <div class="display-field">
+            @Html.Raw( Model?.Quantity )
+        </div>
+
+    </div>
+
+    <div class="right" style="width: 41%;">
+
+        <div class="edit-label">
+            Ref #
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.Ref ) ? Model?.Ref : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Other Ref #
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.OtherRef ) ? Model?.OtherRef : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Batch Ref #
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.BatchRef ) ? Model?.BatchRef : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Shipment Date
+        </div>
+        <div class="display-field">
+            @Html.Raw( Model?.ShipmentDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Delivery Date
+        </div>
+        <div class="display-field">
+            @Html.Raw( Model?.DeliveryDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Effective Date
+        </div>
+        <div class="display-field">
+            @Html.Raw( Model?.EffectiveDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Create Date
+        </div>
+        <div class="display-field">
+            @Html.Raw( Model?.CreateDate?.ToString( "yyyy-MM-dd" ) ?? "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Created By
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.CreatedBy ) ? Model?.CreatedBy : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Invoice #
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.InvoiceNumber ) ? Model?.InvoiceNumber : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Reason
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.Reason ) ? Model?.Reason : "&nbsp;" )
+        </div>
+
+        <div class="edit-label">
+            Data Source
+        </div>
+        <div class="display-field">
+            @Html.Raw( !string.IsNullOrEmpty( Model?.DataSource ) ? Model?.DataSource : "&nbsp;" )
+        </div>
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
+
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <p>
+            @if ( ViewBag.IncludeLayout == null )
+            {
+                <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Close</a>
+            }
+        </p>
+    }
+
+    @if ( ViewBag.IncludeLayout != null )
+    {
+        <div class="back-to-list">
+            @Html.ActionLink( "Back to List", "Index" )
+        </div>
+    }
+
+</div>

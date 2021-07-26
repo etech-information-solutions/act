@@ -1,0 +1,143 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ViewName = "_ExtraChepLoads";
+}
+
+
+@Html.Partial( "_Notification" )
+
+
+@{
+    int count = Model.Start;
+    List<ChepLoadCustomModel> items = ( List<ChepLoadCustomModel> ) Model.Items;
+}
+
+<table id="ExtraChepLoads-table" class="da-table" data-fixed-header-target="#ExtraChepLoads-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="CreateDate" data-column="cl.CreateDate">
+                Created
+            </th>
+            <th data-name="LoadDate" data-column="cl.LoadDate">
+                Load Date
+            </th>
+            <th data-name="CompanyName" data-column="c.CompanyName">
+                Client
+            </th>
+            <th data-name="DocketNumber" data-column="cl.DocketNumber">
+                Docket #
+            </th>
+            <th data-name="Ref" data-column="cl.Ref">
+                Ref
+            </th>
+            <th data-name="OtherRef" data-column="cl.OtherRef">
+                Other Ref
+            </th>
+            <th data-name="InvoiceNumber" data-column="cl.InvoiceNumber">
+                Invoice #
+            </th>
+            <th data-name="TransactionType" data-column="cl.TransactionType">
+                Transaction Type
+            </th>
+            <th data-name="Quantity" data-column="cl.Quantity">
+                Qty
+            </th>
+            <th data-name="Status" data-column="cl.Status">
+                Status
+            </th>
+            <th data-name="BalanceStatus" data-column="cl.BalanceStatus">
+                Balanced
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                PostingType postingType = ( PostingType ) item.PostingType;
+                BalanceStatus balanceStatus = ( BalanceStatus ) item.BalanceStatus;
+                ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
+
+                string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
+
+                <tr id="Extra-@item.Id-ChepLoads" class="Extra-@item.Id-ChepLoads @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        On @(item.CreateDate?.ToString( "yyyy-MM-dd" ) ) <br /> by @item.CreatedBy
+                    </td>
+                    <td>
+                        @(item.EffectiveDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @item.ClientName
+                    </td>
+                    <td>
+                        @item.DocketNumber
+                    </td>
+                    <td>
+                        @(item.CorrectedRef ?? item.Ref)
+
+                        @if ( !string.IsNullOrEmpty( item.CorrectedRef ) )
+                        {
+                            <a rel="tipsyW" title="Manually corrected, was: @item.Ref">
+                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @(item.CorrectedOtherRef ?? item.OtherRef)
+
+                        @if ( !string.IsNullOrEmpty( item.CorrectedOtherRef ) )
+                        {
+                            <a rel="tipsyW" title="Manually corrected, was: @item.OtherRef">
+                                <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @item.InvoiceNumber
+                    </td>
+                    <td>
+                        @item.TransactionType
+                    </td>
+                    <td>
+                        @item.Quantity
+                    </td>
+                    <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
+                        @status.GetDisplayText()
+                    </td>
+                    <td class="@(balanceStatus == BalanceStatus.Balanced ? "active" : "inactive")">
+                        @balanceStatus.GetDisplayText()
+                    </td>
+                    <td width="5%">
+
+                        @Html.ActionLink( "Details", "PoolingAgentDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".Extra-" + item.Id + "-ChepLoads" } )
+
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )
+

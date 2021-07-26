@@ -13,7 +13,11 @@ namespace ACT.Core.Interfaces
 
         List<T> List();
 
-        object Max( string column );
+        string MaxString( string column );
+
+        string MinString( string column );
+
+        DateTime? MinDateTime( string column );
 
         int Total( PagingModel pm, CustomSearchModel csm );
 

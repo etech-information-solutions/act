@@ -1,0 +1,103 @@
+<ion-header>
+
+  <ion-toolbar style="--background: #062d4a !important; background: #062d4a !important; color: #ffffff !important;">
+
+    <ion-title style="font-size: 14px !important; --font-size: 14px;">Hello, {{this.auth.CurrentUser.DisplayName}}</ion-title>
+
+    <ion-buttons slot="end" (click)="Skip()">
+      <ion-text>Skip</ion-text>
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </ion-buttons>
+
+  </ion-toolbar>
+
+</ion-header>
+
+<ion-content>
+
+  <div style="padding: 20px 20px 0 20px;">
+
+    <div style="text-align: center; margin: 0 40% 10px 39.5%; width: 30%;">
+  
+      <ion-avatar style="width: 80px; height: 80px;">
+        <img alt="User Profile" [src]="SelfieUrl" />
+      </ion-avatar>
+  
+    </div>
+
+    <ion-item lines="none" style="--padding-start: 0;" *ngIf="!ConfirmingPin">
+      Make it easier to securely login by creating a 5 digit pin below:
+    </ion-item>
+
+    <ion-item lines="none" style="--padding-start: 0;" *ngIf="ConfirmingPin">
+      Confirm your 5 digit pin:
+    </ion-item>
+  
+    <div style="text-align: center; margin-bottom: 30px;">
+  
+      <ul class="pin">
+        <li>
+          <img [src]="Pin1" />
+        </li>
+        <li>
+          <img [src]="Pin2" />
+        </li>
+        <li>
+          <img [src]="Pin3" />
+        </li>
+        <li>
+          <img [src]="Pin4" />
+        </li>
+        <li>
+          <img [src]="Pin5" />
+        </li>
+      </ul>
+
+      <ul class="pin number">
+        <li>
+          <img [src]="Number1" (click)="SetPin(1)" />
+        </li>
+        <li>
+          <img [src]="Number2" (click)="SetPin(2)" />
+        </li>
+        <li>
+          <img [src]="Number3" (click)="SetPin(3)" />
+        </li>
+        <li>
+          <img [src]="Number4" (click)="SetPin(4)" />
+        </li>
+        <li>
+          <img [src]="Number5" (click)="SetPin(5)" />
+        </li>
+        <li>
+          <img [src]="Number6" (click)="SetPin(6)" />
+        </li>
+        <li>
+          <img [src]="Number7" (click)="SetPin(7)" />
+        </li>
+        <li>
+          <img [src]="Number8" (click)="SetPin(8)" />
+        </li>
+        <li>
+          <img [src]="Number9" (click)="SetPin(9)" />
+        </li>
+        <li>
+          
+        </li>
+        <li>
+          <img [src]="Number0" (click)="SetPin(0)" />
+        </li>
+        <li>
+          <img [src]="NumberB" (click)="SetPin(-1)" />
+        </li>
+      </ul>
+  
+    </div>
+
+  </div>
+    
+  <div class="error-message" *ngIf="ConfirmPinFailed">
+    Pin and Confirm Pin not the same! Please try again below.
+  </div>
+
+</ion-content>

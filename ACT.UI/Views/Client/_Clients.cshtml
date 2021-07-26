@@ -1,0 +1,248 @@
+﻿@model PagingExtension
+
+@using ACT.Data.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
+@using ACT.UI.Models;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_Clients";
+}
+
+
+@Html.Partial( "_Notification" )
+
+
+@{
+    UserModel user = User.Get();
+
+    int count = Model.Start;
+    List<ClientCustomModel> items = ( List<ClientCustomModel> ) Model.Items;
+}
+
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Clients available matching your search criteria.
+    </div>
+}
+
+@if ( user.IsAdmin || user.IsPSPAdmin )
+{
+    <p>
+        @Html.ActionLink( "Add", "AddClient", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Client?", @data_edit = "1", @data_id = 0, @data_target = "#clients" } )
+        <span class="loader"></span>
+    </p>
+}
+
+
+<table id="clients-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#clients-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="CreatedOn" data-column="c.CreatedOn">
+                Created
+            </th>
+            <th data-name="PSPName" data-column="p.CompanyName">
+                PSP
+            </th>
+            <th data-name="CompanyName" data-column="c.CompanyName">
+                Company Name
+            </th>
+            <th data-name="Contact" data-column="c.ContactPerson">
+                Contact
+            </th>
+            @*<th data-name="Suburb" data-column="c.FinancialPerson">
+                    Finance Contact
+                </th>
+                <th data-name="ContactPerson" data-column="c.AdminPerson">
+                    Admin Contact
+                </th>*@
+            <th data-name="ChepReference" data-column="c.ChepReference">
+                Chep Ref
+            </th>
+            <th data-name="ServiceRequired" data-column="c.ServiceRequired">
+                Service Required
+            </th>
+            <th data-name="Status" data-column="c.Status">
+                Status
+            </th>
+            @*<th data-name="UserCount" data-column="UserCount">
+                Users
+            </th>*@
+            <th data-name="ProductCount" data-column="ProductCount">
+                Products
+            </th>
+            <th data-name="InvoiceCount" data-column="InvoiceCount">
+                Invoices
+            </th>
+            <th data-name="BudgetCount" data-column="BudgetCount">
+                Budget
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                PSPClientStatus status = ( PSPClientStatus ) item.Status;
+                ServiceType serviceType = ( ServiceType ) item.ServiceRequired;
+
+                string enable = status.Equals( PSPClientStatus.Verified ) ? "Disable" : "Enable";
+                string active = status == PSPClientStatus.Verified ? "active" : status == PSPClientStatus.Unverified ? "pending" : "inactive";
+
+                if ( item.BudgetCount <= 0 && item.EstimatedLoadCount > 0 )
+                {
+                    item.BudgetCount = item.EstimatedLoadCount;
+                }
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Client">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @(item.PSPCompanyName ?? item.PSPName )
+
+                        @if ( string.IsNullOrEmpty( item.PSPCompanyName ) && !string.IsNullOrEmpty( item.PSPName ) )
+                        {
+                            <a rel="tipsyW" title="This PSP might not exist in this system yet!">
+                                <img alt="" src="@Url.Content( "~/Images/warn.png" )" />
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @item.CompanyName
+
+                        <i class="block">Reg # @item.CompanyRegistrationNumber</i>
+                    </td>
+                    <td>
+                        @item.ContactPerson
+                        <a class="block" href="mailto:@item.Email">@item.Email @item.ContactNumber</a>
+                    </td>
+                    @*<td>
+                            @item.FinancialPerson
+                            <a class="block" href="mailto:@item.FinPersonEmail">@item.FinPersonEmail</a>
+                        </td>
+                        <td>
+                            @item.AdminPerson
+                            <a class="block" href="mailto:@item.AdminEmail">@item.AdminEmail</a>
+                        </td>*@
+                    <td>
+                        @item.ChepReference
+                    </td>
+                    <td>
+                        @serviceType.GetDisplayText()
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+
+                        @if ( status == PSPClientStatus.Rejected && !string.IsNullOrWhiteSpace( item.DeclinedReason ) )
+                        {
+                            <i class="block">@item.DeclinedReason</i>
+                        }
+                    </td>
+                    @*<td>
+                        @if ( item.UserCount > 0 )
+                        {
+                            @Html.ActionLink( item.UserCount.ToString(), "ClientUsers", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        }
+                    </td>*@
+                    <td>
+                        @if ( item.ProductCount > 0 )
+                        {
+                            @Html.ActionLink( item.ProductCount.ToString(), "ClientProducts", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        }
+                    </td>
+                    <td>
+                        @if ( item.InvoiceCount > 0 )
+                        {
+                            @Html.ActionLink( item.InvoiceCount.ToString(), "ClientInvoices", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        }
+                    </td>
+                    <td>
+                        @if ( item.BudgetCount > 0 )
+                        {
+                            @Html.ActionLink( item.BudgetCount.ToString(), "ClientBudgets", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        }
+                    </td>
+
+                    <td width="12%">
+
+                        @if ( status == PSPClientStatus.Unverified && user.IsAdmin )
+                        {
+                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                                @Html.ActionLink( "Approve / Decline", "ApproveDeclineClient", new { id = item.Id, returnView = "Clients" }, new { @class = "approve", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            </div>
+                        }
+
+                        @if ( status != PSPClientStatus.Unverified )
+                        {
+                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                                @Html.ActionLink( "Details", "ClientDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                                @Html.ActionLink( "Edit", "EditClient", new { id = item.Id, returnView = "Clients" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            </div>
+                        }
+
+                        @if ( item.Documents != null && item.Documents.Any( s => s.Name.ToLower() != "logo" && s.Status == ( Int32 ) Status.Active ) )
+                        {
+                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                                <a class="docs" data-sticky-one="1" data-target="#client-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Client Documents">
+                                    Docs
+                                </a>
+                                <div id="client-@item.Id-docs" class="none">
+                                    <ul class="list">
+                                        @foreach ( var d in item.Documents.Where( s => s.Name.ToLower() != "logo" && s.Status == ( Int32 ) Status.Active ) )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )" target="_blank">
+                                                    @d.Description (@d.Type)
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                            </div>
+                        }
+
+                        @if ( status == PSPClientStatus.Verified || status == PSPClientStatus.Inactive )
+                        {
+                            @Html.ActionLink( enable, "DeleteClient", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clients", @rel = "tipsyE", @title = enable + " this item?" } )
+                        }
+
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )

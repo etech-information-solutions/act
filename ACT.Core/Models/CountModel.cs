@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace ACT.Core.Models
 {
-    class CountModel
+    public class CountModel
     {
         public decimal? Sum { get; set; }
 
         public int Total { get; set; }
+
+        public string Description { get; set; }
     }
 }

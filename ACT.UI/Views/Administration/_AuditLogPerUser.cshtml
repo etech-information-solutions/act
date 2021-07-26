@@ -1,0 +1,257 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+
+@Html.Partial( "_Notification" )
+
+@{
+    int count = Model.Start;
+    List<ClientLoadAuditLogModel> items = ( List<ClientLoadAuditLogModel> ) Model.Items;
+
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_AuditLogPerUser";
+}
+
+@if ( !items.NullableAny() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Client Load Audit Logs Per User available matching your search criteria.
+    </div>
+}
+
+<table id="audit-log-per-user-table" class="da-table datatable-numberpaging sort fixed-headerx" data-fixed-header-target="#audit-log-per-user-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="AuditUserName" data-column="AuditUserName">
+                Enquiry Log User
+            </th>
+            <th data-name="AuditUserRole" data-column="AuditUserRole">
+                User Role
+            </th>
+            <th data-name="AuditLogCreatedOn" data-column="AuditLogCreatedOn">
+                Event Date
+            </th>
+            <th data-name="EffectiveDate" data-column="cl.EffectiveDate">
+                Pallet Date
+            </th>
+            <th data-name="GLID" data-column="cl.GLID">
+                GLID
+            </th>
+            <th data-name="FromSiteName" data-column="FromSiteName">
+                Supplier
+            </th>
+            <th data-name="LoadNumber" data-column="cl.LoadNumber">
+                Load #
+            </th>
+            <th data-name="DocumentType">
+                Document Type
+            </th>
+            <th data-name="ClientDescription" data-column="cl.ClientDescription">
+                Customer
+            </th>
+            <th data-name="FromRegionCode" data-column="FromRegionCode">
+                Region From
+            </th>
+            <th data-name="ToRegionCode" data-column="ToRegionCode">
+                Region To
+            </th>
+            <th data-name="PCNNumber" data-column="cl.PCNNumber">
+                PCN
+            </th>
+            <th data-name="OtherRef" data-column="ecl.OtherRef">
+                Other Ref
+            </th>
+            <th data-name="PODComment" data-column="PODComment">
+                Comment
+            </th>
+            <th data-name="TransporterName" data-column="TransporterName">
+                Transporter
+            </th>
+            <th data-name="TransporterNumber" data-column="TransporterNumber">
+                Transporter #
+            </th>
+            <th data-name="VehicleRegistration" data-column="VehicleRegistration">
+                Truck Reg #
+            </th>
+            <th data-name="VehicleFleetNumber" data-column="VehicleFleetNumber">
+                Truck #
+            </th>
+            <th data-name="PalletReturnSlipNo" data-column="ecl.PalletReturnSlipNo">
+                Pallet Return Note
+            </th>
+            <th data-name="ClientLoadNotes" data-column="cl.ClientLoadNotes">
+                Pallet Notes
+            </th>
+            <th data-name="DebtorsCode" data-column="DebtorsCode">
+                Debtors Code
+            </th>
+            <th data-name="ToSiteName" data-column="ToSiteName">
+                Site
+            </th>
+            <th data-name="AuthorizerName" data-column="AuthorizerName">
+                Pallet Authorization By
+            </th>
+            <th data-name="AuthorizationCode" data-column="AuthorizationCode">
+                Pallet Authorization Code
+            </th>
+            <th data-name="LoadType" data-column="ecl.DocumentType">
+                Load Type
+            </th>
+            <th data-name="PalletReturnDate" data-column="PalletReturnDate">
+                Pallet Return Date
+            </th>
+            <th data-name="DeliveryNote" data-column="cl.DeliveryNote">
+                Delivery Note
+            </th>
+            <th data-name="PODNumber" data-column="cl.PODNumber">
+                Invoice #
+            </th>
+            <th data-name="Ref" data-column="ecl.Ref">
+                Customer Order #
+            </th>
+            <th data-name="DeliveryDate" data-column="ecl.DeliveryDate">
+                Delivery Date
+            </th>
+            <th data-name="CustomerAccountNumber" data-column="CustomerAccountNumber">
+                Customer Acc #
+            </th>
+            <th data-name="ReferenceNumber" data-column="cl.ReferenceNumber">
+                Sales Order #
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( items.NullableAny() )
+        {
+            foreach ( ClientLoadAuditLogModel item in items )
+            {
+                string loadType = "THAN";
+
+                if ( item.ClientLoad?.CustomerType?.ToUpper()?.Contains( "EXCHANGE" ) == true || item.ClientLoad?.ReceiverNumber?.StartsWith( "50000" ) == true || item.ClientLoad?.ReceiverNumber?.StartsWith( "52" ) == true || item.ClientLoad?.ReceiverNumber?.StartsWith( "51" ) == true )
+                {
+                    loadType = "PCN";
+                }
+                else if ( item?.ExtendedClientLoad?.Id > 0 && ( DocumentType ) item?.ExtendedClientLoad?.DocumentType == DocumentType.ACTControlDoc )
+                {
+                    loadType = "OTHER";
+                }
+
+                <tr id="tr-@item.AuditLogId-audit-log-per-user" class="tr-@item.AuditLogId-audit-log-per-user">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.AuditUserName
+                    </td>
+                    <td>
+                        @item.AuditUserRole
+                    </td>
+                    <td>
+                        @item.AuditLogCreatedOn
+                    </td>
+                    <td>
+                        @(item.ClientLoad?.EffectiveDate)
+                    </td>
+                    <td>
+                        @(item.ClientLoad?.GLID)
+                    </td>
+                    <td>
+                        @(item.FromSiteName)
+                    </td>
+                    <td>
+                        @(item.ClientLoad?.LoadNumber)
+                    </td>
+                    <td>
+                        @( ( item.ExtendedClientLoad?.Id > 0 && item.ExtendedClientLoad?.DocumentType > -1 ? ( DocumentType ) item.ExtendedClientLoad?.DocumentType : DocumentType.None ).GetDisplayText() )
+                    </td>
+                    <td>
+                        @(item.ClientLoad?.ClientDescription)
+                    </td>
+                    <td>
+                        @(item.FromRegionCode)
+                    </td>
+                    <td>
+                        @(item.ToRegionCode)
+                    </td>
+                    <td>
+                        @(item.ClientLoad?.PCNNumber)
+                    </td>
+                    <td>
+                        @(item.ExtendedClientLoad?.OtherRef)
+                    </td>
+                    <td>
+                        @(item.PODComment)
+                    </td>
+                    <td>
+                        @(item.TransporterName)
+                    </td>
+                    <td>
+                        @(item.TransporterNumber)
+                    </td>
+                    <td>
+                        @(item.VehicleRegistration)
+                    </td>
+                    <td>
+                        @(item.VehicleFleetNumber)
+                    </td>
+                    <td>
+                        @(item.ExtendedClientLoad?.PalletReturnSlipNo)
+                    </td>
+                    <td>
+                        @(item.ClientLoad?.ClientLoadNotes)
+                    </td>
+                    <td>
+                        @(item.DebtorsCode)
+                    </td>
+                    <td>
+                        @(item.ToSiteName)
+                    </td>
+                    <td>
+                        @(item.AuthorizerName)
+                    </td>
+                    <td>
+                        @(item.AuthorizationCode)
+                    </td>
+                    <td>
+                        @loadType
+                    </td>
+                    <td>
+                        @(item.ExtendedClientLoad?.PalletReturnDate)
+                    </td>
+                    <td>
+                        @(item.ClientLoad?.DeliveryNote)
+                    </td>
+                    <td>
+                        @(item.ClientLoad?.PODNumber)
+                    </td>
+                    <td>
+                        @(item.ExtendedClientLoad?.Ref)
+                    </td>
+                    <td>
+                        @(item.ExtendedClientLoad?.DeliveryDate)
+                    </td>
+                    <td>
+                        @(item.CustomerAccountNumber)
+                    </td>
+                    <td>
+                        @(item.ClientLoad?.ReferenceNumber)
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )

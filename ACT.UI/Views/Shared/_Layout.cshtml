@@ -10,7 +10,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>@ViewBag.Title - ACT Pallet Solutions</title>
@@ -21,53 +21,13 @@
     @Styles.Render( "~/Content/jqueryui" )
     @Scripts.Render( "~/bundles/modernizr" )
     @Scripts.Render( "~/bundles/jquery" )
+
 </head>
 <body>
 
     <div class="container">
 
         <div class="@(Request.IsAuthenticated ? "logged-in" : "")">
-
-            @if ( Request.IsAuthenticated )
-            {
-                @*<div id="my-account" class="header my-account" style="border-bottom: 1px solid #eee1e0;">
-
-                    <div class="left" style="width: 22%;">
-
-                        <a href="@Url.Action( "Index", "DashBoard" )">
-                            <img alt="ACT - Pallets" src="@Url.Content( "~/images/act-logo.png" )" style="width: 40%; border-right: 1px solid #848484; padding-right: 73px;" />
-                        </a>
-
-                        <strong style="font-size: 13px; padding-left: 20px;">
-                            @DateTime.Now.ToString( "dd / MM / yyyy" )
-                        </strong>
-
-                    </div>
-
-                    <div class="right" style="font-size: 13px;">
-
-                        <span class="left" style="text-align: right;">
-                            Welcome:
-
-                            <strong class="block">@user.Name @user.Surname</strong>
-                        </span>
-
-                        <div class="clear"></div>
-
-                    </div>
-
-                    <div class="clear"></div>
-
-                </div>*@
-            }
-            else
-            {
-                @*<div class="logo @(Request.IsAuthenticated ? "logged-in" : "")">
-                        <a href="@Url.Action( "Login", "Account" )">
-                            <img alt="ACT - Pallets" src="@Url.Content( "~/images/act-logo.png" )" />
-                        </a>
-                    </div>*@
-            }
 
             <div class="sep @(Request.IsAuthenticated ? "logged-in" : "")"></div>
 
@@ -86,13 +46,6 @@
 
         <div id="main-content" class="content @(Request.IsAuthenticated ? "logged-in" : "")" style="margin-bottom: 0;">
 
-            @Html.Partial( "_Notification" )
-
-            @if ( Request.IsAuthenticated )
-            {
-                @*<strong class="main-title">@ViewBag.Title</strong>*@
-            }
-
             <div id="item-list" class="body">
 
                 @RenderBody()
@@ -110,6 +63,14 @@
 
         </footer>
 
+        <div id="dialog-select" title="Select Client" style="margin-top: 300px; margin-left:auto;">
+            <div id="modalform" class="editor-field" style="display:none;">
+
+                <select id="client" name="client">
+                    <option value="">Select Client</option>
+                </select>
+            </div>
+        </div>
     </div>
 
 
@@ -165,9 +126,11 @@
         var imgurl = "@absoluteUrlBase/";
         var siteurl = "@Url.Content( String.Format( "~/{0}/", controller ) )";
 
-            var lgt = "@( ( Request.IsAuthenticated ) ? alo : "-1")";
-            var atr = "@( ( Request.IsAuthenticated ) ? atr : "-1")";
-            var cas = "@( ( Request.IsAuthenticated ) ? VariableExtension.SystemRules.LogoffSeconds : 0)";
+        var lgt = "@( ( Request.IsAuthenticated ) ? alo : "-1")";
+        var atr = "@( ( Request.IsAuthenticated ) ? atr : "-1")";
+        var cas = "@( ( Request.IsAuthenticated ) ? VariableExtension.SystemRules.LogoffSeconds : 0)";
+
+        var authenticated = @Request.IsAuthenticated.ToString().ToLower();
     </script>
 
     @Scripts.Render( "~/bundles/jqueryval" )
@@ -176,6 +139,5 @@
     @Scripts.Render( "~/bundles/act" )
 
     <div id="empty-div" style="display: none;"></div>
-
 </body>
 </html>

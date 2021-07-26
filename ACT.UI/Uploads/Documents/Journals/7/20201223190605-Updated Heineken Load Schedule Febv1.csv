@@ -1,0 +1,37 @@
+ClientLoad Table,Mapping,Client Load File
+Id,System Generated,LU Account
+ClientId,Id on client table,LU Description
+VehicleId,"Id on Vehcile table (look for Vehicle License to on Vehicle table)  if not there look for carrier name or carrier code in transporter table, and add vehicle to transporter",Tour No
+ClientSiteId,"Look on sites at site name,and look at site code chep to find the right Site ID. Fine the site in the clientsite table, add to CLIentSIte if is is not there. ",Loading date
+OutstandingReasonId,This  will be completed later by agent so blank on load,Delivery Date
+CreatedOn,System date,Customer Code
+ModifiedOn,System date,Customer Name
+ModifiedBy,User loading data,Sender Name
+LoadNumber,Tour No,Receiver Name
+LoadDate,Loading Date,Delivery Order
+EffectiveDate,Delivery Date,Document No
+NotifyDate,null,POD No
+AccountNumber,Customer Code,Client Order No
+ClientDescription,Customer Name,Vehicle License
+DeliveryNote,Client Order No,Carrier Code
+ReferenceNumber,Document NO,Carrier Name
+ReceiverNumber,Client Order No,Pallet Balance
+Equipment,Null,Pen/THAN
+OriginalQuantity,Pallet Balance,Authorisation code
+NewQuantity,Null,Depot Trans No
+ReconcileInvoice,null,Return No
+ReconcileDate,null,Debrief No
+PODNumber,POD No,Recv Region
+PCNNumber,null,
+PRNNumber,Return No,
+Status, ,
+InputInd, Imported or captured,
+THAN,Pen/THAN,
+ReturnQty,If PRNNUMBER exists put the pallet qty here,
+OutstandingQty,null,
+DebriefQty, ,
+AdminMovement,null,
+TransporterLiable,null,
+ChepInvoiceNo, ,
+ChepCompensationNo,,
+0,,

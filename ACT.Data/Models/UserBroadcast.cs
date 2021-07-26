@@ -19,7 +19,7 @@ namespace ACT.Data.Models
         public int BroadcastId { get; set; }
         public System.DateTime CreatedOn { get; set; }
     
-        public virtual User User { get; set; }
         public virtual Broadcast Broadcast { get; set; }
+        public virtual User User { get; set; }
     }
 }

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "354569239891",
+    "project_id": "mobile-testact-co-za",
+    "storage_bucket": "mobile-testact-co-za.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:354569239891:android:86e869af3e590eae41f5a6",
+        "android_client_info": {
+          "package_name": "mobile.testact.co.za"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "354569239891-vs89s00g5bnc7a5neot2oedu3ijaig7c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHqzoEsJh4wiAUYI83vbOilYw52SXcsKQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "354569239891-vs89s00g5bnc7a5neot2oedu3ijaig7c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

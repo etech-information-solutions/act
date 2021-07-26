@@ -21,8 +21,9 @@ namespace ACT.Data.Models
         public System.DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
         public int Status { get; set; }
+        public string GroupName { get; set; }
     
         public virtual Group Group { get; set; }
-        public virtual PSPClient PSPClient { get; set; }
+        public virtual Client Client { get; set; }
     }
 }

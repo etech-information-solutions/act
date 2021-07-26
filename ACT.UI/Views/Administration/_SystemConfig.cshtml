@@ -80,6 +80,13 @@
                 @Html.DisplayFor( model => model.InvoiceRunDay )
             </div>
 
+            <div class="display-label">
+                Client Contract Renewal Reminder (in months)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.ClientContractRenewalReminderMonths )
+            </div>
+
         </div>
 
         <div class="left" style="width: 48%;">
@@ -103,6 +110,13 @@
             </div>
             <div class="display-field">
                 @Html.DisplayFor( model => model.PasswordChange )
+            </div>
+
+            <div class="display-label">
+                Dispute Resolve Time (in days)
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.DisputeDaysToResolve )
             </div>
 
             <div class="display-label">
@@ -131,6 +145,100 @@
             </div>
             <div class="display-field">
                 <a href="@Model.WebsiteUrl" target="_blank">@Model.WebsiteUrl</a>
+            </div>
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+        <div class="left" style="width: 48%; margin-right: 1%;">
+
+            <div class="display-label">
+                Dispute Monitor Path
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.DisputeMonitorPath )
+            </div>
+
+            <div class="display-label">
+                Dispute Monitor Time
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.DisputeMonitorTime )
+            </div>
+
+            <div class="display-label">
+                Dispute Monitor Interval
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.DisputeMonitorInterval )
+            </div>
+
+            <div class="display-label">
+                Last Dispute Monitor Run
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.LastDisputeMonitorRun )
+            </div>
+
+            <div class="display-label">
+                Last Dispute Monitor Count
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.LastDisputeMonitorCount )
+            </div>
+
+            <div class="display-label">
+                Dispute Monitor Enabled
+            </div>
+            <div class="display-field">
+                @Model.DisputeMonitorEnabled
+            </div>
+
+        </div>
+
+        <div class="left" style="width: 48%;">
+
+            <div class="display-label">
+                Client Monitor Path
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.ClientMonitorPath )
+            </div>
+
+            <div class="display-label">
+                Client Monitor Time
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.ClientMonitorTime )
+            </div>
+
+            <div class="display-label">
+                Client Monitor Interval
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.ClientMonitorInterval )
+            </div>
+
+            <div class="display-label">
+                Last Client Monitor Run
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.LastClientMonitorRun )
+            </div>
+
+            <div class="display-label">
+                Last Client Monitor Count
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor( model => model.LastClientMonitorCount )
+            </div>
+
+            <div class="display-label">
+                Client Monitor Enabled
+            </div>
+            <div class="display-field">
+                @Model.ClientMonitorEnabled
             </div>
 
         </div>

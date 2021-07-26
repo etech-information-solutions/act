@@ -1,0 +1,74 @@
+<ion-header [translucent]="true" style="color: #002e70 !important;">
+  <ion-toolbar style="color: #002e70 !important;">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      <img (click)="this.auth.OnShowContact()" alt="Contact" src="../../assets/imgs/contact.png" style="width: 36px;" />
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-icon name="notifications" size="large" (click)="this.auth.GoToPage('notifications')"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" (ionScroll)="this.auth.OnScroll($event)" [scrollEvents]="true">
+  
+  <!-- fab placed to the top end -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="this.auth.ShowScroll" (click)="this.auth.ScrollToTop();">
+    <ion-fab-button>
+      <ion-icon name="chevron-up"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-refresher (ionRefresh)="Refresh($event)" slot="fixed">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-item-divider style="margin-bottom: 20px;">
+    <ion-label style="text-transform: uppercase;">
+      Notifications
+    </ion-label>
+  </ion-item-divider>
+
+  <ion-item>
+    <ion-input type="search" name="Query" placeholder="search" [(ngModel)]="Query" (ionChange)="Search()">
+      <ion-icon name="search" slot="start" style="padding-right: 10px;"></ion-icon>
+    </ion-input>
+  </ion-item>
+
+  <ion-list *ngIf="Notifications != undefined && Notifications.length > 0">
+
+    <div *ngFor="let r of Notifications">
+
+      <ion-item *ngIf="r != undefined">
+  
+        <ion-label (click)="GoToNotification(r.Id)" [class]="r.Status == 0 ? 'unread': ''">
+  
+          <ion-icon *ngIf="r.Status == 0" name="mail"></ion-icon>
+    
+          <ion-icon *ngIf="r.Status == 1" name="mail-open"></ion-icon>
+          
+          <p style="font-size: 13px;">
+            {{r.Message}}
+          </p>
+  
+          <p style="font-size: 12px;">
+            {{this.auth.GetShortDate(r.CreatedOn, 'yyyy/MM/dd')}} @ {{this.auth.GetShortTime(r.CreatedOn)}}
+          </p>
+  
+        </ion-label>
+
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+  
+      </ion-item>
+
+    </div>
+
+  </ion-list>
+
+  <ion-infinite-scroll threshold="200px" (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+ 
+</ion-content>

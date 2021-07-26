@@ -1,6 +1,6 @@
 ﻿@model PagingExtension
 
-@using ACT.Data.Models;
+@using ACT.Core.Models.Custom;
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
 
@@ -19,8 +19,8 @@
 
 
 @{
-    Int32 count = Model.Start;
-    List<User> items = ( List<User> ) Model.Items;
+    int count = Model.Start;
+    List<UserCustomModel> items = ( List<UserCustomModel> ) Model.Items;
 }
 
 
@@ -58,6 +58,9 @@
             <th data-name="LastLogin" data-column="LastLogin">
                 Last Login
             </th>
+            <th data-name="Support">
+                Support
+            </th>
             <th data-name="Actions">
                 Actions
             </th>
@@ -71,17 +74,10 @@
             {
                 Status status = ( Status ) item.Status;
 
-                Role role = new Role() { Name = "~/~", Type = -1 };
+                RoleType roleType = ( RoleType ) item.Type;
 
-                if ( item.UserRoles.Any() )
-                {
-                    role = item.UserRoles.FirstOrDefault().Role;
-                }
-                
-                RoleType roleType = ( RoleType ) role.Type;
-
-                String active = status.Equals( Status.Active ) ? "active" : "inactive";
-                String enable = status.Equals( Status.Active ) ? "Disable" : "Enable";
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
 
@@ -104,10 +100,51 @@
                         @status.GetDisplayText()
                     </td>
                     <td>
-                        @roleType.GetDisplayText()
+                        @item.RoleName
+
+                        @*@if ( roleType == RoleType.Client )
+                        {
+                            <div style="border: 1px dashed #fff; border-radius: 4px; padding: 6px; margin-top: 10px;">
+
+                                <ul class="list">
+                                    @foreach ( Client c in item.ClientUsers.Where( c => c.Status == ( int ) Status.Active ).Select( s => s.Client ) )
+                                    {
+                                        <li>
+                                            <a data-quick-link="1" data-target="#psps" data-id="@c.Id">
+                                                @c.CompanyName (@c.CompanyRegistrationNumber)
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+
+                            </div>
+                        }
+
+                        else if ( roleType == RoleType.PSP )
+                        {
+                            <div style="border: 1px dashed #fff; border-radius: 4px; padding: 6px; margin-top: 10px;">
+
+                                <ul class="list">
+                                    @foreach ( PSP p in item.PSPUsers.Where( c => c.Status == ( int ) Status.Active ).Select( s => s.PSP ) )
+                                    {
+                                        <li>
+                                            <a data-quick-link="1" data-target="#psps" data-id="@p.Id">
+                                                @p.CompanyName (@p.CompanyRegistrationNumber)
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+
+                            </div>
+                        }*@
                     </td>
                     <td>
                         @item.LastLogin
+                    </td>
+                    <td width="15%">
+                        <b>Can Use Chats:</b> @item.SendChat <br />
+                        <b>Can Respond to Chats:</b> @item.ReceiveChat <br />
+                        <b>Online Status:</b> @( ( ( OnlineStatus ) item.ChatStatus ).GetDisplayText() )
                     </td>
                     <td width="15%">
                         @Html.ActionLink( "Details", "UserDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
@@ -121,7 +158,7 @@
                     </td>
 
                 </tr>
-                
+
                 count++;
             }
         }

@@ -1,0 +1,107 @@
+﻿@model AuthorisationCodeViewModel
+
+@using ACT.UI.Models
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Add Authorisation Code";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "AddAuthorisationCode", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#authorisationcodes", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content( "~/images/add.png" )" />
+            <span>Add Authorisation Code</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="left" style="width: 48%; margin-right: 3%;">
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.ClientSiteId, new { @style = "display: inline-block;" } )
+                </div>
+                <div class="edit-field">
+                    @Html.DropDownListFor( model => model.ClientSiteId, model => model.ClientSiteOptions, c => c.Key, c => c.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.ClientSiteId )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.TransporterId )
+                </div>
+                <div class="edit-field">
+                    @Html.DropDownListFor( model => model.TransporterId, model => model.TransporterOptions, s => s.Key, s => s.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.TransporterId )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Status )
+                </div>
+                <div class="edit-field">
+                    @Html.EnumDropDownFor( model => model.Status, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.Status )
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 48%;">
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Code )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.Code, new { @placeholder = "< to be generated >", data_always_disabled = "1" } )
+                    @Html.ValidationMessageFor( model => model.Code )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.AuthorisationDate )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.AuthorisationDate, new { @placeholder = "Select Authorisation Date", @class = "date-picker", @readonly = "readonly" } )
+                    @Html.ValidationMessageFor( model => model.AuthorisationDate )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.LoadNumber )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.LoadNumber, new { @placeholder = "Enter Load Number" } )
+                    @Html.ValidationMessageFor( model => model.LoadNumber )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.DocketNumber )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.DocketNumber, new { @placeholder = "Enter Docket Number" } )
+                    @Html.ValidationMessageFor( model => model.DocketNumber )
+                </div>
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 10px 0; height: 0;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-refresh="1" data-target="#authorisationcodes">Cancel</a>
+            </p>
+
+        </div>
+
+    </div>
+}

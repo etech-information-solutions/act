@@ -1,0 +1,107 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Models;
+
+@Html.Partial( "_Notification" )
+
+@{
+    int count = Model.Start;
+    List<PODUploadLogModel> items = ( List<PODUploadLogModel> ) Model.Items;
+
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_PODUploadLog";
+}
+
+@if ( !items.NullableAny() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Granular POD Upload Logs available matching your search criteria.
+    </div>
+}
+
+<table id="pod-upload-log-count-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#pod-upload-log-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="UserName" data-column="UserName">
+                User Name
+            </th>
+            <th data-name="LoadNumber" data-column="LoadNumber">
+                Load #
+            </th>
+            <th data-name="DeliveryNoteNumber" data-column="DeliveryNoteNumber">
+                Delivery Note #
+            </th>
+            <th data-name="SiteName" data-column="SiteName">
+                Site
+            </th>
+            <th data-name="PODCommentDate" data-column="PODCommentDate">
+                Upload Date Time
+            </th>
+            <th data-name="PODLinks">
+                POD Download Link (s)
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( items.NullableAny() )
+        {
+            foreach ( PODUploadLogModel item in items )
+            {
+                string[] podLinks = item.PODLinks?.Split( ',' );
+
+                <tr id="tr-@item.UserName-@item.PODCommentDate.Ticks-pod-upload-log" class="tr-@item.UserName-@item.PODCommentDate.Ticks-pod-upload-log">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.UserName
+                    </td>
+                    <td>
+                        @item.LoadNumber
+                    </td>
+                    <td>
+                        @item.DeliveryNote
+                    </td>
+                    <td>
+                        @item.ToSiteName
+                    </td>
+                    <td>
+                        @item.PODCommentDate.ToString( "dd/MM/yyyy @ HH:mm:ss" )
+                    </td>
+                    <td>
+                        @if ( podLinks.NullableAny() )
+                        {
+                            <ul class="list">
+                                @foreach ( string id in podLinks )
+                                {
+                                    <li>
+                                        <a href="@Url.Action( "ViewImage", new { id = id } )" target="_blank">
+                                            View POD
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <i>-- N/A --</i>
+                        }
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )

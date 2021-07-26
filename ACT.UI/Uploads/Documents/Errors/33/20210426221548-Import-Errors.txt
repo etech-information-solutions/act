@@ -1,0 +1,84 @@
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Create(T item, Boolean track)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)
+System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at ACT.Core.Services.BaseService`1.Update(T item)
+   at ACT.UI.Controllers.ClientController.ImportSite(SiteViewModel model)

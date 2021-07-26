@@ -1,0 +1,35 @@
+<ion-header [translucent]="true" style="color: #002e70 !important;">
+  <ion-toolbar style="color: #002e70 !important;">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      <img (click)="this.auth.OnShowContact()" alt="Contact" src="../../assets/imgs/contact.png" style="width: 36px;" />
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-icon name="notifications" size="large" (click)="this.auth.GoToPage('notifications')"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <ion-item-divider>
+    <ion-label>
+      Outstanding Pallets (per client)
+    </ion-label>
+    <ion-icon name="document-text-outline" slot="end" (click)="ShowDetail(1)"></ion-icon>
+  </ion-item-divider>
+
+  <div id="outstanding-pallets-per-client" class="shadow2" style="display: block; margin: 30px 20px 30px 20px;"></div>
+
+  <ion-item-divider>
+    <ion-label>
+      Outstanding Pallets (per site)
+    </ion-label>
+    <ion-icon name="document-text-outline" slot="end" (click)="ShowDetail(2)"></ion-icon>
+  </ion-item-divider>
+
+  <div id="outstanding-pallets-per-site" class="shadow2" style="display: block; margin: 30px 20px 30px 20px;"></div>
+
+</ion-content>

@@ -1,0 +1,12 @@
+
+ion-item-divider ion-label {
+    padding: 10px 0;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
+ion-item-divider.ios ion-label {
+    padding: 20px 0;
+    font-size: 14px;
+    font-weight: normal;
+}

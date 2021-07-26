@@ -1,0 +1,178 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ViewName = "_PODManagement";
+}
+
+@Html.Partial( "_Notification" )
+
+@{
+    int count = Model.Start;
+    List<ClientLoadCustomModel> items = ( List<ClientLoadCustomModel> ) Model.Items;
+}
+
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Oustanding shipments available matching your search criteria.
+    </div>
+}
+
+<table id="PODManagement-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#PODManagement-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="LoadDate" data-column="cl.LoadDate">
+                Shipment Date
+            </th>
+            <th data-name="LoadNumber" data-column="cl.LoadNumber">
+                Shipment No.
+            </th>
+            <th data-name="PCNNumber" data-column="cl.PCNNumber">
+                PCN
+            </th>
+            <th data-name="PODNumber" data-column="cl.PODNumber">
+                POD
+            </th>
+            <th data-name="PRNNumber" data-column="cl.PRNNumber">
+                PRN
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                <tr id="PODManagement-@item.Id-item" class="PODManagement-@item.Id-item">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
+                    </td>
+                    <td>
+                        @item.LoadNumber
+                    </td>
+                    <td>
+                        @item.PCNNumber
+
+                        @if ( item.Images.NullableAny( i => i.ObjectType == "PCNNumber" ) )
+                        {
+                            <div class="right">
+                                <a class="camera" data-sticky-one="1" data-target="#clientload-@item.Id-PCNSnapshoot" data-trigger="mouseover" data-arrow="center-right" data-title="PCN Snapshoot">
+                                    <img src="@Url.Content( "~/Images/camera.png" )" />
+                                </a>
+                                <div id="clientload-@item.Id-PCNSnapshoot" class="none">
+                                    <ul class="list">
+                                        @foreach ( var d in item.Images.Where( i => i.ObjectType == "PCNNumber" ) )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                <a rel="tipsyW" title="View Snapshoot?" href="@Url.Action( "ViewImage", "Transporter", new { @id = d.Id } )" target="_blank">
+                                                    View (@d.Extension)
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        }
+
+                        @if ( !string.IsNullOrEmpty( item.PCNComments ) && !string.IsNullOrEmpty( item.PCNCommentBy ) && item.PCNCommentDate.HasValue )
+                        {
+                            <div style="border-top: 1px solid #ddd; padding-top: 5px; margin-top: 8px;">
+                                <i>@item.PCNCommentBy:</i> @item.PCNComments
+                                <em class="block"><small>On @item.PCNCommentDate.Value.ToString( "yyyy-MM-dd @ HH:mm tt" )</small></em>
+                            </div>
+                        }
+                    </td>
+                    <td>
+                        @item.PODNumber
+
+                        @if ( item.Images.NullableAny( i => i.ObjectType == "PODNumber" ) )
+                        {
+                            <div class="right">
+                                <a class="camera" data-sticky-one="1" data-target="#clientload-@item.Id-PODSnapshoot" data-trigger="mouseover" data-arrow="center-right" data-title="POD Snapshoot">
+                                    <img src="@Url.Content( "~/Images/camera.png" )" />
+                                </a>
+                                <div id="clientload-@item.Id-PODSnapshoot" class="none">
+                                    <ul class="list">
+                                        @foreach ( var d in item.Images.Where( i => i.ObjectType == "PODNumber" ) )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                <a rel="tipsyW" title="View Snapshoot?" href="@Url.Action( "ViewImage", "Transporter", new { @id = d.Id } )" target="_blank">
+                                                    View (@d.Extension)
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        }
+
+                        @if ( ( !string.IsNullOrEmpty( item.PODComments ) || !string.IsNullOrEmpty( item.PODComment ) ) && !string.IsNullOrEmpty( item.PODCommentBy ) && item.PODCommentDate.HasValue )
+                        {
+                            <div style="border-top: 1px solid #ddd; padding-top: 5px; margin-top: 8px;">
+                                <i>@item.PODCommentBy:</i> @(item.PODComment ?? item.PODComments)
+                                <em class="block"><small>On @item.PODCommentDate.Value.ToString( "yyyy-MM-dd @ HH:mm tt" )</small></em>
+                            </div>
+                        }
+                    </td>
+                    <td>
+                        @item.PRNNumber
+
+                        @if ( item.Images.NullableAny( i => i.ObjectType == "PRNNumber" ) )
+                        {
+                            <div class="right">
+                                <a class="camera" data-sticky-one="1" data-target="#clientload-@item.Id-PRNSnapshoot" data-trigger="mouseover" data-arrow="center-right" data-title="PRN Snapshoot">
+                                    <img src="@Url.Content( "~/Images/camera.png" )" />
+                                </a>
+                                <div id="clientload-@item.Id-PRNSnapshoot" class="none">
+                                    <ul class="list">
+                                        @foreach ( var d in item.Images.Where( i => i.ObjectType == "PRNNumber" ) )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                <a rel="tipsyW" title="View Snapshoot?" href="@Url.Action( "ViewImage", "Transporter", new { @id = d.Id } )" target="_blank">
+                                                    View (@d.Extension)
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        }
+
+                        @if ( !string.IsNullOrEmpty( item.PRNComments ) && !string.IsNullOrEmpty( item.PRNCommentBy ) && item.PRNCommentDate.HasValue )
+                        {
+                            <div style="border-top: 1px solid #ddd; padding-top: 5px; margin-top: 8px;">
+                                <i>@item.PRNCommentBy:</i> @item.PRNComments
+                                <em class="block"><small>On @item.PRNCommentDate.Value.ToString( "yyyy-MM-dd @ HH:mm tt" )</small></em>
+                            </div>
+                        }
+                    </td>
+                    <td width="5%">
+                        @Html.ActionLink( "Edit", "EditClientLoad", new { id = item.Id, returnView = "PODManagement" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".PODManagement-" + item.Id + "-item" } )
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+@Html.Partial( "_Paging" )

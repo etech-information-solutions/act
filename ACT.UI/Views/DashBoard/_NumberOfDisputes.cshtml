@@ -1,0 +1,40 @@
+﻿
+@model List<NumberOfDisputes>
+
+@using ACT.Core.Models
+
+@{
+    string monthNames = "[";
+
+    foreach ( NumberOfDisputes item in Model )
+    {
+        monthNames += $"\"{item.MonthName}\",";
+    }
+
+    monthNames = monthNames.Remove( monthNames.Trim().Length - 1 );
+    monthNames += "]";
+
+    string disputes = "{\"name\": \"Disputes\", \"data\": [";
+
+    for ( int i = 0; i < Model.Count; i++ )
+    {
+        disputes += Model[ i ].Total + ",";
+    }
+
+    disputes = disputes.Remove( disputes.Trim().Length - 1 );
+    disputes += "]}";
+
+    string series = $"[{disputes}]";
+}
+
+<script type="text/javascript">
+
+    var disputeSeries = JSON.parse( '@series'.replace( /&quot;/g, '"' ) );
+    var disputeMonthNames = JSON.parse( '@monthNames'.replace( /&quot;/g, '"' ) );
+
+    setTimeout( function ()
+    {
+        ACT.UI.NumberOfDisputes( "nod-graph", disputeMonthNames, disputeSeries );
+    }, '500' );
+</script>
+

@@ -1,0 +1,171 @@
+﻿
+@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+    ViewBag.ViewName = "_ChepAudit";
+}
+
+
+@Html.Partial( "_Notification" )
+
+@{
+    int count = Model.Start;
+    List<ChepAuditCustomModel> items = ( List<ChepAuditCustomModel> ) Model.Items;
+}
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Chep Audits available matching your search criteria.
+    </div>
+}
+
+<p>
+    @Html.ActionLink( "Add Audit Report", "AddChepAudit", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Chep Audit Report?", @data_edit = "1", @data_id = 0, @data_target = "#chepaudit" } )
+    <span class="loader"></span>
+</p>
+
+<table id="chepaudits-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#chepaudits-table_wrapper" data-starting-point=".ap-tabs ul">
+
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="CreatedOn" data-column="ca.CreatedOn">
+                Date
+            </th>
+            <th data-name="SiteId" data-column="ca.SiteId">
+                Site
+            </th>
+            <th data-name="Equipment" data-column="ca.Equipment">
+                Equipment
+            </th>
+            <th data-name="ChepStockBalance" data-column="ca.ChepStockBalance">
+                Stock Balance
+            </th>
+            <th data-name="NotInvoiceIn" data-column="ca.NotInvoiceIn">
+                Invoice In
+            </th>
+            <th data-name="NotInvoiceOut" data-column="ca.NotInvoiceOut">
+                Invoice Out
+            </th>
+            <th data-name="ReqAdjustment" data-column="ca.ReqAdjustment">
+                Req Adjustment
+            </th>
+            <th data-name="NotMCCIn" data-column="ca.NotMCCIn">
+                MCC In
+            </th>
+            <th data-name="NotMCCOut" data-column="ca.NotMCCOut">
+                MCC Out
+            </th>
+            <th data-name="MccBalance" data-column="ca.MccBalance">
+                Mcc Balance
+            </th>
+            <th data-name="SuspendITL" data-column="ca.SuspendITL">
+                Suspend ITL
+            </th>
+            <th data-name="SuspendMCC" data-column="ca.SuspendMCC">
+                Suspend MCC
+            </th>
+            <th data-name="AdjustedInvBalance" data-column="ca.AdjustedInvBalance">
+                Adjusted Invoice Balance
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="ChepAudit">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.SiteName
+                    </td>
+                    <td>
+                        @item.Equipment
+                    </td>
+                    <td>
+                        @item.ChepStockBalance
+                    </td>
+                    <td>
+                        @item.NotInvoiceIn
+                    </td>
+                    <td>
+                        @item.NotInvoiceOut
+                    </td>
+                    <td>
+                        @item.ReqAdjustment
+                    </td>
+                    <td>
+                        @item.NotMCCIn
+                    </td>
+                    <td>
+                        @item.NotMCCOut
+                    </td>
+                    <td>
+                        @item.MccBalance
+                    </td>
+                    <td>
+                        @item.SuspendITL
+                    </td>
+                    <td>
+                        @item.SuspendMCC
+                    </td>
+                    <td>
+                        @item.AdjustedInvBalance
+                    </td>
+                    <td width="12%">
+
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                            @if ( item.ReportDocumentId.HasValue )
+                            {
+                                <a class="docs" href="@Url.Action( "ViewDocument", "ClientReporting", new { @id = item.ReportDocumentId } )" target="_blank">
+                                    View Audit Report
+                                </a>
+                            }
+                        </div>
+
+                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                            @Html.ActionLink( "Details", "ChepAuditDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                            @Html.ActionLink( "Edit", "EditChepAudit", new { id = item.Id, returnView = "ChepAudit" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                        </div>
+
+                        @Html.ActionLink( "Delete", "DeleteChepAudit", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#chepaudit", @rel = "tipsyE", @title = "Delete this item?" } )
+
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_ChepAuditCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
+
+@Html.Partial( "_Paging" )

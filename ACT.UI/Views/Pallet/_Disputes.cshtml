@@ -1,0 +1,200 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Models;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_Disputes";
+}
+
+
+@Html.Partial( "_Notification" )
+
+
+@{
+    UserModel user = User.Get();
+
+    int count = Model.Start;
+    List<DisputeCustomModel> items = ( List<DisputeCustomModel> ) Model.Items;
+}
+
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Disputes available matching your search criteria.
+    </div>
+}
+
+<p>
+    @Html.ActionLink( "Add", "AddDispute", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Dispute?", @data_edit = "1", @data_id = 0, @data_target = "#disputes" } )
+
+    <span style="padding: 0 5px;">|</span>
+
+    @Html.ActionLink( "Import", "ImportDisputes", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import Disputes?", @data_edit = "1", @data_id = 0, @data_target = "#disputes" } )
+
+    <span class="loader"></span>
+</p>
+
+<table id="disputes-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#disputes-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="EffectiveDate" data-column="d.EffectiveDate">
+                Eff. Date
+            </th>
+            <th data-name="OriginalDocketNumber" data-column="d.OriginalDocketNumber">
+                Orig. Docket #
+            </th>
+            <th data-name="DocketNumber" data-column="d.DocketNumber">
+                Docket #
+            </th>
+            <th data-name="Reference" data-column="d.Reference">
+                Ref #
+            </th>
+            <th data-name="OtherReference" data-column="d.OtherReference">
+                Other Ref #
+            </th>
+            <th data-name="TDNNumber" data-column="d.TDNNumber">
+                TDN #
+            </th>
+            <th data-name="Quantity" data-column="d.Quantity">
+                Quantity
+            </th>
+            <th data-name="ActionUser" data-column="d.ActionBy">
+                Action By
+            </th>
+            <th data-name="Status" data-column="d.Status">
+                Status
+            </th>
+            <th data-name="DisputeReasonDetails" data-column="dr.Reason">
+                Reason
+            </th>
+            <th data-name="SupplierFrom" data-column="s.Name">
+                Supplier From
+            </th>
+            <th data-name="LoadNumber" data-column="cl.LoadNumber">
+                Shipment #
+            </th>
+            <th data-name="CustomerTo" data-column="s1.Name">
+                Customer To
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( var item in items )
+            {
+                DisputeStatus status = ( DisputeStatus ) item.Status;
+
+                string enable = ( status == DisputeStatus.Active || status == DisputeStatus.Resolved ) ? "Cancel" : "Open";
+                string active = ( status == DisputeStatus.Active || status == DisputeStatus.Resolved ) ? "active" : "inactive";
+
+
+                <tr id="disputes-@item.Id-item" class="disputes-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @( ( item.EffectiveDate ?? item.CreatedOn ).ToString( "yyyy-MM-dd" ) )
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Dispute">
+                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.OriginalDocketNumber
+                    </td>
+                    <td>
+                        @item.DocketNumber
+                    </td>
+                    <td>
+                        @item.Reference
+                    </td>
+                    <td>
+                        @item.OtherReference
+                    </td>
+                    <td>
+                        @item.TDNNumber
+                    </td>
+                    <td>
+                        @item.Quantity
+                    </td>
+                    <td>
+                        @(item.ActionBy ?? item.ActionUser )
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+
+                        @if ( ( status == DisputeStatus.Resolved || status == DisputeStatus.Cancelled ) && !string.IsNullOrWhiteSpace( item.ResolvedUser ) && item.ResolvedOn.HasValue )
+                        {
+                            <small class="block">By @item.ResolvedUser <i class="block">on @item.ResolvedOn.Value.ToString( "yyyy-MM-dd HH:mm" )</i></small>
+                        }
+                    </td>
+                    <td>
+                        @item.DisputeReasonDetails
+                    </td>
+                    <td>
+                        @item.SiteName
+                    </td>
+                    <td>
+                        @item.LoadNumber
+                    </td>
+                    <td>
+                        @item.ToSiteName
+                    </td>
+                    <td width="15%">
+                        @Html.ActionLink( "Details", "DisputeDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".disputes-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( "Edit", "EditDispute", new { id = item.Id, returnView = "Disputes" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".disputes-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( enable, "DeleteDispute", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#disputes-" + item.Id + "-item", @data_refresh_target = "#disputes", @rel = "tipsyE", @title = enable + " this item?" } )
+
+                        @if ( item.ClientLoadId.HasValue )
+                        {
+                            <div style="border-top: 1px dashed #ccc; padding-top: 5px; margin-top: 5px; text-align: center;">
+
+                                @Html.ActionLink( "Load Details", "EditClientData", new { id = ( item.ClientLoadId ?? -1 ), cheploadId = item.ChepLoadId }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".disputes-" + item.Id + "-item" } )
+
+                            </div>
+
+                            <div style="border-top: 1px dashed #ccc; padding-top: 10px; margin-top: 5px; text-align: center;">
+
+                                <a class="docs" data-upload-pod="1" data-id="@item.ClientLoadId">
+                                    Upload POD
+                                    <span id="loader"></span>
+                                </a>
+
+                                <a class="download" data-view-pod="1" data-id="@item.ClientLoadId">
+                                    View POD
+                                    <span id="loader"></span>
+                                </a>
+
+                            </div>
+                        }
+
+                    </td>
+
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+@Html.Partial( "_Paging" )
