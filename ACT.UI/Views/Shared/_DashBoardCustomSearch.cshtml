@@ -5,6 +5,10 @@
 <div class="dashboard-search" style="margin-top: 10px;">
 
     <span>
+        @Html.LabelFor( model => model.ClientId )
+    </span>
+
+    <span>
         @Html.LabelFor( model => model.RegionId )
     </span>
 
@@ -13,12 +17,8 @@
     </span>
 
     <span>
-        @Html.LabelFor( model => model.ClientId )
+        @Html.LabelFor( model => model.ToSiteId )
     </span>
-
-    @*<span>
-        @Html.LabelFor( model => model.ProductId )
-    </span>*@
 
     <span>
         @Html.LabelFor( model => model.FromDate )
@@ -33,6 +33,10 @@
 <div id="gs-search-fields" class="dashboard-search">
 
     <span>
+        @Html.Partial( "_Clients", Model )
+    </span>
+
+    <span>
         @Html.Partial( "_Regions", Model )
     </span>
 
@@ -41,12 +45,8 @@
     </span>
 
     <span>
-        @Html.Partial( "_Clients", Model )
+        @Html.Partial( "_Sites", Model )
     </span>
-
-    @*<span>
-        @Html.Partial( "_Products", Model )
-    </span>*@
 
     <span>
         @Html.TextBoxFor( model => model.ToDate, new { @class = "date-picker", @style = "width: 92%; height: 25px; position: relative; bottom: -6px;", @placeholder = "              /              /" } )

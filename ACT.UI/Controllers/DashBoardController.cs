@@ -29,13 +29,13 @@ namespace ACT.UI.Controllers
         // POST || GET: /DashBoard/AgeOfOutstandingPallets
         public ActionResult AgeOfOutstandingPallets( CustomSearchModel csm, bool givedata = false )
         {
-            using ( ChepLoadService service = new ChepLoadService() )
+            using ( ClientLoadService service = new ClientLoadService() )
             {
-                csm.BalanceStatus = BalanceStatus.NotBalanced;
+                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
 
                 if ( givedata )
                 {
-                    List<ChepLoadCustomModel> loads = service.List1( new PagingModel() { Take = int.MaxValue }, csm );
+                    List<ClientLoadCustomModel> loads = service.List1( new PagingModel() { Take = int.MaxValue }, csm );
 
                     return PartialView( "_AgeOfOutstandingPalletsData", loads );
                 }
@@ -120,7 +120,7 @@ namespace ACT.UI.Controllers
                 reps.Add( rep );
 
                 // By Years? Get MIN YEAR
-                DateTime minYear = service.MinDateTime( "ShipmentDate" ) ?? DateTime.Now;
+                DateTime minYear = service.MinDateTime( "EffectiveDate" ) ?? DateTime.Now;
 
                 if ( minYear.Year == DateTime.Now.Year )
                 {
@@ -172,15 +172,13 @@ namespace ACT.UI.Controllers
         // POST || GET: /DashBoard/AgeOfOutstandingPOD
         public ActionResult AgeOfOutstandingPOD( CustomSearchModel csm, bool givedata = false )
         {
-            using ( ChepLoadService service = new ChepLoadService() )
+            using ( ClientLoadService service = new ClientLoadService() )
             {
                 csm.IsPODOutstanding = true;
-                csm.BalanceStatus = BalanceStatus.NotBalanced;
-                csm.ReconciliationStatus = ReconciliationStatus.Reconciled;
 
                 if ( givedata )
                 {
-                    List<ChepLoadCustomModel> loads = service.List1( new PagingModel() { Take = int.MaxValue }, csm );
+                    List<ClientLoadCustomModel> loads = service.List1( new PagingModel() { Take = int.MaxValue }, csm );
 
                     return PartialView( "_AgeOfOutstandingPODData", loads );
                 }
@@ -265,7 +263,7 @@ namespace ACT.UI.Controllers
                 reps.Add( rep );
 
                 // By Years? Get MIN YEAR
-                DateTime minYear = service.MinDateTime( "ShipmentDate" ) ?? DateTime.Now;
+                DateTime minYear = service.MinDateTime( "EffectiveDate" ) ?? DateTime.Now;
 
                 if ( minYear.Year == DateTime.Now.Year )
                 {
@@ -432,8 +430,8 @@ namespace ACT.UI.Controllers
 
                 if ( givedata )
                 {
-                    csm.ToDate = toDate;
-                    csm.FromDate = fromDate;
+                    //csm.ToDate = toDate;
+                    //csm.FromDate = fromDate;
 
                     csm.HasAuthorisationCode = true;
 

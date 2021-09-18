@@ -107,5 +107,6 @@ namespace ACT.Core.Models.Custom
         public string Email { get; set; }
 
         public string APIKey { get; set; }
+        public string RegionName { get; set; }
     }
 }

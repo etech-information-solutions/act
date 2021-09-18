@@ -1,5 +1,5 @@
 ﻿
-@model List<ChepLoadCustomModel>
+@model List<ClientLoadCustomModel>
 
 @using ACT.Core.Enums;
 @using ACT.Core.Models.Custom;
@@ -27,10 +27,25 @@
                     Load Date
                 </th>
                 <th>
-                    Docket #
+                    Chep Account/GLID #
                 </th>
                 <th>
-                    Client
+                    Supplier From
+                </th>
+                <th>
+                    Shipment #
+                </th>
+                <th>
+                    Customer To
+                </th>
+                <th>
+                    Qty
+                </th>
+                <th>
+                    Comment
+                </th>
+                <th>
+                    Status
                 </th>
                 <th>
                     Transporter
@@ -39,19 +54,7 @@
                     Vehicle
                 </th>
                 <th>
-                    Ref #
-                </th>
-                <th>
-                    Other Ref #
-                </th>
-                <th>
-                    Quantity
-                </th>
-                <th>
-                    Status
-                </th>
-                <th>
-                    Balanced
+                    Invoice #
                 </th>
             </tr>
         </thead>
@@ -63,28 +66,37 @@
 
                 foreach ( var item in Model )
                 {
-                    BalanceStatus balanceStatus = ( BalanceStatus ) item.BalanceStatus;
                     ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
 
-                    <tr>
-                        <td width="1%">
+                    string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
+
+                    <tr id="ageofoutstandingpallets-@item.Id-item" class="ageofoutstandingpallets-@item.Id-item ">
+                        <td>
                             @count
                         </td>
                         <td>
-                            @(item.ShipmentDate?.ToString( "yyyy-MM-dd" ))
+                            @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
                         </td>
                         <td>
-                            @item.DocketNumber
-
-                            @if ( item.VersionCount > 1 )
-                            {
-                                <a data-load-version="1" data-docket="@item.DocketNumber" class="block" rel="tipysE" title="+@item.VersionCount versions of this load, click to view all versions..">
-                                    <small>+@item.VersionCount versions</small>
-                                </a>
-                            }
+                            @( item.ChepAccountGLIDNo ?? item.GLID )
                         </td>
                         <td>
-                            @item.ClientName
+                            @item.SiteName
+                        </td>
+                        <td>
+                            @item.LoadNumber
+                        </td>
+                        <td>
+                            @item.ToSiteName
+                        </td>
+                        <td>
+                            @item.OriginalQuantity
+                        </td>
+                        <td>
+                            @item.PODComment
+                        </td>
+                        <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
+                            @status
                         </td>
                         <td>
                             @item.TransporterName
@@ -93,35 +105,8 @@
                             @item.VehicleRegistration
                         </td>
                         <td>
-                            @(item.CorrectedRef ?? item.Ref)
-
-                            @if ( !string.IsNullOrEmpty( item.CorrectedRef ) )
-                            {
-                                <a rel="tipsyW" title="Manually corrected, was: @item.Ref">
-                                    <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
-                                </a>
-                            }
+                            @item.InvoiceNumber
                         </td>
-                        <td>
-                            @(item.CorrectedOtherRef ?? item.OtherRef)
-
-                            @if ( !string.IsNullOrEmpty( item.CorrectedOtherRef ) )
-                            {
-                                <a rel="tipsyW" title="Manually corrected, was: @item.OtherRef">
-                                    <img src="@Url.Content( "~/Images/hot.gif" )" width="15" />
-                                </a>
-                            }
-                        </td>
-                        <td>
-                            @item.Quantity
-                        </td>
-                        <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
-                            @status.GetDisplayText()
-                        </td>
-                        <td class="@(balanceStatus == BalanceStatus.Balanced ? "active" : "inactive")">
-                            @balanceStatus.GetDisplayText()
-                        </td>
-
                     </tr>
 
                     count++;

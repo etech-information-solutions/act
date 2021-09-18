@@ -1042,8 +1042,7 @@ namespace ACT.UI.Controllers
             }
 
             pm.Take = int.MaxValue;
-            csm.BalanceStatus = BalanceStatus.NotBalanced;
-            csm.ReconciliationStatus = ReconciliationStatus.Reconciled;
+            csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
 
             List<OutstandingPalletsModel> model = GetOustandingCustomers( pm, csm );
 

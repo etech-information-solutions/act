@@ -106,7 +106,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// Can be used as a selected Site 
         /// </summary>
-        [Display( Name = "Site" )]
+        [Display( Name = "Supplier From" )]
         public int SiteId
         {
             get; set;
@@ -115,7 +115,7 @@ namespace ACT.Core.Models
         /// <summary>
         /// Can be used as a selected To Site 
         /// </summary>
-        [Display( Name = "To Site" )]
+        [Display( Name = "Customer To" )]
         public int ToSiteId
         {
             get; set;

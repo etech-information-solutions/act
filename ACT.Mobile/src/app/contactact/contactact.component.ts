@@ -9,7 +9,7 @@ import { PopoverController, NavParams } from '@ionic/angular';
 export class ContactactComponent implements OnInit
 {
 
-  constructor(public popCtrl: PopoverController, public nav: NavParams )
+  constructor( public popCtrl: PopoverController, public nav: NavParams )
   {
 
   }

@@ -247,7 +247,7 @@ namespace ACT.Core.Services
             #region WHERE
 
             query = $"{query} WHERE (1=1)";
-
+             
             // Limit to only show Disputes for logged in user
             if ( CurrentUser.RoleType == RoleType.PSP )
             {

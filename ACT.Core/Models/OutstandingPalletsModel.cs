@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ACT.Core.Models.Custom;
 
 namespace ACT.Core.Models
@@ -13,7 +10,7 @@ namespace ACT.Core.Models
 
         public DateTime MinYear { get; set; }
 
-        public ChepLoadCustomModel ClientLoad { get; set; }
+        public ClientLoadCustomModel ClientLoad { get; set; }
 
         public OutstandingReasonModel GrandTotal { get; set; }
 

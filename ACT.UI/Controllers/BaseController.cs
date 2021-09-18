@@ -1175,14 +1175,14 @@ namespace ACT.UI.Controllers
         /// <returns></returns>
         public List<OutstandingPalletsModel> GetOutstandingPallets( PagingModel pm, CustomSearchModel csm, string email = "" )
         {
-            using ( ChepLoadService chservice = new ChepLoadService() )
+            using ( ClientLoadService chservice = new ClientLoadService() )
             {
                 if ( !string.IsNullOrWhiteSpace( email ) || chservice.CurrentUser == null )
                 {
                     chservice.CurrentUser = chservice.GetUser( email );
                 }
 
-                csm.BalanceStatus = BalanceStatus.NotBalanced;
+                csm.ReconciliationStatus = ReconciliationStatus.Unreconciled;
 
                 List<OutstandingPalletsModel> resp = new List<OutstandingPalletsModel>();
 
@@ -1191,7 +1191,7 @@ namespace ACT.UI.Controllers
                 pm.Take = int.MaxValue;
                 pm.SortBy = "c.CompanyName";
 
-                List<ChepLoadCustomModel> model = chservice.List1( pm, csm );
+                List<ClientLoadCustomModel> model = chservice.List1( pm, csm );
 
                 if ( !model.NullableAny() )
                 {
@@ -1200,9 +1200,9 @@ namespace ACT.UI.Controllers
 
                 List<int?> clientIds = new List<int?>();
 
-                DateTime minYear = model.NullableAny() ? model.Min( m => m.ShipmentDate ) ?? DateTime.Now : DateTime.Now;
+                DateTime minYear = model.NullableAny() ? model.Min( m => m.EffectiveDate ) ?? DateTime.Now : DateTime.Now;
 
-                foreach ( ChepLoadCustomModel item in model )
+                foreach ( ClientLoadCustomModel item in model )
                 {
                     if ( clientIds.Any( c => c == item.ClientId ) ) continue;
 
@@ -1216,13 +1216,13 @@ namespace ACT.UI.Controllers
                         GrandTotal = new OutstandingReasonModel()
                         {
                             Description = "Grand Total",
-                            To30Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -30 ).Date && c.ShipmentDate?.Date <= DateTime.Now.Date ) ),
-                            To60Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -60 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -31 ).Date ) ),
-                            To90Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -90 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -61 ).Date ) ),
-                            To120Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -120 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -91 ).Date ) ),
-                            To183Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -183 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -121 ).Date ) ),
-                            To270Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -270 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -184 ).Date ) ),
-                            To365Days = model.Count( c => c.ClientId == item.ClientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -365 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -271 ).Date ) ),
+                            To30Days = model.Count( c => c.ClientId == item.ClientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -30 ).Date && c.EffectiveDate?.Date <= DateTime.Now.Date ) ),
+                            To60Days = model.Count( c => c.ClientId == item.ClientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -60 ).Date && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -31 ).Date ) ),
+                            To90Days = model.Count( c => c.ClientId == item.ClientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -90 ).Date && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -61 ).Date ) ),
+                            To120Days = model.Count( c => c.ClientId == item.ClientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -120 ).Date && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -91 ).Date ) ),
+                            To183Days = model.Count( c => c.ClientId == item.ClientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -183 ).Date && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -121 ).Date ) ),
+                            To270Days = model.Count( c => c.ClientId == item.ClientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -270 ).Date && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -184 ).Date ) ),
+                            To365Days = model.Count( c => c.ClientId == item.ClientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -365 ).Date && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -271 ).Date ) ),
                             GrandTotal = model.Count( c => c.ClientId == item.ClientId ),
                             PreviousYears = GetGrandPreviousYears( item.ClientId, model ),
                         }
@@ -1241,11 +1241,11 @@ namespace ACT.UI.Controllers
         /// <param name="clientId"></param>
         /// <param name="model"></param>
         /// <returns></returns>
-        public List<PreviousYear> GetGrandPreviousYears( int clientId, List<ChepLoadCustomModel> model )
+        public List<PreviousYear> GetGrandPreviousYears( int clientId, List<ClientLoadCustomModel> model )
         {
             List<PreviousYear> py = new List<PreviousYear>();
 
-            DateTime minYear = model.Min( m => m.ShipmentDate ) ?? DateTime.Now;
+            DateTime minYear = model.Min( m => m.EffectiveDate ) ?? DateTime.Now;
 
             if ( minYear.Year == DateTime.Now.Year )
             {
@@ -1257,7 +1257,7 @@ namespace ACT.UI.Controllers
             py.Add( new PreviousYear()
             {
                 Year = minus1Year,
-                Total = model.Count( c => c.ClientId == clientId && ( c.ShipmentDate?.Date >= new DateTime( DateTime.Now.AddYears( -1 ).Year, 1, 1 ) && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -366 ).Date ) )
+                Total = model.Count( c => c.ClientId == clientId && ( c.EffectiveDate?.Date >= new DateTime( DateTime.Now.AddYears( -1 ).Year, 1, 1 ) && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -366 ).Date ) )
             } );
 
             if ( minus1Year == minYear.Year )
@@ -1270,7 +1270,7 @@ namespace ACT.UI.Controllers
                 py.Add( new PreviousYear()
                 {
                     Year = i,
-                    Total = model.Count( c => c.ClientId == clientId && ( c.ShipmentDate?.Date >= new DateTime( i, 1, 1 ) && c.ShipmentDate?.Date <= new DateTime( i, 12, 31 ) ) )
+                    Total = model.Count( c => c.ClientId == clientId && ( c.EffectiveDate?.Date >= new DateTime( i, 1, 1 ) && c.EffectiveDate?.Date <= new DateTime( i, 12, 31 ) ) )
                 } );
             }
 
@@ -1283,13 +1283,13 @@ namespace ACT.UI.Controllers
         /// <param name="clientId"></param>
         /// <param name="items"></param>
         /// <returns></returns>
-        public List<OutstandingReasonModel> GetOutstandingReasons( int clientId, List<ChepLoadCustomModel> items )
+        public List<OutstandingReasonModel> GetOutstandingReasons( int clientId, List<ClientLoadCustomModel> items )
         {
             List<string> outstandingIds = new List<string>();
 
             List<OutstandingReasonModel> outstandingReasons = new List<OutstandingReasonModel>();
 
-            foreach ( ChepLoadCustomModel item in items )
+            foreach ( ClientLoadCustomModel item in items )
             {
                 if ( item.ClientId != clientId ) continue;
 
@@ -1300,13 +1300,13 @@ namespace ACT.UI.Controllers
                 OutstandingReasonModel r = new OutstandingReasonModel()
                 {
                     Description = item.OutstandingReason ?? "-N/A-",
-                    To30Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -30 ).Date && c.ShipmentDate?.Date <= DateTime.Now.Date ) ),
-                    To60Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -60 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -31 ).Date ) ),
-                    To90Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -90 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -61 ).Date ) ),
-                    To120Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -120 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -91 ).Date ) ),
-                    To183Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -183 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -121 ).Date ) ),
-                    To270Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -270 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -184 ).Date ) ),
-                    To365Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.ShipmentDate?.Date >= DateTime.Now.AddDays( -365 ).Date && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -271 ).Date ) ),
+                    To30Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -30 ).Date && c.EffectiveDate?.Date <= DateTime.Now.Date ) ),
+                    To60Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -60 ).Date && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -31 ).Date ) ),
+                    To90Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -90 ).Date && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -61 ).Date ) ),
+                    To120Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -120 ).Date && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -91 ).Date ) ),
+                    To183Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -183 ).Date && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -121 ).Date ) ),
+                    To270Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -270 ).Date && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -184 ).Date ) ),
+                    To365Days = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId && ( c.EffectiveDate?.Date >= DateTime.Now.AddDays( -365 ).Date && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -271 ).Date ) ),
                     GrandTotal = items.Count( c => c.OutstandingReasonId == item.OutstandingReasonId && c.ClientId == clientId ),
                     PreviousYears = GetOutstandingPreviousYears( clientId, item.OutstandingReasonId, items ),
                 };
@@ -1324,11 +1324,11 @@ namespace ACT.UI.Controllers
         /// <param name="outstandingReasonId"></param>
         /// <param name="items"></param>
         /// <returns></returns>
-        private List<PreviousYear> GetOutstandingPreviousYears( int clientId, int? outstandingReasonId, List<ChepLoadCustomModel> items )
+        private List<PreviousYear> GetOutstandingPreviousYears( int clientId, int? outstandingReasonId, List<ClientLoadCustomModel> items )
         {
             List<PreviousYear> py = new List<PreviousYear>();
 
-            DateTime minYear = items.Min( m => m.ShipmentDate ) ?? DateTime.Now;
+            DateTime minYear = items.Min( m => m.EffectiveDate ) ?? DateTime.Now;
 
             if ( minYear.Year == DateTime.Now.Year )
             {
@@ -1340,7 +1340,7 @@ namespace ACT.UI.Controllers
             py.Add( new PreviousYear()
             {
                 Year = minus1Year,
-                Total = items.Count( c => c.ClientId == clientId && c.OutstandingReasonId == outstandingReasonId && ( c.ShipmentDate?.Date >= new DateTime( DateTime.Now.AddYears( -1 ).Year, 1, 1 ) && c.ShipmentDate?.Date <= DateTime.Now.AddDays( -366 ).Date ) )
+                Total = items.Count( c => c.ClientId == clientId && c.OutstandingReasonId == outstandingReasonId && ( c.EffectiveDate?.Date >= new DateTime( DateTime.Now.AddYears( -1 ).Year, 1, 1 ) && c.EffectiveDate?.Date <= DateTime.Now.AddDays( -366 ).Date ) )
             } );
 
             if ( minus1Year == minYear.Year )
@@ -1353,7 +1353,7 @@ namespace ACT.UI.Controllers
                 py.Add( new PreviousYear()
                 {
                     Year = i,
-                    Total = items.Count( c => c.ClientId == clientId && c.OutstandingReasonId == outstandingReasonId && ( c.ShipmentDate?.Date >= new DateTime( i, 1, 1 ) && c.ShipmentDate?.Date <= new DateTime( i, 12, 31 ) ) )
+                    Total = items.Count( c => c.ClientId == clientId && c.OutstandingReasonId == outstandingReasonId && ( c.EffectiveDate?.Date >= new DateTime( i, 1, 1 ) && c.EffectiveDate?.Date <= new DateTime( i, 12, 31 ) ) )
                 } );
             }
 
@@ -1464,15 +1464,15 @@ namespace ACT.UI.Controllers
         /// <returns></returns>
         public List<OutstandingPalletsModel> GetOustandingCustomers( PagingModel pm, CustomSearchModel csm )
         {
-            using ( ChepLoadService clservice = new ChepLoadService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
             {
-                List<ChepLoadCustomModel> loads = clservice.ListTopOustandingCustomers( pm, csm );
+                List<ClientLoadCustomModel> loads = clservice.ListTopOustandingCustomers( pm, csm );
 
                 List<OutstandingPalletsModel> model = new List<OutstandingPalletsModel>();
 
                 if ( loads.NullableAny() )
                 {
-                    foreach ( ChepLoadCustomModel item in loads )
+                    foreach ( ClientLoadCustomModel item in loads )
                     {
                         if ( model.NullableAny( m => m.ClientLoad.ClientId == item.ClientId ) ) continue;
 
@@ -1497,7 +1497,7 @@ namespace ACT.UI.Controllers
         /// </summary>
         /// <param name="loads"></param>
         /// <returns></returns>
-        public List<OutstandingRegionModel> GetOutstandingRegions( List<ChepLoadCustomModel> loads )
+        public List<OutstandingRegionModel> GetOutstandingRegions( List<ClientLoadCustomModel> loads )
         {
             List<OutstandingRegionModel> regions = new List<OutstandingRegionModel>();
 
@@ -1505,7 +1505,7 @@ namespace ACT.UI.Controllers
 
             List<string> regionIds = new List<string>();
 
-            foreach ( ChepLoadCustomModel item in loads )
+            foreach ( ClientLoadCustomModel item in loads )
             {
                 if ( regionIds.NullableAny( r => r == item.RegionName ) ) continue;
 
@@ -1529,7 +1529,7 @@ namespace ACT.UI.Controllers
         /// </summary>
         /// <param name="loads"></param>
         /// <returns></returns>
-        public List<OutstandingSiteModel> GetOutstandingSites( List<ChepLoadCustomModel> loads )
+        public List<OutstandingSiteModel> GetOutstandingSites( List<ClientLoadCustomModel> loads )
         {
             List<OutstandingSiteModel> sites = new List<OutstandingSiteModel>();
 
@@ -1537,7 +1537,7 @@ namespace ACT.UI.Controllers
 
             List<int?> siteIds = new List<int?>();
 
-            foreach ( ChepLoadCustomModel item in loads )
+            foreach ( ClientLoadCustomModel item in loads )
             {
                 if ( siteIds.NullableAny( r => r == item.ClientSiteId ) ) continue;
 
@@ -1561,7 +1561,7 @@ namespace ACT.UI.Controllers
         /// </summary>
         /// <param name="loads"></param>
         /// <returns></returns>
-        public List<OutstandingReasonModel> GetOutstandingReasons1( List<ChepLoadCustomModel> loads )
+        public List<OutstandingReasonModel> GetOutstandingReasons1( List<ClientLoadCustomModel> loads )
         {
             List<OutstandingReasonModel> outstandingReasons = new List<OutstandingReasonModel>();
 
@@ -1569,7 +1569,7 @@ namespace ACT.UI.Controllers
 
             List<int?> outstandingReasonIds = new List<int?>();
 
-            foreach ( ChepLoadCustomModel item in loads )
+            foreach ( ClientLoadCustomModel item in loads )
             {
                 if ( outstandingReasonIds.NullableAny( r => r == item.OutstandingReasonId ) ) continue;
 
