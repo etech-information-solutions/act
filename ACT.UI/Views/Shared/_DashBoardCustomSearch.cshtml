@@ -20,13 +20,13 @@
         @Html.LabelFor( model => model.ToSiteId )
     </span>
 
-    <span>
+    @*<span>
         @Html.LabelFor( model => model.FromDate )
     </span>
 
     <span>
         @Html.LabelFor( model => model.ToDate )
-    </span>
+    </span>*@
 
 </div>
 
@@ -45,15 +45,15 @@
     </span>
 
     <span>
-        @Html.Partial( "_Sites", Model )
+        @Html.Partial( "_ToSites", Model )
     </span>
 
-    <span>
+    @*<span>
         @Html.TextBoxFor( model => model.ToDate, new { @class = "date-picker", @style = "width: 92%; height: 25px; position: relative; bottom: -6px;", @placeholder = "              /              /" } )
     </span>
 
     <span>
         @Html.TextBoxFor( model => model.FromDate, new { @class = "date-picker", @style = "width: 92%; height: 25px; position: relative; bottom: -6px;", @placeholder = "              /              /" } )
-    </span>
+    </span>*@
 
 </div>

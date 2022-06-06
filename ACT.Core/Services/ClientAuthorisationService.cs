@@ -43,6 +43,8 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmToSiteId", csm.ToSiteId ) },
+                { new SqlParameter( "csmRegionId", csm.RegionId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmTransporterId", csm.TransporterId ) },
             };
@@ -90,6 +92,14 @@ namespace ACT.Core.Services
             if ( csm.SiteId > 0 )
             {
                 query = $"{query} AND (s1.Id=@csmSiteId)";
+            }
+            if ( csm.ToSiteId > 0 )
+            {
+                query = $"{query} AND (s2.Id=@ToSiteId)";
+            }
+            if ( csm.RegionId > 0 )
+            {
+                query = $"{query} AND (s1.[RegionId]=@csmRegionId OR s2.[RegionId]=@csmRegionId) ";
             }
             if ( csm.ClientId > 0 )
             {
@@ -193,6 +203,8 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmToSiteId", csm.ToSiteId ) },
+                { new SqlParameter( "csmRegionId", csm.RegionId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmTransporterId", csm.TransporterId ) },
             };
@@ -251,6 +263,14 @@ namespace ACT.Core.Services
             if ( csm.SiteId > 0 )
             {
                 query = $"{query} AND (s1.Id=@csmSiteId)";
+            }
+            if ( csm.ToSiteId > 0 )
+            {
+                query = $"{query} AND (s2.Id=@ToSiteId)";
+            }
+            if ( csm.RegionId > 0 )
+            {
+                query = $"{query} AND (s1.[RegionId]=@csmRegionId OR s2.[RegionId]=@csmRegionId) ";
             }
             if ( csm.ClientId > 0 )
             {

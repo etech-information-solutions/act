@@ -718,6 +718,7 @@
     <Content Include="Views\Shared\_AuthorizationCodeAuditLogCustomSearch.cshtml" />
     <Content Include="Views\Administration\_AuditLogPerUser.cshtml" />
     <Content Include="Views\Shared\_AuditLogPerUserCustomSearch.cshtml" />
+    <Content Include="Views\DashBoard\_ToSites.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

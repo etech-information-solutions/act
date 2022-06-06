@@ -2404,7 +2404,6 @@
                 }
 
                 ACT.UI.DataCallBack( callback );
-
             } );
         },
 
@@ -4191,41 +4190,78 @@
             } );
         },
 
+        DataGraghTotal: 0,
+        DataGraghCount: 0,
+
         DataGraphs: function ( sender, params )
         {
-            var i = sender.parent().find( 'div[data-loaded="0"]' ).first();
+            var i = sender.parent().parent().find( 'div[data-loaded="0"]' ).first();
 
-            if ( !i.length )
+            if ( !sender.length || !i.length )
             {
-                setTimeout( function ()
-                {
-                    $( ".gs-data" ).show( 1000 );
-                }, 4000 );
+                ACT.Loader.Hide();
 
                 return;
             }
 
-            i.html( "" );
-            i.append( "<div id='loader' />" );
-
-            function LoadNext()
+            if ( ACT.UI.DataGraghTotal == 0 )
             {
-                i.attr( "data-loaded", 1 );
-
-                ACT.UI.DataGraphs( sender, params );
+                ACT.UI.DataGraghTotal = sender.length;
             }
+
+            i
+                .add( i.parent().find( "graph-data" ) )
+                .html( "" );
+
+            i.append( "<div id='loader' />" );
 
             if ( typeof ( params ) === 'undefined' )
             {
                 params = {};
             }
 
-            ACT.UI.Get( i.find( "#loader" ), i, siteurl + "/" + i.attr( "data-type" ), params, LoadNext(), true, true );
+            i
+                .add( i.parent().find( "gs-data" ) )
+                .attr( "data-loaded", 1 );
+
+            ACT.Loader.Show( i.find( "#loader" ), true );
+
+            i.load( siteurl + "/" + i.attr( "data-type" ), params, function ()
+            {
+                ACT.Loader.Hide();
+
+                ACT.UI.DataGraghCount += 1;
+
+                if ( ACT.UI.DataGraghTotal == ACT.UI.DataGraghCount )
+                {
+                    ACT.UI.DataGraghCount = 0;
+
+                    setTimeout( function ()
+                    {
+                        ACT.Init.Start( true );
+
+                        $( ".gs-data" ).show( 1000 );
+                    }, 2500 );
+
+                    return;
+                }
+                else
+                {
+                    ACT.UI.DataGraphs( sender, params );
+                }
+            } );
         },
+
+        AgeOfOutstandingPalletsChat: null,
 
         AgeOfOutstandingPallets: function ( sender, months )
         {
-            Highcharts.chart( sender, {
+            if ( ACT.UI.AgeOfOutstandingPalletsChat != null )
+            {
+                ACT.UI.AgeOfOutstandingPalletsChat.destroy();
+            }
+
+            ACT.UI.AgeOfOutstandingPalletsChat = Highcharts.chart( sender, {
                 chart: {
                     plotBackgroundColor: null,
                     plotBorderWidth: null,
@@ -4256,9 +4292,16 @@
             } );
         },
 
+        AgeOfOutstandingPODChat: null,
+
         AgeOfOutstandingPOD: function ( sender, months )
         {
-            Highcharts.chart( sender, {
+            if ( ACT.UI.AgeOfOutstandingPODChat != null )
+            {
+                ACT.UI.AgeOfOutstandingPODChat.destroy();
+            }
+
+            ACT.UI.AgeOfOutstandingPODChat = Highcharts.chart( sender, {
                 chart: {
                     plotBackgroundColor: null,
                     plotBorderWidth: null,
@@ -4289,9 +4332,16 @@
             } );
         },
 
+        LoadsPerMonthChat: null,
+
         LoadsPerMonth: function ( sender, months, series )
         {
-            Highcharts.chart( sender, {
+            if ( ACT.UI.LoadsPerMonthChat != null )
+            {
+                ACT.UI.LoadsPerMonthChat.destroy();
+            }
+
+            ACT.UI.LoadsPerMonthChat = Highcharts.chart( sender, {
                 title: {
                     text: 'Loads Per Month'
                 },
@@ -4325,9 +4375,16 @@
             } );
         },
 
+        AuthorisationCodesPerMonthChat: null,
+
         AuthorisationCodesPerMonth: function ( sender, months, series )
         {
-            Highcharts.chart( sender, {
+            if ( ACT.UI.AuthorisationCodesPerMonthChat != null )
+            {
+                ACT.UI.AuthorisationCodesPerMonthChat.destroy();
+            }
+
+            ACT.UI.AuthorisationCodesPerMonthChat = Highcharts.chart( sender, {
                 chart: {
                     marginBottom: 70
                 },
@@ -4368,9 +4425,16 @@
             } );
         },
 
+        NumberOfPalletsManagedChat: null,
+
         NumberOfPalletsManaged: function ( sender, months, series )
         {
-            Highcharts.chart( sender, {
+            if ( ACT.UI.NumberOfPalletsManagedChat != null )
+            {
+                ACT.UI.NumberOfPalletsManagedChat.destroy();
+            }
+
+            ACT.UI.NumberOfPalletsManagedChat = Highcharts.chart( sender, {
                 chart: {
                     type: 'line'
                 },
@@ -4413,9 +4477,16 @@
             } );
         },
 
+        NumberOfDisputesChat: null,
+
         NumberOfDisputes: function ( sender, months, series )
         {
-            Highcharts.chart( sender, {
+            if ( ACT.UI.NumberOfDisputesChat != null )
+            {
+                ACT.UI.NumberOfDisputesChat.destroy();
+            }
+
+            ACT.UI.NumberOfDisputesChat = Highcharts.chart( sender, {
                 chart: {
                     type: 'column'
                 },
@@ -4527,6 +4598,8 @@
                         $( ".gs-data" ).css( "display", "none" );
                         $( '*[data-graph="1"]' ).attr( "data-loaded", 0 );
 
+                        ACT.UI.DataGraghCount = 0;
+
                         ACT.UI.DataGraphs( $( '*[data-graph="1"]' ), params );
                     } );
             } );
@@ -4537,6 +4610,7 @@
             return {
                 GiveData: false,
                 SiteId: filters.find( "#SiteId" ).val(),
+                ToSiteId: filters.find( "#ToSiteId" ).val(),
                 ClientId: filters.find( "#ClientId" ).val(),
                 RegionId: filters.find( "#RegionId" ).val(),
                 ToDate: filters.find( '[name="ToDate"]' ).val(),
