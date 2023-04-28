@@ -30,15 +30,15 @@
         </li>
 
         @*@if (user.IsAdmin)
-            {*@
+        {*@
         <li data-hot-spot="1" data-c="Administration" data-t="Products" class="none">
             <a data-ap-tab="1" data-target="#products" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Products">Products</a>
         </li>
         @*}*@
 
         @*<li data-hot-spot="1" data-c="Administration" data-t="Clients" class="none">
-                <a data-ap-tab="1" data-target="#clients" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Clients">Clients</a>
-            </li>*@
+            <a data-ap-tab="1" data-target="#clients" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Clients">Clients</a>
+        </li>*@
 
         <li data-hot-spot="1" data-c="Administration" data-t="AuditLog" class="none">
             <a data-ap-tab="1" data-target="#auditlog" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="AuditLog">Audit Log</a>
@@ -48,7 +48,7 @@
             <a data-ap-tab="1" data-target="#broadcasts" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Broadcasts">Broadcasts</a>
         </li>
 
-        @if ( user.IsAdmin )
+        @if (user.IsAdmin)
         {
             <li data-hot-spot="1" data-c="Administration" data-t="Roles" class="none">
                 <a data-ap-tab="1" data-target="#roles" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Roles">Roles</a>
@@ -63,14 +63,21 @@
             </li>
         }
 
+
         <li data-hot-spot="1" data-c="Administration" data-t="OldDataImport" class="none">
             <a data-ap-tab="1" data-target="#olddataimport" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="OldDataImport">Old Data Import</a>
         </li>
 
-        @if ( user.IsAdmin || user.IsPSPAdmin )
+        @if (user.IsAdmin || user.IsPSPAdmin)
         {
             <li data-hot-spot="1" data-c="Administration" data-t="PODPerUser" class="none">
                 <a data-ap-tab="1" data-target="#podperuser" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PODPerUser">KPI Reports</a>
+            </li>
+            <li data-hot-spot="1" data-c="Administration" data-t="PSPProduct" class="none">
+                <a data-ap-tab="1" data-target="#pspproducts" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PSPProducts">PSP Product</a>
+            </li>
+            <li data-hot-spot="1" data-c="Administration" data-t="PSPConfig" class="none">
+                <a data-ap-tab="1" data-target="#pspconfig" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PSPConfig">PSP Config</a>
             </li>
         }
 
@@ -88,7 +95,7 @@
 
         <div id="products" class="da-tab none" data-load-url="Products"> </div>
 
-        @if ( user.IsAdmin )
+        @if (user.IsAdmin)
         {
             <div id="roles" class="da-tab none" data-load-url="Roles"> </div>
 
@@ -109,11 +116,13 @@
 
         <div id="olddataimport" class="da-tab none" data-load-url="OldDataImport"> </div>
 
-        @if ( user.IsAdmin || user.IsPSPAdmin )
+        @if (user.IsAdmin || user.IsPSPAdmin)
         {
-            @Html.Partial( "_KPIReportFilter", new KPIReportFilterModel() )
+            @Html.Partial("_KPIReportFilter", new KPIReportFilterModel())
 
+            <div id="pspconfig" class="da-tab none" data-load-url="PSPConfig"> </div>
             <div id="podperuser" class="da-tab none kpi-reports-data" data-load-url="PODPerUser"> </div>
+            <div id="pspproducts" class="da-tab none psp-products-data" data-load-url="PSPProducts"></div>
             <div id="poduploadlog" class="da-tab none kpi-reports-data" data-load-url="PODUploadLog"> </div>
             <div id="authorizationcodeaudit" class="da-tab none kpi-reports-data" data-load-url="AuthorizationCodeAudit"> </div>
             <div id="auditlogperuser" class="da-tab none kpi-reports-data" data-load-url="AuditLogPerUser"> </div>

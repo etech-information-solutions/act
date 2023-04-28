@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
-  <Import Project="..\packages\EntityFramework.6.4.0\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -47,10 +46,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="ExcelDataReader, Version=3.6.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelDataReader.3.6.0\lib\net45\ExcelDataReader.dll</HintPath>
@@ -165,6 +164,8 @@
     <Compile Include="Controllers\DashBoardController.cs" />
     <Compile Include="Controllers\TransporterController.cs" />
     <Compile Include="Models\AuthorisationCodeViewModel.cs" />
+    <Compile Include="Models\BankDetailViewModel.cs" />
+    <Compile Include="Models\BillingInvoiceViewModel.cs" />
     <Compile Include="Models\ChepAuditViewModel.cs" />
     <Compile Include="Models\ChepLoadChepViewModel.cs" />
     <Compile Include="Models\ClientLoadViewModel.cs" />
@@ -194,6 +195,8 @@
     <Compile Include="Models\ImportFileModel.cs" />
     <Compile Include="Models\GroupViewModel.cs" />
     <Compile Include="Models\DeliveryNoteViewModel.cs" />
+    <Compile Include="Models\PSPBillingViewModel.cs" />
+    <Compile Include="Models\PSPProductViewModel.cs" />
     <Compile Include="Models\TransporterViewModel.cs" />
     <Compile Include="Models\SiteViewModel.cs" />
     <Compile Include="Models\ClientGroupViewModel.cs" />
@@ -502,7 +505,6 @@
     <Content Include="Views\Administration\_ApproveDeclinePSP.cshtml" />
     <Content Include="Views\Administration\_PSPUsers.cshtml" />
     <Content Include="Views\Administration\_PSPClientsView.cshtml" />
-    <Content Include="Views\Administration\_PSPProducts.cshtml" />
     <Content Include="Views\Administration\_PSPInvoices.cshtml" />
     <Content Include="Views\Administration\_Regions.cshtml" />
     <Content Include="Views\Administration\AddRegion.cshtml" />
@@ -513,7 +515,6 @@
     <Content Include="Views\Administration\EditProduct.cshtml" />
     <Content Include="Views\Administration\ProductDetails.cshtml" />
     <Content Include="Views\Shared\_RegionCustomSearch.cshtml" />
-    <Content Include="Views\Shared\_ProductCustomSearch.cshtml" />
     <Content Include="Views\Client\Index.cshtml" />
     <Content Include="Views\Client\_Clients.cshtml" />
     <Content Include="Views\Client\AddClient.cshtml" />
@@ -718,6 +719,24 @@
     <Content Include="Views\Shared\_AuthorizationCodeAuditLogCustomSearch.cshtml" />
     <Content Include="Views\Administration\_AuditLogPerUser.cshtml" />
     <Content Include="Views\Shared\_AuditLogPerUserCustomSearch.cshtml" />
+    <Content Include="Views\Finance\AddPSPBilling.cshtml" />
+    <Content Include="Views\Administration\AddPSPProduct.cshtml" />
+    <Content Include="Views\Administration\_PSPProducts.cshtml" />
+    <Content Include="Views\Shared\_PSPBillingCustomSearch.cshtml" />
+    <Content Include="Views\Finance\_PSPBilling.cshtml" />
+    <Content Include="Views\Administration\PSPProductDetails.cshtml" />
+    <Content Include="Views\Finance\PSPBillingDetails.cshtml" />
+    <Content Include="Views\Administration\EditPSPProduct.cshtml" />
+    <Content Include="Views\Finance\EditPSPBilling.cshtml" />
+    <Content Include="Views\Shared\_PSPProductCustomSearch.cshtml" />
+    <Content Include="Views\Finance\ProcessPSPBilling.cshtml" />
+    <Content Include="Views\Finance\GenerateInvoice.cshtml" />
+    <Content Include="Views\Finance\GetInvoice.cshtml" />
+    <Content Include="Views\Finance\GetClientInvoice.cshtml" />
+    <Content Include="Views\Shared\_ClientInvoice.cshtml" />
+    <Content Include="Views\Shared\_PSPInvoice.cshtml" />
+    <Content Include="Views\Shared\_BillingInvoiceCustomSearch.cshtml" />
+    <Content Include="Views\Finance\_BillingInvoice.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -781,11 +800,8 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.0\build\EntityFramework.props'))" />
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.0\build\EntityFramework.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
   </Target>
-  <Import Project="..\packages\EntityFramework.6.4.0\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -15,5 +15,9 @@ namespace ACT.Core.Services
         {
             return context.SystemConfigs.FirstOrDefault();
         }
+        public SystemConfig GetByPsp(int id)
+        {
+            return context.SystemConfigs.FirstOrDefault(c => c.Id == id);
+        }
     }
 }

@@ -69,6 +69,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ACT.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\ACT1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Address.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
@@ -79,6 +84,12 @@
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\BankDetail.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\BillingInvoice.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\BillingInvoiceLineItem.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Broadcast.cs">
@@ -177,6 +188,9 @@
     <Compile Include="Models\Document.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\EquipmentCost.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\EstimatedLoad.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
@@ -258,6 +272,9 @@
     <Compile Include="Models\SiteBudget.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\sysdiagram.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\SystemConfig.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
@@ -325,7 +342,7 @@
     <Content Include="Models\ACT.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>ACT.edmx</DependentUpon>
-      <LastGenOutput>ACT.cs</LastGenOutput>
+      <LastGenOutput>ACT1.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -6,19 +6,33 @@
 <div class="ap-tabs">
 
     <ul>
-
-        <li data-hot-spot="1" data-c="Finance" data-t="Billing" class="none">
-            <a data-ap-tab="1" data-target="#billing" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Billing">Billing</a>
+        <li data-hot-spot="1" data-c="PSPBilling" data-t="PSPBilling" class="none">
+            <a data-ap-tab="1" data-target="#pspbilling" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="PSPBilling">PSPBilling</a>
         </li>
+        @*<li data-hot-spot="1" data-c="Billing" data-t="Billing" class="none">
+            <a data-ap-tab="1" data-target="#billing" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="Billing">Billing</a>
+        </li>*@
+        <li data-hot-spot="1" data-c="BillingInvoice" data-t="BillingInvoice" class="none">
+            <a data-ap-tab="1" data-target="#billinginvoice" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="BillingInvoice">BillingInvoice</a>
+        </li>
+
+        @*<li data-hot-spot="1" data-c="XeroInterface" data-t="XeroInterface" class="none">
+            <a data-ap-tab="1" data-target="#xerointerface" data-tab-holder="#tab-data" data-partial-load="1" data-rendered="0" data-load-url="XeroInterface">Xero Interface</a>
+        </li>*@
 
         <li class="last"></li>
     </ul>
 
 
-
     <div id="tab-data" class="tab-data">
 
-        <div id="billing" class="da-tab none" data-load-url="Billing"> </div>
+        @*<div id="billing" class="da-tab none" data-load-url="Billing"> </div>*@
+    
+        <div id="pspbilling" class="da-tab none" data-load-url="PSPBilling"> </div>
+   
+        <div id="billinginvoice" class="da-tab none" data-load-url="BillingInvoice"> </div>
     </div>
+
+
 
 </div>

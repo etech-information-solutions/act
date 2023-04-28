@@ -8,6 +8,7 @@ namespace ACT.Core.Models.Custom
         public int Id { get; set; }
         public int PSPId { get; set; }
         public int PSPProductId { get; set; }
+        public int ClientId { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime ModifiedOn { get; set; }
         public string ModifiedBy { get; set; }
@@ -23,7 +24,7 @@ namespace ACT.Core.Models.Custom
         public string NominatedAccount { get; set; }
         public int Status { get; set; }
 
-
+        public string ClientName { get; set; }
         public string PSPName { get; set; }
         public string ProductName { get; set; }
     }

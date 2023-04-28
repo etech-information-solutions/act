@@ -170,11 +170,15 @@
 
                         @if ( status != PSPClientStatus.Unverified )
                         {
-                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
-                                @Html.ActionLink( "Details", "PSPDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                    <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+                        @Html.ActionLink("Details", "PSPDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
 
-                                @Html.ActionLink( "Edit", "EditPSP", new { id = item.Id, returnView = "PSPs" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                            </div>
+                        @Html.ActionLink("Edit", "EditPSP", new { id = item.Id, returnView = "PSPs" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+                        @Html.ActionLink("Link", "AddPSPProduct", new { id = item.Id, returnView = "PSPs" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+
+                    </div>
                         }
 
                         <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">

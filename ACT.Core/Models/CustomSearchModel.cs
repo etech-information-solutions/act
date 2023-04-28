@@ -652,12 +652,14 @@ namespace ACT.Core.Models
                     using ( SiteService sservice = new SiteService() )
                     using ( RegionService rservice = new RegionService() )
                     using ( ClientService cservice = new ClientService() )
+                    using (PSPService service = new PSPService())
                     using ( ProductService pservice = new ProductService() )
                     {
                         SiteOptions = sservice.List( true );
                         RegionOptions = rservice.List( true );
                         ClientOptions = cservice.List( true );
                         ProductOptions = pservice.List( true );
+                        PSPOptions = service.List(true);
                     }
 
                     break;
@@ -677,13 +679,15 @@ namespace ACT.Core.Models
                     break;
 
 
-                case "Billing":
+                case "PSPBilling":
 
                     using ( PSPService pservice = new PSPService() )
-                    using ( PSPProductService p1service = new PSPProductService() )
+                    using (ClientService cservice = new ClientService())
+                    using ( ProductService p1service = new ProductService() )
                     {
                         PSPOptions = pservice.List( true );
-                        PSPProductOptions = p1service.List( true );
+                        ProductOptions = p1service.List( true );
+                        ClientOptions = cservice.List(true);
                     }
 
                     break;
@@ -763,6 +767,18 @@ namespace ACT.Core.Models
                     {
                         TransporterOptions = tservice.List( true );
                         User1Options = uservice.List( true, RoleType.All );
+                    }
+
+                    break;
+                case "PSPProducts":
+
+                    using (PSPService pservice = new PSPService())
+                    using (ClientService cservice = new ClientService())
+                    using (ProductService p1service = new ProductService())
+                    {
+                        PSPOptions = pservice.List(true);
+                        ProductOptions = p1service.List(true);
+                        ClientOptions = cservice.List(true);
                     }
 
                     break;

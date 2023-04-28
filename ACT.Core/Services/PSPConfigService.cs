@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using ACT.Data.Models;
 
 namespace ACT.Core.Services
@@ -12,6 +12,7 @@ namespace ACT.Core.Services
 
         }
 
+        
         /// <summary>
         /// Gets a list of PSPConfigs
         /// </summary>
@@ -22,6 +23,13 @@ namespace ACT.Core.Services
             context.Configuration.ProxyCreationEnabled = true;
 
             return base.List();
+        }
+
+
+
+        public PSPConfig GetByPsp(int id)
+        {
+            return context.PSPConfigs.FirstOrDefault(c => c.PSPId == id);
         }
     }
 }

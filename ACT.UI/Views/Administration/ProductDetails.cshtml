@@ -131,7 +131,8 @@
                             <label>Rate Unit</label>
                         </div>
                         <div class="display-field">
-                            @p.RateUnit
+                            @*@p.RateUnit*@
+                            @(( (RateUnit) p.RateUnit).GetDisplayText())
                         </div>
 
                         <div class="display-label">

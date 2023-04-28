@@ -1,0 +1,188 @@
+﻿@model ACT.UI.Models.PSPBillingViewModel
+
+@using ACT.Data.Models;
+@using ACT.Core.Models;
+
+@{
+    if (ViewBag.IncludeLayout == null)
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Process PSP Billing ";
+}
+
+
+@Html.Partial("_Notification")
+
+@using (Html.BeginForm("ProcessPSPBilling", "Finance", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#pspbilling", @class = "custom-validate", @style = "width: auto;" }))
+{
+    @*<div id="edit-item">*@
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content( "~/images/edit.png" )" />
+            <span>Process PSP Billing</span>
+        </h2>
+
+        @Html.ValidationSummary(true)
+
+        @Html.HiddenFor(model => model.Id)
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div style="float: left; width: 48%; margin-right: 2%;">
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPId)
+                </div>
+                <div class="edit-field">
+                    @Html.DropDownListFor(model => model.PSPId, model => Model.PSPOptions, p => p.Key, p => p.Value, false, new { @class = "chzn", @style = "width: 98%;" })
+                    @Html.ValidationMessageFor(model => model.PSPId)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPProductId)
+                </div>
+                <div class="edit-field">
+                    @Html.DropDownListFor(model => model.PSPProductId, model => Model.ProductOptions, p => p.Key, p => p.Value, false, new { @class = "chzn", @style = "width: 98%;" })
+                    @Html.ValidationMessageFor(model => model.PSPProductId)
+                </div>
+
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.Rate)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.Rate, new { @placeholder = "Enter Rate" })
+                    @Html.ValidationMessageFor(model => model.Rate)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.Units)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.Units, new { @placeholder = "Enter Units" })
+                    @Html.ValidationMessageFor(model => model.Units)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.CreatedOn)
+                </div>
+                <div class="edit-field">
+                    <input id="CreatedOn" name="CreatedOn" class="date-picker" data-val="true" data-val-date="The field CreatedOn Date must be a date." placeholder="Select CreatedOn Date" readonly="readonly" value="@(Model.CreatedOn)" type="text" />
+                    @Html.ValidationMessageFor(model => model.CreatedOn)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.StatementNumber)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.StatementNumber, new { @placeholder = "Enter Statement Number" })
+                    @Html.ValidationMessageFor(model => model.StatementNumber)
+                </div>
+
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.InvoiceAmount)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.InvoiceAmount, new { @placeholder = "Enter Invoice Amoubt" })
+                    @Html.ValidationMessageFor(model => model.InvoiceAmount)
+                </div>
+
+            </div>
+
+        <div style="float: left; width: 48%; margin-right: 2%;">
+
+
+
+
+            <div class="edit-label">
+                @Html.LabelFor(model => model.StatementNumber)
+            </div>
+            <div class="edit-field">
+                @Html.TextBoxFor(model => model.StatementNumber, new { @placeholder = "Enter Statement Number" })
+                @Html.ValidationMessageFor(model => model.StatementNumber)
+            </div>
+
+
+            <div class="edit-label">
+                @Html.LabelFor(model => model.InvoiceAmount)
+            </div>
+            <div class="edit-field">
+                @Html.TextBoxFor(model => model.InvoiceAmount, new { @placeholder = "Enter Invoice Amount" })
+                @Html.ValidationMessageFor(model => model.InvoiceAmount)
+            </div>
+
+            <div class="edit-label">
+                @Html.LabelFor(model => model.PaymentAmount)
+            </div>
+            <div class="edit-field">
+                @Html.TextBoxFor(model => model.PaymentAmount, new { @placeholder = "Enter Payment Amount" })
+                @Html.ValidationMessageFor(model => model.PaymentAmount)
+            </div>
+
+            <div class="edit-label">
+                @Html.LabelFor(model => model.ReferenceNumber)
+            </div>
+            <div class="edit-field">
+                @Html.TextBoxFor(model => model.ReferenceNumber, new { @placeholder = "Enter Reference Number" })
+                @Html.ValidationMessageFor(model => model.ReferenceNumber)
+            </div>
+
+
+
+
+            <div class="edit-label">
+                @Html.LabelFor(model => model.PaymentDate)
+            </div>
+            <div class="edit-field">
+                <input id="PaymentDate" name="PaymentDate" class="date-picker" data-val="true" data-val-date="The field PaymentDate Date must be a date." placeholder="Select PaymentDate Date" readonly="readonly" value="@(Model.PaymentDate.HasValue ? Model.PaymentDate.Value.ToString( "yyyy/MM/dd" ) : "-/-")" type="text" />
+                @Html.ValidationMessageFor(model => model.PaymentDate)
+            </div>
+
+
+            <div class="edit-label">
+                @Html.LabelFor(model => model.StatementDate)
+            </div>
+            <div class="edit-field">
+                <input id="StatementDate" name="StatementDate" class="date-picker" data-val="true" data-val-date="The field StatementDate Date must be a date." placeholder="Select StatementDate Date" readonly="readonly" value="@(Model.StatementDate)" type="text" />
+                @Html.ValidationMessageFor(model => model.StatementDate)
+            </div>
+
+            <div class="edit-label">
+                @Html.LabelFor(model => model.NominatedAccount)
+            </div>
+            <div class="edit-field">
+                @Html.TextBoxFor(model => model.NominatedAccount, new { @placeholder = "Enter Nominanted Account Number" })
+                @Html.ValidationMessageFor(model => model.NominatedAccount)
+            </div>
+
+            <div class="edit-label">
+                @Html.LabelFor(model => model.TaxAmount)
+            </div>
+            <div class="edit-field">
+                @Html.TextBoxFor(model => model.TaxAmount, new { @placeholder = "Enter Tax Amount" })
+                @Html.ValidationMessageFor(model => model.TaxAmount)
+            </div>
+
+            @*<div class="edit-label">
+                @Html.LabelFor(model => model.Status)
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor(model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" })
+                @Html.ValidationMessageFor(model => model.Status)
+            </div>*@
+
+        </div>
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+        <p>
+            <input id="save-btn" type="submit" value="Save" />
+            <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+        </p>
+  </div>
+}
+
+

@@ -22,7 +22,7 @@ namespace ACT.Core.Services
     {
         private bool disposing = false;
 
-        internal ACTEntities context = new ACTEntities();
+        public ACTEntities context = new ACTEntities();
 
         public int ItemId { get; set; }
 
@@ -824,6 +824,7 @@ namespace ACT.Core.Services
 
             return item;
         }
+        
 
         /// <summary>
         /// Updates an existing entity
@@ -834,7 +835,7 @@ namespace ACT.Core.Services
         {
             // Tracking
             item = Track( item, true );
-
+            
             context.Entry( item ).State = EntityState.Modified;
             context.SaveChanges();
 
@@ -867,6 +868,48 @@ namespace ACT.Core.Services
 
             return true;
         }
+
+        /// </summary>      
+        /// <param name="model">model of the user to be fetched</param>
+        /// <returns></returns>
+        public bool CheckPSPProduct(PSPProduct model)
+        {
+            var test = (from pp in context.PSPProducts
+                        where
+                        (
+                          pp.ProductId == model.ProductId && pp.Name == model.Name && pp.PSPId == model.PSPId &&
+                          pp.RateUnit == model.RateUnit && model.EndDate > DateTime.Today &&
+                          model.Status == 1
+                        )
+                        select pp).FirstOrDefault();
+                  
+            if (test != null)
+            {
+                return true;
+            }
+            else return false;       
+        }
+
+        ///// </summary>      
+        ///// <param name="model">model of the user to be fetched</param>
+        ///// <returns></returns>
+        //public bool CheckPSPBilling(PSPBilling model)
+        //{
+        //    var test = (from pp in context.PSPBillings
+        //                where
+        //                (
+        //                  pp.PSPProductId == model.PSPProductId && pp.ClientId == model.ClientId && 
+        //                  pp.PSPId == model.PSPId && model.Status == 1
+        //                )
+        //                select pp).FirstOrDefault();
+
+        //    if (test != null)
+        //    {
+        //        return true;
+        //    }
+        //    else return false;
+        //}
+
 
         /// <summary>
         /// Formats the number depending on prefix and max

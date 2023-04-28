@@ -1,0 +1,214 @@
+﻿@model BillingInvoiceViewModel
+
+@using ACT.UI.Models;
+
+@{
+    ViewBag.Title = "Generate Invoice";
+
+    Dictionary<int, string> pSPOptions = Model.PSPOptions;
+
+
+    if (!pSPOptions.NullableAny())
+    {
+        pSPOptions = new Dictionary<int, string>();
+    }
+
+    pSPOptions.Add(-1, "Other");
+}
+
+    @Html.Partial("_Notification")
+
+    @using (Html.BeginForm("GenerateInvoice", "Finance", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#pspbilling", @class = "custom-validate", @style = "width: auto;" }))
+    {
+<div id="edit-item">
+
+    <div style="width: 100%; margin-bottom: 10px; margin-left:0px;">
+        <div class="left" style="width:50%; background: #fff;" margin-bottom: 10px;>
+            <img alt="" src="@Url.Content("~/Images/act-logo.png")" style="border-right: 1px solid #002e70; padding: 37px 27px 37px 0; width: 90%;" />
+        </div>
+        <div class="right" style="width: 50%; background: #fff; margin-bottom: 20px; margin-top:10px;">
+            <div class="display-label">
+                Invoice Number /Reference     :
+            </div>
+            <div class="display-field">
+                <i style="background-color:yellow;"> @Html.DisplayFor(model => model.InvoiceNumber)</i>
+            </div>
+            <div class="display-label">
+                Date                :
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.StatementDate)
+            </div>
+            
+            <div class="display-label">
+                Vat No              :
+            </div>
+            <div class="display-field">
+                @Html.DisplayFor(model => model.VATNumber)
+            </div>
+            <div class="display-label">
+                PSP
+            </div>
+            <div class="display-field">
+                
+                @Html.DisplayFor(model => model.PSPName)
+            </div>
+        </div>
+       
+        <div class="right" style="width:50%; background:#fff; margin-bottom:20px;margin-top:10px;">
+                <p><b>Client Details</b></p>
+            <div class="display-label">
+                Company Name
+
+                    @Html.DisplayFor(model => model.CompanyName)
+            </div>
+            <div class="display-label">
+                Contact Number
+
+                    @Html.DisplayFor(model => model.ContactNumber)
+            </div>
+            <div class="display-label">
+                Street Name
+
+                    @Html.DisplayFor(model => model.AddressLine1)
+            </div>
+            <div class="display-label">
+                Building
+
+                    @Html.DisplayFor(model => model.AddressLine2)
+            </div>
+            <div class="display-label">
+                Surburb
+
+                    @Html.DisplayFor(model => model.Town)
+            </div>
+            <div class="display-label">
+                Province
+
+                    @Html.DisplayFor(model => model.Province)
+            </div>
+            <div class="display-label">
+                Postal Code
+
+                   @Html.DisplayFor(model => model.PostalCode)
+            </div>
+            <div class="display-label">
+                Contact Email
+
+                    @Html.DisplayFor(model => model.ContactEmail)
+            </div>
+            <div class="display-label">
+                Vat No
+
+                    @Html.DisplayFor(model => model.VATNumber)
+            </div>
+        </div>
+
+
+        <br />
+        <div>
+
+        </div>
+    </div>
+       
+    <br />
+        <div>
+            <p>Test</p>
+            <table id="billingInvoice-table" class="da-table" style="border-bottom: 0; margin-top: 40px;">
+
+                <thead>
+                    <tr>
+                        <td>Created On</td>
+                        <th>Invoice Number</th>
+                        <th>Due Date</th>  
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model.billings.NullableAny())
+                    {
+                        int count = 0;
+
+                        foreach (PSPBillingViewModel b in Model.billings)
+                        {                          
+                            <tr>                                
+                                <td> @b.CreatedOn </td>
+                                <td>@b.ReferenceNumber </td>
+                                
+                                <td>@b.StatementDate</td> 
+                                <td>@b.InvoiceAmount</td>
+                            </tr>
+
+                            count++;
+                        }
+                    }
+                </tbody>
+
+            </table>           
+           
+
+        </div>
+    <br />
+        <div>
+            <p><b>SubTotals</b></p>                                               <b> @Html.DisplayFor(model => model.Total); </b>
+        </div>
+
+    <br />
+        <div>
+            <p>Our Banking Details here</p>
+            <div class="display-label">
+                Bank
+            
+                @Html.DisplayFor(model => model.Bank)
+            </div>
+            <div class="display-label">
+                Branch
+            
+                @Html.DisplayFor(model => model.Branch)
+             <div class="display-label">
+              Account No
+                
+                    @Html.DisplayFor(model => model.AccountNumber)
+                </div>
+             <div class="display-label">
+              Account Type
+                
+                    @Html.DisplayFor(model => model.AccountType)
+                </div>
+            </div>
+        </div>
+    <br />
+        <div>
+            <p>Invoice</p>
+            <div class="display-label">
+                Invoice No
+               @Html.DisplayFor(model => model.InvoiceNumber)
+            </div>
+            <div class="display-label">
+                Date
+            
+                @Html.DisplayFor(model => model.CreatedOn)
+            </div>
+            <div class="display-label">
+                Acct Vat           
+                @Html.DisplayFor(model => model.VATNumber)
+            </div>
+        </div>
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+
+        <p>
+            <input id="save-btn" type="submit" value="Save" />
+
+            <span style="padding: 0 5px;">/</span>
+
+            <a data-refresh="1" data-target="#pspbilling">Cancel</a>
+        </p>
+
+    </div>
+   
+    }
+
+
+
+

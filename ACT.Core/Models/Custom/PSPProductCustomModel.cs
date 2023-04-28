@@ -18,5 +18,8 @@ namespace ACT.Core.Models.Custom
         public decimal? Rate { get; set; }
         public int? RateUnit { get; set; }
         public int Status { get; set; }
+
+        public string PSPName { get; set; }
+        public string ProductName { get; set; }
     }
 }

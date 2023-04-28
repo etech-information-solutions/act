@@ -27,371 +27,585 @@
 
         @Html.ValidationSummary( true )
 
-        <div id="item-details" class="item-details" style="width: auto;">
+    <div id="item-details" class="item-details" style="width: auto;">
 
-            <div class="left" style="width: 30%; margin-right: 2%;">
+        <div class="left" style="width: 30%; margin-right: 2%;">
 
-                <div class="editor-field" style="text-align: center; margin-bottom: 20px; border: 1px dashed #ddd; padding: 3px 10px;">
+            <div class="editor-field" style="text-align: center; margin-bottom: 20px; border: 1px dashed #ddd; padding: 3px 10px;">
 
-                    <label for="Files-0-File">
-                        Company Logo <br />
-                        <a href="@logoUrl" target="_blank">
-                            <img class="image-preview" style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
-                        </a>
+                <label for="Files-0-File">
+                    Company Logo <br />
+                    <a href="@logoUrl" target="_blank">
+                        <img class="image-preview" style="margin-bottom: 10px; display: inline-block; max-height: 152px; border-top-left-radius: 6px; border-bottom-right-radius: 6px; padding: 8px;" alt="Logo" src="@logoUrl" />
+                    </a>
+                </label>
+
+                <p class="company-files">
+                    <input id="Files-0-File" name="Files[0].File" type="file" value="" data-val-file="1" data-increment="1" data-upload-image="1" class="input" />
+                    <input id="Files-0-Name" name="Files[0].Name" type="hidden" value="Logo" />
+                    <input id="Files-0-Description" name="Files[0].Description" class="input" type="hidden" value="Company Logo" />
+                </p>
+
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.CompanyName)
+            </div>
+
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" })
+                @Html.ValidationMessageFor(model => model.CompanyName)
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.TradingAs)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.TradingAs, new { @class = "input", @placeholder = "Enter Trading As details" })
+                @Html.ValidationMessageFor(model => model.TradingAs)
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.Description)
+            </div>
+
+            <div class="editor-field">
+                @Html.TextAreaFor(model => model.Description, new { @class = "input", @style = "height: 82px;", @placeholder = "Briefely describe your business" })
+                @Html.ValidationMessageFor(model => model.Description)
+            </div>
+
+            <div class="edit-label">
+                @Html.LabelFor(model => model.Status)
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor(model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" })
+                @Html.ValidationMessageFor(model => model.Status)
+            </div>
+
+            <div class="editor-label" style="margin: 0 0 10px 0;">
+                @Html.LabelFor(model => model.ServiceType)
+            </div>
+
+            <div class="editor-field">
+                @foreach (int k in Enum.GetValues(typeof(ServiceType)))
+                {
+                    if (k > 2 || k < 0)
+                    {
+                        continue;
+                    }
+
+                    ServiceType st = ((ServiceType)k);
+
+                    string desc = st.GetDisplayText();
+
+                    string sel = (st == Model.ServiceType) ? "checked=checked" : "";
+
+                    <label class="block" for="ServiceType-@k">
+
+                        <input id="ServiceType-@k" name="ServiceType" type="radio" value="@k" @sel data-service-type="1" data-target="#psp-list" />
+
+                        @desc
+
                     </label>
+                    <div></div>
+                }
+            </div>
 
-                    <p class="company-files">
-                        <input id="Files-0-File" name="Files[0].File" type="file" value="" data-val-file="1" data-increment="1" data-upload-image="1" class="input" />
-                        <input id="Files-0-Name" name="Files[0].Name" type="hidden" value="Logo" />
-                        <input id="Files-0-Description" name="Files[0].Description" class="input" type="hidden" value="Company Logo" />
-                    </p>
+            <div class="edit-label" style="margin-top: 15px;">
+                @Html.LabelFor(model => model.CompanyType)
+            </div>
+            <div class="edit-field">
+                @Html.EnumDropDownFor(model => model.CompanyType, false, true, new { @class = "chzn", @style = "width: 98%;" })
+                @Html.ValidationMessageFor(model => model.CompanyType)
+            </div>
 
-                </div>
+        </div>
 
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.CompanyName )
-                </div>
+        <div class="left" style="width: 25%; margin-right: 2%;">
 
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.CompanyName, new { @class = "input", @placeholder = "Enter Company Name" } )
-                    @Html.ValidationMessageFor( model => model.CompanyName )
-                </div>
+            <div class="editor-label">
+                @Html.LabelFor(model => model.CompanyRegistrationNumber)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" })
+                @Html.ValidationMessageFor(model => model.CompanyRegistrationNumber)
+            </div>
 
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.TradingAs )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.TradingAs, new { @class = "input", @placeholder = "Enter Trading As details" } )
-                    @Html.ValidationMessageFor( model => model.TradingAs )
-                </div>
+            <div class="editor-label">
+                @Html.LabelFor(model => model.VATNumber)
+            </div>
 
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.Description )
-                </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.VATNumber, new { @class = "input", @data_input_show = "1", @data_target = "#vat-file-upload", @placeholder = "Enter your VAT Number" })
+                @Html.ValidationMessageFor(model => model.VATNumber)
+            </div>
 
-                <div class="editor-field">
-                    @Html.TextAreaFor( model => model.Description, new { @class = "input", @style = "height: 82px;", @placeholder = "Briefely describe your business" } )
-                    @Html.ValidationMessageFor( model => model.Description )
-                </div>
+            <div class="editor-label">
+                @Html.LabelFor(model => model.BBBEELevel)
+            </div>
 
-                <div class="edit-label">
-                    @Html.LabelFor( model => model.Status )
-                </div>
-                <div class="edit-field">
-                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.Status )
-                </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.BBBEELevel, new { @class = "input", @data_input_show = "1", @data_target = "#bbbee-file-upload", @placeholder = "Enter your BBBEE Level" })
+                @Html.ValidationMessageFor(model => model.BBBEELevel)
+            </div>
 
-                <div class="editor-label" style="margin: 0 0 10px 0;">
-                    @Html.LabelFor( model => model.ServiceType )
-                </div>
+            <div class="editor-label">
+                @Html.LabelFor(model => model.ContactPerson)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" })
+                @Html.ValidationMessageFor(model => model.ContactPerson)
+            </div>
+            <div class="editor-label">
+                @Html.LabelFor(model => model.ContactNumber)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" })
+                @Html.ValidationMessageFor(model => model.ContactNumber)
+            </div>
 
-                <div class="editor-field">
-                    @foreach ( int k in Enum.GetValues( typeof( ServiceType ) ) )
+            <div class="editor-label">
+                @Html.LabelFor(model => model.EmailAddress)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.EmailAddress, new { @class = "input", @placeholder = "Enter Email Address", type = "email" })
+                @Html.ValidationMessageFor(model => model.EmailAddress)
+            </div>
+
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.AdminPerson)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.AdminPerson, new { @class = "input", @placeholder = "Enter Administrator Name" })
+                @Html.ValidationMessageFor(model => model.AdminPerson)
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.AdminEmail)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.AdminEmail, new { @class = "input", @placeholder = "Enter Administrator Email Address", type = "email" })
+                @Html.ValidationMessageFor(model => model.AdminEmail)
+            </div>
+
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.FinancialPerson)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.FinancialPerson, new { @class = "input", @placeholder = "Enter Financial Person Name" })
+                @Html.ValidationMessageFor(model => model.FinancialPerson)
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.FinPersonEmail)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.FinPersonEmail, new { @class = "input", @placeholder = "Enter Financial Person Email Address", type = "email" })
+                @Html.ValidationMessageFor(model => model.FinPersonEmail)
+            </div>
+
+            <div class="editor-label uppercase" style="margin-bottom: 10px;">
+                @Html.LabelFor(model => model.TypeOfPalletUse)
+            </div>
+
+            <div class="editor-field">
+                @foreach (int k in Enum.GetValues(typeof(TypeOfPalletUse)))
+                {
+                    if (k < 0)
                     {
-                        if ( k > 2 || k < 0 )
-                        {
-                            continue;
-                        }
-
-                        ServiceType st = ( ( ServiceType ) k );
-
-                        string desc = st.GetDisplayText();
-
-                        string sel = ( st == Model.ServiceType ) ? "checked=checked" : "";
-
-                        <label class="block" for="ServiceType-@k">
-
-                            <input id="ServiceType-@k" name="ServiceType" type="radio" value="@k" @sel data-service-type="1" data-target="#psp-list" />
-
-                            @desc
-
-                        </label>
-                        <div></div>
+                        continue;
                     }
+
+                    TypeOfPalletUse topu = ((TypeOfPalletUse)k);
+
+                    string desc = topu.GetDisplayText();
+
+                    string sel = (topu == Model.TypeOfPalletUse) ? "checked=checked" : "";
+
+                    <label class="block" for="TypeOfPalletUse-@k">
+
+                        <input id="TypeOfPalletUse-@k" name="TypeOfPalletUse" type="radio" value="@k" @sel data-pallet-use="1" data-target="#other-pallet-use" />
+
+                        @desc
+
+                    </label>
+                    <div></div>
+                }
+            </div>
+
+            <div id="other-pallet-use" class="@(Model.TypeOfPalletUse == TypeOfPalletUse.Other ? "block": "none")" style="margin-top: 15px;">
+
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.OtherTypeOfPalletUse)
                 </div>
 
-                <div class="edit-label" style="margin-top: 15px;">
-                    @Html.LabelFor( model => model.CompanyType )
-                </div>
-                <div class="edit-field">
-                    @Html.EnumDropDownFor( model => model.CompanyType, false, true, new { @class = "chzn", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.CompanyType )
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.OtherTypeOfPalletUse, new { @class = "input", @placeholder = "Enter your Type of Pallet Use" })
+                    @Html.ValidationMessageFor(model => model.OtherTypeOfPalletUse)
                 </div>
 
             </div>
 
-            <div class="left" style="width: 25%; margin-right: 2%;">
+        </div>
 
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.CompanyRegistrationNumber )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.CompanyRegistrationNumber, new { @class = "input", @placeholder = "Enter Registration Number" } )
-                    @Html.ValidationMessageFor( model => model.CompanyRegistrationNumber )
-                </div>
+        <div class="left" style="width: 41%;">
 
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.VATNumber )
-                </div>
+            <div class="editor-label">
+                <label for="RegistrationFile">Company Registration File</label>
+            </div>
 
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.VATNumber, new { @class = "input", @data_input_show = "1", @data_target = "#vat-file-upload", @placeholder = "Enter your VAT Number" } )
-                    @Html.ValidationMessageFor( model => model.VATNumber )
-                </div>
+            <div class="editor-field" style="margin-bottom: 17px;">
 
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.BBBEELevel )
-                </div>
-
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.BBBEELevel, new { @class = "input", @data_input_show = "1", @data_target = "#bbbee-file-upload", @placeholder = "Enter your BBBEE Level" } )
-                    @Html.ValidationMessageFor( model => model.BBBEELevel )
-                </div>
-
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.ContactPerson )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.ContactPerson, new { @class = "input", @placeholder = "Enter Contact Name" } )
-                    @Html.ValidationMessageFor( model => model.ContactPerson )
-                </div>
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.ContactNumber )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.ContactNumber, new { @class = "input", @placeholder = "Enter Contact Number" } )
-                    @Html.ValidationMessageFor( model => model.ContactNumber )
-                </div>
-
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.EmailAddress )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.EmailAddress, new { @class = "input", @placeholder = "Enter Email Address", type = "email" } )
-                    @Html.ValidationMessageFor( model => model.EmailAddress )
-                </div>
-
-
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.AdminPerson )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.AdminPerson, new { @class = "input", @placeholder = "Enter Administrator Name" } )
-                    @Html.ValidationMessageFor( model => model.AdminPerson )
-                </div>
-
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.AdminEmail )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.AdminEmail, new { @class = "input", @placeholder = "Enter Administrator Email Address", type = "email" } )
-                    @Html.ValidationMessageFor( model => model.AdminEmail )
-                </div>
-
-
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.FinancialPerson )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.FinancialPerson, new { @class = "input", @placeholder = "Enter Financial Person Name" } )
-                    @Html.ValidationMessageFor( model => model.FinancialPerson )
-                </div>
-
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.FinPersonEmail )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.FinPersonEmail, new { @class = "input", @placeholder = "Enter Financial Person Email Address", type = "email" } )
-                    @Html.ValidationMessageFor( model => model.FinPersonEmail )
-                </div>
-
-                <div class="editor-label uppercase" style="margin-bottom: 10px;">
-                    @Html.LabelFor( model => model.TypeOfPalletUse )
-                </div>
-
-                <div class="editor-field">
-                    @foreach ( int k in Enum.GetValues( typeof( TypeOfPalletUse ) ) )
-                    {
-                        if ( k < 0 )
-                        {
-                            continue;
-                        }
-
-                        TypeOfPalletUse topu = ( ( TypeOfPalletUse ) k );
-
-                        string desc = topu.GetDisplayText();
-
-                        string sel = ( topu == Model.TypeOfPalletUse ) ? "checked=checked" : "";
-
-                        <label class="block" for="TypeOfPalletUse-@k">
-
-                            <input id="TypeOfPalletUse-@k" name="TypeOfPalletUse" type="radio" value="@k" @sel data-pallet-use="1" data-target="#other-pallet-use" />
-
-                            @desc
-
-                        </label>
-                        <div></div>
-                    }
-                </div>
-
-                <div id="other-pallet-use" class="@(Model.TypeOfPalletUse == TypeOfPalletUse.Other ? "block": "none")" style="margin-top: 15px;">
-
-                    <div class="editor-label">
-                        @Html.LabelFor( model => model.OtherTypeOfPalletUse )
-                    </div>
-
-                    <div class="editor-field">
-                        @Html.TextBoxFor( model => model.OtherTypeOfPalletUse, new { @class = "input", @placeholder = "Enter your Type of Pallet Use" } )
-                        @Html.ValidationMessageFor( model => model.OtherTypeOfPalletUse )
-                    </div>
-
-                </div>
+                <input id="RegistrationFile" name="Files[1].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
+                <input name="Files[1].Name" type="hidden" value="CompanyRegistrationFile" />
+                <input name="Files[1].Description" class="input" type="hidden" value="Company Registration File" />
 
             </div>
 
-            <div class="left" style="width: 41%;">
+            <div id="vat-file-upload" class="none">
 
                 <div class="editor-label">
-                    <label for="RegistrationFile">Company Registration File</label>
+                    <label for="VATRegistrationFile">VAT Registration File</label>
                 </div>
 
                 <div class="editor-field" style="margin-bottom: 17px;">
 
-                    <input id="RegistrationFile" name="Files[1].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
-                    <input name="Files[1].Name" type="hidden" value="CompanyRegistrationFile" />
-                    <input name="Files[1].Description" class="input" type="hidden" value="Company Registration File" />
-
-                </div>
-
-                <div id="vat-file-upload" class="none">
-
-                    <div class="editor-label">
-                        <label for="VATRegistrationFile">VAT Registration File</label>
-                    </div>
-
-                    <div class="editor-field" style="margin-bottom: 17px;">
-
-                        <input id="VATRegistrationFile" name="Files[2].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
-                        <input name="Files[2].Name" type="hidden" value="VATRegistrationFile" />
-                        <input name="Files[2].Description" class="input" type="hidden" value="VAT Registration File" />
-
-                    </div>
-
-                </div>
-
-                <div id="bbbee-file-upload" class="none">
-
-                    <div class="editor-label">
-                        <label for="BBBEELevelFile">BBBEE Level Certificate</label>
-                    </div>
-
-                    <div class="editor-field" style="margin-bottom: 17px;">
-
-                        <input id="BBBEELevelFile" name="Files[3].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
-                        <input name="Files[3].Name" type="hidden" value="BBBEELevelCertificate" />
-                        <input name="Files[3].Description" class="input" type="hidden" value="BBBEE Level Certificate" />
-
-                    </div>
-
-                </div>
-
-                <div class="editor-label">
-                    <label for="SignedPSPContractFile">Signed PSP Contract Document</label>
-                </div>
-
-                <div class="editor-field" style="margin-bottom: 20px;">
-
-                    <input id="SignedPSPContractFile" name="Files[4].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
-                    <input name="Files[4].Name" type="hidden" value="SignedPSPContractFile" />
-                    <input name="Files[4].Description" class="input" type="hidden" value="Signed PSP Contract File" />
-
-                </div>
-
-                <div class="clear"></div>
-
-                <div class="grouped-area">
-
-                    <p>
-                        <strong class="uppercase">Address Details</strong>
-                    </p>
-
-                    @Html.HiddenFor( model => model.Address.Id )
-                    @Html.HiddenFor( model => model.Address.AddressType )
-
-                    <div class="editor-label">
-                        @Html.LabelFor( model => model.Address.AddressLine1 )
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor( model => model.Address.AddressLine1, new { @class = "input", @placeholder = "Enter Company Address Line 1" } )
-                        @Html.ValidationMessageFor( model => model.Address.AddressLine1 )
-                    </div>
-
-                    <div class="editor-field">
-                        @Html.TextBoxFor( model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter Company Address Line 2" } )
-                        @Html.ValidationMessageFor( model => model.Address.AddressLine2 )
-                    </div>
-
-                    <div class="editor-label">
-                        @Html.LabelFor( model => model.Address.Town )
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor( model => model.Address.Town, new { @class = "input", @placeholder = "Enter Company Address Town" } )
-                        @Html.ValidationMessageFor( model => model.Address.Town )
-                    </div>
-
-                    <div class="editor-label">
-                        @Html.LabelFor( model => model.Address.PostCode )
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor( model => model.Address.PostCode, new { @class = "input", @placeholder = "Enter Company Address Postal Code" } )
-                        @Html.ValidationMessageFor( model => model.Address.PostCode )
-                    </div>
-
-                    <div class="editor-label">
-                        @Html.LabelFor( model => model.Address.ProvinceId )
-                    </div>
-                    <div class="editor-field">
-                        @Html.DropDownListFor( model => model.Address.ProvinceId, model => Model.Address.ProvinceOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-                        @Html.ValidationMessageFor( model => model.Address.ProvinceId )
-                    </div>
+                    <input id="VATRegistrationFile" name="Files[2].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
+                    <input name="Files[2].Name" type="hidden" value="VATRegistrationFile" />
+                    <input name="Files[2].Description" class="input" type="hidden" value="VAT Registration File" />
 
                 </div>
 
             </div>
 
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
+            <div id="bbbee-file-upload" class="none">
 
-            <div id="psp-budget">
+                <div class="editor-label">
+                    <label for="BBBEELevelFile">BBBEE Level Certificate</label>
+                </div>
 
-                @Html.Partial( "_PSPBudgets", Model.PSPBudgets )
+                <div class="editor-field" style="margin-bottom: 17px;">
+
+                    <input id="BBBEELevelFile" name="Files[3].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
+                    <input name="Files[3].Name" type="hidden" value="BBBEELevelCertificate" />
+                    <input name="Files[3].Description" class="input" type="hidden" value="BBBEE Level Certificate" />
+
+                </div>
 
             </div>
 
-            <div style="width: 32%; margin-top: 20px;">
+            <div class="editor-label">
+                <label for="SignedPSPContractFile">Signed PSP Contract Document</label>
+            </div>
+
+            <div class="editor-field" style="margin-bottom: 20px;">
+
+                <input id="SignedPSPContractFile" name="Files[4].File" type="file" value="" data-val-file="1" class="input" style="width: 40%;" />
+                <input name="Files[4].Name" type="hidden" value="SignedPSPContractFile" />
+                <input name="Files[4].Description" class="input" type="hidden" value="Signed PSP Contract File" />
+
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="grouped-area">
+
+                <p>
+                    <strong class="uppercase">Address Details</strong>
+                </p>
+
+                @Html.HiddenFor(model => model.Address.Id)
+                @Html.HiddenFor(model => model.Address.AddressType)
 
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.NumberOfLostPallets )
+                    @Html.LabelFor(model => model.Address.AddressLine1)
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.Address.AddressLine1, new { @class = "input", @placeholder = "Enter Company Address Line 1" })
+                    @Html.ValidationMessageFor(model => model.Address.AddressLine1)
                 </div>
 
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.NumberOfLostPallets, new { @class = "input", @placeholder = "Enter Number Of Lost Pallets" } )
-                    @Html.ValidationMessageFor( model => model.NumberOfLostPallets )
+                    @Html.TextBoxFor(model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter Company Address Line 2" })
+                    @Html.ValidationMessageFor(model => model.Address.AddressLine2)
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.Address.Town)
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.Address.Town, new { @class = "input", @placeholder = "Enter Company Address Town" })
+                    @Html.ValidationMessageFor(model => model.Address.Town)
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.Address.PostCode)
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor(model => model.Address.PostCode, new { @class = "input", @placeholder = "Enter Company Address Postal Code" })
+                    @Html.ValidationMessageFor(model => model.Address.PostCode)
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.Address.ProvinceId)
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor(model => model.Address.ProvinceId, model => Model.Address.ProvinceOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" })
+                    @Html.ValidationMessageFor(model => model.Address.ProvinceId)
                 </div>
 
             </div>
 
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+        </div>
 
-            <p>
-                <input id="save-btn" type="submit" value="Save" />
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin: 20px 0; height: 0;">&nbsp;</div>
 
-                <span style="padding: 0 5px;">/</span>
+        <div id="psp-budget">
 
-                <a data-refresh="1" data-target="#psps">Cancel</a>
-            </p>
+            @Html.Partial("_PSPBudgets", Model.PSPBudgets)
 
         </div>
 
+        <div style="width: 32%; margin-top: 20px;">
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.NumberOfLostPallets)
+            </div>
+
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.NumberOfLostPallets, new { @class = "input", @placeholder = "Enter Number Of Lost Pallets" })
+                @Html.ValidationMessageFor(model => model.NumberOfLostPallets)
+            </div>
+
+        </div>
+
+        <div class="grouped-area">
+
+            <p>
+                <strong class="uppercase">CONFIGURATION</strong>
+            </p>
+
+            <div class="left" style="width: 48%;">
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPConfig.AdminManagerEmail)
+                </div>
+                <div class="edit-field">
+
+                    @Html.TextBoxFor(model => model.PSPConfig.AdminManagerEmail, new { @class = "form-control", @placeholder = "Enter admin Contact Email", @type = "email" })
+                    @Html.ValidationMessageFor(model => model.PSPConfig.AdminManagerEmail)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPConfig.BillingFileLocation)
+                </div>
+                <div class="edit-field">
+
+                    @Html.TextBoxFor(model => model.PSPConfig.BillingFileLocation, new { @class = "form-control", @placeholder = "Enter billing file location", @type = "email" })
+                    @Html.ValidationMessageFor(model => model.PSPConfig.BillingFileLocation)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPConfig.ClientCorrespondenceName)
+                </div>
+                <div class="edit-field">
+
+                    @Html.TextBoxFor(model => model.PSPConfig.ClientCorrespondenceName, new { @class = "form-control", @placeholder = "Enter Client correspondence name" })
+                    @Html.ValidationMessageFor(model => model.PSPConfig.ClientCorrespondenceName)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPConfig.PasswordChange)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.PSPConfig.PasswordChange, new { @class = "form-control", @placeholder = "e.g 30", @type = "number" })
+                    @Html.ValidationMessageFor(model => model.PSPConfig.PasswordChange)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPConfig.InvoiceRunDay)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.PSPConfig.InvoiceRunDay, new { @class = "form-control", @placeholder = "e.g 30", @type = "number" })
+                    @Html.ValidationMessageFor(model => model.PSPConfig.InvoiceRunDay)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPConfig.DeclineEmailName)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.PSPConfig.DeclineEmailName, new { @class = "form-control", @placeholder = "e.g 3", @type = "number" })
+                    @Html.ValidationMessageFor(model => model.PSPConfig.DeclineEmailName)
+                </div>
+                             
+         </div>
+
+            <div class="right" style="width: 48%;">
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPConfig.FinancialEmail)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.PSPConfig.FinancialEmail, new { @class = "form-control", @placeholder = "Enter Financial email" })
+                    @Html.ValidationMessageFor(model => model.PSPConfig.FinancialEmail)
+                </div>
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPConfig.ImportEmail)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.PSPConfig.ImportEmail, new { @class = "form-control", @placeholder = "Enter Import Email" })
+                    @Html.ValidationMessageFor(model => model.PSPConfig.ImportEmail)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPConfig.ImportEmailHost)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.PSPConfig.ImportEmailHost, new { @class = "form-control", @placeholder = "Enter import email host" })
+                    @Html.ValidationMessageFor(model => model.PSPConfig.ImportEmailHost)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPConfig.ImportEmailPassword)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.PSPConfig.ImportEmailPassword, new { @class = "form-control", @placeholder = "Enter import email password" })
+                    @Html.ValidationMessageFor(model => model.PSPConfig.ImportEmailPassword)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPConfig.CollectionRunTime)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.PSPConfig.CollectionRunTime, new { @class = "form-control time-picker", @placeholder = "Select Collection Run Time" })
+                    @Html.ValidationMessageFor(model => model.PSPConfig.CollectionRunTime)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.PSPConfig.ImportEmailUsername)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.PSPConfig.ImportEmailUsername, new { @class = "form-control", @placeholder = "e.g 1800", @type = "number" })
+                    @Html.ValidationMessageFor(model => model.PSPConfig.ImportEmailUsername)
+                </div>
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+            <div class="left" style="width: 48%;">
+
+                <div class="edit-label">
+
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.PSPConfig.ImportUseSSL)
+                    </div>
+                    <div class="edit-field">
+
+                        @Html.TextBoxFor(model => model.PSPConfig.ImportUseSSL, new { @class = "form-control", @placeholder = "Enter import use ssl)" })
+                        @Html.ValidationMessageFor(model => model.PSPConfig.ImportUseSSL)
+                    </div>
+
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.PSPConfig.OpsManagerEmail)
+                    </div>
+                    <div class="edit-field">
+
+                        @Html.TextBoxFor(model => model.PSPConfig.OpsManagerEmail, new { @class = "form-control", @placeholder = "Enter ops mananger Email " })
+                        @Html.ValidationMessageFor(model => model.PSPConfig.OpsManagerEmail)
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.PSPConfig.InvoiceRunDay)
+                    </div>
+                    <div class="edit-field">
+
+                        @Html.TextBoxFor(model => model.PSPConfig.InvoiceRunDay, new { @class = "form-control", @placeholder = "Enter invoice run day" })
+                        @Html.ValidationMessageFor(model => model.PSPConfig.InvoiceRunDay)
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.PSPConfig.DocumentLocation)
+                    </div>
+                    <div class="edit-field">
+
+                        @Html.TextBoxFor(model => model.PSPConfig.DocumentLocation, new { @class = "form-control", @placeholder = "Enter  dcoment Location" })
+                        @Html.ValidationMessageFor(model => model.PSPConfig.DocumentLocation)
+                    </div>
+
+                </div>
+
+                <div class="right" style="width: 48%;">
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.PSPConfig.DocumentLocation)
+                    </div>
+                    <div class="edit-field">
+
+                        @Html.TextBoxFor(model => model.PSPConfig.DocumentLocation, new { @class = "form-control", @placeholder = "Enter  dcoment Location" })
+                        @Html.ValidationMessageFor(model => model.PSPConfig.DocumentLocation)
+                    </div>
+                    
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.PSPConfig.ReceivingManagerEmail)
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor(model => model.PSPConfig.ReceivingManagerEmail, new { @class = "form-control", @placeholder = "Enter Receiving manager email" })
+                        @Html.ValidationMessageFor(model => model.PSPConfig.ReceivingManagerEmail)
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.PSPConfig.SystemEmail)
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor(model => model.PSPConfig.SystemEmail, new { @class = "form-control", @placeholder = "Select System email address" })
+                        @Html.ValidationMessageFor(model => model.PSPConfig.SystemEmail)
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.PSPConfig.TaxPercentage)
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor(model => model.PSPConfig.TaxPercentage, new { @class = "form-control", @placeholder = "Enter tax Perecentage " })
+                        @Html.ValidationMessageFor(model => model.PSPConfig.TaxPercentage)
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.PSPConfig.WelcomeEmailName)
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor(model => model.PSPConfig.WelcomeEmailName, new { @class = "form-control", @placeholder = "Enter welcome Email Addresses " })
+                        @Html.ValidationMessageFor(model => model.PSPConfig.WelcomeEmailName)
+                    </div>
+
+                </div>
+            
+
+            <div class="right" style="width: 48%;">
+
+            </div>
+
+            <div class="clear"></div>
+
+        </div>
+
+
+        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+        <p>
+            <input id="save-btn" type="submit" value="Save" />
+
+            <span style="padding: 0 5px;">/</span>
+
+            <a data-refresh="1" data-target="#psps">Cancel</a>
+        </p>
+
+    </div>
+</div>
     </div>
 }

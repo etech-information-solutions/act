@@ -90,6 +90,8 @@ namespace ACT.UI.Models
 
         public List<PSPClient> PSPClients { get; set; }
 
+        public PSPConfig PSPConfig { get; set; }
+
         public List<PSPBudget> PSPBudgets { get; set; }
 
         public AddressViewModel Address { get; set; }

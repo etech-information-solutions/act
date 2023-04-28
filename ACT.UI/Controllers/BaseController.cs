@@ -305,6 +305,7 @@ namespace ACT.UI.Controllers
             else
                 viewEngineResult = ViewEngines.Engines.FindView( context, viewPath, null );
 
+          
             if ( viewEngineResult == null )
                 throw new FileNotFoundException( "View cannot be found." );
 
@@ -364,12 +365,12 @@ namespace ACT.UI.Controllers
                 // Port Account Type => CDV AccountType
                 switch ( accountType )
                 {
-                    case 1: // Savings
-                        accType = 2;
+                    case 1: // Cheque/Curremt
+                        accType = 1;
                         break;
 
-                    case 2: // Current/Cheque
-                        accType = 1;
+                    case 2: // Savings
+                        accType = 2;
                         break;
 
                     case 3: // Transmission
@@ -782,6 +783,7 @@ namespace ACT.UI.Controllers
             return PartialView( "_ClientList", new CustomSearchModel( "SetClient" ) );
         }
 
+
         public ActionResult SetClient( int? id )
         {
             using ( ClientService cservice = new ClientService() )
@@ -1018,7 +1020,7 @@ namespace ACT.UI.Controllers
                         Id = p.Id,
                         Name = p.Name,
                         Description = p.Description,
-                        CreatedOn = p.CreatedOn.ToString( "yyyy/MM/dd" ),
+                        CreatedOn = DateTime.Now, // p.CreatedOn.ToString( "yyyy/MM/dd" ),
                         LostRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Lost && pp.Status == ( int ) Status.Active )?.Rate,
                         IssueRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Issue && pp.Status == ( int ) Status.Active )?.Rate,
                         HireRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Hire && pp.Status == ( int ) Status.Active )?.Rate,

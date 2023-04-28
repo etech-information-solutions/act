@@ -30,7 +30,7 @@ namespace ACT.Core.Services
             return base.GetById( id );
         }
 
-        public int Total1( PagingModel pm, CustomSearchModel csm )
+       public int Total1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {

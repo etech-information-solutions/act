@@ -93,12 +93,12 @@
                     <strong style="color: #002e70; text-transform: uppercase;">Product Price Options</strong>
                 </p>
 
-                @if ( Model.ProductPrices.NullableAny() )
+                @if (Model.ProductPrices.NullableAny())
                 {
                     int i = 0;
 
                     <ul>
-                        @foreach ( ProductPriceViewModel p in Model.ProductPrices )
+                        @foreach (ProductPriceViewModel p in Model.ProductPrices)
                         {
                             <li style="border-bottom: 1px dashed #ddd; margin-bottom: 20px; padding-bottom: 4px;">
 
@@ -112,9 +112,9 @@
 
                                     <select id="ProductPrices_@p.Type.GetIntValue()-Type" name="ProductPrices[@i].Type" class="chzn" style="width: 98%;">
 
-                                        @foreach ( int t in Enum.GetValues( typeof( ProductPriceType ) ) )
+                                        @foreach (int t in Enum.GetValues(typeof(ProductPriceType)))
                                         {
-                                            ProductPriceType type = ( ProductPriceType ) t;
+                                            ProductPriceType type = (ProductPriceType)t;
 
                                             string sel = type == p.Type ? "selected=selected" : "";
 
@@ -137,10 +137,25 @@
                                 <div class="edit-label">
                                     <label for="ProductPrices_@p.Type.GetIntValue()-RateUnit">Rate Unit</label>
                                 </div>
+
                                 <div class="edit-field">
-                                    <input id="ProductPrices_@p.Type.GetIntValue()-RateUnit" name="ProductPrices[@i].RateUnit" type="text" value="@p.RateUnit" placeholder="Enter price option Rate Unit" />
-                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-RateUnit" data-valmsg-replace="true"></span>
+
+                                    <select id="ProductPrices_@p.Type.GetIntValue()-Status" name="ProductPrices[@i].RateUnit" class="chzn" style="width: 98%;">
+
+                                        @foreach (int t in Enum.GetValues(typeof(RateUnit)))
+                                        {
+                                            RateUnit rate = (RateUnit)t;
+
+                                            string sel = rate == p.RateUnit ? "selected=selected" : "";
+
+                                            <option value="@t" @sel>@rate.GetDisplayText()</option>
+                                        }
+
+                                    </select>
+
+                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-Status" data-valmsg-replace="true"></span>
                                 </div>
+
 
                                 <div class="edit-label">
                                     <label for="ProductPrices_@p.Type.GetIntValue()-StartDate">Start Date</label>
@@ -157,11 +172,11 @@
 
                                     <select id="ProductPrices_@p.Type.GetIntValue()-Status" name="ProductPrices[@i].Status" class="chzn" style="width: 98%;">
 
-                                        @foreach ( int t in Enum.GetValues( typeof( Status ) ) )
+                                        @foreach (int t in Enum.GetValues(typeof(Status)))
                                         {
-                                            Status status = ( Status ) t;
+                                            Status status = (Status)t;
 
-                                            if ( status != Status.Active && status != Status.Inactive )
+                                            if (status != Status.Active && status != Status.Inactive)
                                             {
                                                 continue;
                                             }
@@ -179,6 +194,107 @@
                             </li>
 
                             i++;
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <ul>
+                        @foreach (ProductPriceViewModel p in Model.ProductPrices)
+                        {
+                            <li style="border-bottom: 1px dashed #ddd; margin-bottom: 20px; padding-bottom: 4px;">
+
+                                <input name="ProductPrices.Id" value="@p.Id" type="hidden" />
+                                <input name="ProductPrices.ProductId" value="@p.ProductId" type="hidden" />
+
+                                <div class="edit-label">
+                                    <label for="ProductPrices_@p.Type.GetIntValue()-Type">Option</label>
+                                </div>
+                                <div class="edit-field">
+
+                                    <select id="ProductPrices_@p.Type.GetIntValue()-Type" name="ProductPrices.Type" class="chzn" style="width: 98%;">
+
+                                        @foreach (int t in Enum.GetValues(typeof(ProductPriceType)))
+                                        {
+                                            ProductPriceType type = (ProductPriceType)t;
+
+                                            string sel = type == p.Type ? "selected=selected" : "";
+
+                                            <option value="@t" @sel>@type.GetDisplayText()</option>
+                                        }
+
+                                    </select>
+
+                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-Type" data-valmsg-replace="true"></span>
+                                </div>
+
+                                <div class="edit-label">
+                                    <label for="ProductPrices_@p.Type.GetIntValue()-Rate">Rate</label>
+                                </div>
+                                <div class="edit-field">
+                                    <input id="ProductPrices_@p.Type.GetIntValue()-Rate" name="ProductPrices.Rate" type="text" value="@p.Rate" placeholder="Enter price option Rate" />
+                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-Rate" data-valmsg-replace="true"></span>
+                                </div>
+
+                                <div class="edit-label">
+                                    <label for="ProductPrices_@p.Type.GetIntValue()-RateUnit">Rate Unit</label>
+                                </div>
+
+                                <div class="edit-field">
+
+                                    <select id="ProductPrices_@p.Type.GetIntValue()-Status" name="ProductPrices.RateUnit" class="chzn" style="width: 98%;">
+
+                                        @foreach (int t in Enum.GetValues(typeof(RateUnit)))
+                                        {
+                                            RateUnit rate = (RateUnit)t;
+
+                                            string sel = rate == p.RateUnit ? "selected=selected" : "";
+
+                                            <option value="@t" @sel>@rate.GetDisplayText()</option>
+                                        }
+
+                                    </select>
+
+                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-Status" data-valmsg-replace="true"></span>
+                                </div>
+
+
+                                <div class="edit-label">
+                                    <label for="ProductPrices_@p.Type.GetIntValue()-StartDate">Start Date</label>
+                                </div>
+                                <div class="edit-field">
+                                    <input id="ProductPrices_@p.Type.GetIntValue()-StartDate" name="ProductPrices.StartDate" type="text" value="@( p.StartDate.HasValue ? p.StartDate.Value.ToString( "yyyy-MM-dd" ) : "" )" class="date-picker" placeholder="Enter price option Start Date" />
+                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-StartDate" data-valmsg-replace="true"></span>
+                                </div>
+
+                                <div class="edit-label">
+                                    <label for="ProductPrices_@p.Type.GetIntValue()-Status">Status</label>
+                                </div>
+                                <div class="edit-field">
+
+                                    <select id="ProductPrices_@p.Type.GetIntValue()-Status" name="ProductPrices.Status" class="chzn" style="width: 98%;">
+
+                                        @foreach (int t in Enum.GetValues(typeof(Status)))
+                                        {
+                                            Status status = (Status)t;
+
+                                            if (status != Status.Active && status != Status.Inactive)
+                                            {
+                                                continue;
+                                            }
+
+                                            string sel = status == p.Status ? "selected=selected" : "";
+
+                                            <option value="@t" @sel>@status.GetDisplayText()</option>
+                                        }
+
+                                    </select>
+
+                                    <span class="field-validation-valid" data-valmsg-for="ProductPrices_@p.Type.GetIntValue()-Status" data-valmsg-replace="true"></span>
+                                </div>
+
+                            </li>
+
                         }
                     </ul>
                 }

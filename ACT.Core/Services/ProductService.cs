@@ -190,6 +190,7 @@ namespace ACT.Core.Services
             // SKIP, TAKE
 
             query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
+            
 
             List<ProductCustomModel> model = context.Database.SqlQuery<ProductCustomModel>( query, parameters.ToArray() ).ToList();
 
@@ -236,6 +237,41 @@ namespace ACT.Core.Services
                         continue;
 
                     clientOptions.Add( k.TKey, ( k.TValue ?? "" ).Trim() );
+                }
+            }
+
+            return clientOptions;
+        }
+
+        /// <summary>
+        /// Gets a list of products
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public Dictionary<int, string> ListProd(bool v)
+        {
+            List<IntStringKeyValueModel> model;
+            Dictionary<int, string> clientOptions = new Dictionary<int, string>();
+
+            List<object> parameters = new List<object>()
+            {
+                { new SqlParameter( "actStatus", Status.Active ) },
+            };
+
+            string query = string.Empty;
+
+            query = $"SELECT p.[Id] AS [TKey], p.[Name] + ' ' + p.[Description] AS [TValue] FROM [dbo].[Product] p WHERE p.[Status]=@actStatus";
+
+            model = context.Database.SqlQuery<IntStringKeyValueModel>(query.Trim(), parameters.ToArray()).ToList();
+
+            if (model != null && model.Any())
+            {
+                foreach (var k in model)
+                {
+                    if (clientOptions.Keys.Any(x => x == k.TKey))
+                        continue;
+
+                    clientOptions.Add(k.TKey, (k.TValue ?? "").Trim());
                 }
             }
 

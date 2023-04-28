@@ -275,7 +275,7 @@ namespace ACT.UI.Controllers
                             {
                                 Status status = ( Status ) item.Status;
 
-                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6} {7}",
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6}, {7}",
                                                     csv,
                                                     "\"" + item.CreatedOn + "\"",
                                                     "\"" + item.StartDate + "\"",
@@ -284,6 +284,45 @@ namespace ACT.UI.Controllers
                                                     "\"" + item.UserBroadcasts.Count + "\"",
                                                     "\"" + item.Message + "\"",
                                                     Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
+                case "pspproducts":
+
+                    #region PSPProducts
+
+                    csv = string.Format("PSP, Product,Date Created, Start Date, End Date,Name, Description,Rate, RateUnit,Status,Id {0}", Environment.NewLine);
+
+                    using (PSPProductService service = new PSPProductService())
+                    {
+                        List<PSPProduct> pspproducts = service.List(pm, csm);
+
+                        if (pspproducts.NullableAny())
+                        {
+                            foreach (PSPProduct item in pspproducts)
+                            {
+                                Status status = (Status)item.Status;
+
+                                csv = string.Format("{0} {1},{2},{3},{4},{5},{6}, {7},{8},{9},{10},{11},{12}",
+                                                    csv,
+                                                    "\"" + item.PSPId + "\"",
+                                                    "\"" + item.ProductId + "\"",
+                                                    "\"" + item.CreatedOn + "\"",
+                                                    "\"" + item.StartDate + "\"",
+                                                    "\"" + item.EndDate + "\"",
+                                                    "\"" + status.GetDisplayText() + "\"",
+                                                    "\"" + item.Name + "\"",
+                                                    "\"" + item.Description + "\"",
+                                                    "\"" + item.Rate + "\"",
+                                                    "\"" + item.RateUnit + "\"",
+                                                    "\"" + item.Status + "\"",
+                                                    "\"" + item.Id + "\"",
+                                                    Environment.NewLine);
                             }
                         }
                     }
@@ -858,6 +897,16 @@ namespace ACT.UI.Controllers
                 ClientMonitorInterval = config.ClientMonitorInterval,
                 ClientMonitorEnabled = config.ClientMonitorEnabled ? YesNo.Yes : YesNo.No,
 
+                BillingInvoiceMonitorPath = config.BillingInvoiceMonitorPath,
+                BillingInvoiceMonitorTime = config.BillingInvoiceMonitorTime,
+                BillingInvoiceMonitorInterval = config.BillingInvoiceMonitorInterval,
+                BillingInvoiceMonitorEnabled = config.BillingInvoiceMonitorEnabled ? YesNo.Yes : YesNo.No,
+
+                PSPBillingMonitorPath = config.PSPBillingMonitorPath,
+                PSPBillingMonitorTime = config.PSPBillingMonitorTime,
+                PSPBillingMonitorInterval = config.PSPBillingMonitorInterval,
+                PSPBillingMonitorEnabled = config.PSPBillingMonitorEnabled ? YesNo.Yes : YesNo.No,
+
                 ClientContractRenewalReminderMonths = config.ClientContractRenewalReminderMonths,
                 DisputeDaysToResolve = config.DisputeDaysToResolve
             };
@@ -921,6 +970,16 @@ namespace ACT.UI.Controllers
                 config.ClientMonitorTime = model.ClientMonitorTime;
                 config.ClientMonitorInterval = model.ClientMonitorInterval;
                 config.ClientMonitorEnabled = model.ClientMonitorEnabled.GetBoolValue();
+
+                config.BillingInvoiceMonitorPath = model.BillingInvoiceMonitorPath;
+                config.BillingInvoiceMonitorTime = model.BillingInvoiceMonitorTime; ;
+                config.BillingInvoiceMonitorInterval = model.BillingInvoiceMonitorInterval;
+                config.BillingInvoiceMonitorEnabled = model.BillingInvoiceMonitorEnabled.GetBoolValue();
+
+                config.PSPBillingMonitorPath = model.PSPBillingMonitorPath;
+                config.PSPBillingMonitorTime = model.PSPBillingMonitorTime;
+                config.PSPBillingMonitorInterval = model.PSPBillingMonitorInterval;
+                config.PSPBillingMonitorEnabled = model.PSPBillingMonitorEnabled.GetBoolValue();
 
                 config.ClientContractRenewalReminderMonths = model.ClientContractRenewalReminderMonths;
                 config.DisputeDaysToResolve = model.DisputeDaysToResolve;
@@ -1296,6 +1355,261 @@ namespace ACT.UI.Controllers
         #endregion
 
 
+        #region Link PSP Product
+        //
+        // GET: /Administration/AddPSPProduct/5 
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddPSPProduct()
+        {
+            PSPProductViewModel model = new PSPProductViewModel()
+            {
+                //File = new List<FileViewModel>(),
+                ProductPrices = new List<ProductPriceViewModel>()
+            };
+
+            return View(model);
+        }
+
+        //
+        // POST: /Administration/AddPSP/5
+        [HttpPost]
+        [Requires(PermissionTo.Create)]
+        public ActionResult AddPSPProduct(PSPProductViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                Notify("Sorry, the PSP Product was not created. Please correct all errors and try again.", NotificationType.Error);
+
+                return View(model);
+            }
+
+            using (PSPService pservice = new PSPService())
+                using(PSPProductService pspprodservice = new PSPProductService())
+                using (ProductService service = new ProductService())
+            using (ProductPriceService prodservice = new ProductPriceService())
+            {
+                #region Validations
+                // we need more and reasonable validations here
+                if (model.ClientId <1 && model.ProductId <0)
+                {
+                    Notify($"Client, Product is already linked. Contact us if you require further assistance.", NotificationType.Error);
+
+                    return View(model);
+                }
+                int rate = 0;
+                var prodDetails = service.GetById(model.ProductId);
+                if(model.RateUnit ==RateUnit.Monthly)
+                {
+                    rate = 1; 
+                }
+                if(model.RateUnit == RateUnit.Annually)
+                {
+                    rate = 2;
+                }
+                var priceDetails = prodservice.GetProductDetails(model.ProductId,  rate); 
+                PSPProduct p = new PSPProduct();
+                p.CreatedOn = DateTime.Now;
+                p.Description = model.Description;
+                p.EndDate = model.EndDate;
+                p.StartDate = model.StartDate;
+                p.ProductId = model.ProductId;
+                p.Rate = model.Rate;
+                p.Name = model.Name;
+                p.ProductId = model.ProductId;
+                p.PSPId = model.PSPId;
+                p.Status = 1;
+                p.RateUnit =(int) model.RateUnit;
+                
+                bool verifyRecord = pspprodservice.CheckPSPProduct(p);
+                if (verifyRecord == true)
+                {
+                    Notify($"There is a Client Product is already linked. Try a different PSP Product pair.", NotificationType.Error);
+                    return RedirectToAction("PSPProducts");
+                }
+                else
+                {
+
+                    #endregion
+                    #region Create PSP Product
+
+                    PSPProduct pp = new PSPProduct()
+                    {
+                        EndDate = model.EndDate,
+                        Name = prodDetails.Name,
+                        ProductId = model.ProductId,
+                        Rate = priceDetails.Rate,
+                        StartDate = model.StartDate,
+                        RateUnit = priceDetails.RateUnit,
+                        ModifiedBy = model.ModifiedBy,
+                        CreatedOn = DateTime.Now,
+                        ModifiedOn = DateTime.Now,
+                        Description = prodDetails.Description,
+                        Status = (int)model.Status,
+                        PSPId = model.PSPId
+                    };
+
+                    #endregion
+
+                    pspprodservice.Create(pp);
+                    Notify("The selected psp billing's details were successfully updated.", NotificationType.Success);
+
+                    return RedirectToAction("PSPProducts");
+                }
+                    }
+                }
+
+        #endregion
+
+        //
+        // GET: /Administration/EditPSPProduct/5
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditPSPProduct(int id)
+        {
+            using (PSPProductService pservice = new PSPProductService())
+            {
+                PSPProduct prod = pservice.GetById(id);
+
+                if (prod == null)
+                {
+                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                    return PartialView("_AccessDenied");
+                }
+
+                PSPProductViewModel model = new PSPProductViewModel()
+                {
+                    Id = prod.Id,
+                    EditMode = true,
+                    CreatedOn = prod.CreatedOn,
+                    Name = prod.Name?.Trim(),
+                    Description = prod.Description?.Trim(),
+                    EndDate = prod.EndDate,
+                    ProductId = (int)prod.ProductId,
+                    Rate = prod.Rate,
+                    RateUnit = (RateUnit)prod.RateUnit,
+                    StartDate = prod.StartDate,
+                    Status = (Status)prod.Status,
+                    ModifiedOn = DateTime.Now,
+                    PSPId = (int) prod.PSPId                     
+                };
+
+                return View(model);
+            }
+        }
+
+        //
+        // POST: /Administration/EditPSPProduct/5
+        [HttpPost]
+        [Requires(PermissionTo.Edit)]
+        public ActionResult EditPSPProduct(PSPProductViewModel model, PagingModel pm)
+        {
+            if (!ModelState.IsValid)
+            {
+                Notify("Sorry, the selected User was not updated. Please correct all errors and try again.", NotificationType.Error);
+
+                return View(model);
+            }
+
+            using (PSPProductService prodservice = new PSPProductService())
+           // using (RoleService rservice = new RoleService())
+            {
+                PSPProduct prod = prodservice.GetById(model.Id);
+
+                if (prod == null)
+                {
+                    Notify("Sorry, that psp link does not exist! Please specify a valid psp link Id and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+
+                #region Validations
+                
+                 #endregion
+                #region Update psp product                
+
+                // Update User
+
+                prod.Description = model.Description;
+                prod.Name = model.Name;
+                prod.Rate = model.Rate;
+                prod.RateUnit =(int) model.RateUnit;
+                prod.CreatedOn = (DateTime)model.CreatedOn;
+                prod.ModifiedBy = CurrentUser.Email;
+                prod.ModifiedOn = DateTime.Now;
+                prod.ProductId = model.ProductId;
+                prod.PSPId = model.PSPId;
+                prod.Description = model.Description;
+                prod.EndDate = model.EndDate;
+                prod.StartDate = model.StartDate;
+                prod.Status = (int)model.Status;
+                prod.PSPId = (int)model.PSPId;
+              
+                prod = prodservice.Update(prod);
+                #endregion
+                
+                    Notify("The selected PSP Product's details were successfully updated.", NotificationType.Success);
+
+                    return RedirectToAction("PSPProducts");
+               
+            }
+        }
+
+        //
+        // GET: /Administration/PSPProductDetails/5
+        public ActionResult PSPProductDetails(int id, bool layout = true)
+        {
+            PSPProduct model;
+
+            using (PSPProductService service = new PSPProductService())
+            {
+                model = service.GetById(id);
+            }
+
+            if (model == null)
+            {
+                Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                return RedirectToAction("Index");
+            }
+
+            if (layout)
+            {
+                ViewBag.IncludeLayout = true;
+            }
+
+            return View(model);
+        }
+
+
+        //
+        // POST: /Administration/DeletePSPProduct/5
+        [HttpPost]
+        [Requires(PermissionTo.Delete)]
+        public ActionResult DeletePSPProduct(PSPProductViewModel model, PagingModel pm)
+        {
+            using (PSPProductService service = new PSPProductService())
+            {
+                PSPProduct prod = service.GetById(model.Id);
+
+                if (prod == null)
+                {
+                    Notify("Sorry, the requested resource could not be found. Please try again", NotificationType.Error);
+
+                    return PartialView("_AccessDenied");
+                }
+
+                prod.Status = (((Status)prod.Status) == Status.Active) ? (int)Status.Inactive : (int)Status.Active;
+
+                service.Update(prod);
+
+                Notify("The selected psp product link was successfully updated.", NotificationType.Success);
+
+                return RedirectToAction("PSPProducts");
+            }
+        }
+
+           // #endregion
+
 
         #region PSP Management
 
@@ -1370,6 +1684,7 @@ namespace ACT.UI.Controllers
             using ( AddressService aservice = new AddressService() )
             using ( TransactionScope scope = new TransactionScope() )
             using ( DocumentService dservice = new DocumentService() )
+            using(PSPConfigService cservice = new PSPConfigService())
             using ( PSPBudgetService bservice = new PSPBudgetService() )
             {
                 #region Validations
@@ -1410,6 +1725,42 @@ namespace ACT.UI.Controllers
                 };
 
                 psp = pservice.Create( psp );
+
+                #endregion
+
+                #region Create PSP
+
+                PSPConfig pspconfig = new PSPConfig()
+                {
+                    AdminManagerEmail = model.PSPConfig.AdminManagerEmail,
+                    BillingFileLocation = model.PSPConfig.BillingFileLocation,
+                    ClientCorrespondenceName = model.PSPConfig.ClientCorrespondenceName,
+                    CollectionRunTime = model.PSPConfig.CollectionRunTime,
+                    CreatedOn = DateTime.Now,
+                    DeclineEmailName = model.PSPConfig.DeclineEmailName,
+                    DocumentLocation = model.PSPConfig.DocumentLocation,
+                    InvoiceRunDay = model.PSPConfig.InvoiceRunDay,
+                    FinancialEmail = model.PSPConfig.FinancialEmail,
+                    ImportEmail = model.PSPConfig.ImportEmail,
+                    ImportEmailHost = model.PSPConfig.ImportEmail,
+                    ImportEmailPassword = model.PSPConfig.ImportEmailPassword,
+                    ImportEmailPort = model.PSPConfig.ImportEmailPort,
+                    ImportEmailUsername = model.PSPConfig.ImportEmailUsername,
+                    ImportUseSSL = model.PSPConfig.ImportUseSSL,
+                    LastBillingRun = model.PSPConfig.LastBillingRun,
+                    ModifiedBy = CurrentUser.Email,
+                    ModifiedOn = DateTime.Now,
+                    OpsManagerEmail = model.PSPConfig.OpsManagerEmail,
+                    PasswordChange = model.PSPConfig.PasswordChange,
+                    ReceivingManagerEmail = model.PSPConfig.ReceivingManagerEmail,
+                    SystemEmail = model.PSPConfig.SystemEmail,
+                    WelcomeEmailName = model.PSPConfig.WelcomeEmailName,
+                    TaxPercentage = model.PSPConfig.TaxPercentage,
+                    PSPId = psp.Id,
+                   
+                };
+
+                 cservice.Create(pspconfig);
 
                 #endregion
 
@@ -1527,6 +1878,7 @@ namespace ACT.UI.Controllers
         {
             using ( PSPService pservice = new PSPService() )
             using ( AddressService aservice = new AddressService() )
+           using ( PSPConfigService cservice = new PSPConfigService())
             using ( DocumentService dservice = new DocumentService() )
             {
                 PSP psp = pservice.GetById( id );
@@ -1849,9 +2201,12 @@ namespace ACT.UI.Controllers
         {
             using ( AddressService aservice = new AddressService() )
             using ( DocumentService dservice = new DocumentService() )
+            using(PSPConfigService cservice = new PSPConfigService())
             using ( EstimatedLoadService eservice = new EstimatedLoadService() )
             {
                 Address address = aservice.Get( psp.Id, "PSP" );
+
+                PSPConfig config = cservice.GetById(psp.Id);
 
                 List<Document> documents = dservice.List( psp.Id, "PSP" );
 
@@ -1901,6 +2256,33 @@ namespace ACT.UI.Controllers
                         ProvinceId = address?.ProvinceId ?? 0,
                         Province = address?.Province,
                         AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
+                    },
+                    PSPConfig  = new PSPConfig()
+                    {
+                        AdminManagerEmail = config.AdminManagerEmail,
+                        BillingFileLocation = config.BillingFileLocation,
+                        ClientCorrespondenceName = config.ClientCorrespondenceName,
+                        DeclineEmailName = config.DeclineEmailName,
+                        CollectionRunTime = config.CollectionRunTime,
+                        CreatedOn = config.CreatedOn,
+                        SystemEmail = config.SystemEmail,
+                        ImportUseSSL = config.ImportUseSSL,
+                        DocumentLocation = config.DocumentLocation,
+                        PasswordChange = config.PasswordChange,
+                        InvoiceRunDay = config.InvoiceRunDay,
+                        FinancialEmail = config.FinancialEmail,
+                        ImportEmail = config.ImportEmail,
+                        ImportEmailHost = config.ImportEmailHost,
+                        ImportEmailPassword = config.ImportEmailPassword,
+                        ImportEmailPort = config.ImportEmailPort,
+                        ImportEmailUsername = config.ImportEmailUsername,
+                        PSPId = config.PSPId,
+                        LastBillingRun = config.LastBillingRun,
+                        OpsManagerEmail = config.OpsManagerEmail,
+                        ReceivingManagerEmail = config.ReceivingManagerEmail,
+                        TaxPercentage = config.TaxPercentage,
+                        WelcomeEmailName= config.WelcomeEmailName
+
                     },
                     User = new UserViewModel()
                     {
@@ -2208,6 +2590,7 @@ namespace ACT.UI.Controllers
                     model = new PSPConfigViewModel()
                     {
                         PSPId = psp.Id,
+                        CollectionRunTime = psp.PSPConfigs.FirstOrDefault().CollectionRunTime,
                         Id = psp.PSPConfigs.FirstOrDefault().Id,
                         ImportEmail = psp.PSPConfigs.FirstOrDefault().ImportEmail,
                         InvoiceRunDay = psp.PSPConfigs.FirstOrDefault().InvoiceRunDay,
@@ -2225,6 +2608,7 @@ namespace ACT.UI.Controllers
                         ImportEmailPassword = psp.PSPConfigs.FirstOrDefault().ImportEmailPassword,
                         ImportEmailPort = psp.PSPConfigs.FirstOrDefault().ImportEmailPort,
                         ImportEmailUsername = psp.PSPConfigs.FirstOrDefault().ImportEmailUsername,
+                        
                         ImportUseSSL = psp.PSPConfigs.FirstOrDefault().ImportUseSSL == true ? YesNo.Yes : YesNo.No,
                     };
                 }
@@ -2246,15 +2630,22 @@ namespace ACT.UI.Controllers
                 return PartialView( "_PSPConfig", model );
             }
 
-            using ( PSPConfigService pservice = new PSPConfigService() )
+            if(model.Id ==0)
+            {
+                model.Id = 12;
+            }
+
+            using (PSPConfigService pservice = new PSPConfigService())
+            using (PSPService service = new PSPService()) 
             {
                 PSPConfig config = pservice.GetById( model.Id );
+                PSP p = service.GetById(model.Id);
 
-                if ( config == null )
+                if ( config == null && p != null )
                 {
                     config = new PSPConfig()
                     {
-                        PSPId = model.PSPId,
+                        PSPId = p.Id,
                         ImportEmail = model.ImportEmail,
                         InvoiceRunDay = model.InvoiceRunDay,
                         FinancialEmail = model.FinancialEmail,
@@ -2268,6 +2659,7 @@ namespace ACT.UI.Controllers
                         ReceivingManagerEmail = model.ReceivingManagerEmail,
                         ClientCorrespondenceName = model.ClientCorrespondenceName,
                         ImportEmailHost = model.ImportEmailHost,
+                        CollectionRunTime= model.CollectionRunTime,
                         ImportEmailUsername = model.ImportEmailUsername,
                         ImportEmailPassword = model.ImportEmailPassword,
                         ImportEmailPort = model.ImportEmailPort,
@@ -2465,26 +2857,7 @@ namespace ACT.UI.Controllers
             }
         }
 
-        //
-        // GET: /Administration/PSPProducts/5
-        public ActionResult PSPProducts( int id )
-        {
-            using ( PSPService pservice = new PSPService() )
-            {
-                PSP model = pservice.GetById( id );
-
-                if ( model == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return PartialView( "_Notification" );
-                }
-
-                return PartialView( "_PSPProducts", model );
-            }
-        }
-
-        //
+               //
         // GET: /Administration/PSPInvoices/5
         public ActionResult PSPInvoices( int id )
         {
@@ -2686,8 +3059,8 @@ namespace ACT.UI.Controllers
                 broadcast.Status = ( int ) model.Status;
 
                 broadcast = service.Update( broadcast );
-
-                Notify( "The selected Broadcast's details were successfully updated.", NotificationType.Success );
+              
+                    Notify("The selected Broadcast's details were successfully updated.", NotificationType.Success);                
             }
 
             return RedirectToAction( "Broadcasts" );
@@ -3381,7 +3754,7 @@ namespace ACT.UI.Controllers
                             ProductId = product.Id,
                             Rate = price.Rate ?? 0,
                             Type = ( int ) price.Type,
-                            RateUnit = price.RateUnit,
+                            RateUnit =(int) price.RateUnit,
                             FromDate = price.StartDate,
                             Status = ( int ) price.Status,
                         };
@@ -3485,7 +3858,7 @@ namespace ACT.UI.Controllers
                         {
                             Id = existingPrice.Id,
                             Rate = existingPrice.Rate,
-                            RateUnit = existingPrice.RateUnit,
+                            RateUnit = (RateUnit) existingPrice.RateUnit,
                             StartDate = existingPrice.FromDate,
                             ProductId = existingPrice.ProductId,
                             Status = ( Status ) existingPrice.Status,
@@ -3586,7 +3959,7 @@ namespace ACT.UI.Controllers
                                 ProductId = product.Id,
                                 Rate = price.Rate ?? 0,
                                 Type = ( int ) price.Type,
-                                RateUnit = price.RateUnit,
+                                RateUnit = (int)price.RateUnit,
                                 FromDate = price.StartDate,
                                 Status = ( int ) price.Status,
                             };
@@ -3596,7 +3969,7 @@ namespace ACT.UI.Controllers
                         else
                         {
                             pp.Rate = price.Rate ?? 0;
-                            pp.RateUnit = price.RateUnit;
+                            pp.RateUnit =(int) price.RateUnit;
                             pp.FromDate = price.StartDate;
                             pp.Status = ( int ) price.Status;
 
@@ -4773,6 +5146,28 @@ namespace ACT.UI.Controllers
                 PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
                 return PartialView( "_PSPs", paging );
+            }
+        }
+
+        //
+        // POST || GET: /Administration/PSPProducts
+        public ActionResult PSPProducts(PagingModel pm, CustomSearchModel csm, bool givecsm = false)
+        {
+            if (givecsm)
+            {
+                ViewBag.ViewName = "PSPProducts";
+
+                return PartialView("_PSPProductCustomSearch", new CustomSearchModel("PSPProducts"));
+            }
+
+            using (PSPProductService service = new PSPProductService())
+            {
+                List<PSPProductCustomModel> model = service.List1(pm, csm);
+                int total = (model.Count < pm.Take && pm.Skip == 0) ? model.Count : service.Total1(pm, csm);
+
+                PagingExtension paging = PagingExtension.Create(model, total, pm.Skip, pm.Take, pm.Page);
+
+                return PartialView("_PSPProducts", paging);
             }
         }
 

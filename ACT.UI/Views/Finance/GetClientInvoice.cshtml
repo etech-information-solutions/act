@@ -1,0 +1,190 @@
+﻿@model BillingInvoiceViewModel
+
+@using ACT.UI.Models;
+
+@{
+    ViewBag.Title = "Generate Invoice";
+
+    Dictionary<int, string> pSPOptions = Model.PSPOptions;
+
+
+    if (!pSPOptions.NullableAny())
+    {
+        pSPOptions = new Dictionary<int, string>();
+    }
+
+    pSPOptions.Add(-1, "Other");
+}
+
+@Html.Partial("_Notification")
+
+@using (Html.BeginForm("GenerateInvoice", "Finance", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#pspbilling", @class = "custom-validate", @style = "width: auto;" }))
+{
+
+    <div style="width: 100%; margin-bottom: 10px; margin-left:0px;">
+        <div class="left" style="width:50%; background: #fff;" margin-bottom: 10px;>
+            <img alt="" src="@Url.Content("~/Images/act-logo.png")" style="border-right: 1px solid #002e70; padding: 37px 27px 37px 0; width: 80%;" />
+        </div>
+        <div class="right" style="width: 50%; margin-bottom: 200px; margin-top:50px;">
+            <div class="display-label">
+                Invoice Number /Reference     :
+                @*</div>
+                    <div class="display-field">*@
+                <i style="background-color:yellow;"> @Html.DisplayFor(model => model.InvoiceNumber)</i>
+            </div>
+            <div class="display-label">
+                Date                :
+                @*</div>
+                    <div class="display-field">*@
+                <i>  @Html.DisplayFor(model => model.StatementDate)</i>
+            </div>
+
+            <div class="display-label">
+                Vat No              :
+                @*</div>
+                    <div class="display-field">*@
+                @Html.DisplayFor(model => model.VATNumber)
+            </div>
+            <div class="display-label">
+                PSP
+                @*</div>
+                    <div class="display-field">*@
+
+                @Html.DisplayFor(model => model.PSPName)
+            </div>
+        </div>
+
+        <div>
+            <div class="right" style="width:40%;margin-bottom:20px;margin-top:10px;">
+                <p><b>PSP Details</b></p>
+                <div class="display-label">
+                    Company Name
+
+                    <i>  @Html.DisplayFor(model => model.PSPName)</i>
+                </div>
+                <div class="display-label">
+                    Contact Number
+
+                    <i>   @Html.DisplayFor(model => model.ContactNumber)</i>
+                </div>
+                <div class="display-label">
+                    Address
+                    <i>  @Html.DisplayFor(model => model.AddressLine1)</i>
+                    <i> @Html.DisplayFor(model => model.AddressLine2) </i>
+                    <i>  @Html.DisplayFor(model => model.Town)</i>
+                    <i> @Html.DisplayFor(model => model.Province)</i>
+                    <i>  @Html.DisplayFor(model => model.PostalCode)</i>
+                </div>
+            </div>
+            <div class="left" style="width:40%; margin-bottom:20px;margin-top:10px;">
+                <div class="display-label">
+                    Contact Email
+
+                    <i>  @Html.DisplayFor(model => model.ContactEmail)</i>
+                </div>
+                <div class="display-label">
+                    Vat No
+
+                    <i>  @Html.DisplayFor(model => model.VATNumber) </i>
+                </div>
+            </div>
+
+
+        </div>
+        
+        <div>
+
+            <table id="billingInvoice-table" style="width:100%; position:relative; border:1px solid #cacaca; border-collapse:separate;">
+                @*class="da-table" >*@
+                @*style="border-bottom: 0;margin-top:0px;">*@
+
+                <thead>
+                    <tr>
+                        <td><b>PSP</b></td>
+                        <td><b>Created On </b></td>
+                        <th><b>Invoice Number</b></th>
+                        <th><b>Due Date</b></th>
+                        <th style="padding-bottom: 3px; padding-top: 3px; text-align: right;"><b>Amount</b></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model.billings.NullableAny())
+                    {
+                        int count = 0;
+
+                        foreach (PSPBillingViewModel b in Model.billings)
+                        {
+                            <tr>
+                                <td>@b.PSPId</td>
+                                <td> @b.CreatedOn </td>
+                                <td>@b.ReferenceNumber </td>
+
+                                <td>@b.StatementDate</td>
+                                <td style="padding-bottom: 3px; padding-top: 3px; text-align: right;">@b.InvoiceAmount</td>
+                            </tr>
+
+                            count++;
+                        }
+                    }
+                    <tr>
+                        <td class="style0" colspan="2" rowspan="3"></td>
+                        <td style="padding-bottom: 3px; padding-top: 3px;" colspan="2"><b>Total</b></td>
+                        <td style="padding-bottom: 3px; padding-top: 3px; text-align: right;"><b>@Html.DisplayFor(model => model.Total)</b></td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 3px; padding-top: 3px;" colspan="2"><b>Vat</b></td>
+                        <td style="padding-bottom: 3px; padding-top: 3px; text-align: right;"><b>0</b></td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 3px; padding-top: 3px;" colspan="2"><b>Net Payable Amount</b></td>
+                        <td style="padding-bottom: 3px; padding-top: 3px; text-align: right;"><b>@Html.DisplayFor(model => model.Total)</b></td>
+
+                    </tr>
+                </tbody>
+
+            </table>
+
+            <br />
+            <p style="font-size:20px;">A total of <b style="color:green"> @Html.DisplayFor(model => model.Total)</b> is due for payment on or before <b style="color:red">@Html.DisplayFor(model => model.DueDate)</b>
+           </p>
+            <p> <i>Also make sure each invoice is paid on or before it's own due date to avoid penalty fees.</i></p>
+
+        </div>
+
+        <br />
+        <div>
+            <p><b>Make use of our banking details below</b></p>
+            <div class="display-label">
+                <b>Bank</b>
+                @Html.DisplayFor(model => model.Bank)
+            </div>
+            <div class="display-label">
+                <b>Branch</b>
+
+                @Html.DisplayFor(model => model.Branch)
+                <div class="display-label">
+                    <b>Account No</b>
+
+                    @Html.DisplayFor(model => model.AccountNumber)
+                </div>
+                <div class="display-label">
+                    <b>Account Type</b>
+
+                    @Html.DisplayFor(model => model.AccountType)
+                </div>
+            </div>
+        </div>
+        <br />
+        <br />
+        <p>
+            <input id="save-btn" type="submit" value="Save" />
+
+            <span style="padding: 0 5px;">/</span>
+
+            <a data-refresh="1" data-target="#pspbilling">Cancel</a>
+        </p>
+
+
+    </div>
+}

@@ -14,6 +14,12 @@ namespace ACT.Data.Models
     
     public partial class PSPBilling
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public PSPBilling()
+        {
+            this.BillingInvoices = new HashSet<BillingInvoice>();
+        }
+    
         public int Id { get; set; }
         public int PSPId { get; set; }
         public int PSPProductId { get; set; }
@@ -31,8 +37,11 @@ namespace ACT.Data.Models
         public string NominatedAccount { get; set; }
         public int Status { get; set; }
         public Nullable<decimal> TaxAmount { get; set; }
+        public int ClientId { get; set; }
     
         public virtual PSP PSP { get; set; }
         public virtual PSPProduct PSPProduct { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<BillingInvoice> BillingInvoices { get; set; }
     }
 }

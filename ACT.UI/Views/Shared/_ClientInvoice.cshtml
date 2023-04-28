@@ -1,0 +1,241 @@
+﻿@model BillingInvoice
+
+@using ACT.Data.Models
+@using ACT.Core.Models
+@using ACT.Core.Enums
+
+@{
+    
+        int count = 1;
+
+        UserModel user = User.Get();
+
+        String absoluteUrlBase = Request.Url.Scheme + "://" + Request.Url.Host + (Request.Url.IsDefaultPort ? "" : ":" + Request.Url.Port);
+   
+}
+
+<table cellspacing="10" cellpadding="5" width="100%" style="width: 100%; font-size: 11px; margin: 0 auto; background-color: #fff; font-family: Helvetica, 'Segoe UI', Verdana, Sans-Serif;">
+
+    <tbody>
+        <tr>
+            <td colspan="2" style="border-bottom: 1px solid #ddd;">
+                <table cellspacing="0" cellpadding="0" width="100%" style="width: 100%; font-size: 11px; margin: 0 auto; background-color: #fff; font-family: Helvetica, 'Segoe UI', Verdana, Sans-Serif;">
+                    <tbody>
+                        <tr>
+                            <td style="text-align: center;">
+                                <img src="http://www.testact.co.za/Images/act-logo.png" style="width: 200px;" />
+                            </td>
+                        </tr>
+                        @*<tr>
+                            <td  style="text-align: right; font-size: 20px;">
+                                @Model.InvoiceNumber
+                            </td>
+                            <td  style="text-align: right; font-size: 20px;">
+                                @Model.StatementDate
+                            </td>
+                            <td valign="middle" style="text-align: right; font-size: 20px;">
+                                @Model.VatNumber
+                            </td>
+                            <td valign="middle" style="text-align: right; font-size: 20px;">
+                                @Model.PSPName
+                            </td>
+
+                        </tr>*@
+
+                        <tr>
+                            <td colspan="2" height="20"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold;">
+                Client Name
+            </td>
+            <td style="font-weight: bold;">
+                Phone Number
+            </td>            
+        </tr>
+        <tr>
+            <td>
+                @Model.ClientName
+            </td>
+            <td>
+                @Model.ContactNumber
+            </td>
+           
+        </tr>
+        <tr>
+            <td style="font-weight: bold;">
+                Invoice Number
+            </td>
+            <td style="font-weight :bold">
+                Email Address
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Model.InvoiceNumber
+            </td>            
+            <td>
+                @Model.ContactEmail
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2" height="20"></td>
+        </tr>
+
+        <tr>
+            <td style="font-weight: bold;">
+                Client Name
+            </td>
+            <td style="font-weight: bold;">
+                Vat Number
+            </td>
+
+        </tr>
+        <tr>
+            <td>
+                @Model.ClientName
+            </td>
+            <td>
+                @Model.VatNumber
+            </td>
+
+        </tr>
+        <tr>
+            <td style="font-weight: bold;">
+                Contact Number
+            </td>
+            <td style="font-weight: bold;">
+                Contact Person
+            </td>
+
+        </tr>
+        <tr>
+            <td>
+                @Model.ContactNumber
+            </td>
+            <td>
+                @Model.ContactPerson
+            </td>
+        </tr>
+
+        <tr>
+            <td style="font-weight: bold;">
+                Address
+            </td>
+            <td style="font-weight: bold;">
+                Email Address
+            </td>
+
+        </tr>
+        <tr>
+            <td>
+                @Model.AddressLine1, @Model.AddressLine2, @Model.Town, @Model.Province,@Model.PostalCode
+            </td>
+            <td>
+                @Model.ContactEmail
+            </td>
+
+        </tr>
+    </tbody>
+           <tr>            
+  <td>          <table style="width:150%; border-style:solid; border:1px solid;">
+                @*<table id="billingInvoice-table" style="width:100%; position:relative; border:1px solid #cacaca; border-collapse:separate;">*@
+                   
+                    @*<table id="billingInvoice-table" cellspacing="0" cellpadding="10" width="100%" style="width: 100%; border: 1px solid #ddd; font-size: 11px; margin: 0 auto; background-color: #fff; font-family: Helvetica, 'Segoe UI', Verdana, Sans-Serif;">*@
+
+                        <thead>
+                            <tr>
+                                <th>PSP</th>
+                                <th>Created On</th>
+                                <th>Invoice Number</th>
+                                <th>Due Date</th>
+                                <th style="text-align:right;">Amount</th>
+                            </tr>
+                            
+                        </thead>
+
+                        <tbody>
+                            @foreach (BillingInvoiceLineItem item in Model.BillingInvoiceLineItems)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @item.PSPId
+                                    </td>
+                                    <td>
+                                        @item.CreatedOn
+                                    </td>
+                                    <td>
+                                        @item.InvoiceNumber
+                                    </td>
+                                    <td>
+                                        @item.StatementDate
+                                    </td>
+                                    <td style="text-align:right;">
+                                        @item.InvoiceAmount
+                                    </td>
+                                </tr>
+
+                                count++;
+                            }
+                            <tr>
+                                <td class="style0" colspan="2" rowspan="3"></td>
+                                <td style="padding-bottom: 3px; padding-top: 3px;" colspan="2"><b>Total</b></td>
+                                <td style="padding-bottom: 3px; padding-top: 3px; text-align: right;"><b>@Html.DisplayFor(model => model.Total)</b></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-bottom: 3px; padding-top: 3px;" colspan="2"><b>Vat</b></td>
+                                <td style="padding-bottom: 3px; padding-top: 3px; text-align: right;"><b>0</b></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-bottom: 3px; padding-top: 3px;" colspan="2"><b>Net Payable Amount</b></td>
+                                <td style="padding-bottom: 3px; padding-top: 3px; text-align: right;"><b>@Html.DisplayFor(model => model.Total)</b></td>
+
+                            </tr>
+                        </tbody>
+
+                    </table>                  
+                   
+
+               
+      </td>
+               </tr>
+    </table>
+                
+                <p style="font-size:20px;">
+                    A total of <b style="color:green"> @Model.Total</b> is due for payment on or before <b style="color:red">@Model.DueDate</b>
+                </p>
+                <p> <i>Also make sure each invoice is paid on or before it's own due date to avoid penalty fees.</i></p>
+
+                      
+            <div>
+                <p><b>Make use of our banking details below</b></p>
+                <div class="display-label">
+                    <b>Bank</b>
+                    @Model.Bank
+                </div>
+                <div class="display-label">
+                    <b>Branch</b>
+
+                    @Model.Branch
+                    <div class="display-label">
+                        <b>Account No</b>
+
+                        @Model.AccountNumber
+                    </div>
+                    <div class="display-label">
+                        <b>Account Type</b>
+
+                        @Model.AccountType
+                    </div>
+                </div>
+            </div>           
+
+       
+ 
+        }

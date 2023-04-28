@@ -112,8 +112,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Monitors\BaseMonitor.cs" />
+    <Compile Include="Monitors\BillingInvoiceMonitor.cs" />
     <Compile Include="Monitors\ClientMonitor.cs" />
     <Compile Include="Monitors\DisputeMonitor.cs" />
+    <Compile Include="Monitors\PSPBillingMonitor.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>

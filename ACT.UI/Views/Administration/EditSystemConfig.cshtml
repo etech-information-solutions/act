@@ -32,70 +32,70 @@
                 <div class="left" style="width: 48%; margin-right: 1%;">
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.SystemContactEmail )
+                        @Html.LabelFor(model => model.SystemContactEmail)
                     </div>
                     <div class="edit-field">
 
-                        @Html.TextBoxFor( model => model.SystemContactEmail, new { @placeholder = "Enter System Contact Email" } )
-                        @Html.ValidationMessageFor( model => model.SystemContactEmail )
+                        @Html.TextBoxFor(model => model.SystemContactEmail, new { @placeholder = "Enter System Contact Email" })
+                        @Html.ValidationMessageFor(model => model.SystemContactEmail)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.FinancialEmail )
+                        @Html.LabelFor(model => model.FinancialEmail)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.FinancialEmail, new { @placeholder = "Enter Finance Contact Email" } )
-                        @Html.ValidationMessageFor( model => model.FinancialEmail )
+                        @Html.TextBoxFor(model => model.FinancialEmail, new { @placeholder = "Enter Finance Contact Email" })
+                        @Html.ValidationMessageFor(model => model.FinancialEmail)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.ActivationEmail )
+                        @Html.LabelFor(model => model.ActivationEmail)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.ActivationEmail, new { @placeholder = "Enter Activation Email Address" } )
-                        @Html.ValidationMessageFor( model => model.ActivationEmail )
+                        @Html.TextBoxFor(model => model.ActivationEmail, new { @placeholder = "Enter Activation Email Address" })
+                        @Html.ValidationMessageFor(model => model.ActivationEmail)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.CorrespondenceEmail )
+                        @Html.LabelFor(model => model.CorrespondenceEmail)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.CorrespondenceEmail, new { @placeholder = "Enter Correspondence Email" } )
-                        @Html.ValidationMessageFor( model => model.CorrespondenceEmail )
+                        @Html.TextBoxFor(model => model.CorrespondenceEmail, new { @placeholder = "Enter Correspondence Email" })
+                        @Html.ValidationMessageFor(model => model.CorrespondenceEmail)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.ContactNumber )
+                        @Html.LabelFor(model => model.ContactNumber)
                     </div>
                     <div class="edit-field">
 
-                        @Html.TextBoxFor( model => model.ContactNumber, new { @placeholder = "Enter System Contact Number" } )
-                        @Html.ValidationMessageFor( model => model.ContactNumber )
+                        @Html.TextBoxFor(model => model.ContactNumber, new { @placeholder = "Enter System Contact Number" })
+                        @Html.ValidationMessageFor(model => model.ContactNumber)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.Address )
+                        @Html.LabelFor(model => model.Address)
                     </div>
                     <div class="edit-field">
 
-                        @Html.TextAreaFor( model => model.Address, 5, 10, new { @placeholder = "Enter System Contact Address" } )
-                        @Html.ValidationMessageFor( model => model.Address )
-                    </div>
-
-                    <div class="edit-label">
-                        @Html.LabelFor( model => model.InvoiceRunDay )
-                    </div>
-                    <div class="edit-field">
-                        @Html.TextBoxFor( model => model.InvoiceRunDay, new { @placeholder = "1" } )
-                        @Html.ValidationMessageFor( model => model.InvoiceRunDay )
+                        @Html.TextAreaFor(model => model.Address, 5, 10, new { @placeholder = "Enter System Contact Address" })
+                        @Html.ValidationMessageFor(model => model.Address)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.ClientContractRenewalReminderMonths )
+                        @Html.LabelFor(model => model.InvoiceRunDay)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.ClientContractRenewalReminderMonths, new { @placeholder = "E.g. 3" } )
-                        @Html.ValidationMessageFor( model => model.ClientContractRenewalReminderMonths )
+                        @Html.TextBoxFor(model => model.InvoiceRunDay, new { @placeholder = "1" })
+                        @Html.ValidationMessageFor(model => model.InvoiceRunDay)
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.ClientContractRenewalReminderMonths)
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor(model => model.ClientContractRenewalReminderMonths, new { @placeholder = "E.g. 3" })
+                        @Html.ValidationMessageFor(model => model.ClientContractRenewalReminderMonths)
                     </div>
 
                 </div>
@@ -103,68 +103,68 @@
                 <div class="left" style="width: 48%;">
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.AutoLogoff )
+                        @Html.LabelFor(model => model.AutoLogoff)
                     </div>
                     <div class="edit-field">
-                        @Html.CheckBoxFor( model => model.AutoLogoff )
-                        @Html.ValidationMessageFor( model => model.AutoLogoff )
+                        @Html.CheckBoxFor(model => model.AutoLogoff)
+                        @Html.ValidationMessageFor(model => model.AutoLogoff)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.LogoffSeconds )
+                        @Html.LabelFor(model => model.LogoffSeconds)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.LogoffSeconds, new { @placeholder = "30" } )
-                        @Html.ValidationMessageFor( model => model.LogoffSeconds )
+                        @Html.TextBoxFor(model => model.LogoffSeconds, new { @placeholder = "30" })
+                        @Html.ValidationMessageFor(model => model.LogoffSeconds)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.PasswordChange )
+                        @Html.LabelFor(model => model.PasswordChange)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.PasswordChange, new { @placeholder = "30" } )
-                        @Html.ValidationMessageFor( model => model.PasswordChange )
+                        @Html.TextBoxFor(model => model.PasswordChange, new { @placeholder = "30" })
+                        @Html.ValidationMessageFor(model => model.PasswordChange)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.DisputeDaysToResolve )
+                        @Html.LabelFor(model => model.DisputeDaysToResolve)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.DisputeDaysToResolve, new { @placeholder = "e.g. 10" } )
-                        @Html.ValidationMessageFor( model => model.DisputeDaysToResolve )
+                        @Html.TextBoxFor(model => model.DisputeDaysToResolve, new { @placeholder = "e.g. 10" })
+                        @Html.ValidationMessageFor(model => model.DisputeDaysToResolve)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.ImagesLocation )
+                        @Html.LabelFor(model => model.ImagesLocation)
                     </div>
                     <div class="edit-field">
 
-                        @Html.TextBoxFor( model => model.ImagesLocation, new { @placeholder = "Enter Images Location" } )
-                        @Html.ValidationMessageFor( model => model.ImagesLocation )
-                    </div>
-
-                    <div class="edit-label">
-                        @Html.LabelFor( model => model.DocumentsLocation )
-                    </div>
-                    <div class="edit-field">
-                        @Html.TextBoxFor( model => model.DocumentsLocation, new { @placeholder = "Enter Documents Location" } )
-                        @Html.ValidationMessageFor( model => model.DocumentsLocation )
+                        @Html.TextBoxFor(model => model.ImagesLocation, new { @placeholder = "Enter Images Location" })
+                        @Html.ValidationMessageFor(model => model.ImagesLocation)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.AppDownloadUrl )
+                        @Html.LabelFor(model => model.DocumentsLocation)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.AppDownloadUrl, new { @placeholder = "Enter App Download Url" } )
-                        @Html.ValidationMessageFor( model => model.AppDownloadUrl )
+                        @Html.TextBoxFor(model => model.DocumentsLocation, new { @placeholder = "Enter Documents Location" })
+                        @Html.ValidationMessageFor(model => model.DocumentsLocation)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.WebsiteUrl )
+                        @Html.LabelFor(model => model.AppDownloadUrl)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.WebsiteUrl, new { @placeholder = "Enter Website Url" } )
-                        @Html.ValidationMessageFor( model => model.WebsiteUrl )
+                        @Html.TextBoxFor(model => model.AppDownloadUrl, new { @placeholder = "Enter App Download Url" })
+                        @Html.ValidationMessageFor(model => model.AppDownloadUrl)
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.WebsiteUrl)
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor(model => model.WebsiteUrl, new { @placeholder = "Enter Website Url" })
+                        @Html.ValidationMessageFor(model => model.WebsiteUrl)
                     </div>
 
                 </div>
@@ -174,35 +174,35 @@
                 <div class="left" style="width: 48%; margin-right: 1%;">
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.DisputeMonitorPath )
+                        @Html.LabelFor(model => model.DisputeMonitorPath)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.DisputeMonitorPath, new { @placeholder = "Enter Dispute Monitor Path" } )
-                        @Html.ValidationMessageFor( model => model.DisputeMonitorPath )
+                        @Html.TextBoxFor(model => model.DisputeMonitorPath, new { @placeholder = "Enter Dispute Monitor Path" })
+                        @Html.ValidationMessageFor(model => model.DisputeMonitorPath)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.DisputeMonitorTime )
+                        @Html.LabelFor(model => model.DisputeMonitorTime)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.DisputeMonitorTime, new { @placeholder = "Select Dispute Monitor Time", @class = "time-picker" } )
-                        @Html.ValidationMessageFor( model => model.DisputeMonitorTime )
+                        @Html.TextBoxFor(model => model.DisputeMonitorTime, new { @placeholder = "Select Dispute Monitor Time", @class = "time-picker" })
+                        @Html.ValidationMessageFor(model => model.DisputeMonitorTime)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.DisputeMonitorInterval )
+                        @Html.LabelFor(model => model.DisputeMonitorInterval)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.DisputeMonitorInterval, new { @placeholder = "Enter Dispute Monitor Interval" } )
-                        @Html.ValidationMessageFor( model => model.DisputeMonitorInterval )
+                        @Html.TextBoxFor(model => model.DisputeMonitorInterval, new { @placeholder = "Enter Dispute Monitor Interval" })
+                        @Html.ValidationMessageFor(model => model.DisputeMonitorInterval)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.DisputeMonitorEnabled )
+                        @Html.LabelFor(model => model.DisputeMonitorEnabled)
                     </div>
                     <div class="edit-field">
-                        @Html.EnumDropDownFor( model => model.DisputeMonitorEnabled, false, new { @class = "chzn", @style = "width: 98%" } )
-                        @Html.ValidationMessageFor( model => model.DisputeMonitorEnabled )
+                        @Html.EnumDropDownFor(model => model.DisputeMonitorEnabled, false, new { @class = "chzn", @style = "width: 98%" })
+                        @Html.ValidationMessageFor(model => model.DisputeMonitorEnabled)
                     </div>
 
                 </div>
@@ -210,35 +210,107 @@
                 <div class="left" style="width: 48%;">
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.ClientMonitorPath )
+                        @Html.LabelFor(model => model.ClientMonitorPath)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.ClientMonitorPath, new { @placeholder = "Enter Client Monitor Path" } )
-                        @Html.ValidationMessageFor( model => model.ClientMonitorPath )
+                        @Html.TextBoxFor(model => model.ClientMonitorPath, new { @placeholder = "Enter Client Monitor Path" })
+                        @Html.ValidationMessageFor(model => model.ClientMonitorPath)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.ClientMonitorTime )
+                        @Html.LabelFor(model => model.ClientMonitorTime)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.ClientMonitorTime, new { @placeholder = "Select Client Monitor Time", @class = "time-picker" } )
-                        @Html.ValidationMessageFor( model => model.ClientMonitorTime )
+                        @Html.TextBoxFor(model => model.ClientMonitorTime, new { @placeholder = "Select Client Monitor Time", @class = "time-picker" })
+                        @Html.ValidationMessageFor(model => model.ClientMonitorTime)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.ClientMonitorInterval )
+                        @Html.LabelFor(model => model.ClientMonitorInterval)
                     </div>
                     <div class="edit-field">
-                        @Html.TextBoxFor( model => model.ClientMonitorInterval, new { @placeholder = "Enter Client Monitor Interval" } )
-                        @Html.ValidationMessageFor( model => model.ClientMonitorInterval )
+                        @Html.TextBoxFor(model => model.ClientMonitorInterval, new { @placeholder = "Enter Client Monitor Interval" })
+                        @Html.ValidationMessageFor(model => model.ClientMonitorInterval)
                     </div>
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.ClientMonitorEnabled )
+                        @Html.LabelFor(model => model.ClientMonitorEnabled)
                     </div>
                     <div class="edit-field">
-                        @Html.EnumDropDownFor( model => model.ClientMonitorEnabled, false, new { @class = "chzn", @style = "width: 98%" } )
-                        @Html.ValidationMessageFor( model => model.ClientMonitorEnabled )
+                        @Html.EnumDropDownFor(model => model.ClientMonitorEnabled, false, new { @class = "chzn", @style = "width: 98%" })
+                        @Html.ValidationMessageFor(model => model.ClientMonitorEnabled)
+                    </div>
+
+                </div>
+
+                <div class="left" style="width: 48%;">
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.BillingInvoicePath)
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor(model => model.BillingInvoicePath, new { @placeholder = "Enter Billing Invoice Path" })
+                        @Html.ValidationMessageFor(model => model.BillingInvoicePath)
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.BillingInvoiceTime)
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor(model => model.BillingInvoiceTime, new { @placeholder = "Select Billing Invoice Time", @class = "time-picker" })
+                        @Html.ValidationMessageFor(model => model.BillingInvoiceTime)
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.BillingInvoiceInterval)
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor(model => model.BillingInvoiceInterval, new { @placeholder = "Enter Billing Invoice Interval" })
+                        @Html.ValidationMessageFor(model => model.BillingInvoiceInterval)
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.BillingInvoiceEnabled)
+                    </div>
+                    <div class="edit-field">
+                        @Html.EnumDropDownFor(model => model.BillingInvoiceEnabled, false, new { @class = "chzn", @style = "width: 98%" })
+                        @Html.ValidationMessageFor(model => model.BillingInvoiceEnabled)
+                    </div>
+
+                </div>
+
+                <div class="left" style="width: 48%;">
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.PSPBillingPath)
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor(model => model.PSPBillingPath, new { @placeholder = "Enter PSP Billing Path" })
+                        @Html.ValidationMessageFor(model => model.PSPBillingPath)
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.PSPBillingTime)
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor(model => model.PSPBillingTime, new { @placeholder = "Select PSP Billing Time", @class = "time-picker" })
+                        @Html.ValidationMessageFor(model => model.PSPBillingTime)
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.PSPBillingInterval)
+                    </div>
+                    <div class="edit-field">
+                        @Html.TextBoxFor(model => model.PSPBillingInterval, new { @placeholder = "Enter PSP Billing Interval" })
+                        @Html.ValidationMessageFor(model => model.PSPBillingInterval)
+                    </div>
+
+                    <div class="edit-label">
+                        @Html.LabelFor(model => model.PSPBillingEnabled)
+                    </div>
+                    <div class="edit-field">
+                        @Html.EnumDropDownFor(model => model.PSPBillingEnabled, false, new { @class = "chzn", @style = "width: 98%" })
+                        @Html.ValidationMessageFor(model => model.PSPBillingEnabled)
                     </div>
 
                 </div>

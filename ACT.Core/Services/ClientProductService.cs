@@ -250,5 +250,29 @@ namespace ACT.Core.Services
         {
             return context.ClientProducts.Include( "Product" ).Where( cp => cp.ClientId == clientId ).ToList();
         }
+
+        /// </summary>      
+        /// <param name="model">model of the user to be fetched</param>
+        /// <returns></returns>
+        public List<ClientProduct> ClientProductList()
+        {
+            var tt = (from d in context.ClientProducts select d);
+            if (tt.Count() > 0)
+            {
+                List<ClientProduct> records = (from s in context.ClientProducts where s.Status == 1 select s).ToList();
+                //   .GroupBy(s=>s.PSPId);
+
+
+                if (records != null)
+                {
+                    return records;
+                }
+                else return null;
+
+            }
+            else
+                return null;
+        }
+
     }
 }

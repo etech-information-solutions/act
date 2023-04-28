@@ -25,6 +25,7 @@ namespace ACT.Data.Models
             this.PSPProducts = new HashSet<PSPProduct>();
             this.PSPUsers = new HashSet<PSPUser>();
             this.Regions = new HashSet<Region>();
+            this.BillingInvoices = new HashSet<BillingInvoice>();
         }
     
         public int Id { get; set; }
@@ -69,5 +70,7 @@ namespace ACT.Data.Models
         public virtual ICollection<PSPUser> PSPUsers { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Region> Regions { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<BillingInvoice> BillingInvoices { get; set; }
     }
 }

@@ -477,6 +477,12 @@ namespace ACT.Core.Services
             return model;
         }
 
+        public List<Client> GetClientList()
+        {
+            List<Client> clients = new List<Client>();
+            clients = (from a in context.Clients where a.Status == 1 select a).ToList();
+            return clients;
+        }
         public List<Client> GetClientsByPSP( int pspId )
         {
             List<Client> clientList;
@@ -490,6 +496,15 @@ namespace ACT.Core.Services
             return clientList;
         }
 
+        public Client GetClientById(int id)
+        {
+            var client = (from s in context.Clients where s.Id == id select s).FirstOrDefault();
+            if (client != null)
+            {
+                return client;
+            }
+            else return null;
+        }
 
         public List<Client> GetClientsByPSPAwaitingActivation( int pspId )
         {

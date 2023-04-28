@@ -65,5 +65,13 @@ namespace ACT.Core.Services
         {
             return context.Provinces.FirstOrDefault( p => p.Name == name || p.Description == name )?.Id;
         }
+
+        public Province GetProvinceName(int? id)
+        {
+
+            Province province = (from a in context.Provinces where a.Id == id select a).FirstOrDefault();
+            return province;
+        }
+
     }
 }

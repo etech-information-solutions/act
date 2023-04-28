@@ -93,7 +93,32 @@ namespace ACT.UI.Models
         [Display( Name = "Client Monitor Enabled" )]
         public YesNo ClientMonitorEnabled { get; set; }
 
-        
+
+        [Display(Name = "Billing Invoice Path")]
+        [StringLength(250, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        public string BillingInvoiceMonitorPath { get; set; }
+
+        [Display(Name = "Billing Invoice Interval")]
+        public string BillingInvoiceMonitorInterval { get; set; }
+
+        [Display(Name = "Billing Invoice Time")]
+        public TimeSpan? BillingInvoiceMonitorTime { get; set; }
+
+        [Display(Name = "Billing Invoice Enabled")]
+        public YesNo BillingInvoiceMonitorEnabled { get; set; }
+
+        [Display(Name = "PSP Billing Path")]
+        [StringLength(250, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0)]
+        public string PSPBillingMonitorPath { get; set; }
+
+        [Display(Name = "PSP Billing Interval")]
+        public string PSPBillingMonitorInterval { get; set; }
+
+        [Display(Name = "PSP Billing Time")]
+        public TimeSpan? PSPBillingMonitorTime { get; set; }
+
+        [Display(Name = "PSP Billing Enabled")]
+        public YesNo PSPBillingMonitorEnabled { get; set; }
 
         [Display( Name = "Client Contract Renewal Reminder (in months)" )]
         public int? ClientContractRenewalReminderMonths { get; set; }

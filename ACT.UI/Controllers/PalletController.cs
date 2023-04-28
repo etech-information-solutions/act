@@ -4526,6 +4526,7 @@ namespace ACT.UI.Controllers
                 using ( iTextSharp.text.Document document = new iTextSharp.text.Document( iTextSharp.text.PageSize.A4, 10, 10, 10, 10 ) )
                 {
                     PdfWriter pWriter = PdfWriter.GetInstance( document, stream );
+                   // PdfWriter pWriter = PdfWriter.GetInstance(document, new FileStream(@"C:\inetpub\wwwroot\deliverynote\" +("~") + "invoice.pdf", FileMode.Create));
 
                     PdfAction action = new PdfAction( PdfAction.PRINTDIALOG );
                     pWriter.SetOpenAction( action );
@@ -4533,9 +4534,11 @@ namespace ACT.UI.Controllers
                     document.Open();
 
                     XMLWorkerHelper.GetInstance().ParseXHtml( pWriter, document, new StringReader( body ) );
+                   // XMLWorkerHelper.GetInstance().ParseXHtml(pWriter1, document, new StringReader(body));
                 }
 
-                return File( stream.ToArray(), "application/pdf" );
+                 return File( stream.ToArray(), "application/pdf" );
+               // return null;// File( new MemoryStream(), "application/pdf");
             }
         }
 

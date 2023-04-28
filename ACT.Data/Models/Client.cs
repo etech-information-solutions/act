@@ -34,6 +34,7 @@ namespace ACT.Data.Models
             this.ExtendedClientLoads = new HashSet<ExtendedClientLoad>();
             this.ClientLoads = new HashSet<ClientLoad>();
             this.ClientLoads1 = new HashSet<ClientLoad>();
+            this.BillingInvoices = new HashSet<BillingInvoice>();
         }
     
         public int Id { get; set; }
@@ -98,5 +99,7 @@ namespace ACT.Data.Models
         public virtual ICollection<ClientLoad> ClientLoads { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads1 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<BillingInvoice> BillingInvoices { get; set; }
     }
 }

@@ -13,11 +13,11 @@ namespace ACT.Core.Enums
         [StringEnumDisplayText("None")]
         None = 0,
 
-        [StringEnumDisplayText( "Savings" )]
-        Savings = 1,
+        [StringEnumDisplayText("Current/Cheque")]
+        Current = 1,
 
-        [StringEnumDisplayText( "Current/Cheque" )]
-        Current = 2,
+        [StringEnumDisplayText("Savings")]
+        Savings = 2,
 
         [StringEnumDisplayText( "Transmission" )]
         Transmission = 3

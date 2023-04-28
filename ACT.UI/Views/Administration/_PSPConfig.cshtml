@@ -26,54 +26,61 @@
                 <div class="left" style="width: 48%; margin-right: 4%;">
 
                     <div class="edit-label">
-                        @Html.LabelFor( model => model.SystemContactEmail )
-                    </div>
-                    <div class="edit-field">
-                        @Html.TextBoxFor( model => model.SystemContactEmail, new { @placeholder = "Enter System Contact Email" } )
-                        @Html.ValidationMessageFor( model => model.SystemContactEmail )
-                    </div>
-
-                    <div class="edit-label">
-                        @Html.LabelFor( model => model.FinancialEmail )
-                    </div>
-                    <div class="edit-field">
-                        @Html.TextBoxFor( model => model.FinancialEmail, new { @placeholder = "Enter Finance Contact Email" } )
-                        @Html.ValidationMessageFor( model => model.FinancialEmail )
-                    </div>
-
-                    <div class="edit-label">
-                        @Html.LabelFor( model => model.ImportEmail )
-                    </div>
-                    <div class="edit-field">
-                        @Html.TextBoxFor( model => model.ImportEmail, new { @placeholder = "Enter Import Email" } )
-                        @Html.ValidationMessageFor( model => model.ImportEmail )
-                    </div>
-
-                    <div class="edit-label">
-                        @Html.LabelFor( model => model.ReceivingManagerEmail )
-                    </div>
-                    <div class="edit-field">
-                        @Html.TextBoxFor( model => model.ReceivingManagerEmail, new { @placeholder = "Enter Receiving Manager Email" } )
-                        @Html.ValidationMessageFor( model => model.ReceivingManagerEmail )
-                    </div>
-
-                    <div class="edit-label">
-                        @Html.LabelFor( model => model.OpsManagerEmail )
-                    </div>
-                    <div class="edit-field">
-                        @Html.TextBoxFor( model => model.OpsManagerEmail, new { @placeholder = "Enter OPs Manager Email" } )
-                        @Html.ValidationMessageFor( model => model.OpsManagerEmail )
-                    </div>
-
-                    <div class="edit-label">
-                        @Html.LabelFor( model => model.AdminManagerEmail )
-                    </div>
-                    <div class="edit-field">
-                        @Html.TextBoxFor( model => model.AdminManagerEmail, new { @placeholder = "Enter Admin Manager Email" } )
-                        @Html.ValidationMessageFor( model => model.AdminManagerEmail )
-                    </div>
-
+                    @Html.LabelFor(model => model.PSPId)
                 </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.PSPId, new { @placeholder = "Enter PSP ID received upon registration" })
+                    @Html.ValidationMessageFor(model => model.PSPId)
+                </div>
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.SystemContactEmail)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.SystemContactEmail, new { @placeholder = "Enter System Contact Email" })
+                    @Html.ValidationMessageFor(model => model.SystemContactEmail)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.FinancialEmail)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.FinancialEmail, new { @placeholder = "Enter Finance Contact Email" })
+                    @Html.ValidationMessageFor(model => model.FinancialEmail)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.ImportEmail)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.ImportEmail, new { @placeholder = "Enter Import Email" })
+                    @Html.ValidationMessageFor(model => model.ImportEmail)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.ReceivingManagerEmail)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.ReceivingManagerEmail, new { @placeholder = "Enter Receiving Manager Email" })
+                    @Html.ValidationMessageFor(model => model.ReceivingManagerEmail)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.OpsManagerEmail)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.OpsManagerEmail, new { @placeholder = "Enter OPs Manager Email" })
+                    @Html.ValidationMessageFor(model => model.OpsManagerEmail)
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor(model => model.AdminManagerEmail)
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor(model => model.AdminManagerEmail, new { @placeholder = "Enter Admin Manager Email" })
+                    @Html.ValidationMessageFor(model => model.AdminManagerEmail)
+                </div>
+
+            </div>
 
                 <div class="left" style="width: 48%;">
 

@@ -23,11 +23,23 @@ namespace ACT.Core.Services
             return base.GetById( id );
         }
 
+        public PSP GetPSP()
+        {
+            var returnItem = (from d in context.PSPs where d.Status == 1 select d).FirstOrDefault();
+
+            return returnItem;
+        }
         public bool ExistByCompanyRegistrationNumber( string registrationNumber )
         {
             return context.PSPs.Any( p => p.CompanyRegistrationNumber == registrationNumber );
         }
-        
+        public List<PSP> GetPSPList()
+        {
+            List<PSP> pSPs = new List<PSP>();
+            pSPs = (from a in context.PSPs where a.Status == 1 select a).ToList();
+            return pSPs;
+        }      
+
         public int Total1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )

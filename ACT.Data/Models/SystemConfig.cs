@@ -55,5 +55,17 @@ namespace ACT.Data.Models
         public string OneSignalAPIUrl { get; set; }
         public string OneSignaIAPIKey { get; set; }
         public string OneSignaIAppId { get; set; }
+        public Nullable<System.TimeSpan> PSPBillingMonitorTime { get; set; }
+        public string PSPBillingMonitorInterval { get; set; }
+        public string PSPBillingMonitorPath { get; set; }
+        public bool PSPBillingMonitorEnabled { get; set; }
+        public Nullable<System.DateTime> LastPSPBillingMonitorRun { get; set; }
+        public Nullable<int> LastPSPBillingMonitorCount { get; set; }
+        public Nullable<System.TimeSpan> BillingInvoiceMonitorTime { get; set; }
+        public string BillingInvoiceMonitorInterval { get; set; }
+        public string BillingInvoiceMonitorPath { get; set; }
+        public bool BillingInvoiceMonitorEnabled { get; set; }
+        public Nullable<System.DateTime> LastBillingInvoiceMonitorRun { get; set; }
+        public Nullable<int> LastBillingInvoiceMonitorCount { get; set; }
     }
 }

@@ -24,5 +24,32 @@ namespace ACT.Core.Services
 
             return context.Addresses.FirstOrDefault( a => a.ObjectId == objectId && a.ObjectType == objectType );
         }
+
+        public Address GetProvinceName(int? id)
+        {
+
+            Address address = (from a in context.Addresses where a.ProvinceId == id select a).FirstOrDefault();
+            return address;
+        }
+
+        /// </summary>      
+        /// <param name="model">model of the user to be fetched</param>
+        /// <returns></returns>
+        public Address GetAddress(int id)
+        {
+            var tt = (from d in context.Addresses select d);
+            if (tt.Count() > 0)
+            {
+                Address addRecord = (from s in context.Addresses where s.ObjectId == id select s).FirstOrDefault();
+
+                if (addRecord != null)
+                {
+                    return addRecord;
+                }
+                else return null;
+            }
+            else
+                return null;
+        }
     }
 }

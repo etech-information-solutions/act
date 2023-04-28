@@ -20,13 +20,17 @@ namespace ACT.Monitor
 
         private Timer DisputeTimer;
 
+        private Timer PSPBillingTimer;
+
+        private Timer BillingInvoiceTimer;
+
         private StreamWriter Writer;
 
         public static string LogFile
         {
             get
             {
-                return ConfigurationManager.AppSettings[ "LogFile" ] ?? "C:/Etech_FTP_007/ACT";
+                return ConfigurationManager.AppSettings["LogFile"] ?? "C:/Etech_FTP_007/ACT";
             }
         }
 
@@ -34,31 +38,34 @@ namespace ACT.Monitor
         {
             InitializeComponent();
 
-            if ( !Directory.Exists( LogFile ) )
+            if (!Directory.Exists(LogFile))
             {
-                Directory.CreateDirectory( LogFile );
+                Directory.CreateDirectory(LogFile);
             }
 
-            FileStream fs = new FileStream( $"{LogFile}/log.log", FileMode.Append, FileAccess.Write, FileShare.ReadWrite );
+            FileStream fs = new FileStream($"{LogFile}/log.log", FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
 
-            Writer = new StreamWriter( fs )
+            Writer = new StreamWriter(fs)
             {
                 AutoFlush = true
             };
         }
 
-        protected override void OnStart( string[] args )
+        protected override void OnStart(string[] args)
         {
             try
             {
                 ConfigSettings.SetRules();
 
                 Writer.WriteLine();
-                Writer.WriteLine( $"========================   SERVICE STARTED @ {DateTime.Now}   ========================" );
+                Writer.WriteLine($"========================   SERVICE STARTED @ {DateTime.Now}   ========================");
 
                 // Start independent Timers
-                this.ConfigureTimers( Timers.ClientMonitorTimer );
-                this.ConfigureTimers( Timers.DisputeMonitorTimer );
+                this.ConfigureTimers(Timers.ClientMonitorTimer);
+                this.ConfigureTimers(Timers.DisputeMonitorTimer);
+                this.ConfigureTimers(Timers.PSPBillingMonitorTimer);
+                this.ConfigureTimers(Timers.BillingInvoiceMonitorTimer);
+
 
                 // Polls are in seconds, so we multiply by 1000 to convert seconds to milliseconds
                 //this.DinnerMonitorTimer = new System.Timers.Timer( ( ( ( double ) ConfigSettings.SystemRules.DinnerMonitorPoll ) * 1000 ) );  // 300000 milliseconds = 5 Minutes 60000 milliseconds = 1 Minute
@@ -72,9 +79,9 @@ namespace ACT.Monitor
                 //this.RebateMonitorTimer.Elapsed += new System.Timers.ElapsedEventHandler( this.RebateMonitorTimer_Elapsed );
                 //this.RebateMonitorTimer.Start();
             }
-            catch ( Exception ex )
+            catch (Exception ex)
             {
-                Writer.WriteLine( ex.ToString() );
+                Writer.WriteLine(ex.ToString());
             }
         }
 
@@ -84,7 +91,7 @@ namespace ACT.Monitor
             {
                 ConfigSettings.SetRules();
 
-                string path = Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData );
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
                 try
                 {
@@ -109,21 +116,21 @@ namespace ACT.Monitor
                         Subject = "ACT MONITOR HAS BEEN STOPPED!"
                     };
 
-                    bool sent = Mail.Send( mail );
+                    bool sent = Mail.Send(mail);
                     mail.Dispose();
                 }
-                catch ( Exception ex )
+                catch (Exception ex)
                 {
-                    BaseMonitor.Error( Writer, ex, "OnStop - Email" );
+                    BaseMonitor.Error(Writer, ex, "OnStop - Email");
                 }
 
                 Writer.WriteLine();
-                Writer.WriteLine( string.Format( "========================   SERVICE STOPPED @ {0}   ========================", DateTime.Now ) );
+                Writer.WriteLine(string.Format("========================   SERVICE STOPPED @ {0}   ========================", DateTime.Now));
                 Writer.Flush();
             }
-            catch ( Exception ex )
+            catch (Exception ex)
             {
-                BaseMonitor.Error( Writer, ex, "OnStop - Main" );
+                BaseMonitor.Error(Writer, ex, "OnStop - Main");
             }
         }
 
@@ -132,32 +139,32 @@ namespace ACT.Monitor
         /// </summary>
         /// <param name="path"></param>
         /// <param name="size"></param>
-        private void ArchiveLog( string path, double size )
+        private void ArchiveLog(string path, double size)
         {
             try
             {
                 string logPath = $"{path}\\log.log";
 
-                if ( File.Exists( path: logPath ) )
+                if (File.Exists(path: logPath))
                 {
-                    FileInfo log = new FileInfo( logPath );
+                    FileInfo log = new FileInfo(logPath);
 
-                    if ( ( log.Length / 1024 / 1024 ) >= size )
+                    if ((log.Length / 1024 / 1024) >= size)
                     {
                         // Rename the file to .archive!
-                        @File.Move( sourceFileName: logPath, destFileName: $"{path}\\log-{log.CreationTime.ToString( "yyyyMMdd HH_mm" )} to {DateTime.Now.ToString( "yyyyMMdd HH_mm" )}.archive" );
+                        @File.Move(sourceFileName: logPath, destFileName: $"{path}\\log-{log.CreationTime.ToString("yyyyMMdd HH_mm")} to {DateTime.Now.ToString("yyyyMMdd HH_mm")}.archive");
                     }
                 }
             }
-            catch ( Exception ex )
+            catch (Exception ex)
             {
-                Writer.WriteLine( ex.ToString() );
-                Writer.WriteLine( ex.Message ?? null );
-                Writer.WriteLine( ex.InnerException?.Message );
+                Writer.WriteLine(ex.ToString());
+                Writer.WriteLine(ex.Message ?? null);
+                Writer.WriteLine(ex.InnerException?.Message);
             }
         }
 
-        private void DinnerMonitorTimer_Elapsed( object sender, System.Timers.ElapsedEventArgs e )
+        private void DinnerMonitorTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             try
             {
@@ -192,58 +199,136 @@ namespace ACT.Monitor
                 //    writer.Flush();
                 //}
             }
-            catch ( Exception ex )
+            catch (Exception ex)
             {
-                BaseMonitor.Error( Writer, ex, "DinnerMonitorTimer_Elapsed" );
+                BaseMonitor.Error(Writer, ex, "DinnerMonitorTimer_Elapsed");
             }
         }
 
 
 
-        private void ConfigureTimers( Timers timer )
+        private void ConfigureTimers(Timers timer)
         {
             int dueTime;
 
             DateTime scheduledTime;
             TimeSpan timeSpan, span;
 
-            switch ( timer )
+            switch (timer)
             {
                 case Timers.ClientMonitorTimer:
 
                     #region Member Monitor Timer
 
-                    ClientTimer = new Timer( new TimerCallback( ClientTimerCallback ) );
+                    ClientTimer = new Timer(new TimerCallback(ClientTimerCallback));
 
                     //Set the Default Time.
                     scheduledTime = DateTime.MinValue;
 
                     //Get the Scheduled Time from AppSettings.
                     span = ConfigSettings.SystemRules.ClientMonitorTime.Value;
-                    scheduledTime = DateTime.Parse( $"{span.Hours}:{span.Minutes}:{span.Seconds}" );
+                    scheduledTime = DateTime.Parse($"{span.Hours}:{span.Minutes}:{span.Seconds}");
 
-                    if ( DateTime.Now > scheduledTime )
+                    if (DateTime.Now > scheduledTime)
                     {
                         //If Scheduled Time is passed set Schedule for the next day.
-                        scheduledTime = scheduledTime.AddDays( 1 );
+                        scheduledTime = scheduledTime.AddDays(1);
                     }
 
                     Writer.WriteLine();
-                    Writer.WriteLine( "Client Monitor Scheduled Time: {0}", scheduledTime );
+                    Writer.WriteLine("Client Monitor Scheduled Time: {0}", scheduledTime);
 
-                    timeSpan = scheduledTime.Subtract( DateTime.Now );
+                    timeSpan = scheduledTime.Subtract(DateTime.Now);
 
                     Writer.WriteLine();
-                    Writer.WriteLine( "Client Monitor Time Span: {0}", timeSpan );
+                    Writer.WriteLine("Client Monitor Time Span: {0}", timeSpan);
 
                     //Get the difference in Minutes between the Scheduled and Current Time.
-                    dueTime = Convert.ToInt32( timeSpan.TotalMilliseconds );
+                    dueTime = Convert.ToInt32(timeSpan.TotalMilliseconds);
 
                     Writer.WriteLine();
-                    Writer.WriteLine( "Client Monitor Due Time: {0}", dueTime );
+                    Writer.WriteLine("Client Monitor Due Time: {0}", dueTime);
 
                     // Change the Timer's Due Time.
-                    ClientTimer.Change( dueTime, Timeout.Infinite );
+                    ClientTimer.Change(dueTime, Timeout.Infinite);
+
+                    #endregion
+
+                    break;
+                case Timers.PSPBillingMonitorTimer: 
+
+                    #region PSP Billing Monitor Timer
+
+                    PSPBillingTimer = new Timer(new TimerCallback(PSPBillingTimerCallback));
+
+                    //Set the Default Time.
+                    scheduledTime = DateTime.MinValue;
+
+                    //Get the Scheduled Time from AppSettings.
+                    span = ConfigSettings.SystemRules.PSPBillingMonitorTime.Value;
+                    scheduledTime = DateTime.Parse($"{span.Hours}:{span.Minutes}:{span.Seconds}");
+
+                    if (DateTime.Now > scheduledTime)
+                    {
+                        //If Scheduled Time is passed set Schedule for the next day.
+                        scheduledTime = scheduledTime.AddDays(1);
+                    }
+
+                    Writer.WriteLine();
+                    Writer.WriteLine("PSP Billing Monitor Scheduled Time: {0}", scheduledTime);
+
+                    timeSpan = scheduledTime.Subtract(DateTime.Now);
+
+                    Writer.WriteLine();
+                    Writer.WriteLine("PSP Billing Monitor Time Span: {0}", timeSpan);
+
+                    //Get the difference in Minutes between the Scheduled and Current Time.
+                    dueTime = Convert.ToInt32(timeSpan.TotalMilliseconds);
+
+                    Writer.WriteLine();
+                    Writer.WriteLine("PSP Billing Monitor Due Time: {0}", dueTime);
+
+                    // Change the Timer's Due Time.
+                    PSPBillingTimer.Change(dueTime, Timeout.Infinite);
+
+                    #endregion
+
+                    break;
+                case Timers.BillingInvoiceMonitorTimer:
+
+                    #region Member Monitor Timer
+
+                   BillingInvoiceTimer = new Timer(new TimerCallback(BillingInvoiceTimerCallback));
+
+                    //Set the Default Time.
+                    scheduledTime = DateTime.MinValue;
+
+                    //Get the Scheduled Time from AppSettings.
+                    span = ConfigSettings.SystemRules.BillingInvoiceMonitorTime.Value;
+                    scheduledTime = DateTime.Parse($"{span.Hours}:{span.Minutes}:{span.Seconds}");
+
+                    if (DateTime.Now > scheduledTime)
+                    {
+                        //If Scheduled Time is passed set Schedule for the next day.
+                        scheduledTime = scheduledTime.AddDays(1);
+                    }
+
+                    Writer.WriteLine();
+                    Writer.WriteLine("Billing Invoice Monitor Scheduled Time: {0}", scheduledTime);
+
+                    timeSpan = scheduledTime.Subtract(DateTime.Now);
+
+                    Writer.WriteLine();
+                    Writer.WriteLine("Billing Invoice Monitor Time Span: {0}", timeSpan);
+
+                    //Get the difference in Minutes between the Scheduled and Current Time.
+                    dueTime = Convert.ToInt32(timeSpan.TotalMilliseconds);
+
+                    Writer.WriteLine();
+                    Writer.WriteLine("Billing Invoice Monitor Due Time: {0}", dueTime);
+
+                    // Change the Timer's Due Time.
+                    BillingInvoiceTimer.Change(dueTime, Timeout.Infinite);
 
                     #endregion
 
@@ -253,37 +338,37 @@ namespace ACT.Monitor
 
                     #region Member Monitor Timer
 
-                    DisputeTimer = new Timer( new TimerCallback( DisputeTimerCallback ) );
+                    DisputeTimer = new Timer(new TimerCallback(DisputeTimerCallback));
 
                     //Set the Default Time.
                     scheduledTime = DateTime.MinValue;
 
                     //Get the Scheduled Time from AppSettings.
                     span = ConfigSettings.SystemRules.DisputeMonitorTime.Value;
-                    scheduledTime = DateTime.Parse( $"{span.Hours}:{span.Minutes}:{span.Seconds}" );
+                    scheduledTime = DateTime.Parse($"{span.Hours}:{span.Minutes}:{span.Seconds}");
 
-                    if ( DateTime.Now > scheduledTime )
+                    if (DateTime.Now > scheduledTime)
                     {
                         //If Scheduled Time is passed set Schedule for the next day.
-                        scheduledTime = scheduledTime.AddDays( 1 );
+                        scheduledTime = scheduledTime.AddDays(1);
                     }
 
                     Writer.WriteLine();
-                    Writer.WriteLine( "Dispute Monitor Scheduled Time: {0}", scheduledTime );
+                    Writer.WriteLine("Dispute Monitor Scheduled Time: {0}", scheduledTime);
 
-                    timeSpan = scheduledTime.Subtract( DateTime.Now );
+                    timeSpan = scheduledTime.Subtract(DateTime.Now);
 
                     Writer.WriteLine();
-                    Writer.WriteLine( "Dispute Monitor Time Span: {0}", timeSpan );
+                    Writer.WriteLine("Dispute Monitor Time Span: {0}", timeSpan);
 
                     //Get the difference in Minutes between the Scheduled and Current Time.
-                    dueTime = Convert.ToInt32( timeSpan.TotalMilliseconds );
+                    dueTime = Convert.ToInt32(timeSpan.TotalMilliseconds);
 
                     Writer.WriteLine();
-                    Writer.WriteLine( "Dispute Monitor Due Time: {0}", dueTime );
+                    Writer.WriteLine("Dispute Monitor Due Time: {0}", dueTime);
 
                     // Change the Timer's Due Time.
-                    DisputeTimer.Change( dueTime, Timeout.Infinite );
+                    DisputeTimer.Change(dueTime, Timeout.Infinite);
 
                     #endregion
 
@@ -293,80 +378,152 @@ namespace ACT.Monitor
 
 
 
-        public void ClientTimerCallback( object e )
+        public void ClientTimerCallback(object e)
         {
             try
             {
                 ConfigSettings.SetRules();
 
-                ArchiveLog( ConfigSettings.SystemRules.ClientMonitorPath, 10.0 );
+                ArchiveLog(ConfigSettings.SystemRules.ClientMonitorPath, 10.0);
 
-                using ( StreamWriter writer = new StreamWriter( $"{ConfigSettings.SystemRules.ClientMonitorPath}\\log.log", true ) )
+                using (StreamWriter writer = new StreamWriter($"{ConfigSettings.SystemRules.ClientMonitorPath}\\log.log", true))
                 {
                     writer.AutoFlush = true;
 
                     try
                     {
                         writer.WriteLine();
-                        writer.WriteLine( $"BEGIN Client MONITOR @ {DateTime.Now}   ========================" );
+                        writer.WriteLine($"BEGIN Client MONITOR @ {DateTime.Now}   ========================");
 
-                        ClientMonitor.Run( writer );
+                        ClientMonitor.Run(writer);
 
                         writer.WriteLine();
-                        writer.WriteLine( $"END Client MONITOR @ {DateTime.Now}   ========================" );
+                        writer.WriteLine($"END Client MONITOR @ {DateTime.Now}   ========================");
                     }
-                    catch ( Exception ex )
+                    catch (Exception ex)
                     {
-                        BaseMonitor.Error( writer, ex, "ClientTimerCallback" );
+                        BaseMonitor.Error(writer, ex, "ClientTimerCallback");
                     }
                 }
             }
-            catch ( Exception ex )
+            catch (Exception ex)
             {
-                BaseMonitor.Error( Writer, ex, "ClientTimerCallback" );
+                BaseMonitor.Error(Writer, ex, "ClientTimerCallback");
             }
 
             // Reset Timer
-            ConfigureTimers( Timers.ClientMonitorTimer );
+            ConfigureTimers(Timers.ClientMonitorTimer);
         }
 
-
-
-        public void DisputeTimerCallback( object e )
+        public void PSPBillingTimerCallback(object e)
         {
             try
             {
                 ConfigSettings.SetRules();
 
-                ArchiveLog( ConfigSettings.SystemRules.DisputeMonitorPath, 10.0 );
+                ArchiveLog(ConfigSettings.SystemRules.PSPBillingMonitorPath, 10.0);
 
-                using ( StreamWriter writer = new StreamWriter( $"{ConfigSettings.SystemRules.DisputeMonitorPath}\\log.log", true ) )
+                using (StreamWriter writer = new StreamWriter($"{ConfigSettings.SystemRules.PSPBillingMonitorPath}\\log.log", true))
                 {
                     writer.AutoFlush = true;
 
                     try
                     {
                         writer.WriteLine();
-                        writer.WriteLine( $"BEGIN Dispute MONITOR @ {DateTime.Now}   ========================" );
+                        writer.WriteLine($"BEGIN PSP Billing MONITOR @ {DateTime.Now}   ========================");
 
-                        DisputeMonitor.Run( writer );
+                        ClientMonitor.Run(writer);
 
                         writer.WriteLine();
-                        writer.WriteLine( $"END Dispute MONITOR @ {DateTime.Now}   ========================" );
+                        writer.WriteLine($"END PSP Billing MONITOR @ {DateTime.Now}   ========================");
                     }
-                    catch ( Exception ex )
+                    catch (Exception ex)
                     {
-                        BaseMonitor.Error( writer, ex, "DisputeTimerCallback" );
+                        BaseMonitor.Error(writer, ex, "PSPBillingTimerCallback");
                     }
                 }
             }
-            catch ( Exception ex )
+            catch (Exception ex)
             {
-                BaseMonitor.Error( Writer, ex, "DisputeTimerCallback" );
+                BaseMonitor.Error(Writer, ex, "PSPBillingTimerCallback");
             }
 
             // Reset Timer
-            ConfigureTimers( Timers.DisputeMonitorTimer );
+            ConfigureTimers(Timers.PSPBillingMonitorTimer);
+        }
+
+        public void BillingInvoiceTimerCallback(object e)
+        {
+            try
+            {
+                ConfigSettings.SetRules();
+
+                ArchiveLog(ConfigSettings.SystemRules.BillingInvoiceMonitorPath, 10.0);
+
+                using (StreamWriter writer = new StreamWriter($"{ConfigSettings.SystemRules.BillingInvoiceMonitorPath}\\log.log", true))
+                {
+                    writer.AutoFlush = true;
+
+                    try
+                    {
+                        writer.WriteLine();
+                        writer.WriteLine($"BEGIN Billing Invoice MONITOR @ {DateTime.Now}   ========================");
+
+                        ClientMonitor.Run(writer);
+
+                        writer.WriteLine();
+                        writer.WriteLine($"END Billing Invoice MONITOR @ {DateTime.Now}   ========================");
+                    }
+                    catch (Exception ex)
+                    {
+                        BaseMonitor.Error(writer, ex, "BillingInvoiceTimerCallback");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                BaseMonitor.Error(Writer, ex, "BillingInvoiceTimerCallback");
+            }
+
+            // Reset Timer
+            ConfigureTimers(Timers.BillingInvoiceMonitorTimer);
+        }
+
+        public void DisputeTimerCallback(object e)
+        {
+            try
+            {
+                ConfigSettings.SetRules();
+
+                ArchiveLog(ConfigSettings.SystemRules.DisputeMonitorPath, 10.0);
+
+                using (StreamWriter writer = new StreamWriter($"{ConfigSettings.SystemRules.DisputeMonitorPath}\\log.log", true))
+                {
+                    writer.AutoFlush = true;
+
+                    try
+                    {
+                        writer.WriteLine();
+                        writer.WriteLine($"BEGIN Dispute MONITOR @ {DateTime.Now}   ========================");
+
+                        DisputeMonitor.Run(writer);
+
+                        writer.WriteLine();
+                        writer.WriteLine($"END Dispute MONITOR @ {DateTime.Now}   ========================");
+                    }
+                    catch (Exception ex)
+                    {
+                        BaseMonitor.Error(writer, ex, "DisputeTimerCallback");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                BaseMonitor.Error(Writer, ex, "DisputeTimerCallback");
+            }
+
+            // Reset Timer
+            ConfigureTimers(Timers.DisputeMonitorTimer);
         }
     }
 }

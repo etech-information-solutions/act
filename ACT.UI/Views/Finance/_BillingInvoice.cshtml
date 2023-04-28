@@ -1,0 +1,150 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models.Custom;
+@using ACT.Core.Models;
+
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+    ViewBag.ViewName = "_Billing Invoice";
+}
+
+
+@Html.Partial("_Notification")
+
+@{
+    UserModel user = User.Get();
+
+    int count = Model.Start;
+    List<BillingInvoiceCustomModel> items = (List<BillingInvoiceCustomModel>)Model.Items;
+}
+
+@if (Model == null || !items.Any())
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Billing items available matching your search criteria.
+    </div>
+}
+
+
+@if (user.IsAdmin || user.IsPSPAdmin)
+{
+    <p>
+        @Html.ActionLink("Add PSP Billing", "AddPSPBilling", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Billing Record?", @data_edit = "1", @data_id = 0, @data_target = "#pspbilling" })
+        <span class="loader"></span>
+
+        @Html.ActionLink("Process All Billing", "ProcessAllPSPBilling", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add all new Billing Record?", @data_edit = "1", @data_id = 0, @data_target = "#pspbilling" })
+        <span class="loader"></span>
+
+        @Html.ActionLink("Process PSP", "ProcessPSP", new { }, new { @class = "add", @rel = "tipsyS", @title = "Show a new invoice record?", @data_edit = "1", @data_id = 0, @data_target = "#billinginvoice" })
+        <span class="loader"></span>
+
+        @Html.ActionLink("Generate Client Invoice", "GetClientInvoice", new { }, new { @class = "add", @rel = "tipsyS", @title = "Show a new invoice record?", @data_edit = "1", @data_id = 0, @data_target = "#billinginvoice" })
+        <span class="loader"></span>
+
+        @Html.ActionLink("Xero Interface", "PSPBilling", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Billing Record?", @data_edit = "1", @data_id = 0, @data_target = "#pspbilling" })
+        <span class="loader"></span>
+    </p>
+}
+
+
+
+
+<table id="billinginvoice-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#billinginvoice-table_wrapper" data-starting-point=".ap-tabs ul">
+
+    <thead>
+        <tr>
+            @*<th data-name="Count">
+            #
+        </th>*@
+            <th data-name="StatementDate" data-column="StatementDate">
+                Statement Date
+            </th>
+
+            <th data-name="PSPId" data-column="PSPId">
+                PSP
+            </th>
+            <th data-name="ClientId" data-column="ClientId">
+                Client
+            </th>
+            <th data-name="AccountNumber" data-column="AccountNumber">
+                Account Number
+            </th>
+            <th data-name="VATNumber" data-column="VAtNumber">
+                Vat Number
+            </th>
+            <th data-name="Total" data-column="Total">
+                Total
+            </th>
+            <th data-name="InvoiceType" data-column="InvoiceType">
+                Invoice Type
+            </th>
+
+            <th data-name="InvoiceAmount" data-column="InvoiceAmount">
+                Invoice Amount
+            </th>
+           
+            <th data-name="DueDate" data-column="DueDate">
+                Due Date
+            </th>
+            <th data-name="CompanyName" data-column="CompanyName">
+                Company Name            </th>
+
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (Model != null && items != null && items.Count() > 0)
+        {
+
+
+            foreach (var item in items)
+            {
+                Status status = (Status)item.Status;
+
+                string active = (status == Status.Active) ? "active" : "inactive";
+                string enable = (status == Status.Active) ? "Disable" : "Enable";
+                string pending = (status == Status.Pending) ? "Pending" : "Enable";
+
+              <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
+            <td>
+                @( item.StatementDate )
+            </td>
+            <td> @item.PSPName </td>
+            <td> @item.ClientName    </td>
+            <td>@item.AccountNumber</td>
+            <td>@item.VATNumber</td>
+            <td>@item.Total</td>
+            <td>@item.InvoiceType</td>            
+            <td>  @(item.InvoiceAmount)</td>
+
+            <td>   @item.DueDate</td>
+            <td>  @item.CompanyName  </td>
+            <td>
+                @*@Html.ActionLink("Print PSP Invoice", "PrintPSPInvoice", new { id = item.Id, returnView = "PSPBilling" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })
+
+                @Html.ActionLink("Print Client Invoice", "PrintClientInvoice", new { id = item.Id, returnView = "PSPBilling" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" })*@
+
+                @Html.ActionLink("Print Client", "PrintClientInvoice", new { id = item.Id }, new { @class = "print", @target = "_blank", @data_print_billing_invoice = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#billinginvoice", @rel = "tipsyE", @title = "Print this Billing Invoice?" })
+
+                @Html.ActionLink("Print PSP", "PrintPSPInvoice", new { id = item.Id }, new { @class = "print", @target = "_blank", @data_print_billing_invoice = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#billinginvoice", @rel = "tipsyE", @title = "Print this Billing Invoice?" })
+
+            </td>
+
+        </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@*@Html.Partial( "_BillingCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
+
+@Html.Partial("_Paging")

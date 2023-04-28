@@ -15,5 +15,11 @@ namespace ACT.Core.Enums
 
         [StringEnumDisplayText( "Client Monitor Timer" )]
         ClientMonitorTimer = 2,
+
+        [StringEnumDisplayText("PSP Billing Monitor Timer")]
+        PSPBillingMonitorTimer = 3,
+
+        [StringEnumDisplayText("Billing Invoice Monitor Timer")]
+        BillingInvoiceMonitorTimer = 4,
     }
 }

@@ -122,7 +122,7 @@ namespace ACT.UI.Models
         public decimal? Rate { get; set; }
 
         [Display( Name = "Rate Unit" )]
-        public int? RateUnit { get; set; }
+        public RateUnit RateUnit { get; set; }
 
         [Display( Name = "Start Date" )]
         public DateTime? StartDate { get; set; }

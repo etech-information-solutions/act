@@ -3,6 +3,8 @@
 
 @using ACT.Core.Enums;
 @using ACT.Core.Models.Custom;
+@using ACT.Core.Models;
+
 
 @{
     ViewBag.ShowExport = true;
@@ -11,21 +13,40 @@
 }
 
 
-@Html.Partial( "_Notification" )
+@Html.Partial("_Notification")
 
 @{
+    UserModel user = User.Get();
+
     int count = Model.Start;
-    List<PSPBillingCustomModel> items = ( List<PSPBillingCustomModel> ) Model.Items;
+    List<PSPBillingCustomModel> items = (List<PSPBillingCustomModel>)Model.Items;
 }
 
-@if ( Model == null || !items.Any() )
+@if (Model == null || !items.Any())
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
         There are no Billing items available matching your search criteria.
     </div>
 }
 
-<table id="billing-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#billing-table_wrapper" data-starting-point=".ap-tabs ul">
+
+@if (user.IsAdmin || user.IsPSPAdmin)
+{
+    <p>
+        @Html.ActionLink("AddPSPBilling", "Billing", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Billing Record?", @data_edit = "1", @data_id = 0, @data_target = "#pspbilling" })
+        <span class="loader"></span>
+    
+
+   
+        @Html.ActionLink("Xero Interface", "Billing", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Billing Record?", @data_edit = "1", @data_id = 0, @data_target = "#pspbilling" })
+        <span class="loader"></span>
+    </p>
+}
+
+
+
+
+<table id="pspbilling-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#pspbilling-table_wrapper" data-starting-point=".ap-tabs ul">
 
     <thead>
         <tr>
@@ -62,16 +83,16 @@
             <th data-name="NominatedAccount" data-column="b.NominatedAccount">
                 Nominated Account
             </th>
-            @*<th data-name="Actions">
+            <th data-name="Actions">
                     Actions
-                </th>*@
+                </th>
         </tr>
     </thead>
 
     <tbody>
-        @if ( Model != null && items != null && items.Count() > 0 )
+        @if (Model != null && items != null && items.Count() > 0)
         {
-            foreach ( var item in items )
+            foreach (var item in items)
             {
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item">
 
@@ -128,4 +149,4 @@
 
 @*@Html.Partial( "_BillingCustomSearch", new ACT.Core.Models.CustomSearchModel() )*@
 
-@Html.Partial( "_Paging" )
+@Html.Partial("_Paging")

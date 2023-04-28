@@ -4,9 +4,9 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="e9564c2a9b2949ffa97edfafe5f410d3" Name="Diagram1" ZoomLevel="87">
+      <Diagram DiagramId="e9564c2a9b2949ffa97edfafe5f410d3" Name="Diagram1" ZoomLevel="49">
         <EntityTypeShape EntityType="ACTModel.AuditLog" Width="1.5" PointX="0.75" PointY="5.75" />
-        <EntityTypeShape EntityType="ACTModel.Bank" Width="1.5" PointX="0.75" PointY="1.375" />
+        <EntityTypeShape EntityType="ACTModel.Bank" Width="1.5" PointX="0.75" PointY="3" />
         <EntityTypeShape EntityType="ACTModel.BankDetail" Width="1.5" PointX="3" PointY="1" />
         <EntityTypeShape EntityType="ACTModel.Broadcast" Width="1.5" PointX="3.75" PointY="67.25" />
         <EntityTypeShape EntityType="ACTModel.ChepAudit" Width="1.5" PointX="13.5" PointY="70" />
@@ -22,10 +22,10 @@
         <EntityTypeShape EntityType="ACTModel.ClientProduct" Width="1.5" PointX="24.75" PointY="33.375" />
         <EntityTypeShape EntityType="ACTModel.ClientProductMonthly" Width="1.5" PointX="27" PointY="33.625" />
         <EntityTypeShape EntityType="ACTModel.ClientUser" Width="1.5" PointX="6" PointY="62.5" />
-        <EntityTypeShape EntityType="ACTModel.Comment" Width="1.5" PointX="3" PointY="110.25" />
+        <EntityTypeShape EntityType="ACTModel.Comment" Width="1.5" PointX="3.75" PointY="80.75" />
         <EntityTypeShape EntityType="ACTModel.Contact" Width="1.5" PointX="4.75" PointY="5.75" />
         <EntityTypeShape EntityType="ACTModel.DeclineReason" Width="1.5" PointX="6.75" PointY="5.75" />
-        <EntityTypeShape EntityType="ACTModel.DeliveryNoteLine" Width="1.5" PointX="21" PointY="35.125" />
+        <EntityTypeShape EntityType="ACTModel.DeliveryNoteLine" Width="1.5" PointX="22.125" PointY="35.125" />
         <EntityTypeShape EntityType="ACTModel.Dispute" Width="1.5" PointX="6" PointY="43" />
         <EntityTypeShape EntityType="ACTModel.DisputeReason" Width="1.5" PointX="3.75" PointY="31.75" />
         <EntityTypeShape EntityType="ACTModel.Document" Width="1.5" PointX="12" PointY="75.75" />
@@ -160,7 +160,7 @@
         <AssociationConnector Association="ACTModel.FK_UserNotification_User" />
         <AssociationConnector Association="ACTModel.FK_UserRoles_Users" />
         <AssociationConnector Association="ACTModel.FK_UserTask_User" />
-        <EntityTypeShape EntityType="ACTModel.SystemConfig" Width="1.5" PointX="11.375" PointY="0.75" />
+        <EntityTypeShape EntityType="ACTModel.SystemConfig" Width="6.25" PointX="18" PointY="1.625" />
         <EntityTypeShape EntityType="ACTModel.ClientLoad" Width="1.5" PointX="26.75" PointY="46.5" />
         <EntityTypeShape EntityType="ACTModel.Country" Width="1.5" PointX="7.375" PointY="30.5" />
         <EntityTypeShape EntityType="ACTModel.Province" Width="1.5" PointX="9.625" PointY="23.875" />
@@ -190,6 +190,14 @@
         <AssociationConnector Association="ACTModel.FK_DeliveryNote_Province1" />
         <AssociationConnector Association="ACTModel.FK_DeliveryNote_Province2" />
         <AssociationConnector Association="ACTModel.FK_Region_Province" />
+        <EntityTypeShape EntityType="ACTModel.BillingInvoice" Width="1.5" PointX="7.75" PointY="12.125" />
+        <EntityTypeShape EntityType="ACTModel.sysdiagram" Width="1.5" PointX="5.75" PointY="0.75" />
+        <EntityTypeShape EntityType="ACTModel.EquipmentCost" Width="1.5" PointX="13.125" PointY="2.375" />
+        <AssociationConnector Association="ACTModel.FK_BillingInvoice_Clients" />
+        <AssociationConnector Association="ACTModel.FK_BillingInvoice_PSPBillings" />
+        <AssociationConnector Association="ACTModel.FK_BillingInvoice_PSPs" />
+        <EntityTypeShape EntityType="ACTModel.BillingInvoiceLineItem" Width="1.5" PointX="14.625" PointY="6.25" />
+        <AssociationConnector Association="ACTModel.FK_BillingInvoiceLineItem_BillingInvoice" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

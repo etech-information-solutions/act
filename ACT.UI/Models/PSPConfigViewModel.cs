@@ -90,6 +90,8 @@ namespace ACT.UI.Models
 
         [Display( Name = "Import Use SSL" )]
         public YesNo ImportUseSSL { get; set; }
+        [Display(Name = "Collection Run Time")]
+        public TimeSpan? CollectionRunTime { get; set; }
 
         #endregion
 
