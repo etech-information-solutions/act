@@ -32,20 +32,20 @@
 @if (user.IsAdmin || user.IsPSPAdmin)
 {
     <p>
-        @Html.ActionLink("Add PSP Billing", "AddPSPBilling", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Billing Record?", @data_edit = "1", @data_id = 0, @data_target = "#pspbilling" })
+        @*@Html.ActionLink("Add PSP Billing", "AddPSPBilling", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Billing Record?", @data_edit = "1", @data_id = 0, @data_target = "#pspbilling" })
         <span class="loader"></span>
 
         @Html.ActionLink("Process All Billing", "ProcessAllPSPBilling", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add all new Billing Record?", @data_edit = "1", @data_id = 0, @data_target = "#pspbilling" })
-        <span class="loader"></span>
+        <span class="loader"></span>*@
 
         @Html.ActionLink("Process PSP", "ProcessPSP", new { }, new { @class = "add", @rel = "tipsyS", @title = "Show a new invoice record?", @data_edit = "1", @data_id = 0, @data_target = "#billinginvoice" })
         <span class="loader"></span>
 
-        @Html.ActionLink("Generate Client Invoice", "GetClientInvoice", new { }, new { @class = "add", @rel = "tipsyS", @title = "Show a new invoice record?", @data_edit = "1", @data_id = 0, @data_target = "#billinginvoice" })
-        <span class="loader"></span>
+        @*@Html.ActionLink("Generate Client Invoice", "GetClientInvoice", new { }, new { @class = "add", @rel = "tipsyS", @title = "Show a new invoice record?", @data_edit = "1", @data_id = 0, @data_target = "#billinginvoice" })
+        <span class="loader"></span>*@
 
-        @Html.ActionLink("Xero Interface", "PSPBilling", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Billing Record?", @data_edit = "1", @data_id = 0, @data_target = "#pspbilling" })
-        <span class="loader"></span>
+        @*@Html.ActionLink("Xero Interface", "PSPBilling", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Billing Record?", @data_edit = "1", @data_id = 0, @data_target = "#pspbilling" })
+        <span class="loader"></span>*@
     </p>
 }
 

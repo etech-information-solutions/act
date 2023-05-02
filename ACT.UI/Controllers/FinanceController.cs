@@ -190,12 +190,9 @@ namespace ACT.UI.Controllers
                     var trans = pservice.TransactionalPSPProductList(pc.PSPId);
                     var monthly = pservice.MonthlyPSPProductList(pc.PSPId);
                     var annually = pservice.AnnualPSPProductList(pc.PSPId);
-                    if (monthly == null)
+                    if (monthly.Count()>0)
                     {
-                        continue;
-                    }
-                    else
-                    {
+                   
                         foreach (PSPProduct pp in monthly)
                         {
                             PSPBilling pb = new PSPBilling();
@@ -232,7 +229,7 @@ namespace ACT.UI.Controllers
                                 else { continue; }
                             }
                         }
-                        if (trans != null)
+                        if (trans.Count()>0)
                         {
                             foreach (PSPProduct pp in trans)
                             {
@@ -288,7 +285,7 @@ namespace ACT.UI.Controllers
                                 }
                             }
                         }
-                        if (annually != null && (month==1 || month ==6) )
+                        if (annually.Count()>0 && (month==1 || month ==6) )
                         {
                             foreach (PSPProduct pp in annually)
                             {
@@ -486,7 +483,7 @@ namespace ACT.UI.Controllers
                                 }
                                 else 
                                 { 
-                                    GetClientInvoice(c.ClientId);
+                                    GetClientInvoice(c);
                                 }
                             }
                         }
@@ -612,6 +609,10 @@ namespace ACT.UI.Controllers
                         //return RedirectToAction("PSPBilling");
                        // continue;
                     }
+                    else if(address == null)
+                    {
+                        Notify($"Address cannot be null, please update your records. Try a different PSP Billing.", NotificationType.Error);
+                    }
                     else
                     {
 
@@ -649,14 +650,14 @@ namespace ACT.UI.Controllers
         }
 
         // GET: /Finance/GenerateClientInvoice/5
-        public ActionResult GetClientInvoice(int id) 
+        public ActionResult GetClientInvoice(PSPBilling model) 
         {
-            PSPBilling model;
+            //PSPBilling model;
 
-            using (PSPBillingService service = new PSPBillingService())
-            {
-                model = service.GetById(id);
-            }
+            //using (PSPBillingService service = new PSPBillingService())
+            //{
+            //    model = service.GetById(id);
+            //}
 
 
             if (model == null)
@@ -763,6 +764,10 @@ namespace ACT.UI.Controllers
                 {
                     Notify($"There is a Active Billing invoice already in the table. Try a different PSP Billing.", NotificationType.Error);
                     //return RedirectToAction("PSPBilling");
+                }
+                else if (address == null)
+                {
+                    Notify($"Address cannot be null, please update your records. Try a different PSP Billing.", NotificationType.Error);
                 }
                 else
                 {
@@ -961,6 +966,12 @@ namespace ACT.UI.Controllers
                 if (prod == null)
                 {
                     Notify("Sorry, that psp billing does not exist! Please specify a valid psp link Id and try again.", NotificationType.Error);
+
+                    return View(model);
+                }
+                if (model.PaymentAmount != model.InvoiceAmount)
+                {
+                    Notify("Sorry, part payments are not allowed, only pay the invoice amount and try again.", NotificationType.Error);
 
                     return View(model);
                 }

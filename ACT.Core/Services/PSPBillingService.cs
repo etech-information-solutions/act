@@ -403,7 +403,7 @@ namespace ACT.Core.Services
         public override PSPBilling GetById(int id)
         {
             return context.PSPBillings                        
-                          .FirstOrDefault(c => c.ClientId == id);
+                          .FirstOrDefault(c => c.Id == id);
         }
 
         public PSPBilling GetPSPDetails(int id)
@@ -502,6 +502,28 @@ namespace ACT.Core.Services
             if (tt.Count() > 0)
             {
                 var checkRecord = (from s in context.PSPBillings where  s.PaymentAmount == null && s.PaymentDate == null select s).ToList();
+
+                if (checkRecord.Count() > 0)
+                {
+                    return checkRecord;
+                }
+                else { return null; }
+            }
+            else
+                return null;
+
+        }
+
+        /// </summary>      
+        /// 
+        /// <param name="model">model of the user to be fetched</param>
+        /// <returns></returns>
+        public List<PSPBilling> GetAllPSPBillingList()
+        {
+            var tt = (from d in context.PSPBillings select d);
+            if (tt.Count() > 0)
+            {
+                var checkRecord = (from s in context.PSPBillings select s).ToList();
 
                 if (checkRecord.Count() > 0)
                 {
