@@ -61,6 +61,8 @@ namespace ACT.Core.Services
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmToSiteId", csm.ToSiteId ) },
+                { new SqlParameter( "csmRegionId", csm.RegionId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmDisputeReasonId", csm.DisputeReasonId ) },
                 { new SqlParameter( "csmDisputeStatus", ( int ) csm.DisputeStatus ) },
@@ -131,6 +133,14 @@ namespace ACT.Core.Services
             if ( csm.SiteId != 0 )
             {
                 query = $"{query} AND (s.SiteId=@csmSiteId) ";
+            }
+            if ( csm.ToSiteId > 0 )
+            {
+                query = $"{query} AND (s2.Id=@ToSiteId)";
+            }
+            if ( csm.RegionId > 0 )
+            {
+                query = $"{query} AND (s.[RegionId]=@csmRegionId OR s2.[RegionId]=@csmRegionId) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -208,6 +218,8 @@ namespace ACT.Core.Services
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmToSiteId", csm.ToSiteId ) },
+                { new SqlParameter( "csmRegionId", csm.RegionId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmDisputeReasonId", csm.DisputeReasonId ) },
                 { new SqlParameter( "csmDisputeStatus", ( int ) csm.DisputeStatus ) },
@@ -288,6 +300,14 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (s.SiteId=@csmSiteId) ";
             }
+            if ( csm.ToSiteId > 0 )
+            {
+                query = $"{query} AND (s2.Id=@ToSiteId)";
+            }
+            if ( csm.RegionId > 0 )
+            {
+                query = $"{query} AND (s.[RegionId]=@csmRegionId OR s2.[RegionId]=@csmRegionId) ";
+            }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
@@ -363,6 +383,7 @@ namespace ACT.Core.Services
             List<object> parameters = new List<object>()
             {
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmToSiteId", csm.ToSiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmGroupId", ( int ) csm.GroupId ) },
                 { new SqlParameter( "csmRegionId", ( int ) csm.RegionId ) },
@@ -414,7 +435,11 @@ namespace ACT.Core.Services
 
             if ( csm.SiteId > 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=cl.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs, [dbo].[ClientCustomer] cc WHERE cl.[ClientId]=cc.[ClientId] AND cc.[Id]=cs.[ClientCustomerId] AND cs.[SiteId]=@csmSiteId) ";
+            }
+            if ( csm.ToSiteId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs, [dbo].[ClientCustomer] cc WHERE cl.[ClientId]=cc.[ClientId] AND cc.[Id]=cs.[ClientCustomerId] AND cs.[SiteId]=@csmToSiteId) ";
             }
 
             if ( csm.GroupId > 0 )
@@ -424,7 +449,7 @@ namespace ACT.Core.Services
 
             if ( csm.RegionId > 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=cl.[ClientId] AND s.[RegionId]=@csmRegionId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND s.[RegionId]=@csmRegionId AND cs.[Id]=cl.[ClientSiteId]) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )

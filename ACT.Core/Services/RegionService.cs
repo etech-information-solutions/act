@@ -231,7 +231,7 @@ namespace ACT.Core.Services
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        public Dictionary<int, string> List( bool v )
+        public Dictionary<int, string> List( bool v = true, bool hasClientLoads = false )
         {
             Dictionary<int, string> pspOptions = new Dictionary<int, string>();
             List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
@@ -246,6 +246,11 @@ namespace ACT.Core.Services
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
                 query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu WHERE pu.UserId=@userid AND pu.PSPId=r.PSPId)";
+            }
+
+            if ( hasClientLoads )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs, [dbo].[ClientLoad] cl WHERE s.[RegionId]=r.[Id] AND cs.[SiteId]=s.[Id] AND (cs.Id=cl.[ClientSiteId] OR cs.Id=cl.[ToClientSiteId]))";
             }
 
             model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();

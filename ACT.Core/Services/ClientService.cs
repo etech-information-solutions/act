@@ -22,7 +22,7 @@ namespace ACT.Core.Services
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        public Dictionary<int, string> List( bool v, int siteId = 0, List<int> siteIds = null )
+        public Dictionary<int, string> List( bool v, int siteId = 0, List<int> siteIds = null, bool hasClientLoads = false )
         {
             Dictionary<int, string> clientOptions = new Dictionary<int, string>();
             List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
@@ -51,6 +51,11 @@ namespace ACT.Core.Services
             else if ( siteIds.NullableAny() )
             {
                 query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.SiteId IN({string.Join( ",", siteIds )}) AND cs.ClientId=c.Id)";
+            }
+
+            if ( hasClientLoads )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientLoad] cl WHERE c.[Id]=cl.[ClientId])";
             }
 
             model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();

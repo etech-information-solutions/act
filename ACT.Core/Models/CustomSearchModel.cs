@@ -502,6 +502,8 @@ namespace ACT.Core.Models
 
         public Dictionary<int, string> SiteOptions { get; set; }
 
+        public Dictionary<int, string> ToSiteOptions { get; set; }
+
         public Dictionary<int, string> ClientOptions { get; set; }
 
         public Dictionary<int, string> ProductOptions { get; set; }
@@ -654,10 +656,12 @@ namespace ACT.Core.Models
                     using ( ClientService cservice = new ClientService() )
                     using ( ProductService pservice = new ProductService() )
                     {
-                        SiteOptions = sservice.List( true );
-                        RegionOptions = rservice.List( true );
-                        ClientOptions = cservice.List( true );
-                        ProductOptions = pservice.List( true );
+                        SiteOptions = sservice.ListSuppliers();
+                        ToSiteOptions = sservice.ListCustomers();
+
+                        RegionOptions = rservice.List( true, true );
+                        ClientOptions = cservice.List( true, 0, null, true );
+                        //ProductOptions = pservice.List( true );
                     }
 
                     break;

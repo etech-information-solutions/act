@@ -51,6 +51,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmRegionId", csm.RegionId ) },
                 { new SqlParameter( "csmToSiteId", csm.ToSiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmVehicleId", csm.VehicleId ) },
@@ -116,6 +117,10 @@ namespace ACT.Core.Services
             if ( csm.ToSiteId > 0 )
             {
                 query = $"{query} AND (s2.Id=@csmToSiteId)";
+            }
+            if ( csm.RegionId > 0 )
+            {
+                query = $"{query} AND (s.[RegionId]=@csmRegionId OR s2.[RegionId]=@csmRegionId) ";
             }
             if ( csm.ClientId > 0 )
             {
@@ -233,6 +238,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "skip", pm.Skip ) },
                 { new SqlParameter( "take", pm.Take ) },
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmRegionId", csm.RegionId ) },
                 { new SqlParameter( "csmToSiteId", csm.ToSiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmVehicleId", csm.VehicleId ) },
@@ -313,6 +319,10 @@ namespace ACT.Core.Services
             if ( csm.ToSiteId > 0 )
             {
                 query = $"{query} AND (s2.Id=@csmToSiteId)";
+            }
+            if ( csm.RegionId > 0 )
+            {
+                query = $"{query} AND (s.[RegionId]=@csmRegionId OR s2.[RegionId]=@csmRegionId) ";
             }
             if ( csm.ClientId > 0 )
             {
@@ -509,7 +519,7 @@ namespace ACT.Core.Services
 
             if ( csm.ToSiteId > 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[Id]=ch.[ToSiteId] AND cs.[SiteId]=@csmToSiteId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[Id]=ch.[ToClientSiteId] AND cs.[SiteId]=@csmToSiteId) ";
             }
 
             if ( csm.GroupId > 0 )
@@ -519,7 +529,7 @@ namespace ACT.Core.Services
 
             if ( csm.RegionId > 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=ch.[ClientId] AND s.[RegionId]=@csmRegionId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND s.[RegionId]=@csmRegionId AND (cs.[Id]=ch.[ClientSiteId] OR cs.[Id]=ch.[ToClientSiteId])) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -562,6 +572,7 @@ namespace ACT.Core.Services
             List<object> parameters = new List<object>()
             {
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmToSiteId", csm.ToSiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmGroupId", ( int ) csm.GroupId ) },
                 { new SqlParameter( "csmRegionId", ( int ) csm.RegionId ) },
@@ -611,7 +622,11 @@ namespace ACT.Core.Services
 
             if ( csm.SiteId > 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=cl.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[Id]=cl.[ClientSiteId] AND cs.[SiteId]=@csmSiteId) ";
+            }
+            if ( csm.ToSiteId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[Id]=cl.[ToClientSiteId] AND cs.[SiteId]=@csmToSiteId) ";
             }
 
             if ( csm.GroupId > 0 )
@@ -621,7 +636,7 @@ namespace ACT.Core.Services
 
             if ( csm.RegionId > 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=cl.[ClientId] AND s.[RegionId]=@csmRegionId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND s.[RegionId]=@csmRegionId AND (cs.[Id]=cl.[ClientSiteId] OR cs.[Id]=cl.[ToClientSiteId])) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -659,6 +674,7 @@ namespace ACT.Core.Services
             List<object> parameters = new List<object>()
             {
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmToSiteId", csm.ToSiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmGroupId", ( int ) csm.GroupId ) },
                 { new SqlParameter( "csmRegionId", ( int ) csm.RegionId ) },
@@ -718,8 +734,14 @@ namespace ACT.Core.Services
 
             if ( csm.SiteId > 0 )
             {
-                clQuery = $"{clQuery} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=cl.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
-                caQuery = $"{caQuery} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=cl.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
+                clQuery = $"{clQuery} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[Id]=cl.[ClientSiteId] AND cs.[SiteId]=@csmSiteId) ";
+                caQuery = $"{caQuery} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[Id]=cl.[ClientSiteId] AND cs.[SiteId]=@csmSiteId) ";
+            }
+
+            if ( csm.ToSiteId > 0 )
+            {
+                clQuery = $"{clQuery} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[Id]=cl.[ToClientSiteId] AND cs.[SiteId]=@csmToSiteId) ";
+                caQuery = $"{caQuery} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[Id]=cl.[ToClientSiteId] AND cs.[SiteId]=@csmToSiteId) ";
             }
 
             if ( csm.GroupId > 0 )
@@ -730,8 +752,8 @@ namespace ACT.Core.Services
 
             if ( csm.RegionId > 0 )
             {
-                clQuery = $"{clQuery} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=cl.[ClientId] AND s.[RegionId]=@csmRegionId) ";
-                caQuery = $"{caQuery} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=cl.[ClientId] AND s.[RegionId]=@csmRegionId) ";
+                clQuery = $"{clQuery} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND s.[RegionId]=@csmRegionId AND (cs.[Id]=cl.[ClientSiteId] OR cs.[Id]=cl.[ToClientSiteId])) ";
+                caQuery = $"{caQuery} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND s.[RegionId]=@csmRegionId AND (cs.[Id]=cl.[ClientSiteId] OR cs.[Id]=cl.[ToClientSiteId])) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
@@ -760,6 +782,7 @@ namespace ACT.Core.Services
             parameters = new List<object>()
             {
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmToSiteId", csm.ToSiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmGroupId", ( int ) csm.GroupId ) },
                 { new SqlParameter( "csmRegionId", ( int ) csm.RegionId ) },
@@ -792,6 +815,7 @@ namespace ACT.Core.Services
             List<object> parameters = new List<object>()
             {
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
+                { new SqlParameter( "csmToSiteId", csm.ToSiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
                 { new SqlParameter( "csmGroupId", ( int ) csm.GroupId ) },
                 { new SqlParameter( "csmRegionId", ( int ) csm.RegionId ) },
@@ -843,7 +867,11 @@ namespace ACT.Core.Services
 
             if ( csm.SiteId > 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE cs.[ClientId]=cl.[ClientId] AND cs.[SiteId]=@csmSiteId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs, [dbo].[ClientCustomer] cc WHERE cl.[ClientId]=cc.[ClientId] AND cc.[Id]=cs.[ClientCustomerId] AND cs.[SiteId]=@csmSiteId) ";
+            }
+            if ( csm.ToSiteId > 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs, [dbo].[ClientCustomer] cc WHERE cl.[ClientId]=cc.[ClientId] AND cc.[Id]=cs.[ClientCustomerId] AND cs.[SiteId]=@csmToSiteId) ";
             }
 
             if ( csm.GroupId > 0 )
@@ -853,7 +881,7 @@ namespace ACT.Core.Services
 
             if ( csm.RegionId > 0 )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND cs.[ClientId]=cl.[ClientId] AND s.[RegionId]=@csmRegionId) ";
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Site] s, [dbo].[ClientSite] cs WHERE s.[Id]=cs.[SiteId] AND s.[RegionId]=@csmRegionId AND (cs.[Id]=cl.[ClientSiteId] OR cs.[Id]=cl.[ToClientSiteId])) ";
             }
 
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
