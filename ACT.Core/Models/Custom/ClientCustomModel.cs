@@ -48,6 +48,9 @@ namespace ACT.Core.Models.Custom
 
         public string PSPCompanyName { get; set; }
 
+        public string PrimaryChepReference { get; set; }
+        public string AdditionalChepReferences { get; set; }
+
         public DateTime? ContractRenewalDate { get; set; }
 
 

@@ -76,8 +76,8 @@
                 Status
             </th>
             @*<th data-name="UserCount" data-column="UserCount">
-                Users
-            </th>*@
+                    Users
+                </th>*@
             <th data-name="ProductCount" data-column="ProductCount">
                 Products
             </th>
@@ -150,7 +150,14 @@
                             <a class="block" href="mailto:@item.AdminEmail">@item.AdminEmail</a>
                         </td>*@
                     <td>
-                        @item.ChepReference
+                        @if ( !string.IsNullOrEmpty( item.PrimaryChepReference ) )
+                        {
+                            <div>Primary: @item.PrimaryChepReference</div>
+                        }
+                        @if ( !string.IsNullOrEmpty( item.AdditionalChepReferences ) )
+                        {
+                            <div>Additional: @item.AdditionalChepReferences</div>
+                        }
                     </td>
                     <td>
                         @serviceType.GetDisplayText()
@@ -164,11 +171,11 @@
                         }
                     </td>
                     @*<td>
-                        @if ( item.UserCount > 0 )
-                        {
-                            @Html.ActionLink( item.UserCount.ToString(), "ClientUsers", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                        }
-                    </td>*@
+                            @if ( item.UserCount > 0 )
+                            {
+                                @Html.ActionLink( item.UserCount.ToString(), "ClientUsers", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            }
+                        </td>*@
                     <td>
                         @if ( item.ProductCount > 0 )
                         {

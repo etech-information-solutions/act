@@ -132,6 +132,12 @@ namespace ACT.UI.Models
 
         #endregion
 
+        [Display( Name = "Primary Chep Reference" )]
+        public string PrimaryChepReference { get; set; }
+
+        [Display( Name = "Additional Chep References" )]
+        public string AdditionalChepReferences { get; set; }
+
 
         #region Model Options
 

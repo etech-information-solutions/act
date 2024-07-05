@@ -237,19 +237,21 @@ namespace ACT.Core.Services
             #endregion
 
             string query = @"SELECT
-                                c.*,
-                                p.CompanyName as [PSPCompanyName],
-                                pc.ContractRenewalDate as [ContractRenewalDate],
-                                (SELECT COUNT(1) FROM [dbo].[ClientUser] cu WHERE c.Id=cu.ClientId) AS [UserCount],
-                                (SELECT COUNT(1) FROM [dbo].[ClientBudget] cb WHERE c.Id=cb.ClientId) AS [BudgetCount],
-                                (SELECT COUNT(1) FROM [dbo].[ClientProduct] cp WHERE c.Id=cp.ClientId) AS [ProductCount],
-                                (SELECT COUNT(1) FROM [dbo].[Document] d WHERE c.Id=d.ObjectId AND d.ObjectType='Client') AS [DocumentCount],
-                                (SELECT COUNT(1) FROM [dbo].[EstimatedLoad] el WHERE c.Id=el.ObjectId AND el.ObjectType='Client') AS [EstimatedLoadCount],
-                                (SELECT COUNT(1) FROM [dbo].[ClientInvoice] ci, [dbo].[ClientLoad] cl WHERE cl.Id=ci.ClientLoadId AND c.Id=cl.ClientId) AS [InvoiceCount]
-                             FROM
-                                [dbo].[Client] c
-                                LEFT OUTER JOIN [dbo].[PSPClient] pc ON pc.Id=(SELECT TOP 1 pc1.Id FROM [dbo].[PSPClient] pc1 WHERE pc1.ClientId=pc.ClientId AND pc1.ClientId=c.Id)
-                                LEFT OUTER JOIN [dbo].[PSP] p ON p.Id=pc.PSPId";
+            c.*,
+            p.CompanyName as [PSPCompanyName],
+            pc.ContractRenewalDate as [ContractRenewalDate],
+            (SELECT COUNT(1) FROM [dbo].[ClientUser] cu WHERE c.Id=cu.ClientId) AS [UserCount],
+            (SELECT COUNT(1) FROM [dbo].[ClientBudget] cb WHERE c.Id=cb.ClientId) AS [BudgetCount],
+            (SELECT COUNT(1) FROM [dbo].[ClientProduct] cp WHERE c.Id=cp.ClientId) AS [ProductCount],
+            (SELECT COUNT(1) FROM [dbo].[Document] d WHERE c.Id=d.ObjectId AND d.ObjectType='Client') AS [DocumentCount],
+            (SELECT COUNT(1) FROM [dbo].[EstimatedLoad] el WHERE c.Id=el.ObjectId AND el.ObjectType='Client') AS [EstimatedLoadCount],
+            (SELECT COUNT(1) FROM [dbo].[ClientInvoice] ci, [dbo].[ClientLoad] cl WHERE cl.Id=ci.ClientLoadId AND c.Id=cl.ClientId) AS [InvoiceCount],
+            c.ChepReference as [PrimaryChepReference],
+            (SELECT STRING_AGG(cca.ChepReference, ', ') FROM [dbo].[ClientChepAccount] cca WHERE c.Id=cca.ClientId AND cca.Status = 1) AS [AdditionalChepReferences]
+         FROM
+            [dbo].[Client] c
+            LEFT OUTER JOIN [dbo].[PSPClient] pc ON pc.Id=(SELECT TOP 1 pc1.Id FROM [dbo].[PSPClient] pc1 WHERE pc1.ClientId=pc.ClientId AND pc1.ClientId=c.Id)
+            LEFT OUTER JOIN [dbo].[PSP] p ON p.Id=pc.PSPId";
 
             // WHERE
 
