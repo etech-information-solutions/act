@@ -3379,13 +3379,12 @@ namespace ACT.UI.Controllers
                         ProductPrice pp = new ProductPrice()
                         {
                             ProductId = product.Id,
-                            Rate = price.Rate ?? 0,
+                            Rate = ( decimal ) Math.Round( ( double ) ( price.Rate ?? 0 ), 2 ),
                             Type = ( int ) price.Type,
                             RateUnit = price.RateUnit,
                             FromDate = price.StartDate,
                             Status = ( int ) price.Status,
                         };
-
                         ppservice.Create( pp );
                     }
                 }
@@ -3406,24 +3405,25 @@ namespace ACT.UI.Controllers
 
                     string now = DateTime.Now.ToString( "yyyyMMddHHmmss" );
 
-                    Document doc = new Document()
+                    if ( model.File != null && model.File.File != null )
                     {
-                        ObjectId = product.Id,
-                        ObjectType = "Product",
-                        Name = model.File.Name,
-                        Category = model.File.Name,
-                        Status = ( int ) Status.Active,
-                        Title = model.File.File.FileName,
-                        Size = model.File.File.ContentLength,
-                        Description = model.File.Description,
-                        Type = Path.GetExtension( model.File.File.FileName ),
-                        Location = $"Product/{model.Name.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/{now}-{model.File.File.FileName}"
-                    };
-
-                    dservice.Create( doc );
-
-                    string fullpath = Path.Combine( path, $"{now}-{model.File.File.FileName}" );
-                    model.File.File.SaveAs( fullpath );
+                        Document doc = new Document()
+                        {
+                            ObjectId = product.Id,
+                            ObjectType = "Product",
+                            Name = model.File.Name,
+                            Category = model.File.Name,
+                            Status = ( int ) Status.Active,
+                            Title = model.File.File.FileName,
+                            Size = model.File.File.ContentLength,
+                            Description = model.File.Description,
+                            Type = Path.GetExtension( model.File.File.FileName ),
+                            Location = $"Product/{model.Name.Trim().Replace( "/", "_" ).Replace( "\\", "_" )}/{now}-{model.File.File.FileName}"
+                        };
+                        dservice.Create( doc );
+                        string fullpath = Path.Combine( path, $"{now}-{model.File.File.FileName}" );
+                        model.File.File.SaveAs( fullpath );
+                    }
                 }
 
                 #endregion

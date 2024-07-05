@@ -107,51 +107,40 @@ namespace ACT.Core.Services
             }
 
             // Parameters
-
             #region Parameters
-
             List<object> parameters = new List<object>()
             {
-                { new SqlParameter( "skip", pm.Skip ) },
-                { new SqlParameter( "take", pm.Take ) },
-                { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
-                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                //{ new SqlParameter( "clientid", clientId > 0 ? clientId : 0 ) },
+                { new SqlParameter("skip", pm.Skip) },
+                { new SqlParameter("take", pm.Take) },
+                { new SqlParameter("query", csm.Query ?? (object)DBNull.Value) },
+                { new SqlParameter("csmToDate", csm.ToDate ?? (object)DBNull.Value) },
+                { new SqlParameter("userid", (CurrentUser != null) ? CurrentUser.Id : 0) },
+                { new SqlParameter("csmFromDate", csm.FromDate ?? (object)DBNull.Value) },
+                { new SqlParameter("clientid", csm.ClientId > 0 ? csm.ClientId : 0) },
             };
-
             #endregion
 
             string query = @"SELECT
-                                p.*,
-                                (SELECT COUNT(1) FROM [dbo].[ProductPrice] pp WHERE pp.ProductId=p.Id) AS [ProductPriceCount],
-                                (SELECT COUNT(1) FROM [dbo].[Document] d WHERE p.Id=d.ObjectId AND d.ObjectType='Product') AS [DocumentCount]
-                             FROM
-                                [dbo].[Product] p";
+                        p.*,
+                        (SELECT COUNT(1) FROM [dbo].[ProductPrice] pp WHERE pp.ProductId=p.Id) AS [ProductPriceCount],
+                        (SELECT COUNT(1) FROM [dbo].[Document] d WHERE p.Id=d.ObjectId AND d.ObjectType='Product') AS [DocumentCount]
+                     FROM
+                        [dbo].[Product] p";
 
             // WHERE
-
             #region WHERE
-
             query = $"{query} WHERE (1=1)";
-
             #endregion
 
             #region WHERE IF CLIENT
-
             if ( csm.ClientId > 0 )
             {
                 query = $"{query} AND EXISTS (SELECT Id FROM [dbo].[ClientProduct] cp WHERE cp.ProductId = p.Id AND cp.ClientId = @clientid)";
             }
-
             #endregion
 
-
             // Custom Search
-
             #region Custom Search
-
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
                 query = $"{query} AND (p.CreatedOn >= @csmFromDate AND p.CreatedOn <= @csmToDate) ";
@@ -167,28 +156,22 @@ namespace ACT.Core.Services
                     query = $"{query} AND (p.CreatedOn<=@csmToDate) ";
                 }
             }
-
             #endregion
 
             // Normal Search
-
             #region Normal Search
-
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
                 query = string.Format( @"{0} AND (p.[Name] LIKE '%{1}%' OR
-                                                  p.[Description] LIKE '%{1}%'
-                                                 ) ", query, csm.Query.Trim() );
+                                          p.[Description] LIKE '%{1}%'
+                                         ) ", query, csm.Query.Trim() );
             }
-
             #endregion
 
             // ORDER
-
             query = $"{query} ORDER BY {pm.SortBy} {pm.Sort}";
 
             // SKIP, TAKE
-
             query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
             List<ProductCustomModel> model = context.Database.SqlQuery<ProductCustomModel>( query, parameters.ToArray() ).ToList();

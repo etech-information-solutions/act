@@ -146,7 +146,7 @@ namespace ACT.UI.Controllers
 
                     using ( ClientProductService service = new ClientProductService() )
                     {
-                        csv = string.Format( "Date Created, Client, Name, Description, Active Date, Hire Rate, Lost Rate, Issue Rate, Passon Rate, Passon Days, Rate Type, Status {0}", Environment.NewLine );
+                        csv = string.Format( "Date Created, Client, Name, Description, Active Date, Hire Rate, Compensation Rate, Issue Rate, Transfer Fee, Passon Days, Rate Type, Status {0}", Environment.NewLine );
 
                         List<ClientProductCustomModel> product = service.List1( pm, csm );
 

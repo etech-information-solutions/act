@@ -43,13 +43,13 @@ namespace ACT.UI.Models
         [Display( Name = "Hire Rate" )]
         public decimal? HireRate { get; set; }
 
-        [Display( Name = "Lost Rate" )]
+        [Display( Name = "Compensation Rate" )]
         public decimal? LostRate { get; set; }
 
         [Display( Name = "Issue Rate" )]
         public decimal? IssueRate { get; set; }
 
-        [Display( Name = "Passon Rate" )]
+        [Display( Name = "Transfer Fee" )]
         public decimal? PassonRate { get; set; }
 
         [Display( Name = "Passon Days" )]

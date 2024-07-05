@@ -16,7 +16,12 @@
     int count = Model.Start;
     List<OutstandingPalletsModel> items = ( List<OutstandingPalletsModel> ) Model.Items;
 
-    DateTime minYear = items.Min( m => m.MinYear );
+    DateTime minYear = DateTime.MaxValue;
+
+    if ( items.Any() )
+    {
+        minYear = items.Min( m => m.MinYear );
+    }
 }
 
 @if ( Model == null || !items.Any() )

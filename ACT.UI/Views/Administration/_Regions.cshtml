@@ -54,9 +54,9 @@
             <th data-name="Province" data-column="pv.Description">
                 Province
             </th>
-            <th data-name="RegionalManagerId" data-column="RegionalManagerId">
+            @*<th data-name="RegionalManagerId" data-column="RegionalManagerId">
                 Regional Manager
-            </th>
+            </th>*@
             <th data-name="Status" data-column="Status">
                 Status
             </th>
@@ -101,9 +101,9 @@
                     <td>
                         @( item.ProvinceName )
                     </td>
-                    <td>
+                    @*<td>
                         @item.RegionManagerName
-                    </td>
+                    </td>*@
                     <td>
                         @status.GetDisplayText()
                     </td>
