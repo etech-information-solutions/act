@@ -37,16 +37,32 @@ namespace ACT.Core.Services
 
         public Dictionary<int, decimal> GetProductRates( int productId, DateTime? date = null )
         {
-            List<ProductPrice> productPrices = GetProductPrices( productId, date );
-            Dictionary<int, decimal> rates = new Dictionary<int, decimal>();
-            foreach ( ProductPrice price in productPrices )
+            date = date ?? DateTime.Now;
+
+            var parameters = new List<object>
             {
-                if ( !rates.ContainsKey( price.Type ) )
-                {
-                    rates[ price.Type ] = price.Rate;
-                }
-            }
-            return rates;
+                new SqlParameter("@productId", productId),
+                new SqlParameter("@date", date)
+            };
+
+            var query = @"
+                        SELECT pp.Type, pp.Rate
+                        FROM [dbo].[ProductPrice] pp
+                        WHERE pp.ProductId = @productId
+                          AND pp.Status = 1
+                          AND pp.FromDate <= @date
+                          AND pp.FromDate = (
+                              SELECT MAX(FromDate)
+                              FROM [dbo].[ProductPrice]
+                              WHERE ProductId = pp.ProductId
+                                AND Type = pp.Type
+                                AND Status = 1
+                                AND FromDate <= @date
+                          )";
+
+            var results = context.Database.SqlQuery<ProductPriceResult>( query, parameters.ToArray() ).ToList();
+
+            return results.ToDictionary( r => r.Type, r => r.Rate );
         }
 
         public ProductPrice GetLatestProductPrice( int productId, ProductPriceType priceType )
@@ -68,6 +84,12 @@ namespace ACT.Core.Services
             ProductPrice latestPrice = context.Database.SqlQuery<ProductPrice>( query, parameters.ToArray() ).FirstOrDefault();
 
             return latestPrice;
+        }
+
+        public class ProductPriceResult
+        {
+            public int Type { get; set; }
+            public decimal Rate { get; set; }
         }
     }
 }
