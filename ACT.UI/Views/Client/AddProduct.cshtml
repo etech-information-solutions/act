@@ -90,6 +90,14 @@
                 </div>
 
                 <div class="edit-label">
+                    @Html.LabelFor( model => model.IssueRate )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.IssueRate, new { @style = "width: 93%;", @placeholder = "Enter Product Issue Rate" } )
+                    @Html.ValidationMessageFor( model => model.IssueRate )
+                </div>
+
+                <div class="edit-label">
                     @Html.LabelFor( model => model.TransportFee )
                 </div>
                 <div class="edit-field">
@@ -103,14 +111,6 @@
                 <div class="edit-field">
                     @Html.TextBoxFor( model => model.RecoveryFee, new { @style = "width: 93%;", @placeholder = "Enter Product Recovery Fee" } )
                     @Html.ValidationMessageFor( model => model.RecoveryFee )
-                </div>
-
-                <div class="edit-label">
-                    @Html.LabelFor( model => model.IssueRate )
-                </div>
-                <div class="edit-field">
-                    @Html.TextBoxFor( model => model.IssueRate, new { @style = "width: 93%;", @placeholder = "Enter Product Issue Rate" } )
-                    @Html.ValidationMessageFor( model => model.IssueRate )
                 </div>
 
                 <div class="edit-label">

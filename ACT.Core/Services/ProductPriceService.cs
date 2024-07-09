@@ -35,20 +35,17 @@ namespace ACT.Core.Services
             return productPrices;
         }
 
-        public Dictionary<ProductPriceType, decimal> GetProductRates( int productId, DateTime? date = null )
+        public Dictionary<int, decimal> GetProductRates( int productId, DateTime? date = null )
         {
             List<ProductPrice> productPrices = GetProductPrices( productId, date );
-
-            Dictionary<ProductPriceType, decimal> rates = new Dictionary<ProductPriceType, decimal>();
-
+            Dictionary<int, decimal> rates = new Dictionary<int, decimal>();
             foreach ( ProductPrice price in productPrices )
             {
-                if ( Enum.IsDefined( typeof( ProductPriceType ), price.Type ) && !rates.ContainsKey( ( ProductPriceType ) price.Type ) )
+                if ( !rates.ContainsKey( price.Type ) )
                 {
-                    rates[ ( ProductPriceType ) price.Type ] = price.Rate;
+                    rates[ price.Type ] = price.Rate;
                 }
             }
-
             return rates;
         }
 

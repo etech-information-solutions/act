@@ -17,6 +17,7 @@ using System.Net.Http.Headers;
 using ExcelDataReader;
 using System.Data;
 using Microsoft.VisualBasic.FileIO;
+using System.Web.Services.Description;
 
 namespace ACT.UI.Controllers
 {
@@ -3126,6 +3127,8 @@ namespace ACT.UI.Controllers
 
                 cpservice.Create( cp );
 
+                UpdateProductPrices( model );
+
                 Notify( "The selected Product was successfully linked to the selected client.", NotificationType.Success );
 
                 return LinkProducts( new PagingModel(), new CustomSearchModel() );
@@ -3138,6 +3141,7 @@ namespace ACT.UI.Controllers
         public ActionResult EditProduct( int id )
         {
             using ( ClientProductService pservice = new ClientProductService() )
+            using ( ProductPriceService ppservice = new ProductPriceService() )
             {
                 ClientProduct cp = pservice.GetById( id );
 
@@ -3147,6 +3151,8 @@ namespace ACT.UI.Controllers
 
                     return PartialView( "_AccessDenied" );
                 }
+
+                var productPrices = ppservice.GetProductRates( cp.ProductId );
 
                 ProductViewModel model = new ProductViewModel()
                 {
@@ -3166,6 +3172,8 @@ namespace ACT.UI.Controllers
                     AccountingCode = cp.AccountingCode,
                     RateType = ( RateType ) cp.RateType,
                     Description = cp.ProductDescription,
+                    TransportFee = productPrices.ContainsKey( ( int ) ProductPriceType.Transport ) ? productPrices[ ( int ) ProductPriceType.Transport ] : 0,
+                    RecoveryFee = productPrices.ContainsKey( ( int ) ProductPriceType.Recovery ) ? productPrices[ ( int ) ProductPriceType.Recovery ] : 0
                 };
 
                 return View( model );
@@ -3205,11 +3213,12 @@ namespace ACT.UI.Controllers
                 cp.ActiveDate = model.ActiveDate;
                 cp.RateType = ( int ) model.RateType;
                 cp.AccountingCode = model.AccountingCode;
-                //cp.ProductDescription = model.Description;
 
                 #endregion
 
                 cpservice.Update( cp );
+
+                UpdateProductPrices( model );
 
                 Notify( "The selected Client Product's details were successfully updated.", NotificationType.Success );
             }
@@ -3255,7 +3264,7 @@ namespace ACT.UI.Controllers
                     var rates = ppservice.GetProductRates( productId );
                     var serializableRates = rates.Select( kvp => new
                     {
-                        Type = kvp.Key.ToString(),
+                        Type = kvp.Key,
                         Rate = kvp.Value
                     } ).ToList();
 
@@ -3263,7 +3272,50 @@ namespace ACT.UI.Controllers
                 }
                 catch ( Exception ex )
                 {
+                    // Log the exception if you have a logging mechanism
                     return Json( new { success = false, message = "An error occurred while retrieving product rates." }, JsonRequestBehavior.AllowGet );
+                }
+            }
+        }
+
+        private void UpdateProductPrices( ProductViewModel model )
+        {
+            using ( ProductPriceService ppservice = new ProductPriceService() )
+            {
+                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Hire, model.HireRate );
+                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Lost, model.LostRate );
+                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Issue, model.IssueRate );
+                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Recovery, model.RecoveryFee );
+                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Transport, model.TransportFee );
+            }
+        }
+
+        private void UpdateProductPrice( ProductPriceService ppservice, int productId, ProductPriceType type, decimal? rate )
+        {
+            if ( rate.HasValue )
+            {
+                var existingPrice = ppservice.GetLatestProductPrice( productId, type );
+                if ( existingPrice != null )
+                {
+                    existingPrice.Rate = rate.Value;
+                    existingPrice.ModifiedOn = DateTime.Now;
+                    existingPrice.ModifiedBy = User.Identity.Name;
+                    ppservice.Update( existingPrice );
+                }
+                else
+                {
+                    var newPrice = new ProductPrice
+                    {
+                        ProductId = productId,
+                        Type = ( int ) type,
+                        Rate = rate.Value,
+                        Status = ( int ) Status.Active,
+                        FromDate = DateTime.Now,
+                        CreatedOn = DateTime.Now,
+                        ModifiedOn = DateTime.Now,
+                        ModifiedBy = User.Identity.Name
+                    };
+                    ppservice.Create( newPrice );
                 }
             }
         }

@@ -6219,21 +6219,22 @@
                                     {
                                         switch ( item.Type )
                                         {
-                                            case 'Hire':
+                                            case 0: // Hire
                                                 $( '#HireRate' ).val( item.Rate || '' );
                                                 break;
-                                            case 'Lost':
-                                                $( '#LostRate' ).val( item.Rate || '' );
-                                                break;
-                                            case 'Transport':
-                                                $( '#TransportFee' ).val( item.Rate || '' );
-                                                break;
-                                            case 'Recovery':
-                                                $( '#RecoveryFee' ).val( item.Rate || '' );
-                                                break;
-                                            case 'Issue':
+                                            case 1: // Issue
                                                 $( '#IssueRate' ).val( item.Rate || '' );
                                                 break;
+                                            case 2: // Lost
+                                                $( '#LostRate' ).val( item.Rate || '' );
+                                                break;
+                                            case 3: // Recovery
+                                                $( '#RecoveryFee' ).val( item.Rate || '' );
+                                                break;
+                                            case 4: // Transport
+                                                $( '#TransportFee' ).val( item.Rate || '' );
+                                                break;
+                                            // Add more cases if needed
                                         }
                                     } );
                                 } else

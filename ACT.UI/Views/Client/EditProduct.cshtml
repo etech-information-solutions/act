@@ -100,6 +100,22 @@
                 </div>
 
                 <div class="edit-label">
+                    @Html.LabelFor( model => model.TransportFee )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.TransportFee, new { @style = "width: 93%;", @placeholder = "Enter Product Transport Fee" } )
+                    @Html.ValidationMessageFor( model => model.TransportFee )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.RecoveryFee )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.RecoveryFee, new { @style = "width: 93%;", @placeholder = "Enter Product Recovery Fee" } )
+                    @Html.ValidationMessageFor( model => model.RecoveryFee )
+                </div>
+
+                <div class="edit-label">
                     @Html.LabelFor( model => model.PassonRate )
                 </div>
                 <div class="edit-field">
