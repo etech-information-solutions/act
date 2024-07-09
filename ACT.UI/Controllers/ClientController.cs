@@ -3244,6 +3244,30 @@ namespace ACT.UI.Controllers
             return LinkProducts( new PagingModel(), new CustomSearchModel() );
         }
 
+        [HttpGet]
+        [Requires( PermissionTo.Create )]
+        public ActionResult GetRates( int productId )
+        {
+            using ( ProductPriceService ppservice = new ProductPriceService() )
+            {
+                try
+                {
+                    var rates = ppservice.GetProductRates( productId );
+                    var serializableRates = rates.Select( kvp => new
+                    {
+                        Type = kvp.Key.ToString(),
+                        Rate = kvp.Value
+                    } ).ToList();
+
+                    return Json( new { success = true, data = serializableRates }, JsonRequestBehavior.AllowGet );
+                }
+                catch ( Exception ex )
+                {
+                    return Json( new { success = false, message = "An error occurred while retrieving product rates." }, JsonRequestBehavior.AllowGet );
+                }
+            }
+        }
+
         #endregion
 
 

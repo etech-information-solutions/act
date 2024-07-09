@@ -173,6 +173,9 @@
             // KPI Reports
             this.DataFilter( $( '*[data-filter="1"]' ) );
 
+            // KPI Reports
+            this.DataGetRates( $( '*[data-get-rates="1"]' ) );
+
             if ( window.location.search !== "" && !$( "tr.edit" ).length && $( ".dataTable" ).length && !ACT.UI.PageViewIdProcessed )
             {
                 var viewid = false,
@@ -6193,6 +6196,61 @@
 
             sender.find( "b" ).load( siteurl + "/KPIReportFilterTotal", params, function ()
             {
+            } );
+        },
+
+        DataGetRates: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var select = $( this );
+                select.change( function ()
+                {
+                    var productId = select.val();
+                    if ( productId )
+                    {
+                        ACT.Loader.Show( select.parent(), true );
+                        $.getJSON( siteurl + "/GetRates", { productId: productId } )
+                            .done( function ( response )
+                            {
+                                if ( response.success )
+                                {
+                                    response.data.forEach( function ( item )
+                                    {
+                                        switch ( item.Type )
+                                        {
+                                            case 'Hire':
+                                                $( '#HireRate' ).val( item.Rate || '' );
+                                                break;
+                                            case 'Lost':
+                                                $( '#LostRate' ).val( item.Rate || '' );
+                                                break;
+                                            case 'Transport':
+                                                $( '#TransportFee' ).val( item.Rate || '' );
+                                                break;
+                                            case 'Recovery':
+                                                $( '#RecoveryFee' ).val( item.Rate || '' );
+                                                break;
+                                            case 'Issue':
+                                                $( '#IssueRate' ).val( item.Rate || '' );
+                                                break;
+                                        }
+                                    } );
+                                } else
+                                {
+                                    console.error( "Error fetching rates:", response.message );
+                                }
+                            } )
+                            .fail( function ( jqXHR, textStatus, errorThrown )
+                            {
+                                console.error( "Error fetching rates:", textStatus, errorThrown );
+                            } )
+                            .always( function ()
+                            {
+                                ACT.Loader.Hide();
+                            } );
+                    }
+                } );
             } );
         },
     };

@@ -49,6 +49,12 @@ namespace ACT.UI.Models
         [Display( Name = "Issue Rate" )]
         public decimal? IssueRate { get; set; }
 
+        [Display( Name = "Transport Fee" )]
+        public decimal? TransportFee { get; set; }
+
+        [Display( Name = "Recovery Fee" )]
+        public decimal? RecoveryFee { get; set; }
+
         [Display( Name = "Transfer Fee" )]
         public decimal? PassonRate { get; set; }
 

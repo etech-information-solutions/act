@@ -6,10 +6,10 @@ namespace ACT.Core.Enums
     [StringEnum]
     public enum ProductPriceType
     {
-        [StringEnumDisplayText( "Hire" )]
+        [StringEnumDisplayText( "Hire Fee" )]
         Hire = 0,
 
-        [StringEnumDisplayText( "Issue" )]
+        [StringEnumDisplayText( "Issue Fee" )]
         Issue = 1,
 
         [StringEnumDisplayText( "Compensation Fee" )]

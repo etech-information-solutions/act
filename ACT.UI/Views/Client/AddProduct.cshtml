@@ -41,7 +41,7 @@
                     @Html.LabelFor( model => model.ClientId )
                 </div>
                 <div class="editor-field">
-                    @Html.DropDownListFor( model => model.ClientId, model => Model.ClientOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @required = "required", @readonly = "readonly", @style = "width: 98%;" } )
+                    @Html.DropDownListFor( model => model.ClientId, new SelectList( Model.ClientOptions, "Key", "Value" ), "Select a Client", new { @class = "chzn", @required = "required", @style = "width: 98%;" } )
                     @Html.ValidationMessageFor( model => model.ClientId )
                 </div>
 
@@ -49,7 +49,7 @@
                     @Html.LabelFor( model => model.ProductId )
                 </div>
                 <div class="editor-field">
-                    @Html.DropDownListFor( model => model.ProductId, model => Model.ProductOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @required = "required", @readonly = "readonly", @style = "width: 98%;" } )
+                    @Html.DropDownListFor( model => model.ProductId, new SelectList( Model.ProductOptions, "Key", "Value" ), "Select a Product", new { @class = "chzn", @required = "required", @style = "width: 98%;", @data_get_rates = "1" } )
                     @Html.ValidationMessageFor( model => model.ProductId )
                 </div>
 
@@ -87,6 +87,22 @@
                 <div class="edit-field">
                     @Html.TextBoxFor( model => model.LostRate, new { @style = "width: 93%;", @placeholder = "Enter Product Compensation Rate" } )
                     @Html.ValidationMessageFor( model => model.LostRate )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.TransportFee )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.TransportFee, new { @style = "width: 93%;", @placeholder = "Enter Product Transport Fee" } )
+                    @Html.ValidationMessageFor( model => model.TransportFee )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.RecoveryFee )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.RecoveryFee, new { @style = "width: 93%;", @placeholder = "Enter Product Recovery Fee" } )
+                    @Html.ValidationMessageFor( model => model.RecoveryFee )
                 </div>
 
                 <div class="edit-label">
