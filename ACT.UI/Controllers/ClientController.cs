@@ -3043,29 +3043,36 @@ namespace ACT.UI.Controllers
         {
             using ( ClientProductService cpservice = new ClientProductService() )
             using ( DocumentService dservice = new DocumentService() )
+            using ( ProductPriceService ppservice = new ProductPriceService() )
             {
-                ClientProduct model = cpservice.GetById( id );
-
-                if ( model == null )
+                ClientProduct clientProduct = cpservice.GetById( id );
+                if ( clientProduct == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
                     return RedirectToAction( "Index" );
                 }
+
+                var rates = ppservice.GetProductRates( clientProduct.ProductId );
+
+                ViewBag.TransportFee = rates.ContainsKey( ( int ) ProductPriceType.Transport )
+                    ? rates[ ( int ) ProductPriceType.Transport ]
+                    : ( decimal? ) null;
+                ViewBag.RecoveryFee = rates.ContainsKey( ( int ) ProductPriceType.Recovery )
+                    ? rates[ ( int ) ProductPriceType.Recovery ]
+                    : ( decimal? ) null;
 
                 if ( layout )
                 {
                     ViewBag.IncludeLayout = true;
                 }
 
-                List<Document> documents = dservice.List( model.ProductId, "Product" );
-
+                List<Document> documents = dservice.List( clientProduct.ProductId, "Product" );
                 if ( documents != null )
                 {
                     ViewBag.Documents = documents;
                 }
 
-                return View( model );
+                return View( clientProduct );
             }
         }
 
@@ -3272,7 +3279,6 @@ namespace ACT.UI.Controllers
                 }
                 catch ( Exception ex )
                 {
-                    // Log the exception if you have a logging mechanism
                     return Json( new { success = false, message = "An error occurred while retrieving product rates." }, JsonRequestBehavior.AllowGet );
                 }
             }

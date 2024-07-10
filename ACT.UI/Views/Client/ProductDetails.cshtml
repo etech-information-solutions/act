@@ -66,7 +66,7 @@
             Active Date
         </div>
         <div class="display-field">
-            @( Model.ActiveDate.Value.ToString( "yyyy/MM/dd" ) )
+            @(Model.ActiveDate.HasValue ? Model.ActiveDate.Value.ToString("yyyy/MM/dd") : "N/A")
         </div>
 
         @if ( documents != null && documents.Any() )
@@ -111,6 +111,20 @@
         </div>
         <div class="display-field">
             R @Model.IssueRate
+        </div>
+
+        <div class="display-label">
+            Transport Fee
+        </div>
+        <div class="display-field">
+            R @(ViewBag.TransportFee?.ToString("F2") ?? "N/A")
+        </div>
+
+        <div class="display-label">
+            Recovery Fee
+        </div>
+        <div class="display-field">
+            R @(ViewBag.RecoveryFee?.ToString("F2") ?? "N/A")
         </div>
 
         <div class="display-label">
