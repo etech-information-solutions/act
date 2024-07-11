@@ -102,6 +102,7 @@ namespace ACT.UI.Controllers
                     return RedirectToAction( "Index", "Transporter" );
 
                 case RoleType.PSP:
+                case RoleType.Operator:
                 case RoleType.Client:
                 case RoleType.SuperAdmin:
 
