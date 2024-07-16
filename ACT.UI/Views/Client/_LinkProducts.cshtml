@@ -67,9 +67,9 @@
             <th data-name="LostRate" data-column="cp.LostRate">
                 Compensation Rate
             </th>
-            <th data-name="PassonRate" data-column="cp.PassonRate">
+            @*<th data-name="PassonRate" data-column="cp.PassonRate">
                 Pass-on Cost
-            </th>
+            </th>*@
             <th data-name="RateType" data-column="cp.RateType">
                 Rate Type
             </th>
@@ -124,9 +124,9 @@
                     <td>
                         R @item.LostRate
                     </td>
-                    <td>
+                    @*<td>
                         R @item.PassonRate
-                    </td>
+                    </td>*@
                     <td>
                         @rateType.GetDisplayText()
                     </td>

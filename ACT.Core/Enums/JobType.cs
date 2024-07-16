@@ -15,5 +15,8 @@ namespace ACT.Core.Enums
 
         [StringEnumDisplayText( "Management" )]
         Management = 1,
+
+        [StringEnumDisplayText( "Director" )]
+        Director = 2,
     }
 }

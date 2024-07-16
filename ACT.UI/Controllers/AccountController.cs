@@ -103,6 +103,7 @@ namespace ACT.UI.Controllers
 
                 case RoleType.PSP:
                 case RoleType.Client:
+                case RoleType.Operator:
                 case RoleType.SuperAdmin:
 
                     return RedirectToAction( "Index", "DashBoard" );

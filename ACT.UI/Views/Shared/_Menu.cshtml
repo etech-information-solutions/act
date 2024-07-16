@@ -57,10 +57,10 @@
             </li>
         }
 
-        @if ( User.Has( PermissionTo.View, PermissionContext.Client ) )
+        @if ( User.Has( PermissionTo.View, PermissionContext.Client ) && user.RoleType != RoleType.Operator )
         {
-            <li data-hot-spot="1" data-c="Client" data-t="" class="@(controller.ToLower().Equals( "client" ) ? "current" : "")">
-                <a rel="tipsyW" title="Clients" href="@Url.Action( "Index", "Client" )">
+            <li data-hot-spot="1" data-c="Client" data-t="" class="@(controller.ToLower().Equals("client") ? "current" : "")">
+                <a rel="tipsyW" title="Clients" href="@Url.Action("Index", "Client")">
                     <span>Client Management</span>
                 </a>
             </li>

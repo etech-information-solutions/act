@@ -75,9 +75,9 @@
             <th data-name="InvoiceCount">
                 Invoices
             </th>
-            <th data-name="BudgetCount">
+            @*<th data-name="BudgetCount">
                 Budget
-            </th>
+            </th>*@
             <th data-name="Actions">
                 Actions
             </th>
@@ -153,12 +153,12 @@
                             @Html.ActionLink( item.InvoiceCount.ToString(), "PSPInvoices", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
                         }
                     </td>
-                    <td>
+                    @*<td>
                         @if ( item.BudgetCount > 0 )
                         {
                             @Html.ActionLink( item.BudgetCount.ToString(), "PSPBudgets", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
                         }
-                    </td>
+                    </td>*@
                     <td width="13%" style="text-align: center;">
 
                         @if ( status == PSPClientStatus.Unverified && user.IsAdmin )
