@@ -9,6 +9,8 @@
     }
 
     ViewBag.Title = "Import Sites";
+
+    string absoluteUrlBase = Request.Url.Scheme + "://" + Request.Url.Host + ( Request.Url.IsDefaultPort ? "" : ":" + Request.Url.Port );
 }
 
 
@@ -24,6 +26,123 @@
         </h2>
 
         @Html.ValidationSummary( true )
+
+        <div class="grouped-area">
+
+            <ul class="list">
+                <li>
+                    Your CSV data should be in the format below. The first line of your CSV file should be the column headers as in the table example. Also make sure that your file is <b>UTF-8</b> to avoid unnecessary encoding problems.
+                </li>
+                <li>
+                    If the column you are trying to import is a date make, sure that it is formatted in the format yyyy-MM-dd (@DateTime.Now.ToString( "yyyy-MM-dd" )) or for date and time yyyy-MM-dd HH:mm:ss (@DateTime.Now.ToString( "yyyy-MM-dd HH:mm:ss" )).
+                </li>
+                <li>
+                    If any of the fields marked as <b class="red" style="font-size: 15px;">* REQUIRED</b> below are missing, that record will be skipped. We recommend not importing more than 5,0000 records at a time
+                </li>
+                <li class="red">
+                    The system will upload all supplied data if it is verified as valid and if you input incorrect data you can be guaranteed to be given an <b class="red">incorrect</b> output!
+                </li>
+            </ul>
+
+        </div>
+
+        <p>
+            <strong class="uppercase">Sample Format and Data</strong>
+            <a style="color: #3123c4;" href="@absoluteUrlBase/@ConfigSettings.SystemRules.DocumentsLocation/Client-Site-Sample.csv" target="_blank" rel="tipsyW" title="Download Sample File?">
+            <a style="color: #3123c4;" href="@absoluteUrlBase/@ConfigSettings.SystemRules.DocumentsLocation/Client-Site-Sample.csv" target="_blank" rel="tipsyW" title="Download Sample File?">
+                ( <i class="fa fa-download" style="color: #3123c4;"></i> Download Sample File)
+            </a>
+        </p>
+
+        <div style="width: 100%; height: 180px; overflow-x: auto; overflow-y: auto; margin-bottom: 20px;">
+
+            <table class="da-table">
+
+                <thead>
+
+                    <tr style="text-align: center;">
+                        <th><i class="red" style="padding-right: 2px;">*</i>0. Action</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>1. Policy #</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>2. Title</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>3. Name</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>4. Surname</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>5. SA ID?</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>6. ID #</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>7. DOB</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>8. Gender</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>9. Email</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>10. Cell</th>
+                        <th>11. Alt Cell</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>12. Married?</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>13. Preferred Contact</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>14. Client</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>15. Plan</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>16. Pay Day</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>17. Debit Day</th>
+                        <th><i class="red" style="padding-right: 2px;">*</i>18. Start Date</th>
+                        <th>19. Broker</th>
+                        <th>20. Agent</th>
+                        <th>21. Promo</th>
+                        <th>22. Groups</th>
+
+                        <th><i class="red" style="padding-right: 2px;">*</i>23. Signed At</th>
+
+                        <th>24. Bank Name</th>
+                        <th>25. Bank Account #</th>
+                        <th>26. Bank Account Type</th>
+                        <th>27. Bank Branch Code</th>
+                        <th>28. Bank Account Holder</th>
+
+                        <th>29. Address 1</th>
+                        <th>30. Address 2</th>
+                        <th>31. Town</th>
+                        <th>32. Province</th>
+                        <th>33. Zip</th>
+
+                        <th>34. Billing Address 1</th>
+                        <th>35. Billing Address 2</th>
+                        <th>36. Billing Town</th>
+                        <th>37. Billing Province</th>
+                        <th>38. Billing Zip</th>
+
+                        <th>39. Shipping Address 1</th>
+                        <th>40. Shipping Address 2</th>
+                        <th>41. Shipping Town</th>
+                        <th>42. Shipping Province</th>
+                        <th>43. Shipping Zip</th>
+
+                        <th>44. Spouse Title</th>
+                        <th>45. Spouse Name</th>
+                        <th>46. Spouse Surname</th>
+                        <th>47. Spouse Cell</th>
+                        <th>48. Spouse SAID?</th>
+                        <th>49. Spouse ID</th>
+                        <th>50. Spouse DOB</th>
+
+                        <th>
+                            51. Beneficiary Title<b class="red" style="font-size: 15px;">|</b>Beneficiary Name<b class="red" style="font-size: 15px;">|</b>Beneficiary Surname<b class="red" style="font-size: 15px;">|</b>Beneficiary Cell<b class="red" style="font-size: 15px;">|</b>Beneficiary SA ID?<b class="red" style="font-size: 15px;">|</b>Beneficiary ID<b class="red" style="font-size: 15px;">|</b>Beneficiary DOB<b class="red" style="font-size: 15px;">|</b>Beneficiary Allocation<b class="red" style="font-size: 15px;">|</b>Beneficiary Relationship
+                        </th>
+
+                        <th>
+                            52. Dependent Name<b class="red" style="font-size: 15px;">|</b>Dependent Surname<b class="red" style="font-size: 15px;">|</b>Dependent Contact<b class="red" style="font-size: 15px;">|</b>Dependent SA ID?<b class="red" style="font-size: 15px;">|</b>Dependent ID<b class="red" style="font-size: 15px;">|</b>Dependent DOB
+                        </th>
+                        <th>53. Payment Frequency</th>
+                        <th>54. Payment Method</th>
+                        <th>55. Race</th>
+                        <th>55. Charity Id</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    
+
+                </tbody>
+
+            </table>
+
+        </div>
 
         <div class="left" style="width: 30%;">
 
