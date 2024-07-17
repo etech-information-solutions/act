@@ -18,5 +18,8 @@ namespace ACT.Core.Enums
 
         [StringEnumDisplayText( "Director" )]
         Director = 2,
+
+        [StringEnumDisplayText( "Finance" )]
+        Finance = 3,
     }
 }

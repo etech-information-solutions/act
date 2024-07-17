@@ -246,12 +246,18 @@ namespace ACT.Core.Services
             (SELECT COUNT(1) FROM [dbo].[Document] d WHERE c.Id=d.ObjectId AND d.ObjectType='Client') AS [DocumentCount],
             (SELECT COUNT(1) FROM [dbo].[EstimatedLoad] el WHERE c.Id=el.ObjectId AND el.ObjectType='Client') AS [EstimatedLoadCount],
             (SELECT COUNT(1) FROM [dbo].[ClientInvoice] ci, [dbo].[ClientLoad] cl WHERE cl.Id=ci.ClientLoadId AND c.Id=cl.ClientId) AS [InvoiceCount],
+            (SELECT COUNT(1) FROM [dbo].[Contact] con WHERE c.Id=con.ObjectId AND con.ObjectType='Client') AS [ContactCount],
             c.ChepReference as [PrimaryChepReference],
-            (SELECT STRING_AGG(cca.ChepReference, ', ') FROM [dbo].[ClientChepAccount] cca WHERE c.Id=cca.ClientId AND cca.Status = 1) AS [AdditionalChepReferences]
+            (SELECT STRING_AGG(cca.ChepReference, ', ') FROM [dbo].[ClientChepAccount] cca WHERE c.Id=cca.ClientId AND cca.Status = 1) AS [AdditionalChepReferences],
+            a.Addressline1,
+            a.Addressline2,
+            a.Town,
+            a.PostalCode
          FROM
             [dbo].[Client] c
             LEFT OUTER JOIN [dbo].[PSPClient] pc ON pc.Id=(SELECT TOP 1 pc1.Id FROM [dbo].[PSPClient] pc1 WHERE pc1.ClientId=pc.ClientId AND pc1.ClientId=c.Id)
-            LEFT OUTER JOIN [dbo].[PSP] p ON p.Id=pc.PSPId";
+            LEFT OUTER JOIN [dbo].[PSP] p ON p.Id=pc.PSPId
+            LEFT OUTER JOIN [dbo].[Address] a ON a.ObjectId = c.Id AND a.ObjectType = 'Client' AND a.Status = 1";
 
             // WHERE
 
@@ -346,6 +352,14 @@ namespace ACT.Core.Services
             query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
             List<ClientCustomModel> model = context.Database.SqlQuery<ClientCustomModel>( query, parameters.ToArray() ).ToList();
+
+            if ( model.Any( c => c.ContactCount > 0 ) )
+            {
+                foreach ( ClientCustomModel item in model.Where( c => c.ContactCount > 0 ) )
+                {
+                    item.Contacts = context.Contacts.Where( c => c.ObjectId == item.Id && c.ObjectType == "Client" ).ToList();
+                }
+            }
 
             if ( model.NullableAny( c => c.DocumentCount > 0 ) )
             {

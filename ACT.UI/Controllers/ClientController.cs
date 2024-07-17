@@ -52,7 +52,7 @@ namespace ACT.UI.Controllers
 
                     using ( ClientService service = new ClientService() )
                     {
-                        csv = string.Format( "Date Created, Company Name, Trading As, Reg #, Description, Chep reference, Status, Service Required, Type of Pallet Use, Other Type of Pallet Use, Company Type, PSP, VAT Number, BBBEE Level, Contact Person, Contact Number, Contact Email, Administrator, Administrator Email, Financial Person, Financial Person Email {0}", Environment.NewLine );
+                        csv = string.Format( "Date Created,Company Name,Contacts,Address,Chep Reference,Status{0}", Environment.NewLine );
 
                         List<ClientCustomModel> clients = service.List1( pm, csm );
 
@@ -60,29 +60,36 @@ namespace ACT.UI.Controllers
                         {
                             foreach ( ClientCustomModel item in clients )
                             {
-                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21} {22}",
+                                string address = string.Join( ", ", new[]
+                                {
+                                    item.AddressLine1,
+                                    item.AddressLine2,
+                                    item.Town,
+                                    item.PostalCode
+                                }.Where( s => !string.IsNullOrEmpty( s ) ) );
+
+                                string chepReference = string.Join( ", ", new[]
+                                {
+                                    !string.IsNullOrEmpty(item.PrimaryChepReference) ? $"Primary: {item.PrimaryChepReference}" : null,
+                                    !string.IsNullOrEmpty(item.AdditionalChepReferences) ? $"Additional: {item.AdditionalChepReferences}" : null
+                                }.Where( s => s != null ) );
+
+                                string contacts = "";
+                                if ( item.Contacts != null && item.Contacts.Any( c => c.Status == ( Int32 ) Status.Active ) )
+                                {
+                                    contacts = string.Join( "; ", item.Contacts
+                                        .Where( c => c.Status == ( Int32 ) Status.Active )
+                                        .Select( c => $"{c.ContactName} - {c.ContactCell} - {c.ContactEmail}" ) );
+                                }
+
+                                csv = string.Format( "{0}\"{1}\",\"{2}\",\"{3}\",\"{4}\",\"{5}\",\"{6}\"{7}",
                                                     csv,
-                                                    "\"" + item.CreatedOn + "\"",
-                                                    "\"" + item.CompanyName + "\"",
-                                                    "\"" + item.TradingAs + "\"",
-                                                    "\"" + item.CompanyRegistrationNumber + "\"",
-                                                    "\"" + item.Description + "\"",
-                                                    "\"" + item.ChepReference + "\"",
-                                                    "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
-                                                    "\"" + ( ( ServiceType ) item.ServiceRequired ).GetDisplayText() + "\"",
-                                                    "\"" + ( ( TypeOfPalletUse ) item.PalletType ).GetDisplayText() + "\"",
-                                                    "\"" + item.PalletTypeOther + "\"",
-                                                    "\"" + ( ( CompanyType ) item.CompanyType ).GetDisplayText() + "\"",
-                                                    "\"" + ( item.PSPName ?? item.PSPCompanyName ) + "\"",
-                                                    "\"" + item.VATNumber + "\"",
-                                                    "\"" + item.BBBEELevel + "\"",
-                                                    "\"" + item.ContactPerson + "\"",
-                                                    "\"" + item.ContactNumber + "\"",
-                                                    "\"" + item.Email + "\"",
-                                                    "\"" + item.AdminPerson + "\"",
-                                                    "\"" + item.AdminEmail + "\"",
-                                                    "\"" + item.FinancialPerson + "\"",
-                                                    "\"" + item.FinPersonEmail + "\"",
+                                                    item.CreatedOn.ToString( "yyyy-MM-dd" ),
+                                                    item.CompanyName,
+                                                    contacts,
+                                                    address,
+                                                    chepReference,
+                                                    ( ( PSPClientStatus ) item.Status ).GetDisplayText(),
                                                     Environment.NewLine );
                             }
                         }
@@ -303,6 +310,7 @@ namespace ACT.UI.Controllers
             using ( ClientService cservice = new ClientService() )
             using ( AddressService aservice = new AddressService() )
             using ( DocumentService dservice = new DocumentService() )
+            using ( ContactService contactService = new ContactService() )
             {
                 Client model = cservice.GetById( id );
 
@@ -314,8 +322,12 @@ namespace ACT.UI.Controllers
                 }
 
                 Address address = aservice.Get( model.Id, "Client" );
-
                 List<Document> documents = dservice.List( model.Id, "Client" );
+                List<Contact> contacts = contactService.List( model.Id, "Client" );
+
+                ViewBag.Address = address;
+                ViewBag.Documents = documents;
+                ViewBag.Contacts = contacts;
 
                 if ( address != null )
                 {
@@ -345,6 +357,7 @@ namespace ACT.UI.Controllers
                 Address = new AddressViewModel(),
                 Files = new List<FileViewModel>(),
                 ClientBudgets = new List<ClientBudget>(),
+                Contacts = new List<Contact>(),
                 ClientChepAccounts = new List<ClientChepAccount>(),
             };
 
@@ -364,6 +377,7 @@ namespace ACT.UI.Controllers
             //}
 
             using ( ClientService service = new ClientService() )
+            using ( ContactService cservice = new ContactService() )
             using ( AddressService aservice = new AddressService() )
             using ( TransactionScope scope = new TransactionScope() )
             using ( DocumentService dservice = new DocumentService() )
@@ -387,30 +401,30 @@ namespace ACT.UI.Controllers
 
                 Client client = new Client()
                 {
-                    Email = model.Email,
-                    TradingAs = model.TradingAs,
-                    VATNumber = model.VATNumber,
-                    AdminEmail = model.AdminEmail,
-                    Status = ( int ) model.Status,
-                    AdminPerson = model.AdminPerson,
                     CompanyName = model.CompanyName,
-                    Description = model.CompanyName,
-                    ChepReference = model.ChepReference,
-                    ContactPerson = model.ContactPerson,
-                    ContactNumber = model.ContactNumber,
-                    FinPersonEmail = model.FinPersonEmail,
-                    FinancialPerson = model.FinancialPerson,
-                    ServiceRequired = ( int ) model.ServiceType,
-
-                    PSPName = model.PSPName,
-                    BBBEELevel = model.BBBEELevel,
-                    CompanyType = ( int ) model.CompanyType,
-                    PalletType = ( int ) model.TypeOfPalletUse,
-                    PalletTypeOther = model.OtherTypeOfPalletUse,
-                    NumberOfLostPallets = model.NumberOfLostPallets,
                     CompanyRegistrationNumber = model.CompanyRegistrationNumber,
-
+                    TradingAs = model.TradingAs,
+                    Description = model.Description,
+                    VATNumber = model.VATNumber ?? "",
+                    ChepReference = model.ChepReference ?? "",
+                    Status = ( int ) model.PSPClientStatus,
+                    PalletType = ( int ) model.TypeOfPalletUse,
+                    PalletTypeOther = model.OtherTypeOfPalletUse ?? "",
                     IsChepClient = model.IsChepClient.GetBoolValue(),
+                    PSPName = model.PSPName,
+                    // Fields not in the current view, but keeping them with empty strings or 0
+                    Email = "",
+                    AdminEmail = "",
+                    AdminPerson = "",
+                    ContactPerson = "",
+                    ContactNumber = "",
+                    FinPersonEmail = "",
+                    FinancialPerson = "",
+                    ServiceRequired = 0,
+                    
+                    BBBEELevel = "",
+                    CompanyType = 0,
+                    NumberOfLostPallets = 0
                 };
 
                 client = service.Create( client );
@@ -520,7 +534,7 @@ namespace ACT.UI.Controllers
 
                 #endregion
 
-                #region Any File Uploads
+                /*#region Any File Uploads
 
                 if ( model.Files.NullableAny( f => f.File != null ) )
                 {
@@ -560,6 +574,47 @@ namespace ACT.UI.Controllers
                     }
                 }
 
+                #endregion*/
+
+                #region Contacts
+
+                if ( model.Contacts != null && model.Contacts.Any( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                {
+                    foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                    {
+                        Contact c = cservice.Get( mc.ContactEmail, "Client" );
+
+                        if ( c == null )
+                        {
+                            c = new Contact()
+                            {
+                                ObjectId = client.Id,
+                                JobTitle = mc.JobTitle,
+                                ObjectType = "Client",
+                                ContactCell = mc.ContactCell,
+                                ContactName = mc.ContactName,
+                                Status = mc.Status,
+                                ContactEmail = mc.ContactEmail,
+                                ContactTitle = mc.ContactTitle,
+                            };
+
+                            cservice.Create( c );
+                        }
+                        else
+                        {
+                            // Update existing contact
+                            c.JobTitle = mc.JobTitle;
+                            c.ContactCell = mc.ContactCell;
+                            c.ContactName = mc.ContactName;
+                            c.Status = mc.Status;
+                            c.ContactEmail = mc.ContactEmail;
+                            c.ContactTitle = mc.ContactTitle;
+
+                            cservice.Update( c );
+                        }
+                    }
+                }
+
                 #endregion
 
                 scope.Complete();
@@ -579,19 +634,19 @@ namespace ACT.UI.Controllers
             using ( DocumentService dservice = new DocumentService() )
             using ( EstimatedLoadService eservice = new EstimatedLoadService() )
             using ( ClientKPIService kpiservice = new ClientKPIService() )
+            using ( ContactService cservice = new ContactService() )
             {
                 Client client = service.GetById( id );
 
                 if ( client == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
                     return PartialView( "_AccessDenied" );
                 }
 
                 Address address = aservice.Get( client.Id, "Client" );
-
                 List<Document> documents = dservice.List( client.Id, "Client" );
+                List<Contact> contacts = cservice.List( client.Id, "Client" );
 
                 List<EstimatedLoad> loads = new List<EstimatedLoad>();
 
@@ -608,25 +663,16 @@ namespace ACT.UI.Controllers
 
                 ClientViewModel model = new ClientViewModel()
                 {
-                    PSPId = pspId,
                     Id = client.Id,
+                    PSPId = pspId,
                     CompanyName = client.CompanyName,
                     CompanyRegistrationNumber = client.CompanyRegistrationNumber,
                     TradingAs = client.TradingAs,
                     Description = client.Description,
                     VATNumber = client.VATNumber,
                     ChepReference = client.ChepReference,
-                    ContactNumber = client.ContactNumber,
-                    ContactPerson = client.ContactPerson,
-                    FinancialPerson = client.FinancialPerson,
-                    FinPersonEmail = client.FinPersonEmail,
-                    Email = client.Email,
-                    AdminPerson = client.AdminPerson,
-                    AdminEmail = client.AdminEmail,
-                    DeclinedReason = client.DeclinedReason,
-                    Status = ( PSPClientStatus ) client.Status,
+                    PSPClientStatus = ( PSPClientStatus ) client.Status,
                     EditMode = true,
-
                     BBBEELevel = client.BBBEELevel,
                     CompanyType = ( CompanyType ) client.CompanyType,
                     NumberOfLostPallets = client.NumberOfLostPallets,
@@ -635,24 +681,28 @@ namespace ACT.UI.Controllers
                     ServiceType = ( ServiceType ) client.ServiceRequired,
                     TypeOfPalletUse = ( TypeOfPalletUse ) client.PalletType,
                     IsChepClient = client.IsChepClient ? YesNo.Yes : YesNo.No,
-
                     Address = new AddressViewModel()
                     {
                         EditMode = true,
-                        Town = address?.Town,
                         Id = address?.Id ?? 0,
-                        PostCode = address?.PostalCode,
                         AddressLine1 = address?.Addressline1,
                         AddressLine2 = address?.Addressline2,
+                        Town = address?.Town,
+                        PostCode = address?.PostalCode,
                         ProvinceId = address?.ProvinceId ?? 0,
-                        AddressType = ( address != null ) ? ( AddressType ) address.Type : AddressType.Postal,
+                        AddressType = address != null ? ( AddressType ) address.Type : AddressType.Postal,
                     },
-
-                    ClientBudgets = new List<ClientBudget>(),
-
-                    Files = new List<FileViewModel>(),
-
-                    ClientChepAccounts = client.ClientChepAccounts.ToList()
+                    ClientBudgets = client.ClientBudgets?.ToList() ?? new List<ClientBudget>(),
+                    Files = documents?.Select( d => new FileViewModel
+                    {
+                        Id = d.Id,
+                        Name = d.Name,
+                        Extension = d.Type,
+                        Size = ( decimal ) d.Size,
+                        Description = d.Description,
+                    } ).ToList() ?? new List<FileViewModel>(),
+                    ClientChepAccounts = client.ClientChepAccounts?.ToList() ?? new List<ClientChepAccount>(),
+                    Contacts = contacts ?? new List<Contact>()
                 };
 
                 if ( !client.ClientChepAccounts.NullableAny( a => client.ChepReference?.Trim()?.ToLower() == client.ChepReference?.Trim()?.ToLower() ) )
@@ -694,27 +744,7 @@ namespace ACT.UI.Controllers
                 }
                 else if ( client.ClientBudgets.NullableAny() )
                 {
-                    foreach ( ClientBudget l in client.ClientBudgets )
-                    {
-                        model.ClientBudgets.Add( new ClientBudget()
-                        {
-                            Id = l.Id,
-                            BudgetYear = l.BudgetYear,
-                            Total = l.Total,
-                            January = l.January,
-                            February = l.February,
-                            March = l.March,
-                            April = l.April,
-                            May = l.May,
-                            June = l.June,
-                            July = l.July,
-                            August = l.August,
-                            September = l.September,
-                            October = l.October,
-                            November = l.November,
-                            December = l.December,
-                        } );
-                    }
+                    model.ClientBudgets = client.ClientBudgets.ToList();
                 }
 
                 #endregion
@@ -752,6 +782,7 @@ namespace ACT.UI.Controllers
             using ( TransactionScope scope = new TransactionScope() )
             using ( DocumentService dservice = new DocumentService() )
             using ( PSPClientService pcservice = new PSPClientService() )
+            using ( ContactService contactService = new ContactService() )
             using ( ClientBudgetService bservice = new ClientBudgetService() )
             using ( ClientChepAccountService ccaservice = new ClientChepAccountService() )
             {
@@ -783,31 +814,23 @@ namespace ACT.UI.Controllers
 
                 #endregion
 
-                #region Client
+                #region Update Client
 
-                client.Email = model.Email;
-                client.TradingAs = model.TradingAs;
-                client.VATNumber = model.VATNumber;
-                client.AdminEmail = model.AdminEmail;
-                client.Status = ( int ) model.Status;
-                client.AdminPerson = model.AdminPerson;
-                client.Description = model.Description;
                 client.CompanyName = model.CompanyName;
-                client.ChepReference = model.ChepReference;
-                client.ContactNumber = model.ContactNumber;
-                client.ContactPerson = model.ContactPerson;
-                client.FinPersonEmail = model.FinPersonEmail;
-                client.FinancialPerson = model.FinancialPerson;
                 client.CompanyRegistrationNumber = model.CompanyRegistrationNumber;
-
+                client.Status = ( int ) model.PSPClientStatus;
+                client.Description = model.Description;
+                client.VATNumber = model.VATNumber;
+                client.IsChepClient = model.IsChepClient.GetBoolValue();
+                client.TradingAs = model.TradingAs;
+                client.ChepReference = model.ChepReference;
                 client.BBBEELevel = model.BBBEELevel;
                 client.CompanyType = ( int ) model.CompanyType;
-                client.NumberOfLostPallets = model.NumberOfLostPallets;
+                client.NumberOfLostPallets = model.NumberOfLostPallets ?? client.NumberOfLostPallets;
                 client.PalletTypeOther = model.OtherTypeOfPalletUse;
                 client.PSPName = model.PSPName;
                 client.ServiceRequired = ( int ) model.ServiceType;
                 client.PalletType = ( int ) model.TypeOfPalletUse;
-                client.IsChepClient = model.IsChepClient.GetBoolValue();
 
                 cservice.Update( client );
 
@@ -924,17 +947,18 @@ namespace ACT.UI.Controllers
 
                 #endregion
 
-                #region Address (s)
+                #region Address
 
                 if ( model.Address != null )
                 {
-                    Address address = aservice.GetById( model.Address.Id );
+                    Address address = aservice.Get( client.Id, "Client" );
 
                     if ( address == null )
                     {
+                        // If no address exists, create a new one
                         address = new Address()
                         {
-                            ObjectId = model.Id,
+                            ObjectId = client.Id,
                             ObjectType = "Client",
                             Town = model.Address.Town,
                             Status = ( int ) Status.Active,
@@ -949,6 +973,7 @@ namespace ACT.UI.Controllers
                     }
                     else
                     {
+                        // Update existing address
                         address.Town = model.Address.Town;
                         address.PostalCode = model.Address.PostCode;
                         address.Type = ( int ) model.Address.AddressType;
@@ -957,6 +982,50 @@ namespace ACT.UI.Controllers
                         address.ProvinceId = model.Address.ProvinceId;
 
                         aservice.Update( address );
+                    }
+                }
+
+                #endregion
+
+                #region Contacts
+
+                if ( model.Contacts != null && model.Contacts.Any() )
+                {
+                    foreach ( Contact contact in model.Contacts )
+                    {
+                        if ( contact.Id > 0 )
+                        {
+                            // Update existing contact
+                            Contact existingContact = contactService.GetById( contact.Id );
+                            if ( existingContact != null )
+                            {
+                                existingContact.ContactName = contact.ContactName;
+                                existingContact.ContactTitle = contact.ContactTitle;
+                                existingContact.ContactCell = contact.ContactCell;
+                                existingContact.ContactEmail = contact.ContactEmail;
+                                existingContact.JobTitle = contact.JobTitle;
+                                existingContact.Status = contact.Status;
+
+                                contactService.Update( existingContact );
+                            }
+                        }
+                        else
+                        {
+                            // Create new contact
+                            Contact newContact = new Contact
+                            {
+                                ObjectId = client.Id,
+                                ObjectType = "Client",
+                                ContactName = contact.ContactName,
+                                ContactTitle = contact.ContactTitle,
+                                ContactCell = contact.ContactCell,
+                                ContactEmail = contact.ContactEmail,
+                                JobTitle = contact.JobTitle,
+                                Status = contact.Status
+                            };
+
+                            contactService.Create( newContact );
+                        }
                     }
                 }
 
@@ -1067,8 +1136,10 @@ namespace ACT.UI.Controllers
                     scope.Complete();
 
                 }
-                Notify( "The selected Client was successfully updated.", NotificationType.Success );
-                return RedirectToAction( "ClientList" );
+
+                Notify( "The selected Client details were successfully updated.", NotificationType.Success );
+
+                return Clients( new PagingModel(), new CustomSearchModel() );
             }
             catch ( Exception ex )
             {
@@ -1083,6 +1154,7 @@ namespace ACT.UI.Controllers
         {
             using ( ClientService service = new ClientService() )
             using ( AddressService aservice = new AddressService() )
+            using ( ContactService cservice = new ContactService() )
             using ( DocumentService dservice = new DocumentService() )
             using ( ClientKPIService kpiservice = new ClientKPIService() )
             using ( EstimatedLoadService eservice = new EstimatedLoadService() )
@@ -1092,27 +1164,17 @@ namespace ACT.UI.Controllers
                 if ( client == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
                     return PartialView( "_AccessDenied" );
                 }
 
                 Address address = aservice.Get( client.Id, "Client" );
-
                 List<Document> documents = dservice.List( client.Id, "Client" );
-
-                List<EstimatedLoad> loads = new List<EstimatedLoad>();
+                List<Contact> contacts = cservice.List( client.Id, "Client" );
 
                 bool unverified = ( client.Status == ( int ) PSPClientStatus.Unverified );
 
-                if ( unverified )
-                {
-                    loads = eservice.List( client.Id, "Client" );
-                }
-
                 PSP psp = ( client.PSPClients.NullableAny() ) ? client.PSPClients?.FirstOrDefault()?.PSP : null;
                 int? pspId = ( client.PSPClients.NullableAny() ) ? client.PSPClients?.FirstOrDefault()?.PSPId : CurrentUser?.PSPs?.FirstOrDefault()?.Id;
-
-                #region Client
 
                 ClientViewModel model = new ClientViewModel()
                 {
@@ -1125,17 +1187,9 @@ namespace ACT.UI.Controllers
                     Description = client.Description,
                     VATNumber = client.VATNumber,
                     ChepReference = client.ChepReference,
-                    ContactNumber = client.ContactNumber,
-                    ContactPerson = client.ContactPerson,
-                    FinancialPerson = client.FinancialPerson,
-                    FinPersonEmail = client.FinPersonEmail,
-                    Email = client.Email,
-                    AdminPerson = client.AdminPerson,
-                    AdminEmail = client.AdminEmail,
                     DeclinedReason = client.DeclinedReason,
-                    Status = ( PSPClientStatus ) client.Status,
+                    PSPClientStatus = ( PSPClientStatus ) client.Status,
                     EditMode = true,
-
                     BBBEELevel = client.BBBEELevel,
                     CompanyType = ( CompanyType ) client.CompanyType,
                     NumberOfLostPallets = client.NumberOfLostPallets,
@@ -1143,6 +1197,7 @@ namespace ACT.UI.Controllers
                     PSPName = client.PSPName,
                     ServiceType = ( ServiceType ) client.ServiceRequired,
                     TypeOfPalletUse = ( TypeOfPalletUse ) client.PalletType,
+                    IsChepClient = client.IsChepClient ? YesNo.Yes : YesNo.No,
 
                     Address = new AddressViewModel()
                     {
@@ -1157,83 +1212,47 @@ namespace ACT.UI.Controllers
                     },
 
                     ClientBudgets = new List<ClientBudget>(),
-
                     Files = new List<FileViewModel>(),
+                    Contacts = contacts
                 };
 
-                #endregion
-
-                #region Client Budgets
-
-                if ( unverified && loads.NullableAny() )
+                // Client Budgets
+                if ( unverified )
                 {
-                    foreach ( EstimatedLoad l in loads )
+                    var loads = eservice.List( client.Id, "Client" );
+                    model.ClientBudgets = loads.Select( l => new ClientBudget
                     {
-                        model.ClientBudgets.Add( new ClientBudget()
-                        {
-                            Id = l.Id,
-                            BudgetYear = l.BudgetYear,
-                            Total = l.Total,
-                            January = l.January,
-                            February = l.February,
-                            March = l.March,
-                            April = l.April,
-                            May = l.May,
-                            June = l.June,
-                            July = l.July,
-                            August = l.August,
-                            September = l.September,
-                            October = l.October,
-                            November = l.November,
-                            December = l.December,
-                        } );
-                    }
+                        Id = l.Id,
+                        BudgetYear = l.BudgetYear,
+                        Total = l.Total,
+                        January = l.January,
+                        February = l.February,
+                        March = l.March,
+                        April = l.April,
+                        May = l.May,
+                        June = l.June,
+                        July = l.July,
+                        August = l.August,
+                        September = l.September,
+                        October = l.October,
+                        November = l.November,
+                        December = l.December,
+                    } ).ToList();
                 }
-                else if ( client.ClientBudgets.NullableAny() )
+                else
                 {
-                    foreach ( ClientBudget l in client.ClientBudgets )
-                    {
-                        model.ClientBudgets.Add( new ClientBudget()
-                        {
-                            Id = l.Id,
-                            BudgetYear = l.BudgetYear,
-                            Total = l.Total,
-                            January = l.January,
-                            February = l.February,
-                            March = l.March,
-                            April = l.April,
-                            May = l.May,
-                            June = l.June,
-                            July = l.July,
-                            August = l.August,
-                            September = l.September,
-                            October = l.October,
-                            November = l.November,
-                            December = l.December,
-                        } );
-                    }
+                    model.ClientBudgets = client.ClientBudgets.ToList();
                 }
 
-                #endregion
-
-                #region Client Files
-
-                if ( documents.NullableAny() )
+                // Client Files
+                model.Files = documents.Select( d => new FileViewModel
                 {
-                    foreach ( Document d in documents )
-                    {
-                        model.Files.Add( new FileViewModel()
-                        {
-                            Id = d.Id,
-                            Name = d.Name,
-                            Extension = d.Type,
-                            Size = ( decimal ) d.Size,
-                            Description = d.Description,
-                        } );
-                    }
-                }
-
-                #endregion
+                    Id = d.Id,
+                    Name = d.Name,
+                    Extension = d.Type,
+                    Size = ( decimal ) d.Size,
+                    Description = d.Description,
+                } ).ToList();
 
                 return PartialView( "_ApproveDeclineClient", model );
             }
@@ -1253,68 +1272,55 @@ namespace ACT.UI.Controllers
                 Client client = cservice.GetById( model.Id );
 
                 #region Validations
-
                 if ( client == null )
                 {
-                    Notify( "Sorry, that Client does not exist! Please specify a valid Role Id and try again.", NotificationType.Error );
-
+                    Notify( "Sorry, that Client does not exist! Please specify a valid Client Id and try again.", NotificationType.Error );
                     return View( model );
                 }
-
                 #endregion
 
                 #region Client
-
-                client.Status = ( int ) model.Status;
+                client.Status = ( int ) model.PSPClientStatus;
                 client.ChepReference = model.ChepReference;
+                client.IsChepClient = model.IsChepClient == YesNo.Yes;
 
-                if ( !string.IsNullOrEmpty( model.DeclineReason ) )
+                if ( model.PSPClientStatus == PSPClientStatus.Rejected && !string.IsNullOrEmpty( model.DeclineReason ) )
                 {
                     client.DeclinedReason = model.DeclineReason;
                 }
-
-                cservice.Update( client );
-
-                #endregion
-
-                #region Client Budgets
-
-                if ( model.ClientBudgets.NullableAny() )
+                else
                 {
-                    foreach ( ClientBudget l in model.ClientBudgets )
-                    {
-                        ClientBudget b = new ClientBudget()
-                        {
-                            ClientId = client.Id,
-                            BudgetYear = l.BudgetYear,
-                            Total = l.Total,
-                            January = l.January,
-                            February = l.February,
-                            March = l.March,
-                            April = l.April,
-                            May = l.May,
-                            June = l.June,
-                            July = l.July,
-                            August = l.August,
-                            September = l.September,
-                            October = l.October,
-                            November = l.November,
-                            December = l.December,
-                            Status = ( int ) Status.Active,
-                        };
-
-                        bservice.Create( b );
-                    }
+                    client.DeclinedReason = null; // Clear decline reason if approving
                 }
 
+                try
+                {
+                    cservice.Update( client );
+                    scope.Complete();
+
+                    if ( model.PSPClientStatus == PSPClientStatus.Verified )
+                    {
+                        Notify( $"The client '{client.CompanyName}' was successfully approved.", NotificationType.Success );
+                    }
+                    else if ( model.PSPClientStatus == PSPClientStatus.Rejected )
+                    {
+                        Notify( $"The client '{client.CompanyName}' was declined.", NotificationType.Warn );
+                    }
+                    else
+                    {
+                        Notify( $"The client '{client.CompanyName}' status was updated to {model.PSPClientStatus}.", NotificationType.Success );
+                    }
+
+                    return RedirectToAction( "Clients", new { paging = new PagingModel(), search = new CustomSearchModel() } );
+                }
+                catch ( Exception ex )
+                {
+                    // Log the exception
+                    Notify( $"An error occurred while processing the client: {ex.Message}", NotificationType.Error );
+                    return View( model );
+                }
                 #endregion
-
-                Notify( $"The selected Client ({client.CompanyName}) was successfully approved.", NotificationType.Success );
-
-                scope.Complete();
             }
-
-            return Clients( new PagingModel(), new CustomSearchModel() );
         }
 
         //

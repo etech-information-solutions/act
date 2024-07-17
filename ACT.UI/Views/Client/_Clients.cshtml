@@ -51,14 +51,17 @@
             <th data-name="CreatedOn" data-column="c.CreatedOn">
                 Created
             </th>
-            <th data-name="PSPName" data-column="p.CompanyName">
+            @*<th data-name="PSPName" data-column="p.CompanyName">
                 PSP
-            </th>
+            </th>*@
             <th data-name="CompanyName" data-column="c.CompanyName">
                 Company Name
             </th>
-            <th data-name="Contact" data-column="c.ContactPerson">
-                Contact
+            <th data-name="ContactCount" data-column="ContactCount">
+                Contacts
+            </th>
+            <th data-name="Address" data-column="a.Addressline1">
+                Address
             </th>
             @*<th data-name="Suburb" data-column="c.FinancialPerson">
                     Finance Contact
@@ -69,24 +72,24 @@
             <th data-name="ChepReference" data-column="c.ChepReference">
                 Chep Ref
             </th>
-            <th data-name="ServiceRequired" data-column="c.ServiceRequired">
-                Service Required
-            </th>
+            @*<th data-name="ServiceRequired" data-column="c.ServiceRequired">
+                    Service Required
+                </th>*@
             <th data-name="Status" data-column="c.Status">
                 Status
             </th>
             @*<th data-name="UserCount" data-column="UserCount">
                     Users
                 </th>*@
-            <th data-name="ProductCount" data-column="ProductCount">
-                Products
-            </th>
-            <th data-name="InvoiceCount" data-column="InvoiceCount">
-                Invoices
-            </th>
-            <th data-name="BudgetCount" data-column="BudgetCount">
-                Budget
-            </th>
+            @*<th data-name="ProductCount" data-column="ProductCount">
+                    Products
+                </th>
+                <th data-name="InvoiceCount" data-column="InvoiceCount">
+                    Invoices
+                </th>
+                <th data-name="BudgetCount" data-column="BudgetCount">
+                    Budget
+                </th>*@
             <th data-name="Actions">
                 Actions
             </th>
@@ -99,7 +102,7 @@
             foreach ( var item in items )
             {
                 PSPClientStatus status = ( PSPClientStatus ) item.Status;
-                ServiceType serviceType = ( ServiceType ) item.ServiceRequired;
+                /*ServiceType serviceType = ( ServiceType ) item.ServiceRequired;*/
 
                 string enable = status.Equals( PSPClientStatus.Verified ) ? "Disable" : "Enable";
                 string active = status == PSPClientStatus.Verified ? "active" : status == PSPClientStatus.Unverified ? "pending" : "inactive";
@@ -122,7 +125,7 @@
                             <span></span>
                         </a>
                     </td>
-                    <td>
+                    @*<td>
                         @(item.PSPCompanyName ?? item.PSPName )
 
                         @if ( string.IsNullOrEmpty( item.PSPCompanyName ) && !string.IsNullOrEmpty( item.PSPName ) )
@@ -131,15 +134,58 @@
                                 <img alt="" src="@Url.Content( "~/Images/warn.png" )" />
                             </a>
                         }
-                    </td>
+                    </td>*@
                     <td>
                         @item.CompanyName
 
                         <i class="block">Reg # @item.CompanyRegistrationNumber</i>
                     </td>
+                    <td width="10%">
+                        @if ( item.Contacts != null && item.Contacts.Any( c => c.Status == ( Int32 ) Status.Active ) )
+                        {
+                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                                <a data-sticky-one="1" data-target="#transporter-@item.Id-contacts" data-trigger="mouseover" data-arrow="center-right" data-title="Contacts">
+                                    <i class="fa fa-phone"></i>@item.ContactCount contacts
+                                </a>
+
+                                <div id="transporter-@item.Id-contacts" class="none">
+                                    <ul class="list" style="max-height: 200px; overflow-y: auto;">
+                                        @foreach ( Contact d in item.Contacts.Where( c => c.Status == ( Int32 ) Status.Active ) )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                @d.ContactName -
+                                                <a href="tel:@d.ContactCell">@d.ContactCell</a>
+                                                <a href="mailto:@d.ContactEmail">@d.ContactEmail</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>@item.ContactCount contacts</span>
+                        }
+                    </td>
                     <td>
-                        @item.ContactPerson
-                        <a class="block" href="mailto:@item.Email">@item.Email @item.ContactNumber</a>
+                        @if ( !string.IsNullOrEmpty( item.AddressLine1 ) )
+                        {
+                            <span>@item.AddressLine1</span><br />
+                        }
+                        @if ( !string.IsNullOrEmpty( item.AddressLine2 ) )
+                        {
+                            <span>@item.AddressLine2</span><br />
+                        }
+                        @if ( !string.IsNullOrEmpty( item.Town ) )
+                        {
+                            <span>@item.Town</span><br />
+                        }
+                        @if ( !string.IsNullOrEmpty( item.PostalCode ) )
+                        {
+                            <span>@item.PostalCode</span>
+                        }
                     </td>
                     @*<td>
                             @item.FinancialPerson
@@ -159,9 +205,9 @@
                             <div>Additional: @item.AdditionalChepReferences</div>
                         }
                     </td>
-                    <td>
-                        @serviceType.GetDisplayText()
-                    </td>
+                    @*<td>
+                            @serviceType.GetDisplayText()
+                        </td>*@
                     <td>
                         @status.GetDisplayText()
 
@@ -176,24 +222,24 @@
                                 @Html.ActionLink( item.UserCount.ToString(), "ClientUsers", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
                             }
                         </td>*@
-                    <td>
-                        @if ( item.ProductCount > 0 )
-                        {
-                            @Html.ActionLink( item.ProductCount.ToString(), "ClientProducts", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                        }
-                    </td>
-                    <td>
-                        @if ( item.InvoiceCount > 0 )
-                        {
-                            @Html.ActionLink( item.InvoiceCount.ToString(), "ClientInvoices", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                        }
-                    </td>
-                    <td>
-                        @if ( item.BudgetCount > 0 )
-                        {
-                            @Html.ActionLink( item.BudgetCount.ToString(), "ClientBudgets", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                        }
-                    </td>
+                    @*<td>
+                            @if ( item.ProductCount > 0 )
+                            {
+                                @Html.ActionLink( item.ProductCount.ToString(), "ClientProducts", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            }
+                        </td>
+                        <td>
+                            @if ( item.InvoiceCount > 0 )
+                            {
+                                @Html.ActionLink( item.InvoiceCount.ToString(), "ClientInvoices", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            }
+                        </td>
+                        <td>
+                            @if ( item.BudgetCount > 0 )
+                            {
+                                @Html.ActionLink( item.BudgetCount.ToString(), "ClientBudgets", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            }
+                        </td>*@
 
                     <td width="12%">
 

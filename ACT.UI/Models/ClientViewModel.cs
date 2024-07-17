@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 using ACT.Core.Enums;
@@ -54,37 +53,29 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string ContactNumber { get; set; }
 
-        [Required]
         [Display( Name = "Contact Person" )]
         [StringLength( 200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string ContactPerson { get; set; }
 
-        [Required]
-        [Display( Name = " Contact Person Email" )]
+        [Display( Name = "Contact Person Email" )]
         [StringLength( 200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string Email { get; set; }
 
-        [Required]
         [Display( Name = "Administrator Name" )]
         [StringLength( 200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string AdminPerson { get; set; }
 
-        [Required]
         [Display( Name = "Administrator Email" )]
         [StringLength( 200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string AdminEmail { get; set; }
 
-
-        [Required]
-        [Display( Name = " Financial Person Name" )]
+        [Display( Name = "Financial Person Name" )]
         [StringLength( 200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string FinancialPerson { get; set; }
 
-        [Required]
         [Display( Name = "Financial Person Email" )]
         [StringLength( 200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string FinPersonEmail { get; set; }
-
 
         [Display( Name = "Select a reason why you're declining this Client" )]
         public string DeclinedReason { get; set; }
@@ -99,12 +90,14 @@ namespace ACT.UI.Models
         [Display( Name = "Your Type of Pallet Use" )]
         public string OtherTypeOfPalletUse { get; set; }
 
-        [Required]
         [Display( Name = "Company Type" )]
         public CompanyType CompanyType { get; set; }
 
-        [Display( Name = "Status" )]
-        public PSPClientStatus Status { get; set; }
+        [Display( Name = "Client Status" )]
+        public PSPClientStatus PSPClientStatus { get; set; }
+
+        [Display( Name = "Contact Status" )]
+        public Status ContactStatus { get; set; }
 
         [Display( Name = "Chep Client?" )]
         public YesNo IsChepClient { get; set; }
@@ -124,13 +117,10 @@ namespace ACT.UI.Models
         [Display( Name = "Number Of Pallets Lost" )]
         public int? NumberOfLostPallets { get; set; }
 
-
         [Display( Name = "Select a reason why you're declining this Client" )]
         public string DeclineReason { get; set; }
 
         public bool EditMode { get; set; }
-
-        #endregion
 
         [Display( Name = "Primary Chep Reference" )]
         public string PrimaryChepReference { get; set; }
@@ -138,6 +128,10 @@ namespace ACT.UI.Models
         [Display( Name = "Additional Chep References" )]
         public string AdditionalChepReferences { get; set; }
 
+        [Display( Name = "Contacts" )]
+        public List<Contact> Contacts { get; set; }
+
+        #endregion
 
         #region Model Options
 
@@ -156,7 +150,7 @@ namespace ACT.UI.Models
         {
             get
             {
-                if ( Status == PSPClientStatus.Unverified )
+                if ( PSPClientStatus == PSPClientStatus.Unverified )
                 {
                     using ( DeclineReasonService dservice = new DeclineReasonService() )
                     {

@@ -770,6 +770,8 @@
     <Content Include="Views\Administration\_AuditLogPerUser.cshtml" />
     <Content Include="Views\Shared\_AuditLogPerUserCustomSearch.cshtml" />
     <Content Include="Views\DashBoard\_ToSites.cshtml" />
+    <Content Include="Views\Shared\_ClientContacts.cshtml" />
+    <Content Include="Views\Shared\_ClientContactsView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
