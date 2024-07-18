@@ -3941,6 +3941,30 @@ namespace ACT.UI.Controllers
             }
         }
 
+        public ActionResult Customers( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "Customers";
+
+                return PartialView( "_CustomersCustomSearch", new CustomSearchModel( "Customers" ) );
+            }
+
+            using ( ClientCustomerService service = new ClientCustomerService() )
+            {
+                pm.Sort = pm.Sort ?? "ASC";
+                pm.SortBy = pm.SortBy ?? "c.CompanyName";
+
+                List<ClientCustomerCustomModel> model = service.List1( pm, csm );
+
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_Customers", paging );
+            }
+        }
+
         //
         // POST || GET: /Client/ClientKPIS
         public ActionResult ClientKPI( PagingModel pm, CustomSearchModel csm, bool givecsm = false )

@@ -772,6 +772,7 @@
     <Content Include="Views\DashBoard\_ToSites.cshtml" />
     <Content Include="Views\Shared\_ClientContacts.cshtml" />
     <Content Include="Views\Shared\_ClientContactsView.cshtml" />
+    <Content Include="Views\Client\_Customers.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

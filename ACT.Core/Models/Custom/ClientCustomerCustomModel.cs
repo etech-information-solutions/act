@@ -1,9 +1,6 @@
-
 namespace ACT.Core.Models.Custom
 {
     using System;
-    using System.Collections.Generic;
-    using ACT.Data.Models;
 
     public partial class ClientCustomerCustomModel
     {
@@ -11,10 +8,16 @@ namespace ACT.Core.Models.Custom
         public int ClientId { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime ModifiedOn { get; set; }
-        public string Modifiedby { get; set; }
+        public string ModifiedBy { get; set; }
         public string CustomerName { get; set; }
+        public string CustomerNumber { get; set; }
+        public string ContactNumber { get; set; }
+        public string CompanyName { get; set; } = string.Empty;
+        public string KeyAccountManager { get; set; }
+        public string CustomerAddress1 { get; set; }
+        public string CustomerTown { get; set; }
+        public string CustomerPostalCode { get; set; }
         public int Status { get; set; }
-
         public string ClientName { get; set; }
     }
 }

@@ -1,0 +1,142 @@
+﻿@model PagingExtension
+
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+@using ACT.Core.Models.Custom;
+
+@{
+    ViewBag.ShowExport = true;
+    ViewBag.ShowCustom = true;
+
+    ViewBag.ViewName = "_Customers";
+}
+
+@Html.Partial( "_Notification" )
+
+@{
+    UserModel user = User.Get();
+
+    int count = Model.Start;
+    List<ClientCustomerCustomModel> items = ( List<ClientCustomerCustomModel> ) Model.Items;
+}
+
+@if ( Model == null || !items.Any() )
+{
+    <div class="notification message-warn" style="margin-bottom: 20px;">
+        There are no Customers available matching your search criteria.
+    </div>
+}
+
+@if ( user.IsAdmin || user.IsPSPAdmin )
+{
+    <p>
+        @Html.ActionLink( "Add", "AddCustomer", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Customer?", @data_edit = "1", @data_id = 0, @data_target = "#customers" } )
+        <span class="loader"></span>
+    </p>
+}
+
+<table id="customers-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#customers-table_wrapper" data-starting-point=".ap-tabs ul">
+    <thead>
+        <tr>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="CreatedOn" data-column="cc.CreatedOn">
+                Created
+            </th>
+            <th data-name="CompanyName" data-column="cc.CompanyName">
+                Customer Name
+            </th>
+            <th data-name="CustomerNumber" data-column="cc.CustomerNumber">
+                Customer Number
+            </th>
+            <th data-name="CustomerContact" data-column="cc.CustomerContact">
+                Customer Contact
+            </th>
+            <th data-name="KeyAccountManager" data-column="c.KeyAccountManager">
+                Key Account Manager
+            </th>
+            <th data-name="CustomerAddress1" data-column="cc.CustomerAddress1">
+                Address
+            </th>
+            <th data-name="CustomerTown" data-column="cc.CustomerTown">
+                Town
+            </th>
+            <th data-name="CustomerPostalCode" data-column="cc.CustomerPostalCode">
+                Postal Code
+            </th>
+            <th data-name="Status" data-column="cc.Status">
+                Status
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if ( Model != null && items != null && items.Count() > 0 )
+        {
+            foreach ( ClientCustomerCustomModel item in items )
+            {
+                Status status = ( Status ) item.Status;
+
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
+
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+
+                    <td width="1%">
+                        @count
+                    </td>
+                    <td>
+                        @item.CreatedOn.ToString( "yyyy-MM-dd" )
+
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Customer">
+                            <img alt="" src="@Url.Content("~/Images/duplicate-content.png")" style="max-width: 15px;" />
+                            <span></span>
+                        </a>
+                    </td>
+                    <td>
+                        @item.CompanyName
+                    </td>
+                    <td>
+                        @item.CustomerNumber
+                    </td>
+                    <td>
+                        @item.ContactNumber
+                    </td>
+                    <td>
+                        @item.KeyAccountManager
+                    </td>
+                    <td>
+                        @item.CustomerAddress1
+                    </td>
+                    <td>
+                        @item.CustomerTown
+                    </td>
+                    <td>
+                        @item.CustomerPostalCode
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+                    </td>
+
+                    <td width="15%">
+                        @Html.ActionLink( "Details", "CustomerDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( "Edit", "EditCustomer", new { id = item.Id, returnView = "Customer" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                        @Html.ActionLink( enable, "DeleteCustomer", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#customer", @rel = "tipsyE", @title = enable + " this item?" } )
+                    </td>
+
+                </tr>
+
+                count++;
+            }
+        }
+    </tbody>
+
+</table>
+
+@Html.Partial( "_Paging" )

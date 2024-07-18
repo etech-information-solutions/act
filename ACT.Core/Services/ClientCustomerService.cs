@@ -199,12 +199,12 @@ namespace ACT.Core.Services
         }
 
         /// <summary>
-        /// Gets a list of Clients matching the specified search params
+        /// Gets a list of Customers matching the specified search params
         /// </summary>
         /// <param name="pm"></param>
         /// <param name="csm"></param>
         /// <returns></returns>
-        public List<ClientCustomModel> List1( PagingModel pm, CustomSearchModel csm )
+        public List<ClientCustomerCustomModel> List1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
@@ -217,31 +217,27 @@ namespace ACT.Core.Services
 
             List<object> parameters = new List<object>()
             {
-                { new SqlParameter( "skip", pm.Skip ) },
-                { new SqlParameter( "take", pm.Take ) },
-                { new SqlParameter( "csmPSPId", csm.PSPId ) },
-                { new SqlParameter( "csmStatus", ( int ) csm.PSPClientStatus ) },
-                { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
-                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                { new SqlParameter("skip", pm.Skip) },
+                { new SqlParameter("take", pm.Take) },
+                { new SqlParameter("csmPSPId", csm.PSPId) },
+                { new SqlParameter("csmStatus", (int)csm.PSPClientStatus) },
+                { new SqlParameter("query", csm.Query ?? (object)DBNull.Value) },
+                { new SqlParameter("csmToDate", csm.ToDate ?? (object)DBNull.Value) },
+                { new SqlParameter("userid", (CurrentUser != null) ? CurrentUser.Id : 0) },
+                { new SqlParameter("csmFromDate", csm.FromDate ?? (object)DBNull.Value) },
             };
 
             #endregion
 
             string query = @"SELECT
-                                c.*,
-                                p.CompanyName as [PSPCompanyName],
-                                (SELECT COUNT(1) FROM [dbo].[ClientUser] cu WHERE c.Id=cu.ClientId) AS [UserCount],
-                                (SELECT COUNT(1) FROM [dbo].[ClientBudget] cb WHERE c.Id=cb.ClientId) AS [BudgetCount],
-                                (SELECT COUNT(1) FROM [dbo].[ClientProduct] cp WHERE c.Id=cp.ClientId) AS [ProductCount],
-                                (SELECT COUNT(1) FROM [dbo].[Document] d WHERE c.Id=d.ObjectId AND d.ObjectType='Client') AS [DocumentCount],
-                                (SELECT COUNT(1) FROM [dbo].[EstimatedLoad] el WHERE c.Id=el.ObjectId AND el.ObjectType='Client') AS [EstimatedLoadCount],
-                                (SELECT COUNT(1) FROM [dbo].[ClientInvoice] ci, [dbo].[ClientLoad] cl WHERE cl.Id=ci.ClientLoadId AND c.Id=cl.ClientId) AS [InvoiceCount]
-                             FROM
-                                [dbo].[Client] c
-                                LEFT OUTER JOIN [dbo].[PSPClient] pc ON pc.Id=(SELECT TOP 1 pc1.Id FROM [dbo].[PSPClient] pc1 WHERE pc1.ClientId=pc.ClientId AND pc1.ClientId=c.Id)
-                                LEFT OUTER JOIN [dbo].[PSP] p ON p.Id=pc.PSPId";
+                        cc.*,
+                        c.CompanyName,
+                        c.ContactNumber,
+                        c.ContactPerson AS [KeyAccountManager],
+                        (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cc.Id=d.ObjectId AND d.ObjectType='Customer') AS [DocumentCount]
+                     FROM
+                        [dbo].[ClientCustomer] cc
+                        LEFT OUTER JOIN [dbo].[Client] c ON c.Id=cc.ClientId";
 
             // WHERE
 
@@ -249,15 +245,14 @@ namespace ACT.Core.Services
 
             query = $"{query} WHERE (1=1)";
 
-            // Limit to only show clients for logged in PSP
+            // Limit to only show customers for logged in Client
             if ( !CurrentUser.IsAdmin )
             {
-                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu
-                                                       INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId
-                                              WHERE
-                                                pc.ClientId=c.Id AND
-                                                pu.UserId=@userid
-                                             ) ";
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu
+                                      WHERE
+                                        cc.ClientId=cu.ClientId AND
+                                        cu.UserId=@userid
+                                     ) ";
             }
 
             #endregion
@@ -266,28 +261,23 @@ namespace ACT.Core.Services
 
             #region Custom Search
 
-            if ( csm.PSPId > 0 )
-            {
-                query = $"{query} AND (p.Id=@csmPSPId) ";
-            }
-
             if ( csm.PSPClientStatus != PSPClientStatus.All )
             {
-                query = $"{query} AND (c.Status=@csmStatus) ";
+                query = $"{query} AND (cc.Status=@csmStatus) ";
             }
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (c.CreatedOn >= @csmFromDate AND c.CreatedOn <= @csmToDate) ";
+                query = $"{query} AND (cc.CreatedOn >= @csmFromDate AND cc.CreatedOn <= @csmToDate) ";
             }
             else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
             {
                 if ( csm.FromDate.HasValue )
                 {
-                    query = $"{query} AND (c.CreatedOn>=@csmFromDate) ";
+                    query = $"{query} AND (cc.CreatedOn>=@csmFromDate) ";
                 }
                 if ( csm.ToDate.HasValue )
                 {
-                    query = $"{query} AND (c.CreatedOn<=@csmToDate) ";
+                    query = $"{query} AND (cc.CreatedOn<=@csmToDate) ";
                 }
             }
 
@@ -299,23 +289,14 @@ namespace ACT.Core.Services
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (c.[CompanyName] LIKE '%{1}%' OR
-                                                  c.[CompanyRegistrationNumber] LIKE '%{1}%' OR
-                                                  c.[CompanyName] LIKE '%{1}%' OR
-                                                  c.[TradingAs] LIKE '%{1}%' OR
-                                                  c.[Description] LIKE '%{1}%' OR
-                                                  c.[VATNumber] LIKE '%{1}%' OR
-                                                  c.[ContactNumber] LIKE '%{1}%' OR
-                                                  c.[ContactPerson] LIKE '%{1}%' OR
-                                                  c.[FinancialPerson] LIKE '%{1}%' OR
-                                                  c.[FinPersonEmail] LIKE '%{1}%' OR
-                                                  c.[Email] LIKE '%{1}%' OR
-                                                  c.[AdminEmail] LIKE '%{1}%' OR
-                                                  c.[AdminPerson] LIKE '%{1}%' OR
-                                                  c.[ChepReference] LIKE '%{1}%' OR
-                                                  c.[AdminPerson] LIKE '%{1}%' OR
-                                                  p.[CompanyName] LIKE '%{1}%'
-                                             ) ", query, csm.Query.Trim() );
+                query = string.Format( @"{0} AND (cc.[CustomerName] LIKE '%{1}%' OR
+                                          cc.[CustomerNumber] LIKE '%{1}%' OR
+                                          cc.[CustomerContact] LIKE '%{1}%' OR
+                                          cc.[CustomerAddress1] LIKE '%{1}%' OR
+                                          cc.[CustomerTown] LIKE '%{1}%' OR
+                                          cc.[CustomerPostalCode] LIKE '%{1}%' OR
+                                          c.[CompanyName] LIKE '%{1}%'
+                                     ) ", query, csm.Query.Trim() );
             }
 
             #endregion
@@ -328,18 +309,7 @@ namespace ACT.Core.Services
 
             query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
-            List<ClientCustomModel> model = context.Database.SqlQuery<ClientCustomModel>( query, parameters.ToArray() ).ToList();
-
-            if ( model.NullableAny( c => c.DocumentCount > 0 ) )
-            {
-                using ( DocumentService dservice = new DocumentService() )
-                {
-                    foreach ( ClientCustomModel item in model.Where( c => c.DocumentCount > 0 ) )
-                    {
-                        item.Documents = dservice.List( item.Id, "Client" );
-                    }
-                }
-            }
+            List<ClientCustomerCustomModel> model = context.Database.SqlQuery<ClientCustomerCustomModel>( query, parameters.ToArray() ).ToList();
 
             return model;
         }
