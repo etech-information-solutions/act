@@ -19,6 +19,9 @@ namespace ACT.Core.Enums
         [StringEnumDisplayText( "Director" )]
         Director = 2,
 
+        [StringEnumDisplayText( "Key Account Manager" )]
+        KeyAccount = 3,
+
         [StringEnumDisplayText( "Finance" )]
         Finance = 3,
     }
