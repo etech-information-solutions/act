@@ -217,23 +217,22 @@ namespace ACT.Core.Services
             }
 
             // Parameters
-
             #region Parameters
-
             List<object> parameters = new List<object>()
             {
-                { new SqlParameter( "skip", pm.Skip ) },
-                { new SqlParameter( "take", pm.Take ) },
-                { new SqlParameter( "csmPSPId", csm.PSPId ) },
-                { new SqlParameter( "csmClientId", csm.ClientId ) },
-                { new SqlParameter( "csmStatus", ( int ) csm.PSPClientStatus ) },
-                { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
-                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "useremail", ( CurrentUser != null ) ? CurrentUser.Email : "" ) },
+                { new SqlParameter("skip", pm.Skip) },
+                { new SqlParameter("take", pm.Take) },
+                { new SqlParameter("csmClientId", csm.ClientId) },
+                { new SqlParameter("csmStatus", (int)csm.PSPClientStatus) },
+                { new SqlParameter("query", csm.Query ?? (object)DBNull.Value) },
+                { new SqlParameter("csmToDate", csm.ToDate ?? (object)DBNull.Value) },
+                { new SqlParameter("userid", (CurrentUser != null) ? CurrentUser.Id : 0) },
+                { new SqlParameter("csmFromDate", csm.FromDate ?? (object)DBNull.Value) },
+                { new SqlParameter("useremail", (CurrentUser != null) ? CurrentUser.Email : "") },
+                { new SqlParameter("csmCompanyNameId", csm.CompanyNameId) },
+                { new SqlParameter("csmChepReference", csm.ChepReference ?? (object)DBNull.Value) },
+                { new SqlParameter("csmCompanyRegistrationNumberId", csm.CompanyRegistrationNumberId) },
             };
-
             #endregion
 
             string query = @"SELECT
@@ -260,15 +259,13 @@ namespace ACT.Core.Services
             LEFT OUTER JOIN [dbo].[Address] a ON a.ObjectId = c.Id AND a.ObjectType = 'Client' AND a.Status = 1";
 
             // WHERE
-
             #region WHERE
-
             query = $"{query} WHERE (1=1)";
 
             // Limit to only show clients for logged in PSP
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
+                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid) ";
             }
             else if ( CurrentUser.RoleType == RoleType.Client )
             {
@@ -278,17 +275,10 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[Transporter] t WHERE t.[Id]=cl.[TransporterId] AND t.[Email]=@useremail)";
             }
-
             #endregion
 
             // Custom Search
-
             #region Custom Search
-
-            if ( csm.PSPId > 0 )
-            {
-                query = $"{query} AND (p.Id=@csmPSPId) ";
-            }
             if ( csm.ClientId > 0 )
             {
                 query = $"{query} AND (c.Id=@csmClientId) ";
@@ -298,6 +288,7 @@ namespace ACT.Core.Services
             {
                 query = $"{query} AND (c.Status=@csmStatus) ";
             }
+
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
                 query = $"{query} AND (c.CreatedOn >= @csmFromDate AND c.CreatedOn <= @csmToDate) ";
@@ -314,12 +305,30 @@ namespace ACT.Core.Services
                 }
             }
 
+            if ( csm.CompanyNameId > 0 )
+            {
+                query = $"{query} AND c.Id = @csmCompanyNameId";
+            }
+
+            if ( !string.IsNullOrEmpty( csm.ChepReference ) )
+            {
+                query = $@"{query} AND EXISTS (
+                    SELECT 1 
+                    FROM [dbo].[ClientChepAccount] cca 
+                    WHERE c.Id = cca.ClientId 
+                        AND cca.ChepReference = @csmChepReference
+                )";
+            }
+
+            if ( csm.CompanyRegistrationNumberId > 0 )
+            {
+                query = $"{query} AND c.Id = @csmCompanyRegistrationNumberId";
+            }
+
             #endregion
 
             // Normal Search
-
             #region Normal Search
-
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
                 query = string.Format( @"{0} AND (c.[CompanyName] LIKE '%{1}%' OR
@@ -340,15 +349,12 @@ namespace ACT.Core.Services
                                                   p.[CompanyName] LIKE '%{1}%'
                                              ) ", query, csm.Query.Trim() );
             }
-
             #endregion
 
             // ORDER
-
             query = $"{query} ORDER BY {pm.SortBy} {pm.Sort}";
 
             // SKIP, TAKE
-
             query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
             List<ClientCustomModel> model = context.Database.SqlQuery<ClientCustomModel>( query, parameters.ToArray() ).ToList();
@@ -591,5 +597,30 @@ namespace ACT.Core.Services
         {
             return context.Clients.Any( c => c.CompanyRegistrationNumber == registrationNumber );
         }
+
+        #region Search functionality for Client Specific search
+
+        public Dictionary<int, string> GetCompanyNameOptions()
+        {
+            return context.Clients
+                .Where( c => !string.IsNullOrEmpty( c.CompanyName ) )
+                .ToDictionary( c => c.Id, c => c.CompanyName );
+        }
+
+        public Dictionary<string, string> GetChepReferenceOptions()
+        {
+            return context.ClientChepAccounts
+                .Where( cca => !string.IsNullOrEmpty( cca.ChepReference ) )
+                .ToDictionary( cca => cca.ChepReference, cca => cca.ChepReference );
+        }
+
+        public Dictionary<int, string> GetCompanyRegistrationNumberOptions()
+        {
+            return context.Clients
+                .Where( c => !string.IsNullOrEmpty( c.CompanyRegistrationNumber ) )
+                .ToDictionary( c => c.Id, c => c.CompanyRegistrationNumber );
+        }
+
+        #endregion
     }
 }

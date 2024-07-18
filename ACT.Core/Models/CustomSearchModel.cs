@@ -8,6 +8,7 @@ using ACT.Data.Models;
 using System.Reflection;
 using ACT.Core.Models.Simple;
 using System.Data;
+using System.Web.Mvc;
 
 namespace ACT.Core.Models
 {
@@ -102,6 +103,15 @@ namespace ACT.Core.Models
         {
             get; set;
         }
+
+        [Display( Name = "Company Name" )]
+        public int CompanyNameId { get; set; }
+
+        [Display( Name = "Chep Reference" )]
+        public string ChepReference { get; set; }
+
+        [Display( Name = "Company Registration Number" )]
+        public int CompanyRegistrationNumberId { get; set; }
 
         /// <summary>
         /// Can be used as a selected Site 
@@ -524,6 +534,12 @@ namespace ACT.Core.Models
 
         public Dictionary<int, string> OutstandingReasonOptions { get; set; }
 
+        public List<SelectListItem> CompanyNameOptions { get; set; }
+
+        public List<SelectListItem> ChepReferenceOptions { get; set; }
+
+        public List<SelectListItem> CompanyRegistrationNumberOptions { get; set; }
+
         public List<DisputeReason> DisputeReasonOptions { get; set; }
 
         public List<string> TableNameOptions
@@ -602,6 +618,17 @@ namespace ACT.Core.Models
                     {
                         PSPOptions = pservice.List( true );
                         ClientOptions = cservice.List( true );
+                        CompanyNameOptions = cservice.GetCompanyNameOptions()
+                            .Select( kvp => new SelectListItem { Value = kvp.Key.ToString(), Text = kvp.Value } )
+                            .ToList();
+
+                        ChepReferenceOptions = cservice.GetChepReferenceOptions()
+                            .Select( kvp => new SelectListItem { Value = kvp.Key, Text = kvp.Value } )
+                            .ToList();
+
+                        CompanyRegistrationNumberOptions = cservice.GetCompanyRegistrationNumberOptions()
+                            .Select( kvp => new SelectListItem { Value = kvp.Key.ToString(), Text = kvp.Value } )
+                            .ToList();
                     }
 
                     break;
