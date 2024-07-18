@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Web.Mvc;
 
 using ACT.Core.Enums;
 using ACT.Core.Models;
@@ -600,25 +601,28 @@ namespace ACT.Core.Services
 
         #region Search functionality for Client Specific search
 
-        public Dictionary<int, string> GetCompanyNameOptions()
+        public List<SelectListItem> GetCompanyNameOptions()
         {
             return context.Clients
                 .Where( c => !string.IsNullOrEmpty( c.CompanyName ) )
-                .ToDictionary( c => c.Id, c => c.CompanyName );
+                .Select( c => new SelectListItem { Value = c.Id.ToString(), Text = c.CompanyName } )
+                .ToList();
         }
 
-        public Dictionary<string, string> GetChepReferenceOptions()
+        public List<SelectListItem> GetChepReferenceOptions()
         {
             return context.ClientChepAccounts
                 .Where( cca => !string.IsNullOrEmpty( cca.ChepReference ) )
-                .ToDictionary( cca => cca.ChepReference, cca => cca.ChepReference );
+                .Select( cca => new SelectListItem { Value = cca.ChepReference, Text = cca.ChepReference } )
+                .ToList();
         }
 
-        public Dictionary<int, string> GetCompanyRegistrationNumberOptions()
+        public List<SelectListItem> GetCompanyRegistrationNumberOptions()
         {
             return context.Clients
                 .Where( c => !string.IsNullOrEmpty( c.CompanyRegistrationNumber ) )
-                .ToDictionary( c => c.Id, c => c.CompanyRegistrationNumber );
+                .Select( c => new SelectListItem { Value = c.Id.ToString(), Text = c.CompanyRegistrationNumber } )
+                .ToList();
         }
 
         #endregion

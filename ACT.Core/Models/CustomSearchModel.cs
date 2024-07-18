@@ -618,17 +618,9 @@ namespace ACT.Core.Models
                     {
                         PSPOptions = pservice.List( true );
                         ClientOptions = cservice.List( true );
-                        CompanyNameOptions = cservice.GetCompanyNameOptions()
-                            .Select( kvp => new SelectListItem { Value = kvp.Key.ToString(), Text = kvp.Value } )
-                            .ToList();
-
-                        ChepReferenceOptions = cservice.GetChepReferenceOptions()
-                            .Select( kvp => new SelectListItem { Value = kvp.Key, Text = kvp.Value } )
-                            .ToList();
-
-                        CompanyRegistrationNumberOptions = cservice.GetCompanyRegistrationNumberOptions()
-                            .Select( kvp => new SelectListItem { Value = kvp.Key.ToString(), Text = kvp.Value } )
-                            .ToList();
+                        CompanyNameOptions = cservice.GetCompanyNameOptions();
+                        ChepReferenceOptions = cservice.GetChepReferenceOptions();
+                        CompanyRegistrationNumberOptions = cservice.GetCompanyRegistrationNumberOptions();
                     }
 
                     break;
