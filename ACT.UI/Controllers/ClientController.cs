@@ -1597,7 +1597,7 @@ namespace ACT.UI.Controllers
                 {
                     Address address = new Address()
                     {
-                        ObjectId = client.Id,
+                        ObjectId = customer.Id,
                         ObjectType = "Customer",
                         Town = model.Address.Town,
                         Status = ( int ) Status.Active,
@@ -1662,12 +1662,9 @@ namespace ACT.UI.Controllers
 
         public JsonResult GetKeyAccountManager( int clientId )
         {
-            using ( var clientService = new ClientService() )
+            using ( var clientCustomerService = new ClientCustomerService() )
             {
-                var client = clientService.GetById( clientId );
-                string keyAccountManager = !string.IsNullOrWhiteSpace( client?.ContactPerson )
-                    ? client.ContactPerson
-                    : "No Key Account Manager assigned";
+                string keyAccountManager = clientCustomerService.GetKeyAccountManagerFromContacts( clientId );
                 return Json( new { success = true, keyAccountManager }, JsonRequestBehavior.AllowGet );
             }
         }
