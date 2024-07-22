@@ -185,11 +185,11 @@ namespace ACT.Core.Services
                                 c.CompanyName AS ClientName,
                                 cc.CustomerName,
                                 cc.CustomerNumber,
-                                cont.ContactCell AS CustomerContact,
-                                kam.ContactName AS KeyAccountManager,
+                                MAX(CASE WHEN cont.JobTitle = 2 THEN cont.ContactCell ELSE NULL END) AS CustomerContact,
+                                MAX(CASE WHEN cont.JobTitle = 2 THEN cont.ContactName ELSE NULL END) AS KeyAccountManager,
                                 CONCAT(
                                     ISNULL(a.Addressline1, ''),
-                                    '|',  -- Use a pipe character as a separator
+                                    '|',
                                     ISNULL(a.Addressline2, '')
                                 ) AS CustomerAddress1,
                                 a.Town AS CustomerTown,
@@ -201,7 +201,6 @@ namespace ACT.Core.Services
                                 INNER JOIN [dbo].[Client] c ON c.Id = cc.ClientId
                                 LEFT JOIN [dbo].[Address] a ON a.ObjectId = cc.Id AND a.ObjectType = 'Customer'
                                 LEFT JOIN [dbo].[Contact] cont ON cont.ObjectId = cc.Id AND cont.ObjectType = 'Customer'
-                                LEFT JOIN [dbo].[Contact] kam ON kam.ObjectId = cc.Id AND kam.ObjectType = 'Customer' AND kam.JobTitle = 2
                             WHERE (1=1)";
 
             if ( !CurrentUser.IsAdmin )
@@ -241,6 +240,11 @@ namespace ACT.Core.Services
                kam.ContactName LIKE '%{0}%')",
                csm.Query.Trim() );
             }
+
+            query += @"
+                    GROUP BY
+                    cc.Id, cc.CreatedOn, c.CompanyName, cc.CustomerName, cc.CustomerNumber,
+                    a.Addressline1, a.Addressline2, a.Town, a.PostalCode, cc.Status, c.Id";
 
             query += $" ORDER BY {pm.SortBy} {pm.Sort}";
             query += " OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY";
