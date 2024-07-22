@@ -10,19 +10,23 @@ namespace ACT.Core.Enums
         [StringEnumDisplayText( "None" )]
         None = -1,
 
-        [StringEnumDisplayText( "Administration" )]
-        Administration = 0,
-
-        [StringEnumDisplayText( "Management" )]
-        Management = 1,
-
-        [StringEnumDisplayText( "Director" )]
-        Director = 2,
-
-        [StringEnumDisplayText( "Key Account Manager" )]
-        KeyAccount = 3,
+        [StringEnumDisplayText( "General Account" )]
+        General = 0,
 
         [StringEnumDisplayText( "Finance" )]
-        Finance = 4,
+        Finance = 1,
+
+        [StringEnumDisplayText( "Key Account Manager" )]
+        KeyAccount = 2,
+
+        [StringEnumDisplayText( "Management" )]
+        Management = 3,
+
+        [StringEnumDisplayText( "Director" )]
+        Director = 4,
+
+        [StringEnumDisplayText( "Administration" )]
+        Administration = 5,
+        
     }
 }

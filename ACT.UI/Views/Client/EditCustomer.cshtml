@@ -2,7 +2,6 @@
 
 @using ACT.UI.Models;
 @using ACT.Core.Enums;
-@using ACT.Core.Models;
 
 @{
     if ( ViewBag.IncludeLayout == null )
@@ -10,31 +9,27 @@
         Layout = null;
     }
 
-    ViewBag.Title = "Add Customer";
-
-    UserModel user = User.Get();
+    ViewBag.Title = "Edit Customer";
 }
 
 @Html.Partial( "_Notification" )
 
 @Html.HiddenFor( m => m.ClientId )
 
-
-@using ( Html.BeginForm( "AddCustomer", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#customers", @class = "custom-validate", @style = "width: auto;" } ) )
+@using ( Html.BeginForm( "EditCustomer", "Client", FormMethod.Post, new { @data_ajax_form = "1", @data_target = "#customers", @class = "custom-validate", @style = "width: auto;" } ) )
 {
     <div id="edit-item">
-
         <h2 class="uppercase" style="width: auto;">
-            <img alt="" src="@Url.Content("~/images/add.png")" />
-            <span>Add Customer</span>
+            <img alt="" src="@Url.Content("~/images/edit.png")" />
+            <span>Edit Customer</span>
         </h2>
 
         @Html.ValidationSummary( true )
 
+        @Html.HiddenFor( model => model.Id )
+
         <div id="item-details" class="item-details" style="width: auto;">
-
-            <div class="left" style="width: 25%; margin-right: 2%;">
-
+            <div class="left" style="width: 47%; margin-right: 4%;">
                 <div class="editor-label">
                     @Html.LabelFor( model => model.ClientId, "Select Client" )
                 </div>
@@ -59,14 +54,6 @@
                     @Html.ValidationMessageFor( model => model.CustomerNumber )
                 </div>
 
-                @*<div class="editor-label">
-                        @Html.LabelFor( model => model.CustomerContact, "Contact Number" )
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor( model => model.CustomerContact, new { @class = "input", @placeholder = "Enter Contact Number" } )
-                        @Html.ValidationMessageFor( model => model.CustomerContact )
-                    </div>*@
-
                 <div class="editor-label">
                     @Html.LabelFor( model => model.KeyAccountManager )
                 </div>
@@ -82,11 +69,9 @@
                     @Html.EnumDropDownListFor( model => model.Status, "-- Select Status --", new { @class = "chzn", @style = "width: 98%;" } )
                     @Html.ValidationMessageFor( model => model.Status )
                 </div>
-
             </div>
 
-            <div class="left" style="width: 73%;">
-
+            <div class="left" style="width: 47%;">
                 <div id="contact-list">
                     @Html.Partial( "_Contacts", Model.Contacts )
                 </div>
@@ -94,7 +79,6 @@
                 <div class="clear"></div>
 
                 <div class="grouped-area">
-
                     <p>
                         <strong class="uppercase">Address Details</strong>
                     </p>
@@ -137,9 +121,7 @@
                         @Html.DropDownListFor( model => model.Address.ProvinceId, model => Model.Address.ProvinceOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
                         @Html.ValidationMessageFor( model => model.Address.ProvinceId )
                     </div>
-
                 </div>
-
             </div>
 
             <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
@@ -149,9 +131,8 @@
 
                 <span style="padding: 0 5px;">/</span>
 
-                <a data-refresh="1" data-target="#customers">Cancel</a>
+                <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
             </p>
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
         </div>
     </div>
 }

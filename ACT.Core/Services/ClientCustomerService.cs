@@ -178,7 +178,6 @@ namespace ACT.Core.Services
                 new SqlParameter("csmFromDate", csm.FromDate ?? (object)DBNull.Value),
             };
 
-
             string query = @"
                             SELECT
                                 cc.Id,
@@ -186,8 +185,8 @@ namespace ACT.Core.Services
                                 c.CompanyName AS ClientName,
                                 cc.CustomerName,
                                 cc.CustomerNumber,
-                                cc.CustomerContact,
-                                c.ContactPerson AS KeyAccountManager,
+                                cont.ContactCell AS CustomerContact,
+                                kam.ContactName AS KeyAccountManager,
                                 CONCAT(
                                     ISNULL(a.Addressline1, ''),
                                     '|',  -- Use a pipe character as a separator
@@ -200,14 +199,15 @@ namespace ACT.Core.Services
                             FROM
                                 [dbo].[ClientCustomer] cc
                                 INNER JOIN [dbo].[Client] c ON c.Id = cc.ClientId
-                                LEFT JOIN [dbo].[Address] a ON a.ObjectId = cc.Id AND a.ObjectType = 'Customer'";
-
-            query += " WHERE (1=1)";      
+                                LEFT JOIN [dbo].[Address] a ON a.ObjectId = cc.Id AND a.ObjectType = 'Customer'
+                                LEFT JOIN [dbo].[Contact] cont ON cont.ObjectId = cc.Id AND cont.ObjectType = 'Customer'
+                                LEFT JOIN [dbo].[Contact] kam ON kam.ObjectId = cc.Id AND kam.ObjectType = 'Customer' AND kam.JobTitle = 2
+                            WHERE (1=1)";
 
             if ( !CurrentUser.IsAdmin )
             {
                 query += @" AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu
-            WHERE cc.ClientId = cu.ClientId AND cu.UserId = @userid)";
+                WHERE cc.ClientId = cu.ClientId AND cu.UserId = @userid)";
             }
 
             if ( csm.PSPClientStatus != PSPClientStatus.All )
@@ -219,12 +219,10 @@ namespace ACT.Core.Services
             {
                 query += " AND (cc.CreatedOn >= @csmFromDate AND cc.CreatedOn <= @csmToDate)";
             }
-
             else if ( csm.FromDate.HasValue )
             {
                 query += " AND (cc.CreatedOn >= @csmFromDate)";
             }
-
             else if ( csm.ToDate.HasValue )
             {
                 query += " AND (cc.CreatedOn <= @csmToDate)";
@@ -233,27 +231,32 @@ namespace ACT.Core.Services
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
                 query += string.Format( @" AND (cc.CustomerName LIKE '%{0}%' OR
-                               cc.CustomerNumber LIKE '%{0}%' OR
-                               cc.CustomerContact LIKE '%{0}%' OR
-                               a.Addressline1 LIKE '%{0}%' OR
-                               a.Addressline2 LIKE '%{0}%' OR
-                               a.Town LIKE '%{0}%' OR
-                               a.PostalCode LIKE '%{0}%' OR
-                               c.CompanyName LIKE '%{0}%')",
-                                        csm.Query.Trim() );
+               cc.CustomerNumber LIKE '%{0}%' OR
+               cont.ContactCell LIKE '%{0}%' OR
+               a.Addressline1 LIKE '%{0}%' OR
+               a.Addressline2 LIKE '%{0}%' OR
+               a.Town LIKE '%{0}%' OR
+               a.PostalCode LIKE '%{0}%' OR
+               c.CompanyName LIKE '%{0}%' OR
+               kam.ContactName LIKE '%{0}%')",
+               csm.Query.Trim() );
             }
 
             query += $" ORDER BY {pm.SortBy} {pm.Sort}";
-
             query += " OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY";
 
             List<ClientCustomerCustomModel> results = context.Database.SqlQuery<ClientCustomerCustomModel>( query, parameters.ToArray() ).ToList();
 
-            // Process the address
+            // Process the address information
             foreach ( var item in results )
             {
                 string[] addressParts = item.CustomerAddress1.Split( '|' );
                 item.CustomerAddress1 = string.Join( "<br>", addressParts.Where( p => !string.IsNullOrWhiteSpace( p ) ) );
+
+                // Set KeyAccountManager to "No Key Account Manager" if it's null or empty
+                item.KeyAccountManager = !string.IsNullOrWhiteSpace( item.KeyAccountManager )
+                    ? item.KeyAccountManager
+                    : "No Key Account Manager";
             }
 
             return results;
@@ -278,6 +281,25 @@ namespace ACT.Core.Services
         public ClientCustomer GetByClient( int clientId )
         {
             return context.ClientCustomers.FirstOrDefault( cc => cc.ClientId == clientId );
+        }
+
+        public string GetKeyAccountManagerFromContacts( int clientId )
+        {
+            var parameters = new List<object>
+            {
+                new SqlParameter("@clientId", clientId)
+            };
+
+            string query = @"
+                            SELECT TOP 1 ContactName
+                            FROM [dbo].[Contact]
+                            WHERE ObjectId = @clientId 
+                            AND ObjectType = 'Client'
+                            AND JobTitle = 2
+                            ORDER BY CreatedOn DESC";
+
+            var result = context.Database.SqlQuery<string>( query, parameters.ToArray() ).FirstOrDefault();
+            return result ?? "No Key Account Manager assigned.";
         }
     }
 }

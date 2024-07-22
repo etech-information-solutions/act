@@ -35,10 +35,6 @@ namespace ACT.UI.Models
         [Display( Name = "Contacts" )]
         public List<Contact> Contacts { get; set; }
 
-        [Display( Name = "Select Province" )]
-        public int ProvinceId { get; set; }
-        public Province Province { get; set; }
-
         [Required]
         [Display( Name = "Status" )]
         public Status Status { get; set; }
@@ -47,6 +43,7 @@ namespace ACT.UI.Models
 
         public AddressViewModel Address { get; set; }
 
+        public int? CustomerUserId { get; set; }
         #endregion
 
         #region Model Options

@@ -102,7 +102,7 @@
                         @item.CustomerNumber
                     </td>
                     <td>
-                        @item.CustomerContact
+                        @Html.Raw( item.CustomerContact )
                     </td>
                     <td>
                         @item.KeyAccountManager
@@ -122,7 +122,7 @@
                     <td width="15%">
                         @Html.ActionLink( "Details", "CustomerDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
                         @Html.ActionLink( "Edit", "EditCustomer", new { id = item.Id, returnView = "Customer" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                        @Html.ActionLink( enable, "DeleteCustomer", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#customer", @rel = "tipsyE", @title = enable + " this item?" } )
+                        @Html.ActionLink( enable, "DeleteCustomer", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#customers", @rel = "tipsyE", @title = enable + " this item?" } )
                     </td>
                 </tr>
                 count++;
