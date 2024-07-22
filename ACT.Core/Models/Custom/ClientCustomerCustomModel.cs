@@ -11,6 +11,7 @@ namespace ACT.Core.Models.Custom
         public string ModifiedBy { get; set; }
         public string CustomerName { get; set; }
         public string CustomerNumber { get; set; }
+        public string CustomerContact { get; set; }
         public string ContactNumber { get; set; }
         public string CompanyName { get; set; } = string.Empty;
         public string KeyAccountManager { get; set; }

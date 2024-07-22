@@ -80,7 +80,7 @@ namespace ACT.Core.Services
         }
 
         /// <summary>
-        /// Gets a Total count of Clients matching the specified search params
+        /// Gets a Total count of Customers matching the specified search params
         /// </summary>
         /// <param name="pm"></param>
         /// <param name="csm"></param>
@@ -91,110 +91,65 @@ namespace ACT.Core.Services
             {
                 csm.ToDate = csm.ToDate?.AddDays( 1 );
             }
-
             // Parameters
-
-            #region Parameters
-
             List<object> parameters = new List<object>()
             {
-                { new SqlParameter( "skip", pm.Skip ) },
-                { new SqlParameter( "take", pm.Take ) },
-                { new SqlParameter( "csmPSPId", csm.PSPId ) },
-                { new SqlParameter( "csmStatus", ( int ) csm.PSPClientStatus ) },
-                { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
-                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
+                new SqlParameter("csmPSPId", csm.PSPId),
+                new SqlParameter("csmStatus", (int)csm.PSPClientStatus),
+                new SqlParameter("query", csm.Query ?? (object)DBNull.Value),
+                new SqlParameter("csmToDate", csm.ToDate ?? (object)DBNull.Value),
+                new SqlParameter("userid", (CurrentUser != null) ? CurrentUser.Id : 0),
+                new SqlParameter("csmFromDate", csm.FromDate ?? (object)DBNull.Value),
             };
 
-            #endregion
-
-            string query = @"SELECT
-                                COUNT(c.Id) AS [Total]
-                             FROM
-                                [dbo].[Client] c
-                                LEFT OUTER JOIN [dbo].[PSPClient] pc ON pc.Id=(SELECT TOP 1 pc1.Id FROM [dbo].[PSPClient] pc1 WHERE pc1.ClientId=pc.ClientId AND pc1.ClientId=c.Id)
-                                LEFT OUTER JOIN [dbo].[PSP] p ON p.Id=pc.PSPId";
+            string query = @"
+                            SELECT COUNT(DISTINCT cc.Id) AS [Total]
+                            FROM [dbo].[ClientCustomer] cc
+                            INNER JOIN [dbo].[Client] c ON c.Id = cc.ClientId";
 
             // WHERE
+            query += " WHERE (1=1)";
 
-            #region WHERE
-
-            query = $"{query} WHERE (1=1)";
-
-            // Limit to only show clients for logged in PSP
+            // Limit to only show customers for logged in Client
             if ( !CurrentUser.IsAdmin )
             {
-                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu
-                                                       INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId
-                                              WHERE
-                                                pc.ClientId=c.Id AND
-                                                pu.UserId=@userid
-                                             ) ";
+                query += @" AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu
+                    WHERE cc.ClientId = cu.ClientId AND cu.UserId = @userid)";
             }
-
-            #endregion
 
             // Custom Search
-
-            #region Custom Search
-
-            if ( csm.PSPId > 0 )
-            {
-                query = $"{query} AND (p.Id=@csmPSPId) ";
-            }
-
             if ( csm.PSPClientStatus != PSPClientStatus.All )
             {
-                query = $"{query} AND (c.Status=@csmStatus) ";
+                query += " AND (cc.Status = @csmStatus)";
             }
+
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (c.CreatedOn >= @csmFromDate AND c.CreatedOn <= @csmToDate) ";
+                query += " AND (cc.CreatedOn >= @csmFromDate AND cc.CreatedOn <= @csmToDate)";
             }
-            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            else if ( csm.FromDate.HasValue )
             {
-                if ( csm.FromDate.HasValue )
-                {
-                    query = $"{query} AND (c.CreatedOn>=@csmFromDate) ";
-                }
-                if ( csm.ToDate.HasValue )
-                {
-                    query = $"{query} AND (c.CreatedOn<=@csmToDate) ";
-                }
+                query += " AND (cc.CreatedOn >= @csmFromDate)";
             }
-
-            #endregion
+            else if ( csm.ToDate.HasValue )
+            {
+                query += " AND (cc.CreatedOn <= @csmToDate)";
+            }
 
             // Normal Search
-
-            #region Normal Search
-
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (c.[CompanyName] LIKE '%{1}%' OR
-                                                  c.[CompanyRegistrationNumber] LIKE '%{1}%' OR
-                                                  c.[CompanyName] LIKE '%{1}%' OR
-                                                  c.[TradingAs] LIKE '%{1}%' OR
-                                                  c.[Description] LIKE '%{1}%' OR
-                                                  c.[VATNumber] LIKE '%{1}%' OR
-                                                  c.[ContactNumber] LIKE '%{1}%' OR
-                                                  c.[ContactPerson] LIKE '%{1}%' OR
-                                                  c.[FinancialPerson] LIKE '%{1}%' OR
-                                                  c.[FinPersonEmail] LIKE '%{1}%' OR
-                                                  c.[Email] LIKE '%{1}%' OR
-                                                  c.[AdminEmail] LIKE '%{1}%' OR
-                                                  c.[AdminPerson] LIKE '%{1}%' OR
-                                                  c.[ChepReference] LIKE '%{1}%' OR
-                                                  p.[CompanyName] LIKE '%{1}%'
-                                             ) ", query, csm.Query.Trim() );
+                query += string.Format( @" AND (cc.CustomerName LIKE '%{0}%' OR
+                               cc.CustomerNumber LIKE '%{0}%' OR
+                               cc.CustomerContact LIKE '%{0}%' OR
+                               cc.CustomerAddress1 LIKE '%{0}%' OR
+                               cc.CustomerTown LIKE '%{0}%' OR
+                               cc.CustomerPostalCode LIKE '%{0}%' OR
+                               c.CompanyName LIKE '%{0}%')",
+                                        csm.Query.Trim() );
             }
 
-            #endregion
-
             CountModel model = context.Database.SqlQuery<CountModel>( query, parameters.ToArray() ).FirstOrDefault();
-
             return model.Total;
         }
 
@@ -211,107 +166,97 @@ namespace ACT.Core.Services
                 csm.ToDate = csm.ToDate?.AddDays( 1 );
             }
 
-            // Parameters
-
-            #region Parameters
-
             List<object> parameters = new List<object>()
             {
-                { new SqlParameter("skip", pm.Skip) },
-                { new SqlParameter("take", pm.Take) },
-                { new SqlParameter("csmPSPId", csm.PSPId) },
-                { new SqlParameter("csmStatus", (int)csm.PSPClientStatus) },
-                { new SqlParameter("query", csm.Query ?? (object)DBNull.Value) },
-                { new SqlParameter("csmToDate", csm.ToDate ?? (object)DBNull.Value) },
-                { new SqlParameter("userid", (CurrentUser != null) ? CurrentUser.Id : 0) },
-                { new SqlParameter("csmFromDate", csm.FromDate ?? (object)DBNull.Value) },
+                new SqlParameter("skip", pm.Skip),
+                new SqlParameter("take", pm.Take),
+                new SqlParameter("csmPSPId", csm.PSPId),
+                new SqlParameter("csmStatus", (int)csm.PSPClientStatus),
+                new SqlParameter("query", csm.Query ?? (object)DBNull.Value),
+                new SqlParameter("csmToDate", csm.ToDate ?? (object)DBNull.Value),
+                new SqlParameter("userid", (CurrentUser != null) ? CurrentUser.Id : 0),
+                new SqlParameter("csmFromDate", csm.FromDate ?? (object)DBNull.Value),
             };
 
-            #endregion
 
-            string query = @"SELECT
-                        cc.*,
-                        c.CompanyName,
-                        c.ContactNumber,
-                        c.ContactPerson AS [KeyAccountManager],
-                        (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cc.Id=d.ObjectId AND d.ObjectType='Customer') AS [DocumentCount]
-                     FROM
-                        [dbo].[ClientCustomer] cc
-                        LEFT OUTER JOIN [dbo].[Client] c ON c.Id=cc.ClientId";
+            string query = @"
+                            SELECT
+                                cc.Id,
+                                cc.CreatedOn,
+                                c.CompanyName AS ClientName,
+                                cc.CustomerName,
+                                cc.CustomerNumber,
+                                cc.CustomerContact,
+                                c.ContactPerson AS KeyAccountManager,
+                                CONCAT(
+                                    ISNULL(a.Addressline1, ''),
+                                    '|',  -- Use a pipe character as a separator
+                                    ISNULL(a.Addressline2, '')
+                                ) AS CustomerAddress1,
+                                a.Town AS CustomerTown,
+                                a.PostalCode AS CustomerPostalCode,
+                                cc.Status,
+                                c.Id AS ClientId
+                            FROM
+                                [dbo].[ClientCustomer] cc
+                                INNER JOIN [dbo].[Client] c ON c.Id = cc.ClientId
+                                LEFT JOIN [dbo].[Address] a ON a.ObjectId = cc.Id AND a.ObjectType = 'Customer'";
 
-            // WHERE
+            query += " WHERE (1=1)";      
 
-            #region WHERE
-
-            query = $"{query} WHERE (1=1)";
-
-            // Limit to only show customers for logged in Client
             if ( !CurrentUser.IsAdmin )
             {
-                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu
-                                      WHERE
-                                        cc.ClientId=cu.ClientId AND
-                                        cu.UserId=@userid
-                                     ) ";
+                query += @" AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu
+            WHERE cc.ClientId = cu.ClientId AND cu.UserId = @userid)";
             }
-
-            #endregion
-
-            // Custom Search
-
-            #region Custom Search
 
             if ( csm.PSPClientStatus != PSPClientStatus.All )
             {
-                query = $"{query} AND (cc.Status=@csmStatus) ";
+                query += " AND (cc.Status = @csmStatus)";
             }
+
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (cc.CreatedOn >= @csmFromDate AND cc.CreatedOn <= @csmToDate) ";
+                query += " AND (cc.CreatedOn >= @csmFromDate AND cc.CreatedOn <= @csmToDate)";
             }
-            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+
+            else if ( csm.FromDate.HasValue )
             {
-                if ( csm.FromDate.HasValue )
-                {
-                    query = $"{query} AND (cc.CreatedOn>=@csmFromDate) ";
-                }
-                if ( csm.ToDate.HasValue )
-                {
-                    query = $"{query} AND (cc.CreatedOn<=@csmToDate) ";
-                }
+                query += " AND (cc.CreatedOn >= @csmFromDate)";
             }
 
-            #endregion
-
-            // Normal Search
-
-            #region Normal Search
+            else if ( csm.ToDate.HasValue )
+            {
+                query += " AND (cc.CreatedOn <= @csmToDate)";
+            }
 
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (cc.[CustomerName] LIKE '%{1}%' OR
-                                          cc.[CustomerNumber] LIKE '%{1}%' OR
-                                          cc.[CustomerContact] LIKE '%{1}%' OR
-                                          cc.[CustomerAddress1] LIKE '%{1}%' OR
-                                          cc.[CustomerTown] LIKE '%{1}%' OR
-                                          cc.[CustomerPostalCode] LIKE '%{1}%' OR
-                                          c.[CompanyName] LIKE '%{1}%'
-                                     ) ", query, csm.Query.Trim() );
+                query += string.Format( @" AND (cc.CustomerName LIKE '%{0}%' OR
+                               cc.CustomerNumber LIKE '%{0}%' OR
+                               cc.CustomerContact LIKE '%{0}%' OR
+                               a.Addressline1 LIKE '%{0}%' OR
+                               a.Addressline2 LIKE '%{0}%' OR
+                               a.Town LIKE '%{0}%' OR
+                               a.PostalCode LIKE '%{0}%' OR
+                               c.CompanyName LIKE '%{0}%')",
+                                        csm.Query.Trim() );
             }
 
-            #endregion
+            query += $" ORDER BY {pm.SortBy} {pm.Sort}";
 
-            // ORDER
+            query += " OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY";
 
-            query = $"{query} ORDER BY {pm.SortBy} {pm.Sort}";
+            List<ClientCustomerCustomModel> results = context.Database.SqlQuery<ClientCustomerCustomModel>( query, parameters.ToArray() ).ToList();
 
-            // SKIP, TAKE
+            // Process the address
+            foreach ( var item in results )
+            {
+                string[] addressParts = item.CustomerAddress1.Split( '|' );
+                item.CustomerAddress1 = string.Join( "<br>", addressParts.Where( p => !string.IsNullOrWhiteSpace( p ) ) );
+            }
 
-            query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
-
-            List<ClientCustomerCustomModel> model = context.Database.SqlQuery<ClientCustomerCustomModel>( query, parameters.ToArray() ).ToList();
-
-            return model;
+            return results;
         }
 
         /// <summary>

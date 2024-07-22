@@ -575,6 +575,13 @@ input[type="checkbox"].input-validation-error {
 }
 
 
+.no-manager {
+    background-color: #ffe6e6;
+}
+
+label.warning {
+    color: #ff6666;
+}
 
 
 .partial-loading {

@@ -181,6 +181,7 @@
     <Compile Include="Models\AuthorisationCodeViewModel.cs" />
     <Compile Include="Models\ChepAuditViewModel.cs" />
     <Compile Include="Models\ChepLoadChepViewModel.cs" />
+    <Compile Include="Models\ClientCustomerViewModel.cs" />
     <Compile Include="Models\ClientLoadViewModel.cs" />
     <Compile Include="Models\ChepLoadViewModel.cs" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -773,6 +774,8 @@
     <Content Include="Views\Shared\_ClientContacts.cshtml" />
     <Content Include="Views\Shared\_ClientContactsView.cshtml" />
     <Content Include="Views\Client\_Customers.cshtml" />
+    <Content Include="Views\Client\AddCustomer.cshtml" />
+    <Content Include="Views\Shared\_CustomersCustomSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

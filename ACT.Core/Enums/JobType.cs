@@ -23,6 +23,6 @@ namespace ACT.Core.Enums
         KeyAccount = 3,
 
         [StringEnumDisplayText( "Finance" )]
-        Finance = 3,
+        Finance = 4,
     }
 }

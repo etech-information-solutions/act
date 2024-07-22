@@ -1525,6 +1525,155 @@ namespace ACT.UI.Controllers
         #endregion
 
 
+        #region Customers
+
+        // GET: Client/AddClient
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddCustomer()
+        {
+            ClientCustomerViewModel model = new ClientCustomerViewModel()
+            {
+                EditMode = true,
+                Address = new AddressViewModel(),
+                Contacts = new List<Contact>(),
+            };
+
+            return View( model );
+        }
+
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddCustomer( ClientCustomerViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the Customer was not created. Please correct all errors and try again.", NotificationType.Error );
+                return View( model );
+            }
+
+            using ( AddressService aservice = new AddressService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( ClientService clientService = new ClientService() )
+            using ( ContactService contactService = new ContactService() )
+            using ( ClientCustomerService customerService = new ClientCustomerService() )
+            {
+                #region Validation
+                if ( !string.IsNullOrEmpty( model.CustomerNumber ) && customerService.GetByNumber( model.ClientId, model.CustomerNumber.Trim() ) != null )
+                {
+                    Notify( $"Sorry, a Customer with the Reference number \"{model.CustomerNumber}\" already exists for this Client!", NotificationType.Error );
+                    return View( model );
+                }
+                #endregion
+
+                #region Create Customer
+                // Fetch the client to get the company name
+                var client = clientService.GetById( model.ClientId );
+
+                if ( client == null )
+                {
+                    Notify( "Invalid Client selected.", NotificationType.Error );
+                    return View( model );
+                }
+
+                ClientCustomer customer = new ClientCustomer()
+                {
+                    ClientId = model.ClientId,
+                    CustomerName = model.CustomerName,
+                    CustomerNumber = model.CustomerNumber,
+                    CustomerContact = model.CustomerContact,
+                    Status = ( int ) model.Status,
+                    CreatedOn = DateTime.Now,
+                    ModifiedOn = DateTime.Now,
+                    ModifiedBy = User.Identity.Name
+                };
+
+                customer = customerService.Create( customer );
+
+                #endregion
+
+                #region Create Address (s)
+
+                if ( model.Address != null )
+                {
+                    Address address = new Address()
+                    {
+                        ObjectId = client.Id,
+                        ObjectType = "Customer",
+                        Town = model.Address.Town,
+                        Status = ( int ) Status.Active,
+                        PostalCode = model.Address.PostCode,
+                        Type = ( int ) model.Address.AddressType,
+                        Addressline1 = model.Address.AddressLine1,
+                        Addressline2 = model.Address.AddressLine2,
+                        ProvinceId = model.Address.ProvinceId,
+                    };
+
+                    aservice.Create( address );
+                }
+
+                #endregion
+
+                #region Contacts
+                if ( model.Contacts != null && model.Contacts.Any( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                {
+                    foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                    {
+                        Contact c = contactService.Get( mc.ContactEmail, "Customer" );
+
+                        if ( c == null )
+                        {
+                            c = new Contact()
+                            {
+                                ObjectId = customer.Id,
+                                JobTitle = mc.JobTitle,
+                                ObjectType = "Customer",
+                                ContactCell = mc.ContactCell,
+                                ContactName = mc.ContactName,
+                                Status = mc.Status,
+                                ContactEmail = mc.ContactEmail,
+                                ContactTitle = mc.ContactTitle,
+                            };
+
+                            contactService.Create( c );
+                        }
+                        else
+                        {
+                            // Update existing contact
+                            c.JobTitle = mc.JobTitle;
+                            c.ContactCell = mc.ContactCell;
+                            c.ContactName = mc.ContactName;
+                            c.Status = mc.Status;
+                            c.ContactEmail = mc.ContactEmail;
+                            c.ContactTitle = mc.ContactTitle;
+
+                            contactService.Update( c );
+                        }
+                    }
+                }
+                #endregion
+
+                scope.Complete();
+            }
+
+            Notify( "The Customer was successfully created.", NotificationType.Success );
+
+            return Customers( new PagingModel(), new CustomSearchModel() );
+        }
+
+        public JsonResult GetKeyAccountManager( int clientId )
+        {
+            using ( var clientService = new ClientService() )
+            {
+                var client = clientService.GetById( clientId );
+                string keyAccountManager = !string.IsNullOrWhiteSpace( client?.ContactPerson )
+                    ? client.ContactPerson
+                    : "No Key Account Manager assigned";
+                return Json( new { success = true, keyAccountManager }, JsonRequestBehavior.AllowGet );
+            }
+        }
+
+        #endregion
+
 
         #region KPIS
 

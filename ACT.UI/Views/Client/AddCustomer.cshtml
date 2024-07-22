@@ -1,0 +1,154 @@
+﻿@model ClientCustomerViewModel
+
+@using ACT.UI.Models;
+@using ACT.Core.Enums;
+@using ACT.Core.Models;
+
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+
+    ViewBag.Title = "Add Customer";
+
+    UserModel user = User.Get();
+}
+
+@Html.Partial( "_Notification" )
+
+@using ( Html.BeginForm( "AddCustomer", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#customers", @class = "custom-validate", @style = "width: auto;" } ) )
+{
+    <div id="edit-item">
+
+        <h2 class="uppercase" style="width: auto;">
+            <img alt="" src="@Url.Content("~/images/add.png")" />
+            <span>Add Customer</span>
+        </h2>
+
+        @Html.ValidationSummary( true )
+
+        <div id="item-details" class="item-details" style="width: auto;">
+
+            <div class="left" style="width: 25%; margin-right: 2%;">
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.ClientId, "Select Client" )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.ClientId, new SelectList( Model.ClientOptions, "Key", "Value" ), "-- Select Customer Name --", new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.ClientId )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.CustomerName, "Customer Name" )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.CustomerName, new { @class = "input", @placeholder = "Enter Customer Reference" } )
+                    @Html.ValidationMessageFor( model => model.CustomerName )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.CustomerNumber, "Customer Reference" )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.CustomerNumber, new { @class = "input", @placeholder = "Enter Customer Reference" } )
+                    @Html.ValidationMessageFor( model => model.CustomerNumber )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.CustomerContact, "Contact Number" )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.CustomerContact, new { @class = "input", @placeholder = "Enter Contact Number" } )
+                    @Html.ValidationMessageFor( model => model.CustomerContact )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.KeyAccountManager )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.KeyAccountManager, new { @class = "input", @readonly = "readonly" } )
+                    @Html.ValidationMessageFor( model => model.KeyAccountManager )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.Status )
+                </div>
+                <div class="edit-field">
+                    @Html.EnumDropDownListFor( model => model.Status, "-- Select Status --", new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.Status )
+                </div>
+
+            </div>
+
+            <div class="left" style="width: 73%;">
+
+                <div id="contact-list">
+                    @Html.Partial( "_Contacts", Model.Contacts )
+                </div>
+
+                <div class="clear"></div>
+
+                <div class="grouped-area">
+
+                    <p>
+                        <strong class="uppercase">Address Details</strong>
+                    </p>
+
+                    <input id="Address.AddressType" name="Address.AddressType" type="hidden" value="@((int)AddressType.Postal)" />
+
+                    <div class="editor-label">
+                        @Html.LabelFor( model => model.Address.AddressLine1 )
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor( model => model.Address.AddressLine1, new { @class = "input", @placeholder = "Enter Address Line 1" } )
+                        @Html.ValidationMessageFor( model => model.Address.AddressLine1 )
+                    </div>
+
+                    <div class="editor-field">
+                        @Html.TextBoxFor( model => model.Address.AddressLine2, new { @class = "input", @placeholder = "Enter Address Line 2" } )
+                        @Html.ValidationMessageFor( model => model.Address.AddressLine2 )
+                    </div>
+
+                    <div class="editor-label">
+                        @Html.LabelFor( model => model.Address.Town )
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor( model => model.Address.Town, new { @class = "input", @placeholder = "Enter Town" } )
+                        @Html.ValidationMessageFor( model => model.Address.Town )
+                    </div>
+
+                    <div class="editor-label">
+                        @Html.LabelFor( model => model.Address.PostCode )
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor( model => model.Address.PostCode, new { @class = "input", @placeholder = "Enter Postal Code" } )
+                        @Html.ValidationMessageFor( model => model.Address.PostCode )
+                    </div>
+
+                    <div class="editor-label">
+                        @Html.LabelFor( model => model.Address.ProvinceId )
+                    </div>
+                    <div class="editor-field">
+                        @Html.DropDownListFor( model => model.Address.ProvinceId, model => Model.Address.ProvinceOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                        @Html.ValidationMessageFor( model => model.Address.ProvinceId )
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+
+                <span style="padding: 0 5px;">/</span>
+
+                <a data-refresh="1" data-target="#customers">Cancel</a>
+            </p>
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 0;">&nbsp;</div>
+        </div>
+    </div>
+}

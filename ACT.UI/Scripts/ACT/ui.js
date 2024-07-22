@@ -165,6 +165,7 @@
             this.DataUpdateOutstandingQty( $( '*[data-update-oqty="1"]' ) );
             this.DataClientLoadJournal( $( '*[data-clientload-journal="1"]' ) );
             this.DataUpdateOutstandingReason( $( '*[data-update-outstanding-reason="1"]' ) );
+            this.DataPopulateKeyAccountManager( $( 'select[name="ClientId"]' ) );
 
             // Chep Load Buttons
             this.DataChepLoadJournal( $( '*[data-chepload-journal="1"]' ) );
@@ -6046,6 +6047,59 @@
                             ACT.Loader.Hide();
                         } );
                     } );
+            } );
+        },
+
+        DataPopulateKeyAccountManager: function ( $dropdown )
+        {
+            $dropdown.each( function ()
+            {
+                var $this = $( this );
+                var $keyAccountManagerField = $( '#KeyAccountManager' );
+                var $keyAccountManagerLabel = $( 'label[for="KeyAccountManager"]' );
+
+                $this.on( 'change', function ()
+                {
+                    var selectedClientId = $this.val();
+                    if ( selectedClientId )
+                    {
+                        $.ajax( {
+                            url: '/Client/GetKeyAccountManager',
+                            type: 'GET',
+                            data: { clientId: selectedClientId },
+                            success: function ( response )
+                            {
+                                if ( response.success )
+                                {
+                                    $keyAccountManagerField.val( response.keyAccountManager );
+                                    if ( response.keyAccountManager === "No Key Account Manager assigned" )
+                                    {
+                                        $keyAccountManagerField.addClass( 'no-manager' );
+                                        $keyAccountManagerLabel.addClass( 'warning' );
+                                    } else
+                                    {
+                                        $keyAccountManagerField.removeClass( 'no-manager' );
+                                        $keyAccountManagerLabel.removeClass( 'warning' );
+                                    }
+                                } else
+                                {
+                                    console.log( 'Error fetching Key Account Manager' );
+                                    $keyAccountManagerField.val( '' );
+                                }
+                            },
+                            error: function ()
+                            {
+                                console.log( 'Error fetching Key Account Manager' );
+                                $keyAccountManagerField.val( '' );
+                            }
+                        } );
+                    } else
+                    {
+                        $keyAccountManagerField.val( '' );
+                        $keyAccountManagerField.removeClass( 'no-manager' );
+                        $keyAccountManagerLabel.removeClass( 'warning' );
+                    }
+                } );
             } );
         },
 

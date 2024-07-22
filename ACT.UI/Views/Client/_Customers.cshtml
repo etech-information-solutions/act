@@ -7,7 +7,6 @@
 @{
     ViewBag.ShowExport = true;
     ViewBag.ShowCustom = true;
-
     ViewBag.ViewName = "_Customers";
 }
 
@@ -15,7 +14,6 @@
 
 @{
     UserModel user = User.Get();
-
     int count = Model.Start;
     List<ClientCustomerCustomModel> items = ( List<ClientCustomerCustomModel> ) Model.Items;
 }
@@ -44,7 +42,10 @@
             <th data-name="CreatedOn" data-column="cc.CreatedOn">
                 Created
             </th>
-            <th data-name="CompanyName" data-column="cc.CompanyName">
+            <th data-name="ClientName" data-column="c.CompanyName">
+                Client Name
+            </th>
+            <th data-name="CustomerName" data-column="cc.CustomerName">
                 Customer Name
             </th>
             <th data-name="CustomerNumber" data-column="cc.CustomerNumber">
@@ -53,16 +54,16 @@
             <th data-name="CustomerContact" data-column="cc.CustomerContact">
                 Customer Contact
             </th>
-            <th data-name="KeyAccountManager" data-column="c.KeyAccountManager">
+            <th data-name="KeyAccountManager" data-column="c.ContactPerson">
                 Key Account Manager
             </th>
-            <th data-name="CustomerAddress1" data-column="cc.CustomerAddress1">
+            <th data-name="CustomerAddress1" data-column="a.Addressline1">
                 Address
             </th>
-            <th data-name="CustomerTown" data-column="cc.CustomerTown">
+            <th data-name="CustomerTown" data-column="a.Town">
                 Town
             </th>
-            <th data-name="CustomerPostalCode" data-column="cc.CustomerPostalCode">
+            <th data-name="CustomerPostalCode" data-column="a.PostalCode">
                 Postal Code
             </th>
             <th data-name="Status" data-column="cc.Status">
@@ -73,44 +74,41 @@
             </th>
         </tr>
     </thead>
-
     <tbody>
         @if ( Model != null && items != null && items.Count() > 0 )
         {
             foreach ( ClientCustomerCustomModel item in items )
             {
                 Status status = ( Status ) item.Status;
-
                 string active = ( status == Status.Active ) ? "active" : "inactive";
                 string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
                 <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
-
-                    <td width="1%">
-                        @count
-                    </td>
+                    <td width="1%">@count</td>
                     <td>
                         @item.CreatedOn.ToString( "yyyy-MM-dd" )
-
                         <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Customer">
                             <img alt="" src="@Url.Content("~/Images/duplicate-content.png")" style="max-width: 15px;" />
                             <span></span>
                         </a>
                     </td>
                     <td>
-                        @item.CompanyName
+                        @item.ClientName
+                    </td>
+                    <td>
+                        @item.CustomerName
                     </td>
                     <td>
                         @item.CustomerNumber
                     </td>
                     <td>
-                        @item.ContactNumber
+                        @item.CustomerContact
                     </td>
                     <td>
                         @item.KeyAccountManager
                     </td>
                     <td>
-                        @item.CustomerAddress1
+                        @Html.Raw( item.CustomerAddress1 )
                     </td>
                     <td>
                         @item.CustomerTown
@@ -121,22 +119,16 @@
                     <td>
                         @status.GetDisplayText()
                     </td>
-
                     <td width="15%">
                         @Html.ActionLink( "Details", "CustomerDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-
                         @Html.ActionLink( "Edit", "EditCustomer", new { id = item.Id, returnView = "Customer" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-
                         @Html.ActionLink( enable, "DeleteCustomer", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#customer", @rel = "tipsyE", @title = enable + " this item?" } )
                     </td>
-
                 </tr>
-
                 count++;
             }
         }
     </tbody>
-
 </table>
 
 @Html.Partial( "_Paging" )
