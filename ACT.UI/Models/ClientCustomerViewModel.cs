@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 using ACT.Core.Enums;
 using ACT.Core.Services;
@@ -29,7 +30,6 @@ namespace ACT.UI.Models
         public string CustomerContact { get; set; }
 
         [Display( Name = "Key Account Manager" )]
-        [StringLength( 200, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string KeyAccountManager { get; set; }
 
         [Display( Name = "Contacts" )]

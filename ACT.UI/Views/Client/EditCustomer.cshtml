@@ -14,8 +14,6 @@
 
 @Html.Partial( "_Notification" )
 
-@Html.HiddenFor( m => m.ClientId )
-
 @using ( Html.BeginForm( "EditCustomer", "Client", FormMethod.Post, new { @data_ajax_form = "1", @data_target = "#customers", @class = "custom-validate", @style = "width: auto;" } ) )
 {
     <div id="edit-item">

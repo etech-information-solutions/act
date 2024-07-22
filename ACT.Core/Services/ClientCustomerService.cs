@@ -283,6 +283,42 @@ namespace ACT.Core.Services
             return context.ClientCustomers.FirstOrDefault( cc => cc.ClientId == clientId );
         }
 
+        /// <summary>
+        /// Checks if a customer with the given customer number exists for any client
+        /// </summary>
+        /// <param name="customerNumber"></param>
+        /// <returns></returns>
+        public bool ExistByCustomerNumber( string customerNumber )
+        {
+            return context.ClientCustomers.Any( cc => cc.CustomerNumber.Trim().ToLower() == customerNumber.Trim().ToLower() );
+        }
+
+        /// <summary>
+        /// Gets the Key Account Manager for a client or customer
+        /// </summary>
+        /// <param name="id">The ID of the client or customer</param>
+        /// <param name="objectType">Either "Client" or "Customer"</param>
+        /// <returns></returns>
+        public string GetKeyAccountManager( int id, string objectType )
+        {
+            var parameters = new List<object>
+        {
+            new SqlParameter("@id", id),
+            new SqlParameter("@objectType", objectType)
+        };
+
+            string query = @"
+            SELECT TOP 1 ContactName
+            FROM [dbo].[Contact]
+            WHERE ObjectId = @id 
+            AND ObjectType = @objectType
+            AND JobTitle = 2
+            ORDER BY CreatedOn DESC";
+
+            var result = context.Database.SqlQuery<string>( query, parameters.ToArray() ).FirstOrDefault();
+            return result ?? "No Key Account Manager assigned.";
+        }
+
         public string GetKeyAccountManagerFromContacts( int clientId )
         {
             var parameters = new List<object>

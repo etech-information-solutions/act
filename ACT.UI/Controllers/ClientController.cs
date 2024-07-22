@@ -421,7 +421,7 @@ namespace ACT.UI.Controllers
                     FinPersonEmail = "",
                     FinancialPerson = "",
                     ServiceRequired = 0,
-                    
+
                     BBBEELevel = "",
                     CompanyType = 0,
                     NumberOfLostPallets = 0
@@ -1527,6 +1527,36 @@ namespace ACT.UI.Controllers
 
         #region Customers
 
+        public ActionResult CustomerDetails( int id, bool layout = true )
+        {
+            using ( AddressService aservice = new AddressService() )
+            using ( ContactService contactService = new ContactService() )
+            using ( ClientCustomerService cservice = new ClientCustomerService() )
+            {
+                ClientCustomer model = cservice.GetById( id );
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+                    return RedirectToAction( "Index" );
+                }
+                Address address = aservice.Get( model.Id, "Customer" );
+                List<Contact> contacts = contactService.List( model.Id, "Customer" );
+
+                // Find the Key Account Manager contact
+                var keyAccountManager = contacts.FirstOrDefault( c => c.JobTitle == ( int ) JobType.KeyAccount );
+
+                ViewBag.Address = address;
+                ViewBag.Contacts = contacts;
+                ViewBag.CustomerContact = keyAccountManager?.ContactCell ?? "No contact information available";
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+                return View( model );
+            }
+        }
+
         // GET: Client/AddClient
         [Requires( PermissionTo.Create )]
         public ActionResult AddCustomer()
@@ -1618,36 +1648,19 @@ namespace ACT.UI.Controllers
                 {
                     foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
                     {
-                        Contact c = contactService.Get( mc.ContactEmail, "Customer" );
-
-                        if ( c == null )
+                        Contact newContact = new Contact()
                         {
-                            c = new Contact()
-                            {
-                                ObjectId = customer.Id,
-                                JobTitle = mc.JobTitle,
-                                ObjectType = "Customer",
-                                ContactCell = mc.ContactCell,
-                                ContactName = mc.ContactName,
-                                Status = mc.Status,
-                                ContactEmail = mc.ContactEmail,
-                                ContactTitle = mc.ContactTitle,
-                            };
+                            ObjectId = customer.Id,
+                            JobTitle = mc.JobTitle,
+                            ObjectType = "Customer",
+                            ContactCell = mc.ContactCell,
+                            ContactName = mc.ContactName,
+                            Status = ( int ) Status.Active,
+                            ContactEmail = mc.ContactEmail,
+                            ContactTitle = mc.ContactTitle,
+                        };
 
-                            contactService.Create( c );
-                        }
-                        else
-                        {
-                            // Update existing contact
-                            c.JobTitle = mc.JobTitle;
-                            c.ContactCell = mc.ContactCell;
-                            c.ContactName = mc.ContactName;
-                            c.Status = mc.Status;
-                            c.ContactEmail = mc.ContactEmail;
-                            c.ContactTitle = mc.ContactTitle;
-
-                            contactService.Update( c );
-                        }
+                        contactService.Create( newContact );
                     }
                 }
                 #endregion
@@ -1660,11 +1673,233 @@ namespace ACT.UI.Controllers
             return Customers( new PagingModel(), new CustomSearchModel() );
         }
 
+        // GET: Client/EditCustomer/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditCustomer( int id )
+        {
+            using ( ClientCustomerService customerService = new ClientCustomerService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( ContactService cservice = new ContactService() )
+            {
+                ClientCustomer customer = customerService.GetById( id );
+                if ( customer == null )
+                {
+                    Notify( "Sorry, the requested customer could not be found. Please try again", NotificationType.Error );
+                    return PartialView( "_AccessDenied" );
+                }
+
+                Address address = aservice.Get( customer.Id, "Customer" );
+                List<Contact> contacts = cservice.List( customer.Id, "Customer" );
+                Contact keyAccountManager = cservice.List( customer.Id, "Customer" ).FirstOrDefault( c => c.JobTitle == ( int ) JobType.KeyAccount );
+
+                ClientCustomerViewModel model = new ClientCustomerViewModel()
+                {
+                    Id = customer.Id,
+                    ClientId = customer.ClientId,
+                    CustomerName = customer.CustomerName,
+                    CustomerNumber = customer.CustomerNumber,
+                    CustomerContact = customer.CustomerContact,
+                    Status = ( Status ) customer.Status,
+                    KeyAccountManager = keyAccountManager?.ContactName ?? "No Key Account Manager",
+                    Address = new AddressViewModel()
+                    {
+                        EditMode = true,
+                        Id = address?.Id ?? 0,
+                        AddressLine1 = address?.Addressline1,
+                        AddressLine2 = address?.Addressline2,
+                        Town = address?.Town,
+                        PostCode = address?.PostalCode,
+                        ProvinceId = address?.ProvinceId ?? 0,
+                        AddressType = address != null ? ( AddressType ) address.Type : AddressType.Postal,
+                    },
+                    Contacts = contacts ?? new List<Contact>(),
+                    EditMode = true
+                };
+
+                return View( model );
+            }
+        }
+
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditCustomer( ClientCustomerViewModel model )
+        {
+            using ( ClientCustomerService customerService = new ClientCustomerService() )
+            using ( AddressService addressService = new AddressService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( ContactService contactService = new ContactService() )
+            {
+                // Add this debugging code
+                System.Diagnostics.Debug.WriteLine( $"Received Id: {model.Id}" );
+
+                if ( !ModelState.IsValid )
+                {
+                    foreach ( var key in ModelState.Keys )
+                    {
+                        var modelStateVal = ModelState[ key ];
+                        var errors = modelStateVal.Errors.Select( error => error.ErrorMessage );
+
+                        foreach ( var error in errors )
+                        {
+                            System.Diagnostics.Debug.WriteLine( $"Key: {key}, Error: {error}" );
+                        }
+                    }
+                    Notify( "Sorry, the selected Customer was not updated. Please correct all errors and try again.", NotificationType.Error );
+                    return View( model );
+                }
+
+                ClientCustomer customer = customerService.GetById( model.Id );
+
+                #region Validations
+
+                if ( customer == null )
+                {
+                    Notify( "Sorry, that Customer does not exist! Please specify a valid Customer Id and try again.", NotificationType.Error );
+                    return View( model );
+                }
+
+                if ( !string.IsNullOrEmpty( model.CustomerNumber ) &&
+                    model.CustomerNumber.Trim().ToLower() != customer.CustomerNumber.Trim().ToLower() &&
+                    customerService.ExistByCustomerNumber( model.CustomerNumber.Trim() ) )
+                {
+                    Notify( $"Sorry, a Customer with the Number \"{model.CustomerNumber}\" already exists!", NotificationType.Error );
+                    return View( model );
+                }
+
+                #endregion
+
+                #region Update Customer
+
+                customer.ClientId = model.ClientId;
+                customer.CustomerName = model.CustomerName;
+                customer.CustomerNumber = model.CustomerNumber;
+                customer.CustomerContact = model.CustomerContact;
+                customer.Status = ( int ) model.Status;
+
+                customerService.Update( customer );
+
+                #endregion
+
+                #region Address
+
+                if ( model.Address != null )
+                {
+                    Address address = addressService.Get( customer.Id, "Customer" );
+
+                    if ( address == null )
+                    {
+                        address = new Address()
+                        {
+                            ObjectId = customer.Id,
+                            ObjectType = "Customer",
+                            Town = model.Address.Town,
+                            Status = ( int ) Status.Active,
+                            PostalCode = model.Address.PostCode,
+                            Type = ( int ) model.Address.AddressType,
+                            Addressline1 = model.Address.AddressLine1,
+                            Addressline2 = model.Address.AddressLine2,
+                            ProvinceId = model.Address.ProvinceId,
+                        };
+
+                        addressService.Create( address );
+                    }
+                    else
+                    {
+                        address.Town = model.Address.Town;
+                        address.PostalCode = model.Address.PostCode;
+                        address.Type = ( int ) model.Address.AddressType;
+                        address.Addressline1 = model.Address.AddressLine1;
+                        address.Addressline2 = model.Address.AddressLine2;
+                        address.ProvinceId = model.Address.ProvinceId;
+
+                        addressService.Update( address );
+                    }
+                }
+
+                #endregion
+
+                #region Contacts
+
+                if ( model.Contacts != null && model.Contacts.Any( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                {
+                    foreach ( Contact contact in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                    {
+                        Contact existingContact = contactService.GetById( contact.Id );
+
+                        if ( existingContact == null )
+                        {
+                            // Create new contact
+                            Contact newContact = new Contact()
+                            {
+                                ObjectId = customer.Id,
+                                JobTitle = contact.JobTitle,
+                                ObjectType = "Customer",
+                                ContactCell = contact.ContactCell,
+                                ContactName = contact.ContactName,
+                                Status = ( int ) model.Status,
+                                ContactEmail = contact.ContactEmail,
+                                ContactTitle = contact.ContactTitle,
+                            };
+
+                            contactService.Create( newContact );
+                        }
+                        else
+                        {
+                            // Update existing contact
+                            existingContact.JobTitle = contact.JobTitle;
+                            existingContact.ContactCell = contact.ContactCell;
+                            existingContact.ContactName = contact.ContactName;
+                            existingContact.Status = ( int ) model.Status;
+                            existingContact.ContactEmail = contact.ContactEmail;
+                            existingContact.ContactTitle = contact.ContactTitle;
+
+                            contactService.Update( existingContact );
+                        }
+                    }
+
+                #endregion
+
+            }
+
+            scope.Complete();
+            }
+
+            Notify( "The selected Customer details were successfully updated.", NotificationType.Success );
+
+            return Customers( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // POST: Client/DeleteKPI/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteCustomer( ClientCustomerViewModel model )
+        {
+            using ( ClientCustomerService service = new ClientCustomerService() )
+            {
+                ClientCustomer customer = service.GetById( model.Id );
+
+                if ( customer == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                customer.Status = ( ( ( Status ) customer.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.Update( customer );
+
+                Notify( "The selected Customer was successfully updated.", NotificationType.Success );
+
+                return Customers( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
         public JsonResult GetKeyAccountManager( int clientId )
         {
             using ( var clientCustomerService = new ClientCustomerService() )
             {
-                string keyAccountManager = clientCustomerService.GetKeyAccountManagerFromContacts( clientId );
+                string keyAccountManager = clientCustomerService.GetKeyAccountManager( clientId, "Client" );
                 return Json( new { success = true, keyAccountManager }, JsonRequestBehavior.AllowGet );
             }
         }

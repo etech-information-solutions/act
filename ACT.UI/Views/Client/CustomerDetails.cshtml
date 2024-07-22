@@ -1,0 +1,111 @@
+﻿@model ClientCustomer
+@using ACT.Core.Enums;
+@using ACT.Data.Models;
+@{
+    if ( ViewBag.IncludeLayout == null )
+    {
+        Layout = null;
+    }
+    ViewBag.Title = "Customer Details";
+    Address address = ViewBag.Address;
+    var contacts = ( List<Contact> ) ViewBag.Contacts;
+}
+<div id="item-details" class="item-details" style="width: auto;">
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <h2>
+            <img alt="" src="@Url.Content("~/images/info.png")" />
+            <span>Customer Details</span>
+        </h2>
+    }
+    <div class="left" style="width: 25%; margin-right: 2%;">
+        <div class="display-label">
+            Date Created
+        </div>
+        <div class="display-field">
+            @Model.CreatedOn.ToString( "yyyy-MM-dd" )
+        </div>
+        <div class="display-label">
+            Client
+        </div>
+        <div class="display-field">
+            @(Model.Client?.CompanyName)
+        </div>
+        <div class="display-label">
+            Customer Name
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.CustomerName )
+        </div>
+        <div class="display-label">
+            Customer Number
+        </div>
+        <div class="display-field">
+            @Html.DisplayFor( model => model.CustomerNumber )
+        </div>
+        <div class="display-label">
+            Customer Contact
+        </div>
+        <div class="display-field">
+            @ViewBag.CustomerContact
+        </div>
+        <div class="display-label">
+            Key Account Manager
+        </div>
+        <div class="display-field">
+            @{
+                var keyAccountManager = contacts.FirstOrDefault( c => c.JobTitle == ( int ) JobType.KeyAccount );
+                @(keyAccountManager != null ? keyAccountManager.ContactName : "No Key Account Manager assigned")
+            }
+        </div>
+        <div class="display-label">
+            Status
+        </div>
+        <div class="display-field">
+            @(((Status)Model.Status).GetDisplayText())
+        </div>
+    </div>
+    <div class="left" style="width: 73%;">
+        <div id="contact-list">
+            @Html.Partial( "_ClientContacts", contacts )
+        </div>
+        <div class="clear"></div>
+        <div class="grouped-area">
+            <p>
+                <strong class="uppercase">Address Details</strong>
+            </p>
+            @if ( address != null )
+            {
+                <div class="display-label">Address Line 1</div>
+                <div class="display-field">@address.Addressline1</div>
+                <div class="display-label">Address Line 2</div>
+                <div class="display-field">@address.Addressline2</div>
+                <div class="display-label">Town</div>
+                <div class="display-field">@address.Town</div>
+                <div class="display-label">Postal Code</div>
+                <div class="display-field">@address.PostalCode</div>
+                <div class="display-label">Province</div>
+                <div class="display-field">@(address.Province?.Description)</div>
+            }
+            else
+            {
+                <p>No address information available.</p>
+            }
+        </div>
+    </div>
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
+    @if ( ViewBag.IncludeLayout == null )
+    {
+        <p>
+            @Html.ActionLink( "Edit", "EditCustomer", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+            <span style="padding: 0 5px;">/</span>
+            <a data-cancel="1" data-target="#item-details" data-remove="tr.edit">Cancel</a>
+        </p>
+    }
+    @if ( ViewBag.IncludeLayout != null )
+    {
+        <div class="back-to-list">
+            @Html.ActionLink( "Back to List", "Customers" )
+        </div>
+    }
+</div>
