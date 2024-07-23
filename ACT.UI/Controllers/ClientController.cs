@@ -99,6 +99,42 @@ namespace ACT.UI.Controllers
 
                     break;
 
+                case "customers":
+
+                    #region Customers
+
+                    using ( ClientCustomerService ccservice = new ClientCustomerService() )
+                    using ( AddressService aservice = new AddressService() )
+                    {
+                        csv = string.Format( "Date Created,Client Name,Customer Name,Customer Number,Customer Contact,Key Account Manager,Address,Status{0}", Environment.NewLine );
+
+                        List<ClientCustomerCustomModel> customers = ccservice.List1( pm, csm );
+
+                        if ( customers.NullableAny() )
+                        {
+                            foreach ( ClientCustomerCustomModel item in customers )
+                            {
+                                Address address = aservice.Get( item.Id, "Customer" );
+
+                                csv = string.Format( "{0}\"{1}\",\"{2}\",\"{3}\",\"{4}\",\"{5}\",\"{6}\",\"{7}\",\"{8}\"{9}",
+                                                    csv,
+                                                    item.CreatedOn.ToString( "yyyy-MM-dd" ),
+                                                    item.ClientName,
+                                                    item.CustomerName,
+                                                    item.CustomerNumber,
+                                                    item.CustomerContact,
+                                                    item.KeyAccountManager,
+                                                    address?.Addressline1,
+                                                    ( ( Status ) item.Status ).GetDisplayText(),
+                                                    Environment.NewLine );
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    break;
+
                 case "managesites":
 
                     #region Manage Sites

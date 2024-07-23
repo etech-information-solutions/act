@@ -51,20 +51,14 @@
             <th data-name="CustomerNumber" data-column="cc.CustomerNumber">
                 Customer Number
             </th>
-            <th data-name="CustomerContact" data-column="cc.CustomerContact">
+            <th data-name="CustomerContact" data-column="CustomerContact">
                 Customer Contact
             </th>
-            <th data-name="KeyAccountManager" data-column="c.ContactPerson">
+            <th data-name="KeyAccountManager" data-column="KeyAccountManager">
                 Key Account Manager
             </th>
             <th data-name="CustomerAddress1" data-column="a.Addressline1">
                 Address
-            </th>
-            <th data-name="CustomerTown" data-column="a.Town">
-                Town
-            </th>
-            <th data-name="CustomerPostalCode" data-column="a.PostalCode">
-                Postal Code
             </th>
             <th data-name="Status" data-column="cc.Status">
                 Status
@@ -108,13 +102,24 @@
                         @item.KeyAccountManager
                     </td>
                     <td>
-                        @Html.Raw( item.CustomerAddress1 )
-                    </td>
-                    <td>
-                        @item.CustomerTown
-                    </td>
-                    <td>
-                        @item.CustomerPostalCode
+                        @{
+                            var addressParts = item.CustomerAddress1.Split( new[] { "<br>" }, StringSplitOptions.None );
+                        }
+                        @foreach ( var part in addressParts )
+                        {
+                            if ( !string.IsNullOrEmpty( part ) )
+                            {
+                                <span>@part</span><br />
+                            }
+                        }
+                        @if ( !string.IsNullOrEmpty( item.CustomerTown ) )
+                        {
+                            <span>@item.CustomerTown</span><br />
+                        }
+                        @if ( !string.IsNullOrEmpty( item.CustomerPostalCode ) )
+                        {
+                            <span>@item.CustomerPostalCode</span>
+                        }
                     </td>
                     <td>
                         @status.GetDisplayText()

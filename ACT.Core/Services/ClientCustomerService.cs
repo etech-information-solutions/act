@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Web.Mvc;
+
 using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Core.Models.Custom;
@@ -136,6 +138,18 @@ namespace ACT.Core.Services
                 query += " AND (cc.CreatedOn <= @csmToDate)";
             }
 
+            if ( csm.ClientId > 0 )
+            {
+                query += " AND (cc.ClientId = @clientId)";
+                parameters.Add( new SqlParameter( "@clientId", csm.ClientId ) );
+            }
+
+            if ( csm.CustomerId > 0 )
+            {
+                query += " AND (cc.Id = @customerId)";
+                parameters.Add( new SqlParameter( "@customerId", csm.CustomerId ) );
+            }
+
             // Normal Search
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
@@ -176,32 +190,34 @@ namespace ACT.Core.Services
                 new SqlParameter("csmToDate", csm.ToDate ?? (object)DBNull.Value),
                 new SqlParameter("userid", (CurrentUser != null) ? CurrentUser.Id : 0),
                 new SqlParameter("csmFromDate", csm.FromDate ?? (object)DBNull.Value),
+                new SqlParameter("clientId", csm.ClientId),
+                new SqlParameter("customerId", csm.CustomerId)
             };
 
             string query = @"
-                            SELECT
-                                cc.Id,
-                                cc.CreatedOn,
-                                c.CompanyName AS ClientName,
-                                cc.CustomerName,
-                                cc.CustomerNumber,
-                                MAX(CASE WHEN cont.JobTitle = 2 THEN cont.ContactCell ELSE NULL END) AS CustomerContact,
-                                MAX(CASE WHEN cont.JobTitle = 2 THEN cont.ContactName ELSE NULL END) AS KeyAccountManager,
-                                CONCAT(
-                                    ISNULL(a.Addressline1, ''),
-                                    '|',
-                                    ISNULL(a.Addressline2, '')
-                                ) AS CustomerAddress1,
-                                a.Town AS CustomerTown,
-                                a.PostalCode AS CustomerPostalCode,
-                                cc.Status,
-                                c.Id AS ClientId
-                            FROM
-                                [dbo].[ClientCustomer] cc
-                                INNER JOIN [dbo].[Client] c ON c.Id = cc.ClientId
-                                LEFT JOIN [dbo].[Address] a ON a.ObjectId = cc.Id AND a.ObjectType = 'Customer'
-                                LEFT JOIN [dbo].[Contact] cont ON cont.ObjectId = cc.Id AND cont.ObjectType = 'Customer'
-                            WHERE (1=1)";
+                    SELECT
+                        cc.Id,
+                        cc.CreatedOn,
+                        c.CompanyName AS ClientName,
+                        cc.CustomerName,
+                        cc.CustomerNumber,
+                        MAX(CASE WHEN cont.JobTitle = 2 THEN cont.ContactCell ELSE NULL END) AS CustomerContact,
+                        MAX(CASE WHEN cont.JobTitle = 2 THEN cont.ContactName ELSE NULL END) AS KeyAccountManager,
+                        CONCAT(
+                            ISNULL(a.Addressline1, ''), 
+                            CASE WHEN a.Addressline1 IS NOT NULL AND a.Addressline2 IS NOT NULL THEN ', ' ELSE '' END, 
+                            ISNULL(a.Addressline2, '')
+                        ) AS CustomerAddress1,
+                        a.Town AS CustomerTown,
+                        a.PostalCode AS CustomerPostalCode,
+                        cc.Status,
+                        c.Id AS ClientId
+                    FROM
+                        [dbo].[ClientCustomer] cc
+                        INNER JOIN [dbo].[Client] c ON c.Id = cc.ClientId
+                        LEFT JOIN [dbo].[Address] a ON a.ObjectId = cc.Id AND a.ObjectType = 'Customer'
+                        LEFT JOIN [dbo].[Contact] cont ON cont.ObjectId = cc.Id AND cont.ObjectType = 'Customer'
+                    WHERE (1=1)";
 
             if ( !CurrentUser.IsAdmin )
             {
@@ -227,31 +243,40 @@ namespace ACT.Core.Services
                 query += " AND (cc.CreatedOn <= @csmToDate)";
             }
 
+            if ( csm.ClientId > 0 )
+            {
+                query += " AND (cc.ClientId = @clientId)";
+            }
+
+            if ( csm.CustomerId > 0 )
+            {
+                query += " AND (cc.Id = @customerId)";
+            }
+
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
                 query += string.Format( @" AND (cc.CustomerName LIKE '%{0}%' OR
-               cc.CustomerNumber LIKE '%{0}%' OR
-               cont.ContactCell LIKE '%{0}%' OR
-               a.Addressline1 LIKE '%{0}%' OR
-               a.Addressline2 LIKE '%{0}%' OR
-               a.Town LIKE '%{0}%' OR
-               a.PostalCode LIKE '%{0}%' OR
-               c.CompanyName LIKE '%{0}%' OR
-               kam.ContactName LIKE '%{0}%')",
-               csm.Query.Trim() );
+                                       cc.CustomerNumber LIKE '%{0}%' OR
+                                       cont.ContactCell LIKE '%{0}%' OR
+                                       a.Addressline1 LIKE '%{0}%' OR
+                                       a.Addressline2 LIKE '%{0}%' OR
+                                       a.Town LIKE '%{0}%' OR
+                                       a.PostalCode LIKE '%{0}%' OR
+                                       c.CompanyName LIKE '%{0}%' OR
+                                       kam.ContactName LIKE '%{0}%')",
+                                       csm.Query.Trim() );
             }
 
             query += @"
-                    GROUP BY
-                    cc.Id, cc.CreatedOn, c.CompanyName, cc.CustomerName, cc.CustomerNumber,
-                    a.Addressline1, a.Addressline2, a.Town, a.PostalCode, cc.Status, c.Id";
+            GROUP BY
+            cc.Id, cc.CreatedOn, c.CompanyName, cc.CustomerName, cc.CustomerNumber,
+            a.Addressline1, a.Addressline2, a.Town, a.PostalCode, cc.Status, c.Id";
 
             query += $" ORDER BY {pm.SortBy} {pm.Sort}";
             query += " OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY";
 
             List<ClientCustomerCustomModel> results = context.Database.SqlQuery<ClientCustomerCustomModel>( query, parameters.ToArray() ).ToList();
 
-            // Process the address information
             foreach ( var item in results )
             {
                 string[] addressParts = item.CustomerAddress1.Split( '|' );
@@ -340,6 +365,66 @@ namespace ACT.Core.Services
 
             var result = context.Database.SqlQuery<string>( query, parameters.ToArray() ).FirstOrDefault();
             return result ?? "No Key Account Manager assigned.";
+        }
+
+        public Dictionary<int, string> ListCustomers( bool v, int clientId = 0 )
+        {
+            Dictionary<int, string> customerOptions = new Dictionary<int, string>();
+            List<object> parameters = new List<object>()
+            {
+                new SqlParameter("clientid", clientId),
+                new SqlParameter("userid", (CurrentUser != null) ? CurrentUser.Id : 0),
+            };
+
+            string query = @"
+            SELECT cc.Id AS [TKey], cc.CustomerName AS [TValue]
+            FROM [dbo].[ClientCustomer] cc
+            INNER JOIN [dbo].[Client] c ON c.Id = cc.ClientId
+            WHERE cc.Status = 1";
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query += @" AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu 
+                        INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId 
+                        WHERE pc.ClientId=cc.ClientId AND pu.UserId=@userid)";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query += @" AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu 
+                        WHERE cu.UserId=@userid AND cu.ClientId=cc.ClientId)";
+            }
+
+            if ( clientId > 0 )
+            {
+                query += " AND cc.ClientId=@clientid";
+            }
+
+            query += " ORDER BY cc.CustomerName";
+
+            var model = context.Database.SqlQuery<IntStringKeyValueModel>( query, parameters.ToArray() ).ToList();
+
+            if ( model != null && model.Any() )
+            {
+                foreach ( var k in model )
+                {
+                    if ( !customerOptions.ContainsKey( k.TKey ) )
+                    {
+                        customerOptions.Add( k.TKey, k.TValue?.Trim() ?? "" );
+                    }
+                }
+            }
+
+            return customerOptions;
+        }
+
+        public List<SelectListItem> GetCustomerSelectList( bool v, int clientId = 0 )
+        {
+            Dictionary<int, string> customerDict = ListCustomers( v, clientId );
+            return customerDict.Select( kvp => new SelectListItem
+            {
+                Value = kvp.Key.ToString(),
+                Text = kvp.Value
+            } ).ToList();
         }
     }
 }

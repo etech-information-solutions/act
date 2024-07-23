@@ -68,6 +68,9 @@ namespace ACT.Core.Models
             get; set;
         }
 
+        [Display( Name = "Customer" )]
+        public int CustomerId { get; set; }
+
         /// <summary>
         /// Can be used as a selected Client Group 
         /// </summary>
@@ -534,6 +537,8 @@ namespace ACT.Core.Models
 
         public Dictionary<int, string> OutstandingReasonOptions { get; set; }
 
+        public List<SelectListItem> CustomerOptions { get; set; }
+
         public List<SelectListItem> CompanyNameOptions { get; set; }
 
         public List<SelectListItem> ChepReferenceOptions { get; set; }
@@ -623,6 +628,15 @@ namespace ACT.Core.Models
                         CompanyRegistrationNumberOptions = cservice.GetCompanyRegistrationNumberOptions();
                     }
 
+                    break;
+
+                case "Customers":
+                    using ( ClientService cservice = new ClientService() )
+                    using ( ClientCustomerService ccservice = new ClientCustomerService() )
+                    {
+                        ClientOptions = cservice.List( true );
+                        CustomerOptions = ccservice.GetCustomerSelectList( true );
+                    }
                     break;
 
 
