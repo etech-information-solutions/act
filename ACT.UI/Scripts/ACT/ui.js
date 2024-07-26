@@ -6057,7 +6057,6 @@
                 var $this = $( this );
                 var $keyAccountManagerField = $( '#KeyAccountManager' );
                 var $keyAccountManagerLabel = $( 'label[for="KeyAccountManager"]' );
-
                 $this.on( 'change', function ()
                 {
                     var selectedClientId = $this.val();
@@ -6080,6 +6079,16 @@
                                     {
                                         $keyAccountManagerField.removeClass( 'no-manager' );
                                         $keyAccountManagerLabel.removeClass( 'warning' );
+
+                                        // Populate Contact fields
+                                        var $contactsTable = $( '#contacts-table' );
+                                        var $firstRow = $contactsTable.find( 'tbody tr:first' );
+
+                                        $firstRow.find( 'input[name^="Contacts[0].ContactName"]' ).val( response.keyAccountManagerInfo.ContactName );
+                                        $firstRow.find( 'input[name^="Contacts[0].ContactTitle"]' ).val( response.keyAccountManagerInfo.ContactTitle );
+                                        $firstRow.find( 'input[name^="Contacts[0].ContactCell"]' ).val( response.keyAccountManagerInfo.ContactCell );
+                                        $firstRow.find( 'input[name^="Contacts[0].ContactEmail"]' ).val( response.keyAccountManagerInfo.ContactEmail );
+                                        $firstRow.find( 'select[name^="Contacts[0].JobTitle"]' ).val( 2 ).trigger( 'chosen:updated' ); // 2 is the value for Key Account Manager
                                     }
                                 } else
                                 {
@@ -6098,6 +6107,16 @@
                         $keyAccountManagerField.val( '' );
                         $keyAccountManagerField.removeClass( 'no-manager' );
                         $keyAccountManagerLabel.removeClass( 'warning' );
+
+                        // Clear Contact fields
+                        var $contactsTable = $( '#contacts-table' );
+                        var $firstRow = $contactsTable.find( 'tbody tr:first' );
+
+                        $firstRow.find( 'input[name^="Contacts[0].ContactName"]' ).val( '' );
+                        $firstRow.find( 'input[name^="Contacts[0].ContactTitle"]' ).val( '' );
+                        $firstRow.find( 'input[name^="Contacts[0].ContactCell"]' ).val( '' );
+                        $firstRow.find( 'input[name^="Contacts[0].ContactEmail"]' ).val( '' );
+                        $firstRow.find( 'select[name^="Contacts[0].JobTitle"]' ).val( '' ).trigger( 'chosen:updated' );
                     }
                 } );
             } );

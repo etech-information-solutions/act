@@ -1765,22 +1765,20 @@ namespace ACT.UI.Controllers
             using ( TransactionScope scope = new TransactionScope() )
             using ( ContactService contactService = new ContactService() )
             {
-                // Add this debugging code
-                System.Diagnostics.Debug.WriteLine( $"Received Id: {model.Id}" );
+
+                // Contact Id is null on subsequent entries. When adding another contact row the new Id is null and the ModelState fails. This is a pragmatic solution for now.
+                if ( model.Contacts != null )
+                {
+                    foreach ( var contact in model.Contacts.Where( c => c.Id == 0 ) )
+                    {
+                        ModelState.Remove( $"Contacts[{model.Contacts.IndexOf( contact )}].Id" );
+                    }
+                }
 
                 if ( !ModelState.IsValid )
                 {
-                    foreach ( var key in ModelState.Keys )
-                    {
-                        var modelStateVal = ModelState[ key ];
-                        var errors = modelStateVal.Errors.Select( error => error.ErrorMessage );
-
-                        foreach ( var error in errors )
-                        {
-                            System.Diagnostics.Debug.WriteLine( $"Key: {key}, Error: {error}" );
-                        }
-                    }
                     Notify( "Sorry, the selected Customer was not updated. Please correct all errors and try again.", NotificationType.Error );
+
                     return View( model );
                 }
 
@@ -1905,6 +1903,17 @@ namespace ACT.UI.Controllers
             return Customers( new PagingModel(), new CustomSearchModel() );
         }
 
+        // GET: Client/TransporterContacts/5
+        public ActionResult CustomerContacts( int id )
+        {
+            using ( ContactService ccservice = new ContactService() )
+            {
+                List<Contact> contacts = ccservice.List( id, "Customer" );
+
+                return PartialView( "_ContactsView", contacts );
+            }
+        }
+
         // POST: Client/DeleteKPI/5
         [HttpPost]
         [Requires( PermissionTo.Delete )]
@@ -1931,12 +1940,25 @@ namespace ACT.UI.Controllers
             }
         }
 
+        // GET: Client/GetKeyAccountManager/5
         public JsonResult GetKeyAccountManager( int clientId )
         {
-            using ( var clientCustomerService = new ClientCustomerService() )
+            using ( ClientCustomerService clientCustomerService = new ClientCustomerService() )
             {
-                string keyAccountManager = clientCustomerService.GetKeyAccountManager( clientId, "Client" );
-                return Json( new { success = true, keyAccountManager }, JsonRequestBehavior.AllowGet );
+                ClientCustomerService.KeyAccountManagerInfo keyAccountManagerInfo = clientCustomerService.GetKeyAccountManagerInfo( clientId, "Client" );
+                return Json( new
+                {
+                    success = true,
+                    keyAccountManager = keyAccountManagerInfo.ContactName,
+                    keyAccountManagerInfo = new
+                    {
+                        keyAccountManagerInfo.ContactName,
+                        keyAccountManagerInfo.ContactTitle,
+                        keyAccountManagerInfo.ContactCell,
+                        keyAccountManagerInfo.ContactEmail,
+                        keyAccountManagerInfo.JobTitle
+                    }
+                }, JsonRequestBehavior.AllowGet );
             }
         }
 
@@ -3991,6 +4013,15 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Edit )]
         public ActionResult EditTransporter( TransporterViewModel model )
         {
+            // Contact Id is null on subsequent entries. When adding another contact row the new Id is null and the ModelState fails. This is a pragmatic solution for now.
+            if ( model.Contacts != null )
+            {
+                foreach ( var contact in model.Contacts.Where( c => c.Id == 0 ) )
+                {
+                    ModelState.Remove( $"Contacts[{model.Contacts.IndexOf( contact )}].Id" );
+                }
+            }
+
             if ( !ModelState.IsValid )
             {
                 Notify( "Sorry, the selected Transporter was not updated. Please correct all errors and try again.", NotificationType.Error );

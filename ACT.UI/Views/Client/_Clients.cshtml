@@ -52,10 +52,13 @@
                 Created
             </th>
             @*<th data-name="PSPName" data-column="p.CompanyName">
-                PSP
-            </th>*@
+            PSP
+        </th>*@
             <th data-name="CompanyName" data-column="c.CompanyName">
                 Company Name
+            </th>
+            <th data-name="ChepReference" data-column="c.ChepReference">
+                Chep Ref
             </th>
             <th data-name="ContactCount" data-column="ContactCount">
                 Contacts
@@ -64,32 +67,29 @@
                 Address
             </th>
             @*<th data-name="Suburb" data-column="c.FinancialPerson">
-                    Finance Contact
-                </th>
-                <th data-name="ContactPerson" data-column="c.AdminPerson">
-                    Admin Contact
-                </th>*@
-            <th data-name="ChepReference" data-column="c.ChepReference">
-                Chep Ref
-            </th>
+            Finance Contact
+        </th>
+        <th data-name="ContactPerson" data-column="c.AdminPerson">
+            Admin Contact
+        </th>*@
             @*<th data-name="ServiceRequired" data-column="c.ServiceRequired">
-                    Service Required
-                </th>*@
+            Service Required
+        </th>*@
             <th data-name="Status" data-column="c.Status">
                 Status
             </th>
             @*<th data-name="UserCount" data-column="UserCount">
-                    Users
-                </th>*@
+            Users
+        </th>*@
             @*<th data-name="ProductCount" data-column="ProductCount">
-                    Products
-                </th>
-                <th data-name="InvoiceCount" data-column="InvoiceCount">
-                    Invoices
-                </th>
-                <th data-name="BudgetCount" data-column="BudgetCount">
-                    Budget
-                </th>*@
+            Products
+        </th>
+        <th data-name="InvoiceCount" data-column="InvoiceCount">
+            Invoices
+        </th>
+        <th data-name="BudgetCount" data-column="BudgetCount">
+            Budget
+        </th>*@
             <th data-name="Actions">
                 Actions
             </th>
@@ -126,19 +126,29 @@
                         </a>
                     </td>
                     @*<td>
-                        @(item.PSPCompanyName ?? item.PSPName )
+            @(item.PSPCompanyName ?? item.PSPName )
 
-                        @if ( string.IsNullOrEmpty( item.PSPCompanyName ) && !string.IsNullOrEmpty( item.PSPName ) )
-                        {
-                            <a rel="tipsyW" title="This PSP might not exist in this system yet!">
-                                <img alt="" src="@Url.Content( "~/Images/warn.png" )" />
-                            </a>
-                        }
-                    </td>*@
+            @if ( string.IsNullOrEmpty( item.PSPCompanyName ) && !string.IsNullOrEmpty( item.PSPName ) )
+            {
+                <a rel="tipsyW" title="This PSP might not exist in this system yet!">
+                    <img alt="" src="@Url.Content( "~/Images/warn.png" )" />
+                </a>
+            }
+        </td>*@
                     <td>
                         @item.CompanyName
 
                         <i class="block">Reg # @item.CompanyRegistrationNumber</i>
+                    </td>
+                    <td>
+                        @if ( !string.IsNullOrEmpty( item.PrimaryChepReference ) )
+                        {
+                            <div>Primary: @item.PrimaryChepReference</div>
+                        }
+                        @if ( !string.IsNullOrEmpty( item.AdditionalChepReferences ) )
+                        {
+                            <div>Additional: @item.AdditionalChepReferences</div>
+                        }
                     </td>
                     <td width="10%">
                         @if ( item.Contacts != null && item.Contacts.Any( c => c.Status == ( Int32 ) Status.Active ) )
@@ -188,26 +198,16 @@
                         }
                     </td>
                     @*<td>
-                            @item.FinancialPerson
-                            <a class="block" href="mailto:@item.FinPersonEmail">@item.FinPersonEmail</a>
-                        </td>
-                        <td>
-                            @item.AdminPerson
-                            <a class="block" href="mailto:@item.AdminEmail">@item.AdminEmail</a>
-                        </td>*@
-                    <td>
-                        @if ( !string.IsNullOrEmpty( item.PrimaryChepReference ) )
-                        {
-                            <div>Primary: @item.PrimaryChepReference</div>
-                        }
-                        @if ( !string.IsNullOrEmpty( item.AdditionalChepReferences ) )
-                        {
-                            <div>Additional: @item.AdditionalChepReferences</div>
-                        }
-                    </td>
+            @item.FinancialPerson
+            <a class="block" href="mailto:@item.FinPersonEmail">@item.FinPersonEmail</a>
+        </td>
+        <td>
+            @item.AdminPerson
+            <a class="block" href="mailto:@item.AdminEmail">@item.AdminEmail</a>
+        </td>*@
                     @*<td>
-                            @serviceType.GetDisplayText()
-                        </td>*@
+            @serviceType.GetDisplayText()
+        </td>*@
                     <td>
                         @status.GetDisplayText()
 
@@ -217,29 +217,29 @@
                         }
                     </td>
                     @*<td>
-                            @if ( item.UserCount > 0 )
-                            {
-                                @Html.ActionLink( item.UserCount.ToString(), "ClientUsers", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                            }
-                        </td>*@
+            @if ( item.UserCount > 0 )
+            {
+                @Html.ActionLink( item.UserCount.ToString(), "ClientUsers", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+            }
+        </td>*@
                     @*<td>
-                            @if ( item.ProductCount > 0 )
-                            {
-                                @Html.ActionLink( item.ProductCount.ToString(), "ClientProducts", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                            }
-                        </td>
-                        <td>
-                            @if ( item.InvoiceCount > 0 )
-                            {
-                                @Html.ActionLink( item.InvoiceCount.ToString(), "ClientInvoices", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                            }
-                        </td>
-                        <td>
-                            @if ( item.BudgetCount > 0 )
-                            {
-                                @Html.ActionLink( item.BudgetCount.ToString(), "ClientBudgets", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                            }
-                        </td>*@
+            @if ( item.ProductCount > 0 )
+            {
+                @Html.ActionLink( item.ProductCount.ToString(), "ClientProducts", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+            }
+        </td>
+        <td>
+            @if ( item.InvoiceCount > 0 )
+            {
+                @Html.ActionLink( item.InvoiceCount.ToString(), "ClientInvoices", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+            }
+        </td>
+        <td>
+            @if ( item.BudgetCount > 0 )
+            {
+                @Html.ActionLink( item.BudgetCount.ToString(), "ClientBudgets", new { id = item.Id }, new { @class = "right counter-tip", @rel = "tipsyW", @title = "Click to view", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+            }
+        </td>*@
 
                     <td width="12%">
 
@@ -260,27 +260,27 @@
                         }
 
                         @*@if ( item.Documents != null && item.Documents.Any( s => s.Name.ToLower() != "logo" && s.Status == ( Int32 ) Status.Active ) )
-                        {
-                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+            {
+                <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
-                                <a class="docs" data-sticky-one="1" data-target="#client-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Client Documents">
-                                    Docs
-                                </a>
-                                <div id="client-@item.Id-docs" class="none">
-                                    <ul class="list">
-                                        @foreach ( var d in item.Documents.Where( s => s.Name.ToLower() != "logo" && s.Status == ( Int32 ) Status.Active ) )
-                                        {
-                                            <li style="line-height: 20px;">
-                                                <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )" target="_blank">
-                                                    @d.Description (@d.Type)
-                                                </a>
-                                            </li>
-                                        }
-                                    </ul>
-                                </div>
+                    <a class="docs" data-sticky-one="1" data-target="#client-@item.Id-docs" data-trigger="mouseover" data-arrow="center-right" data-title="Client Documents">
+                        Docs
+                    </a>
+                    <div id="client-@item.Id-docs" class="none">
+                        <ul class="list">
+                            @foreach ( var d in item.Documents.Where( s => s.Name.ToLower() != "logo" && s.Status == ( Int32 ) Status.Active ) )
+                            {
+                                <li style="line-height: 20px;">
+                                    <a rel="tipsyW" title="View File?" href="@Url.Action( "ViewDocument", "Client", new { @id = d.Id } )" target="_blank">
+                                        @d.Description (@d.Type)
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
 
-                            </div>
-                        }*@
+                </div>
+            }*@
 
                         @if ( status == PSPClientStatus.Verified || status == PSPClientStatus.Inactive )
                         {

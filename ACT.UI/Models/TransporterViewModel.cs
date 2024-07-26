@@ -36,7 +36,6 @@ namespace ACT.UI.Models
         [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string ContactNumber { get; set; }
 
-        [Required]
         [Display( Name = "Email" )]
         [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 1 )]
         public string Email { get; set; }

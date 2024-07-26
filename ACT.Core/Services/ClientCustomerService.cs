@@ -322,51 +322,6 @@ namespace ACT.Core.Services
             return context.ClientCustomers.Any( cc => cc.CustomerNumber.Trim().ToLower() == customerNumber.Trim().ToLower() );
         }
 
-        /// <summary>
-        /// Gets the Key Account Manager for a client or customer
-        /// </summary>
-        /// <param name="id">The ID of the client or customer</param>
-        /// <param name="objectType">Either "Client" or "Customer"</param>
-        /// <returns></returns>
-        public string GetKeyAccountManager( int id, string objectType )
-        {
-            var parameters = new List<object>
-        {
-            new SqlParameter("@id", id),
-            new SqlParameter("@objectType", objectType)
-        };
-
-            string query = @"
-            SELECT TOP 1 ContactName
-            FROM [dbo].[Contact]
-            WHERE ObjectId = @id 
-            AND ObjectType = @objectType
-            AND JobTitle = 2
-            ORDER BY CreatedOn DESC";
-
-            var result = context.Database.SqlQuery<string>( query, parameters.ToArray() ).FirstOrDefault();
-            return result ?? "No Key Account Manager assigned.";
-        }
-
-        public string GetKeyAccountManagerFromContacts( int clientId )
-        {
-            var parameters = new List<object>
-            {
-                new SqlParameter("@clientId", clientId)
-            };
-
-            string query = @"
-                            SELECT TOP 1 ContactName
-                            FROM [dbo].[Contact]
-                            WHERE ObjectId = @clientId 
-                            AND ObjectType = 'Client'
-                            AND JobTitle = 2
-                            ORDER BY CreatedOn DESC";
-
-            var result = context.Database.SqlQuery<string>( query, parameters.ToArray() ).FirstOrDefault();
-            return result ?? "No Key Account Manager assigned.";
-        }
-
         public Dictionary<int, string> ListCustomers( bool v, int clientId = 0 )
         {
             Dictionary<int, string> customerOptions = new Dictionary<int, string>();
@@ -425,6 +380,41 @@ namespace ACT.Core.Services
                 Value = kvp.Key.ToString(),
                 Text = kvp.Value
             } ).ToList();
+        }
+
+        /// <summary>
+        /// Gets the Key Account Manager Info for a client or customer
+        /// </summary>
+        /// <param name="id">The ID of the client or customer</param>
+        /// <param name="objectType">Either "Client" or "Customer"</param>
+        /// <returns></returns>
+        public KeyAccountManagerInfo GetKeyAccountManagerInfo( int id, string objectType )
+        {
+            var parameters = new List<object>
+            {
+                new SqlParameter("@id", id),
+                new SqlParameter("@objectType", objectType)
+            };
+
+            string query = @"
+                            SELECT TOP 1 ContactName, ContactTitle, ContactCell, ContactEmail, JobTitle
+                            FROM [dbo].[Contact]
+                            WHERE ObjectId = @id 
+                            AND ObjectType = @objectType
+                            AND JobTitle = 2
+                            ORDER BY CreatedOn DESC";
+
+            KeyAccountManagerInfo result = context.Database.SqlQuery<KeyAccountManagerInfo>( query, parameters.ToArray() ).FirstOrDefault();
+            return result ?? new KeyAccountManagerInfo { ContactName = "No Key Account Manager assigned." };
+        }
+
+        public class KeyAccountManagerInfo
+        {
+            public string ContactName { get; set; }
+            public string ContactTitle { get; set; }
+            public string ContactCell { get; set; }
+            public string ContactEmail { get; set; }
+            public int JobTitle { get; set; }
         }
     }
 }

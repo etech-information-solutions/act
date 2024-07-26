@@ -202,6 +202,7 @@
     <Compile Include="Models\AddressViewModel.cs" />
     <Compile Include="Models\BudgetViewModel.cs" />
     <Compile Include="Models\ClientKPIViewModel.cs" />
+    <Compile Include="Models\ContactViewModel.cs" />
     <Compile Include="Models\DeliveryNoteLineViewModel.cs" />
     <Compile Include="Models\DisputeViewModel.cs" />
     <Compile Include="Models\JournalViewModel.cs" />
