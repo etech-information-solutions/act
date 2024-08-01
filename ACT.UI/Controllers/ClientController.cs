@@ -2464,6 +2464,7 @@ namespace ACT.UI.Controllers
             using ( SiteService sservice = new SiteService() )
             using ( AddressService aservice = new AddressService() )
             using ( TransactionScope scope = new TransactionScope() )
+            using ( RegionService regionService = new RegionService() )
             using ( ContactService contactService = new ContactService() )
             using ( ClientSiteService csservice = new ClientSiteService() )
             using ( SiteBudgetService sbservice = new SiteBudgetService() )
@@ -2507,10 +2508,21 @@ namespace ACT.UI.Controllers
                     AccountCode = model.AccountCode,
                     SiteType = ( int ) model.SiteType,
                     SiteCodeChep = model.SiteCodeChep,
-
                     ARPMSalesManagerId = model.ARPMSalesManagerId,
                     CLCode = model.CLCode,
                 };
+
+                int provinceId = model.Address?.ProvinceId ?? 0;
+
+                int? matchingRegionId = regionService.FindMatchingRegionId( provinceId );
+
+                if ( !matchingRegionId.HasValue )
+                {
+                    ModelState.AddModelError( "Address.ProvinceId", "Could not find a matching Region for the selected Province." );
+                    return View( model );
+                }
+
+                site.RegionId = matchingRegionId.Value;
 
                 site = sservice.Create( site );
 

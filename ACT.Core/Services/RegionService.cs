@@ -289,5 +289,14 @@ namespace ACT.Core.Services
         {
             return context.Regions.FirstOrDefault( r => r.Name == code || r.Code == code );
         }
+
+        public int? FindMatchingRegionId( int provinceId )
+        {
+            var query = @"SELECT TOP 1 Id FROM Region WHERE ProvinceId = @ProvinceId OR Id = @ProvinceId OR Name = (SELECT Name FROM Province WHERE Id = @ProvinceId)";
+
+            var parameters = new SqlParameter[] { new SqlParameter( "@ProvinceId", provinceId ) };
+
+            return context.Database.SqlQuery<int?>( query, parameters ).FirstOrDefault();
+        }
     }
 }
