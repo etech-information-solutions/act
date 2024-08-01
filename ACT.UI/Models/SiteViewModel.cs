@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Web;
 
 using ACT.Core.Enums;
+using ACT.Core.Models.Custom;
 using ACT.Core.Services;
 using ACT.Data.Models;
 
@@ -23,6 +24,9 @@ namespace ACT.UI.Models
         public int? SiteId { get; set; }
 
         [Required]
+        [Display( Name = "Customer" )]
+        public int CustomerId { get; set; }
+
         [Display( Name = "Region" )]
         public int? RegionId { get; set; }
 
@@ -164,6 +168,11 @@ namespace ACT.UI.Models
 
         public bool EditMode { get; set; }
 
+        [Display( Name = "Contacts" )]
+        public List<Contact> Contacts { get; set; }
+
+        public ClientSiteCustomModel ClientSite { get; set; }
+
         public List<ClientCustomer> Clients { get; set; }
 
         public AddressViewModel Address { get; set; }
@@ -219,6 +228,19 @@ namespace ACT.UI.Models
                 using ( ClientCustomerService cservice = new ClientCustomerService() )
                 {
                     return cservice.List( true );
+                }
+            }
+        }
+
+        public Dictionary<int, string> CustomerOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+
+                using ( ClientCustomerService ccservice = new ClientCustomerService() )
+                {
+                    return ccservice.ListCustomers( true, ClientId );
                 }
             }
         }

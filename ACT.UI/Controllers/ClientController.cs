@@ -1680,6 +1680,7 @@ namespace ACT.UI.Controllers
                 #endregion
 
                 #region Contacts
+
                 if ( model.Contacts != null && model.Contacts.Any( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
                 {
                     foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
@@ -1699,6 +1700,7 @@ namespace ACT.UI.Controllers
                         contactService.Create( newContact );
                     }
                 }
+
                 #endregion
 
                 scope.Complete();
@@ -1903,7 +1905,7 @@ namespace ACT.UI.Controllers
             return Customers( new PagingModel(), new CustomSearchModel() );
         }
 
-        // GET: Client/TransporterContacts/5
+        // GET: Client/CustomerContacts/5
         public ActionResult CustomerContacts( int id )
         {
             using ( ContactService ccservice = new ContactService() )
@@ -2400,6 +2402,1048 @@ namespace ACT.UI.Controllers
 
         #endregion
 
+        #region Manage Customer Sites
+
+        //
+        // GET: /Client/SiteDetails/5
+        public ActionResult CustomerSiteDetails( int id, bool layout = true )
+        {
+            using ( SiteService sservice = new SiteService() )
+            using ( AddressService aservice = new AddressService() )
+            {
+                Site model = sservice.GetById( id );
+
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                Address address = aservice.Get( model.Id, "Site" );
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                ViewBag.Address = address;
+
+                return View( model );
+            }
+        }
+
+        // GET: Client/AddSite
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddCustomerSite()
+        {
+            SiteViewModel model = new SiteViewModel()
+            {
+                EditMode = true,
+                Clients = new List<ClientCustomer>(),
+                SiteBudgets = new List<SiteBudget>(),
+                Address = new AddressViewModel() { EditMode = true },
+                Contacts = new List<Contact>(),
+            };
+
+            return View( model );
+        }
+
+        // POST: Client/Site
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddCustomerSite( SiteViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( SiteService sservice = new SiteService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( ContactService contactService = new ContactService() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            using ( SiteBudgetService sbservice = new SiteBudgetService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
+            {
+                Site site1 = sservice.GetById( model.SiteId ?? 0 );
+
+                #region Validation
+
+                if ( sservice.ExistByClientAndName( model.ClientId, model.Name?.Trim()?.ToLower() ) )
+                {
+                    Notify( $"Sorry, a Site with the name {model.Name} in the specified region already exists.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                #endregion
+
+                if ( !model.SiteId.HasValue && !string.IsNullOrWhiteSpace( model.Longitude ) && !string.IsNullOrWhiteSpace( model.Latitude ) )
+                {
+                    Site existingSite = sservice.ExistByXYCoords( model.Longitude?.Trim(), model.Latitude?.Trim() );
+
+                    if ( existingSite != null )
+                    {
+                        model.SiteId = existingSite.Id;
+                    }
+                }
+
+                #region Create Site
+
+                Site site = new Site()
+                {
+                    Name = model.Name,
+                    Depot = model.Depot,
+                    SiteId = model.SiteId,
+                    RegionId = model.Address?.ProvinceId,
+                    ContactNo = model.ContactNo,
+                    Status = ( int ) model.Status,
+                    ContactName = model.ContactName,
+                    Description = model.Description,
+                    AccountCode = model.AccountCode,
+                    SiteType = ( int ) model.SiteType,
+                    SiteCodeChep = model.SiteCodeChep,
+
+                    ARPMSalesManagerId = model.ARPMSalesManagerId,
+                    CLCode = model.CLCode,
+                };
+
+                site = sservice.Create( site );
+
+                #endregion
+
+                #region Create Address (s)
+
+                if ( model.Address != null )
+                {
+                    Address address = new Address()
+                    {
+                        ObjectId = site.Id,
+                        ObjectType = "CustomerSite",
+                        Town = model.Address.Town,
+                        Latitude = model.Latitude,
+                        Longitude = model.Longitude,
+                        Status = ( int ) Status.Active,
+                        Type = ( int ) AddressType.Postal,
+                        PostalCode = model.Address.PostCode,
+                        Addressline1 = model.Address.AddressLine1,
+                        Addressline2 = model.Address.AddressLine2,
+                        ProvinceId = model.Address.ProvinceId,
+                    };
+
+                    aservice.Create( address );
+                }
+
+                #endregion
+
+                #region Add Client Site
+
+                if ( model.CustomerId > 0 )
+                {
+                    ClientSite csSite = new ClientSite()
+                    {
+                        SiteId = site.Id,
+                        ClientCustomerId = model.CustomerId,
+                        Status = ( int ) model.Status,
+                        AccountingCode = site.AccountCode,
+                        CreatedOn = DateTime.Now,
+                        ModifiedOn = DateTime.Now,
+                        ModifiedBy = User.Identity.Name
+                    };
+
+                    csservice.Create( csSite );
+                }
+                else
+                {
+                    Notify( "No customer selected for this site. Please select a customer and try again.", NotificationType.Error );
+                    return View( model );
+                }
+
+                #endregion
+
+                #region Create Client Budget
+
+                if ( model.SiteBudgets.NullableAny() )
+                {
+                    foreach ( SiteBudget l in model.SiteBudgets )
+                    {
+                        SiteBudget sb = new SiteBudget()
+                        {
+                            SiteId = site.Id,
+                            BudgetYear = l.BudgetYear,
+                            Total = l.Total,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
+                            Status = ( int ) model.Status,
+                        };
+
+                        sbservice.Create( sb );
+                    }
+                }
+
+                #endregion
+
+                #region Contacts
+
+                if ( model.Contacts != null && model.Contacts.Any( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                {
+                    foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                    {
+                        Contact newContact = new Contact()
+                        {
+                            ObjectId = site.Id,
+                            JobTitle = mc.JobTitle,
+                            ObjectType = "CustomerSite",
+                            ContactCell = mc.ContactCell,
+                            ContactName = mc.ContactName,
+                            Status = ( int ) Status.Active,
+                            ContactEmail = mc.ContactEmail,
+                            ContactTitle = mc.ContactTitle,
+                        };
+                        contactService.Create( newContact );
+                    }
+                }
+
+                #endregion
+
+                scope.Complete();
+            }
+
+            Notify( "The Site was successfully created.", NotificationType.Success );
+
+            return ManageSites( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // GET: Client/EditSite/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditCustomerSite( int id )
+        {
+            using ( SiteService service = new SiteService() )
+            using ( RegionService rservice = new RegionService() )
+            using ( AddressService aservice = new AddressService() )
+            {
+                Site site = service.GetById( id );
+
+                if ( site == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                Address address = aservice.Get( site.Id, "Site" );
+
+                #region Site
+
+                SiteViewModel model = new SiteViewModel()
+                {
+                    Id = site.Id,
+                    EditMode = true,
+                    Name = site.Name,
+                    Depot = site.Depot,
+                    SiteId = site.SiteId,
+                    Latitude = site.YCord,
+                    Longitude = site.XCord,
+                    RegionId = site.RegionId,
+                    ContactNo = site.ContactNo,
+                    ContactName = site.ContactName,
+                    Description = site.Description,
+                    AccountCode = site.AccountCode,
+                    Status = ( Status ) site.Status,
+                    SiteCodeChep = site.SiteCodeChep,
+                    PlanningPoint = site.PlanningPoint,
+                    FinanceEmail = site.FinanceEmail,
+                    FinanceContact = site.FinanceContact,
+                    FinanceContactNo = site.FinanceContactNo,
+                    ReceivingContact = site.ReceivingContact,
+                    ReceivingContactNo = site.ReceivingContactNo,
+                    ReceivingEmail = site.ReceivingEmail,
+                    DepotManager = site.DepotManager,
+                    DepotManagerEmail = site.DepotManagerEmail,
+                    DepotManagerContact = site.DepotManagerContact,
+                    LocationNumber = site.LocationNumber,
+
+                    ARPMSalesManagerId = site.ARPMSalesManagerId,
+                    CLCode = site.CLCode,
+
+                    AuthorisationEmail1 = site.ClientSites?.FirstOrDefault()?.AuthorisationEmail1,
+                    AuthorisationEmail2 = site.ClientSites?.FirstOrDefault()?.AuthorisationEmail2,
+                    AuthorisationEmail3 = site.ClientSites?.FirstOrDefault()?.AuthorisationEmail3,
+
+                    ClientSalesManager = site.ClientSites?.FirstOrDefault()?.ClientSalesManager,
+                    ClientManagerContact = site.ClientSites?.FirstOrDefault()?.ClientManagerContact,
+                    ClientManagerEmail = site.ClientSites?.FirstOrDefault()?.ClientManagerEmail,
+                    ClientSalesRepContact = site.ClientSites?.FirstOrDefault()?.ClientSalesRepContact,
+                    ClientSalesRegEmail = site.ClientSites?.FirstOrDefault()?.ClientSalesRegEmail,
+
+                    SiteType = ( site.SiteType.HasValue ? ( SiteType ) site.SiteType : SiteType.All ),
+
+
+                    Clients = new List<ClientCustomer>(),
+                    SiteBudgets = new List<SiteBudget>(),
+                    Address = new AddressViewModel() { EditMode = true },
+                    ClientId = site.ClientSites.FirstOrDefault()?.ClientCustomer?.ClientId ?? 0,
+                };
+
+                #endregion
+
+                #region Clients
+
+                if ( site.ClientSites.NullableAny() )
+                {
+                    foreach ( int cid in site.ClientSites.Select( s => s.ClientCustomerId ) )
+                    {
+                        model.Clients.Add( new ClientCustomer()
+                        {
+                            Id = cid
+                        } );
+                    }
+                }
+
+                #endregion
+
+                #region Site Budgets
+
+                if ( site.SiteBudgets.NullableAny() )
+                {
+                    foreach ( SiteBudget l in site.SiteBudgets )
+                    {
+                        model.SiteBudgets.Add( new SiteBudget()
+                        {
+                            Id = l.Id,
+                            BudgetYear = l.BudgetYear,
+                            Total = l.Total,
+                            January = l.January,
+                            February = l.February,
+                            March = l.March,
+                            April = l.April,
+                            May = l.May,
+                            June = l.June,
+                            July = l.July,
+                            August = l.August,
+                            September = l.September,
+                            October = l.October,
+                            November = l.November,
+                            December = l.December,
+                        } );
+                    }
+                }
+
+                #endregion
+
+                #region Address
+
+                if ( address != null )
+                {
+                    model.Address = new AddressViewModel()
+                    {
+                        EditMode = true,
+                        Town = address?.Town,
+                        Id = address?.Id ?? 0,
+                        PostCode = address?.PostalCode,
+                        AddressLine1 = address?.Addressline1,
+                        AddressLine2 = address?.Addressline2,
+                        ProvinceId = address?.ProvinceId ?? 0,
+                        Longitude = address.Longitude,
+                        Latitude = address.Latitude,
+                    };
+                }
+
+                #endregion
+
+                return View( model );
+            }
+        }
+
+        // POST: Client/EditSite/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditCustomerSite( SiteViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the selected Site was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( SiteService sservice = new SiteService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            using ( SiteBudgetService sbservice = new SiteBudgetService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
+            {
+                Site site = sservice.GetById( model.Id );
+
+                Site site1 = sservice.GetById( model.SiteId ?? 0 );
+
+                #region Validations
+
+                if ( site == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                if ( site.Name?.Trim()?.ToLower() != model.Name?.Trim()?.ToLower() && site.RegionId != model.RegionId && sservice.ExistByClientAndName( model.ClientId, model.Name?.Trim()?.ToLower() ) )
+                {
+                    Notify( $"Sorry, a Site with the name {model.Name} in the specified region already exists.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                #endregion
+
+                if ( !model.SiteId.HasValue && !string.IsNullOrWhiteSpace( model.Longitude ) && !string.IsNullOrWhiteSpace( model.Latitude ) )
+                {
+                    Site existingSite = sservice.ExistByXYCoords( model.Longitude?.Trim(), model.Latitude?.Trim() );
+
+                    if ( existingSite != null && site.Id != existingSite.Id && site.SiteId != existingSite.Id )
+                    {
+                        // Instead of pass back to view, we will create the new site as a subsite of the existing site.
+                        // Get the existing site first
+                        model.SiteId = existingSite.Id;
+                    }
+                }
+
+                #region Update Site
+
+                site.Name = model.Name;
+                site.Depot = model.Depot;
+                site.SiteId = model.SiteId;
+                site.YCord = model.Latitude;
+                site.XCord = model.Longitude;
+                site.RegionId = model.RegionId;
+                site.ContactNo = model.ContactNo;
+                site.Status = ( int ) model.Status;
+                site.Description = model.Description;
+                site.ContactName = model.ContactName;
+                site.AccountCode = model.AccountCode;
+                site.SiteType = ( int ) model.SiteType;
+                site.SiteCodeChep = model.SiteCodeChep;
+                site.PlanningPoint = model.PlanningPoint;
+                site.FinanceEmail = model.FinanceEmail;
+                site.FinanceContact = model.FinanceContact;
+                site.ReceivingContact = model.ReceivingContact;
+                site.FinanceContactNo = model.FinanceContactNo;
+                site.ReceivingContactNo = model.ReceivingContactNo;
+                site.ReceivingEmail = model.ReceivingEmail;
+                site.DepotManager = model.DepotManager;
+                site.DepotManagerEmail = model.DepotManagerEmail;
+                site.DepotManagerContact = model.DepotManagerContact;
+                site.LocationNumber = model.LocationNumber;
+
+                site.ARPMSalesManagerId = model.ARPMSalesManagerId;
+                site.CLCode = model.CLCode;
+
+                sservice.Update( site );
+
+                #endregion
+
+                #region Add Client Site
+
+                csservice.Query( $"UPDATE [dbo].[ClientSite] SET [Status]={( int ) Status.Inactive} WHERE [SiteId]={site.Id}" );
+
+                if ( model.Clients.NullableAny( c => c.Id > 0 ) )
+                {
+                    foreach ( ClientCustomer c in model.Clients.Where( c => c.Id > 0 ) )
+                    {
+                        if ( c.Id <= 0 ) continue;
+
+                        ClientSite cs = csservice.GetBySiteId( c.Id, site.Id );
+
+                        if ( cs != null )
+                        {
+                            cs.Status = ( int ) model.Status;
+                            cs.AccountingCode = site.AccountCode;
+                            cs.KAMName = site.ContactName;
+                            cs.KAMContact = site.ContactNo;
+                            cs.KAMEmail = site.ReceivingEmail;
+                            cs.AuthorisationEmail1 = model.AuthorisationEmail1;
+                            cs.AuthorisationEmail2 = model.AuthorisationEmail2;
+                            cs.AuthorisationEmail3 = model.AuthorisationEmail3;
+                            cs.ClientManagerContact = model.ClientManagerContact;
+                            cs.ClientManagerEmail = model.ClientManagerEmail;
+                            cs.ClientSalesManager = model.ClientSalesManager;
+                            cs.ClientSalesRegEmail = model.ClientSalesRegEmail;
+                            cs.ClientSalesRepContact = model.ClientSalesRepContact;
+
+                            csservice.Update( cs );
+                        }
+                        else
+                        {
+                            cs = new ClientSite()
+                            {
+                                SiteId = site.Id,
+                                ClientCustomerId = c.Id,
+                                Status = ( int ) model.Status,
+                                AccountingCode = site.AccountCode,
+                                KAMName = site.ContactName,
+                                KAMContact = site.ContactNo,
+                                KAMEmail = site.ReceivingEmail,
+                                AuthorisationEmail1 = model.AuthorisationEmail1,
+                                AuthorisationEmail2 = model.AuthorisationEmail2,
+                                AuthorisationEmail3 = model.AuthorisationEmail3,
+                                ClientManagerContact = model.ClientManagerContact,
+                                ClientManagerEmail = model.ClientManagerEmail,
+                                ClientSalesManager = model.ClientSalesManager,
+                                ClientSalesRegEmail = model.ClientSalesRegEmail,
+                                ClientSalesRepContact = model.ClientSalesRepContact,
+                            };
+
+                            csservice.Create( cs );
+                        }
+                    }
+                }
+                else
+                {
+                    ClientCustomer cc = new ClientCustomer()
+                    {
+                        ClientId = model.ClientId,
+                        Status = ( int ) model.Status,
+                        CustomerName = site1?.Name ?? model.Name,
+                        CustomerNumber = model.CustomerNoDebtorCode,
+                    };
+
+                    cc = ccservice.Create( cc );
+
+                    ClientSite csSite = new ClientSite()
+                    {
+                        SiteId = site.Id,
+                        ClientCustomerId = cc.Id,
+                        Status = ( int ) model.Status,
+                        AccountingCode = site.AccountCode,
+                        KAMName = site.ContactName,
+                        KAMContact = site.ContactNo,
+                        KAMEmail = site.ReceivingEmail,
+                        AuthorisationEmail1 = model.AuthorisationEmail1,
+                        AuthorisationEmail2 = model.AuthorisationEmail2,
+                        AuthorisationEmail3 = model.AuthorisationEmail3,
+                        ClientManagerContact = model.ClientManagerContact,
+                        ClientManagerEmail = model.ClientManagerEmail,
+                        ClientSalesManager = model.ClientSalesManager,
+                        ClientSalesRegEmail = model.ClientSalesRegEmail,
+                        ClientSalesRepContact = model.ClientSalesRepContact,
+                    };
+
+                    csservice.Create( csSite );
+                }
+
+                #endregion
+
+                #region Client Budgets
+
+                if ( model.SiteBudgets.NullableAny() )
+                {
+                    foreach ( SiteBudget l in model.SiteBudgets )
+                    {
+                        SiteBudget b = sbservice.GetById( l.Id );
+
+                        if ( b == null )
+                        {
+                            b = new SiteBudget()
+                            {
+                                SiteId = site.Id,
+                                BudgetYear = l.BudgetYear,
+                                Total = l.Total,
+                                January = l.January,
+                                February = l.February,
+                                March = l.March,
+                                April = l.April,
+                                May = l.May,
+                                June = l.June,
+                                July = l.July,
+                                August = l.August,
+                                September = l.September,
+                                October = l.October,
+                                November = l.November,
+                                December = l.December,
+                                Status = ( int ) Status.Active,
+                            };
+
+                            sbservice.Create( b );
+                        }
+                        else
+                        {
+                            b.BudgetYear = l.BudgetYear;
+                            b.Total = l.Total;
+                            b.January = l.January;
+                            b.February = l.February;
+                            b.March = l.March;
+                            b.April = l.April;
+                            b.May = l.May;
+                            b.June = l.June;
+                            b.July = l.July;
+                            b.August = l.August;
+                            b.September = l.September;
+                            b.October = l.October;
+                            b.November = l.November;
+                            b.December = l.December;
+                            b.Status = ( int ) Status.Active;
+
+                            sbservice.Update( b );
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region Address (s)
+
+                if ( model.Address != null )
+                {
+                    Address address = aservice.GetById( model.Address.Id );
+
+                    if ( address == null )
+                    {
+                        address = new Address()
+                        {
+                            ObjectType = "CustomerSite",
+                            ObjectId = model.Id,
+                            Town = model.Address.Town,
+                            Latitude = model.Latitude,
+                            Longitude = model.Longitude,
+                            Status = ( int ) Status.Active,
+                            PostalCode = model.Address.PostCode,
+                            Type = ( int ) model.Address.AddressType,
+                            Addressline1 = model.Address.AddressLine1,
+                            Addressline2 = model.Address.AddressLine2,
+                            ProvinceId = model.Address.ProvinceId,
+                        };
+
+                        aservice.Create( address );
+                    }
+                    else
+                    {
+                        address.Town = model.Address.Town;
+                        address.Latitude = model.Latitude;
+                        address.Longitude = model.Longitude;
+                        address.PostalCode = model.Address.PostCode;
+                        address.Type = ( int ) model.Address.AddressType;
+                        address.Addressline1 = model.Address.AddressLine1;
+                        address.Addressline2 = model.Address.AddressLine2;
+                        address.ProvinceId = model.Address.ProvinceId;
+
+                        aservice.Update( address );
+                    }
+                }
+
+                #endregion
+
+                scope.Complete();
+            }
+
+            Notify( "The selected Site details were successfully updated.", NotificationType.Success );
+
+            return ManageSites( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // POST: Client/DeleteSite/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteCustomerSite( SiteViewModel model )
+        {
+            using ( SiteService service = new SiteService() )
+            {
+                Site site = service.GetById( model.Id );
+
+                if ( site == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                site.Status = ( ( ( Status ) site.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.Update( site );
+
+                Notify( "The selected Site was successfully updated.", NotificationType.Success );
+
+                return ManageSites( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
+        //
+        // POST: /Site/DeleteSiteBudget/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteCustomerSiteBudget( int id )
+        {
+            using ( SiteBudgetService bservice = new SiteBudgetService() )
+            {
+                SiteBudget b = bservice.GetById( id );
+
+                if ( b == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                int SiteId = b.SiteId;
+
+                bservice.Delete( b );
+
+                Notify( "The selected Budget was successfully Deleted.", NotificationType.Success );
+
+                List<SiteBudget> model = bservice.ListByColumnWhere( "SiteId", SiteId );
+
+                return PartialView( "_SiteBudgets", model );
+            }
+        }
+
+        // GET: Client/ImportSite
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportCustomerSite()
+        {
+            SiteViewModel model = new SiteViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        // POST: Client/ImportSite
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportCustomerSite( SiteViewModel model )
+        {
+            if ( model.SiteImportFile == null )
+            {
+                Notify( "Please select a file to upload and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            int line = 0,
+                count = 0,
+                errors = 0,
+                skipped = 0,
+                created = 0,
+                updated = 0,
+                errorDocId = 0;
+
+            string cQuery, uQuery;
+
+            List<string> errs = new List<string>();
+
+            using ( SiteService sservice = new SiteService() )
+            using ( RegionService rservice = new RegionService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( ProvinceService pservice = new ProvinceService() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
+            using ( TextFieldParser parser = new TextFieldParser( model.SiteImportFile.InputStream ) )
+            {
+                parser.Delimiters = new string[] { "," };
+
+                while ( true )
+                {
+                    string[] load = parser.ReadFields();
+
+                    if ( load == null )
+                    {
+                        break;
+                    }
+
+                    line++;
+
+                    if ( line == 1 ) continue;
+
+                    cQuery = uQuery = string.Empty;
+
+                    count++;
+
+                    if ( load.NullableCount() < 2 )
+                    {
+                        skipped++;
+
+                        continue;
+                    }
+
+                    load = load.ToSQLSafe();
+
+                    try
+                    {
+                        using ( TransactionScope scope = new TransactionScope() )
+                        {
+                            string siteNumber = load[ 0 ],
+                                   customerNumber = load[ 1 ],
+                                   customerName = load[ 2 ],
+                                   siteName = load[ 3 ],
+                                   subSiteName = load[ 4 ],
+                                   addressLine1 = load[ 5 ],
+                                   addressLine2 = load[ 6 ],
+                                   town = load[ 7 ],
+                                   xCord = load[ 8 ],
+                                   yCord = load[ 9 ],
+                                   kamContact = load[ 10 ],
+                                   managerContact = load[ 11 ],
+                                   liquorLicenseNumber = load[ 12 ],
+                                   kamName = load[ 13 ],
+                                   region = load[ 14 ],
+                                   province = load[ 15 ],
+                                   salesManager = load[ 16 ],
+                                   salesRepCluster = load[ 17 ],
+                                   salesRep = load[ 18 ];
+
+                            if ( string.IsNullOrEmpty( siteName ) || string.IsNullOrEmpty( customerName ) || string.IsNullOrEmpty( customerNumber ) )
+                            {
+                                skipped++;
+
+                                throw new Exception( $"Site name, Customer Name or Customer Number missing @ line {line}!" );
+                            }
+
+                            Region r = rservice.Search( region, province );
+
+                            #region Site
+
+                            Site s;
+
+                            int? siteId = null;
+
+                            if ( !string.IsNullOrWhiteSpace( subSiteName ) )
+                            {
+                                s = sservice.GetByClientAndName( model.ClientId, subSiteName );
+                                Site s1 = sservice.GetByClientAndName( model.ClientId, siteName );
+
+                                siteName = subSiteName;
+
+                                siteId = s1?.Id;
+                            }
+                            else
+                            {
+                                s = sservice.GetByClientAndName( model.ClientId, siteName );
+                            }
+
+                            if ( s == null )
+                            {
+                                // Create new site
+
+                                s = new Site()
+                                {
+                                    XCord = xCord,
+                                    YCord = yCord,
+                                    Name = siteName,
+                                    SiteId = siteId,
+                                    RegionId = r?.Id,
+                                    Depot = siteNumber,
+                                    Description = siteName,
+                                    AccountCode = siteNumber,
+                                    ContactName = salesManager,
+                                    ContactNo = managerContact,
+                                    DepotManager = salesManager,
+                                    FinanceContact = salesManager,
+                                    Status = ( int ) Status.Active,
+                                    ReceivingContact = salesManager,
+                                    FinanceContactNo = managerContact,
+                                    ReceivingContactNo = managerContact,
+                                    DepotManagerContact = managerContact,
+                                    Address = $"{addressLine1}\n {addressLine2}\n {town}",
+                                };
+
+                                s = sservice.Create( s );
+
+                                created++;
+                            }
+                            else if ( s != null )
+                            {
+                                // Same site, update
+
+                                s.XCord = xCord;
+                                s.YCord = yCord;
+                                s.Name = siteName;
+                                s.SiteId = siteId;
+                                s.Depot = siteNumber;
+                                s.Description = siteName;
+                                s.AccountCode = siteNumber;
+                                s.ContactName = salesManager;
+                                s.ContactNo = managerContact;
+                                s.DepotManager = salesManager;
+                                s.FinanceContact = salesManager;
+                                s.Status = ( int ) Status.Active;
+                                s.ReceivingContact = salesManager;
+                                s.FinanceContactNo = managerContact;
+                                s.ReceivingContactNo = managerContact;
+                                s.DepotManagerContact = managerContact;
+                                s.Address = $"{addressLine1}\n {addressLine2}\n {town}";
+                                s.RegionId = ( r?.Id ?? s.RegionId );
+
+                                s = sservice.Update( s );
+
+                                updated++;
+                            }
+
+                            #endregion
+
+                            #region Client Customer
+
+                            ClientCustomer cc = ccservice.GetByNumber( model.ClientId, customerNumber );
+
+                            if ( cc == null )
+                            {
+                                cc = new ClientCustomer()
+                                {
+                                    CustomerTown = town,
+                                    ClientId = model.ClientId,
+                                    CustomerName = customerName,
+                                    Status = ( int ) Status.Active,
+                                    CustomerNumber = customerNumber,
+                                    CustomerAddress1 = addressLine1,
+                                    CustomerAddress2 = addressLine2,
+                                    CustomerContact = managerContact,
+                                };
+
+                                cc = ccservice.Create( cc );
+                            }
+                            else
+                            {
+                                cc.CustomerTown = town;
+                                cc.CustomerName = customerName;
+                                cc.Status = ( int ) Status.Active;
+                                cc.CustomerNumber = customerNumber;
+                                cc.CustomerAddress1 = addressLine1;
+                                cc.CustomerAddress2 = addressLine2;
+                                cc.CustomerContact = managerContact;
+
+                                cc = ccservice.Update( cc );
+                            }
+
+                            #endregion
+
+                            #region Client Site
+
+                            ClientSite cs = csservice.GetBySiteId( cc.Id, s.Id );
+
+                            if ( cs == null )
+                            {
+                                cs = new ClientSite()
+                                {
+                                    SiteId = s.Id,
+                                    KAMName = kamName,
+                                    KAMContact = kamContact,
+                                    ClientCustomerId = cc.Id,
+                                    ClientSalesRep = salesRep,
+                                    AccountingCode = siteNumber,
+                                    Status = ( int ) Status.Active,
+                                    ClientSalesManager = salesManager,
+                                    ClientManagerContact = managerContact,
+                                    ClientCustomerNumber = customerNumber,
+                                    ClientSalesRepContact = managerContact,
+                                    LiquorLicenceNumber = liquorLicenseNumber,
+                                };
+
+                                csservice.Create( cs );
+                            }
+                            else
+                            {
+                                cs.SiteId = s.Id;
+                                cs.KAMName = kamName;
+                                cs.KAMContact = kamContact;
+                                cs.ClientCustomerId = cc.Id;
+                                cs.ClientSalesRep = salesRep;
+                                cs.AccountingCode = siteNumber;
+                                cs.Status = ( int ) Status.Active;
+                                cs.ClientSalesManager = salesManager;
+                                cs.ClientManagerContact = managerContact;
+                                cs.ClientCustomerNumber = customerNumber;
+                                cs.ClientSalesRepContact = managerContact;
+                                cs.LiquorLicenceNumber = liquorLicenseNumber;
+
+                                csservice.Update( cs );
+                            }
+
+                            #endregion
+
+                            #region Site Address
+
+                            int? provinceId = pservice.GetIdByName( province?.Trim()?.ToLower()?.Replace( " ", "" ) );
+
+                            Address a = aservice.Get( s.Id, "Site" );
+
+                            if ( a == null )
+                            {
+                                a = new Address()
+                                {
+                                    Town = town,
+                                    ObjectId = s.Id,
+                                    Latitude = yCord,
+                                    Longitude = xCord,
+                                    PostalCode = town,
+                                    ObjectType = "Site",
+                                    ProvinceId = provinceId,
+                                    Addressline1 = addressLine1,
+                                    Addressline2 = addressLine2,
+                                    Status = ( int ) Status.Active,
+                                    Type = ( int ) AddressType.Postal,
+                                };
+
+                                aservice.Create( a );
+                            }
+                            else
+                            {
+                                a.Town = town;
+                                a.Latitude = yCord;
+                                a.Longitude = xCord;
+                                a.PostalCode = town;
+                                a.ProvinceId = provinceId;
+                                a.Addressline1 = addressLine1;
+                                a.Addressline2 = addressLine2;
+                                a.Type = ( int ) AddressType.Postal;
+
+                                aservice.Update( a );
+                            }
+
+                            #endregion
+
+                            scope.Complete();
+                        }
+                    }
+                    catch ( Exception ex )
+                    {
+                        errors++;
+
+                        errs.Add( ex.ToString() );
+                    }
+                }
+
+                cQuery = string.Empty;
+                uQuery = string.Empty;
+
+                if ( errs.NullableAny() )
+                {
+                    errorDocId = LogImportErrors( errs, model.ClientId );
+                }
+            }
+
+            string resp = $"{created} sites were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.";
+
+            if ( errs.NullableAny() && errorDocId > 0 )
+            {
+                resp = $"{resp} <a href='/Client/ViewDocument/{errorDocId}' target='_blank'>Click here</a> to view the erros.";
+            }
+
+            Notify( resp, NotificationType.Success );
+
+            return ManageSites( new PagingModel(), new CustomSearchModel() );
+        }
+
+        #endregion
 
 
         #region Manage Sites
@@ -4462,6 +5506,31 @@ namespace ACT.UI.Controllers
                 PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
 
                 return PartialView( "_ClientGroups", paging );
+            }
+        }
+
+        //
+        // GET: /Client/ManageCustomerSites
+        public ActionResult ManageCustomerSites( PagingModel pm, CustomSearchModel csm, bool givecsm = false )
+        {
+            if ( givecsm )
+            {
+                ViewBag.ViewName = "ManageCustomerSites";
+
+                return PartialView( "_ManageSitesCustomSearch", new CustomSearchModel( "ManageSites" ) );
+            }
+
+            using ( SiteService service = new SiteService() )
+            {
+                pm.Sort = pm.Sort ?? "ASC";
+                pm.SortBy = pm.SortBy ?? "s.Name";
+
+                List<SiteCustomModel> model = service.List1( pm, csm );
+                int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
+
+                PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );
+
+                return PartialView( "_ManageCustomerSites", paging );
             }
         }
 

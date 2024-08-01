@@ -38,46 +38,54 @@ namespace ACT.Core.Services
         public Dictionary<int, string> List( bool v, int regionId = 0 )
         {
             Dictionary<int, string> siteOptions = new Dictionary<int, string>();
-            List<IntStringKeyValueModel> model = new List<IntStringKeyValueModel>();
-
             List<object> parameters = new List<object>()
             {
-                { new SqlParameter( "regionId", regionId ) },
-                { new SqlParameter( "sAct", Status.Active ) },
-                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
+                new SqlParameter("regionId", regionId),
+                new SqlParameter("sAct", (int)Status.Active),
+                new SqlParameter("userid", (CurrentUser != null) ? CurrentUser.Id : 0),
             };
 
-            string query = string.Empty;
-
-            query = $"SELECT s.Id AS [TKey], s.Name AS [TValue] FROM [dbo].[Site] s WHERE (s.[Status]=@sAct)";
+            string query = @"
+                            SELECT DISTINCT s.Id AS [TKey], s.Name AS [TValue]
+                            FROM [dbo].[Site] s
+                            WHERE s.[Status] = @sAct";
 
             if ( regionId > 0 )
             {
-                query = $"{query} AND (s.[RegionId]=@regionId)";
+                query += " AND s.[RegionId] = @regionId";
             }
 
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu, [dbo].[PSPClient] pc, [dbo].[ClientCustomer] cc, [dbo].[ClientSite] cs WHERE pu.[PSPId]=pc.[PSPId] AND pc.[ClientId]=cc.[ClientId] AND cc.[Id]=cs.[ClientCustomerId] AND s.[Id]=cs.[SiteId] AND pu.[UserId]=@userid)";
+                query += @"
+                        AND EXISTS (
+                            SELECT 1
+                            FROM [dbo].[PSPUser] pu
+                            JOIN [dbo].[PSPClient] pc ON pu.[PSPId] = pc.[PSPId]
+                            JOIN [dbo].[ClientCustomer] cc ON pc.[ClientId] = cc.[ClientId]
+                            JOIN [dbo].[ClientSite] cs ON cc.[Id] = cs.[ClientCustomerId]
+                            WHERE s.[Id] = cs.[SiteId] AND pu.[UserId] = @userid
+                        )";
             }
             else if ( CurrentUser.RoleType == RoleType.Client )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu, [dbo].[ClientCustomer] cc, [dbo].[ClientSite] cs WHERE cu.[ClientId]=cc.[ClientId] AND cc.[Id]=cs.[ClientCustomerId] AND s.[Id]=cs.[SiteId] AND cu.UserId=@userid)";
+                query += @"
+                        AND EXISTS (
+                            SELECT 1
+                            FROM [dbo].[ClientUser] cu
+                            JOIN [dbo].[ClientCustomer] cc ON cu.[ClientId] = cc.[ClientId]
+                            JOIN [dbo].[ClientSite] cs ON cc.[Id] = cs.[ClientCustomerId]
+                            WHERE s.[Id] = cs.[SiteId] AND cu.UserId = @userid
+                        )";
             }
 
-            query = $"{query} ORDER BY s.[Name] ASC;";
+            query += " ORDER BY s.[Name] ASC";
 
-            model = context.Database.SqlQuery<IntStringKeyValueModel>( query.Trim(), parameters.ToArray() ).ToList();
+            var model = context.Database.SqlQuery<IntStringKeyValueModel>( query, parameters.ToArray() ).ToList();
 
-            if ( model != null && model.Any() )
+            foreach ( var k in model )
             {
-                foreach ( var k in model )
-                {
-                    if ( siteOptions.Keys.Any( x => x == k.TKey ) )
-                        continue;
-
-                    siteOptions.Add( k.TKey, ( k.TValue ?? "" ).Trim() );
-                }
+                siteOptions[ k.TKey ] = ( k.TValue ?? "" ).Trim();
             }
 
             return siteOptions;
