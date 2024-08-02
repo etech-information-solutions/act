@@ -20,8 +20,12 @@ namespace ACT.UI.Models
 
         public int Id { get; set; }
 
-        [Display( Name = "Main Site (Optional: Only make a selection if you're adding a subsite)" )]
-        public int? SiteId { get; set; }
+        [Required]
+        [Display( Name = "Main Site" )]
+        public string MainSite { get; set; }
+
+        [Display( Name = "Optional Site" )]
+        public int? OptionalSiteId { get; set; }
 
         [Required]
         [Display( Name = "Customer" )]
@@ -32,11 +36,6 @@ namespace ACT.UI.Models
 
         [Display( Name = "ARPM Sales Manager" )]
         public int? ARPMSalesManagerId { get; set; }
-
-        [Required]
-        [Display( Name = "Site Name" )]
-        [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 3 )]
-        public string Name { get; set; }
 
         [Required]
         [Display( Name = "Description" )]

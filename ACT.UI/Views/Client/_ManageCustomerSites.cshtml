@@ -1,6 +1,5 @@
 ﻿@model PagingExtension
 
-@using ACT.Data.Models;
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
 @using ACT.Core.Models.Custom;
@@ -8,15 +7,13 @@
 @{
     ViewBag.ShowExport = true;
     ViewBag.ShowCustom = true;
-
     ViewBag.ViewName = "_ManageCustomerSites";
-
-    UserModel user = User.Get();
 }
 
 @Html.Partial( "_Notification" )
 
 @{
+    UserModel user = User.Get();
     int count = Model.Start;
     List<SiteCustomModel> items = ( List<SiteCustomModel> ) Model.Items;
 }
@@ -24,209 +21,85 @@
 @if ( Model == null || !items.Any() )
 {
     <div class="notification message-warn" style="margin-bottom: 20px;">
-        There are no Sites available matching your search criteria.
+        There are no Customer Sites available matching your search criteria.
     </div>
 }
 
 <p>
-    @Html.ActionLink( "Add", "AddCustomerSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new site?", @data_edit = "1", @data_id = 0, @data_target = "#managecustomersites" } )
-
+    @Html.ActionLink( "Add", "AddCustomerSite", new { }, new { @class = "add", @rel = "tipsyS", @title = "Add a new Customer Site?", @data_edit = "1", @data_id = 0, @data_target = "#managecustomersites" } )
     <span style="padding: 0 5px;">|</span>
-
-    @Html.ActionLink( "Import", "ImportCustomerSite", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import new sites?", @data_edit = "1", @data_id = 0, @data_target = "#managecustomersites" } )
-
+    @Html.ActionLink( "Import", "ImportCustomerSite", new { }, new { @class = "csv", @rel = "tipsyS", @title = "Import new Customer Sites?", @data_edit = "1", @data_id = 0, @data_target = "#managecustomersites" } )
     <span class="loader"></span>
 </p>
 
 <table id="sites-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#sites-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
-            <th data-name="Count">
-                #
-            </th>
-            <th data-name="CreatedOn" data-column="s.CreatedOn">
-                Date
-            </th>
-            @*<th data-name="ClientName" data-column="c.CompanyName">
-                    Client
-                </th>*@
-            <th data-name="RegionName" data-column="r.Name">
-                Region
-            </th>
-            <th data-name="SiteName" data-column="s.Name">
-                Name
-            </th>
-            <th data-name="Coordinates">
-                Coordinates
-            </th>
-            <th data-name="ContactNo" data-column="s.ContactNo">
-                Contact
-            </th>
-            <th data-name="Address" data-column="s.FinanceContact">
-                Finance
-            </th>
-            <th data-name="PostalCode" data-column="s.ReceivingContact">
-                Receiver
-            </th>
-            <th data-name="PlanningPoint" data-column="s.PlanningPoint">
-                Planning Point
-            </th>
-            <th data-name="SiteType" data-column="s.SiteType">
-                Site Type
-            </th>
-            <th data-name="Counts">
-
-            </th>
-            <th data-name="Actions">
-                Actions
-            </th>
+            <th data-name="Count">#</th>
+            <th data-name="CreatedOn" data-column="s.CreatedOn">Date</th>
+            <th data-name="ClientName" data-column="c.CompanyName">Client</th>
+            <th data-name="CustomerName" data-column="cc.CustomerName">Customer</th>
+            <th data-name="SiteName" data-column="s.Name">Site Name</th>
+            <th data-name="SubSite">Sub Site</th>
+            <th data-name="RegionName" data-column="r.Name">Region</th>
+            <th data-name="Status" data-column="s.Status">Status</th>
+            <th data-name="Actions">Actions</th>
         </tr>
     </thead>
-
     <tbody>
         @if ( Model != null && items != null && items.Count() > 0 )
         {
             foreach ( SiteCustomModel item in items )
             {
                 Status status = ( Status ) item.Status;
-
                 string active = ( status == Status.Active ) ? "active" : "inactive";
                 string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
-                string italic = item.SiteId.HasValue ? "italic" : "";
-
-                string siteTypeName = ( item.SiteType != null ) ? ( ( SiteType ) item.SiteType ).GetDisplayText() : "N/A";
-
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active @italic">
-
-                    <td width="1%">
-                        @count
-                    </td>
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+                    <td width="1%">@count</td>
                     <td>
                         @item.CreatedOn.ToString( "yyyy-MM-dd" )
-
-                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Site">
-                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="CustomerSite">
+                            <img alt="" src="@Url.Content("~/Images/duplicate-content.png")" style="max-width: 15px;" />
                             <span></span>
                         </a>
                     </td>
-                    @*<td>
-                            @item.ClientName
-                        </td>*@
+                    <td>@item.ClientName</td>
                     <td>
-                        @item.RegionName
-                    </td>
-                    <td>
-                        @item.Name
-
-                        @if ( item.SiteId.HasValue )
+                        @if ( !string.IsNullOrEmpty( item.CustomerName ) )
                         {
-                            <a class="block" rel="tipsyE" title="I am a sub-site">
-                                <img alt="" src="@Url.Content( "~/Images/sub.png" )" style="max-width: 22px;" />
-                                <span></span>
-                            </a>
+                            @item.CustomerName
+                        }
+                        else
+                        {
+                            <span>No Customer Selected</span>
                         }
                     </td>
+                    <td>@item.MainSite</td>
                     <td>
-                        @item.XCord,@item.YCord
+                        @if ( !string.IsNullOrEmpty( item.OptionalSite ) )
+                        {
+                            @item.OptionalSite
+                        }
+                        else
+                        {
+                            <span>No Optional Site</span>
+                        }
                     </td>
-                    <td>
-                        @item.ContactName <br />
-                        @item.ContactNo
-                    </td>
-                    <td>
-                        @item.FinanceContact <br />
-                        @item.FinanceContactNo
-                    </td>
-                    <td>
-                        @item.ReceivingContact <br />
-                        @item.ReceivingContactNo
-                    </td>
-                    <td>
-                        @item.PlanningPoint
-                    </td>
-                    <td>
-                        @siteTypeName
-                    </td>
-                    <td width="8%">
-                        <ul class="list">
-                            <li>
-                                <a data-sticky-one="1" data-target="#site-@item.Id-subsites" data-trigger="mouseover" data-arrow="center-right" data-title="Subsites">
-                                    @item.SubSiteCount Subsites
-                                </a>
-
-                                <div id="site-@item.Id-subsites" class="none">
-                                    @if ( item.SubSites.NullableAny() )
-                                    {
-                                        <ul class="list">
-                                            @foreach ( string ss in item.SubSites )
-                                            {
-                                                <li style="line-height: 20px;">
-                                                    @ss
-                                                </li>
-                                            }
-                                        </ul>
-                                    }
-                                    else
-                                    {
-                                        <div class="message-warn">
-                                            This Site has no sub-sites linked
-                                        </div>
-                                    }
-                                </div>
-
-                            </li>
-                            <li>
-                                <a data-sticky-one="1" data-target="#site-@item.Id-clients" data-trigger="mouseover" data-arrow="center-right" data-title="Customers">
-                                    @item.ClientCount Customers
-                                </a>
-
-                                <div id="site-@item.Id-clients" class="none">
-                                    @if ( item.Clients.NullableAny() )
-                                    {
-                                        <ul class="list">
-                                            @foreach ( string c in item.Clients )
-                                            {
-                                                <li style="line-height: 20px;">
-                                                    @c
-                                                </li>
-                                            }
-                                        </ul>
-                                    }
-                                    else
-                                    {
-                                        <div class="message-warn">
-                                            This site has no clients linked
-                                        </div>
-                                    }
-                                </div>
-                            </li>
-                            @*<li>
-                                    @Html.ActionLink( item.BudgetCount + " Budgets", "SiteDetails", new { id = item.Id }, new { @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                                </li>*@
-                        </ul>
-                    </td>
-
-                    <td width="9%">
-
+                    <td>@item.RegionName</td>
+                    <td>@status.GetDisplayText()</td>
+                    <td width="15%">
                         <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
-                            @Html.ActionLink( "Details", "CustomerSiteDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item", @style = "margin-left: 0;" } )
-
+                            @Html.ActionLink( "Details", "CustomerSiteDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
                             @Html.ActionLink( "Edit", "EditCustomerSite", new { id = item.Id, returnView = "managecustomersites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                        </div>
-
-                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
-                            @Html.ActionLink( enable, "DeleteCustomerSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managecustomersites", @rel = "tipsyE", @title = enable + " this item?", @style = "margin-left: 0;" } )
+                            @Html.ActionLink( enable, "DeleteCustomerSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managecustomersites", @rel = "tipsyE", @title = enable + " this item?" } )
                         </div>
                     </td>
                 </tr>
-
                 count++;
             }
         }
-
     </tbody>
-
 </table>
 
 @Html.Partial( "_Paging" )

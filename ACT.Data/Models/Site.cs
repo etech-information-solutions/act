@@ -23,6 +23,7 @@ namespace ACT.Data.Models
             this.SiteBudgets = new HashSet<SiteBudget>();
             this.Site1 = new HashSet<Site>();
             this.ClientSites = new HashSet<ClientSite>();
+            this.ClientSites1 = new HashSet<ClientSite>();
         }
     
         public int Id { get; set; }
@@ -75,5 +76,7 @@ namespace ACT.Data.Models
         public virtual ICollection<ClientSite> ClientSites { get; set; }
         public virtual Region Region { get; set; }
         public virtual User User { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ClientSite> ClientSites1 { get; set; }
     }
 }

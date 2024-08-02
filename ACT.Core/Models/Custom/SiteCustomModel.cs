@@ -49,6 +49,14 @@ namespace ACT.Core.Models.Custom
 
         public int BudgetCount { get; set; }
 
+        public string SubSitesString { get; set; }
+
+        public int? ClientCustomerId { get; set; }
+        public string CustomerName { get; set; }
+
+        public string MainSite { get; set; }
+        public string OptionalSite { get; set; }
+
         public List<string> Clients { get; set; }
 
         public List<string> SubSites { get; set; }

@@ -92,6 +92,7 @@ namespace ACT.Data.Models
         public string GLID { get; set; }
         public string CustomerType { get; set; }
         public string OrderNumber { get; set; }
+        public string DocNumber { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }

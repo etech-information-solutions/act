@@ -123,7 +123,7 @@
         <AssociationConnector Association="ACTModel.FK_ChepLoadJournal_ClientSite" />
         <AssociationConnector Association="ACTModel.FK_ClientSite_ClientCustomer" />
         <AssociationConnector Association="ACTModel.FK_ClientSites_Sites" />
-        <EntityTypeShape EntityType="ACTModel.Address" Width="1.5" PointX="11.875" PointY="11.5" />
+        <EntityTypeShape EntityType="ACTModel.Address" Width="1.5" PointX="10.75" PointY="12.25" />
         <EntityTypeShape EntityType="ACTModel.DeliveryNote" Width="1.5" PointX="15.75" PointY="28" />
         <AssociationConnector Association="ACTModel.FK_DeliveryNote_Clients" />
         <AssociationConnector Association="ACTModel.FK_DeliveryNote_ClientSite" />
@@ -190,6 +190,7 @@
         <AssociationConnector Association="ACTModel.FK_DeliveryNote_Province1" />
         <AssociationConnector Association="ACTModel.FK_DeliveryNote_Province2" />
         <AssociationConnector Association="ACTModel.FK_Region_Province" />
+        <AssociationConnector Association="ACTModel.FK_ClientSite_OptionalSite" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

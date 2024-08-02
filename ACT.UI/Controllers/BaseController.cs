@@ -1018,7 +1018,7 @@ namespace ACT.UI.Controllers
                         Id = p.Id,
                         Name = p.Name,
                         Description = p.Description,
-                        CreatedOn = p.CreatedOn.ToString( "yyyy/MM/dd" ),
+                        CreatedOn = p.CreatedOn.ToString(),
                         LostRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Lost && pp.Status == ( int ) Status.Active )?.Rate,
                         IssueRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Issue && pp.Status == ( int ) Status.Active )?.Rate,
                         HireRate = prices?.FirstOrDefault( pp => pp.Type == ( int ) ProductPriceType.Hire && pp.Status == ( int ) Status.Active )?.Rate,

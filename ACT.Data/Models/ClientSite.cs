@@ -50,6 +50,7 @@ namespace ACT.Data.Models
         public string AuthorisationEmail1 { get; set; }
         public string AuthorisationEmail2 { get; set; }
         public string AuthorisationEmail3 { get; set; }
+        public Nullable<int> OptionalSiteId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepLoad> ChepLoads { get; set; }
@@ -65,5 +66,6 @@ namespace ACT.Data.Models
         public virtual ICollection<ClientLoad> ClientLoads { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientLoad> ClientLoads1 { get; set; }
+        public virtual Site Site1 { get; set; }
     }
 }

@@ -290,6 +290,15 @@ namespace ACT.Core.Services
             return context.Regions.FirstOrDefault( r => r.Name == code || r.Code == code );
         }
 
+        /// <summary>
+        /// Attempts to find a matching Region Id based on the provided Province Id.
+        /// The method checks for three conditions:
+        /// 1. If there's a Region with a ProvinceId matching the input.
+        /// 2. If there's a Region with an Id matching the input ProvinceId.
+        /// 3. If there's a Region with the same name as the Province with the given Id.
+        /// </summary>
+        /// <param name="provinceId">The Id of the Province to find a matching Region for.</param>
+        /// <returns>The Id of the matching Region if found; otherwise, null.</returns>
         public int? FindMatchingRegionId( int provinceId )
         {
             var query = @"SELECT TOP 1 Id FROM Region WHERE ProvinceId = @ProvinceId OR Id = @ProvinceId OR Name = (SELECT Name FROM Province WHERE Id = @ProvinceId)";

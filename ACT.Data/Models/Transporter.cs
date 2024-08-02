@@ -35,6 +35,28 @@ namespace ACT.Data.Models
         public string ClientTransporterCode { get; set; }
         public string ChepClientTransporterCode { get; set; }
         public int Status { get; set; }
+        public string AddressLine1 { get; set; }
+        public string AddressLine2 { get; set; }
+        public string AddressLine3 { get; set; }
+        public string Region { get; set; }
+        public string District { get; set; }
+        public string Country { get; set; }
+        public string EmailAddress2 { get; set; }
+        public bool IsAdminClerk { get; set; }
+        public bool IsManagement { get; set; }
+        public bool ReceiveEmailsAutomatically { get; set; }
+        public bool IsActive { get; set; }
+        public string Transporter_AddressLine1 { get; set; }
+        public string Transporter_AddressLine2 { get; set; }
+        public string Transporter_AddressLine3 { get; set; }
+        public string Transporter_Region { get; set; }
+        public string Transporter_District { get; set; }
+        public string Transporter_Country { get; set; }
+        public string Transporter_EmailAddress2 { get; set; }
+        public bool Transporter_IsAdminClerk { get; set; }
+        public bool Transporter_IsManagement { get; set; }
+        public bool Transporter_ReceiveEmailsAutomatically { get; set; }
+        public bool Transporter_IsActive { get; set; }
     
         public virtual Client Client { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

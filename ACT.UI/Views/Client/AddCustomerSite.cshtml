@@ -42,19 +42,19 @@
                 </div>
 
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.SiteId )
+                    @Html.LabelFor( model => model.MainSite )
                 </div>
                 <div class="editor-field">
-                    @Html.DropDownListFor( model => model.SiteId, model => Model.SiteOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.SiteId )
+                    @Html.TextBoxFor( model => model.MainSite, new { @class = "input", @placeholder = "Enter Site Name" } )
+                    @Html.ValidationMessageFor( model => model.MainSite )
                 </div>
 
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.Name )
+                    @Html.LabelFor( model => model.OptionalSiteId )
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.Name, new { @class = "input", @placeholder = "Enter Site Name" } )
-                    @Html.ValidationMessageFor( model => model.Name )
+                    @Html.DropDownListFor( model => model.OptionalSiteId, model => Model.SiteOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.OptionalSiteId )
                 </div>
 
                 <div class="editor-label">
@@ -66,20 +66,20 @@
                 </div>
 
                 @*<div class="editor-label">
-                        @Html.LabelFor( model => model.RegionId )
-                    </div>
-                    <div class="editor-field">
-                        @Html.DropDownListFor( model => model.RegionId, model => Model.RegionOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-                        @Html.ValidationMessageFor( model => model.RegionId )
-                    </div>*@
+            @Html.LabelFor( model => model.RegionId )
+        </div>
+        <div class="editor-field">
+            @Html.DropDownListFor( model => model.RegionId, model => Model.RegionOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+            @Html.ValidationMessageFor( model => model.RegionId )
+        </div>*@
 
                 @*<div class="editor-label">
-                        @Html.LabelFor( model => model.ARPMSalesManagerId )
-                    </div>
-                    <div class="editor-field">
-                        @Html.DropDownListFor( model => model.ARPMSalesManagerId, model => Model.ARPMSalesManagerOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-                        @Html.ValidationMessageFor( model => model.ARPMSalesManagerId )
-                    </div>*@
+            @Html.LabelFor( model => model.ARPMSalesManagerId )
+        </div>
+        <div class="editor-field">
+            @Html.DropDownListFor( model => model.ARPMSalesManagerId, model => Model.ARPMSalesManagerOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+            @Html.ValidationMessageFor( model => model.ARPMSalesManagerId )
+        </div>*@
 
                 <div class="editor-label">
                     @Html.LabelFor( model => model.SiteType )

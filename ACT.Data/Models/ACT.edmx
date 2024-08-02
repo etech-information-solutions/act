@@ -461,7 +461,7 @@
           <Property Name="InvoiceStatus" Type="int" />
           <Property Name="PODStatus" Type="int" />
           <Property Name="OrderStatus" Type="int" />
-          <Property Name="UID" Type="varchar" MaxLength="150" />
+          <Property Name="UID" Type="varchar" MaxLength="500" />
           <Property Name="TransporterLiableQty" Type="numeric" Precision="18" Scale="0" />
           <Property Name="ClientLoadComment" Type="varchar" MaxLength="250" />
           <Property Name="ClientLoadNotes" Type="varchar" MaxLength="250" />
@@ -486,6 +486,7 @@
           <Property Name="GLID" Type="varchar" MaxLength="150" />
           <Property Name="CustomerType" Type="varchar" MaxLength="150" />
           <Property Name="OrderNumber" Type="varchar" MaxLength="150" />
+          <Property Name="DocNumber" Type="varchar" MaxLength="150" />
         </EntityType>
         <EntityType Name="ClientLoadHistory">
           <Key>
@@ -593,6 +594,7 @@
           <Property Name="AuthorisationEmail1" Type="varchar" MaxLength="150" />
           <Property Name="AuthorisationEmail2" Type="varchar" MaxLength="150" />
           <Property Name="AuthorisationEmail3" Type="varchar" MaxLength="150" />
+          <Property Name="OptionalSiteId" Type="int" />
         </EntityType>
         <EntityType Name="ClientUser">
           <Key>
@@ -643,11 +645,11 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Code" Type="char" MaxLength="10" />
+          <Property Name="Name" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
-          <Property Name="Code" Type="char" MaxLength="10" />
-          <Property Name="Name" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="Status" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="DeclineReason">
@@ -992,9 +994,9 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="CreatedOn" Type="datetime" Nullable="false" />
-          <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
-          <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
+          <Property Name="CreatedOn" Type="datetime" />
+          <Property Name="ModifiedOn" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="150" />
           <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Description" Type="varchar" MaxLength="500" Nullable="false" />
           <Property Name="Status" Type="int" Nullable="false" />
@@ -1023,7 +1025,7 @@
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
-          <Property Name="Code" Type="varchar" MaxLength="5" />
+          <Property Name="Code" Type="varchar" MaxLength="150" />
           <Property Name="Name" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="Description" Type="varchar" MaxLength="500" Nullable="false" />
           <Property Name="Status" Type="int" Nullable="false" />
@@ -1036,7 +1038,7 @@
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
-          <Property Name="CompanyRegistrationNumber" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CompanyRegistrationNumber" Type="varchar" MaxLength="50" />
           <Property Name="CompanyName" Type="varchar" MaxLength="200" Nullable="false" />
           <Property Name="TradingAs" Type="varchar" MaxLength="200" Nullable="false" />
           <Property Name="Description" Type="varchar" MaxLength="500" />
@@ -1065,6 +1067,7 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="PSPId" Type="int" Nullable="false" />
           <Property Name="PSPProductId" Type="int" Nullable="false" />
+          <Property Name="ClientId" Type="int" Nullable="false" />
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
@@ -1148,6 +1151,7 @@
           <Property Name="ImportEmailPassword" Type="varchar" MaxLength="150" />
           <Property Name="ImportEmailPort" Type="int" />
           <Property Name="ImportUseSSL" Type="bit" />
+          <Property Name="CollectionRunTime" Type="time" Precision="7" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -1233,14 +1237,14 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PSPId" Type="int" Nullable="false" />
           <Property Name="CountryId" Type="int" />
           <Property Name="ProvinceId" Type="int" />
           <Property Name="RegionManagerId" Type="int" />
-          <Property Name="PSPId" Type="int" Nullable="false" />
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
-          <Property Name="Code" Type="varchar" MaxLength="5" />
+          <Property Name="Code" Type="varchar" MaxLength="150" />
           <Property Name="Name" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="Description" Type="varchar" MaxLength="500" Nullable="false" />
           <Property Name="Status" Type="int" Nullable="false" />
@@ -1280,7 +1284,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="XCord" Type="varchar" MaxLength="150" />
           <Property Name="YCord" Type="varchar" MaxLength="150" />
           <Property Name="Address" Type="varchar" MaxLength="500" />
-          <Property Name="Town" Type="varchar" MaxLength="150" />
+          <Property Name="Town" Type="varchar" MaxLength="100" />
           <Property Name="PostalCode" Type="varchar" MaxLength="150" />
           <Property Name="ContactNo" Type="varchar" MaxLength="150" />
           <Property Name="ContactName" Type="varchar" MaxLength="150" />
@@ -1417,6 +1421,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="OneSignalAPIUrl" Type="varchar(max)" />
           <Property Name="OneSignaIAPIKey" Type="varchar(max)" />
           <Property Name="OneSignaIAppId" Type="varchar(max)" />
+          <Property Name="PSPBillingMonitorTime" Type="time" Precision="7" />
+          <Property Name="PSPBillingMonitorInterval" Type="varchar" MaxLength="50" />
+          <Property Name="PSPBillingMonitorPath" Type="varchar" MaxLength="250" />
+          <Property Name="PSPBillingMonitorEnabled" Type="bit" Nullable="false" />
+          <Property Name="LastPSPBillingMonitorRun" Type="datetime" />
+          <Property Name="LastPSPBillingMonitorCount" Type="int" />
+          <Property Name="BillingInvoiceMonitorTime" Type="time" Precision="7" />
+          <Property Name="BillingInvoiceMonitorInterval" Type="varchar" MaxLength="50" />
+          <Property Name="BillingInvoiceMonitorPath" Type="varchar" MaxLength="250" />
+          <Property Name="BillingInvoiceMonitorEnabled" Type="bit" Nullable="false" />
+          <Property Name="LastBillingInvoiceMonitorRun" Type="datetime" />
+          <Property Name="LastBillingInvoiceMonitorCount" Type="int" />
         </EntityType>
         <EntityType Name="Task">
           <Key>
@@ -1484,6 +1500,28 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="ClientTransporterCode" Type="varchar" MaxLength="150" />
           <Property Name="ChepClientTransporterCode" Type="varchar" MaxLength="150" />
           <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="AddressLine1" Type="varchar" MaxLength="150" />
+          <Property Name="AddressLine2" Type="varchar" MaxLength="150" />
+          <Property Name="AddressLine3" Type="varchar" MaxLength="150" />
+          <Property Name="Region" Type="varchar" MaxLength="150" />
+          <Property Name="District" Type="varchar" MaxLength="150" />
+          <Property Name="Country" Type="varchar" MaxLength="150" />
+          <Property Name="EmailAddress2" Type="varchar" MaxLength="150" />
+          <Property Name="IsAdminClerk" Type="bit" Nullable="false" />
+          <Property Name="IsManagement" Type="bit" Nullable="false" />
+          <Property Name="ReceiveEmailsAutomatically" Type="bit" Nullable="false" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="Transporter_AddressLine1" Type="varchar" MaxLength="150" />
+          <Property Name="Transporter_AddressLine2" Type="varchar" MaxLength="150" />
+          <Property Name="Transporter_AddressLine3" Type="varchar" MaxLength="150" />
+          <Property Name="Transporter_Region" Type="varchar" MaxLength="150" />
+          <Property Name="Transporter_District" Type="varchar" MaxLength="150" />
+          <Property Name="Transporter_Country" Type="varchar" MaxLength="150" />
+          <Property Name="Transporter_EmailAddress2" Type="varchar" MaxLength="150" />
+          <Property Name="Transporter_IsAdminClerk" Type="bit" Nullable="false" />
+          <Property Name="Transporter_IsManagement" Type="bit" Nullable="false" />
+          <Property Name="Transporter_ReceiveEmailsAutomatically" Type="bit" Nullable="false" />
+          <Property Name="Transporter_IsActive" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -2091,6 +2129,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ClientSite_OptionalSite">
+          <End Role="Site" Type="Self.Site" Multiplicity="0..1" />
+          <End Role="ClientSite" Type="Self.ClientSite" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Site">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ClientSite">
+              <PropertyRef Name="OptionalSiteId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ClientSites_Sites">
           <End Role="Site" Type="Self.Site" Multiplicity="1" />
           <End Role="ClientSite" Type="Self.ClientSite" Multiplicity="*" />
@@ -2417,30 +2467,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_PSPBilling_PSP">
-          <End Role="PSP" Type="Self.PSP" Multiplicity="1" />
-          <End Role="PSPBilling" Type="Self.PSPBilling" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSP">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PSPBilling">
-              <PropertyRef Name="PSPId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PSPBilling_PSPProducts">
-          <End Role="PSPProduct" Type="Self.PSPProduct" Multiplicity="1" />
-          <End Role="PSPBilling" Type="Self.PSPBilling" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PSPProduct">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="PSPBilling">
-              <PropertyRef Name="PSPProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_PSPBudget_PSP">
           <End Role="PSP" Type="Self.PSP" Multiplicity="1" />
           <End Role="PSPBudget" Type="Self.PSPBudget" Multiplicity="*" />
@@ -2753,7 +2779,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Transporter_Client">
+        <Association Name="FK_Transporter_Client_New">
           <End Role="Client" Type="Self.Client" Multiplicity="0..1" />
           <End Role="Transporter" Type="Self.Transporter" Multiplicity="*" />
           <ReferentialConstraint>
@@ -3197,6 +3223,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="ClientCustomer" EntitySet="ClientCustomer" />
             <End Role="ClientSite" EntitySet="ClientSite" />
           </AssociationSet>
+          <AssociationSet Name="FK_ClientSite_OptionalSite" Association="Self.FK_ClientSite_OptionalSite">
+            <End Role="Site" EntitySet="Site" />
+            <End Role="ClientSite" EntitySet="ClientSite" />
+          </AssociationSet>
           <AssociationSet Name="FK_ClientSites_Sites" Association="Self.FK_ClientSites_Sites">
             <End Role="Site" EntitySet="Site" />
             <End Role="ClientSite" EntitySet="ClientSite" />
@@ -3305,14 +3335,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="Country" EntitySet="Country" />
             <End Role="Province" EntitySet="Province" />
           </AssociationSet>
-          <AssociationSet Name="FK_PSPBilling_PSP" Association="Self.FK_PSPBilling_PSP">
-            <End Role="PSP" EntitySet="PSP" />
-            <End Role="PSPBilling" EntitySet="PSPBilling" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PSPBilling_PSPProducts" Association="Self.FK_PSPBilling_PSPProducts">
-            <End Role="PSPProduct" EntitySet="PSPProduct" />
-            <End Role="PSPBilling" EntitySet="PSPBilling" />
-          </AssociationSet>
           <AssociationSet Name="FK_PSPBudget_PSP" Association="Self.FK_PSPBudget_PSP">
             <End Role="PSP" EntitySet="PSP" />
             <End Role="PSPBudget" EntitySet="PSPBudget" />
@@ -3417,7 +3439,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="User" EntitySet="User" />
             <End Role="Token" EntitySet="Token" />
           </AssociationSet>
-          <AssociationSet Name="FK_Transporter_Client" Association="Self.FK_Transporter_Client">
+          <AssociationSet Name="FK_Transporter_Client_New" Association="Self.FK_Transporter_Client_New">
             <End Role="Client" EntitySet="Client" />
             <End Role="Transporter" EntitySet="Transporter" />
           </AssociationSet>
@@ -3989,6 +4011,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <AssociationSet Name="FK_Region_Province" Association="ACTModel.FK_Region_Province">
             <End Role="Province" EntitySet="Provinces" />
             <End Role="Region" EntitySet="Regions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ClientSite_OptionalSite" Association="ACTModel.FK_ClientSite_OptionalSite">
+            <End Role="Site" EntitySet="Sites" />
+            <End Role="ClientSite" EntitySet="ClientSites" />
           </AssociationSet>
           </EntityContainer>
         <EntityType Name="AuditLog">
@@ -4606,9 +4632,9 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedOn" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Description" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
@@ -4642,7 +4668,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="CompanyRegistrationNumber" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyRegistrationNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="CompanyName" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="TradingAs" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
@@ -4695,6 +4721,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="TaxAmount" Type="Decimal" Precision="19" Scale="4" />
           <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPBilling_PSP" FromRole="PSPBilling" ToRole="PSP" />
           <NavigationProperty Name="PSPProduct" Relationship="ACTModel.FK_PSPBilling_PSPProducts" FromRole="PSPBilling" ToRole="PSPProduct" />
+          <Property Name="ClientId" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="PSPBudget">
           <Key>
@@ -4768,6 +4795,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="ImportEmailPort" Type="Int32" />
           <Property Name="ImportUseSSL" Type="Boolean" />
           <NavigationProperty Name="PSP" Relationship="ACTModel.FK_PSPConfigs_PSP" FromRole="PSPConfig" ToRole="PSP" />
+          <Property Name="CollectionRunTime" Type="Time" Precision="7" />
         </EntityType>
         <EntityType Name="PSPProduct">
           <Key>
@@ -4840,7 +4868,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="XCord" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="YCord" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="Address" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="Town" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Town" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="PostalCode" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="ContactNo" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="ContactName" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
@@ -4871,6 +4899,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="ClientSites" Relationship="ACTModel.FK_ClientSites_Sites" FromRole="Site" ToRole="ClientSite" />
           <NavigationProperty Name="Region" Relationship="ACTModel.FK_Site_Region" FromRole="Site" ToRole="Region" />
           <NavigationProperty Name="User" Relationship="ACTModel.FK_Site_User" FromRole="Site" ToRole="User" />
+          <NavigationProperty Name="ClientSites1" Relationship="ACTModel.FK_ClientSite_OptionalSite" FromRole="Site" ToRole="ClientSite" />
         </EntityType>
         <EntityType Name="SiteAudit">
           <Key>
@@ -5002,6 +5031,28 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Client" Relationship="ACTModel.FK_Transporter_Client" FromRole="Transporter" ToRole="Client" />
           <NavigationProperty Name="ClientLoads" Relationship="ACTModel.FK_ClientLoad_Transporter" FromRole="Transporter" ToRole="ClientLoad" />
+          <Property Name="AddressLine1" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="AddressLine2" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="AddressLine3" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Region" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="District" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Country" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="EmailAddress2" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="IsAdminClerk" Type="Boolean" Nullable="false" />
+          <Property Name="IsManagement" Type="Boolean" Nullable="false" />
+          <Property Name="ReceiveEmailsAutomatically" Type="Boolean" Nullable="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="Transporter_AddressLine1" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Transporter_AddressLine2" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Transporter_AddressLine3" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Transporter_Region" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Transporter_District" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Transporter_Country" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Transporter_EmailAddress2" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Transporter_IsAdminClerk" Type="Boolean" Nullable="false" />
+          <Property Name="Transporter_IsManagement" Type="Boolean" Nullable="false" />
+          <Property Name="Transporter_ReceiveEmailsAutomatically" Type="Boolean" Nullable="false" />
+          <Property Name="Transporter_IsActive" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="UserBroadcast">
           <Key>
@@ -5992,6 +6043,8 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="ExtendedClientLoads" Relationship="ACTModel.FK_ExtendedClientLoad_ClientSite" FromRole="ClientSite" ToRole="ExtendedClientLoad" />
           <NavigationProperty Name="ClientLoads" Relationship="ACTModel.FK_ClientLoad_ClientSite" FromRole="ClientSite" ToRole="ClientLoad" />
           <NavigationProperty Name="ClientLoads1" Relationship="ACTModel.FK_ClientLoad_ClientSite1" FromRole="ClientSite" ToRole="ClientLoad" />
+          <Property Name="OptionalSiteId" Type="Int32" />
+          <NavigationProperty Name="Site1" Relationship="ACTModel.FK_ClientSite_OptionalSite" FromRole="ClientSite" ToRole="Site" />
         </EntityType>
         <Association Name="FK_ChepLoad_ClientSite">
           <End Type="ACTModel.ClientSite" Role="ClientSite" Multiplicity="0..1" />
@@ -6150,7 +6203,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="PSP" Relationship="ACTModel.FK_Regions_PSP" FromRole="Region" ToRole="PSP" />
           <NavigationProperty Name="Sites" Relationship="ACTModel.FK_Site_Region" FromRole="Region" ToRole="Site" />
           <NavigationProperty Name="User" Relationship="ACTModel.FK_Regions_Users" FromRole="Region" ToRole="User" />
-          <Property Name="Code" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="Code" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Country" Relationship="ACTModel.FK_Region_Country" FromRole="Region" ToRole="Country" />
           <NavigationProperty Name="Province" Relationship="ACTModel.FK_Region_Province" FromRole="Region" ToRole="Province" />
         </EntityType>
@@ -6673,6 +6726,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="OneSignalAPIUrl" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="OneSignaIAPIKey" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="OneSignaIAppId" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="PSPBillingMonitorTime" Type="Time" Precision="7" />
+          <Property Name="PSPBillingMonitorInterval" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="PSPBillingMonitorPath" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="PSPBillingMonitorEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="LastPSPBillingMonitorRun" Type="DateTime" Precision="3" />
+          <Property Name="LastPSPBillingMonitorCount" Type="Int32" />
+          <Property Name="BillingInvoiceMonitorTime" Type="Time" Precision="7" />
+          <Property Name="BillingInvoiceMonitorInterval" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="BillingInvoiceMonitorPath" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="BillingInvoiceMonitorEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="LastBillingInvoiceMonitorRun" Type="DateTime" Precision="3" />
+          <Property Name="LastBillingInvoiceMonitorCount" Type="Int32" />
         </EntityType>
         <EntityType Name="ClientLoad">
           <Key>
@@ -6718,7 +6783,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="InvoiceStatus" Type="Int32" />
           <Property Name="PODStatus" Type="Int32" />
           <Property Name="OrderStatus" Type="Int32" />
-          <Property Name="UID" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="UID" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="TransporterLiableQty" Type="Decimal" Precision="18" Scale="0" />
           <Property Name="ClientLoadComment" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="ClientLoadNotes" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
@@ -6762,6 +6827,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="ExtendedClientLoads" Relationship="ACTModel.FK_ExtendedClientLoad_ClientLoad" FromRole="ClientLoad" ToRole="ExtendedClientLoad" />
           <NavigationProperty Name="Journals" Relationship="ACTModel.FK_Postings_ClientLoads" FromRole="ClientLoad" ToRole="Journal" />
           <NavigationProperty Name="Tasks" Relationship="ACTModel.FK_Task_ClientLoad" FromRole="ClientLoad" ToRole="Task" />
+          <Property Name="DocNumber" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Country">
           <Key>
@@ -6786,7 +6852,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Code" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="Code" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="Name" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="Description" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
@@ -7110,6 +7176,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="Region">
               <PropertyRef Name="ProvinceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ClientSite_OptionalSite">
+          <End Type="ACTModel.Site" Role="Site" Multiplicity="0..1" />
+          <End Type="ACTModel.ClientSite" Role="ClientSite" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Site">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ClientSite">
+              <PropertyRef Name="OptionalSiteId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -7780,6 +7858,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySetMapping Name="PSPBillings">
             <EntityTypeMapping TypeName="ACTModel.PSPBilling">
               <MappingFragment StoreEntitySet="PSPBilling">
+                <ScalarProperty Name="ClientId" ColumnName="ClientId" />
                 <ScalarProperty Name="TaxAmount" ColumnName="TaxAmount" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="NominatedAccount" ColumnName="NominatedAccount" />
@@ -7844,6 +7923,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySetMapping Name="PSPConfigs">
             <EntityTypeMapping TypeName="ACTModel.PSPConfig">
               <MappingFragment StoreEntitySet="PSPConfig">
+                <ScalarProperty Name="CollectionRunTime" ColumnName="CollectionRunTime" />
                 <ScalarProperty Name="ImportUseSSL" ColumnName="ImportUseSSL" />
                 <ScalarProperty Name="ImportEmailPort" ColumnName="ImportEmailPort" />
                 <ScalarProperty Name="ImportEmailPassword" ColumnName="ImportEmailPassword" />
@@ -8070,6 +8150,28 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySetMapping Name="Transporters">
             <EntityTypeMapping TypeName="ACTModel.Transporter">
               <MappingFragment StoreEntitySet="Transporter">
+                <ScalarProperty Name="Transporter_IsActive" ColumnName="Transporter_IsActive" />
+                <ScalarProperty Name="Transporter_ReceiveEmailsAutomatically" ColumnName="Transporter_ReceiveEmailsAutomatically" />
+                <ScalarProperty Name="Transporter_IsManagement" ColumnName="Transporter_IsManagement" />
+                <ScalarProperty Name="Transporter_IsAdminClerk" ColumnName="Transporter_IsAdminClerk" />
+                <ScalarProperty Name="Transporter_EmailAddress2" ColumnName="Transporter_EmailAddress2" />
+                <ScalarProperty Name="Transporter_Country" ColumnName="Transporter_Country" />
+                <ScalarProperty Name="Transporter_District" ColumnName="Transporter_District" />
+                <ScalarProperty Name="Transporter_Region" ColumnName="Transporter_Region" />
+                <ScalarProperty Name="Transporter_AddressLine3" ColumnName="Transporter_AddressLine3" />
+                <ScalarProperty Name="Transporter_AddressLine2" ColumnName="Transporter_AddressLine2" />
+                <ScalarProperty Name="Transporter_AddressLine1" ColumnName="Transporter_AddressLine1" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="ReceiveEmailsAutomatically" ColumnName="ReceiveEmailsAutomatically" />
+                <ScalarProperty Name="IsManagement" ColumnName="IsManagement" />
+                <ScalarProperty Name="IsAdminClerk" ColumnName="IsAdminClerk" />
+                <ScalarProperty Name="EmailAddress2" ColumnName="EmailAddress2" />
+                <ScalarProperty Name="Country" ColumnName="Country" />
+                <ScalarProperty Name="District" ColumnName="District" />
+                <ScalarProperty Name="Region" ColumnName="Region" />
+                <ScalarProperty Name="AddressLine3" ColumnName="AddressLine3" />
+                <ScalarProperty Name="AddressLine2" ColumnName="AddressLine2" />
+                <ScalarProperty Name="AddressLine1" ColumnName="AddressLine1" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="ChepClientTransporterCode" ColumnName="ChepClientTransporterCode" />
                 <ScalarProperty Name="ClientTransporterCode" ColumnName="ClientTransporterCode" />
@@ -8397,6 +8499,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySetMapping Name="ClientSites">
             <EntityTypeMapping TypeName="ACTModel.ClientSite">
               <MappingFragment StoreEntitySet="ClientSite">
+                <ScalarProperty Name="OptionalSiteId" ColumnName="OptionalSiteId" />
                 <ScalarProperty Name="AuthorisationEmail3" ColumnName="AuthorisationEmail3" />
                 <ScalarProperty Name="AuthorisationEmail2" ColumnName="AuthorisationEmail2" />
                 <ScalarProperty Name="AuthorisationEmail1" ColumnName="AuthorisationEmail1" />
@@ -8626,6 +8729,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySetMapping Name="SystemConfigs">
             <EntityTypeMapping TypeName="ACTModel.SystemConfig">
               <MappingFragment StoreEntitySet="SystemConfig">
+                <ScalarProperty Name="LastBillingInvoiceMonitorCount" ColumnName="LastBillingInvoiceMonitorCount" />
+                <ScalarProperty Name="LastBillingInvoiceMonitorRun" ColumnName="LastBillingInvoiceMonitorRun" />
+                <ScalarProperty Name="BillingInvoiceMonitorEnabled" ColumnName="BillingInvoiceMonitorEnabled" />
+                <ScalarProperty Name="BillingInvoiceMonitorPath" ColumnName="BillingInvoiceMonitorPath" />
+                <ScalarProperty Name="BillingInvoiceMonitorInterval" ColumnName="BillingInvoiceMonitorInterval" />
+                <ScalarProperty Name="BillingInvoiceMonitorTime" ColumnName="BillingInvoiceMonitorTime" />
+                <ScalarProperty Name="LastPSPBillingMonitorCount" ColumnName="LastPSPBillingMonitorCount" />
+                <ScalarProperty Name="LastPSPBillingMonitorRun" ColumnName="LastPSPBillingMonitorRun" />
+                <ScalarProperty Name="PSPBillingMonitorEnabled" ColumnName="PSPBillingMonitorEnabled" />
+                <ScalarProperty Name="PSPBillingMonitorPath" ColumnName="PSPBillingMonitorPath" />
+                <ScalarProperty Name="PSPBillingMonitorInterval" ColumnName="PSPBillingMonitorInterval" />
+                <ScalarProperty Name="PSPBillingMonitorTime" ColumnName="PSPBillingMonitorTime" />
                 <ScalarProperty Name="OneSignaIAppId" ColumnName="OneSignaIAppId" />
                 <ScalarProperty Name="OneSignaIAPIKey" ColumnName="OneSignaIAPIKey" />
                 <ScalarProperty Name="OneSignalAPIUrl" ColumnName="OneSignalAPIUrl" />
@@ -8673,6 +8788,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySetMapping Name="ClientLoads">
             <EntityTypeMapping TypeName="ACTModel.ClientLoad">
               <MappingFragment StoreEntitySet="ClientLoad">
+                <ScalarProperty Name="DocNumber" ColumnName="DocNumber" />
                 <ScalarProperty Name="OrderNumber" ColumnName="OrderNumber" />
                 <ScalarProperty Name="CustomerType" ColumnName="CustomerType" />
                 <ScalarProperty Name="GLID" ColumnName="GLID" />

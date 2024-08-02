@@ -359,25 +359,33 @@ namespace ACT.Core.Services
 
             #endregion
 
-            string query = @"SELECT
-                                s.*,
+            string query = @"
+                            SELECT
+                                s.Id,
+                                s.Name AS MainSite,
+                                s.CreatedOn,
                                 c.[CompanyName] AS [ClientName],
                                 r.[Description] AS [RegionName],
-                                (SELECT COUNT (1) FROM [dbo].[Site] s1 WHERE s1.[SiteId]=s.[Id]) AS [SubSiteCount],
-                                (SELECT COUNT (1) FROM [dbo].[ClientSite] cs WHERE cs.[SiteId]=s.[Id]) AS [ClientCount],
-                                (SELECT COUNT (1) FROM [dbo].[SiteBudget] sb WHERE sb.[SiteId]=s.[Id]) AS [BudgetCount]
-                             FROM
+                                cc.[Id] AS [ClientCustomerId],
+                                cc.[CustomerName] AS [CustomerName],
+                                os.Name AS OptionalSite,
+                                (SELECT COUNT(1) FROM [dbo].[ClientSite] cs2 WHERE cs2.[SiteId]=s.[Id]) AS [ClientCount],
+                                (SELECT COUNT(1) FROM [dbo].[SiteBudget] sb WHERE sb.[SiteId]=s.[Id]) AS [BudgetCount],
+                                s.Status,
+                                s.RegionId
+                            FROM
                                 [dbo].[Site] s
-                                LEFT OUTER JOIN [dbo].[Region] r ON r.[Id]=s.[RegionId]
-                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.Id=(SELECT TOP 1 cs1.Id FROM [dbo].[ClientSite] cs1 WHERE cs1.SiteId=s.Id)
-                                LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cs.ClientCustomerId=cc.Id
-                                LEFT OUTER JOIN [dbo].[Client] c ON cc.ClientId=c.Id";
+                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[SiteId] = s.[Id]
+                                LEFT OUTER JOIN [dbo].[Site] os ON os.[Id] = cs.[OptionalSiteId]
+                                LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cs.[ClientCustomerId] = cc.[Id]
+                                LEFT OUTER JOIN [dbo].[Client] c ON cc.[ClientId] = c.[Id]
+                                LEFT OUTER JOIN [dbo].[Region] r ON r.[Id] = s.[RegionId]";
 
             // WHERE
 
             #region WHERE
 
-            query = $"{query} WHERE (1=1)";
+            query += " WHERE (1=1)";
 
             // Limit to only show Sites for logged in user 
             if ( CurrentUser.RoleType == RoleType.PSP )
@@ -479,11 +487,15 @@ namespace ACT.Core.Services
                 }
             }
 
-            if ( model.NullableAny( p => p.SubSiteCount > 0 ) )
+            foreach ( var item in model )
             {
-                foreach ( SiteCustomModel item in model.Where( p => p.SubSiteCount > 0 ) )
+                if ( !string.IsNullOrEmpty( item.SubSitesString ) )
                 {
-                    item.SubSites = context.Sites.Where( s => s.SiteId == item.Id ).Select( s => s.Name ).ToList();
+                    item.SubSites = item.SubSitesString.Split( ',' ).ToList();
+                }
+                else
+                {
+                    item.SubSites = new List<string>();
                 }
             }
 

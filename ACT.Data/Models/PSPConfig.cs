@@ -39,6 +39,7 @@ namespace ACT.Data.Models
         public string ImportEmailPassword { get; set; }
         public Nullable<int> ImportEmailPort { get; set; }
         public Nullable<bool> ImportUseSSL { get; set; }
+        public Nullable<System.TimeSpan> CollectionRunTime { get; set; }
     
         public virtual PSP PSP { get; set; }
     }

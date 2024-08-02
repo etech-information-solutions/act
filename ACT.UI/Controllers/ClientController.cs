@@ -1893,11 +1893,11 @@ namespace ACT.UI.Controllers
                         }
                     }
 
-                #endregion
+                    #endregion
 
-            }
+                }
 
-            scope.Complete();
+                scope.Complete();
             }
 
             Notify( "The selected Customer details were successfully updated.", NotificationType.Success );
@@ -2457,7 +2457,6 @@ namespace ACT.UI.Controllers
             if ( !ModelState.IsValid )
             {
                 Notify( "Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error );
-
                 return View( model );
             }
 
@@ -2470,36 +2469,19 @@ namespace ACT.UI.Controllers
             using ( SiteBudgetService sbservice = new SiteBudgetService() )
             using ( ClientCustomerService ccservice = new ClientCustomerService() )
             {
-                Site site1 = sservice.GetById( model.SiteId ?? 0 );
-
                 #region Validation
-
-                if ( sservice.ExistByClientAndName( model.ClientId, model.Name?.Trim()?.ToLower() ) )
+                if ( sservice.ExistByClientAndName( model.ClientId, model.MainSite?.Trim()?.ToLower() ) )
                 {
-                    Notify( $"Sorry, a Site with the name {model.Name} in the specified region already exists.", NotificationType.Error );
-
+                    Notify( $"Sorry, a Site with the name {model.MainSite} in the specified region already exists.", NotificationType.Error );
                     return View( model );
                 }
-
                 #endregion
 
-                if ( !model.SiteId.HasValue && !string.IsNullOrWhiteSpace( model.Longitude ) && !string.IsNullOrWhiteSpace( model.Latitude ) )
+                #region Create Main Site
+                Site mainSite = new Site()
                 {
-                    Site existingSite = sservice.ExistByXYCoords( model.Longitude?.Trim(), model.Latitude?.Trim() );
-
-                    if ( existingSite != null )
-                    {
-                        model.SiteId = existingSite.Id;
-                    }
-                }
-
-                #region Create Site
-
-                Site site = new Site()
-                {
-                    Name = model.Name,
+                    Name = model.MainSite,
                     Depot = model.Depot,
-                    SiteId = model.SiteId,
                     RegionId = model.Address?.ProvinceId,
                     ContactNo = model.ContactNo,
                     Status = ( int ) model.Status,
@@ -2513,7 +2495,6 @@ namespace ACT.UI.Controllers
                 };
 
                 int provinceId = model.Address?.ProvinceId ?? 0;
-
                 int? matchingRegionId = regionService.FindMatchingRegionId( provinceId );
 
                 if ( !matchingRegionId.HasValue )
@@ -2522,19 +2503,16 @@ namespace ACT.UI.Controllers
                     return View( model );
                 }
 
-                site.RegionId = matchingRegionId.Value;
-
-                site = sservice.Create( site );
-
+                mainSite.RegionId = matchingRegionId.Value;
+                mainSite = sservice.Create( mainSite );
                 #endregion
 
-                #region Create Address (s)
-
+                #region Create Address
                 if ( model.Address != null )
                 {
                     Address address = new Address()
                     {
-                        ObjectId = site.Id,
+                        ObjectId = mainSite.Id,
                         ObjectType = "CustomerSite",
                         Town = model.Address.Town,
                         Latitude = model.Latitude,
@@ -2549,19 +2527,18 @@ namespace ACT.UI.Controllers
 
                     aservice.Create( address );
                 }
-
                 #endregion
 
                 #region Add Client Site
-
                 if ( model.CustomerId > 0 )
                 {
                     ClientSite csSite = new ClientSite()
                     {
-                        SiteId = site.Id,
+                        SiteId = mainSite.Id,
                         ClientCustomerId = model.CustomerId,
+                        OptionalSiteId = model.OptionalSiteId,
                         Status = ( int ) model.Status,
-                        AccountingCode = site.AccountCode,
+                        AccountingCode = mainSite.AccountCode,
                         CreatedOn = DateTime.Now,
                         ModifiedOn = DateTime.Now,
                         ModifiedBy = User.Identity.Name
@@ -2574,18 +2551,16 @@ namespace ACT.UI.Controllers
                     Notify( "No customer selected for this site. Please select a customer and try again.", NotificationType.Error );
                     return View( model );
                 }
-
                 #endregion
 
-                #region Create Client Budget
-
+                #region Create Site Budget
                 if ( model.SiteBudgets.NullableAny() )
                 {
                     foreach ( SiteBudget l in model.SiteBudgets )
                     {
                         SiteBudget sb = new SiteBudget()
                         {
-                            SiteId = site.Id,
+                            SiteId = mainSite.Id,
                             BudgetYear = l.BudgetYear,
                             Total = l.Total,
                             January = l.January,
@@ -2606,18 +2581,16 @@ namespace ACT.UI.Controllers
                         sbservice.Create( sb );
                     }
                 }
-
                 #endregion
 
                 #region Contacts
-
                 if ( model.Contacts != null && model.Contacts.Any( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
                 {
                     foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
                     {
                         Contact newContact = new Contact()
                         {
-                            ObjectId = site.Id,
+                            ObjectId = mainSite.Id,
                             JobTitle = mc.JobTitle,
                             ObjectType = "CustomerSite",
                             ContactCell = mc.ContactCell,
@@ -2629,7 +2602,6 @@ namespace ACT.UI.Controllers
                         contactService.Create( newContact );
                     }
                 }
-
                 #endregion
 
                 scope.Complete();
@@ -2637,7 +2609,7 @@ namespace ACT.UI.Controllers
 
             Notify( "The Site was successfully created.", NotificationType.Success );
 
-            return ManageSites( new PagingModel(), new CustomSearchModel() );
+            return ManageCustomerSites( new PagingModel(), new CustomSearchModel() );
         }
 
         // GET: Client/EditSite/5
@@ -2665,9 +2637,9 @@ namespace ACT.UI.Controllers
                 {
                     Id = site.Id,
                     EditMode = true,
-                    Name = site.Name,
+                    MainSite = site.Name,
                     Depot = site.Depot,
-                    SiteId = site.SiteId,
+                    OptionalSiteId = site.SiteId,
                     Latitude = site.YCord,
                     Longitude = site.XCord,
                     RegionId = site.RegionId,
@@ -2802,7 +2774,7 @@ namespace ACT.UI.Controllers
             {
                 Site site = sservice.GetById( model.Id );
 
-                Site site1 = sservice.GetById( model.SiteId ?? 0 );
+                Site site1 = sservice.GetById( model.OptionalSiteId ?? 0 );
 
                 #region Validations
 
@@ -2813,16 +2785,16 @@ namespace ACT.UI.Controllers
                     return PartialView( "_AccessDenied" );
                 }
 
-                if ( site.Name?.Trim()?.ToLower() != model.Name?.Trim()?.ToLower() && site.RegionId != model.RegionId && sservice.ExistByClientAndName( model.ClientId, model.Name?.Trim()?.ToLower() ) )
+                if ( site.Name?.Trim()?.ToLower() != model.MainSite?.Trim()?.ToLower() && site.RegionId != model.RegionId && sservice.ExistByClientAndName( model.ClientId, model.MainSite?.Trim()?.ToLower() ) )
                 {
-                    Notify( $"Sorry, a Site with the name {model.Name} in the specified region already exists.", NotificationType.Error );
+                    Notify( $"Sorry, a Site with the name {model.MainSite} in the specified region already exists.", NotificationType.Error );
 
                     return View( model );
                 }
 
                 #endregion
 
-                if ( !model.SiteId.HasValue && !string.IsNullOrWhiteSpace( model.Longitude ) && !string.IsNullOrWhiteSpace( model.Latitude ) )
+                if ( !model.OptionalSiteId.HasValue && !string.IsNullOrWhiteSpace( model.Longitude ) && !string.IsNullOrWhiteSpace( model.Latitude ) )
                 {
                     Site existingSite = sservice.ExistByXYCoords( model.Longitude?.Trim(), model.Latitude?.Trim() );
 
@@ -2830,15 +2802,15 @@ namespace ACT.UI.Controllers
                     {
                         // Instead of pass back to view, we will create the new site as a subsite of the existing site.
                         // Get the existing site first
-                        model.SiteId = existingSite.Id;
+                        model.OptionalSiteId = existingSite.Id;
                     }
                 }
 
                 #region Update Site
 
-                site.Name = model.Name;
+                site.Name = model.MainSite;
                 site.Depot = model.Depot;
-                site.SiteId = model.SiteId;
+                site.SiteId = model.OptionalSiteId;
                 site.YCord = model.Latitude;
                 site.XCord = model.Longitude;
                 site.RegionId = model.RegionId;
@@ -2929,7 +2901,7 @@ namespace ACT.UI.Controllers
                     {
                         ClientId = model.ClientId,
                         Status = ( int ) model.Status,
-                        CustomerName = site1?.Name ?? model.Name,
+                        CustomerName = site1?.Name ?? model.MainSite,
                         CustomerNumber = model.CustomerNoDebtorCode,
                     };
 
@@ -3523,20 +3495,20 @@ namespace ACT.UI.Controllers
             using ( SiteBudgetService sbservice = new SiteBudgetService() )
             using ( ClientCustomerService ccservice = new ClientCustomerService() )
             {
-                Site site1 = sservice.GetById( model.SiteId ?? 0 );
+                Site site1 = sservice.GetById( model.OptionalSiteId ?? 0 );
 
                 #region Validation
 
-                if ( sservice.ExistByClientAndName( model.ClientId, model.Name?.Trim()?.ToLower() ) )
+                if ( sservice.ExistByClientAndName( model.ClientId, model.MainSite?.Trim()?.ToLower() ) )
                 {
-                    Notify( $"Sorry, a Site with the name {model.Name} in the specified region already exists.", NotificationType.Error );
+                    Notify( $"Sorry, a Site with the name {model.MainSite} in the specified region already exists.", NotificationType.Error );
 
                     return View( model );
                 }
 
                 #endregion
 
-                if ( !model.SiteId.HasValue && !string.IsNullOrWhiteSpace( model.Longitude ) && !string.IsNullOrWhiteSpace( model.Latitude ) )
+                if ( !model.OptionalSiteId.HasValue && !string.IsNullOrWhiteSpace( model.Longitude ) && !string.IsNullOrWhiteSpace( model.Latitude ) )
                 {
                     Site existingSite = sservice.ExistByXYCoords( model.Longitude?.Trim(), model.Latitude?.Trim() );
 
@@ -3544,7 +3516,7 @@ namespace ACT.UI.Controllers
                     {
                         // Instead of pass back to view, we will create the new site as a subsite of the existing site.
                         // Get the existing site first
-                        model.SiteId = existingSite.Id;
+                        model.OptionalSiteId = existingSite.Id;
                     }
                 }
 
@@ -3552,9 +3524,9 @@ namespace ACT.UI.Controllers
 
                 Site site = new Site()
                 {
-                    Name = model.Name,
+                    Name = model.MainSite,
                     Depot = model.Depot,
-                    SiteId = model.SiteId,
+                    SiteId = model.OptionalSiteId,
                     RegionId = model.RegionId,
                     ContactNo = model.ContactNo,
                     Status = ( int ) model.Status,
@@ -3647,7 +3619,7 @@ namespace ACT.UI.Controllers
                     {
                         ClientId = model.ClientId,
                         Status = ( int ) model.Status,
-                        CustomerName = site1?.Name ?? model.Name,
+                        CustomerName = site1?.Name ?? model.MainSite,
                         CustomerNumber = model.CustomerNoDebtorCode,
                     };
 
@@ -3742,9 +3714,9 @@ namespace ACT.UI.Controllers
                 {
                     Id = site.Id,
                     EditMode = true,
-                    Name = site.Name,
+                    MainSite = site.Name,
                     Depot = site.Depot,
-                    SiteId = site.SiteId,
+                    OptionalSiteId = site.SiteId,
                     Latitude = site.YCord,
                     Longitude = site.XCord,
                     RegionId = site.RegionId,
@@ -3879,7 +3851,7 @@ namespace ACT.UI.Controllers
             {
                 Site site = sservice.GetById( model.Id );
 
-                Site site1 = sservice.GetById( model.SiteId ?? 0 );
+                Site site1 = sservice.GetById( model.OptionalSiteId ?? 0 );
 
                 #region Validations
 
@@ -3890,16 +3862,16 @@ namespace ACT.UI.Controllers
                     return PartialView( "_AccessDenied" );
                 }
 
-                if ( site.Name?.Trim()?.ToLower() != model.Name?.Trim()?.ToLower() && site.RegionId != model.RegionId && sservice.ExistByClientAndName( model.ClientId, model.Name?.Trim()?.ToLower() ) )
+                if ( site.Name?.Trim()?.ToLower() != model.MainSite?.Trim()?.ToLower() && site.RegionId != model.RegionId && sservice.ExistByClientAndName( model.ClientId, model.MainSite?.Trim()?.ToLower() ) )
                 {
-                    Notify( $"Sorry, a Site with the name {model.Name} in the specified region already exists.", NotificationType.Error );
+                    Notify( $"Sorry, a Site with the name {model.MainSite} in the specified region already exists.", NotificationType.Error );
 
                     return View( model );
                 }
 
                 #endregion
 
-                if ( !model.SiteId.HasValue && !string.IsNullOrWhiteSpace( model.Longitude ) && !string.IsNullOrWhiteSpace( model.Latitude ) )
+                if ( !model.OptionalSiteId.HasValue && !string.IsNullOrWhiteSpace( model.Longitude ) && !string.IsNullOrWhiteSpace( model.Latitude ) )
                 {
                     Site existingSite = sservice.ExistByXYCoords( model.Longitude?.Trim(), model.Latitude?.Trim() );
 
@@ -3907,15 +3879,15 @@ namespace ACT.UI.Controllers
                     {
                         // Instead of pass back to view, we will create the new site as a subsite of the existing site.
                         // Get the existing site first
-                        model.SiteId = existingSite.Id;
+                        model.OptionalSiteId = existingSite.Id;
                     }
                 }
 
                 #region Update Site
 
-                site.Name = model.Name;
+                site.Name = model.MainSite;
                 site.Depot = model.Depot;
-                site.SiteId = model.SiteId;
+                site.SiteId = model.OptionalSiteId;
                 site.YCord = model.Latitude;
                 site.XCord = model.Longitude;
                 site.RegionId = model.RegionId;
@@ -4006,7 +3978,7 @@ namespace ACT.UI.Controllers
                     {
                         ClientId = model.ClientId,
                         Status = ( int ) model.Status,
-                        CustomerName = site1?.Name ?? model.Name,
+                        CustomerName = site1?.Name ?? model.MainSite,
                         CustomerNumber = model.CustomerNoDebtorCode,
                     };
 
