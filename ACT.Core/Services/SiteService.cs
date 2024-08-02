@@ -371,6 +371,7 @@ namespace ACT.Core.Services
                                 os.Name AS OptionalSite,
                                 (SELECT COUNT(1) FROM [dbo].[ClientSite] cs2 WHERE cs2.[SiteId]=s.[Id]) AS [ClientCount],
                                 (SELECT COUNT(1) FROM [dbo].[SiteBudget] sb WHERE sb.[SiteId]=s.[Id]) AS [BudgetCount],
+                                (SELECT COUNT(1) FROM [dbo].[Contact] con WHERE s.Id=con.ObjectId AND con.ObjectType='CustomerSite') AS [ContactCount],
                                 s.Status,
                                 s.RegionId
                             FROM
@@ -478,6 +479,14 @@ namespace ACT.Core.Services
             query = string.Format( "{0} OFFSET (@skip) ROWS FETCH NEXT (@take) ROWS ONLY ", query );
 
             List<SiteCustomModel> model = context.Database.SqlQuery<SiteCustomModel>( query, parameters.ToArray() ).ToList();
+
+            if ( model.Any( c => c.ContactCount > 0 ) )
+            {
+                foreach ( SiteCustomModel item in model.Where( c => c.ContactCount > 0 ) )
+                {
+                    item.Contacts = context.Contacts.Where( c => c.ObjectId == item.Id && c.ObjectType == "CustomerSite" ).ToList();
+                }
+            }
 
             if ( model.NullableAny( p => p.ClientCount > 0 ) )
             {

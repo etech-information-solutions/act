@@ -3,6 +3,7 @@ namespace ACT.Core.Models.Custom
 {
     using System;
     using System.Collections.Generic;
+    using ACT.Data.Models;
 
     public partial class SiteCustomModel
     {
@@ -56,6 +57,9 @@ namespace ACT.Core.Models.Custom
 
         public string MainSite { get; set; }
         public string OptionalSite { get; set; }
+
+        public int ContactCount { get; set; }
+        public List<Contact> Contacts { get; set; }
 
         public List<string> Clients { get; set; }
 

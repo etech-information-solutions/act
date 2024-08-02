@@ -2464,7 +2464,7 @@ namespace ACT.UI.Controllers
             using ( AddressService aservice = new AddressService() )
             using ( TransactionScope scope = new TransactionScope() )
             using ( RegionService regionService = new RegionService() )
-            using ( ContactService contactService = new ContactService() )
+            using ( ContactService cservice = new ContactService() )
             using ( ClientSiteService csservice = new ClientSiteService() )
             using ( SiteBudgetService sbservice = new SiteBudgetService() )
             using ( ClientCustomerService ccservice = new ClientCustomerService() )
@@ -2553,55 +2553,45 @@ namespace ACT.UI.Controllers
                 }
                 #endregion
 
-                #region Create Site Budget
-                if ( model.SiteBudgets.NullableAny() )
-                {
-                    foreach ( SiteBudget l in model.SiteBudgets )
-                    {
-                        SiteBudget sb = new SiteBudget()
-                        {
-                            SiteId = mainSite.Id,
-                            BudgetYear = l.BudgetYear,
-                            Total = l.Total,
-                            January = l.January,
-                            February = l.February,
-                            March = l.March,
-                            April = l.April,
-                            May = l.May,
-                            June = l.June,
-                            July = l.July,
-                            August = l.August,
-                            September = l.September,
-                            October = l.October,
-                            November = l.November,
-                            December = l.December,
-                            Status = ( int ) model.Status,
-                        };
-
-                        sbservice.Create( sb );
-                    }
-                }
-                #endregion
-
                 #region Contacts
+
                 if ( model.Contacts != null && model.Contacts.Any( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
                 {
                     foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
                     {
-                        Contact newContact = new Contact()
+                        Contact c = cservice.Get( mc.ContactEmail, "CustomerSite" );
+
+                        if ( c == null )
                         {
-                            ObjectId = mainSite.Id,
-                            JobTitle = mc.JobTitle,
-                            ObjectType = "CustomerSite",
-                            ContactCell = mc.ContactCell,
-                            ContactName = mc.ContactName,
-                            Status = ( int ) Status.Active,
-                            ContactEmail = mc.ContactEmail,
-                            ContactTitle = mc.ContactTitle,
-                        };
-                        contactService.Create( newContact );
+                            c = new Contact()
+                            {
+                                ObjectId = mainSite.Id,
+                                JobTitle = mc.JobTitle,
+                                ObjectType = "CustomerSite",
+                                ContactCell = mc.ContactCell,
+                                ContactName = mc.ContactName,
+                                Status = mc.Status,
+                                ContactEmail = mc.ContactEmail,
+                                ContactTitle = mc.ContactTitle,
+                            };
+
+                            cservice.Create( c );
+                        }
+                        else
+                        {
+                            // Update existing contact
+                            c.JobTitle = mc.JobTitle;
+                            c.ContactCell = mc.ContactCell;
+                            c.ContactName = mc.ContactName;
+                            c.Status = mc.Status;
+                            c.ContactEmail = mc.ContactEmail;
+                            c.ContactTitle = mc.ContactTitle;
+
+                            cservice.Update( c );
+                        }
                     }
                 }
+
                 #endregion
 
                 scope.Complete();
@@ -5501,7 +5491,7 @@ namespace ACT.UI.Controllers
             {
                 ViewBag.ViewName = "ManageCustomerSites";
 
-                return PartialView( "_ManageSitesCustomSearch", new CustomSearchModel( "ManageSites" ) );
+                return PartialView( "_ManageSitesCustomSearch", new CustomSearchModel( "ManageCustomerSites" ) );
             }
 
             using ( SiteService service = new SiteService() )

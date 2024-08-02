@@ -1,8 +1,11 @@
 ﻿@model PagingExtension
 
+@using ACT.Data.Models;
 @using ACT.Core.Enums;
 @using ACT.Core.Models;
 @using ACT.Core.Models.Custom;
+@using ACT.Core.Services;
+@using ACT.UI.Models;
 
 @{
     ViewBag.ShowExport = true;
@@ -35,15 +38,36 @@
 <table id="sites-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#sites-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
-            <th data-name="Count">#</th>
-            <th data-name="CreatedOn" data-column="s.CreatedOn">Date</th>
-            <th data-name="ClientName" data-column="c.CompanyName">Client</th>
-            <th data-name="CustomerName" data-column="cc.CustomerName">Customer</th>
-            <th data-name="SiteName" data-column="s.Name">Site Name</th>
-            <th data-name="SubSite">Sub Site</th>
-            <th data-name="RegionName" data-column="r.Name">Region</th>
-            <th data-name="Status" data-column="s.Status">Status</th>
-            <th data-name="Actions">Actions</th>
+            <th data-name="Count">
+                #
+            </th>
+            <th data-name="CreatedOn" data-column="s.CreatedOn">
+                Date
+            </th>
+            <th data-name="ClientName" data-column="c.CompanyName">
+                Client
+            </th>
+            <th data-name="CustomerName" data-column="cc.CustomerName">
+                Customer
+            </th>
+            <th data-name="SiteName" data-column="s.Name">
+                Main Site
+            </th>
+            <th data-name="SubSite">
+                Sub Site
+            </th>
+            <th data-name="ContactCount" data-column="ContactCount">
+                Contacts
+            </th>
+            <th data-name="RegionName" data-column="r.Name">
+                Region
+            </th>
+            <th data-name="Status" data-column="s.Status">
+                Status
+            </th>
+            <th data-name="Actions">
+                Actions
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -64,7 +88,9 @@
                             <span></span>
                         </a>
                     </td>
-                    <td>@item.ClientName</td>
+                    <td>
+                        @item.ClientName
+                    </td>
                     <td>
                         @if ( !string.IsNullOrEmpty( item.CustomerName ) )
                         {
@@ -75,7 +101,9 @@
                             <span>No Customer Selected</span>
                         }
                     </td>
-                    <td>@item.MainSite</td>
+                    <td>
+                        @item.MainSite
+                    </td>
                     <td>
                         @if ( !string.IsNullOrEmpty( item.OptionalSite ) )
                         {
@@ -86,8 +114,41 @@
                             <span>No Optional Site</span>
                         }
                     </td>
-                    <td>@item.RegionName</td>
-                    <td>@status.GetDisplayText()</td>
+                    <td width="10%">
+                        @if ( item.Contacts != null && item.Contacts.Any( c => c.Status == ( Int32 ) Status.Active ) )
+                        {
+                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                                <a data-sticky-one="1" data-target="#customersite-@item.Id-contacts" data-trigger="mouseover" data-arrow="center-right" data-title="Contacts">
+                                    <i class="fa fa-phone"></i>@item.ContactCount contacts
+                                </a>
+
+                                <div id="customersite-@item.Id-contacts" class="none">
+                                    <ul class="list" style="max-height: 200px; overflow-y: auto;">
+                                        @foreach ( Contact d in item.Contacts.Where( c => c.Status == ( Int32 ) Status.Active ) )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                @d.ContactName -
+                                                <a href="tel:@d.ContactCell">@d.ContactCell</a>
+                                                <a href="mailto:@d.ContactEmail">@d.ContactEmail</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>@item.ContactCount contacts</span>
+                        }
+                    </td>
+                    <td>
+                        @item.RegionName
+                    </td>
+                    <td>
+                        @status.GetDisplayText()
+                    </td>
                     <td width="15%">
                         <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
                             @Html.ActionLink( "Details", "CustomerSiteDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
