@@ -18,6 +18,9 @@ namespace ACT.Core.Models.Custom
         public string XCord { get; set; }
         public string YCord { get; set; }
         public string Address { get; set; }
+        public string AddressLine1 { get; set; }
+        public string AddressLine2 { get; set; }
+        public string Town { get; set; }
         public string PostalCode { get; set; }
         public string ContactNo { get; set; }
         public string ContactName { get; set; }

@@ -373,14 +373,20 @@ namespace ACT.Core.Services
                                 (SELECT COUNT(1) FROM [dbo].[SiteBudget] sb WHERE sb.[SiteId]=s.[Id]) AS [BudgetCount],
                                 (SELECT COUNT(1) FROM [dbo].[Contact] con WHERE s.Id=con.ObjectId AND con.ObjectType='CustomerSite') AS [ContactCount],
                                 s.Status,
-                                s.RegionId
+                                s.RegionId,
+                                a.Addressline1 AS AddressLine1,
+                                a.Addressline2 AS AddressLine2,
+                                a.Town,
+                                a.PostalCode
                             FROM
                                 [dbo].[Site] s
                                 LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[SiteId] = s.[Id]
                                 LEFT OUTER JOIN [dbo].[Site] os ON os.[Id] = cs.[OptionalSiteId]
                                 LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cs.[ClientCustomerId] = cc.[Id]
                                 LEFT OUTER JOIN [dbo].[Client] c ON cc.[ClientId] = c.[Id]
-                                LEFT OUTER JOIN [dbo].[Region] r ON r.[Id] = s.[RegionId]";
+                                LEFT OUTER JOIN [dbo].[Region] r ON r.[Id] = s.[RegionId]
+                                LEFT OUTER JOIN [dbo].[Address] a ON a.ObjectId = s.Id AND a.ObjectType = 'CustomerSite' AND a.Status = 1";
+
 
             // WHERE
 

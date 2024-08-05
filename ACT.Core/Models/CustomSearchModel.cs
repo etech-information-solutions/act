@@ -740,6 +740,21 @@ namespace ACT.Core.Models
                     break;
 
 
+                case "ManageCustomerSites":
+
+                    using ( SiteService sservice = new SiteService() )
+                    using ( ClientService cservice = new ClientService() )
+                    using ( RegionService rservice = new RegionService() )
+                    using ( ClientCustomerService ccuservice = new ClientCustomerService() )
+                    {
+                        SiteOptions = sservice.List( true );
+                        ClientOptions = cservice.List( true );
+                        RegionOptions = rservice.List( true );
+                        CustomerOptions = ccuservice.GetCustomerSelectList( true );
+                    }
+
+                    break;
+
                 case "ClientData":
 
                     using ( ClientService cservice = new ClientService() )

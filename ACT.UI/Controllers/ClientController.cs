@@ -135,6 +135,49 @@ namespace ACT.UI.Controllers
 
                     break;
 
+                case "managecustomersites":
+                    #region Manage Customer Sites
+                    using ( SiteService sservice = new SiteService() )
+                    {
+                        csv = string.Format( "Date Created,Client,Customer,Main Site,Sub Site,Contacts,Address,Region,Status{0}", Environment.NewLine );
+                        List<SiteCustomModel> sites = sservice.List1( pm, csm );
+                        if ( sites.NullableAny() )
+                        {
+                            foreach ( SiteCustomModel item in sites )
+                            {
+                                string address = string.Join( ", ", new[]
+                                {
+                                    item.AddressLine1,
+                                    item.AddressLine2,
+                                    item.Town,
+                                    item.PostalCode
+                                }.Where( s => !string.IsNullOrEmpty( s ) ) );
+
+                                string contacts = "";
+                                if ( item.Contacts != null && item.Contacts.Any( c => c.Status == ( Int32 ) Status.Active ) )
+                                {
+                                    contacts = string.Join( "; ", item.Contacts
+                                        .Where( c => c.Status == ( Int32 ) Status.Active )
+                                        .Select( c => $"{c.ContactName} - {c.ContactCell} - {c.ContactEmail}" ) );
+                                }
+
+                                csv += string.Format( "{0},{1},{2},{3},{4},{5},{6},{7},{8}{9}",
+                                    "\"" + item.CreatedOn.ToString( "yyyy-MM-dd" ) + "\"",
+                                    "\"" + item.ClientName + "\"",
+                                    "\"" + item.CustomerName + "\"",
+                                    "\"" + item.MainSite + "\"",
+                                    "\"" + item.OptionalSite + "\"",
+                                    "\"" + contacts + "\"",
+                                    "\"" + address + "\"",
+                                    "\"" + item.RegionName + "\"",
+                                    "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
+                                    Environment.NewLine );
+                            }
+                        }
+                    }
+                    #endregion
+                    break;
+
                 case "managesites":
 
                     #region Manage Sites
@@ -2410,26 +2453,63 @@ namespace ACT.UI.Controllers
         {
             using ( SiteService sservice = new SiteService() )
             using ( AddressService aservice = new AddressService() )
+            using ( ContactService contactService = new ContactService() )
+            using ( ClientSiteService clientSiteService = new ClientSiteService() )
+            using ( ClientCustomerService clientCustomerService = new ClientCustomerService() )
             {
-                Site model = sservice.GetById( id );
-
-                if ( model == null )
+                Site site = sservice.GetById( id );
+                if ( site == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
                     return PartialView( "_AccessDenied" );
                 }
 
-                Address address = aservice.Get( model.Id, "Site" );
+                // Get ClientSite information
+                var clientCustomerId = site.ClientSites.FirstOrDefault()?.ClientCustomerId;
+                if ( !clientCustomerId.HasValue )
+                {
+                    Notify( "Sorry, the client customer information could not be found. Please try again", NotificationType.Error );
+                    return PartialView( "_AccessDenied" );
+                }
+
+                ClientSite clientSite = clientSiteService.GetBySiteId( clientCustomerId.Value, id );
+                if ( clientSite == null )
+                {
+                    Notify( "Sorry, the client site information could not be found. Please try again", NotificationType.Error );
+                    return PartialView( "_AccessDenied" );
+                }
+
+                // Ensure we have the customer name
+                string customerName = clientSite.ClientCustomer?.CustomerName;
+                if ( string.IsNullOrEmpty( customerName ) )
+                {
+                    var clientCustomer = clientCustomerService.GetById( clientCustomerId.Value );
+                    customerName = clientCustomer?.CustomerName ?? "Unknown Customer";
+                }
+
+                Address address = aservice.Get( site.Id, "CustomerSite" );
+                List<Contact> contacts = contactService.List( site.Id, "CustomerSite" );
+
+                // Get the Optional Site name if it exists
+                string optionalSiteName = null;
+                if ( clientSite.OptionalSiteId.HasValue )
+                {
+                    var optionalSite = sservice.GetById( clientSite.OptionalSiteId.Value );
+                    optionalSiteName = optionalSite?.Name;
+                }
+
+                ViewBag.Address = address;
+                ViewBag.Contacts = contacts;
+                ViewBag.ClientSite = clientSite;
+                ViewBag.OptionalSiteName = optionalSiteName;
+                ViewBag.CustomerName = customerName;
 
                 if ( layout )
                 {
                     ViewBag.IncludeLayout = true;
                 }
 
-                ViewBag.Address = address;
-
-                return View( model );
+                return View( site );
             }
         }
 
@@ -2483,6 +2563,8 @@ namespace ACT.UI.Controllers
                     Name = model.MainSite,
                     Depot = model.Depot,
                     RegionId = model.Address?.ProvinceId,
+                    PlanningPoint = model.PlanningPoint,
+                    LocationNumber = model.LocationNumber,
                     ContactNo = model.ContactNo,
                     Status = ( int ) model.Status,
                     ContactName = model.ContactName,
@@ -2539,6 +2621,7 @@ namespace ACT.UI.Controllers
                     {
                         SiteId = mainSite.Id,
                         ClientCustomerId = model.CustomerId,
+                        ClientCustomerNumber = model.CustomerNoDebtorCode,
                         OptionalSiteId = model.OptionalSiteId,
                         Status = ( int ) model.Status,
                         AccountingCode = mainSite.AccountCode,
@@ -2626,6 +2709,7 @@ namespace ACT.UI.Controllers
 
                 Address address = aservice.Get( site.Id, "CustomerSite" );
                 List<Contact> contacts = cservice.List( site.Id, "CustomerSite" );
+                ClientSite clientSite = csservice.GetBySiteId( site.ClientSites.FirstOrDefault()?.ClientCustomerId ?? 0, id );
 
                 SiteViewModel model = new SiteViewModel()
                 {
@@ -2637,6 +2721,7 @@ namespace ACT.UI.Controllers
                     ContactName = site.ContactName,
                     Description = site.Description,
                     AccountCode = site.AccountCode,
+                    CustomerNoDebtorCode = clientSite.ClientCustomerNumber,
                     Status = ( Status ) site.Status,
                     SiteCodeChep = site.SiteCodeChep,
                     PlanningPoint = site.PlanningPoint,
@@ -2645,7 +2730,8 @@ namespace ACT.UI.Controllers
                     CustomerId = site.ClientSites.FirstOrDefault()?.ClientCustomerId ?? 0,
                     ARPMSalesManagerId = site.ARPMSalesManagerId,
                     CLCode = site.CLCode,
-                    Contacts = contacts ?? new List<Contact>()
+                    Contacts = contacts ?? new List<Contact>(),
+                    OptionalSiteId = clientSite?.OptionalSiteId
                 };
 
                 // Address
@@ -2801,6 +2887,7 @@ namespace ACT.UI.Controllers
                     csSite.Status = ( int ) model.Status;
                     csSite.AccountingCode = site.AccountCode;
                     csSite.OptionalSiteId = model.OptionalSiteId;
+                    csSite.ClientCustomerNumber = model.CustomerNoDebtorCode;
                     csSite.ModifiedOn = DateTime.Now;
                     csSite.ModifiedBy = User.Identity.Name;
 
@@ -2886,15 +2973,15 @@ namespace ACT.UI.Controllers
 
                 service.Update( site );
 
-                Notify( "The selected Site was successfully updated.", NotificationType.Success );
+                Notify( "The selected Customer Site was successfully updated.", NotificationType.Success );
 
-                return ManageSites( new PagingModel(), new CustomSearchModel() );
+                return ManageCustomerSites( new PagingModel(), new CustomSearchModel() );
             }
         }
 
         //
         // POST: /Site/DeleteSiteBudget/5
-        [HttpPost]
+        /*[HttpPost]
         [Requires( PermissionTo.Delete )]
         public ActionResult DeleteCustomerSiteBudget( int id )
         {
@@ -2919,7 +3006,9 @@ namespace ACT.UI.Controllers
 
                 return PartialView( "_SiteBudgets", model );
             }
-        }
+        }*/
+
+
 
         // GET: Client/ImportSite
         [Requires( PermissionTo.Create )]
@@ -3253,6 +3342,17 @@ namespace ACT.UI.Controllers
             Notify( resp, NotificationType.Success );
 
             return ManageSites( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // GET: Client/TransporterContacts/5
+        public ActionResult CustomerSiteContacts( int id )
+        {
+            using ( ContactService cservice = new ContactService() )
+            {
+                List<Contact> contacts = cservice.List( id, "CustomerSite" );
+
+                return PartialView( "_ContactsView", contacts );
+            }
         }
 
         #endregion
@@ -5329,7 +5429,7 @@ namespace ACT.UI.Controllers
             {
                 ViewBag.ViewName = "ManageCustomerSites";
 
-                return PartialView( "_ManageSitesCustomSearch", new CustomSearchModel( "ManageCustomerSites" ) );
+                return PartialView( "_ManageCustomerSitesCustomSearch", new CustomSearchModel( "ManageCustomerSites" ) );
             }
 
             using ( SiteService service = new SiteService() )

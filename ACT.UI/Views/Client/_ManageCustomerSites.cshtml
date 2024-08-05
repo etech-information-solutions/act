@@ -155,6 +155,10 @@
                             @Html.ActionLink( "Edit", "EditCustomerSite", new { id = item.Id, returnView = "managecustomersites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
                             @Html.ActionLink( enable, "DeleteCustomerSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managecustomersites", @rel = "tipsyE", @title = enable + " this item?" } )
                         </div>
+
+                        <a href="@Url.Action( "CustomerSiteContacts", "Client", new { id = item.Id } )" data-details="1" data-id="@item.Id" data-target=".tr-@item.Id-item">
+                            <i class="fa fa-phone"></i>Contacts
+                        </a>
                     </td>
                 </tr>
                 count++;
