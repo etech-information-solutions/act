@@ -264,6 +264,12 @@ namespace ACT.Core.Models
         }
 
         /// <summary>
+        /// Can be used to indicate Customer Main Site
+        /// </summary>
+        [Display( Name = "Main Site" )]
+        public string MainSite { get; set; }
+
+        /// <summary>
         /// A custom search query
         /// </summary>
         [Display( Name = "Search Text" )]
@@ -731,10 +737,12 @@ namespace ACT.Core.Models
                     using ( SiteService sservice = new SiteService() )
                     using ( ClientService cservice = new ClientService() )
                     using ( RegionService rservice = new RegionService() )
+                    using ( ClientCustomerService ccservice = new ClientCustomerService() )
                     {
                         SiteOptions = sservice.List( true );
                         ClientOptions = cservice.List( true );
                         RegionOptions = rservice.List( true );
+                        CustomerOptions = ccservice.GetCustomerSelectList( true );
                     }
 
                     break;

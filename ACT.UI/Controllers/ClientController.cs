@@ -2700,7 +2700,6 @@ namespace ACT.UI.Controllers
             using ( ClientSiteService csservice = new ClientSiteService() )
             {
                 Site site = service.GetById( id );
-
                 if ( site == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
@@ -2708,8 +2707,13 @@ namespace ACT.UI.Controllers
                 }
 
                 Address address = aservice.Get( site.Id, "CustomerSite" );
-                List<Contact> contacts = cservice.List( site.Id, "CustomerSite" );
-                ClientSite clientSite = csservice.GetBySiteId( site.ClientSites.FirstOrDefault()?.ClientCustomerId ?? 0, id );
+                List<Contact> contacts = cservice.List( site.Id, "CustomerSite" ) ?? new List<Contact>();
+
+                // Safely get the ClientCustomerId
+                int clientCustomerId = site.ClientSites?.FirstOrDefault()?.ClientCustomerId ?? 0;
+
+                // Safely get the ClientSite
+                ClientSite clientSite = clientCustomerId != 0 ? csservice.GetBySiteId( clientCustomerId, id ) : null;
 
                 SiteViewModel model = new SiteViewModel()
                 {
@@ -2721,23 +2725,22 @@ namespace ACT.UI.Controllers
                     ContactName = site.ContactName,
                     Description = site.Description,
                     AccountCode = site.AccountCode,
-                    CustomerNoDebtorCode = clientSite.ClientCustomerNumber,
+                    CustomerNoDebtorCode = clientSite?.ClientCustomerNumber ?? string.Empty,
                     Status = ( Status ) site.Status,
                     SiteCodeChep = site.SiteCodeChep,
                     PlanningPoint = site.PlanningPoint,
                     LocationNumber = site.LocationNumber,
-                    SiteType = ( site.SiteType.HasValue ? ( SiteType ) site.SiteType : SiteType.All ),
-                    CustomerId = site.ClientSites.FirstOrDefault()?.ClientCustomerId ?? 0,
+                    SiteType = site.SiteType.HasValue ? ( SiteType ) site.SiteType : SiteType.All,
+                    CustomerId = clientCustomerId,
                     ARPMSalesManagerId = site.ARPMSalesManagerId,
                     CLCode = site.CLCode,
-                    Contacts = contacts ?? new List<Contact>(),
-                    OptionalSiteId = clientSite?.OptionalSiteId
+                    Contacts = contacts,
+                    OptionalSiteId = clientSite?.OptionalSiteId ?? 0
                 };
 
                 // Address
-                if ( address != null )
-                {
-                    model.Address = new AddressViewModel()
+                model.Address = address != null
+                    ? new AddressViewModel()
                     {
                         EditMode = true,
                         Id = address.Id,
@@ -2748,12 +2751,8 @@ namespace ACT.UI.Controllers
                         ProvinceId = address.ProvinceId ?? 0,
                         Latitude = address.Latitude,
                         Longitude = address.Longitude,
-                    };
-                }
-                else
-                {
-                    model.Address = new AddressViewModel() { EditMode = true };
-                }
+                    }
+                    : new AddressViewModel() { EditMode = true };
 
                 return View( model );
             }

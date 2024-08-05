@@ -35,7 +35,7 @@ namespace ACT.Core.Services
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        public Dictionary<int, string> List( bool v, int regionId = 0 )
+        public Dictionary<int, string> List( bool v, int regionId = 0, string mainSite = null )
         {
             Dictionary<int, string> siteOptions = new Dictionary<int, string>();
             List<object> parameters = new List<object>()
@@ -43,6 +43,7 @@ namespace ACT.Core.Services
                 new SqlParameter("regionId", regionId),
                 new SqlParameter("sAct", (int)Status.Active),
                 new SqlParameter("userid", (CurrentUser != null) ? CurrentUser.Id : 0),
+                new SqlParameter("mainSite", (!string.IsNullOrEmpty(mainSite) ? mainSite : (object)DBNull.Value)),
             };
 
             string query = @"
@@ -53,6 +54,11 @@ namespace ACT.Core.Services
             if ( regionId > 0 )
             {
                 query += " AND s.[RegionId] = @regionId";
+            }
+
+            if ( !string.IsNullOrEmpty( mainSite ) )
+            {
+                query += " AND s.Name LIKE @mainSite + '%'";
             }
 
             if ( CurrentUser.RoleType == RoleType.PSP )
@@ -349,12 +355,13 @@ namespace ACT.Core.Services
                 { new SqlParameter( "take", pm.Take ) },
                 { new SqlParameter( "csmSiteId", csm.SiteId ) },
                 { new SqlParameter( "csmClientId", csm.ClientId ) },
+                { new SqlParameter( "csmCustomerId", csm.CustomerId ) },
                 { new SqlParameter( "csmRegionId", csm.RegionId ) },
                 { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
                 { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-
+                { new SqlParameter("csmMainSite", (!string.IsNullOrEmpty(csm.MainSite) ? csm.MainSite : (object)DBNull.Value)) }
             };
 
             #endregion
@@ -413,6 +420,14 @@ namespace ACT.Core.Services
             if ( csm.ClientId != 0 )
             {
                 query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs, [dbo].[ClientCustomer] cc WHERE s.Id=cs.SiteId AND cc.Id=cs.ClientCustomerId AND cc.ClientId=@csmClientId) ";
+            }
+            if ( csm.CustomerId != 0 )
+            {
+                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE s.Id=cs.SiteId AND cs.ClientCustomerId=@csmCustomerId) ";
+            }
+            if ( !string.IsNullOrEmpty( csm.MainSite ) )
+            {
+                query = $"{query} AND s.Name LIKE @csmMainSite + '%'";
             }
             if ( csm.SiteId != 0 )
             {
