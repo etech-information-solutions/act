@@ -1376,6 +1376,45 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Status" Type="int" Nullable="false" />
           <Property Name="Total" Type="int" />
         </EntityType>
+        <EntityType Name="SupplierSite">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ClientId" Type="int" />
+          <Property Name="RegionId" Type="int" />
+          <Property Name="ARPMSalesManagerId" Type="int" />
+          <Property Name="CreatedOn" Type="datetime" Nullable="false" />
+          <Property Name="ModifiedOn" Type="datetime" Nullable="false" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="150" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="150" Nullable="false" />
+          <Property Name="Description" Type="varchar" MaxLength="500" Nullable="false" />
+          <Property Name="XCord" Type="varchar" MaxLength="150" />
+          <Property Name="YCord" Type="varchar" MaxLength="150" />
+          <Property Name="Address" Type="varchar" MaxLength="500" />
+          <Property Name="Town" Type="varchar" MaxLength="100" />
+          <Property Name="PostalCode" Type="varchar" MaxLength="150" />
+          <Property Name="ContactNo" Type="varchar" MaxLength="150" />
+          <Property Name="ContactName" Type="varchar" MaxLength="150" />
+          <Property Name="PlanningPoint" Type="varchar" MaxLength="150" />
+          <Property Name="SiteType" Type="int" />
+          <Property Name="AccountCode" Type="varchar" MaxLength="150" />
+          <Property Name="Depot" Type="varchar" MaxLength="150" />
+          <Property Name="SiteCodeChep" Type="varchar" MaxLength="150" />
+          <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="FinanceContact" Type="varchar" MaxLength="150" />
+          <Property Name="FinanceContactNo" Type="varchar" MaxLength="150" />
+          <Property Name="ReceivingContact" Type="varchar" MaxLength="150" />
+          <Property Name="ReceivingContactNo" Type="varchar" MaxLength="150" />
+          <Property Name="DepotManager" Type="varchar" MaxLength="150" />
+          <Property Name="DepotManagerContact" Type="varchar" MaxLength="150" />
+          <Property Name="FinanceEmail" Type="varchar" MaxLength="150" />
+          <Property Name="ReceivingEmail" Type="varchar" MaxLength="150" />
+          <Property Name="DepotManagerEmail" Type="varchar" MaxLength="150" />
+          <Property Name="Province" Type="int" />
+          <Property Name="LocationNumber" Type="varchar" MaxLength="150" />
+          <Property Name="CLCode" Type="varchar" MaxLength="150" />
+        </EntityType>
         <EntityType Name="SystemConfig">
           <Key>
             <PropertyRef Name="Id" />
@@ -2707,6 +2746,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_SupplierSite_Region">
+          <End Role="Region" Type="Self.Region" Multiplicity="0..1" />
+          <End Role="SupplierSite" Type="Self.SupplierSite" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Region">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SupplierSite">
+              <PropertyRef Name="RegionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Task_ClientLoad">
           <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="0..1" />
           <End Role="Task" Type="Self.Task" Multiplicity="*" />
@@ -2998,6 +3049,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySet Name="SiteAudit" EntityType="Self.SiteAudit" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SiteBilling" EntityType="Self.SiteBilling" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SiteBudget" EntityType="Self.SiteBudget" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SupplierSite" EntityType="Self.SupplierSite" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SystemConfig" EntityType="Self.SystemConfig" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Task" EntityType="Self.Task" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Ticket" EntityType="Self.Ticket" Schema="dbo" store:Type="Tables" />
@@ -3414,6 +3466,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <AssociationSet Name="FK_Sites_Sites" Association="Self.FK_Sites_Sites">
             <End Role="Site" EntitySet="Site" />
             <End Role="Site1" EntitySet="Site" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SupplierSite_Region" Association="Self.FK_SupplierSite_Region">
+            <End Role="Region" EntitySet="Region" />
+            <End Role="SupplierSite" EntitySet="SupplierSite" />
           </AssociationSet>
           <AssociationSet Name="FK_Task_ClientLoad" Association="Self.FK_Task_ClientLoad">
             <End Role="ClientLoad" EntitySet="ClientLoad" />
@@ -4015,6 +4071,11 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <AssociationSet Name="FK_ClientSite_OptionalSite" Association="ACTModel.FK_ClientSite_OptionalSite">
             <End Role="Site" EntitySet="Sites" />
             <End Role="ClientSite" EntitySet="ClientSites" />
+          </AssociationSet>
+          <EntitySet Name="SupplierSites" EntityType="ACTModel.SupplierSite" />
+          <AssociationSet Name="FK_SupplierSite_Region" Association="ACTModel.FK_SupplierSite_Region">
+            <End Role="Region" EntitySet="Regions" />
+            <End Role="SupplierSite" EntitySet="SupplierSites" />
           </AssociationSet>
           </EntityContainer>
         <EntityType Name="AuditLog">
@@ -6206,6 +6267,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Code" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Country" Relationship="ACTModel.FK_Region_Country" FromRole="Region" ToRole="Country" />
           <NavigationProperty Name="Province" Relationship="ACTModel.FK_Region_Province" FromRole="Region" ToRole="Province" />
+          <NavigationProperty Name="SupplierSites" Relationship="ACTModel.FK_SupplierSite_Region" FromRole="Region" ToRole="SupplierSite" />
         </EntityType>
         <Association Name="FK_Regions_PSP">
           <End Type="ACTModel.PSP" Role="PSP" Multiplicity="1" />
@@ -7188,6 +7250,58 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="ClientSite">
               <PropertyRef Name="OptionalSiteId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="SupplierSite">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClientId" Type="Int32" />
+          <Property Name="RegionId" Type="Int32" />
+          <Property Name="ARPMSalesManagerId" Type="Int32" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="XCord" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="YCord" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Address" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Town" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="PostalCode" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="ContactNo" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="ContactName" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="PlanningPoint" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="SiteType" Type="Int32" />
+          <Property Name="AccountCode" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Depot" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="SiteCodeChep" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="FinanceContact" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="FinanceContactNo" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="ReceivingContact" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="ReceivingContactNo" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="DepotManager" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="DepotManagerContact" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="FinanceEmail" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="ReceivingEmail" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="DepotManagerEmail" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Province" Type="Int32" />
+          <Property Name="LocationNumber" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="CLCode" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Region" Relationship="ACTModel.FK_SupplierSite_Region" FromRole="SupplierSite" ToRole="Region" />
+        </EntityType>
+        <Association Name="FK_SupplierSite_Region">
+          <End Type="ACTModel.Region" Role="Region" Multiplicity="0..1" />
+          <End Type="ACTModel.SupplierSite" Role="SupplierSite" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Region">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SupplierSite">
+              <PropertyRef Name="RegionId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -8881,6 +8995,46 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
                 <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="CountryId" ColumnName="CountryId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SupplierSites">
+            <EntityTypeMapping TypeName="ACTModel.SupplierSite">
+              <MappingFragment StoreEntitySet="SupplierSite">
+                <ScalarProperty Name="CLCode" ColumnName="CLCode" />
+                <ScalarProperty Name="LocationNumber" ColumnName="LocationNumber" />
+                <ScalarProperty Name="Province" ColumnName="Province" />
+                <ScalarProperty Name="DepotManagerEmail" ColumnName="DepotManagerEmail" />
+                <ScalarProperty Name="ReceivingEmail" ColumnName="ReceivingEmail" />
+                <ScalarProperty Name="FinanceEmail" ColumnName="FinanceEmail" />
+                <ScalarProperty Name="DepotManagerContact" ColumnName="DepotManagerContact" />
+                <ScalarProperty Name="DepotManager" ColumnName="DepotManager" />
+                <ScalarProperty Name="ReceivingContactNo" ColumnName="ReceivingContactNo" />
+                <ScalarProperty Name="ReceivingContact" ColumnName="ReceivingContact" />
+                <ScalarProperty Name="FinanceContactNo" ColumnName="FinanceContactNo" />
+                <ScalarProperty Name="FinanceContact" ColumnName="FinanceContact" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="SiteCodeChep" ColumnName="SiteCodeChep" />
+                <ScalarProperty Name="Depot" ColumnName="Depot" />
+                <ScalarProperty Name="AccountCode" ColumnName="AccountCode" />
+                <ScalarProperty Name="SiteType" ColumnName="SiteType" />
+                <ScalarProperty Name="PlanningPoint" ColumnName="PlanningPoint" />
+                <ScalarProperty Name="ContactName" ColumnName="ContactName" />
+                <ScalarProperty Name="ContactNo" ColumnName="ContactNo" />
+                <ScalarProperty Name="PostalCode" ColumnName="PostalCode" />
+                <ScalarProperty Name="Town" ColumnName="Town" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="YCord" ColumnName="YCord" />
+                <ScalarProperty Name="XCord" ColumnName="XCord" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ARPMSalesManagerId" ColumnName="ARPMSalesManagerId" />
+                <ScalarProperty Name="RegionId" ColumnName="RegionId" />
+                <ScalarProperty Name="ClientId" ColumnName="ClientId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

@@ -259,6 +259,9 @@
     <Compile Include="Models\SiteBudget.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\SupplierSite.cs">
+      <DependentUpon>ACT.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\SystemConfig.cs">
       <DependentUpon>ACT.tt</DependentUpon>
     </Compile>

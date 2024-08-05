@@ -191,6 +191,8 @@
         <AssociationConnector Association="ACTModel.FK_DeliveryNote_Province2" />
         <AssociationConnector Association="ACTModel.FK_Region_Province" />
         <AssociationConnector Association="ACTModel.FK_ClientSite_OptionalSite" />
+        <EntityTypeShape EntityType="ACTModel.SupplierSite" Width="1.5" PointX="17.125" PointY="36.125" />
+        <AssociationConnector Association="ACTModel.FK_SupplierSite_Region" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

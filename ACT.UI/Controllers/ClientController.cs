@@ -666,11 +666,11 @@ namespace ACT.UI.Controllers
         public ActionResult EditClient( int id )
         {
             using ( ClientService service = new ClientService() )
+            using ( ContactService cservice = new ContactService() )
             using ( AddressService aservice = new AddressService() )
             using ( DocumentService dservice = new DocumentService() )
             using ( EstimatedLoadService eservice = new EstimatedLoadService() )
             using ( ClientKPIService kpiservice = new ClientKPIService() )
-            using ( ContactService cservice = new ContactService() )
             {
                 Client client = service.GetById( id );
 
@@ -2508,6 +2508,7 @@ namespace ACT.UI.Controllers
                 #endregion
 
                 #region Create Address
+
                 if ( model.Address != null )
                 {
                     Address address = new Address()
@@ -2527,9 +2528,11 @@ namespace ACT.UI.Controllers
 
                     aservice.Create( address );
                 }
+
                 #endregion
 
                 #region Add Client Site
+
                 if ( model.CustomerId > 0 )
                 {
                     ClientSite csSite = new ClientSite()
@@ -2551,6 +2554,7 @@ namespace ACT.UI.Controllers
                     Notify( "No customer selected for this site. Please select a customer and try again.", NotificationType.Error );
                     return View( model );
                 }
+
                 #endregion
 
                 #region Contacts
@@ -2607,21 +2611,21 @@ namespace ACT.UI.Controllers
         public ActionResult EditCustomerSite( int id )
         {
             using ( SiteService service = new SiteService() )
-            using ( RegionService rservice = new RegionService() )
             using ( AddressService aservice = new AddressService() )
+            using ( ContactService cservice = new ContactService() )
+            using ( RegionService regionService = new RegionService() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
             {
                 Site site = service.GetById( id );
 
                 if ( site == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
                     return PartialView( "_AccessDenied" );
                 }
 
-                Address address = aservice.Get( site.Id, "Site" );
-
-                #region Site
+                Address address = aservice.Get( site.Id, "CustomerSite" );
+                List<Contact> contacts = cservice.List( site.Id, "CustomerSite" );
 
                 SiteViewModel model = new SiteViewModel()
                 {
@@ -2629,10 +2633,6 @@ namespace ACT.UI.Controllers
                     EditMode = true,
                     MainSite = site.Name,
                     Depot = site.Depot,
-                    OptionalSiteId = site.SiteId,
-                    Latitude = site.YCord,
-                    Longitude = site.XCord,
-                    RegionId = site.RegionId,
                     ContactNo = site.ContactNo,
                     ContactName = site.ContactName,
                     Description = site.Description,
@@ -2640,104 +2640,34 @@ namespace ACT.UI.Controllers
                     Status = ( Status ) site.Status,
                     SiteCodeChep = site.SiteCodeChep,
                     PlanningPoint = site.PlanningPoint,
-                    FinanceEmail = site.FinanceEmail,
-                    FinanceContact = site.FinanceContact,
-                    FinanceContactNo = site.FinanceContactNo,
-                    ReceivingContact = site.ReceivingContact,
-                    ReceivingContactNo = site.ReceivingContactNo,
-                    ReceivingEmail = site.ReceivingEmail,
-                    DepotManager = site.DepotManager,
-                    DepotManagerEmail = site.DepotManagerEmail,
-                    DepotManagerContact = site.DepotManagerContact,
                     LocationNumber = site.LocationNumber,
-
+                    SiteType = ( site.SiteType.HasValue ? ( SiteType ) site.SiteType : SiteType.All ),
+                    CustomerId = site.ClientSites.FirstOrDefault()?.ClientCustomerId ?? 0,
                     ARPMSalesManagerId = site.ARPMSalesManagerId,
                     CLCode = site.CLCode,
-
-                    AuthorisationEmail1 = site.ClientSites?.FirstOrDefault()?.AuthorisationEmail1,
-                    AuthorisationEmail2 = site.ClientSites?.FirstOrDefault()?.AuthorisationEmail2,
-                    AuthorisationEmail3 = site.ClientSites?.FirstOrDefault()?.AuthorisationEmail3,
-
-                    ClientSalesManager = site.ClientSites?.FirstOrDefault()?.ClientSalesManager,
-                    ClientManagerContact = site.ClientSites?.FirstOrDefault()?.ClientManagerContact,
-                    ClientManagerEmail = site.ClientSites?.FirstOrDefault()?.ClientManagerEmail,
-                    ClientSalesRepContact = site.ClientSites?.FirstOrDefault()?.ClientSalesRepContact,
-                    ClientSalesRegEmail = site.ClientSites?.FirstOrDefault()?.ClientSalesRegEmail,
-
-                    SiteType = ( site.SiteType.HasValue ? ( SiteType ) site.SiteType : SiteType.All ),
-
-
-                    Clients = new List<ClientCustomer>(),
-                    SiteBudgets = new List<SiteBudget>(),
-                    Address = new AddressViewModel() { EditMode = true },
-                    ClientId = site.ClientSites.FirstOrDefault()?.ClientCustomer?.ClientId ?? 0,
+                    Contacts = contacts ?? new List<Contact>()
                 };
 
-                #endregion
-
-                #region Clients
-
-                if ( site.ClientSites.NullableAny() )
-                {
-                    foreach ( int cid in site.ClientSites.Select( s => s.ClientCustomerId ) )
-                    {
-                        model.Clients.Add( new ClientCustomer()
-                        {
-                            Id = cid
-                        } );
-                    }
-                }
-
-                #endregion
-
-                #region Site Budgets
-
-                if ( site.SiteBudgets.NullableAny() )
-                {
-                    foreach ( SiteBudget l in site.SiteBudgets )
-                    {
-                        model.SiteBudgets.Add( new SiteBudget()
-                        {
-                            Id = l.Id,
-                            BudgetYear = l.BudgetYear,
-                            Total = l.Total,
-                            January = l.January,
-                            February = l.February,
-                            March = l.March,
-                            April = l.April,
-                            May = l.May,
-                            June = l.June,
-                            July = l.July,
-                            August = l.August,
-                            September = l.September,
-                            October = l.October,
-                            November = l.November,
-                            December = l.December,
-                        } );
-                    }
-                }
-
-                #endregion
-
-                #region Address
-
+                // Address
                 if ( address != null )
                 {
                     model.Address = new AddressViewModel()
                     {
                         EditMode = true,
-                        Town = address?.Town,
-                        Id = address?.Id ?? 0,
-                        PostCode = address?.PostalCode,
-                        AddressLine1 = address?.Addressline1,
-                        AddressLine2 = address?.Addressline2,
-                        ProvinceId = address?.ProvinceId ?? 0,
-                        Longitude = address.Longitude,
+                        Id = address.Id,
+                        Town = address.Town,
+                        PostCode = address.PostalCode,
+                        AddressLine1 = address.Addressline1,
+                        AddressLine2 = address.Addressline2,
+                        ProvinceId = address.ProvinceId ?? 0,
                         Latitude = address.Latitude,
+                        Longitude = address.Longitude,
                     };
                 }
-
-                #endregion
+                else
+                {
+                    model.Address = new AddressViewModel() { EditMode = true };
+                }
 
                 return View( model );
             }
@@ -2748,273 +2678,181 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Edit )]
         public ActionResult EditCustomerSite( SiteViewModel model )
         {
+
+            // Contact Id is null on subsequent entries. When adding another contact row the new Id is null and the ModelState fails. This is a pragmatic solution for now.
+            if ( model.Contacts != null )
+            {
+                foreach ( var contact in model.Contacts.Where( c => c.Id == 0 ) )
+                {
+                    ModelState.Remove( $"Contacts[{model.Contacts.IndexOf( contact )}].Id" );
+                }
+            }
+
             if ( !ModelState.IsValid )
             {
                 Notify( "Sorry, the selected Site was not updated. Please correct all errors and try again.", NotificationType.Error );
-
                 return View( model );
             }
 
             using ( SiteService sservice = new SiteService() )
             using ( AddressService aservice = new AddressService() )
             using ( TransactionScope scope = new TransactionScope() )
+            using ( RegionService regionService = new RegionService() )
+            using ( ContactService cservice = new ContactService() )
             using ( ClientSiteService csservice = new ClientSiteService() )
-            using ( SiteBudgetService sbservice = new SiteBudgetService() )
-            using ( ClientCustomerService ccservice = new ClientCustomerService() )
             {
                 Site site = sservice.GetById( model.Id );
 
-                Site site1 = sservice.GetById( model.OptionalSiteId ?? 0 );
-
                 #region Validations
-
                 if ( site == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
                     return PartialView( "_AccessDenied" );
                 }
 
-                if ( site.Name?.Trim()?.ToLower() != model.MainSite?.Trim()?.ToLower() && site.RegionId != model.RegionId && sservice.ExistByClientAndName( model.ClientId, model.MainSite?.Trim()?.ToLower() ) )
+                if ( site.Name?.Trim()?.ToLower() != model.MainSite?.Trim()?.ToLower() &&
+                    sservice.ExistByClientAndName( model.CustomerId, model.MainSite?.Trim()?.ToLower() ) )
                 {
-                    Notify( $"Sorry, a Site with the name {model.MainSite} in the specified region already exists.", NotificationType.Error );
-
+                    Notify( $"Sorry, a Site with the name {model.MainSite} for this customer already exists.", NotificationType.Error );
                     return View( model );
                 }
-
                 #endregion
 
-                if ( !model.OptionalSiteId.HasValue && !string.IsNullOrWhiteSpace( model.Longitude ) && !string.IsNullOrWhiteSpace( model.Latitude ) )
-                {
-                    Site existingSite = sservice.ExistByXYCoords( model.Longitude?.Trim(), model.Latitude?.Trim() );
-
-                    if ( existingSite != null && site.Id != existingSite.Id && site.SiteId != existingSite.Id )
-                    {
-                        // Instead of pass back to view, we will create the new site as a subsite of the existing site.
-                        // Get the existing site first
-                        model.OptionalSiteId = existingSite.Id;
-                    }
-                }
-
                 #region Update Site
-
                 site.Name = model.MainSite;
                 site.Depot = model.Depot;
-                site.SiteId = model.OptionalSiteId;
-                site.YCord = model.Latitude;
-                site.XCord = model.Longitude;
-                site.RegionId = model.RegionId;
                 site.ContactNo = model.ContactNo;
-                site.Status = ( int ) model.Status;
-                site.Description = model.Description;
                 site.ContactName = model.ContactName;
+                site.Description = model.Description;
                 site.AccountCode = model.AccountCode;
+                site.Status = ( int ) model.Status;
                 site.SiteType = ( int ) model.SiteType;
                 site.SiteCodeChep = model.SiteCodeChep;
                 site.PlanningPoint = model.PlanningPoint;
-                site.FinanceEmail = model.FinanceEmail;
-                site.FinanceContact = model.FinanceContact;
-                site.ReceivingContact = model.ReceivingContact;
-                site.FinanceContactNo = model.FinanceContactNo;
-                site.ReceivingContactNo = model.ReceivingContactNo;
-                site.ReceivingEmail = model.ReceivingEmail;
-                site.DepotManager = model.DepotManager;
-                site.DepotManagerEmail = model.DepotManagerEmail;
-                site.DepotManagerContact = model.DepotManagerContact;
                 site.LocationNumber = model.LocationNumber;
-
                 site.ARPMSalesManagerId = model.ARPMSalesManagerId;
                 site.CLCode = model.CLCode;
 
+                int provinceId = model.Address?.ProvinceId ?? 0;
+                int? matchingRegionId = regionService.FindMatchingRegionId( provinceId );
+
+                if ( matchingRegionId.HasValue )
+                {
+                    site.RegionId = matchingRegionId.Value;
+                }
+
                 sservice.Update( site );
-
                 #endregion
 
-                #region Add Client Site
-
-                csservice.Query( $"UPDATE [dbo].[ClientSite] SET [Status]={( int ) Status.Inactive} WHERE [SiteId]={site.Id}" );
-
-                if ( model.Clients.NullableAny( c => c.Id > 0 ) )
-                {
-                    foreach ( ClientCustomer c in model.Clients.Where( c => c.Id > 0 ) )
-                    {
-                        if ( c.Id <= 0 ) continue;
-
-                        ClientSite cs = csservice.GetBySiteId( c.Id, site.Id );
-
-                        if ( cs != null )
-                        {
-                            cs.Status = ( int ) model.Status;
-                            cs.AccountingCode = site.AccountCode;
-                            cs.KAMName = site.ContactName;
-                            cs.KAMContact = site.ContactNo;
-                            cs.KAMEmail = site.ReceivingEmail;
-                            cs.AuthorisationEmail1 = model.AuthorisationEmail1;
-                            cs.AuthorisationEmail2 = model.AuthorisationEmail2;
-                            cs.AuthorisationEmail3 = model.AuthorisationEmail3;
-                            cs.ClientManagerContact = model.ClientManagerContact;
-                            cs.ClientManagerEmail = model.ClientManagerEmail;
-                            cs.ClientSalesManager = model.ClientSalesManager;
-                            cs.ClientSalesRegEmail = model.ClientSalesRegEmail;
-                            cs.ClientSalesRepContact = model.ClientSalesRepContact;
-
-                            csservice.Update( cs );
-                        }
-                        else
-                        {
-                            cs = new ClientSite()
-                            {
-                                SiteId = site.Id,
-                                ClientCustomerId = c.Id,
-                                Status = ( int ) model.Status,
-                                AccountingCode = site.AccountCode,
-                                KAMName = site.ContactName,
-                                KAMContact = site.ContactNo,
-                                KAMEmail = site.ReceivingEmail,
-                                AuthorisationEmail1 = model.AuthorisationEmail1,
-                                AuthorisationEmail2 = model.AuthorisationEmail2,
-                                AuthorisationEmail3 = model.AuthorisationEmail3,
-                                ClientManagerContact = model.ClientManagerContact,
-                                ClientManagerEmail = model.ClientManagerEmail,
-                                ClientSalesManager = model.ClientSalesManager,
-                                ClientSalesRegEmail = model.ClientSalesRegEmail,
-                                ClientSalesRepContact = model.ClientSalesRepContact,
-                            };
-
-                            csservice.Create( cs );
-                        }
-                    }
-                }
-                else
-                {
-                    ClientCustomer cc = new ClientCustomer()
-                    {
-                        ClientId = model.ClientId,
-                        Status = ( int ) model.Status,
-                        CustomerName = site1?.Name ?? model.MainSite,
-                        CustomerNumber = model.CustomerNoDebtorCode,
-                    };
-
-                    cc = ccservice.Create( cc );
-
-                    ClientSite csSite = new ClientSite()
-                    {
-                        SiteId = site.Id,
-                        ClientCustomerId = cc.Id,
-                        Status = ( int ) model.Status,
-                        AccountingCode = site.AccountCode,
-                        KAMName = site.ContactName,
-                        KAMContact = site.ContactNo,
-                        KAMEmail = site.ReceivingEmail,
-                        AuthorisationEmail1 = model.AuthorisationEmail1,
-                        AuthorisationEmail2 = model.AuthorisationEmail2,
-                        AuthorisationEmail3 = model.AuthorisationEmail3,
-                        ClientManagerContact = model.ClientManagerContact,
-                        ClientManagerEmail = model.ClientManagerEmail,
-                        ClientSalesManager = model.ClientSalesManager,
-                        ClientSalesRegEmail = model.ClientSalesRegEmail,
-                        ClientSalesRepContact = model.ClientSalesRepContact,
-                    };
-
-                    csservice.Create( csSite );
-                }
-
-                #endregion
-
-                #region Client Budgets
-
-                if ( model.SiteBudgets.NullableAny() )
-                {
-                    foreach ( SiteBudget l in model.SiteBudgets )
-                    {
-                        SiteBudget b = sbservice.GetById( l.Id );
-
-                        if ( b == null )
-                        {
-                            b = new SiteBudget()
-                            {
-                                SiteId = site.Id,
-                                BudgetYear = l.BudgetYear,
-                                Total = l.Total,
-                                January = l.January,
-                                February = l.February,
-                                March = l.March,
-                                April = l.April,
-                                May = l.May,
-                                June = l.June,
-                                July = l.July,
-                                August = l.August,
-                                September = l.September,
-                                October = l.October,
-                                November = l.November,
-                                December = l.December,
-                                Status = ( int ) Status.Active,
-                            };
-
-                            sbservice.Create( b );
-                        }
-                        else
-                        {
-                            b.BudgetYear = l.BudgetYear;
-                            b.Total = l.Total;
-                            b.January = l.January;
-                            b.February = l.February;
-                            b.March = l.March;
-                            b.April = l.April;
-                            b.May = l.May;
-                            b.June = l.June;
-                            b.July = l.July;
-                            b.August = l.August;
-                            b.September = l.September;
-                            b.October = l.October;
-                            b.November = l.November;
-                            b.December = l.December;
-                            b.Status = ( int ) Status.Active;
-
-                            sbservice.Update( b );
-                        }
-                    }
-                }
-
-                #endregion
-
-                #region Address (s)
+                #region Update Address
 
                 if ( model.Address != null )
                 {
-                    Address address = aservice.GetById( model.Address.Id );
-
-                    if ( address == null )
+                    Address address = aservice.Get( site.Id, "CustomerSite" ) ?? new Address()
                     {
-                        address = new Address()
-                        {
-                            ObjectType = "CustomerSite",
-                            ObjectId = model.Id,
-                            Town = model.Address.Town,
-                            Latitude = model.Latitude,
-                            Longitude = model.Longitude,
-                            Status = ( int ) Status.Active,
-                            PostalCode = model.Address.PostCode,
-                            Type = ( int ) model.Address.AddressType,
-                            Addressline1 = model.Address.AddressLine1,
-                            Addressline2 = model.Address.AddressLine2,
-                            ProvinceId = model.Address.ProvinceId,
-                        };
+                        ObjectId = site.Id,
+                        ObjectType = "CustomerSite",
+                        Status = ( int ) Status.Active,
+                        Type = ( int ) AddressType.Postal
+                    };
 
+                    address.Town = model.Address.Town;
+                    address.Latitude = model.Latitude;
+                    address.Longitude = model.Longitude;
+                    address.PostalCode = model.Address.PostCode;
+                    address.Addressline1 = model.Address.AddressLine1;
+                    address.Addressline2 = model.Address.AddressLine2;
+                    address.ProvinceId = model.Address.ProvinceId;
+
+                    if ( address.Id == 0 )
+                    {
                         aservice.Create( address );
                     }
                     else
                     {
-                        address.Town = model.Address.Town;
-                        address.Latitude = model.Latitude;
-                        address.Longitude = model.Longitude;
-                        address.PostalCode = model.Address.PostCode;
-                        address.Type = ( int ) model.Address.AddressType;
-                        address.Addressline1 = model.Address.AddressLine1;
-                        address.Addressline2 = model.Address.AddressLine2;
-                        address.ProvinceId = model.Address.ProvinceId;
-
                         aservice.Update( address );
+                    }
+                }
+
+                #endregion
+
+                #region Update Client Site
+
+                ClientSite csSite = csservice.GetBySiteId( model.CustomerId, site.Id );
+
+                if ( csSite == null )
+                {
+                    csSite = new ClientSite()
+                    {
+                        SiteId = site.Id,
+                        ClientCustomerId = model.CustomerId,
+                        OptionalSiteId = model.OptionalSiteId,
+                        Status = ( int ) model.Status,
+                        AccountingCode = site.AccountCode,
+                        CreatedOn = DateTime.Now,
+                        ModifiedOn = DateTime.Now,
+                        ModifiedBy = User.Identity.Name
+                    };
+
+                    csservice.Create( csSite );
+                }
+                else
+                {
+                    csSite.Status = ( int ) model.Status;
+                    csSite.AccountingCode = site.AccountCode;
+                    csSite.OptionalSiteId = model.OptionalSiteId;
+                    csSite.ModifiedOn = DateTime.Now;
+                    csSite.ModifiedBy = User.Identity.Name;
+
+                    csservice.Update( csSite );
+                }
+
+                #endregion
+
+                #region Update Contacts
+
+                if ( model.Contacts != null && model.Contacts.Any() )
+                {
+                    List<Contact> existingContacts = cservice.List( site.Id, "CustomerSite" );
+
+                    foreach ( Contact contact in model.Contacts )
+                    {
+                        if ( contact.Id > 0 )
+                        {
+                            // Update existing contact
+                            Contact existingContact = existingContacts.FirstOrDefault( c => c.Id == contact.Id );
+                            if ( existingContact != null )
+                            {
+                                existingContact.ContactName = contact.ContactName;
+                                existingContact.ContactTitle = contact.ContactTitle;
+                                existingContact.ContactCell = contact.ContactCell;
+                                existingContact.ContactEmail = contact.ContactEmail;
+                                existingContact.JobTitle = contact.JobTitle;
+                                existingContact.Status = contact.Status;
+
+                                cservice.Update( existingContact );
+                            }
+                        }
+                        else
+                        {
+                            // Create new contact only if it doesn't already exist
+                            if ( !existingContacts.Any( c => c.ContactEmail == contact.ContactEmail ) )
+                            {
+                                Contact newContact = new Contact
+                                {
+                                    ObjectId = site.Id,
+                                    ObjectType = "CustomerSite",
+                                    ContactName = contact.ContactName,
+                                    ContactTitle = contact.ContactTitle,
+                                    ContactCell = contact.ContactCell,
+                                    ContactEmail = contact.ContactEmail,
+                                    JobTitle = contact.JobTitle,
+                                    Status = contact.Status
+                                };
+
+                                cservice.Create( newContact );
+                            }
+                        }
                     }
                 }
 
@@ -3023,9 +2861,9 @@ namespace ACT.UI.Controllers
                 scope.Complete();
             }
 
-            Notify( "The selected Site details were successfully updated.", NotificationType.Success );
+            Notify( "The Site was successfully updated.", NotificationType.Success );
 
-            return ManageSites( new PagingModel(), new CustomSearchModel() );
+            return ManageCustomerSites( new PagingModel(), new CustomSearchModel() );
         }
 
         // POST: Client/DeleteSite/5

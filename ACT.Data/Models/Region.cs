@@ -18,6 +18,7 @@ namespace ACT.Data.Models
         public Region()
         {
             this.Sites = new HashSet<Site>();
+            this.SupplierSites = new HashSet<SupplierSite>();
         }
     
         public int Id { get; set; }
@@ -39,5 +40,7 @@ namespace ACT.Data.Models
         public virtual User User { get; set; }
         public virtual Country Country { get; set; }
         public virtual Province Province { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SupplierSite> SupplierSites { get; set; }
     }
 }

@@ -781,6 +781,7 @@
     <Content Include="Views\Client\CustomerDetails.cshtml" />
     <Content Include="Views\Client\_ManageCustomerSites.cshtml" />
     <Content Include="Views\Client\AddCustomerSite.cshtml" />
+    <Content Include="Views\Client\EditCustomerSite.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

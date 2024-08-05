@@ -100,5 +100,6 @@ namespace ACT.Data.Models
         public virtual DbSet<ClientLoad> ClientLoads { get; set; }
         public virtual DbSet<Country> Countries { get; set; }
         public virtual DbSet<Province> Provinces { get; set; }
+        public virtual DbSet<SupplierSite> SupplierSites { get; set; }
     }
 }
