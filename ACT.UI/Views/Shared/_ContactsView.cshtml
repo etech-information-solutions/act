@@ -19,6 +19,7 @@
                 <th>Cell</th>
                 <th>Email</th>
                 <th>Job</th>
+                <th>Status</th>
             </tr>
         </thead>
 
@@ -30,7 +31,11 @@
 
                 foreach ( Contact b in Model )
                 {
-                    <tr>
+                    Status status = ( Status ) b.Status;
+                    string active = ( status == Status.Active ) ? "active" : "inactive";
+                    string enable = ( status == Status.Active ) ? "Disable" : "Enable";
+
+                    <tr style="@(status == Status.Active ? "" : "opacity: 0.5;")">
                         <td width="1%">
                             @count
                         </td>
@@ -48,6 +53,9 @@
                         </td>
                         <td>
                             @( b.JobTitle.HasValue ? ( ( JobType ) b.JobTitle ).GetDisplayText() : string.Empty )
+                        </td>
+                        <td>
+                            @status.GetDisplayText()
                         </td>
                     </tr>
 

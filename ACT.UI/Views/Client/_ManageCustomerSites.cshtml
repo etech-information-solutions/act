@@ -53,7 +53,7 @@
             <th data-name="SiteName" data-column="s.Name">
                 Main Site
             </th>
-            <th data-name="SubSite">
+            <th data-name="SubSite" data-column="cs.OptionalSiteId">
                 Sub Site
             </th>
             <th data-name="ContactCount" data-column="ContactCount">
@@ -117,10 +117,13 @@
                     <td width="10%">
                         @if ( item.Contacts != null && item.Contacts.Any( c => c.Status == ( Int32 ) Status.Active ) )
                         {
+
+                            var activeContactCount = item.Contacts?.Count( c => c.Status == ( Int32 ) Status.Active );
+
                             <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
                                 <a data-sticky-one="1" data-target="#customersite-@item.Id-contacts" data-trigger="mouseover" data-arrow="center-right" data-title="Contacts">
-                                    <i class="fa fa-phone"></i>@item.ContactCount contacts
+                                    <i class="fa fa-phone"></i>@activeContactCount contacts
                                 </a>
 
                                 <div id="customersite-@item.Id-contacts" class="none">
