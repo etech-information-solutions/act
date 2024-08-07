@@ -2461,7 +2461,6 @@ namespace ACT.UI.Controllers
                     return PartialView( "_AccessDenied" );
                 }
 
-                // Get ClientSite information
                 var clientCustomerId = site.ClientSites.FirstOrDefault()?.ClientCustomerId;
                 if ( !clientCustomerId.HasValue )
                 {
@@ -2476,7 +2475,6 @@ namespace ACT.UI.Controllers
                     return PartialView( "_AccessDenied" );
                 }
 
-                // Ensure we have the customer name
                 string customerName = clientSite.ClientCustomer?.CustomerName;
                 if ( string.IsNullOrEmpty( customerName ) )
                 {
@@ -2487,7 +2485,6 @@ namespace ACT.UI.Controllers
                 Address address = aservice.Get( site.Id, "CustomerSite" );
                 List<Contact> contacts = contactService.List( site.Id, "CustomerSite" );
 
-                // Get the Optional Site name if it exists
                 string optionalSiteName = null;
                 if ( clientSite.OptionalSiteId.HasValue )
                 {
@@ -2706,10 +2703,8 @@ namespace ACT.UI.Controllers
                 Address address = aservice.Get( site.Id, "CustomerSite" );
                 List<Contact> contacts = cservice.List( site.Id, "CustomerSite" ) ?? new List<Contact>();
 
-                // Safely get the ClientCustomerId
                 int clientCustomerId = site.ClientSites?.FirstOrDefault()?.ClientCustomerId ?? 0;
 
-                // Safely get the ClientSite
                 ClientSite clientSite = clientCustomerId != 0 ? csservice.GetBySiteId( clientCustomerId, id ) : null;
 
                 SiteViewModel model = new SiteViewModel()
@@ -3395,8 +3390,6 @@ namespace ACT.UI.Controllers
             SupplierSiteViewModel model = new SupplierSiteViewModel()
             {
                 EditMode = true,
-                Clients = new List<ClientCustomer>(),
-                SiteBudgets = new List<SiteBudget>(),
                 Address = new AddressViewModel() { EditMode = true },
                 Contacts = new List<Contact>(),
             };

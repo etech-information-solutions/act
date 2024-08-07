@@ -398,6 +398,7 @@ namespace ACT.Core.Services
             string siteType = isSupplierSite ? "SupplierSite" : "CustomerSite";
 
             #region Parameters
+
             List<object> parameters = new List<object>()
             {
                 new SqlParameter("@siteType", siteType),
@@ -407,12 +408,12 @@ namespace ACT.Core.Services
                 new SqlParameter("@csmClientId", csm.ClientId),
                 new SqlParameter("@csmCustomerId", csm.CustomerId),
                 new SqlParameter("@csmRegionId", csm.RegionId),
-                new SqlParameter("@query", csm.Query ?? (object)DBNull.Value),
                 new SqlParameter("@csmToDate", csm.ToDate ?? (object)DBNull.Value),
                 new SqlParameter("@userid", (CurrentUser != null) ? CurrentUser.Id : 0),
                 new SqlParameter("@csmFromDate", csm.FromDate ?? (object)DBNull.Value),
                 new SqlParameter("@csmMainSite", (!string.IsNullOrEmpty(csm.MainSite) ? csm.MainSite : (object)DBNull.Value))
             };
+
             #endregion
 
             string query;
@@ -539,31 +540,67 @@ namespace ACT.Core.Services
             #region Normal Search
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
-                query = string.Format( @"{0} AND (s.[Name] LIKE '%{1}%' OR
-                                                  s.[Description] LIKE '%{1}%' OR
-                                                  s.[XCord] LIKE '%{1}%' OR
-                                                  s.[YCord] LIKE '%{1}%' OR
-                                                  s.[Address] LIKE '%{1}%' OR
-                                                  s.[AccountCode] LIKE '%{1}%' OR
-                                                  s.[ContactNo] LIKE '%{1}%' OR
-                                                  s.[ContactName] LIKE '%{1}%' OR
-                                                  s.[Depot] LIKE '%{1}%' OR
-                                                  s.[SiteCodeChep] LIKE '%{1}%' OR
-                                                  s.[PlanningPoint] LIKE '%{1}%' OR
-                                                  s.[FinanceContact] LIKE '%{1}%' OR
-                                                  s.[FinanceContactNo] LIKE '%{1}%' OR
-                                                  s.[ReceivingContact] LIKE '%{1}%' OR
-                                                  s.[ReceivingContactNo] LIKE '%{1}%' OR
-                                                  r.[Name] LIKE '%{1}%' OR
-                                                  cc.[CustomerName] LIKE '%{1}%' OR
-                                                  cc.[CustomerNumber] LIKE '%{1}%' OR
-                                                  cs.[AccountingCode] LIKE '%{1}%' OR
-                                                  cs.[GLIDNo] LIKE '%{1}%' OR
-                                                  cs.[KAMName] LIKE '%{1}%' OR
-                                                  cs.[ClientSiteCode] LIKE '%{1}%' OR
-                                                  cs.[LiquorLicenceNumber] LIKE '%{1}%' OR
-                                                  cs.[ClientCustomerNumber] LIKE '%{1}%'
-                                             ) ", query, csm.Query.Trim() );
+                string searchFields;
+                if ( isSupplierSite )
+                {
+                    searchFields = @"
+                    ss.[Name] LIKE @query OR
+                    ss.[Description] LIKE @query OR
+                    ss.[XCord] LIKE @query OR
+                    ss.[YCord] LIKE @query OR
+                    ss.[Address] LIKE @query OR
+                    ss.[Town] LIKE @query OR
+                    ss.[PostalCode] LIKE @query OR
+                    ss.[ContactNo] LIKE @query OR
+                    ss.[ContactName] LIKE @query OR
+                    ss.[PlanningPoint] LIKE @query OR
+                    ss.[AccountCode] LIKE @query OR
+                    ss.[Depot] LIKE @query OR
+                    ss.[SiteCodeChep] LIKE @query OR
+                    ss.[FinanceContact] LIKE @query OR
+                    ss.[FinanceContactNo] LIKE @query OR
+                    ss.[ReceivingContact] LIKE @query OR
+                    ss.[ReceivingContactNo] LIKE @query OR
+                    ss.[DepotManager] LIKE @query OR
+                    ss.[DepotManagerContact] LIKE @query OR
+                    ss.[FinanceEmail] LIKE @query OR
+                    ss.[ReceivingEmail] LIKE @query OR
+                    ss.[DepotManagerEmail] LIKE @query OR
+                    ss.[LocationNumber] LIKE @query OR
+                    ss.[CLCode] LIKE @query OR
+                    r.[Description] LIKE @query";
+                }
+                else
+                {
+                    searchFields = @"
+                    s.[Name] LIKE @query OR
+                    s.[Description] LIKE @query OR
+                    s.[XCord] LIKE @query OR
+                    s.[YCord] LIKE @query OR
+                    s.[Address] LIKE @query OR
+                    s.[AccountCode] LIKE @query OR
+                    s.[ContactNo] LIKE @query OR
+                    s.[ContactName] LIKE @query OR
+                    s.[Depot] LIKE @query OR
+                    s.[SiteCodeChep] LIKE @query OR
+                    s.[PlanningPoint] LIKE @query OR
+                    s.[FinanceContact] LIKE @query OR
+                    s.[FinanceContactNo] LIKE @query OR
+                    s.[ReceivingContact] LIKE @query OR
+                    s.[ReceivingContactNo] LIKE @query OR
+                    r.[Description] LIKE @query OR
+                    cc.[CustomerName] LIKE @query OR
+                    cc.[CustomerNumber] LIKE @query OR
+                    cs.[AccountingCode] LIKE @query OR
+                    cs.[GLIDNo] LIKE @query OR
+                    cs.[KAMName] LIKE @query OR
+                    cs.[ClientSiteCode] LIKE @query OR
+                    cs.[LiquorLicenceNumber] LIKE @query OR
+                    cs.[ClientCustomerNumber] LIKE @query";
+                }
+
+                query += $" AND ({searchFields})";
+                parameters.Add( new SqlParameter( "@query", $"%{csm.Query.Trim()}%" ) );
             }
             #endregion
 
