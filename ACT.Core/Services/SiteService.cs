@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 
@@ -28,6 +29,16 @@ namespace ACT.Core.Services
             context.Configuration.ProxyCreationEnabled = true;
 
             return base.GetById( id );
+        }
+
+        /// <summary>
+        /// Gets a supplier site using the specified Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public SupplierSite GetSupplierSiteById( int id )
+        {
+            return context.SupplierSites.Find( id );
         }
 
         /// <summary>
@@ -144,6 +155,45 @@ namespace ACT.Core.Services
                 }
             }
 
+            return siteOptions;
+        }
+
+        /// <summary>
+        /// Retrieves Region and Main Site for Supplier Sites
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<int, string> ListSupplierSites( bool v, int regionId = 0, string mainSite = null )
+        {
+            Dictionary<int, string> siteOptions = new Dictionary<int, string>();
+            List<object> parameters = new List<object>()
+            {
+                new SqlParameter("regionId", regionId),
+                new SqlParameter("sAct", (int)Status.Active),
+                new SqlParameter("userid", (CurrentUser != null) ? CurrentUser.Id : 0),
+                new SqlParameter("mainSite", (!string.IsNullOrEmpty(mainSite) ? mainSite : (object)DBNull.Value)),
+            };
+
+            string query = @"
+                            SELECT DISTINCT ss.Id AS [TKey], ss.Name AS [TValue]
+                            FROM [dbo].[SupplierSite] ss
+                            WHERE ss.[Status] = @sAct";
+
+            if ( regionId > 0 )
+            {
+                query += " AND ss.[RegionId] = @regionId";
+            }
+            if ( !string.IsNullOrEmpty( mainSite ) )
+            {
+                query += " AND ss.Name LIKE @mainSite + '%'";
+            }
+
+            query += " ORDER BY ss.[Name] ASC";
+
+            var model = context.Database.SqlQuery<IntStringKeyValueModel>( query, parameters.ToArray() ).ToList();
+            foreach ( var k in model )
+            {
+                siteOptions[ k.TKey ] = ( k.TValue ?? "" ).Trim();
+            }
             return siteOptions;
         }
 
@@ -338,128 +388,155 @@ namespace ACT.Core.Services
         /// <param name="pm"></param>
         /// <param name="csm"></param>
         /// <returns></returns>
-        public List<SiteCustomModel> List1( PagingModel pm, CustomSearchModel csm )
+        public List<SiteCustomModel> List1( PagingModel pm, CustomSearchModel csm, bool isSupplierSite = false )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
             {
                 csm.ToDate = csm.ToDate?.AddDays( 1 );
             }
 
-            // Parameters
+            string siteType = isSupplierSite ? "SupplierSite" : "CustomerSite";
 
             #region Parameters
-
             List<object> parameters = new List<object>()
             {
-                { new SqlParameter( "skip", pm.Skip ) },
-                { new SqlParameter( "take", pm.Take ) },
-                { new SqlParameter( "csmSiteId", csm.SiteId ) },
-                { new SqlParameter( "csmClientId", csm.ClientId ) },
-                { new SqlParameter( "csmCustomerId", csm.CustomerId ) },
-                { new SqlParameter( "csmRegionId", csm.RegionId ) },
-                { new SqlParameter( "query", csm.Query ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "csmToDate", csm.ToDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
-                { new SqlParameter( "csmFromDate", csm.FromDate ?? ( object ) DBNull.Value ) },
-                { new SqlParameter("csmMainSite", (!string.IsNullOrEmpty(csm.MainSite) ? csm.MainSite : (object)DBNull.Value)) }
+                new SqlParameter("@siteType", siteType),
+                new SqlParameter("@skip", pm.Skip),
+                new SqlParameter("@take", pm.Take),
+                new SqlParameter("@csmSiteId", csm.SiteId),
+                new SqlParameter("@csmClientId", csm.ClientId),
+                new SqlParameter("@csmCustomerId", csm.CustomerId),
+                new SqlParameter("@csmRegionId", csm.RegionId),
+                new SqlParameter("@query", csm.Query ?? (object)DBNull.Value),
+                new SqlParameter("@csmToDate", csm.ToDate ?? (object)DBNull.Value),
+                new SqlParameter("@userid", (CurrentUser != null) ? CurrentUser.Id : 0),
+                new SqlParameter("@csmFromDate", csm.FromDate ?? (object)DBNull.Value),
+                new SqlParameter("@csmMainSite", (!string.IsNullOrEmpty(csm.MainSite) ? csm.MainSite : (object)DBNull.Value))
             };
-
             #endregion
 
-            string query = @"
-                            SELECT
-                                s.Id,
-                                s.Name AS MainSite,
-                                s.CreatedOn,
-                                c.[CompanyName] AS [ClientName],
-                                r.[Description] AS [RegionName],
-                                cc.[Id] AS [ClientCustomerId],
-                                cc.[CustomerName] AS [CustomerName],
-                                os.Name AS OptionalSite,
-                                (SELECT COUNT(1) FROM [dbo].[ClientSite] cs2 WHERE cs2.[SiteId]=s.[Id]) AS [ClientCount],
-                                (SELECT COUNT(1) FROM [dbo].[SiteBudget] sb WHERE sb.[SiteId]=s.[Id]) AS [BudgetCount],
-                                (SELECT COUNT(1) FROM [dbo].[Contact] con WHERE s.Id=con.ObjectId AND con.ObjectType='CustomerSite') AS [ContactCount],
-                                s.Status,
-                                s.RegionId,
-                                a.Addressline1 AS AddressLine1,
-                                a.Addressline2 AS AddressLine2,
-                                a.Town,
-                                a.PostalCode
-                            FROM
-                                [dbo].[Site] s
-                                LEFT OUTER JOIN [dbo].[ClientSite] cs ON cs.[SiteId] = s.[Id]
-                                LEFT OUTER JOIN [dbo].[Site] os ON os.[Id] = cs.[OptionalSiteId]
-                                LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cs.[ClientCustomerId] = cc.[Id]
-                                LEFT OUTER JOIN [dbo].[Client] c ON cc.[ClientId] = c.[Id]
-                                LEFT OUTER JOIN [dbo].[Region] r ON r.[Id] = s.[RegionId]
-                                LEFT OUTER JOIN [dbo].[Address] a ON a.ObjectId = s.Id AND a.ObjectType = 'CustomerSite' AND a.Status = 1";
+            string query;
 
+            if ( isSupplierSite )
+            {
+                query = @"
+                        SELECT
+                            ss.Id,
+                            ss.Name AS MainSite,
+                            ss.Description,
+                            ss.CreatedOn,
+                            ss.SiteType,
+                            r.[Description] AS [RegionName],
+                            NULL AS [ClientName],
+                            NULL AS [ClientCustomerId],
+                            NULL AS [CustomerName],
+                            NULL AS OptionalSite,
+                            0 AS [ClientCount],
+                            (SELECT COUNT(1) FROM [dbo].[SiteBudget] sb WHERE sb.[SiteId]=ss.[Id]) AS [BudgetCount],
+                            (SELECT COUNT(1) FROM [dbo].[Contact] con WHERE ss.Id=con.ObjectId AND con.ObjectType = @siteType) AS [ContactCount],
+                            ss.Status,
+                            ss.RegionId,
+                            a.Addressline1 AS AddressLine1,
+                            a.Addressline2 AS AddressLine2,
+                            a.Town,
+                            a.PostalCode
+                        FROM
+                            [dbo].[SupplierSite] ss
+                            LEFT OUTER JOIN [dbo].[Region] r ON r.[Id] = ss.[RegionId]
+                            LEFT OUTER JOIN [dbo].[Address] a ON a.ObjectId = ss.Id AND a.ObjectType = @siteType AND a.Status = 1
+                        WHERE (1=1)";
+            }
+            else
+            {
+                query = @"
+                        SELECT
+                            s.Id,
+                            s.Name AS MainSite,
+                            s.CreatedOn,
+                            s.SiteType,
+                            r.[Description] AS [RegionName],
+                            c.[CompanyName] AS [ClientName],
+                            cc.[Id] AS [ClientCustomerId],
+                            cc.[CustomerName] AS [CustomerName],
+                            os.Name AS OptionalSite,
+                            (SELECT COUNT(1) FROM [dbo].[ClientSite] cs2 WHERE cs2.[SiteId]=s.[Id]) AS [ClientCount],
+                            (SELECT COUNT(1) FROM [dbo].[SiteBudget] sb WHERE sb.[SiteId]=s.[Id]) AS [BudgetCount],
+                            (SELECT COUNT(1) FROM [dbo].[Contact] con WHERE s.Id=con.ObjectId AND con.ObjectType = @siteType) AS [ContactCount],
+                            s.Status,
+                            s.RegionId,
+                            a.Addressline1 AS AddressLine1,
+                            a.Addressline2 AS AddressLine2,
+                            a.Town,
+                            a.PostalCode
+                        FROM
+                            [dbo].[Site] s
+                            INNER JOIN [dbo].[ClientSite] cs ON cs.[SiteId] = s.[Id]
+                            LEFT OUTER JOIN [dbo].[Site] os ON os.[Id] = cs.[OptionalSiteId]
+                            LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cs.[ClientCustomerId] = cc.[Id]
+                            LEFT OUTER JOIN [dbo].[Client] c ON cc.[ClientId] = c.[Id]
+                            LEFT OUTER JOIN [dbo].[Region] r ON r.[Id] = s.[RegionId]
+                            LEFT OUTER JOIN [dbo].[Address] a ON a.ObjectId = s.Id AND a.ObjectType = @siteType AND a.Status = 1
+                        WHERE (1=1)";
+            }
 
-            // WHERE
+            #region WHERE clauses
 
-            #region WHERE
-
-            query += " WHERE (1=1)";
-
-            // Limit to only show Sites for logged in user 
             if ( CurrentUser.RoleType == RoleType.PSP )
             {
-                query = $@"{query} AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId WHERE pc.ClientId=c.Id AND pu.UserId=@userid ) ";
+                if ( !isSupplierSite )
+                {
+                    query += @" AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu 
+                        INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId=pu.PSPId 
+                        WHERE pc.ClientId=c.Id AND pu.UserId=@userid)";
+                }
             }
             else if ( CurrentUser.RoleType == RoleType.Client )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
+                if ( !isSupplierSite )
+                {
+                    query += @" AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu 
+                        WHERE cu.UserId=@userid AND cu.ClientId=c.Id)";
+                }
             }
 
-            #endregion
-
-            // Custom Search
-
-            #region Custom Search
-
-            if ( csm.ClientId != 0 )
+            if ( csm.ClientId != 0 && !isSupplierSite )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs, [dbo].[ClientCustomer] cc WHERE s.Id=cs.SiteId AND cc.Id=cs.ClientCustomerId AND cc.ClientId=@csmClientId) ";
+                query += @" AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs, [dbo].[ClientCustomer] cc 
+                    WHERE s.Id=cs.SiteId AND cc.Id=cs.ClientCustomerId AND cc.ClientId=@csmClientId)";
             }
-            if ( csm.CustomerId != 0 )
+            if ( csm.CustomerId != 0 && !isSupplierSite )
             {
-                query = $"{query} AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs WHERE s.Id=cs.SiteId AND cs.ClientCustomerId=@csmCustomerId) ";
+                query += @" AND EXISTS(SELECT 1 FROM [dbo].[ClientSite] cs 
+                    WHERE s.Id=cs.SiteId AND cs.ClientCustomerId=@csmCustomerId)";
             }
             if ( !string.IsNullOrEmpty( csm.MainSite ) )
             {
-                query = $"{query} AND s.Name LIKE @csmMainSite + '%'";
+                query += isSupplierSite ? " AND ss.Name LIKE @csmMainSite + '%'" : " AND s.Name LIKE @csmMainSite + '%'";
             }
             if ( csm.SiteId != 0 )
             {
-                query = $"{query} AND s.SiteId=@csmSiteId ";
+                query += isSupplierSite ? " AND ss.Id=@csmSiteId" : " AND s.Id=@csmSiteId";
             }
             if ( csm.RegionId != 0 )
             {
-                query = $"{query} AND s.RegionId=@csmRegionId ";
+                query += isSupplierSite ? " AND ss.RegionId=@csmRegionId" : " AND s.RegionId=@csmRegionId";
             }
-
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue )
             {
-                query = $"{query} AND (s.CreatedOn >= @csmFromDate AND s.CreatedOn <= @csmToDate) ";
+                query += isSupplierSite ? " AND (ss.CreatedOn >= @csmFromDate AND ss.CreatedOn <= @csmToDate)"
+                                        : " AND (s.CreatedOn >= @csmFromDate AND s.CreatedOn <= @csmToDate)";
             }
-            else if ( csm.FromDate.HasValue || csm.ToDate.HasValue )
+            else if ( csm.FromDate.HasValue )
             {
-                if ( csm.FromDate.HasValue )
-                {
-                    query = $"{query} AND (s.CreatedOn>=@csmFromDate) ";
-                }
-                if ( csm.ToDate.HasValue )
-                {
-                    query = $"{query} AND (s.CreatedOn<=@csmToDate) ";
-                }
+                query += isSupplierSite ? " AND (ss.CreatedOn >= @csmFromDate)" : " AND (s.CreatedOn >= @csmFromDate)";
             }
-
+            else if ( csm.ToDate.HasValue )
+            {
+                query += isSupplierSite ? " AND (ss.CreatedOn <= @csmToDate)" : " AND (s.CreatedOn <= @csmToDate)";
+            }
             #endregion
 
-            // Normal Search
-
             #region Normal Search
-
             if ( !string.IsNullOrEmpty( csm.Query ) )
             {
                 query = string.Format( @"{0} AND (s.[Name] LIKE '%{1}%' OR
@@ -488,7 +565,6 @@ namespace ACT.Core.Services
                                                   cs.[ClientCustomerNumber] LIKE '%{1}%'
                                              ) ", query, csm.Query.Trim() );
             }
-
             #endregion
 
             // ORDER
@@ -505,11 +581,11 @@ namespace ACT.Core.Services
             {
                 foreach ( SiteCustomModel item in model.Where( c => c.ContactCount > 0 ) )
                 {
-                    item.Contacts = context.Contacts.Where( c => c.ObjectId == item.Id && c.ObjectType == "CustomerSite" ).ToList();
+                    item.Contacts = context.Contacts.Where( c => c.ObjectId == item.Id && c.ObjectType == siteType ).ToList();
                 }
             }
 
-            if ( model.NullableAny( p => p.ClientCount > 0 ) )
+            if ( !isSupplierSite && model.NullableAny( p => p.ClientCount > 0 ) )
             {
                 foreach ( SiteCustomModel item in model.Where( p => p.ClientCount > 0 ) )
                 {
@@ -708,6 +784,46 @@ namespace ACT.Core.Services
             return context.Sites.FirstOrDefault( s => s.XCord == xCord && s.YCord == yCord );
         }
 
+
+        /// <summary>
+        /// Create Supplier Site
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public SupplierSite CreateSupplierSite( SupplierSite supplierSite )
+        {
+            if ( supplierSite == null )
+            {
+                throw new ArgumentNullException( nameof( supplierSite ) );
+            }
+
+            supplierSite.CreatedOn = DateTime.Now;
+            supplierSite.ModifiedOn = DateTime.Now;
+            supplierSite.ModifiedBy = CurrentUser?.Username ?? "System";
+
+            if ( ExistByName( supplierSite.Name ) )
+            {
+                throw new InvalidOperationException( $"A supplier site with the name '{supplierSite.Name}' already exists." );
+            }
+
+            context.SupplierSites.Add( supplierSite );
+
+            context.SaveChanges();
+
+            return supplierSite;
+        }
+
+        /// <summary>
+        /// Update supplier site entity using SupplierSite model
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public void UpdateSupplierSite( SupplierSite site )
+        {
+            context.Entry( site ).State = EntityState.Modified;
+            context.SaveChanges();
+        }
+
         /// <summary>
         /// Gets a site using the specified site code
         /// </summary>
@@ -726,6 +842,11 @@ namespace ACT.Core.Services
         public bool ExistByClientAndName( int clientId, string siteName )
         {
             return context.Sites.Any( s => s.Name.Trim() == siteName.Trim() && s.ClientSites.Any( cs => cs.ClientCustomer.ClientId == clientId ) );
+        }
+
+        public bool ExistByName( string siteName )
+        {
+            return context.Sites.Any( s => s.Name.Trim() == siteName.Trim() );
         }
     }
 }

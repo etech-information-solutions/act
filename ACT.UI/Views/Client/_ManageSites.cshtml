@@ -44,189 +44,113 @@
             <th data-name="Count">
                 #
             </th>
-            <th data-name="CreatedOn" data-column="s.CreatedOn">
+            <th data-name="CreatedOn" data-column="ss.CreatedOn">
                 Date
             </th>
-            @*<th data-name="ClientName" data-column="c.CompanyName">
-                Client
-            </th>*@
+            <th data-name="SiteName" data-column="ss.Name">
+                Main Site
+            </th>
+            <th data-name="Description" data-column="ss.Description">
+                Description
+            </th>
+            <th data-name="SiteType" data-column="ss.SiteType">
+                Site Type
+            </th>
+            <th data-name="ContactCount" data-column="ContactCount">
+                Contacts
+            </th>
             <th data-name="RegionName" data-column="r.Name">
                 Region
             </th>
-            <th data-name="SiteName" data-column="s.Name">
-                Name
-            </th>
-            <th data-name="Coordinates">
-                Coordinates
-            </th>
-            <th data-name="ContactNo" data-column="s.ContactNo">
-                Contact
-            </th>
-            <th data-name="Address" data-column="s.FinanceContact">
-                Finance
-            </th>
-            <th data-name="PostalCode" data-column="s.ReceivingContact">
-                Receiver
-            </th>
-            <th data-name="PlanningPoint" data-column="s.PlanningPoint">
-                Planning Point
-            </th>
-            <th data-name="SiteType" data-column="s.SiteType">
-                Site Type
-            </th>
-            <th data-name="Counts">
-
+            <th data-name="Status" data-column="ss.Status">
+                Status
             </th>
             <th data-name="Actions">
                 Actions
             </th>
         </tr>
     </thead>
-
     <tbody>
         @if ( Model != null && items != null && items.Count() > 0 )
         {
             foreach ( SiteCustomModel item in items )
             {
                 Status status = ( Status ) item.Status;
-
                 string active = ( status == Status.Active ) ? "active" : "inactive";
                 string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
-                string italic = item.SiteId.HasValue ? "italic" : "";
-
-                string siteTypeName = ( item.SiteType != null ) ? ( ( SiteType ) item.SiteType ).GetDisplayText() : "N/A";
-
-                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active @italic">
-
-                    <td width="1%">
-                        @count
-                    </td>
+                <tr id="tr-@item.Id-item" class="tr-@item.Id-item @active">
+                    <td width="1%">@count</td>
                     <td>
                         @item.CreatedOn.ToString( "yyyy-MM-dd" )
-
-                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="Site">
-                            <img alt="" src="@Url.Content( "~/Images/duplicate-content.png" )" style="max-width: 15px;" />
+                        <a class="block" rel="tipsyE" title="Review audit log" data-audit-log="1" data-pid="@item.Id" data-type="CustomerSite">
+                            <img alt="" src="@Url.Content("~/Images/duplicate-content.png")" style="max-width: 15px;" />
                             <span></span>
                         </a>
                     </td>
-                    @*<td>
-                        @item.ClientName
-                    </td>*@
+                    <td>
+                        @item.MainSite
+                    </td>
+                    <td>
+                        @item.Description
+                    </td>
+                    <td>
+                        @item.SiteTypeName
+                    </td>
+                    <td width="10%">
+                        @if ( item.Contacts != null && item.Contacts.Any( c => c.Status == ( Int32 ) Status.Active ) )
+                        {
+
+                            var activeContactCount = item.Contacts?.Count( c => c.Status == ( Int32 ) Status.Active );
+
+                            <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
+
+                                <a data-sticky-one="1" data-target="#customersite-@item.Id-contacts" data-trigger="mouseover" data-arrow="center-right" data-title="Contacts">
+                                    <i class="fa fa-phone"></i>@activeContactCount contacts
+                                </a>
+
+                                <div id="customersite-@item.Id-contacts" class="none">
+                                    <ul class="list" style="max-height: 200px; overflow-y: auto;">
+                                        @foreach ( Contact d in item.Contacts.Where( c => c.Status == ( Int32 ) Status.Active ) )
+                                        {
+                                            <li style="line-height: 20px;">
+                                                @d.ContactName -
+                                                <a href="tel:@d.ContactCell">@d.ContactCell</a>
+                                                <a href="mailto:@d.ContactEmail">@d.ContactEmail</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <span>@item.ContactCount contacts</span>
+                        }
+                    </td>
                     <td>
                         @item.RegionName
                     </td>
                     <td>
-                        @item.Name
-
-                        @if ( item.SiteId.HasValue )
-                        {
-                            <a class="block" rel="tipsyE" title="I am a sub-site">
-                                <img alt="" src="@Url.Content( "~/Images/sub.png" )" style="max-width: 22px;" />
-                                <span></span>
-                            </a>
-                        }
+                        @status.GetDisplayText()
                     </td>
-                    <td>
-                        @item.XCord,@item.YCord
-                    </td>
-                    <td>
-                        @item.ContactName <br />
-                        @item.ContactNo
-                    </td>
-                    <td>
-                        @item.FinanceContact <br />
-                        @item.FinanceContactNo
-                    </td>
-                    <td>
-                        @item.ReceivingContact <br />
-                        @item.ReceivingContactNo
-                    </td>
-                    <td>
-                        @item.PlanningPoint
-                    </td>
-                    <td>
-                        @siteTypeName
-                    </td>
-                    <td width="8%">
-                        <ul class="list">
-                            <li>
-                                <a data-sticky-one="1" data-target="#site-@item.Id-subsites" data-trigger="mouseover" data-arrow="center-right" data-title="Subsites">
-                                    @item.SubSiteCount Subsites
-                                </a>
-
-                                <div id="site-@item.Id-subsites" class="none">
-                                    @if ( item.SubSites.NullableAny() )
-                                    {
-                                        <ul class="list">
-                                            @foreach ( string ss in item.SubSites )
-                                            {
-                                                <li style="line-height: 20px;">
-                                                    @ss
-                                                </li>
-                                            }
-                                        </ul>
-                                    }
-                                    else
-                                    {
-                                        <div class="message-warn">
-                                            This Site has no sub-sites linked
-                                        </div>
-                                    }
-                                </div>
-
-                            </li>
-                            <li>
-                                <a data-sticky-one="1" data-target="#site-@item.Id-clients" data-trigger="mouseover" data-arrow="center-right" data-title="Customers">
-                                    @item.ClientCount Customers
-                                </a>
-
-                                <div id="site-@item.Id-clients" class="none">
-                                    @if ( item.Clients.NullableAny() )
-                                    {
-                                        <ul class="list">
-                                            @foreach ( string c in item.Clients )
-                                            {
-                                                <li style="line-height: 20px;">
-                                                    @c
-                                                </li>
-                                            }
-                                        </ul>
-                                    }
-                                    else
-                                    {
-                                        <div class="message-warn">
-                                            This site has no clients linked
-                                        </div>
-                                    }
-                                </div>
-                            </li>
-                            @*<li>
-                                @Html.ActionLink( item.BudgetCount + " Budgets", "SiteDetails", new { id = item.Id }, new { @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
-                            </li>*@
-                        </ul>
-                    </td>
-
-                    <td width="9%">
-
+                    <td width="15%">
                         <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
-                            @Html.ActionLink( "Details", "SiteDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item", @style = "margin-left: 0;" } )
-
-                            @Html.ActionLink( "Edit", "EditSite", new { id = item.Id, returnView = "ManageSites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            @Html.ActionLink( "Details", "SiteDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            @Html.ActionLink( "Edit", "EditSite", new { id = item.Id, returnView = "managesites" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+                            @Html.ActionLink( enable, "DeleteSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managesites", @rel = "tipsyE", @title = enable + " this item?" } )
                         </div>
 
-                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
-                            @Html.ActionLink( enable, "DeleteSite", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#managesites", @rel = "tipsyE", @title = enable + " this item?", @style = "margin-left: 0;" } )
-                        </div>
+                        <a href="@Url.Action( "SiteContacts", "Client", new { id = item.Id } )" data-details="1" data-id="@item.Id" data-target=".tr-@item.Id-item">
+                            <i class="fa fa-phone"></i>Contacts
+                        </a>
                     </td>
                 </tr>
-
                 count++;
             }
         }
-
     </tbody>
-
 </table>
 
 @Html.Partial( "_Paging" )

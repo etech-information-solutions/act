@@ -3,6 +3,8 @@ namespace ACT.Core.Models.Custom
 {
     using System;
     using System.Collections.Generic;
+
+    using ACT.Core.Enums;
     using ACT.Data.Models;
 
     public partial class SiteCustomModel
@@ -67,5 +69,14 @@ namespace ACT.Core.Models.Custom
         public List<string> Clients { get; set; }
 
         public List<string> SubSites { get; set; }
+
+        public string SiteTypeName
+        {
+            get
+            {
+                if ( !SiteType.HasValue ) return string.Empty;
+                return ( ( SiteType ) SiteType.Value ).GetStringValue();
+            }
+        }
     }
 }

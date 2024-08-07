@@ -179,52 +179,49 @@ namespace ACT.UI.Controllers
                     break;
 
                 case "managesites":
-
-                    #region Manage Sites
-
-                    using ( SiteService service = new SiteService() )
-                    using ( AddressService aservice = new AddressService() )
+                    #region Manage Supplier Sites
+                    using ( SiteService sservice = new SiteService() )
                     {
-                        csv = string.Format( "Date Created, Name, Description, X Coord, Y Coord, Address Line 1, Address Line 2, Town, Province, Postal Code, Contact Name, Contact No, Finance Contact, Finance No., Receiver Contact, Receiver No., Planning Point, Depot, Chep Site Code, Site Type, Status {0}", Environment.NewLine );
-
-                        List<SiteCustomModel> sites = service.List1( pm, csm );
-
+                        csv = string.Format( "Date Created,Main Site,Description, Site Type,Contacts,Address,Region,Status{0}", Environment.NewLine );
+                        // Pass true if supplier site
+                        List<SiteCustomModel> sites = sservice.List1( pm, csm, true );
                         if ( sites.NullableAny() )
                         {
                             foreach ( SiteCustomModel item in sites )
                             {
-                                Address address = aservice.Get( item.Id, "Site" );
+                                string address = string.Join( ", ", new[]
+                                {
+                                    item.AddressLine1,
+                                    item.AddressLine2,
+                                    item.Town,
+                                    item.PostalCode
+                                }.Where( s => !string.IsNullOrEmpty( s ) ) );
 
-                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21} {22}",
-                                                    csv,
-                                                    "\"" + item.CreatedOn + "\"",
-                                                    "\"" + item.Name + "\"",
-                                                    "\"" + item.Description + "\"",
-                                                    "\"" + item.XCord + "\"",
-                                                    "\"" + item.YCord + "\"",
-                                                    "\"" + address?.Addressline1 + "\"",
-                                                    "\"" + address?.Addressline2 + "\"",
-                                                    "\"" + address?.Town + "\"",
-                                                    "\"" + ( address != null ? address.Province.Description : string.Empty ) + "\"",
-                                                    "\"" + item.PostalCode + "\"",
-                                                    "\"" + item.ContactName + "\"",
-                                                    "\"" + item.ContactNo + "\"",
-                                                    "\"" + item.FinanceContact + "\"",
-                                                    "\"" + item.FinanceContactNo + "\"",
-                                                    "\"" + item.ReceivingContact + "\"",
-                                                    "\"" + item.ReceivingContactNo + "\"",
-                                                    "\"" + item.PlanningPoint + "\"",
-                                                    "\"" + item.Depot + "\"",
-                                                    "\"" + item.SiteCodeChep + "\"",
-                                                    "\"" + ( ( item.SiteType.HasValue ) ? ( ( SiteType ) item.SiteType ).GetDisplayText() : string.Empty ) + "\"",
-                                                    "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
-                                                    Environment.NewLine );
+                                string contacts = "";
+                                if ( item.Contacts != null && item.Contacts.Any( c => c.Status == ( Int32 ) Status.Active ) )
+                                {
+                                    contacts = string.Join( "; ", item.Contacts
+                                        .Where( c => c.Status == ( Int32 ) Status.Active )
+                                        .Select( c => $"" +
+                                        $"{c.ContactName} - " +
+                                        $"{c.ContactCell} - " +
+                                        $"{c.ContactEmail}" ) );
+                                }
+
+                                csv += string.Format( "{0},{1},{2},{3},{4},{5},{6},{7},{8}",
+                                "\"" + item.CreatedOn.ToString( "yyyy-MM-dd" ) + "\"",
+                                "\"" + item.MainSite + "\"",
+                                "\"" + item.Description + "\"",
+                                "\"" + item.SiteTypeName + "\"",
+                                "\"" + contacts + "\"",
+                                "\"" + address + "\"",
+                                "\"" + item.RegionName + "\"",
+                                "\"" + ( ( Status ) item.Status ).GetDisplayText() + "\"",
+                                Environment.NewLine );
                             }
                         }
                     }
-
                     #endregion
-
                     break;
 
                 case "linkproducts":
@@ -3357,7 +3354,1665 @@ namespace ACT.UI.Controllers
         #endregion
 
 
-        #region Manage Sites
+
+        #region Manage Supplier Sites
+
+        //
+        // GET: /Client/SiteDetails/5
+        public ActionResult SiteDetails( int id, bool layout = true )
+        {
+            using ( SiteService sservice = new SiteService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( ContactService contactService = new ContactService() )
+            {
+                SupplierSite site = sservice.GetSupplierSiteById( id );
+
+                if ( site == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+                    return PartialView( "_AccessDenied" );
+                }
+
+                Address address = aservice.Get( site.Id, "SupplierSite" );
+                List<Contact> contacts = contactService.List( site.Id, "SupplierSite" );
+
+                ViewBag.Address = address;
+                ViewBag.Contacts = contacts;
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                return View( site );
+            }
+        }
+
+        // GET: Client/AddSite
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddSite()
+        {
+            SupplierSiteViewModel model = new SupplierSiteViewModel()
+            {
+                EditMode = true,
+                Clients = new List<ClientCustomer>(),
+                SiteBudgets = new List<SiteBudget>(),
+                Address = new AddressViewModel() { EditMode = true },
+                Contacts = new List<Contact>(),
+            };
+
+            return View( model );
+        }
+
+        // POST: Client/Site
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddSite( SupplierSiteViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the Supplier Site was not created. Please correct all errors and try again.", NotificationType.Error );
+                return View( model );
+            }
+
+            using ( SiteService sservice = new SiteService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( RegionService regionService = new RegionService() )
+            using ( ContactService cservice = new ContactService() )
+            {
+                #region Validation
+                if ( sservice.ExistByName( model.MainSite?.Trim()?.ToLower() ) )
+                {
+                    Notify( $"Sorry, a Supplier Site with the name {model.MainSite} already exists.", NotificationType.Error );
+                    return View( model );
+                }
+                #endregion
+
+                #region Create Supplier Site
+                SupplierSite supplierSite = new SupplierSite()
+                {
+                    Name = model.MainSite,
+                    Depot = model.Depot,
+                    RegionId = model.Address?.ProvinceId,
+                    PlanningPoint = model.PlanningPoint,
+                    LocationNumber = model.LocationNumber,
+                    Status = ( int ) model.Status,
+                    Description = model.Description,
+                    AccountCode = model.AccountCode,
+                    SiteType = ( int ) model.SiteType,
+                    SiteCodeChep = model.SiteCodeChep,
+                };
+
+                int provinceId = model.Address?.ProvinceId ?? 0;
+                int? matchingRegionId = regionService.FindMatchingRegionId( provinceId );
+
+                if ( !matchingRegionId.HasValue )
+                {
+                    ModelState.AddModelError( "Address.ProvinceId", "Could not find a matching Region for the selected Province." );
+                    return View( model );
+                }
+
+                supplierSite.RegionId = matchingRegionId.Value;
+                supplierSite = sservice.CreateSupplierSite( supplierSite );
+                #endregion
+
+                #region Create Address
+                if ( model.Address != null )
+                {
+                    Address address = new Address()
+                    {
+                        ObjectId = supplierSite.Id,
+                        ObjectType = "SupplierSite",
+                        Town = model.Address.Town,
+                        Status = ( int ) Status.Active,
+                        Type = ( int ) AddressType.Postal,
+                        PostalCode = model.Address.PostCode,
+                        Addressline1 = model.Address.AddressLine1,
+                        Addressline2 = model.Address.AddressLine2,
+                        ProvinceId = model.Address.ProvinceId,
+                    };
+
+                    aservice.Create( address );
+                }
+                #endregion
+
+                #region Contacts
+                if ( model.Contacts != null && model.Contacts.Any( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                {
+                    foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                    {
+                        Contact c = cservice.Get( mc.ContactEmail, "SupplierSite" );
+
+                        if ( c == null )
+                        {
+                            c = new Contact()
+                            {
+                                ObjectId = supplierSite.Id,
+                                JobTitle = mc.JobTitle,
+                                ObjectType = "SupplierSite",
+                                ContactCell = mc.ContactCell,
+                                ContactName = mc.ContactName,
+                                Status = mc.Status,
+                                ContactEmail = mc.ContactEmail,
+                                ContactTitle = mc.ContactTitle,
+                            };
+
+                            cservice.Create( c );
+                        }
+                        else
+                        {
+                            // Update existing contact
+                            c.JobTitle = mc.JobTitle;
+                            c.ContactCell = mc.ContactCell;
+                            c.ContactName = mc.ContactName;
+                            c.Status = mc.Status;
+                            c.ContactEmail = mc.ContactEmail;
+                            c.ContactTitle = mc.ContactTitle;
+
+                            cservice.Update( c );
+                        }
+                    }
+                }
+                #endregion
+
+                scope.Complete();
+            }
+
+            Notify( "The Supplier Site was successfully created.", NotificationType.Success );
+
+            return ManageSites( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // GET: Client/EditSite/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditSite( int id )
+        {
+            using ( SiteService service = new SiteService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( ContactService cservice = new ContactService() )
+            using ( RegionService regionService = new RegionService() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            {
+                SupplierSite site = service.GetSupplierSiteById( id );
+
+                if ( site == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+                    return PartialView( "_AccessDenied" );
+                }
+
+                Address address = aservice.Get( site.Id, "SupplierSite" );
+                List<Contact> contacts = cservice.List( site.Id, "SupplierSite" ) ?? new List<Contact>();
+
+                SupplierSiteViewModel model = new SupplierSiteViewModel
+                {
+                    Id = site.Id,
+                    EditMode = true,
+                    MainSite = site.Name,
+                    Depot = site.Depot,
+                    Description = site.Description,
+                    AccountCode = site.AccountCode,
+                    Status = ( Status ) site.Status,
+                    SiteCodeChep = site.SiteCodeChep,
+                    PlanningPoint = site.PlanningPoint,
+                    LocationNumber = site.LocationNumber,
+                    SiteType = site.SiteType.HasValue ? ( SiteType ) site.SiteType : SiteType.All,
+                    Contacts = contacts,
+                    // Address
+                    Address = address != null
+                    ? new AddressViewModel()
+                    {
+                        EditMode = true,
+                        Id = address.Id,
+                        Town = address.Town,
+                        PostCode = address.PostalCode,
+                        AddressLine1 = address.Addressline1,
+                        AddressLine2 = address.Addressline2,
+                        ProvinceId = address.ProvinceId ?? 0,
+                        Latitude = address.Latitude,
+                        Longitude = address.Longitude,
+                    }
+                    : new AddressViewModel() { EditMode = true }
+                };
+
+                return View( model );
+            }
+        }
+
+        // POST: Client/EditSite/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditSite( SupplierSiteViewModel model )
+        {
+
+            // Contact Id is null on subsequent entries. When adding another contact row the new Id is null and the ModelState fails. This is a pragmatic solution for now.
+            if ( model.Contacts != null )
+            {
+                foreach ( var contact in model.Contacts.Where( c => c.Id == 0 ) )
+                {
+                    ModelState.Remove( $"Contacts[{model.Contacts.IndexOf( contact )}].Id" );
+                }
+            }
+
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the selected Site was not updated. Please correct all errors and try again.", NotificationType.Error );
+                return View( model );
+            }
+
+            using ( SiteService sservice = new SiteService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( RegionService regionService = new RegionService() )
+            using ( ContactService cservice = new ContactService() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            {
+                SupplierSite site = sservice.GetSupplierSiteById( model.Id );
+
+                #region Validations
+                if ( site == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+                    return PartialView( "_AccessDenied" );
+                }
+
+                #endregion
+
+                #region Update Site
+
+                site.Name = model.MainSite;
+                site.Depot = model.Depot;
+                site.Description = model.Description;
+                site.AccountCode = model.AccountCode;
+                site.Status = ( int ) model.Status;
+                site.SiteType = ( int ) model.SiteType;
+                site.SiteCodeChep = model.SiteCodeChep;
+                site.PlanningPoint = model.PlanningPoint;
+                site.LocationNumber = model.LocationNumber;
+
+                int provinceId = model.Address?.ProvinceId ?? 0;
+                int? matchingRegionId = regionService.FindMatchingRegionId( provinceId );
+
+                if ( matchingRegionId.HasValue )
+                {
+                    site.RegionId = matchingRegionId.Value;
+                }
+
+                sservice.UpdateSupplierSite( site );
+
+                #endregion
+
+                #region Update Address
+
+                if ( model.Address != null )
+                {
+                    Address address = aservice.Get( site.Id, "SupplierSite" ) ?? new Address()
+                    {
+                        ObjectId = site.Id,
+                        ObjectType = "SupplierSite",
+                        Status = ( int ) Status.Active,
+                        Type = ( int ) AddressType.Postal
+                    };
+
+                    address.Town = model.Address.Town;
+                    address.PostalCode = model.Address.PostCode;
+                    address.Addressline1 = model.Address.AddressLine1;
+                    address.Addressline2 = model.Address.AddressLine2;
+                    address.ProvinceId = model.Address.ProvinceId;
+
+                    if ( address.Id == 0 )
+                    {
+                        aservice.Create( address );
+                    }
+                    else
+                    {
+                        aservice.Update( address );
+                    }
+                }
+
+                #endregion
+
+                #region Update Contacts
+
+                if ( model.Contacts != null && model.Contacts.Any() )
+                {
+                    List<Contact> existingContacts = cservice.List( site.Id, "SupplierSite" );
+
+                    foreach ( Contact contact in model.Contacts )
+                    {
+                        if ( contact.Id > 0 )
+                        {
+                            // Update existing contact
+                            Contact existingContact = existingContacts.FirstOrDefault( c => c.Id == contact.Id );
+                            if ( existingContact != null )
+                            {
+                                existingContact.ContactName = contact.ContactName;
+                                existingContact.ContactTitle = contact.ContactTitle;
+                                existingContact.ContactCell = contact.ContactCell;
+                                existingContact.ContactEmail = contact.ContactEmail;
+                                existingContact.JobTitle = contact.JobTitle;
+                                existingContact.Status = contact.Status;
+
+                                cservice.Update( existingContact );
+                            }
+                        }
+                        else
+                        {
+                            // Create new contact only if it doesn't already exist
+                            if ( !existingContacts.Any( c => c.ContactEmail == contact.ContactEmail ) )
+                            {
+                                Contact newContact = new Contact
+                                {
+                                    ObjectId = site.Id,
+                                    ObjectType = "SupplierSite",
+                                    ContactName = contact.ContactName,
+                                    ContactTitle = contact.ContactTitle,
+                                    ContactCell = contact.ContactCell,
+                                    ContactEmail = contact.ContactEmail,
+                                    JobTitle = contact.JobTitle,
+                                    Status = contact.Status
+                                };
+
+                                cservice.Create( newContact );
+                            }
+                        }
+                    }
+                }
+
+                #endregion
+
+                scope.Complete();
+            }
+
+            Notify( "The Supplier Site was successfully updated.", NotificationType.Success );
+
+            return ManageSites( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // POST: Client/DeleteSite/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteSite( SupplierSiteViewModel model )
+        {
+            using ( SiteService service = new SiteService() )
+            {
+                SupplierSite site = service.GetSupplierSiteById( model.Id );
+
+                if ( site == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+                    return PartialView( "_AccessDenied" );
+                }
+
+                site.Status = ( ( ( Status ) site.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.UpdateSupplierSite( site );
+
+                Notify( "The selected Supplier Site was successfully updated.", NotificationType.Success );
+                return ManageSites( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
+        //
+        // POST: /Site/DeleteSiteBudget/5
+        /*[HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteCustomerSiteBudget( int id )
+        {
+            using ( SiteBudgetService bservice = new SiteBudgetService() )
+            {
+                SiteBudget b = bservice.GetById( id );
+
+                if ( b == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                int SiteId = b.SiteId;
+
+                bservice.Delete( b );
+
+                Notify( "The selected Budget was successfully Deleted.", NotificationType.Success );
+
+                List<SiteBudget> model = bservice.ListByColumnWhere( "SiteId", SiteId );
+
+                return PartialView( "_SiteBudgets", model );
+            }
+        }*/
+
+
+
+        // GET: Client/ImportSite
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportSite()
+        {
+            SiteViewModel model = new SiteViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        // POST: Client/ImportSite
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportSite( SiteViewModel model )
+        {
+            if ( model.SiteImportFile == null )
+            {
+                Notify( "Please select a file to upload and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            int line = 0,
+                count = 0,
+                errors = 0,
+                skipped = 0,
+                created = 0,
+                updated = 0,
+                errorDocId = 0;
+
+            string cQuery, uQuery;
+
+            List<string> errs = new List<string>();
+
+            using ( SiteService sservice = new SiteService() )
+            using ( RegionService rservice = new RegionService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( ProvinceService pservice = new ProvinceService() )
+            using ( ClientSiteService csservice = new ClientSiteService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
+            using ( TextFieldParser parser = new TextFieldParser( model.SiteImportFile.InputStream ) )
+            {
+                parser.Delimiters = new string[] { "," };
+
+                while ( true )
+                {
+                    string[] load = parser.ReadFields();
+
+                    if ( load == null )
+                    {
+                        break;
+                    }
+
+                    line++;
+
+                    if ( line == 1 ) continue;
+
+                    cQuery = uQuery = string.Empty;
+
+                    count++;
+
+                    if ( load.NullableCount() < 2 )
+                    {
+                        skipped++;
+
+                        continue;
+                    }
+
+                    load = load.ToSQLSafe();
+
+                    try
+                    {
+                        using ( TransactionScope scope = new TransactionScope() )
+                        {
+                            string siteNumber = load[ 0 ],
+                                   customerNumber = load[ 1 ],
+                                   customerName = load[ 2 ],
+                                   siteName = load[ 3 ],
+                                   subSiteName = load[ 4 ],
+                                   addressLine1 = load[ 5 ],
+                                   addressLine2 = load[ 6 ],
+                                   town = load[ 7 ],
+                                   xCord = load[ 8 ],
+                                   yCord = load[ 9 ],
+                                   kamContact = load[ 10 ],
+                                   managerContact = load[ 11 ],
+                                   liquorLicenseNumber = load[ 12 ],
+                                   kamName = load[ 13 ],
+                                   region = load[ 14 ],
+                                   province = load[ 15 ],
+                                   salesManager = load[ 16 ],
+                                   salesRepCluster = load[ 17 ],
+                                   salesRep = load[ 18 ];
+
+                            if ( string.IsNullOrEmpty( siteName ) || string.IsNullOrEmpty( customerName ) || string.IsNullOrEmpty( customerNumber ) )
+                            {
+                                skipped++;
+
+                                throw new Exception( $"Site name, Customer Name or Customer Number missing @ line {line}!" );
+                            }
+
+                            Region r = rservice.Search( region, province );
+
+                            #region Site
+
+                            Site s;
+
+                            int? siteId = null;
+
+                            if ( !string.IsNullOrWhiteSpace( subSiteName ) )
+                            {
+                                s = sservice.GetByClientAndName( model.ClientId, subSiteName );
+                                Site s1 = sservice.GetByClientAndName( model.ClientId, siteName );
+
+                                siteName = subSiteName;
+
+                                siteId = s1?.Id;
+                            }
+                            else
+                            {
+                                s = sservice.GetByClientAndName( model.ClientId, siteName );
+                            }
+
+                            if ( s == null )
+                            {
+                                // Create new site
+
+                                s = new Site()
+                                {
+                                    XCord = xCord,
+                                    YCord = yCord,
+                                    Name = siteName,
+                                    SiteId = siteId,
+                                    RegionId = r?.Id,
+                                    Depot = siteNumber,
+                                    Description = siteName,
+                                    AccountCode = siteNumber,
+                                    ContactName = salesManager,
+                                    ContactNo = managerContact,
+                                    DepotManager = salesManager,
+                                    FinanceContact = salesManager,
+                                    Status = ( int ) Status.Active,
+                                    ReceivingContact = salesManager,
+                                    FinanceContactNo = managerContact,
+                                    ReceivingContactNo = managerContact,
+                                    DepotManagerContact = managerContact,
+                                    Address = $"{addressLine1}\n {addressLine2}\n {town}",
+                                };
+
+                                s = sservice.Create( s );
+
+                                created++;
+                            }
+                            else if ( s != null )
+                            {
+                                // Same site, update
+
+                                s.XCord = xCord;
+                                s.YCord = yCord;
+                                s.Name = siteName;
+                                s.SiteId = siteId;
+                                s.Depot = siteNumber;
+                                s.Description = siteName;
+                                s.AccountCode = siteNumber;
+                                s.ContactName = salesManager;
+                                s.ContactNo = managerContact;
+                                s.DepotManager = salesManager;
+                                s.FinanceContact = salesManager;
+                                s.Status = ( int ) Status.Active;
+                                s.ReceivingContact = salesManager;
+                                s.FinanceContactNo = managerContact;
+                                s.ReceivingContactNo = managerContact;
+                                s.DepotManagerContact = managerContact;
+                                s.Address = $"{addressLine1}\n {addressLine2}\n {town}";
+                                s.RegionId = ( r?.Id ?? s.RegionId );
+
+                                s = sservice.Update( s );
+
+                                updated++;
+                            }
+
+                            #endregion
+
+                            #region Client Customer
+
+                            ClientCustomer cc = ccservice.GetByNumber( model.ClientId, customerNumber );
+
+                            if ( cc == null )
+                            {
+                                cc = new ClientCustomer()
+                                {
+                                    CustomerTown = town,
+                                    ClientId = model.ClientId,
+                                    CustomerName = customerName,
+                                    Status = ( int ) Status.Active,
+                                    CustomerNumber = customerNumber,
+                                    CustomerAddress1 = addressLine1,
+                                    CustomerAddress2 = addressLine2,
+                                    CustomerContact = managerContact,
+                                };
+
+                                cc = ccservice.Create( cc );
+                            }
+                            else
+                            {
+                                cc.CustomerTown = town;
+                                cc.CustomerName = customerName;
+                                cc.Status = ( int ) Status.Active;
+                                cc.CustomerNumber = customerNumber;
+                                cc.CustomerAddress1 = addressLine1;
+                                cc.CustomerAddress2 = addressLine2;
+                                cc.CustomerContact = managerContact;
+
+                                cc = ccservice.Update( cc );
+                            }
+
+                            #endregion
+
+                            #region Client Site
+
+                            ClientSite cs = csservice.GetBySiteId( cc.Id, s.Id );
+
+                            if ( cs == null )
+                            {
+                                cs = new ClientSite()
+                                {
+                                    SiteId = s.Id,
+                                    KAMName = kamName,
+                                    KAMContact = kamContact,
+                                    ClientCustomerId = cc.Id,
+                                    ClientSalesRep = salesRep,
+                                    AccountingCode = siteNumber,
+                                    Status = ( int ) Status.Active,
+                                    ClientSalesManager = salesManager,
+                                    ClientManagerContact = managerContact,
+                                    ClientCustomerNumber = customerNumber,
+                                    ClientSalesRepContact = managerContact,
+                                    LiquorLicenceNumber = liquorLicenseNumber,
+                                };
+
+                                csservice.Create( cs );
+                            }
+                            else
+                            {
+                                cs.SiteId = s.Id;
+                                cs.KAMName = kamName;
+                                cs.KAMContact = kamContact;
+                                cs.ClientCustomerId = cc.Id;
+                                cs.ClientSalesRep = salesRep;
+                                cs.AccountingCode = siteNumber;
+                                cs.Status = ( int ) Status.Active;
+                                cs.ClientSalesManager = salesManager;
+                                cs.ClientManagerContact = managerContact;
+                                cs.ClientCustomerNumber = customerNumber;
+                                cs.ClientSalesRepContact = managerContact;
+                                cs.LiquorLicenceNumber = liquorLicenseNumber;
+
+                                csservice.Update( cs );
+                            }
+
+                            #endregion
+
+                            #region Site Address
+
+                            int? provinceId = pservice.GetIdByName( province?.Trim()?.ToLower()?.Replace( " ", "" ) );
+
+                            Address a = aservice.Get( s.Id, "SupplierSite" );
+
+                            if ( a == null )
+                            {
+                                a = new Address()
+                                {
+                                    Town = town,
+                                    ObjectId = s.Id,
+                                    Latitude = yCord,
+                                    Longitude = xCord,
+                                    PostalCode = town,
+                                    ObjectType = "SupplierSite",
+                                    ProvinceId = provinceId,
+                                    Addressline1 = addressLine1,
+                                    Addressline2 = addressLine2,
+                                    Status = ( int ) Status.Active,
+                                    Type = ( int ) AddressType.Postal,
+                                };
+
+                                aservice.Create( a );
+                            }
+                            else
+                            {
+                                a.Town = town;
+                                a.Latitude = yCord;
+                                a.Longitude = xCord;
+                                a.PostalCode = town;
+                                a.ProvinceId = provinceId;
+                                a.Addressline1 = addressLine1;
+                                a.Addressline2 = addressLine2;
+                                a.Type = ( int ) AddressType.Postal;
+
+                                aservice.Update( a );
+                            }
+
+                            #endregion
+
+                            scope.Complete();
+                        }
+                    }
+                    catch ( Exception ex )
+                    {
+                        errors++;
+
+                        errs.Add( ex.ToString() );
+                    }
+                }
+
+                cQuery = string.Empty;
+                uQuery = string.Empty;
+
+                if ( errs.NullableAny() )
+                {
+                    errorDocId = LogImportErrors( errs, model.ClientId );
+                }
+            }
+
+            string resp = $"{created} sites were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.";
+
+            if ( errs.NullableAny() && errorDocId > 0 )
+            {
+                resp = $"{resp} <a href='/Client/ViewDocument/{errorDocId}' target='_blank'>Click here</a> to view the erros.";
+            }
+
+            Notify( resp, NotificationType.Success );
+
+            return ManageSites( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // GET: Client/TransporterContacts/5
+        public ActionResult SiteContacts( int id )
+        {
+            using ( ContactService cservice = new ContactService() )
+            {
+                List<Contact> contacts = cservice.List( id, "SupplierSite" );
+
+                return PartialView( "_ContactsView", contacts );
+            }
+        }
+
+        #endregion
+
+
+        #region Client Products
+
+        //
+        // GET: /Client/ProductDetails/5
+        public ActionResult ProductDetails( int id, bool layout = true )
+        {
+            using ( ClientProductService cpservice = new ClientProductService() )
+            using ( DocumentService dservice = new DocumentService() )
+            using ( ProductPriceService ppservice = new ProductPriceService() )
+            {
+                ClientProduct clientProduct = cpservice.GetById( id );
+                if ( clientProduct == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+                    return RedirectToAction( "Index" );
+                }
+
+                var rates = ppservice.GetProductRates( clientProduct.ProductId );
+
+                ViewBag.TransportFee = rates.ContainsKey( ( int ) ProductPriceType.Transport )
+                    ? rates[ ( int ) ProductPriceType.Transport ]
+                    : ( decimal? ) null;
+                ViewBag.RecoveryFee = rates.ContainsKey( ( int ) ProductPriceType.Recovery )
+                    ? rates[ ( int ) ProductPriceType.Recovery ]
+                    : ( decimal? ) null;
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                List<Document> documents = dservice.List( clientProduct.ProductId, "Product" );
+                if ( documents != null )
+                {
+                    ViewBag.Documents = documents;
+                }
+
+                return View( clientProduct );
+            }
+        }
+
+        //
+        // GET: /Client/LinkProduct
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddProduct()
+        {
+            ProductViewModel model = new ProductViewModel() { LinkMode = true };
+
+            return View( model );
+        }
+
+        //
+        // POST: /Client/LinkProduct
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddProduct( ProductViewModel model )
+        {
+            using ( ClientService cservice = new ClientService() )
+            using ( ProductService pservice = new ProductService() )
+            using ( ClientProductService cpservice = new ClientProductService() )
+            {
+                Client c = cservice.GetById( model.ClientId );
+
+                if ( c == null )
+                {
+                    Notify( "Sorry, the selected Client was not found. Please select a valid client and try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                if ( !c.PSPClients.Any() )
+                {
+                    Notify( "Sorry, the selected Client is not linked to any PSP. Please select a valid client and try again or contact us for further assistance.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                Product p = pservice.GetById( model.ProductId );
+
+                ClientProduct cp = new ClientProduct()
+                {
+                    Rate = model.HireRate,
+                    LostRate = model.LostRate,
+                    ClientId = model.ClientId,
+                    ProductId = model.ProductId,
+                    Equipment = model.Equipment,
+                    IssueRate = model.IssueRate,
+                    PassonDays = model.PassonDays,
+                    PassonRate = model.PassonRate,
+                    Status = ( int ) model.Status,
+                    ActiveDate = model.ActiveDate,
+                    RateType = ( int ) model.RateType,
+                    ProductDescription = p.Description,
+                    AccountingCode = model.AccountingCode,
+                    PSPId = c.PSPClients.FirstOrDefault().PSPId,
+                };
+
+                cpservice.Create( cp );
+
+                UpdateProductPrices( model );
+
+                Notify( "The selected Product was successfully linked to the selected client.", NotificationType.Success );
+
+                return LinkProducts( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
+        //
+        // GET: /Client/EditProduct/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditProduct( int id )
+        {
+            using ( ClientProductService pservice = new ClientProductService() )
+            using ( ProductPriceService ppservice = new ProductPriceService() )
+            {
+                ClientProduct cp = pservice.GetById( id );
+
+                if ( cp == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                var productPrices = ppservice.GetProductRates( cp.ProductId );
+
+                ProductViewModel model = new ProductViewModel()
+                {
+                    Id = cp.Id,
+                    LinkMode = true,
+                    HireRate = cp.Rate,
+                    Name = cp.Product.Name,
+                    ClientId = cp.ClientId,
+                    LostRate = cp.LostRate,
+                    Equipment = cp.Equipment,
+                    ProductId = cp.ProductId,
+                    IssueRate = cp.IssueRate,
+                    ActiveDate = cp.ActiveDate,
+                    PassonRate = cp.PassonRate,
+                    PassonDays = cp.PassonDays,
+                    Status = ( Status ) cp.Status,
+                    AccountingCode = cp.AccountingCode,
+                    RateType = ( RateType ) cp.RateType,
+                    Description = cp.ProductDescription,
+                    TransportFee = productPrices.ContainsKey( ( int ) ProductPriceType.Transport ) ? productPrices[ ( int ) ProductPriceType.Transport ] : 0,
+                    RecoveryFee = productPrices.ContainsKey( ( int ) ProductPriceType.Recovery ) ? productPrices[ ( int ) ProductPriceType.Recovery ] : 0
+                };
+
+                return View( model );
+            }
+        }
+
+        //
+        // POST: /Client/EditProduct/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditProduct( ProductViewModel model )
+        {
+            using ( ClientProductService cpservice = new ClientProductService() )
+            {
+                ClientProduct cp = cpservice.GetById( model.Id );
+
+                #region Validations
+
+                if ( cp == null )
+                {
+                    Notify( "Sorry, that Client Product does not exist! Please try again.", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                #endregion
+
+                #region Product
+
+                cp.Rate = model.HireRate;
+                cp.LostRate = model.LostRate;
+                cp.Equipment = model.Equipment;
+                cp.IssueRate = model.IssueRate;
+                cp.PassonDays = model.PassonDays;
+                cp.PassonRate = model.PassonRate;
+                cp.Status = ( int ) model.Status;
+                cp.ActiveDate = model.ActiveDate;
+                cp.RateType = ( int ) model.RateType;
+                cp.AccountingCode = model.AccountingCode;
+
+                #endregion
+
+                cpservice.Update( cp );
+
+                UpdateProductPrices( model );
+
+                Notify( "The selected Client Product's details were successfully updated.", NotificationType.Success );
+            }
+
+            return LinkProducts( new PagingModel(), new CustomSearchModel() );
+        }
+
+        //
+        // POST: /Client/DeleteProduct/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteProduct( ProductViewModel model )
+        {
+            using ( ClientProductService service = new ClientProductService() )
+            {
+                ClientProduct cp = service.GetById( model.Id );
+
+                if ( cp == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                cp.Status = ( ( ( Status ) cp.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.Update( cp );
+
+                Notify( "The selected Client Product was successfully updated.", NotificationType.Success );
+            }
+
+            return LinkProducts( new PagingModel(), new CustomSearchModel() );
+        }
+
+        [HttpGet]
+        [Requires( PermissionTo.Create )]
+        public ActionResult GetRates( int productId )
+        {
+            using ( ProductPriceService ppservice = new ProductPriceService() )
+            {
+                try
+                {
+                    var rates = ppservice.GetProductRates( productId );
+                    var serializableRates = rates.Select( kvp => new
+                    {
+                        Type = kvp.Key,
+                        Rate = kvp.Value
+                    } ).ToList();
+
+                    return Json( new { success = true, data = serializableRates }, JsonRequestBehavior.AllowGet );
+                }
+                catch ( Exception ex )
+                {
+                    return Json( new { success = false, message = "An error occurred while retrieving product rates." }, JsonRequestBehavior.AllowGet );
+                }
+            }
+        }
+
+        private void UpdateProductPrices( ProductViewModel model )
+        {
+            using ( ProductPriceService ppservice = new ProductPriceService() )
+            {
+                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Hire, model.HireRate );
+                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Lost, model.LostRate );
+                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Issue, model.IssueRate );
+                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Recovery, model.RecoveryFee );
+                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Transport, model.TransportFee );
+            }
+        }
+
+        private void UpdateProductPrice( ProductPriceService ppservice, int productId, ProductPriceType type, decimal? rate )
+        {
+            if ( rate.HasValue )
+            {
+                var existingPrice = ppservice.GetLatestProductPrice( productId, type );
+                if ( existingPrice != null )
+                {
+                    existingPrice.Rate = rate.Value;
+                    existingPrice.ModifiedOn = DateTime.Now;
+                    existingPrice.ModifiedBy = User.Identity.Name;
+                    ppservice.Update( existingPrice );
+                }
+                else
+                {
+                    var newPrice = new ProductPrice
+                    {
+                        ProductId = productId,
+                        Type = ( int ) type,
+                        Rate = rate.Value,
+                        Status = ( int ) Status.Active,
+                        FromDate = DateTime.Now,
+                        CreatedOn = DateTime.Now,
+                        ModifiedOn = DateTime.Now,
+                        ModifiedBy = User.Identity.Name
+                    };
+                    ppservice.Create( newPrice );
+                }
+            }
+        }
+
+        #endregion
+
+
+
+        #region Manage Transporters
+
+        //
+        // GET: /Client/TransporterDetails/5
+        public ActionResult TransporterDetails( int id, bool layout = true )
+        {
+            using ( ContactService cservice = new ContactService() )
+            using ( VehicleService vservice = new VehicleService() )
+            using ( TransporterService tservice = new TransporterService() )
+            {
+                Transporter model = tservice.GetById( id );
+
+                if ( model == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return RedirectToAction( "Index" );
+                }
+
+                if ( layout )
+                {
+                    ViewBag.IncludeLayout = true;
+                }
+
+                ViewBag.Contacts = cservice.List( model.Id, "Transporter" );
+
+                ViewBag.Vehicles = vservice.List( model.Id, "Transporter" );
+
+                return View( model );
+            }
+        }
+
+        // GET: Client/AddTransporter
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddTransporter()
+        {
+            TransporterViewModel model = new TransporterViewModel()
+            {
+                EditMode = true,
+                Contacts = new List<Contact>(),
+                Vehicles = new List<Vehicle>()
+            };
+
+            return View( model );
+        }
+
+        // POST: Client/Transporter
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult AddTransporter( TransporterViewModel model )
+        {
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( ContactService cservice = new ContactService() )
+            using ( VehicleService vservice = new VehicleService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( TransporterService tservice = new TransporterService() )
+            {
+                #region Validation
+
+                if ( !string.IsNullOrEmpty( model.Name ) && tservice.ExistByClientAndName( model.ClientId, model.Name.Trim() ) )
+                {
+                    // Transporter already exist!
+                    Notify( $"Sorry, a Transporter with the Company Name \"{model.Name}\" for the selected client already exists!", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                #endregion
+
+                #region Transporter
+
+                Transporter t = new Transporter()
+                {
+                    Name = model.Name,
+                    Email = model.Email,
+                    ClientId = model.ClientId,
+                    Status = ( int ) Status.Active,
+                    TradingName = model.TradingName,
+                    ContactName = model.ContactName,
+                    SupplierCode = model.SupplierCode,
+                    ContactNumber = model.ContactNumber,
+                    RegistrationNumber = model.RegistrationNumber,
+                    ClientTransporterCode = model.ClientTransporterCode,
+                    ChepClientTransporterCode = model.ChepClientTransporterCode,
+                };
+
+                t = tservice.Create( t );
+
+                #endregion
+
+                #region Contacts
+
+                if ( model.Contacts.NullableAny( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                {
+                    foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                    {
+                        Contact c = cservice.Get( mc.ContactEmail, "Transporter" );
+
+                        if ( c == null )
+                        {
+                            c = new Contact()
+                            {
+                                ObjectId = t.Id,
+                                JobTitle = mc.JobTitle,
+                                ObjectType = "Transporter",
+                                ContactCell = mc.ContactCell,
+                                ContactName = mc.ContactName,
+                                Status = ( int ) model.Status,
+                                ContactEmail = mc.ContactEmail,
+                                ContactTitle = mc.ContactTitle,
+                            };
+
+                            cservice.Create( c );
+                        }
+                        else
+                        {
+                            c.JobTitle = mc.JobTitle;
+                            c.ContactCell = mc.ContactCell;
+                            c.ContactName = mc.ContactName;
+                            c.Status = ( int ) model.Status;
+                            c.ContactEmail = mc.ContactEmail;
+                            c.ContactTitle = mc.ContactTitle;
+
+                            cservice.Update( c );
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region Vehicles
+
+                if ( model.Vehicles.NullableAny( c => !string.IsNullOrWhiteSpace( c.Registration ) ) )
+                {
+                    foreach ( Vehicle mv in model.Vehicles.Where( c => !string.IsNullOrWhiteSpace( c.Registration ) ) )
+                    {
+                        Vehicle v = vservice.Get( mv.Registration, "Transporter" );
+
+                        if ( v == null )
+                        {
+                            v = new Vehicle()
+                            {
+                                Type = mv.Type,
+                                Make = mv.Make,
+                                //Year = mv.Year,
+                                ObjectId = t.Id,
+                                //VINNumber = mv.VINNumber,
+                                ObjectType = "Transporter",
+                                FleetNumber = mv.FleetNumber,
+                                Descriptoin = mv.Descriptoin,
+                                Status = ( int ) model.Status,
+                                Registration = mv.Registration,
+                                //EngineNumber = mv.EngineNumber,
+                            };
+
+                            vservice.Create( v );
+                        }
+                        else
+                        {
+                            v.Type = mv.Type;
+                            v.Make = mv.Make;
+                            //v.Year = mv.Year;
+                            //v.VINNumber = mv.VINNumber;
+                            v.Descriptoin = mv.Descriptoin;
+                            v.FleetNumber = mv.FleetNumber;
+                            v.Status = ( int ) model.Status;
+                            v.Registration = mv.Registration;
+                            //v.EngineNumber = mv.EngineNumber;
+
+                            vservice.Update( v );
+                        }
+                    }
+                }
+
+                #endregion
+
+                scope.Complete();
+            }
+
+            Notify( "The Transporter was successfully created.", NotificationType.Success );
+
+            return ManageTransporters( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // GET: Client/EditTransporter/5
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditTransporter( int id )
+        {
+            using ( ContactService cservice = new ContactService() )
+            using ( VehicleService vservice = new VehicleService() )
+            using ( TransporterService tservice = new TransporterService() )
+            {
+                Transporter t = tservice.GetById( id );
+
+                if ( t == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                List<Contact> contacts = cservice.List( t.Id, "Transporter" );
+                List<Vehicle> vehicles = vservice.List( t.Id, "Transporter" );
+
+                TransporterViewModel model = new TransporterViewModel()
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Email = t.Email,
+                    EditMode = true,
+                    Contacts = contacts,
+                    Vehicles = vehicles,
+                    ClientId = t.ClientId,
+                    ContactName = t.ContactName,
+                    TradingName = t.TradingName,
+                    Status = ( Status ) t.Status,
+                    SupplierCode = t.SupplierCode,
+                    ContactNumber = t.ContactNumber,
+                    RegistrationNumber = t.RegistrationNumber,
+                    ClientTransporterCode = t.ClientTransporterCode,
+                    ChepClientTransporterCode = t.ChepClientTransporterCode,
+                };
+
+                return View( model );
+            }
+        }
+
+        // POST: Client/EditTransporter/5
+        [HttpPost]
+        [Requires( PermissionTo.Edit )]
+        public ActionResult EditTransporter( TransporterViewModel model )
+        {
+            // Contact Id is null on subsequent entries. When adding another contact row the new Id is null and the ModelState fails. This is a pragmatic solution for now.
+            if ( model.Contacts != null )
+            {
+                foreach ( var contact in model.Contacts.Where( c => c.Id == 0 ) )
+                {
+                    ModelState.Remove( $"Contacts[{model.Contacts.IndexOf( contact )}].Id" );
+                }
+            }
+
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the selected Transporter was not updated. Please correct all errors and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            using ( ContactService cservice = new ContactService() )
+            using ( VehicleService vservice = new VehicleService() )
+            using ( TransactionScope scope = new TransactionScope() )
+            using ( TransporterService tservice = new TransporterService() )
+            {
+                Transporter t = tservice.GetById( model.Id );
+
+                #region Validations
+
+                if ( !string.IsNullOrEmpty( model.Name ) && model.Name.Trim().ToLower() != t.Name.Trim().ToLower() && tservice.ExistByClientAndName( model.ClientId, model.Name.Trim() ) )
+                {
+                    // Role already exist!
+                    Notify( $"Sorry, a Transporter with the Company Name \"{model.Name}\" for the selected client already exists!", NotificationType.Error );
+
+                    return View( model );
+                }
+
+                #endregion
+
+                #region Transporter
+
+                t.Id = model.Id;
+                t.Name = model.Name;
+                t.Email = model.Email;
+                t.Status = ( int ) model.Status;
+                t.TradingName = model.TradingName;
+                t.ContactName = model.ContactName;
+                t.SupplierCode = model.SupplierCode;
+                t.ContactNumber = model.ContactNumber;
+                t.RegistrationNumber = model.RegistrationNumber;
+                t.ClientTransporterCode = model.ClientTransporterCode ?? string.Empty;
+                t.ChepClientTransporterCode = model.ChepClientTransporterCode ?? string.Empty;
+
+                tservice.Update( t );
+
+                #endregion
+
+                #region Contacts
+
+                if ( model.Contacts.NullableAny( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                {
+                    foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
+                    {
+                        Contact c = cservice.GetById( mc.Id );
+
+                        if ( c == null )
+                        {
+                            c = new Contact()
+                            {
+                                ObjectId = t.Id,
+                                JobTitle = mc.JobTitle,
+                                ObjectType = "Transporter",
+                                ContactCell = mc.ContactCell,
+                                //ContactIdNo = mc.ContactIdNo,
+                                ContactName = mc.ContactName,
+                                Status = ( int ) model.Status,
+                                ContactEmail = mc.ContactEmail,
+                                ContactTitle = mc.ContactTitle,
+                            };
+
+                            cservice.Create( c );
+                        }
+                        else
+                        {
+                            c.JobTitle = mc.JobTitle;
+                            c.ContactCell = mc.ContactCell;
+                            //c.ContactIdNo = mc.ContactIdNo;
+                            c.ContactName = mc.ContactName;
+                            c.Status = ( int ) model.Status;
+                            c.ContactEmail = mc.ContactEmail;
+                            c.ContactTitle = mc.ContactTitle;
+
+                            cservice.Update( c );
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region Vehicles
+
+                if ( model.Vehicles.NullableAny( c => !string.IsNullOrWhiteSpace( c.Registration ) ) )
+                {
+                    foreach ( Vehicle mv in model.Vehicles.Where( c => !string.IsNullOrWhiteSpace( c.Registration ) ) )
+                    {
+                        Vehicle v = vservice.GetById( mv.Id );
+
+                        if ( v == null )
+                        {
+                            v = new Vehicle()
+                            {
+                                Type = mv.Type,
+                                Make = mv.Make,
+                                //Year = mv.Year,
+                                ObjectId = t.Id,
+                                //VINNumber = mv.VINNumber,
+                                ObjectType = "Transporter",
+                                FleetNumber = mv.FleetNumber,
+                                Status = ( int ) model.Status,
+                                Registration = mv.Registration,
+                                //EngineNumber = mv.EngineNumber,
+                                Descriptoin = $"{mv.Make} {mv.FleetNumber}",
+                            };
+
+                            vservice.Create( v );
+                        }
+                        else
+                        {
+                            v.Type = mv.Type;
+                            v.Make = mv.Make;
+                            //v.Year = mv.Year;
+                            //v.VINNumber = mv.VINNumber;
+                            v.FleetNumber = mv.FleetNumber;
+                            v.Status = ( int ) model.Status;
+                            v.Registration = mv.Registration;
+                            //v.EngineNumber = mv.EngineNumber;
+                            v.Descriptoin = $"{mv.Make} {mv.FleetNumber}";
+
+                            vservice.Update( v );
+                        }
+                    }
+                }
+
+                #endregion
+
+                scope.Complete();
+            }
+
+            Notify( "The selected Transporter details were successfully updated.", NotificationType.Success );
+
+            return ManageTransporters( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // GET: Client/ImportTransporter
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportTransporter()
+        {
+            TransporterViewModel model = new TransporterViewModel() { EditMode = true };
+
+            return View( model );
+        }
+
+        // POST: Client/ImportTransporter
+        [HttpPost]
+        [Requires( PermissionTo.Create )]
+        public ActionResult ImportTransporter( TransporterViewModel model )
+        {
+            if ( model.File == null )
+            {
+                Notify( "Please select a file to upload and try again.", NotificationType.Error );
+
+                return View( model );
+            }
+
+            int line = 0,
+                count = 0,
+                errors = 0,
+                skipped = 0,
+                created = 0,
+                updated = 0,
+                errorDocId = 0;
+
+            string cQuery, uQuery;
+
+            List<string> errs = new List<string>();
+
+            using ( TransporterService tservice = new TransporterService() )
+            using ( TextFieldParser parser = new TextFieldParser( model.File.InputStream ) )
+            {
+                parser.Delimiters = new string[] { "," };
+
+                while ( true )
+                {
+                    string[] load = parser.ReadFields();
+
+                    if ( load == null )
+                    {
+                        break;
+                    }
+
+                    line++;
+
+                    if ( line == 1 ) continue;
+
+                    cQuery = uQuery = string.Empty;
+
+                    count++;
+
+                    if ( load.NullableCount() < 2 || string.IsNullOrWhiteSpace( load[ 0 ].Trim() ) )
+                    {
+                        skipped++;
+
+                        continue;
+                    }
+
+                    load = load.ToSQLSafe();
+
+                    Transporter t = tservice.GetByClientAndName( model.ClientId, load[ 0 ] );
+
+                    if ( t == null )
+                    {
+                        #region Create Transporter
+
+                        cQuery = $" {cQuery} INSERT INTO [dbo].[Transporter] ([ClientId],[CreatedOn],[ModifiedOn],[ModifiedBy],[Name],[ContactNumber],[Email],[TradingName],[RegistrationNumber],[ContactName],[SupplierCode],[ClientTransporterCode],[ChepClientTransporterCode],[Status]) ";
+                        cQuery = $" {cQuery} VALUES ({model.ClientId},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 1 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}',{( int ) Status.Active}) ";
+
+                        #endregion
+
+                        try
+                        {
+                            tservice.Query( cQuery );
+
+                            created++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+
+                            errs.Add( ex.ToString() );
+                        }
+                    }
+                    else
+                    {
+                        #region Update Transporter
+
+                        uQuery = $@"{uQuery} UPDATE [dbo].[Transporter] SET
+                                                    [ModifiedOn]='{DateTime.Now}',
+                                                    [ModifiedBy]='{CurrentUser.Email}',
+                                                    [Name]='{load[ 0 ]}',
+                                                    [ContactNumber]='{load[ 1 ]}',
+                                                    [Email]='{load[ 2 ]}',
+                                                    [TradingName]='{load[ 3 ]}',
+                                                    [RegistrationNumber]='{load[ 4 ]}',
+                                                    [ContactName]='{load[ 6 ]}',
+                                                    [SupplierCode]='{load[ 7 ]}',
+                                                    [ClientTransporterCode]='{load[ 8 ]}',
+                                                    [ChepClientTransporterCode]='{load[ 9 ]}',
+                                                    [Status]={( int ) Status.Active}
+                                                WHERE
+                                                    [Id]={t.Id}";
+
+                        #endregion
+
+                        try
+                        {
+                            tservice.Query( uQuery );
+
+                            updated++;
+                        }
+                        catch ( Exception ex )
+                        {
+                            errors++;
+
+                            errs.Add( ex.ToString() );
+                        }
+                    }
+                }
+
+                cQuery = string.Empty;
+                uQuery = string.Empty;
+
+                if ( errs.NullableAny() )
+                {
+                    errorDocId = LogImportErrors( errs, model.ClientId ?? 0 );
+                }
+            }
+
+            string resp = $"{created} Transporters were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.";
+
+            if ( errs.NullableAny() && errorDocId > 0 )
+            {
+                resp = $"{resp} <a href='/Client/ViewDocument/{errorDocId}' target='_blank'>Click here</a> to view the errors.";
+            }
+
+            Notify( resp, NotificationType.Success );
+
+            return ManageTransporters( new PagingModel(), new CustomSearchModel() );
+        }
+
+        // POST: Client/DeleteTransporter/5
+        [HttpPost]
+        [Requires( PermissionTo.Delete )]
+        public ActionResult DeleteTransporter( TransporterViewModel model )
+        {
+            using ( TransporterService service = new TransporterService() )
+            {
+                Transporter t = service.GetById( model.Id );
+
+                if ( t == null )
+                {
+                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
+
+                    return PartialView( "_AccessDenied" );
+                }
+
+                t.Status = ( ( ( Status ) t.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
+
+                service.Update( t );
+
+                Notify( "The selected Transporter was successfully updated.", NotificationType.Success );
+
+                return ManageTransporters( new PagingModel(), new CustomSearchModel() );
+            }
+        }
+
+        // GET: Client/TransporterContacts/5
+        public ActionResult TransporterContacts( int id )
+        {
+            using ( ContactService cservice = new ContactService() )
+            {
+                List<Contact> contacts = cservice.List( id, "Transporter" );
+
+                return PartialView( "_ContactsView", contacts );
+            }
+        }
+
+        // GET: Client/TransporterVehicles/5
+        public ActionResult TransporterVehicles( int id )
+        {
+            using ( VehicleService vservice = new VehicleService() )
+            {
+                List<Vehicle> vehicles = vservice.List( id, "Transporter" );
+
+                return PartialView( "_VehiclesView", vehicles );
+            }
+        }
+
+        #endregion
+
+
+        /* #region Manage Sites
 
         //
         // GET: /Client/SiteDetails/5
@@ -4431,887 +6086,7 @@ namespace ACT.UI.Controllers
             return ManageSites( new PagingModel(), new CustomSearchModel() );
         }
 
-        #endregion
-
-
-
-        #region Client Products
-
-        //
-        // GET: /Client/ProductDetails/5
-        public ActionResult ProductDetails( int id, bool layout = true )
-        {
-            using ( ClientProductService cpservice = new ClientProductService() )
-            using ( DocumentService dservice = new DocumentService() )
-            using ( ProductPriceService ppservice = new ProductPriceService() )
-            {
-                ClientProduct clientProduct = cpservice.GetById( id );
-                if ( clientProduct == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-                    return RedirectToAction( "Index" );
-                }
-
-                var rates = ppservice.GetProductRates( clientProduct.ProductId );
-
-                ViewBag.TransportFee = rates.ContainsKey( ( int ) ProductPriceType.Transport )
-                    ? rates[ ( int ) ProductPriceType.Transport ]
-                    : ( decimal? ) null;
-                ViewBag.RecoveryFee = rates.ContainsKey( ( int ) ProductPriceType.Recovery )
-                    ? rates[ ( int ) ProductPriceType.Recovery ]
-                    : ( decimal? ) null;
-
-                if ( layout )
-                {
-                    ViewBag.IncludeLayout = true;
-                }
-
-                List<Document> documents = dservice.List( clientProduct.ProductId, "Product" );
-                if ( documents != null )
-                {
-                    ViewBag.Documents = documents;
-                }
-
-                return View( clientProduct );
-            }
-        }
-
-        //
-        // GET: /Client/LinkProduct
-        [Requires( PermissionTo.Create )]
-        public ActionResult AddProduct()
-        {
-            ProductViewModel model = new ProductViewModel() { LinkMode = true };
-
-            return View( model );
-        }
-
-        //
-        // POST: /Client/LinkProduct
-        [HttpPost]
-        [Requires( PermissionTo.Create )]
-        public ActionResult AddProduct( ProductViewModel model )
-        {
-            using ( ClientService cservice = new ClientService() )
-            using ( ProductService pservice = new ProductService() )
-            using ( ClientProductService cpservice = new ClientProductService() )
-            {
-                Client c = cservice.GetById( model.ClientId );
-
-                if ( c == null )
-                {
-                    Notify( "Sorry, the selected Client was not found. Please select a valid client and try again.", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                if ( !c.PSPClients.Any() )
-                {
-                    Notify( "Sorry, the selected Client is not linked to any PSP. Please select a valid client and try again or contact us for further assistance.", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                Product p = pservice.GetById( model.ProductId );
-
-                ClientProduct cp = new ClientProduct()
-                {
-                    Rate = model.HireRate,
-                    LostRate = model.LostRate,
-                    ClientId = model.ClientId,
-                    ProductId = model.ProductId,
-                    Equipment = model.Equipment,
-                    IssueRate = model.IssueRate,
-                    PassonDays = model.PassonDays,
-                    PassonRate = model.PassonRate,
-                    Status = ( int ) model.Status,
-                    ActiveDate = model.ActiveDate,
-                    RateType = ( int ) model.RateType,
-                    ProductDescription = p.Description,
-                    AccountingCode = model.AccountingCode,
-                    PSPId = c.PSPClients.FirstOrDefault().PSPId,
-                };
-
-                cpservice.Create( cp );
-
-                UpdateProductPrices( model );
-
-                Notify( "The selected Product was successfully linked to the selected client.", NotificationType.Success );
-
-                return LinkProducts( new PagingModel(), new CustomSearchModel() );
-            }
-        }
-
-        //
-        // GET: /Client/EditProduct/5
-        [Requires( PermissionTo.Edit )]
-        public ActionResult EditProduct( int id )
-        {
-            using ( ClientProductService pservice = new ClientProductService() )
-            using ( ProductPriceService ppservice = new ProductPriceService() )
-            {
-                ClientProduct cp = pservice.GetById( id );
-
-                if ( cp == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return PartialView( "_AccessDenied" );
-                }
-
-                var productPrices = ppservice.GetProductRates( cp.ProductId );
-
-                ProductViewModel model = new ProductViewModel()
-                {
-                    Id = cp.Id,
-                    LinkMode = true,
-                    HireRate = cp.Rate,
-                    Name = cp.Product.Name,
-                    ClientId = cp.ClientId,
-                    LostRate = cp.LostRate,
-                    Equipment = cp.Equipment,
-                    ProductId = cp.ProductId,
-                    IssueRate = cp.IssueRate,
-                    ActiveDate = cp.ActiveDate,
-                    PassonRate = cp.PassonRate,
-                    PassonDays = cp.PassonDays,
-                    Status = ( Status ) cp.Status,
-                    AccountingCode = cp.AccountingCode,
-                    RateType = ( RateType ) cp.RateType,
-                    Description = cp.ProductDescription,
-                    TransportFee = productPrices.ContainsKey( ( int ) ProductPriceType.Transport ) ? productPrices[ ( int ) ProductPriceType.Transport ] : 0,
-                    RecoveryFee = productPrices.ContainsKey( ( int ) ProductPriceType.Recovery ) ? productPrices[ ( int ) ProductPriceType.Recovery ] : 0
-                };
-
-                return View( model );
-            }
-        }
-
-        //
-        // POST: /Client/EditProduct/5
-        [HttpPost]
-        [Requires( PermissionTo.Edit )]
-        public ActionResult EditProduct( ProductViewModel model )
-        {
-            using ( ClientProductService cpservice = new ClientProductService() )
-            {
-                ClientProduct cp = cpservice.GetById( model.Id );
-
-                #region Validations
-
-                if ( cp == null )
-                {
-                    Notify( "Sorry, that Client Product does not exist! Please try again.", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                #endregion
-
-                #region Product
-
-                cp.Rate = model.HireRate;
-                cp.LostRate = model.LostRate;
-                cp.Equipment = model.Equipment;
-                cp.IssueRate = model.IssueRate;
-                cp.PassonDays = model.PassonDays;
-                cp.PassonRate = model.PassonRate;
-                cp.Status = ( int ) model.Status;
-                cp.ActiveDate = model.ActiveDate;
-                cp.RateType = ( int ) model.RateType;
-                cp.AccountingCode = model.AccountingCode;
-
-                #endregion
-
-                cpservice.Update( cp );
-
-                UpdateProductPrices( model );
-
-                Notify( "The selected Client Product's details were successfully updated.", NotificationType.Success );
-            }
-
-            return LinkProducts( new PagingModel(), new CustomSearchModel() );
-        }
-
-        //
-        // POST: /Client/DeleteProduct/5
-        [HttpPost]
-        [Requires( PermissionTo.Delete )]
-        public ActionResult DeleteProduct( ProductViewModel model )
-        {
-            using ( ClientProductService service = new ClientProductService() )
-            {
-                ClientProduct cp = service.GetById( model.Id );
-
-                if ( cp == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return PartialView( "_AccessDenied" );
-                }
-
-                cp.Status = ( ( ( Status ) cp.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
-
-                service.Update( cp );
-
-                Notify( "The selected Client Product was successfully updated.", NotificationType.Success );
-            }
-
-            return LinkProducts( new PagingModel(), new CustomSearchModel() );
-        }
-
-        [HttpGet]
-        [Requires( PermissionTo.Create )]
-        public ActionResult GetRates( int productId )
-        {
-            using ( ProductPriceService ppservice = new ProductPriceService() )
-            {
-                try
-                {
-                    var rates = ppservice.GetProductRates( productId );
-                    var serializableRates = rates.Select( kvp => new
-                    {
-                        Type = kvp.Key,
-                        Rate = kvp.Value
-                    } ).ToList();
-
-                    return Json( new { success = true, data = serializableRates }, JsonRequestBehavior.AllowGet );
-                }
-                catch ( Exception ex )
-                {
-                    return Json( new { success = false, message = "An error occurred while retrieving product rates." }, JsonRequestBehavior.AllowGet );
-                }
-            }
-        }
-
-        private void UpdateProductPrices( ProductViewModel model )
-        {
-            using ( ProductPriceService ppservice = new ProductPriceService() )
-            {
-                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Hire, model.HireRate );
-                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Lost, model.LostRate );
-                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Issue, model.IssueRate );
-                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Recovery, model.RecoveryFee );
-                UpdateProductPrice( ppservice, model.ProductId, ProductPriceType.Transport, model.TransportFee );
-            }
-        }
-
-        private void UpdateProductPrice( ProductPriceService ppservice, int productId, ProductPriceType type, decimal? rate )
-        {
-            if ( rate.HasValue )
-            {
-                var existingPrice = ppservice.GetLatestProductPrice( productId, type );
-                if ( existingPrice != null )
-                {
-                    existingPrice.Rate = rate.Value;
-                    existingPrice.ModifiedOn = DateTime.Now;
-                    existingPrice.ModifiedBy = User.Identity.Name;
-                    ppservice.Update( existingPrice );
-                }
-                else
-                {
-                    var newPrice = new ProductPrice
-                    {
-                        ProductId = productId,
-                        Type = ( int ) type,
-                        Rate = rate.Value,
-                        Status = ( int ) Status.Active,
-                        FromDate = DateTime.Now,
-                        CreatedOn = DateTime.Now,
-                        ModifiedOn = DateTime.Now,
-                        ModifiedBy = User.Identity.Name
-                    };
-                    ppservice.Create( newPrice );
-                }
-            }
-        }
-
-        #endregion
-
-
-
-        #region Manage Transporters
-
-        //
-        // GET: /Client/TransporterDetails/5
-        public ActionResult TransporterDetails( int id, bool layout = true )
-        {
-            using ( ContactService cservice = new ContactService() )
-            using ( VehicleService vservice = new VehicleService() )
-            using ( TransporterService tservice = new TransporterService() )
-            {
-                Transporter model = tservice.GetById( id );
-
-                if ( model == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return RedirectToAction( "Index" );
-                }
-
-                if ( layout )
-                {
-                    ViewBag.IncludeLayout = true;
-                }
-
-                ViewBag.Contacts = cservice.List( model.Id, "Transporter" );
-
-                ViewBag.Vehicles = vservice.List( model.Id, "Transporter" );
-
-                return View( model );
-            }
-        }
-
-        // GET: Client/AddTransporter
-        [Requires( PermissionTo.Create )]
-        public ActionResult AddTransporter()
-        {
-            TransporterViewModel model = new TransporterViewModel()
-            {
-                EditMode = true,
-                Contacts = new List<Contact>(),
-                Vehicles = new List<Vehicle>()
-            };
-
-            return View( model );
-        }
-
-        // POST: Client/Transporter
-        [HttpPost]
-        [Requires( PermissionTo.Create )]
-        public ActionResult AddTransporter( TransporterViewModel model )
-        {
-            if ( !ModelState.IsValid )
-            {
-                Notify( "Sorry, the Site was not created. Please correct all errors and try again.", NotificationType.Error );
-
-                return View( model );
-            }
-
-            using ( ContactService cservice = new ContactService() )
-            using ( VehicleService vservice = new VehicleService() )
-            using ( TransactionScope scope = new TransactionScope() )
-            using ( TransporterService tservice = new TransporterService() )
-            {
-                #region Validation
-
-                if ( !string.IsNullOrEmpty( model.Name ) && tservice.ExistByClientAndName( model.ClientId, model.Name.Trim() ) )
-                {
-                    // Transporter already exist!
-                    Notify( $"Sorry, a Transporter with the Company Name \"{model.Name}\" for the selected client already exists!", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                #endregion
-
-                #region Transporter
-
-                Transporter t = new Transporter()
-                {
-                    Name = model.Name,
-                    Email = model.Email,
-                    ClientId = model.ClientId,
-                    Status = ( int ) Status.Active,
-                    TradingName = model.TradingName,
-                    ContactName = model.ContactName,
-                    SupplierCode = model.SupplierCode,
-                    ContactNumber = model.ContactNumber,
-                    RegistrationNumber = model.RegistrationNumber,
-                    ClientTransporterCode = model.ClientTransporterCode,
-                    ChepClientTransporterCode = model.ChepClientTransporterCode,
-                };
-
-                t = tservice.Create( t );
-
-                #endregion
-
-                #region Contacts
-
-                if ( model.Contacts.NullableAny( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
-                {
-                    foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
-                    {
-                        Contact c = cservice.Get( mc.ContactEmail, "Transporter" );
-
-                        if ( c == null )
-                        {
-                            c = new Contact()
-                            {
-                                ObjectId = t.Id,
-                                JobTitle = mc.JobTitle,
-                                ObjectType = "Transporter",
-                                ContactCell = mc.ContactCell,
-                                ContactName = mc.ContactName,
-                                Status = ( int ) model.Status,
-                                ContactEmail = mc.ContactEmail,
-                                ContactTitle = mc.ContactTitle,
-                            };
-
-                            cservice.Create( c );
-                        }
-                        else
-                        {
-                            c.JobTitle = mc.JobTitle;
-                            c.ContactCell = mc.ContactCell;
-                            c.ContactName = mc.ContactName;
-                            c.Status = ( int ) model.Status;
-                            c.ContactEmail = mc.ContactEmail;
-                            c.ContactTitle = mc.ContactTitle;
-
-                            cservice.Update( c );
-                        }
-                    }
-                }
-
-                #endregion
-
-                #region Vehicles
-
-                if ( model.Vehicles.NullableAny( c => !string.IsNullOrWhiteSpace( c.Registration ) ) )
-                {
-                    foreach ( Vehicle mv in model.Vehicles.Where( c => !string.IsNullOrWhiteSpace( c.Registration ) ) )
-                    {
-                        Vehicle v = vservice.Get( mv.Registration, "Transporter" );
-
-                        if ( v == null )
-                        {
-                            v = new Vehicle()
-                            {
-                                Type = mv.Type,
-                                Make = mv.Make,
-                                //Year = mv.Year,
-                                ObjectId = t.Id,
-                                //VINNumber = mv.VINNumber,
-                                ObjectType = "Transporter",
-                                FleetNumber = mv.FleetNumber,
-                                Descriptoin = mv.Descriptoin,
-                                Status = ( int ) model.Status,
-                                Registration = mv.Registration,
-                                //EngineNumber = mv.EngineNumber,
-                            };
-
-                            vservice.Create( v );
-                        }
-                        else
-                        {
-                            v.Type = mv.Type;
-                            v.Make = mv.Make;
-                            //v.Year = mv.Year;
-                            //v.VINNumber = mv.VINNumber;
-                            v.Descriptoin = mv.Descriptoin;
-                            v.FleetNumber = mv.FleetNumber;
-                            v.Status = ( int ) model.Status;
-                            v.Registration = mv.Registration;
-                            //v.EngineNumber = mv.EngineNumber;
-
-                            vservice.Update( v );
-                        }
-                    }
-                }
-
-                #endregion
-
-                scope.Complete();
-            }
-
-            Notify( "The Transporter was successfully created.", NotificationType.Success );
-
-            return ManageTransporters( new PagingModel(), new CustomSearchModel() );
-        }
-
-        // GET: Client/EditTransporter/5
-        [Requires( PermissionTo.Edit )]
-        public ActionResult EditTransporter( int id )
-        {
-            using ( ContactService cservice = new ContactService() )
-            using ( VehicleService vservice = new VehicleService() )
-            using ( TransporterService tservice = new TransporterService() )
-            {
-                Transporter t = tservice.GetById( id );
-
-                if ( t == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return PartialView( "_AccessDenied" );
-                }
-
-                List<Contact> contacts = cservice.List( t.Id, "Transporter" );
-                List<Vehicle> vehicles = vservice.List( t.Id, "Transporter" );
-
-                TransporterViewModel model = new TransporterViewModel()
-                {
-                    Id = t.Id,
-                    Name = t.Name,
-                    Email = t.Email,
-                    EditMode = true,
-                    Contacts = contacts,
-                    Vehicles = vehicles,
-                    ClientId = t.ClientId,
-                    ContactName = t.ContactName,
-                    TradingName = t.TradingName,
-                    Status = ( Status ) t.Status,
-                    SupplierCode = t.SupplierCode,
-                    ContactNumber = t.ContactNumber,
-                    RegistrationNumber = t.RegistrationNumber,
-                    ClientTransporterCode = t.ClientTransporterCode,
-                    ChepClientTransporterCode = t.ChepClientTransporterCode,
-                };
-
-                return View( model );
-            }
-        }
-
-        // POST: Client/EditTransporter/5
-        [HttpPost]
-        [Requires( PermissionTo.Edit )]
-        public ActionResult EditTransporter( TransporterViewModel model )
-        {
-            // Contact Id is null on subsequent entries. When adding another contact row the new Id is null and the ModelState fails. This is a pragmatic solution for now.
-            if ( model.Contacts != null )
-            {
-                foreach ( var contact in model.Contacts.Where( c => c.Id == 0 ) )
-                {
-                    ModelState.Remove( $"Contacts[{model.Contacts.IndexOf( contact )}].Id" );
-                }
-            }
-
-            if ( !ModelState.IsValid )
-            {
-                Notify( "Sorry, the selected Transporter was not updated. Please correct all errors and try again.", NotificationType.Error );
-
-                return View( model );
-            }
-
-            using ( ContactService cservice = new ContactService() )
-            using ( VehicleService vservice = new VehicleService() )
-            using ( TransactionScope scope = new TransactionScope() )
-            using ( TransporterService tservice = new TransporterService() )
-            {
-                Transporter t = tservice.GetById( model.Id );
-
-                #region Validations
-
-                if ( !string.IsNullOrEmpty( model.Name ) && model.Name.Trim().ToLower() != t.Name.Trim().ToLower() && tservice.ExistByClientAndName( model.ClientId, model.Name.Trim() ) )
-                {
-                    // Role already exist!
-                    Notify( $"Sorry, a Transporter with the Company Name \"{model.Name}\" for the selected client already exists!", NotificationType.Error );
-
-                    return View( model );
-                }
-
-                #endregion
-
-                #region Transporter
-
-                t.Id = model.Id;
-                t.Name = model.Name;
-                t.Email = model.Email;
-                t.Status = ( int ) model.Status;
-                t.TradingName = model.TradingName;
-                t.ContactName = model.ContactName;
-                t.SupplierCode = model.SupplierCode;
-                t.ContactNumber = model.ContactNumber;
-                t.RegistrationNumber = model.RegistrationNumber;
-                t.ClientTransporterCode = model.ClientTransporterCode ?? string.Empty;
-                t.ChepClientTransporterCode = model.ChepClientTransporterCode ?? string.Empty;
-
-                tservice.Update( t );
-
-                #endregion
-
-                #region Contacts
-
-                if ( model.Contacts.NullableAny( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
-                {
-                    foreach ( Contact mc in model.Contacts.Where( c => !string.IsNullOrWhiteSpace( c.ContactName ) ) )
-                    {
-                        Contact c = cservice.GetById( mc.Id );
-
-                        if ( c == null )
-                        {
-                            c = new Contact()
-                            {
-                                ObjectId = t.Id,
-                                JobTitle = mc.JobTitle,
-                                ObjectType = "Transporter",
-                                ContactCell = mc.ContactCell,
-                                //ContactIdNo = mc.ContactIdNo,
-                                ContactName = mc.ContactName,
-                                Status = ( int ) model.Status,
-                                ContactEmail = mc.ContactEmail,
-                                ContactTitle = mc.ContactTitle,
-                            };
-
-                            cservice.Create( c );
-                        }
-                        else
-                        {
-                            c.JobTitle = mc.JobTitle;
-                            c.ContactCell = mc.ContactCell;
-                            //c.ContactIdNo = mc.ContactIdNo;
-                            c.ContactName = mc.ContactName;
-                            c.Status = ( int ) model.Status;
-                            c.ContactEmail = mc.ContactEmail;
-                            c.ContactTitle = mc.ContactTitle;
-
-                            cservice.Update( c );
-                        }
-                    }
-                }
-
-                #endregion
-
-                #region Vehicles
-
-                if ( model.Vehicles.NullableAny( c => !string.IsNullOrWhiteSpace( c.Registration ) ) )
-                {
-                    foreach ( Vehicle mv in model.Vehicles.Where( c => !string.IsNullOrWhiteSpace( c.Registration ) ) )
-                    {
-                        Vehicle v = vservice.GetById( mv.Id );
-
-                        if ( v == null )
-                        {
-                            v = new Vehicle()
-                            {
-                                Type = mv.Type,
-                                Make = mv.Make,
-                                //Year = mv.Year,
-                                ObjectId = t.Id,
-                                //VINNumber = mv.VINNumber,
-                                ObjectType = "Transporter",
-                                FleetNumber = mv.FleetNumber,
-                                Status = ( int ) model.Status,
-                                Registration = mv.Registration,
-                                //EngineNumber = mv.EngineNumber,
-                                Descriptoin = $"{mv.Make} {mv.FleetNumber}",
-                            };
-
-                            vservice.Create( v );
-                        }
-                        else
-                        {
-                            v.Type = mv.Type;
-                            v.Make = mv.Make;
-                            //v.Year = mv.Year;
-                            //v.VINNumber = mv.VINNumber;
-                            v.FleetNumber = mv.FleetNumber;
-                            v.Status = ( int ) model.Status;
-                            v.Registration = mv.Registration;
-                            //v.EngineNumber = mv.EngineNumber;
-                            v.Descriptoin = $"{mv.Make} {mv.FleetNumber}";
-
-                            vservice.Update( v );
-                        }
-                    }
-                }
-
-                #endregion
-
-                scope.Complete();
-            }
-
-            Notify( "The selected Transporter details were successfully updated.", NotificationType.Success );
-
-            return ManageTransporters( new PagingModel(), new CustomSearchModel() );
-        }
-
-        // GET: Client/ImportTransporter
-        [Requires( PermissionTo.Create )]
-        public ActionResult ImportTransporter()
-        {
-            TransporterViewModel model = new TransporterViewModel() { EditMode = true };
-
-            return View( model );
-        }
-
-        // POST: Client/ImportTransporter
-        [HttpPost]
-        [Requires( PermissionTo.Create )]
-        public ActionResult ImportTransporter( TransporterViewModel model )
-        {
-            if ( model.File == null )
-            {
-                Notify( "Please select a file to upload and try again.", NotificationType.Error );
-
-                return View( model );
-            }
-
-            int line = 0,
-                count = 0,
-                errors = 0,
-                skipped = 0,
-                created = 0,
-                updated = 0,
-                errorDocId = 0;
-
-            string cQuery, uQuery;
-
-            List<string> errs = new List<string>();
-
-            using ( TransporterService tservice = new TransporterService() )
-            using ( TextFieldParser parser = new TextFieldParser( model.File.InputStream ) )
-            {
-                parser.Delimiters = new string[] { "," };
-
-                while ( true )
-                {
-                    string[] load = parser.ReadFields();
-
-                    if ( load == null )
-                    {
-                        break;
-                    }
-
-                    line++;
-
-                    if ( line == 1 ) continue;
-
-                    cQuery = uQuery = string.Empty;
-
-                    count++;
-
-                    if ( load.NullableCount() < 2 || string.IsNullOrWhiteSpace( load[ 0 ].Trim() ) )
-                    {
-                        skipped++;
-
-                        continue;
-                    }
-
-                    load = load.ToSQLSafe();
-
-                    Transporter t = tservice.GetByClientAndName( model.ClientId, load[ 0 ] );
-
-                    if ( t == null )
-                    {
-                        #region Create Transporter
-
-                        cQuery = $" {cQuery} INSERT INTO [dbo].[Transporter] ([ClientId],[CreatedOn],[ModifiedOn],[ModifiedBy],[Name],[ContactNumber],[Email],[TradingName],[RegistrationNumber],[ContactName],[SupplierCode],[ClientTransporterCode],[ChepClientTransporterCode],[Status]) ";
-                        cQuery = $" {cQuery} VALUES ({model.ClientId},'{DateTime.Now}','{DateTime.Now}','{CurrentUser.Email}','{load[ 0 ]}','{load[ 1 ]}','{load[ 2 ]}','{load[ 3 ]}','{load[ 4 ]}','{load[ 6 ]}','{load[ 7 ]}','{load[ 8 ]}','{load[ 9 ]}',{( int ) Status.Active}) ";
-
-                        #endregion
-
-                        try
-                        {
-                            tservice.Query( cQuery );
-
-                            created++;
-                        }
-                        catch ( Exception ex )
-                        {
-                            errors++;
-
-                            errs.Add( ex.ToString() );
-                        }
-                    }
-                    else
-                    {
-                        #region Update Transporter
-
-                        uQuery = $@"{uQuery} UPDATE [dbo].[Transporter] SET
-                                                    [ModifiedOn]='{DateTime.Now}',
-                                                    [ModifiedBy]='{CurrentUser.Email}',
-                                                    [Name]='{load[ 0 ]}',
-                                                    [ContactNumber]='{load[ 1 ]}',
-                                                    [Email]='{load[ 2 ]}',
-                                                    [TradingName]='{load[ 3 ]}',
-                                                    [RegistrationNumber]='{load[ 4 ]}',
-                                                    [ContactName]='{load[ 6 ]}',
-                                                    [SupplierCode]='{load[ 7 ]}',
-                                                    [ClientTransporterCode]='{load[ 8 ]}',
-                                                    [ChepClientTransporterCode]='{load[ 9 ]}',
-                                                    [Status]={( int ) Status.Active}
-                                                WHERE
-                                                    [Id]={t.Id}";
-
-                        #endregion
-
-                        try
-                        {
-                            tservice.Query( uQuery );
-
-                            updated++;
-                        }
-                        catch ( Exception ex )
-                        {
-                            errors++;
-
-                            errs.Add( ex.ToString() );
-                        }
-                    }
-                }
-
-                cQuery = string.Empty;
-                uQuery = string.Empty;
-
-                if ( errs.NullableAny() )
-                {
-                    errorDocId = LogImportErrors( errs, model.ClientId ?? 0 );
-                }
-            }
-
-            string resp = $"{created} Transporters were successfully created, {updated} were updated, {skipped} were skipped and there were {errors} errors.";
-
-            if ( errs.NullableAny() && errorDocId > 0 )
-            {
-                resp = $"{resp} <a href='/Client/ViewDocument/{errorDocId}' target='_blank'>Click here</a> to view the errors.";
-            }
-
-            Notify( resp, NotificationType.Success );
-
-            return ManageTransporters( new PagingModel(), new CustomSearchModel() );
-        }
-
-        // POST: Client/DeleteTransporter/5
-        [HttpPost]
-        [Requires( PermissionTo.Delete )]
-        public ActionResult DeleteTransporter( TransporterViewModel model )
-        {
-            using ( TransporterService service = new TransporterService() )
-            {
-                Transporter t = service.GetById( model.Id );
-
-                if ( t == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return PartialView( "_AccessDenied" );
-                }
-
-                t.Status = ( ( ( Status ) t.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
-
-                service.Update( t );
-
-                Notify( "The selected Transporter was successfully updated.", NotificationType.Success );
-
-                return ManageTransporters( new PagingModel(), new CustomSearchModel() );
-            }
-        }
-
-        // GET: Client/TransporterContacts/5
-        public ActionResult TransporterContacts( int id )
-        {
-            using ( ContactService cservice = new ContactService() )
-            {
-                List<Contact> contacts = cservice.List( id, "Transporter" );
-
-                return PartialView( "_ContactsView", contacts );
-            }
-        }
-
-        // GET: Client/TransporterVehicles/5
-        public ActionResult TransporterVehicles( int id )
-        {
-            using ( VehicleService vservice = new VehicleService() )
-            {
-                List<Vehicle> vehicles = vservice.List( id, "Transporter" );
-
-                return PartialView( "_VehiclesView", vehicles );
-            }
-        }
-
-        #endregion
+        #endregion*/
 
 
 
@@ -5461,7 +6236,7 @@ namespace ACT.UI.Controllers
                 pm.Sort = pm.Sort ?? "ASC";
                 pm.SortBy = pm.SortBy ?? "s.Name";
 
-                List<SiteCustomModel> model = service.List1( pm, csm );
+                List<SiteCustomModel> model = service.List1( pm, csm, true );
                 int total = ( model.Count < pm.Take && pm.Skip == 0 ) ? model.Count : service.Total1( pm, csm );
 
                 PagingExtension paging = PagingExtension.Create( model, total, pm.Skip, pm.Take, pm.Page );

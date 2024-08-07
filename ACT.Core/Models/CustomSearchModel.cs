@@ -264,7 +264,7 @@ namespace ACT.Core.Models
         }
 
         /// <summary>
-        /// Can be used to indicate Customer Main Site
+        /// Can be used to indicate Customer/Supplier Main Site
         /// </summary>
         [Display( Name = "Main Site" )]
         public string MainSite { get; set; }
@@ -733,18 +733,12 @@ namespace ACT.Core.Models
 
 
                 case "ManageSites":
-
                     using ( SiteService sservice = new SiteService() )
-                    using ( ClientService cservice = new ClientService() )
                     using ( RegionService rservice = new RegionService() )
-                    using ( ClientCustomerService ccservice = new ClientCustomerService() )
                     {
-                        SiteOptions = sservice.List( true );
-                        ClientOptions = cservice.List( true );
+                        SiteOptions = sservice.ListSupplierSites( true );
                         RegionOptions = rservice.List( true );
-                        CustomerOptions = ccservice.GetCustomerSelectList( true );
                     }
-
                     break;
 
 
