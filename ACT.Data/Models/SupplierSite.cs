@@ -50,5 +50,6 @@ namespace ACT.Data.Models
         public string CLCode { get; set; }
     
         public virtual Region Region { get; set; }
+        public virtual User User { get; set; }
     }
 }

@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="e9564c2a9b2949ffa97edfafe5f410d3" Name="Diagram1" ZoomLevel="87">
+      <Diagram DiagramId="e9564c2a9b2949ffa97edfafe5f410d3" Name="Diagram1" ZoomLevel="73">
         <EntityTypeShape EntityType="ACTModel.AuditLog" Width="1.5" PointX="0.75" PointY="5.75" />
         <EntityTypeShape EntityType="ACTModel.Bank" Width="1.5" PointX="0.75" PointY="1.375" />
         <EntityTypeShape EntityType="ACTModel.BankDetail" Width="1.5" PointX="3" PointY="1" />
@@ -193,6 +193,7 @@
         <AssociationConnector Association="ACTModel.FK_ClientSite_OptionalSite" />
         <EntityTypeShape EntityType="ACTModel.SupplierSite" Width="1.5" PointX="17.125" PointY="36.125" />
         <AssociationConnector Association="ACTModel.FK_SupplierSite_Region" />
+        <AssociationConnector Association="ACTModel.FK_SupplierSite_User" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

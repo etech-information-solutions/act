@@ -3414,12 +3414,15 @@ namespace ACT.UI.Controllers
             using ( RegionService regionService = new RegionService() )
             using ( ContactService cservice = new ContactService() )
             {
+
                 #region Validation
-                if ( sservice.ExistByName( model.MainSite?.Trim()?.ToLower() ) )
+
+                if ( sservice.ExistBySupplierName( model.MainSite?.Trim() ) )
                 {
                     Notify( $"Sorry, a Supplier Site with the name {model.MainSite} already exists.", NotificationType.Error );
                     return View( model );
                 }
+
                 #endregion
 
                 #region Create Supplier Site

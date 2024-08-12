@@ -15,11 +15,13 @@
     UserModel user = User.Get();
 }
 
+@Html.HiddenFor( m => m.Id )
 
 @Html.Partial( "_Notification" )
 
 @using ( Html.BeginForm( "AddSite", "Client", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#managesites", @class = "custom-validate", @style = "width: auto;" } ) )
 {
+
     <div id="edit-item">
 
         <h2 class="uppercase" style="width: auto;">

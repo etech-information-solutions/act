@@ -838,7 +838,7 @@ namespace ACT.Core.Services
             supplierSite.ModifiedOn = DateTime.Now;
             supplierSite.ModifiedBy = CurrentUser?.Username ?? "System";
 
-            if ( ExistByName( supplierSite.Name ) )
+            if ( ExistBySupplierName( supplierSite.Name ) )
             {
                 throw new InvalidOperationException( $"A supplier site with the name '{supplierSite.Name}' already exists." );
             }
@@ -879,6 +879,11 @@ namespace ACT.Core.Services
         public bool ExistByClientAndName( int clientId, string siteName )
         {
             return context.Sites.Any( s => s.Name.Trim() == siteName.Trim() && s.ClientSites.Any( cs => cs.ClientCustomer.ClientId == clientId ) );
+        }
+
+        public bool ExistBySupplierName( string siteName )
+        {
+            return context.SupplierSites.Any( ss => ss.Name.Trim().ToLower() == siteName.Trim().ToLower() );
         }
 
         public bool ExistByName( string siteName )

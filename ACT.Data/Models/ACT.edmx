@@ -1539,28 +1539,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="ClientTransporterCode" Type="varchar" MaxLength="150" />
           <Property Name="ChepClientTransporterCode" Type="varchar" MaxLength="150" />
           <Property Name="Status" Type="int" Nullable="false" />
-          <Property Name="AddressLine1" Type="varchar" MaxLength="150" />
-          <Property Name="AddressLine2" Type="varchar" MaxLength="150" />
-          <Property Name="AddressLine3" Type="varchar" MaxLength="150" />
-          <Property Name="Region" Type="varchar" MaxLength="150" />
-          <Property Name="District" Type="varchar" MaxLength="150" />
-          <Property Name="Country" Type="varchar" MaxLength="150" />
-          <Property Name="EmailAddress2" Type="varchar" MaxLength="150" />
-          <Property Name="IsAdminClerk" Type="bit" Nullable="false" />
-          <Property Name="IsManagement" Type="bit" Nullable="false" />
-          <Property Name="ReceiveEmailsAutomatically" Type="bit" Nullable="false" />
-          <Property Name="IsActive" Type="bit" Nullable="false" />
-          <Property Name="Transporter_AddressLine1" Type="varchar" MaxLength="150" />
-          <Property Name="Transporter_AddressLine2" Type="varchar" MaxLength="150" />
-          <Property Name="Transporter_AddressLine3" Type="varchar" MaxLength="150" />
-          <Property Name="Transporter_Region" Type="varchar" MaxLength="150" />
-          <Property Name="Transporter_District" Type="varchar" MaxLength="150" />
-          <Property Name="Transporter_Country" Type="varchar" MaxLength="150" />
-          <Property Name="Transporter_EmailAddress2" Type="varchar" MaxLength="150" />
-          <Property Name="Transporter_IsAdminClerk" Type="bit" Nullable="false" />
-          <Property Name="Transporter_IsManagement" Type="bit" Nullable="false" />
-          <Property Name="Transporter_ReceiveEmailsAutomatically" Type="bit" Nullable="false" />
-          <Property Name="Transporter_IsActive" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -2758,6 +2736,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_SupplierSite_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="SupplierSite" Type="Self.SupplierSite" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SupplierSite">
+              <PropertyRef Name="ARPMSalesManagerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Task_ClientLoad">
           <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="0..1" />
           <End Role="Task" Type="Self.Task" Multiplicity="*" />
@@ -2830,7 +2820,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Transporter_Client_New">
+        <Association Name="FK_Transporter_Client">
           <End Role="Client" Type="Self.Client" Multiplicity="0..1" />
           <End Role="Transporter" Type="Self.Transporter" Multiplicity="*" />
           <ReferentialConstraint>
@@ -3471,6 +3461,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="Region" EntitySet="Region" />
             <End Role="SupplierSite" EntitySet="SupplierSite" />
           </AssociationSet>
+          <AssociationSet Name="FK_SupplierSite_User" Association="Self.FK_SupplierSite_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="SupplierSite" EntitySet="SupplierSite" />
+          </AssociationSet>
           <AssociationSet Name="FK_Task_ClientLoad" Association="Self.FK_Task_ClientLoad">
             <End Role="ClientLoad" EntitySet="ClientLoad" />
             <End Role="Task" EntitySet="Task" />
@@ -3495,7 +3489,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="User" EntitySet="User" />
             <End Role="Token" EntitySet="Token" />
           </AssociationSet>
-          <AssociationSet Name="FK_Transporter_Client_New" Association="Self.FK_Transporter_Client_New">
+          <AssociationSet Name="FK_Transporter_Client" Association="Self.FK_Transporter_Client">
             <End Role="Client" EntitySet="Client" />
             <End Role="Transporter" EntitySet="Transporter" />
           </AssociationSet>
@@ -4075,6 +4069,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySet Name="SupplierSites" EntityType="ACTModel.SupplierSite" />
           <AssociationSet Name="FK_SupplierSite_Region" Association="ACTModel.FK_SupplierSite_Region">
             <End Role="Region" EntitySet="Regions" />
+            <End Role="SupplierSite" EntitySet="SupplierSites" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SupplierSite_User" Association="ACTModel.FK_SupplierSite_User">
+            <End Role="User" EntitySet="Users" />
             <End Role="SupplierSite" EntitySet="SupplierSites" />
           </AssociationSet>
           </EntityContainer>
@@ -5071,50 +5069,28 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="Status" Type="Int32" Nullable="false" />
           <NavigationProperty Name="User" Relationship="ACTModel.FK_Token_User" FromRole="Token" ToRole="User" />
         </EntityType>
-        <EntityType Name="Transporter">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ClientId" Type="Int32" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Name" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="ContactNumber" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Email" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="TradingName" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="RegistrationNumber" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="ContactName" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="SupplierCode" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="ClientTransporterCode" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="ChepClientTransporterCode" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Status" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Client" Relationship="ACTModel.FK_Transporter_Client" FromRole="Transporter" ToRole="Client" />
-          <NavigationProperty Name="ClientLoads" Relationship="ACTModel.FK_ClientLoad_Transporter" FromRole="Transporter" ToRole="ClientLoad" />
-          <Property Name="AddressLine1" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="AddressLine2" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="AddressLine3" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Region" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="District" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Country" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="EmailAddress2" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="IsAdminClerk" Type="Boolean" Nullable="false" />
-          <Property Name="IsManagement" Type="Boolean" Nullable="false" />
-          <Property Name="ReceiveEmailsAutomatically" Type="Boolean" Nullable="false" />
-          <Property Name="IsActive" Type="Boolean" Nullable="false" />
-          <Property Name="Transporter_AddressLine1" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Transporter_AddressLine2" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Transporter_AddressLine3" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Transporter_Region" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Transporter_District" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Transporter_Country" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Transporter_EmailAddress2" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="Transporter_IsAdminClerk" Type="Boolean" Nullable="false" />
-          <Property Name="Transporter_IsManagement" Type="Boolean" Nullable="false" />
-          <Property Name="Transporter_ReceiveEmailsAutomatically" Type="Boolean" Nullable="false" />
-          <Property Name="Transporter_IsActive" Type="Boolean" Nullable="false" />
-        </EntityType>
+		  <EntityType Name="Transporter">
+			  <Key>
+				  <PropertyRef Name="Id" />
+			  </Key>
+			  <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+			  <Property Name="ClientId" Type="Int32" />
+			  <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+			  <Property Name="ModifiedOn" Type="DateTime" Nullable="false" Precision="3" />
+			  <Property Name="ModifiedBy" Type="String" MaxLength="150" FixedLength="false" Unicode="false" Nullable="false" />
+			  <Property Name="Name" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+			  <Property Name="ContactNumber" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+			  <Property Name="Email" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+			  <Property Name="TradingName" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+			  <Property Name="RegistrationNumber" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+			  <Property Name="ContactName" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+			  <Property Name="SupplierCode" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+			  <Property Name="ClientTransporterCode" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+			  <Property Name="ChepClientTransporterCode" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+			  <Property Name="Status" Type="Int32" Nullable="false" />
+			  <NavigationProperty Name="Client" Relationship="Self.FK_Transporter_Client" FromRole="Transporter" ToRole="Client" />
+			  <NavigationProperty Name="ClientLoads" Relationship="Self.FK_ClientLoad_Transporter" FromRole="Transporter" ToRole="ClientLoad" />
+		  </EntityType>
         <EntityType Name="UserBroadcast">
           <Key>
             <PropertyRef Name="Id" />
@@ -6514,6 +6490,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="ClientLoads" Relationship="ACTModel.FK_ClientLoad_User" FromRole="User" ToRole="ClientLoad" />
           <NavigationProperty Name="ClientLoads1" Relationship="ACTModel.FK_ClientLoad_User1" FromRole="User" ToRole="ClientLoad" />
           <NavigationProperty Name="ClientLoads2" Relationship="ACTModel.FK_ClientLoad_User2" FromRole="User" ToRole="ClientLoad" />
+          <NavigationProperty Name="SupplierSites" Relationship="ACTModel.FK_SupplierSite_User" FromRole="User" ToRole="SupplierSite" />
         </EntityType>
         <Association Name="FK_ClientAuthorisation_User">
           <End Type="ACTModel.User" Role="User" Multiplicity="1" />
@@ -7292,6 +7269,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="LocationNumber" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="CLCode" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Region" Relationship="ACTModel.FK_SupplierSite_Region" FromRole="SupplierSite" ToRole="Region" />
+          <NavigationProperty Name="User" Relationship="ACTModel.FK_SupplierSite_User" FromRole="SupplierSite" ToRole="User" />
         </EntityType>
         <Association Name="FK_SupplierSite_Region">
           <End Type="ACTModel.Region" Role="Region" Multiplicity="0..1" />
@@ -7302,6 +7280,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="SupplierSite">
               <PropertyRef Name="RegionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SupplierSite_User">
+          <End Type="ACTModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="ACTModel.SupplierSite" Role="SupplierSite" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SupplierSite">
+              <PropertyRef Name="ARPMSalesManagerId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -8264,28 +8254,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySetMapping Name="Transporters">
             <EntityTypeMapping TypeName="ACTModel.Transporter">
               <MappingFragment StoreEntitySet="Transporter">
-                <ScalarProperty Name="Transporter_IsActive" ColumnName="Transporter_IsActive" />
-                <ScalarProperty Name="Transporter_ReceiveEmailsAutomatically" ColumnName="Transporter_ReceiveEmailsAutomatically" />
-                <ScalarProperty Name="Transporter_IsManagement" ColumnName="Transporter_IsManagement" />
-                <ScalarProperty Name="Transporter_IsAdminClerk" ColumnName="Transporter_IsAdminClerk" />
-                <ScalarProperty Name="Transporter_EmailAddress2" ColumnName="Transporter_EmailAddress2" />
-                <ScalarProperty Name="Transporter_Country" ColumnName="Transporter_Country" />
-                <ScalarProperty Name="Transporter_District" ColumnName="Transporter_District" />
-                <ScalarProperty Name="Transporter_Region" ColumnName="Transporter_Region" />
-                <ScalarProperty Name="Transporter_AddressLine3" ColumnName="Transporter_AddressLine3" />
-                <ScalarProperty Name="Transporter_AddressLine2" ColumnName="Transporter_AddressLine2" />
-                <ScalarProperty Name="Transporter_AddressLine1" ColumnName="Transporter_AddressLine1" />
-                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
-                <ScalarProperty Name="ReceiveEmailsAutomatically" ColumnName="ReceiveEmailsAutomatically" />
-                <ScalarProperty Name="IsManagement" ColumnName="IsManagement" />
-                <ScalarProperty Name="IsAdminClerk" ColumnName="IsAdminClerk" />
-                <ScalarProperty Name="EmailAddress2" ColumnName="EmailAddress2" />
-                <ScalarProperty Name="Country" ColumnName="Country" />
-                <ScalarProperty Name="District" ColumnName="District" />
-                <ScalarProperty Name="Region" ColumnName="Region" />
-                <ScalarProperty Name="AddressLine3" ColumnName="AddressLine3" />
-                <ScalarProperty Name="AddressLine2" ColumnName="AddressLine2" />
-                <ScalarProperty Name="AddressLine1" ColumnName="AddressLine1" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="ChepClientTransporterCode" ColumnName="ChepClientTransporterCode" />
                 <ScalarProperty Name="ClientTransporterCode" ColumnName="ClientTransporterCode" />
