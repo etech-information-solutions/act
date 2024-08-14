@@ -1,0 +1,76 @@
+﻿@model ACT.UI.Models.ClientLoadViewModel
+
+<div class="equipment-detail-section">
+    <p>
+        <strong class="uppercase">Equipment Details</strong>
+    </p>
+    <div class="editor-label">
+        @Html.LabelFor( m => m.EquipmentDetails[ 0 ].ProductId )
+    </div>
+    <div class="editor-field">
+        @for ( int i = 0; i < 3; i++ )
+        {
+            @Html.DropDownListFor( m => m.EquipmentDetails[ i ].ProductId, new SelectList( Model.EquipmentCodeOptions, "Key", "Value" ), "Select Equipment", new { @class = "chzn", @style = "width: 30%;" } )
+        }
+    </div>
+
+    <div class="editor-label">
+        @Html.LabelFor( m => m.EquipmentDetails[ 0 ].DeliveredQty )
+    </div>
+    <div class="editor-field">
+        @for ( int i = 0; i < 3; i++ )
+        {
+            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].DeliveredQty, new { @class = "input", @style = "width: 30%;" } )
+        }
+    </div>
+
+    <div class="editor-label">
+        @Html.LabelFor( m => m.EquipmentDetails[ 0 ].ReturnedTransferredQty )
+    </div>
+    <div class="editor-field">
+        @for ( int i = 0; i < 3; i++ )
+        {
+            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].ReturnedTransferredQty, new { @class = "input", @style = "width: 30%;" } )
+        }
+    </div>
+
+    <div class="editor-label">
+        @Html.LabelFor( m => m.EquipmentDetails[ 0 ].DebriefQty )
+    </div>
+    <div class="editor-field">
+        @for ( int i = 0; i < 3; i++ )
+        {
+            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].DebriefQty, new { @class = "input", @style = "width: 30%;" } )
+        }
+    </div>
+
+    <div class="editor-label">
+        @Html.LabelFor( m => m.EquipmentDetails[ 0 ].TransporterLiable )
+    </div>
+    <div class="editor-field">
+        @for ( int i = 0; i < 3; i++ )
+        {
+            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].TransporterLiable, new { @class = "input", @style = "width: 30%;" } )
+        }
+    </div>
+
+    <div class="editor-label">
+        @Html.LabelFor( m => m.EquipmentDetails[ 0 ].AdminMovement )
+    </div>
+    <div class="editor-field">
+        @for ( int i = 0; i < 3; i++ )
+        {
+            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].AdminMovement, new { @class = "input", @style = "width: 30%;" } )
+        }
+    </div>
+
+    <div class="editor-label">
+        @Html.LabelFor( m => m.EquipmentDetails[ 0 ].OutstandingQtyAtCustomer )
+    </div>
+    <div class="editor-field">
+        @for ( int i = 0; i < 3; i++ )
+        {
+            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].OutstandingQtyAtCustomer, new { @class = "input", @style = "width: 30%;" } )
+        }
+    </div>
+</div>

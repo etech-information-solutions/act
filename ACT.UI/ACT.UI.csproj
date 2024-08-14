@@ -785,6 +785,7 @@
     <Content Include="Views\Client\EditCustomerSite.cshtml" />
     <Content Include="Views\Client\CustomerSiteDetails.cshtml" />
     <Content Include="Views\Shared\_ManageCustomerSitesCustomSearch.cshtml" />
+    <Content Include="Views\Shared\_EquipmentDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

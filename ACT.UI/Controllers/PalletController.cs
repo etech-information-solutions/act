@@ -1189,11 +1189,11 @@ namespace ACT.UI.Controllers
             ClientLoadViewModel model = new ClientLoadViewModel()
             {
                 EditMode = true,
-                EquipmentDetails = new List<EquipmentDetailViewModel>
+                EquipmentDetails = new List<ClientLoadViewModel.EquipmentDetailViewModel>
                 {
-                    new EquipmentDetailViewModel(),
-                    new EquipmentDetailViewModel(),
-                    new EquipmentDetailViewModel()
+                    new ClientLoadViewModel.EquipmentDetailViewModel(),
+                    new ClientLoadViewModel.EquipmentDetailViewModel(),
+                    new ClientLoadViewModel.EquipmentDetailViewModel()
                 }
             };
 
@@ -1202,6 +1202,8 @@ namespace ACT.UI.Controllers
             {
                 model.EquipmentCodeOptions = productService.List( true );
             }
+
+            ViewBag.EquipmentCodeOptions = model.EquipmentCodeOptions;
 
             return View( model );
         }

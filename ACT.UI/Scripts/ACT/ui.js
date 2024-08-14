@@ -72,6 +72,7 @@
             this.DataDeleteImage( $( '*[data-delete-image="1"]' ) );
             this.DataUploadImage( $( '*[data-upload-image="1"]' ) );
             this.DataDeleteDocument( $( '*[data-delete-document="1"]' ) );
+            this.DataAddMoreEquipmentDetails( $( '[data-add-one-more="1"]' ) );
 
             // Table CRUD Operations
             this.DataEdit( $( '*[data-edit="1"]' ) );
@@ -1541,6 +1542,68 @@
                             ACT.UI.DataIndex( $( this ).find( "input,textarea,select" ), indx );
                         } );
                     }
+
+                    // Restart JT JS DOM
+                    ACT.Init.Start( true );
+
+                    return false;
+                } );
+            } );
+        },
+
+        DataAddMoreEquipmentDetails: function ( sender )
+        {
+            sender.each( function ()
+            {
+                var i = $( this );
+                var target = $( i.attr( 'data-target' ) );
+
+                i.unbind( 'click' );
+                i.click( function ()
+                {
+                    // Clone the last equipment detail section
+                    var lastSection = target.find( '.equipment-detail-section' ).last();
+                    var newSection = lastSection.clone( true );
+
+                    // Get the current index (number of existing sections * 3)
+                    var currentIndex = target.find( '.equipment-detail-section' ).length * 3;
+
+                    // Update the IDs, names, and labels of the cloned elements
+                    newSection.find( 'input, select, label' ).each( function ( index )
+                    {
+                        var element = $( this );
+                        var name = element.attr( 'name' );
+                        var id = element.attr( 'id' );
+                        var for_attr = element.attr( 'for' );
+
+                        if ( name )
+                        {
+                            element.attr( 'name', name.replace( /\[\d+\]/, '[' + ( currentIndex + index % 3 ) + ']' ) );
+                        }
+                        if ( id )
+                        {
+                            element.attr( 'id', id.replace( /\_\d+\_/, '_' + ( currentIndex + index % 3 ) + '_' ) );
+                        }
+                        if ( for_attr )
+                        {
+                            element.attr( 'for', for_attr.replace( /\_\d+\_/, '_' + ( currentIndex + index % 3 ) + '_' ) );
+                        }
+
+                        // Clear input values
+                        if ( element.is( 'input:text' ) )
+                        {
+                            element.val( '' );
+                        } else if ( element.is( 'select' ) )
+                        {
+                            element.prop( 'selectedIndex', 0 );
+                        }
+                    } );
+
+                    // Append the new section to the container
+                    target.append( newSection );
+
+                    // Reinitialize any necessary plugins (e.g., chosen)
+                    newSection.find( '.chzn' ).chosen();
 
                     // Restart JT JS DOM
                     ACT.Init.Start( true );
@@ -6327,5 +6390,6 @@
                 } );
             } );
         },
+
     };
 } )();
