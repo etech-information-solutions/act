@@ -174,6 +174,31 @@ namespace ACT.UI.Models
 
         public string GLID { get; set; }
 
+        [Display( Name = "GRV Number:" )]
+        [StringLength( 250 )]
+        public string GRVNumber { get; set; }
+
+        [Display( Name = "ACT Control Doc No:" )]
+        public string ActControlDocNo { get; set; }
+
+        [Display( Name = "Chep Exchange Doc No:" )]
+        public string ChepExchangeDocNo { get; set; }
+
+        [Display( Name = "Debtors Code:" )]
+        public string DebtorsCode { get; set; }
+
+        [Display( Name = "Fleet Number:" )]
+        public string FleetNumber { get; set; }
+
+        [Display( Name = "Depot STO Number:" )]
+        public string DepotStoNumber { get; set; }
+
+        [Display( Name = "Primary Second:" )]
+        public string PrimarySecond { get; set; }
+
+        [Display( Name = "Chep Compensation Date:" )]
+        public DateTime? ChepCompensationDate { get; set; }
+
 
 
         [Display( Name = "Import Loads" )]
@@ -222,6 +247,46 @@ namespace ACT.UI.Models
         public DateTime? ChepEffectiveDate { get; set; }
 
 
+        [Display( Name = "Region From:" )]
+        public string RegionFrom { get; set; }
+
+        [Display( Name = "Region To:" )]
+        public string RegionTo { get; set; }
+
+        [Display( Name = "Customer Group:" )]
+        public int? ClientGroupId { get; set; }
+
+        [Display( Name = "Sales Order Number:" )]
+        public string OrderNumber { get; set; }
+
+        [Display( Name = "Primary/Secondary:" )]
+        public string PrimarySecondary { get; set; }
+
+        [Display( Name = "Depot STO Number:" )]
+        public string DepoSTONo { get; set; }
+
+        [Display( Name = "Customer Account No:" )]
+        public string CustomerAccountNumber { get; set; }
+
+        [Display( Name = "Load Sheet No:" )]
+        public string LoadsheetNo { get; set; }
+
+        [Display( Name = "ACT Control Doc No:" )]
+        public string DocNumber { get; set; }
+
+        [Display( Name = "CHEP Exchange Doc No:" )]
+        public string ExchangeNo { get; set; }
+
+        [Display( Name = "Authorization Code:" )]
+        public string AuthorizationCode { get; set; }
+
+        [Display( Name = "Authorized By:" )]
+        public string AuthorizedBy { get; set; }
+
+        [Display( Name = "CHEP Compensation Date:" )]
+        public DateTime? CompensationDate { get; set; }
+
+
         [Display( Name = "Document Type:" )]
         public DocumentType DocumentType { get; set; }
 
@@ -230,6 +295,10 @@ namespace ACT.UI.Models
         public List<ClientLoadQuantity> ClientLoadQuantities { get; set; }
 
         public string CustomerType { get; set; }
+
+        public List<EquipmentDetailViewModel> EquipmentDetails { get; set; } = new List<EquipmentDetailViewModel>();
+
+        public Dictionary<int, string> EquipmentCodeOptions { get; set; }
 
         #endregion
 
@@ -251,6 +320,19 @@ namespace ACT.UI.Models
                     }
 
                     return cservice.List( true );
+                }
+            }
+        }
+
+
+        public Dictionary<int, string> ClientGroupOptions
+        {
+            get
+            {
+                if ( !EditMode ) return null;
+                using ( ClientGroupService service = new ClientGroupService() )
+                {
+                    return service.List( true );
                 }
             }
         }
@@ -321,6 +403,30 @@ namespace ACT.UI.Models
                     return service.List( true );
                 }
             }
+        }
+
+        public class EquipmentDetailViewModel
+        {
+            [Display( Name = "Equipment" )]
+            public int ProductId { get; set; }
+
+            [Display( Name = "Delivered Qty" )]
+            public decimal DeliveredQty { get; set; }
+
+            [Display( Name = "Returned/Transferred Qty" )]
+            public decimal ReturnedTransferredQty { get; set; }
+
+            [Display( Name = "Debrief Qty" )]
+            public decimal DebriefQty { get; set; }
+
+            [Display( Name = "Transporter Liable" )]
+            public decimal TransporterLiable { get; set; }
+
+            [Display( Name = "Admin Movement" )]
+            public decimal AdminMovement { get; set; }
+
+            [Display( Name = "Outstanding Qty at Customer" )]
+            public decimal OutstandingQtyAtCustomer { get; set; }
         }
 
         #endregion

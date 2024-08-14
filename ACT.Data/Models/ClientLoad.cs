@@ -93,6 +93,13 @@ namespace ACT.Data.Models
         public string CustomerType { get; set; }
         public string OrderNumber { get; set; }
         public string DocNumber { get; set; }
+        public string GRVNumber { get; set; }
+        public string DepoSTONo { get; set; }
+        public Nullable<System.DateTime> DeliveryDate { get; set; }
+        public string LoadSheetNo { get; set; }
+        public string ExchangeNo { get; set; }
+        public Nullable<System.DateTime> CompensationDate { get; set; }
+        public string ReceiverNumber1 { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }

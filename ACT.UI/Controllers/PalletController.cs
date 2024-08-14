@@ -20,6 +20,7 @@ using iTextSharp.tool.xml;
 using ACT.Mailer;
 using Microsoft.VisualBasic.FileIO;
 using System.Globalization;
+using static ACT.UI.Models.ClientLoadViewModel;
 
 namespace ACT.UI.Controllers
 {
@@ -1185,7 +1186,22 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Create )]
         public ActionResult AddClientData()
         {
-            ClientLoadViewModel model = new ClientLoadViewModel() { EditMode = true };
+            ClientLoadViewModel model = new ClientLoadViewModel()
+            {
+                EditMode = true,
+                EquipmentDetails = new List<EquipmentDetailViewModel>
+                {
+                    new EquipmentDetailViewModel(),
+                    new EquipmentDetailViewModel(),
+                    new EquipmentDetailViewModel()
+                }
+            };
+
+            // Populate EquipmentCodeOptions
+            using ( var productService = new ProductService() )
+            {
+                model.EquipmentCodeOptions = productService.List( true );
+            }
 
             return View( model );
         }
@@ -1236,7 +1252,7 @@ namespace ACT.UI.Controllers
                     EffectiveDate = model.EffectiveDate,
                     ChepInvoiceNo = model.ChepInvoiceNo,
                     AdminMovement = model.AdminMovement,
-                    ReceiverNumber = model.ReceiverNumber,
+                    ReceiverNumber = model.ReferenceNumber,
                     OutstandingQty = model.OutstandingQty,
                     CancelledReason = model.CancelledReason,
                     ReferenceNumber = model.ReferenceNumber,

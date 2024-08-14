@@ -33,6 +33,7 @@ namespace ACT.Data.Models
         public string CustomerContact { get; set; }
         public Nullable<int> CustomerUserId { get; set; }
         public int Status { get; set; }
+        public string CustomerAccountNo { get; set; }
     
         public virtual Client Client { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

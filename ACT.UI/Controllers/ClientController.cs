@@ -2297,6 +2297,7 @@ namespace ACT.UI.Controllers
                     {
                         ClientGroup client = new ClientGroup()
                         {
+                            GroupName = group.Name,
                             GroupId = group.Id,
                             ClientId = cg.ClientId,
                             Status = ( int ) Status.Active
@@ -2395,6 +2396,7 @@ namespace ACT.UI.Controllers
                     {
                         ClientGroup client = new ClientGroup()
                         {
+                            GroupName = group.Name,
                             GroupId = group.Id,
                             ClientId = cg.ClientId,
                             Status = ( int ) Status.Active
