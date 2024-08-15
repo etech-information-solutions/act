@@ -9,19 +9,17 @@
         Layout = null;
     }
 
-    ViewBag.Title = "Edit Client Data";
+    ViewBag.Title = "Edit Client Load";
 }
-
 
 @Html.Partial( "_Notification" )
 
-@using ( Html.BeginForm( "EditClientData", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clientdata", @class = "custom-validate", @style = "width: auto;", id = "editclientdata" } ) )
+@using ( Html.BeginForm( "EditClientData", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clientdata", @class = "custom-validate", @style = "width: auto;" } ) )
 {
     <div id="edit-item">
-
         <h2 class="uppercase" style="width: auto;">
             <img alt="" src="@Url.Content("~/images/edit.png")" />
-            <span>Edit Pooling Agent Data</span>
+            <span>Edit Client Load</span>
         </h2>
 
         @Html.ValidationSummary( true )
@@ -29,75 +27,37 @@
         @Html.HiddenFor( model => model.Id )
 
         <div id="item-details" class="item-details" style="width: auto;">
-
             <div class="left" style="width: 31%; margin-right: 3%;">
-
-                <div class="editor-label">
+                <div class="edit-label">
                     @Html.LabelFor( model => model.ClientId )
                 </div>
-                <div class="editor-field">
-                    @Html.DropDownListFor( model => model.ClientId, model => Model.ClientOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                <div class="edit-field">
+                    @Html.DropDownListFor( model => model.ClientId, new SelectList( Model.ClientOptions, "Key", "Value" ), "Select Client", new { @class = "chzn", @style = "width: 98%;" } )
                     @Html.ValidationMessageFor( model => model.ClientId )
                 </div>
 
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.VehicleId )
-                </div>
-                <div class="editor-field">
-                    @Html.DropDownListFor( model => model.VehicleId, model => Model.VehicleOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.VehicleId )
-                </div>
-
-                <div class="editor-label">
+                <div class="edit-label">
                     @Html.LabelFor( model => model.ClientSiteId )
                 </div>
-                <div class="editor-field">
-                    @Html.DropDownListFor( model => model.ClientSiteId, model => Model.ClientSiteOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                <div class="edit-field">
+                    @Html.DropDownListFor( model => model.ClientSiteId, new SelectList( Model.ClientSiteOptions, "Key", "Value" ), "Select Supplier From", new { @class = "chzn", @style = "width: 98%;" } )
                     @Html.ValidationMessageFor( model => model.ClientSiteId )
                 </div>
 
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.TransporterId )
+                    @Html.LabelFor( model => model.ClientSiteIdTo )
                 </div>
                 <div class="editor-field">
-                    @Html.DropDownListFor( model => model.TransporterId, model => Model.TransporterOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.TransporterId )
+                    @Html.DropDownListFor( model => model.ClientSiteIdTo, new SelectList( Model.ClientSiteOptions, "Key", "Value" ), "Select Customer To", new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.ClientSiteIdTo )
                 </div>
 
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.OutstandingReasonId )
+                    @Html.LabelFor( model => model.LoadNumber )
                 </div>
                 <div class="editor-field">
-                    @Html.DropDownListFor( model => model.OutstandingReasonId, model => Model.OutstandingReasonOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.OutstandingReasonId )
-                </div>
-
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.Status )
-                </div>
-                <div class="editor-field">
-                    @Html.EnumDropDownFor( model => model.Status, false, new { @class = "chzn", @data_client_load_status = 1, @data_target = "#cancelled-status-reason", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.Status )
-                </div>
-
-                <div id="cancelled-status-reason" class="@(Model.Status == ReconciliationStatus.Cancelled ? "block" : "none")">
-
-                    <div class="editor-label ">
-                        @Html.LabelFor( model => model.CancelledReason )
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor( model => model.CancelledReason, new { @class = "input", @placeholder = "Please Complete" } )
-                        @Html.ValidationMessageFor( model => model.CancelledReason )
-                    </div>
-
-                </div>
-
-                <div class="editor-label">
-                    @Html.LabelFor( model => model.ReconcileInvoice )
-                </div>
-                <div class="editor-field">
-                    @Html.EnumDropDownFor( model => model.ReconcileInvoice, false, new { @class = "chzn", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.ReconcileInvoice )
+                    @Html.TextBoxFor( model => model.LoadNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.LoadNumber )
                 </div>
 
                 <div class="editor-label">
@@ -109,166 +69,30 @@
                 </div>
 
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.EffectiveDate )
+                    @Html.LabelFor( model => model.RegionFrom )
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.EffectiveDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
-                    @Html.ValidationMessageFor( model => model.EffectiveDate )
+                    @Html.TextBoxFor( model => model.RegionFrom, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.RegionFrom )
                 </div>
 
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.NotifyDate )
+                    @Html.LabelFor( model => model.RegionTo )
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.NotifyDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
-                    @Html.ValidationMessageFor( model => model.NotifyDate )
-                </div>
-
-            </div>
-
-            <div class="left" style="width: 31%; margin-right: 3%;">
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.OriginalQuantity )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.OriginalQuantity, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.OriginalQuantity )
-                </div>
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.ReturnQty )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.ReturnQty, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.ReturnQty )
-                </div>
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.NewQuantity )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.NewQuantity, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.NewQuantity )
-                </div>
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.OutstandingQty )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.OutstandingQty, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.OutstandingQty )
-                </div>
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.DebriefQty )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.DebriefQty, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.DebriefQty )
-                </div>
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.AdminMovement )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.AdminMovement, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.AdminMovement )
-                </div>
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.PODNumber )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.PODNumber, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.PODNumber )
+                    @Html.TextBoxFor( model => model.RegionTo, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.RegionTo )
                 </div>
 
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.PODCommentId )
+                    @Html.LabelFor( model => model.ClientGroupId )
                 </div>
                 <div class="editor-field">
-                    @Html.DropDownListFor( model => model.PODCommentId, model => Model.PODCommentOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.PODCommentId )
-                </div>
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.PCNNumber )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.PCNNumber, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.PCNNumber )
-                </div>
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.PRNNumber )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.PRNNumber, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.PRNNumber )
+                    @Html.DropDownListFor( model => model.ClientGroupId, new SelectList( Model.ClientGroupOptions, "Key", "Value" ), "Select Customer Group", new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.ClientGroupId )
                 </div>
 
                 <div class="editor-label">
-                    @Html.LabelFor( model => model.ReconcileDate )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.ReconcileDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
-                    @Html.ValidationMessageFor( model => model.ReconcileDate )
-                </div>
-
-            </div>
-
-            <div class="left" style="width: 31%;">
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.LoadNumber )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.LoadNumber, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.LoadNumber )
-                </div>
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.AccountNumber )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.AccountNumber, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.AccountNumber )
-                </div>
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.ClientDescription )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.ClientDescription, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.ClientDescription )
-                </div>
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.ReferenceNumber )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.ReferenceNumber, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.ReferenceNumber )
-                </div>
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.ReceiverNumber )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.ReceiverNumber, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.ReceiverNumber )
-                </div>
-
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.Equipment )
-                </div>
-                <div class="editor-field">
-                    @Html.TextBoxFor( model => model.Equipment, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.Equipment )
-                </div>
-
-                <div class="editor-label ">
                     @Html.LabelFor( model => model.DeliveryNote )
                 </div>
                 <div class="editor-field">
@@ -276,7 +100,7 @@
                     @Html.ValidationMessageFor( model => model.DeliveryNote )
                 </div>
 
-                <div class="editor-label ">
+                <div class="editor-label">
                     @Html.LabelFor( model => model.ChepInvoiceNo )
                 </div>
                 <div class="editor-field">
@@ -284,32 +108,234 @@
                     @Html.ValidationMessageFor( model => model.ChepInvoiceNo )
                 </div>
 
-                <div class="editor-label ">
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.OrderNumber )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.OrderNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.OrderNumber )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.PrimarySecondary )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.PrimarySecondary, new List<SelectListItem> { new SelectListItem { Text = "Primary", Value = "Primary" }, new SelectListItem { Text = "Secondary", Value = "Secondary" } }, "Select Primary/Secondary", new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.PrimarySecondary )
+                </div>
+            </div>
+
+            <div class="left" style="width: 31%; margin-right: 3%;">
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.DepoSTONo )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.DepoSTONo, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.DepoSTONo )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.GLID )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.GLID, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.GLID )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.DeliveryDate )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.DeliveryDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
+                    @Html.ValidationMessageFor( model => model.DeliveryDate )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.TransporterId )
+                </div>
+                <div class="editor-field">
+                    @Html.DropDownListFor( model => model.TransporterId, new SelectList( Model.TransporterOptions, "Key", "Value" ), "Select Transporter", new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.TransporterId )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.FleetNumber )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.FleetNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.FleetNumber )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.VehicleRegistration )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.VehicleRegistration, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.VehicleRegistration )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.DebtorsCode )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.DebtorsCode, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.DebtorsCode )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.CustomerAccountNumber )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.CustomerAccountNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.CustomerAccountNumber )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.ReferenceNumber )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.ReferenceNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.ReferenceNumber )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.LoadsheetNo )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.LoadsheetNo, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.LoadsheetNo )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.ReceiverNumber )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.ReceiverNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.ReceiverNumber )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.DocNumber )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.DocNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.DocNumber )
+                </div>
+            </div>
+
+            <div class="left" style="width: 31%;">
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.ExchangeNo )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.ExchangeNo, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.ExchangeNo )
+                </div>
+
+                <div class="edit-label">
+                    @Html.LabelFor( model => model.ChepCustomerThanDocNo )
+                </div>
+                <div class="edit-field">
+                    @Html.TextBoxFor( model => model.ChepCustomerThanDocNo, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.ChepCustomerThanDocNo )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.WarehouseTransferDocNo )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.WarehouseTransferDocNo, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.WarehouseTransferDocNo )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.DebriefDocketNo )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.DebriefDocketNo, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.DebriefDocketNo )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.PalletReturnSlipNo )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.PalletReturnSlipNo, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.ValidationMessageFor( model => model.PalletReturnSlipNo )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.PalletReturnDate )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.PalletReturnDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
+                    @Html.ValidationMessageFor( model => model.PalletReturnDate )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.AuthorizationCode )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.AuthorizationCode, new { @class = "input", @placeholder = "Please Complete", @readonly = "readonly" } )
+                    @Html.ValidationMessageFor( model => model.AuthorizationCode )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.AuthorizedBy )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.AuthorizedBy, new { @class = "input", @placeholder = "Please Complete", @readonly = "readonly" } )
+                    @Html.ValidationMessageFor( model => model.AuthorizedBy )
+                </div>
+
+                <div class="editor-label">
                     @Html.LabelFor( model => model.ChepCompensationNo )
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.ChepCompensationNo, new { @class = "input", @placeholder = "Please Complete" } )
+                    @Html.TextBoxFor( model => model.ChepCompensationNo, new { @class = "input", @placeholder = "Please Complete", @readonly = "readonly" } )
                     @Html.ValidationMessageFor( model => model.ChepCompensationNo )
                 </div>
 
-                <div class="editor-label ">
-                    @Html.LabelFor( model => model.THAN )
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.CompensationDate )
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor( model => model.THAN, new { @class = "input", @placeholder = "Please Complete" } )
-                    @Html.ValidationMessageFor( model => model.THAN )
+                    @Html.TextBoxFor( model => model.CompensationDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
+                    @Html.ValidationMessageFor( model => model.CompensationDate )
+                </div>
+
+                <div class="editor-label">
+                    @Html.LabelFor( model => model.EffectiveDate )
+                </div>
+                <div class="editor-field">
+                    @Html.TextBoxFor( model => model.EffectiveDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
+                    @Html.ValidationMessageFor( model => model.EffectiveDate )
                 </div>
 
             </div>
 
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+            <div class="grouped-area">
+                <div id="equipment-details-container">
+                    @Html.Partial( "_EquipmentDetails", Model )
+                    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; margin-top: 20px; height: 0;">&nbsp;</div>
+                </div>
+
+                <div style="position: relative;">
+                    <a data-add-one-more="1" data-target="#equipment-details-container" rel="tipsyW" title="Add another Section?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                        <img alt="Add" src="@Url.Content("~/Images/add.png")" />
+                    </a>
+                </div>
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+            <p>
+                <input id="save-btn" type="submit" value="Save" />
+                <span style="padding: 0 5px;">/</span>
+                <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
+            </p>
         </div>
-
-        <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 10px; height: 20px;">&nbsp;</div>
-
-        <p>
-            <input id="save-btn" type="submit" value="Update" />
-            <span style="padding: 0 5px;">/</span> <a data-cancel="1" data-target="#edit-item" data-remove="tr.edit">Cancel</a>
-        </p>
-
     </div>
 }

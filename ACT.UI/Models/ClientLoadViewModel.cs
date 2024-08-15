@@ -298,7 +298,7 @@ namespace ACT.UI.Models
 
         public List<EquipmentDetailViewModel> EquipmentDetails { get; set; } = new List<EquipmentDetailViewModel>();
 
-        public Dictionary<int, string> EquipmentCodeOptions { get; set; }
+        public Dictionary<int, string> EquipmentCodeOptions { get; set; } = new Dictionary<int, string>();
 
         #endregion
 
@@ -427,6 +427,8 @@ namespace ACT.UI.Models
 
             [Display( Name = "Outstanding Qty at Customer" )]
             public decimal OutstandingQtyAtCustomer { get; set; }
+
+            public Dictionary<int, string> ProductOptions { get; set; }
         }
 
         #endregion

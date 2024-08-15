@@ -21,6 +21,7 @@ using ACT.Mailer;
 using Microsoft.VisualBasic.FileIO;
 using System.Globalization;
 using static ACT.UI.Models.ClientLoadViewModel;
+using System.Web.Services.Description;
 
 namespace ACT.UI.Controllers
 {
@@ -1189,11 +1190,11 @@ namespace ACT.UI.Controllers
             ClientLoadViewModel model = new ClientLoadViewModel()
             {
                 EditMode = true,
-                EquipmentDetails = new List<ClientLoadViewModel.EquipmentDetailViewModel>
+                EquipmentDetails = new List<EquipmentDetailViewModel>
                 {
-                    new ClientLoadViewModel.EquipmentDetailViewModel(),
-                    new ClientLoadViewModel.EquipmentDetailViewModel(),
-                    new ClientLoadViewModel.EquipmentDetailViewModel()
+                    new EquipmentDetailViewModel(),
+                    new EquipmentDetailViewModel(),
+                    new EquipmentDetailViewModel()
                 }
             };
 
@@ -1215,8 +1216,15 @@ namespace ACT.UI.Controllers
         {
             if ( !ModelState.IsValid )
             {
+                using ( ClientProductService cpservice = new ClientProductService() )
+                {
+                    var clientProducts = cpservice.ListByClient( model.ClientId );
+                    model.EquipmentCodeOptions = clientProducts.ToDictionary(
+                        cp => cp.ProductId,
+                        cp => cp.Product.Name
+                    );
+                }
                 Notify( "Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error );
-
                 return View( model );
             }
 
@@ -1228,327 +1236,177 @@ namespace ACT.UI.Controllers
             using ( TransactionScope scope = new TransactionScope() )
             {
                 #region Create Client Load
-
                 ClientLoad load = new ClientLoad()
                 {
-                    THAN = model.THAN,
                     ClientId = model.ClientId,
-                    LoadDate = model.LoadDate,
-                    Equipment = model.Equipment,
-                    ReturnQty = model.ReturnQty,
-                    PODNumber = model.PODNumber,
-                    PCNNumber = model.PCNNumber,
-                    PRNNumber = model.PRNNumber,
-                    VehicleId = model.VehicleId,
-                    DebriefQty = model.DebriefQty,
-                    LoadNumber = model.LoadNumber,
-                    NotifyDate = model.NotifyDate,
-                    Status = ( int ) model.Status,
-                    NewQuantity = model.NewQuantity,
-                    DeliveryNote = model.DeliveryNote,
                     ClientSiteId = model.ClientSiteId,
-                    PODCommentId = model.PODCommentId,
-                    ReconcileDate = model.ReconcileDate,
-                    TransporterId = model.TransporterId,
-                    AccountNumber = model.AccountNumber,
-                    EffectiveDate = model.EffectiveDate,
+                    ToClientSiteId = model.ClientSiteIdTo,
+                    LoadNumber = model.LoadNumber,
+                    LoadDate = model.LoadDate,
+                    DeliveryNote = model.DeliveryNote,
                     ChepInvoiceNo = model.ChepInvoiceNo,
-                    AdminMovement = model.AdminMovement,
-                    ReceiverNumber = model.ReferenceNumber,
-                    OutstandingQty = model.OutstandingQty,
-                    CancelledReason = model.CancelledReason,
+                    OrderNumber = model.OrderNumber,
+                    DepoSTONo = model.DepoSTONo,
+                    GLID = model.GLID,
+                    DeliveryDate = model.DeliveryDate,
+                    TransporterId = model.TransporterId,
+                    VehicleId = !string.IsNullOrEmpty( model.FleetNumber ) && int.TryParse( model.FleetNumber, out int fleetNumber ) ? ( int? ) fleetNumber : null,
                     ReferenceNumber = model.ReferenceNumber,
-                    OriginalQuantity = model.OriginalQuantity,
-                    ClientDescription = model.ClientDescription,
+                    LoadSheetNo = model.LoadsheetNo,
+                    ReceiverNumber = model.ReceiverNumber,
+                    DocNumber = model.DocNumber,
+                    ExchangeNo = model.ExchangeNo,
+                    ChepCustomerThanDocNo = model.ChepCustomerThanDocNo,
+                    WarehouseTransferDocNo = model.WarehouseTransferDocNo,
+                    DebriefDocketNo = model.DebriefDocketNo,
+                    PalletReturnSlipNo = model.PalletReturnSlipNo,
+                    PalletReturnDate = model.PalletReturnDate,
                     ChepCompensationNo = model.ChepCompensationNo,
-                    OutstandingReasonId = model.OutstandingReasonId,
-                    ReconcileInvoice = model.ReconcileInvoice.GetBoolValue(),
+                    CompensationDate = model.CompensationDate,
+                    EffectiveDate = model.EffectiveDate
                 };
 
                 load = clservice.Create( load );
-
                 #endregion
 
-                Address address = aservice.Get( model.ClientId, "Client" );
-
-                string customerAddress = $"{address?.Addressline1} {address?.Addressline2} {address?.Town} {address?.PostalCode}";
-
-                #region Create Delivery Note
-
-                Client client = cservice.GetById( model.ClientId );
-
-                DeliveryNote deliveryNote = new DeliveryNote()
+                #region Create Equipment Details
+                if ( model.EquipmentDetails != null && model.EquipmentDetails.Count > 0 )
                 {
-                    ClientId = model.ClientId,
-                    ClientSiteId = model.ClientSiteId,
+                    using ( ClientLoadQuantityService clientLoadQuantityService = new ClientLoadQuantityService() )
+                    {
+                        foreach ( var detail in model.EquipmentDetails )
+                        {
+                            if ( detail.ProductId != 0 ) // Only create if a product is selected
+                            {
+                                ClientLoadQuantity clientLoadQuantity = new ClientLoadQuantity
+                                {
+                                    ClientLoadId = load.Id,
+                                    EquipmentCode = detail.ProductId.ToString(),
+                                    OriginalQuantity = ( int ) detail.DeliveredQty,
+                                    ReturnQty = ( int ) detail.ReturnedTransferredQty,
+                                    DebriefQty = ( int ) detail.DebriefQty,
+                                    TransporterLiableQty = ( int ) detail.TransporterLiable,
+                                    AdminMovementQty = ( int ) detail.AdminMovement,
+                                    OutstandingQty = ( int ) detail.OutstandingQtyAtCustomer,
+                                    CreatedOn = DateTime.Now,
+                                    ModifiedOn = DateTime.Now,
+                                };
 
-                    OrderDate = model.LoadDate,
-                    EmailAddress = client.Email,
-                    Status = ( int ) Status.Active,
-                    Reference306 = model.LoadNumber ?? "",
-                    CustomerName = client.CompanyName,
-                    InvoiceNumber = model.DeliveryNote ?? "",
-                    OrderNumber = model.ReferenceNumber ?? "",
-                    ContactNumber = model.ReceiverNumber ?? "",
-
-                    CustomerAddress = customerAddress,
-                    CustomerProvinceId = address?.ProvinceId,
-                    CustomerPostalCode = address?.PostalCode,
-
-                    DeliveryAddress = customerAddress,
-                    DeliveryProvinceId = address?.ProvinceId,
-                    DeliveryPostalCode = address?.PostalCode,
-
-                    BillingAddress = customerAddress,
-                    BillingProvinceId = address?.ProvinceId,
-                    BililngPostalCode = address?.PostalCode,
-                };
-
-                deliveryNote = dnservice.Create( deliveryNote );
-
-                #endregion
-
-                #region Delivery Note Line
-
-                DeliveryNoteLine dnl = new DeliveryNoteLine
-                {
-                    Returned = 0,
-                    Product = model.Equipment ?? "",
-                    DeliveryNoteId = deliveryNote.Id,
-                    Equipment = model.Equipment ?? "",
-                    Delivered = model.NewQuantity,
-                    Status = ( int ) Status.Active,
-                    ProductDescription = model.Equipment ?? "",
-                    OrderQuantity = model.OriginalQuantity,
-                };
-
-                dnlservice.Create( dnl );
-
-                #endregion
-
-                #region Delivery Note Address
-
-                // Create Invoice Customer Address
-                Address invoiceCustomerAddress = new Address()
-                {
-                    Type = 1,
-                    Town = address?.Town,
-                    ObjectId = deliveryNote.Id,
-                    ObjectType = "DeliveryNote",
-                    Status = ( int ) Status.Active,
-                    PostalCode = address?.PostalCode,
-                    Addressline1 = address?.Addressline1,
-                    Addressline2 = address?.Addressline2,
-                    ProvinceId = address?.ProvinceId,
-                };
-
-                aservice.Create( invoiceCustomerAddress );
-
+                                clientLoadQuantityService.Create( clientLoadQuantity );
+                            }
+                        }
+                    }
+                }
                 #endregion
 
                 scope.Complete();
             }
 
             Notify( "The item was successfully created.", NotificationType.Success );
-
             return ClientData( new PagingModel(), new CustomSearchModel() );
         }
 
         // GET: Pallet/EditClientData/5
         [Requires( PermissionTo.Edit )]
-        public ActionResult EditClientData( int id, int chepLoadId = 0 )
+        public ActionResult EditClientData( int id )
         {
             using ( ImageService iservice = new ImageService() )
             using ( ChepLoadService chservice = new ChepLoadService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( ClientProductService cpservice = new ClientProductService() )
+            using ( ProductService pservice = new ProductService() )
             {
                 ClientLoad load = clservice.GetById( id );
-
-                ChepLoad chep = chservice.Get( chepLoadId );
-
-                if ( load == null && chep == null )
-                {
-                    Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return PartialView( "_AccessDenied" );
-                }
-
-                if ( chep != null && load == null )
-                {
-                    load = new ClientLoad() { ReceiverNumber = chep.Ref, ClientId = chep.ClientId, };
-                }
-
                 #region Client Load
-
                 ClientLoadViewModel model = new ClientLoadViewModel()
                 {
                     EditMode = true,
-                    THAN = load?.THAN,
                     Id = load?.Id ?? 0,
-                    GLID = load?.GLID,
-                    LoadDate = load?.LoadDate,
-                    VehicleId = load?.VehicleId,
-                    Equipment = load?.Equipment,
-                    ReturnQty = load?.ReturnQty,
-                    PODNumber = load?.PODNumber,
-                    PCNNumber = load?.PCNNumber,
-                    PRNNumber = load?.PRNNumber,
-                    DebriefQty = load?.DebriefQty,
-                    LoadNumber = load?.LoadNumber,
-                    NotifyDate = load?.NotifyDate,
                     ClientId = load?.ClientId ?? 0,
-                    NewQuantity = load?.NewQuantity,
-                    DeliveryNote = load?.DeliveryNote,
                     ClientSiteId = load?.ClientSiteId,
-                    PODCommentId = load?.PODCommentId,
-                    DeliveryDate = load?.EffectiveDate,
-                    TransporterId = load?.TransporterId,
-                    ReconcileDate = load?.ReconcileDate,
-                    AccountNumber = load?.AccountNumber,
-                    EffectiveDate = load?.EffectiveDate,
-                    AdminMovement = load?.AdminMovement,
-                    ChepInvoiceNo = load?.ChepInvoiceNo,
                     ClientSiteIdTo = load?.ToClientSiteId,
-                    OutstandingQty = load?.OutstandingQty,
-                    ReceiverNumber = load?.ReceiverNumber,
-                    ToClientSiteName = load?.ClientSite1,
-                    FromClientSiteName = load?.ClientSite,
-                    CancelledReason = load?.CancelledReason,
-                    ReferenceNumber = load?.ReferenceNumber,
-                    ClientLoadNotes = load?.ClientLoadNotes,
-                    DebriefDocketNo = load?.DebriefDocketNo,
-                    OriginalQuantity = load?.OriginalQuantity,
-                    TransporterName = load?.Transporter?.Name,
-                    ClientDescription = load?.ClientDescription,
-                    ChepCompensationNo = load?.ChepCompensationNo,
-                    Status = ( ReconciliationStatus ) load?.Status,
-                    OutstandingReasonId = load?.OutstandingReasonId,
-                    RegionToId = load?.ClientSite1?.Site?.Region?.Id,
-                    RegionFromId = load?.ClientSite?.Site?.Region?.Id,
+                    LoadNumber = load?.LoadNumber,
+                    LoadDate = load?.LoadDate,
+                    DeliveryNote = load?.DeliveryNote,
+                    ChepInvoiceNo = load?.ChepInvoiceNo,
+                    OrderNumber = load?.OrderNumber,
+                    DepoSTONo = load?.DepoSTONo,
+                    GLID = load?.GLID,
+                    DeliveryDate = load?.DeliveryDate,
+                    TransporterId = load?.TransporterId,
+                    FleetNumber = load?.VehicleId?.ToString(),
                     VehicleRegistration = load?.Vehicle?.Registration,
-                    ExtendedClientLoad = load?.ExtendedClientLoads.FirstOrDefault(),
-                    ReconcileInvoice = load?.ReconcileInvoice == true ? YesNo.Yes : YesNo.No,
-
-                    ChepAccountNumberGlid = load?.Client?.ClientCustomers?.FirstOrDefault()?.CustomerNumber,
-                    ClientLoadQuantities = load?.ClientLoadQuantities.ToList(),
-
+                    ReferenceNumber = load?.ReferenceNumber,
+                    LoadsheetNo = load?.LoadSheetNo,
+                    ReceiverNumber = load?.ReceiverNumber,
+                    DocNumber = load?.DocNumber,
+                    ExchangeNo = load?.ExchangeNo,
                     ChepCustomerThanDocNo = load?.ChepCustomerThanDocNo,
                     WarehouseTransferDocNo = load?.WarehouseTransferDocNo,
-                    PalletReturnDate = load?.PalletReturnDate,
+                    DebriefDocketNo = load?.DebriefDocketNo,
                     PalletReturnSlipNo = load?.PalletReturnSlipNo,
-                    CustomerType = load?.CustomerType,
-
+                    PalletReturnDate = load?.PalletReturnDate,
+                    ChepCompensationNo = load?.ChepCompensationNo,
+                    CompensationDate = load?.CompensationDate,
+                    EffectiveDate = load?.EffectiveDate,
+                    EquipmentDetails = load?.ClientLoadQuantities.Select( clq => new EquipmentDetailViewModel
+                    {
+                        ProductId = int.TryParse( clq.EquipmentCode, out int productId ) ? productId : 0,
+                        DeliveredQty = clq.OriginalQuantity,
+                        ReturnedTransferredQty = clq.ReturnQty,
+                        DebriefQty = clq.DebriefQty,
+                        TransporterLiable = clq.TransporterLiableQty,
+                        AdminMovement = clq.AdminMovementQty,
+                        OutstandingQtyAtCustomer = clq.OutstandingQty
+                    } ).ToList() ?? new List<EquipmentDetailViewModel>()
                 };
 
                 #endregion
 
-                ViewBag.ClientAuthorisation = load?.ClientAuthorisations.FirstOrDefault();
+                #region Equipment Details
+                var clientProducts = cpservice.ListByClient( model.ClientId );
+                var allProducts = pservice.List( true ); // Get all active products
 
-                ViewBag.ClientLoads = new List<ClientLoad>() { load };
-
-                List<ChepLoad> cheps = chservice.ListByReference( load?.ClientId ?? 0, load?.ReceiverNumber?.Trim() );
-
-                if ( chep == null )
+                model.EquipmentDetails = load?.ClientLoadQuantities.Select( clq => new EquipmentDetailViewModel
                 {
-                    chep = cheps?.FirstOrDefault();
-                }
+                    ProductId = clientProducts.FirstOrDefault( cp => cp.Equipment == clq.EquipmentCode )?.ProductId ?? 0,
+                    DeliveredQty = clq.OriginalQuantity,
+                    ReturnedTransferredQty = clq.ReturnQty,
+                    DebriefQty = clq.DebriefQty,
+                    TransporterLiable = clq.TransporterLiableQty,
+                    AdminMovement = clq.AdminMovementQty,
+                    OutstandingQtyAtCustomer = clq.OutstandingQty
+                } ).ToList() ?? new List<EquipmentDetailViewModel>();
 
-                #region Client Load Quantities
-
-                if ( !model.ClientLoadQuantities.NullableAny() )
+                if ( !model.EquipmentDetails.Any() )
                 {
-                    model.ClientLoadQuantities = new List<ClientLoadQuantity>()
+                    model.EquipmentDetails = new List<EquipmentDetailViewModel>
                     {
-                        new ClientLoadQuantity()
+                        new EquipmentDetailViewModel
                         {
-                            ReturnQty = ( int? ) load?.ReturnQty ?? 0,
-                            DebriefQty = ( int? ) load?.DebriefQty ?? 0,
-                            OutstandingQty = ( int? ) load?.OutstandingQty ?? 0,
-                            AdminMovementQty = ( int? ) load?.AdminMovement ?? 0,
-                            OriginalQuantity = ( int? ) load?.OriginalQuantity ?? 0,
-                            EquipmentCode = chep?.EquipmentCode ?? load?.EquipmentCode,
-                            TransporterLiableQty = ( int? ) load?.TransporterLiableQty ?? 0,
+                            ProductId = 0,
+                            DeliveredQty = load?.OriginalQuantity ?? 0,
+                            ReturnedTransferredQty = load?.ReturnQty ?? 0,
+                            DebriefQty = load?.DebriefQty ?? 0,
+                            TransporterLiable = load?.TransporterLiableQty ?? 0,
+                            AdminMovement = load?.AdminMovement ?? 0,
+                            OutstandingQtyAtCustomer = load?.OutstandingQty ?? 0
                         }
                     };
                 }
 
                 #endregion
 
-                ViewBag.ChepLoad = chep;
-                ViewBag.ChepLoads = cheps;
+                #region Populate EquipmentCodeOptions
 
-                model.DocumentType = ( load?.CustomerType?.ToUpper().Contains( "EXCHANGE" ) == true ) ? DocumentType.ExchangeCustomer : DocumentType.THAN;
-
-
-                #region Chep Fields
-
-                if ( chep != null )
-                {
-                    model.ChepRef = chep.Ref;
-                    model.ChepOtherRef = chep.OtherRef;
-                    model.DeliveryDate = chep.DeliveryDate;
-                    model.ChepInvoiceNumber = chep.InvoiceNumber;
-                    model.ChepEffectiveDate = chep.EffectiveDate;
-
-                    if ( chep.DocumentType > 0 )
-                    {
-                        model.DocumentType = ( DocumentType ) chep.DocumentType;
-                    }
-                }
-                else if ( load?.ReceiverNumber?.StartsWith( "50000" ) == true || load?.ReceiverNumber?.StartsWith( "52" ) == true || load?.ReceiverNumber?.StartsWith( "51" ) == true )
-                {
-                    model.DocumentType = DocumentType.ExchangeCustomer;
-                }
-
-                if ( string.IsNullOrEmpty( model.PalletReturnSlipNo ) )
-                {
-                    model.PalletReturnSlipNo = cheps?.Where( c => c?.TransactionType?.ToUpper() == "RETURN" )
-                                                    ?.FirstOrDefault()
-                                                    ?.DocketNumber;
-                }
-
-                if ( !model.PalletReturnDate.HasValue )
-                {
-                    model.PalletReturnDate = cheps?.Where( c => c?.TransactionType?.ToUpper() == "RETURN" )
-                                                  ?.FirstOrDefault()
-                                                  ?.EffectiveDate;
-                }
-
-                if ( cheps?.NullableAny( c => c?.DocketNumber?.StartsWith( "42" ) == true ) == true )
-                {
-                    model.ChepCustomerThanDocNo = cheps?.FirstOrDefault( c => c?.DocketNumber?.StartsWith( "42" ) == true ).DocketNumber;
-                }
-
-                if ( cheps?.NullableAny( c => c?.DocketNumber?.StartsWith( "42" ) == true ) == true )
-                {
-                    model.WarehouseTransferDocNo = cheps?.Where( c => c?.IsExchange == true )
-                                                        ?.OrderByDescending( o => o.Id )
-                                                        ?.FirstOrDefault()
-                                                        ?.DocketNumber;
-                }
+                model.EquipmentCodeOptions = clientProducts.ToDictionary(
+                    cp => cp.ProductId,
+                    cp => allProducts.ContainsKey( cp.ProductId ) ? allProducts[ cp.ProductId ] : "Unknown Product"
+                );
 
                 #endregion
 
-                List<ClientProduct> cp = new List<ClientProduct>(); // load?.Client.ClientProducts.Where( xcp => xcp.Status == ( int ) Status.Active ).ToList();
-
-                if ( !cp.NullableAny() )
-                {
-                    cp = new List<ClientProduct>()
-                    {
-                        { new ClientProduct() { Equipment = "8001" } },
-                        { new ClientProduct() { Equipment = "8003" } },
-                        { new ClientProduct() { Equipment = "8005" } },
-                    };
-                }
-
-                ViewBag.ClientProducts = cp;
-
-                Image podImg = iservice.Get( model.Id, "PODNumber", true );
-
-                model.HasPOD = ( podImg != null );
-                model.HasDisputes = cheps.NullableAny( c => c.Disputes.NullableAny() );
-
-                return View( "ClientDataDetails", model );
+                return View( model );
             }
         }
 

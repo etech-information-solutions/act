@@ -88,9 +88,9 @@
         {
             foreach ( var item in items )
             {
-                ReconciliationStatus status = ( ReconciliationStatus ) item.Status;
-
-                string active = status == ReconciliationStatus.Reconciled ? "active" : "inactive";
+                Status status = ( Status ) item.Status;
+                string active = ( status == Status.Active ) ? "active" : "inactive";
+                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
                 <tr id="clientdata-@item.Id-item" class="clientdata-@item.Id-item ">
                     <td>
@@ -117,8 +117,8 @@
                     <td>
                         @item.PODComment
                     </td>
-                    <td class="@(status == ReconciliationStatus.Reconciled ? "active" : "inactive")">
-                        @status
+                    <td>
+                        @status.GetDisplayText()
                     </td>
                     <td>
                         @item.TransporterName
@@ -129,18 +129,21 @@
                     <td>
                         @item.InvoiceNumber
                     </td>
-                    <td width="5%">
+                    <td width="15%">
 
                         <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
 
-                            @Html.ActionLink( "Details", "EditClientData", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
+                            @Html.ActionLink( "Details", "ClientDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".tr-" + item.Id + "-item" } )
+
+                            @Html.ActionLink( "Edit", "EditClientData", new { id = item.Id, returnView = "Pallet" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
+
+                            @Html.ActionLink( enable, "DeleteClientData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = enable + " this item?" } )
 
                         </div>
 
-                        @*<span>
-                            @Html.ActionLink( "Journals", "ClientLoadJournals", new { id = item.Id, edit = false }, new { @class = "reports", @rel = "tipsyS", @title = "View Journals", @style = "padding-left: 28px; margin-left: 0; background-position-y: center;", @data_clientload_journal = "1", @data_id = item.Id } )
-                        </span>*@
-
+                        <a href="@Url.Action( "CustomerContacts", "Client", new { id = item.Id } )" data-details="1" data-id="@item.Id" data-target=".tr-@item.Id-item">
+                            <i class="fa fa-phone"></i>Contacts
+                        </a>
                     </td>
                 </tr>
                 
