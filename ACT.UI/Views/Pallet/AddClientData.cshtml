@@ -107,9 +107,7 @@
                     @Html.TextBoxFor( model => model.ChepInvoiceNo, new { @class = "input", @placeholder = "Please Complete" } )
                     @Html.ValidationMessageFor( model => model.ChepInvoiceNo )
                 </div>
-            </div>
 
-            <div class="left" style="width: 31%; margin-right: 3%;">
                 <div class="editor-label">
                     @Html.LabelFor( model => model.OrderNumber )
                 </div>
@@ -125,6 +123,9 @@
                     @Html.DropDownListFor( model => model.PrimarySecondary, new List<SelectListItem> { new SelectListItem { Text = "Primary", Value = "Primary" }, new SelectListItem { Text = "Secondary", Value = "Secondary" } }, "Select Primary/Secondary", new { @class = "chzn", @style = "width: 98%;" } )
                     @Html.ValidationMessageFor( model => model.PrimarySecondary )
                 </div>
+            </div>
+
+            <div class="left" style="width: 31%; margin-right: 3%;">
 
                 <div class="editor-label">
                     @Html.LabelFor( model => model.DepoSTONo )
@@ -189,9 +190,7 @@
                     @Html.TextBoxFor( model => model.CustomerAccountNumber, new { @class = "input", @placeholder = "Please Complete" } )
                     @Html.ValidationMessageFor( model => model.CustomerAccountNumber )
                 </div>
-            </div>
 
-            <div class="left" style="width: 31%;">
                 <div class="editor-label">
                     @Html.LabelFor( model => model.ReferenceNumber )
                 </div>
@@ -223,6 +222,9 @@
                     @Html.TextBoxFor( model => model.DocNumber, new { @class = "input", @placeholder = "Please Complete" } )
                     @Html.ValidationMessageFor( model => model.DocNumber )
                 </div>
+            </div>
+
+            <div class="left" style="width: 31%;">
 
                 <div class="editor-label">
                     @Html.LabelFor( model => model.ExchangeNo )

@@ -1557,56 +1557,119 @@
             {
                 var i = $( this );
                 var target = $( i.attr( 'data-target' ) );
-
                 i.unbind( 'click' );
                 i.click( function ()
                 {
-                    // Clone the last equipment detail section
-                    var lastSection = target.find( '.equipment-detail-section' ).last();
-                    var newSection = lastSection.clone( true );
+                    // Get the current number of sections
+                    var sectionCount = target.find( '.equipment-detail-section' ).length;
 
-                    // Get the current index (number of existing sections * 3)
-                    var currentIndex = target.find( '.equipment-detail-section' ).length * 3;
+                    // Create a new section
+                    var newSection = $( '<div class="equipment-detail-section"></div>' );
+                    newSection.attr( 'data-section-index', sectionCount );
 
-                    // Update the IDs, names, and labels of the cloned elements
-                    newSection.find( 'input, select, label' ).each( function ( index )
+                    // Function to create new dropdowns
+                    function createDropdowns ( fieldName, options )
                     {
-                        var element = $( this );
-                        var name = element.attr( 'name' );
-                        var id = element.attr( 'id' );
-                        var for_attr = element.attr( 'for' );
+                        var editorField = $( '<div class="editor-field"></div>' );
+                        for ( var i = 0; i < 3; i++ )
+                        {
+                            var select = $( '<select></select>', {
+                                name: 'EquipmentDetails[' + ( sectionCount * 3 + i ) + '].' + fieldName,
+                                id: 'EquipmentDetails_' + ( sectionCount * 3 + i ) + '__' + fieldName,
+                                class: 'chzn equipment-dropdown',
+                                style: 'width: 25%; margin-right: 15px;',
+                                'data-index': i
+                            } );
+                            select.append( $( '<option></option>' ).attr( 'value', '' ).text( 'Select Equipment' ) );
 
-                        if ( name )
-                        {
-                            element.attr( 'name', name.replace( /\[\d+\]/, '[' + ( currentIndex + index % 3 ) + ']' ) );
-                        }
-                        if ( id )
-                        {
-                            element.attr( 'id', id.replace( /\_\d+\_/, '_' + ( currentIndex + index % 3 ) + '_' ) );
-                        }
-                        if ( for_attr )
-                        {
-                            element.attr( 'for', for_attr.replace( /\_\d+\_/, '_' + ( currentIndex + index % 3 ) + '_' ) );
-                        }
+                            // Ensure options is an object before iterating
+                            if ( typeof options === 'object' && options !== null )
+                            {
+                                $.each( options, function ( key, value )
+                                {
+                                    select.append( $( '<option></option>' ).attr( 'value', key ).text( value ) );
+                                } );
+                            } else
+                            {
+                                console.warn( 'Equipment options are not available or not in the correct format' );
+                            }
 
-                        // Clear input values
-                        if ( element.is( 'input:text' ) )
-                        {
-                            element.val( '' );
-                        } else if ( element.is( 'select' ) )
-                        {
-                            element.prop( 'selectedIndex', 0 );
+                            editorField.append( select );
                         }
+                        return editorField;
+                    }
+
+                    // Function to create new input fields with default value
+                    function createInputFields ( fieldName, defaultValue )
+                    {
+                        var editorField = $( '<div class="editor-field"></div>' );
+                        for ( var i = 0; i < 3; i++ )
+                        {
+                            var input = $( '<input>', {
+                                type: 'text',
+                                name: 'EquipmentDetails[' + ( sectionCount * 3 + i ) + '].' + fieldName,
+                                id: 'EquipmentDetails_' + ( sectionCount * 3 + i ) + '__' + fieldName,
+                                class: 'input',
+                                style: 'width: 20%; margin-right: 5px;',
+                                value: defaultValue // Set the default value
+                            } );
+                            editorField.append( input );
+                        }
+                        return editorField;
+                    }
+
+                    // Get the equipment options from the first section's dropdown
+                    var equipmentOptions = {};
+                    var firstDropdown = target.find( '.equipment-detail-section:first select.equipment-dropdown:first' );
+                    firstDropdown.find( 'option' ).each( function ()
+                    {
+                        var option = $( this );
+                        if ( option.val() !== '' )
+                        {  // Exclude the default "Select Equipment" option
+                            equipmentOptions[ option.val() ] = option.text();
+                        }
+                    } );
+
+                    // Add the dropdowns for ProductId
+                    newSection.append( '<p><strong class="uppercase">Equipment Details</strong></p>' );
+                    newSection.append( '<div class="editor-label" style="margin-top: 15px !important"><label for="EquipmentDetails_' + ( sectionCount * 3 ) + '__ProductId">Equipment</label></div>' );
+                    newSection.append( createDropdowns( 'ProductId', equipmentOptions ) );
+
+                    // Add input fields for other properties with default value of 0
+                    var inputFields = [
+                        { name: 'OriginalQuantity', label: 'Original Quantity' },
+                        { name: 'ReturnQty', label: 'Return Qty' },
+                        { name: 'DebriefQty', label: 'Debrief Qty' },
+                        { name: 'TransporterLiableQty', label: 'Transporter Liable Qty' },
+                        { name: 'AdminMovement', label: 'Admin Movement' },
+                        { name: 'OutstandingQty', label: 'Outstanding Qty' }
+                    ];
+                    inputFields.forEach( function ( field )
+                    {
+                        newSection.append( '<div class="editor-label" style="margin-top: 15px !important"><label for="EquipmentDetails_' + ( sectionCount * 3 ) + '__' + field.name + '">' + field.label + '</label></div>' );
+                        newSection.append( createInputFields( field.name, '0' ) ); // Set default value to '0'
                     } );
 
                     // Append the new section to the container
                     target.append( newSection );
 
-                    // Reinitialize any necessary plugins (e.g., chosen)
-                    newSection.find( '.chzn' ).chosen();
+                    // Initialize Chosen for the new dropdowns
+                    if ( $.fn.chosen )
+                    {
+                        newSection.find( 'select.chzn' ).chosen();
+                    } else
+                    {
+                        console.warn( 'Chosen plugin is not available' );
+                    }
 
-                    // Restart JT JS DOM
-                    ACT.Init.Start( true );
+                    // Reinitialize any other necessary plugins or events for the new section
+                    if ( typeof ACT !== 'undefined' && ACT.Init && typeof ACT.Init.Start === 'function' )
+                    {
+                        ACT.Init.Start( true );
+                    } else
+                    {
+                        console.warn( 'ACT.Init.Start is not available' );
+                    }
 
                     return false;
                 } );

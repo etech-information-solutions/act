@@ -1,76 +1,85 @@
 ﻿@model ACT.UI.Models.ClientLoadViewModel
 
-<div class="equipment-detail-section">
+<div class="equipment-detail-section" style="margin-top: 35px !important">
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; margin-top: 20px !important">&nbsp;</div>
+
     <p>
         <strong class="uppercase">Equipment Details</strong>
     </p>
-    <div class="editor-label">
+
+    <div class="editor-label" style="margin-top: 15px !important">
         @Html.LabelFor( m => m.EquipmentDetails[ 0 ].ProductId )
     </div>
     <div class="editor-field">
         @for ( int i = 0; i < 3; i++ )
         {
-            @Html.DropDownListFor( m => m.EquipmentDetails[ i ].ProductId, new SelectList( Model.EquipmentCodeOptions, "Key", "Value" ), "Select Equipment", new { @class = "chzn", @style = "width: 30%;" } )
+            <div style="display: inline-block; margin-right: 10px; width: 21.1%;">
+                @Html.DropDownListFor( m => m.EquipmentDetails[ i ].ProductId, new SelectList( Model.EquipmentCodeOptions, "Key", "Value" ), "Select Equipment", new { @class = "chzn equipment-dropdown", @style = "width: 100%;", data_index = i } )
+            </div>
         }
     </div>
 
-    <div class="editor-label">
+    <div class="editor-label" style="margin-top: 15px !important">
         @Html.LabelFor( m => m.EquipmentDetails[ 0 ].DeliveredQty )
     </div>
     <div class="editor-field">
         @for ( int i = 0; i < 3; i++ )
         {
-            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].DeliveredQty, new { @class = "input", @style = "width: 30%;" } )
+            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].DeliveredQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
         }
     </div>
 
-    <div class="editor-label">
+    <div class="editor-label" style="margin-top: 15px !important">
         @Html.LabelFor( m => m.EquipmentDetails[ 0 ].ReturnedTransferredQty )
     </div>
     <div class="editor-field">
         @for ( int i = 0; i < 3; i++ )
         {
-            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].ReturnedTransferredQty, new { @class = "input", @style = "width: 30%;" } )
+            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].ReturnedTransferredQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
         }
     </div>
 
-    <div class="editor-label">
+    <div class="editor-label" style="margin-top: 15px !important">
         @Html.LabelFor( m => m.EquipmentDetails[ 0 ].DebriefQty )
     </div>
     <div class="editor-field">
         @for ( int i = 0; i < 3; i++ )
         {
-            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].DebriefQty, new { @class = "input", @style = "width: 30%;" } )
+            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].DebriefQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
         }
     </div>
 
-    <div class="editor-label">
+    <div class="editor-label" style="margin-top: 15px !important">
         @Html.LabelFor( m => m.EquipmentDetails[ 0 ].TransporterLiable )
     </div>
     <div class="editor-field">
         @for ( int i = 0; i < 3; i++ )
         {
-            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].TransporterLiable, new { @class = "input", @style = "width: 30%;" } )
+            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].TransporterLiable, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
         }
     </div>
 
-    <div class="editor-label">
+    <div class="editor-label" style="margin-top: 15px !important">
         @Html.LabelFor( m => m.EquipmentDetails[ 0 ].AdminMovement )
     </div>
     <div class="editor-field">
         @for ( int i = 0; i < 3; i++ )
         {
-            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].AdminMovement, new { @class = "input", @style = "width: 30%;" } )
+            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].AdminMovement, new { @class = "input", @style = "width: 20%; margin-right: 5px;;" } )
         }
     </div>
 
-    <div class="editor-label">
+    <div class="editor-label" style="margin-top: 15px !important">
         @Html.LabelFor( m => m.EquipmentDetails[ 0 ].OutstandingQtyAtCustomer )
     </div>
     <div class="editor-field">
         @for ( int i = 0; i < 3; i++ )
         {
-            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].OutstandingQtyAtCustomer, new { @class = "input", @style = "width: 30%;" } )
+            @Html.TextBoxFor( m => m.EquipmentDetails[ i ].OutstandingQtyAtCustomer, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
         }
     </div>
+
 </div>
+
+<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; margin-top: 20px !important">&nbsp;</div>
