@@ -1564,7 +1564,7 @@
                     var sectionCount = target.find( '.equipment-detail-section' ).length;
 
                     // Create a new section
-                    var newSection = $( '<div class="equipment-detail-section"></div>' );
+                    var newSection = $( '<div class="equipment-detail-section" style="margin-top: 35px !important"></div>' );
                     newSection.attr( 'data-section-index', sectionCount );
 
                     // Function to create new dropdowns
@@ -1573,16 +1573,16 @@
                         var editorField = $( '<div class="editor-field"></div>' );
                         for ( var i = 0; i < 3; i++ )
                         {
-                            var select = $( '<select></select>', {
+                            var wrapper = $( '<div style="display: inline-block; margin-right: 10px; width: 21.1%;"></div>' );
+                            var select = $( '<select>', {
                                 name: 'EquipmentDetails[' + ( sectionCount * 3 + i ) + '].' + fieldName,
                                 id: 'EquipmentDetails_' + ( sectionCount * 3 + i ) + '__' + fieldName,
                                 class: 'chzn equipment-dropdown',
-                                style: 'width: 25%; margin-right: 15px;',
+                                style: 'width: 100%;',
                                 'data-index': i
                             } );
                             select.append( $( '<option></option>' ).attr( 'value', '' ).text( 'Select Equipment' ) );
 
-                            // Ensure options is an object before iterating
                             if ( typeof options === 'object' && options !== null )
                             {
                                 $.each( options, function ( key, value )
@@ -1594,7 +1594,8 @@
                                 console.warn( 'Equipment options are not available or not in the correct format' );
                             }
 
-                            editorField.append( select );
+                            wrapper.append( select );
+                            editorField.append( wrapper );
                         }
                         return editorField;
                     }
@@ -1611,7 +1612,7 @@
                                 id: 'EquipmentDetails_' + ( sectionCount * 3 + i ) + '__' + fieldName,
                                 class: 'input',
                                 style: 'width: 20%; margin-right: 5px;',
-                                value: defaultValue // Set the default value
+                                value: defaultValue
                             } );
                             editorField.append( input );
                         }
@@ -1625,7 +1626,7 @@
                     {
                         var option = $( this );
                         if ( option.val() !== '' )
-                        {  // Exclude the default "Select Equipment" option
+                        {
                             equipmentOptions[ option.val() ] = option.text();
                         }
                     } );
@@ -1637,21 +1638,25 @@
 
                     // Add input fields for other properties with default value of 0
                     var inputFields = [
-                        { name: 'OriginalQuantity', label: 'Original Quantity' },
-                        { name: 'ReturnQty', label: 'Return Qty' },
+                        { name: 'DeliveredQty', label: 'Original Quantity' },
+                        { name: 'ReturnedTransferredQty', label: 'Return Qty' },
                         { name: 'DebriefQty', label: 'Debrief Qty' },
-                        { name: 'TransporterLiableQty', label: 'Transporter Liable Qty' },
+                        { name: 'TransporterLiable', label: 'Transporter Liable Qty' },
                         { name: 'AdminMovement', label: 'Admin Movement' },
-                        { name: 'OutstandingQty', label: 'Outstanding Qty' }
+                        { name: 'OutstandingQtyAtCustomer', label: 'Outstanding Qty' }
                     ];
                     inputFields.forEach( function ( field )
                     {
                         newSection.append( '<div class="editor-label" style="margin-top: 15px !important"><label for="EquipmentDetails_' + ( sectionCount * 3 ) + '__' + field.name + '">' + field.label + '</label></div>' );
-                        newSection.append( createInputFields( field.name, '0' ) ); // Set default value to '0'
+                        newSection.append( createInputFields( field.name, '0' ) );
                     } );
 
-                    // Append the new section to the container
+                    // Add a dotted line break after the new section
+                    var lineBreak = $( '<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; margin-top: 20px; height: 0;">&nbsp;</div>' );
+
+                    // Append the new section and line break to the container
                     target.append( newSection );
+                    target.append( lineBreak );
 
                     // Initialize Chosen for the new dropdowns
                     if ( $.fn.chosen )
