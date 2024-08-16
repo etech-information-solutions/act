@@ -1555,6 +1555,39 @@
         {
             var target = $( sender.attr( 'data-target' ) );
 
+            // Function to calculate and update OutstandingQty for a specific row
+            function updateOutstandingQty ( section )
+            {
+                var fields = [ 'DeliveredQty', 'ReturnedTransferredQty', 'DebriefQty', 'TransporterLiable', 'AdminMovement' ];
+                var totals = [ 0, 0, 0 ];
+
+                fields.forEach( function ( field )
+                {
+                    section.find( 'input[name$=".' + field + '"]' ).each( function ( index )
+                    {
+                        var value = parseFloat( $( this ).val() ) || 0;
+                        totals[ index ] += value;
+                        console.log( "Column: " + ( index + 1 ) + ", Field: " + field + ", Value: " + value + ", Running Total: " + totals[ index ] );
+                    } );
+                } );
+
+                section.find( 'input[name$=".OutstandingQtyAtCustomer"]' ).each( function ( index )
+                {
+                    $( this ).val( totals[ index ].toFixed( 2 ) );
+                    console.log( "Column: " + ( index + 1 ) + ", Final Total: " + totals[ index ].toFixed( 2 ) );
+                } );
+            }
+
+            // Function to handle input changes
+            function handleInputChange ()
+            {
+                var section = $( this ).closest( '.equipment-detail-section' );
+                updateOutstandingQty( section );
+            }
+
+            // Apply the event listener to all existing input fields
+            target.on( 'input', '.equipment-detail-section input[type="text"]', handleInputChange );
+
             // Function to handle dropdown selection
             function handleDropdownSelection ()
             {
@@ -1671,7 +1704,14 @@
                 inputFields.forEach( function ( field )
                 {
                     newSection.append( '<div class="editor-label" style="margin-top: 15px !important"><label for="EquipmentDetails_' + ( sectionCount * 3 ) + '__' + field.name + '">' + field.label + '</label></div>' );
-                    newSection.append( createInputFields( field.name, '0' ) );
+                    var inputField = createInputFields( field.name, '0' );
+                    newSection.append( inputField );
+
+                    // Make OutstandingQty read-only
+                    if ( field.name === 'OutstandingQtyAtCustomer' )
+                    {
+                        inputField.find( 'input' ).prop( 'readonly', true );
+                    }
                 } );
 
                 // Add a dotted line break after the new section
@@ -1698,6 +1738,9 @@
                 {
                     console.warn( 'ACT.Init.Start is not available' );
                 }
+
+                // Initialize the OutstandingQty for the new section
+                updateOutstandingQty( newSection );
 
                 return false;
             } );

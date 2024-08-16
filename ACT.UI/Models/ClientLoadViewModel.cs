@@ -425,7 +425,7 @@ namespace ACT.UI.Models
             [Display( Name = "Admin Movement" )]
             public decimal AdminMovement { get; set; }
 
-            [Display( Name = "Outstanding Qty at Customer" )]
+            [Display( Name = "Outstanding Qty" )]
             public decimal OutstandingQtyAtCustomer { get; set; }
 
             public Dictionary<int, string> ProductOptions { get; set; }
