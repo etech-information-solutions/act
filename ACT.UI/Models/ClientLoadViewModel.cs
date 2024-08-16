@@ -274,6 +274,7 @@ namespace ACT.UI.Models
         [Display( Name = "ACT Control Doc No:" )]
         public string DocNumber { get; set; }
 
+        [Required]
         [Display( Name = "CHEP Exchange Doc No:" )]
         public string ExchangeNo { get; set; }
 
@@ -408,7 +409,7 @@ namespace ACT.UI.Models
         public class EquipmentDetailViewModel
         {
             [Display( Name = "Equipment" )]
-            public int ProductId { get; set; }
+            public int? ProductId { get; set; }
 
             [Display( Name = "Delivered Qty" )]
             public decimal DeliveredQty { get; set; }

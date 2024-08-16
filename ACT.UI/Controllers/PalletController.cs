@@ -1,27 +1,26 @@
-﻿using ACT.Core.Enums;
-using ACT.Core.Models;
-using ACT.Core.Models.Custom;
-using ACT.Core.Services;
-using ACT.Data.Models;
-using ACT.UI.Models;
-using ACT.UI.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Transactions;
 using System.Web.Mvc;
-using System.Web;
-using Newtonsoft.Json;
-using OpenPop;
-using ACT.Core.Helpers;
+
+using ACT.Core.Enums;
+using ACT.Core.Models;
+using ACT.Core.Models.Custom;
+using ACT.Core.Services;
+using ACT.Data.Models;
+using ACT.Mailer;
+using ACT.UI.Models;
+using ACT.UI.Mvc;
+
 using iTextSharp.text.pdf;
 using iTextSharp.tool.xml;
-using ACT.Mailer;
+
 using Microsoft.VisualBasic.FileIO;
-using System.Globalization;
+
 using static ACT.UI.Models.ClientLoadViewModel;
-using System.Web.Services.Description;
 
 namespace ACT.UI.Controllers
 {
@@ -1276,12 +1275,12 @@ namespace ACT.UI.Controllers
                     {
                         foreach ( var detail in model.EquipmentDetails )
                         {
-                            if ( detail.ProductId != 0 ) // Only create if a product is selected
+                            if ( detail.ProductId.HasValue && detail.ProductId.Value != 0 )
                             {
                                 ClientLoadQuantity clientLoadQuantity = new ClientLoadQuantity
                                 {
                                     ClientLoadId = load.Id,
-                                    EquipmentCode = detail.ProductId.ToString(),
+                                    EquipmentCode = detail.ProductId.Value.ToString(),
                                     OriginalQuantity = ( int ) detail.DeliveredQty,
                                     ReturnQty = ( int ) detail.ReturnedTransferredQty,
                                     DebriefQty = ( int ) detail.DebriefQty,
