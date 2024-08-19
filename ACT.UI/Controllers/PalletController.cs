@@ -5092,22 +5092,6 @@ namespace ACT.UI.Controllers
                 {
                     recipients.Add( cl?.Transporter?.Email );
                 }
-                if ( !string.IsNullOrEmpty( cl?.ClientSite1?.AuthorisationEmail1 ) )
-                {
-                    recipients.Add( cl?.ClientSite1?.AuthorisationEmail1 );
-                }
-                if ( !string.IsNullOrEmpty( cl?.ClientSite1?.AuthorisationEmail2 ) )
-                {
-                    recipients.Add( cl?.ClientSite1?.AuthorisationEmail2 );
-                }
-                if ( !string.IsNullOrEmpty( cl?.ClientSite1?.AuthorisationEmail3 ) )
-                {
-                    recipients.Add( cl?.ClientSite1?.AuthorisationEmail3 );
-                }
-                if ( !string.IsNullOrEmpty( cl?.ClientSite1?.ClientManagerEmail ) )
-                {
-                    recipients.Add( cl?.ClientSite1?.ClientManagerEmail );
-                }
 
                 if ( recipients.NullableAny() )
                 {
