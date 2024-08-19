@@ -1909,18 +1909,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ClientLoad_ClientSite1">
-          <End Role="ClientSite" Type="Self.ClientSite" Multiplicity="0..1" />
-          <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ClientSite">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ClientLoad">
-              <PropertyRef Name="ToClientSiteId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_ClientLoad_OutstandingReason">
           <End Role="OutstandingReason" Type="Self.OutstandingReason" Multiplicity="0..1" />
           <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="*" />
@@ -3080,10 +3068,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="ClientSite" EntitySet="ClientSite" />
             <End Role="ClientLoad" EntitySet="ClientLoad" />
           </AssociationSet>
-          <AssociationSet Name="FK_ClientLoad_ClientSite1" Association="Self.FK_ClientLoad_ClientSite1">
-            <End Role="ClientSite" EntitySet="ClientSite" />
-            <End Role="ClientLoad" EntitySet="ClientLoad" />
-          </AssociationSet>
           <AssociationSet Name="FK_ClientLoad_OutstandingReason" Association="Self.FK_ClientLoad_OutstandingReason">
             <End Role="OutstandingReason" EntitySet="OutstandingReason" />
             <End Role="ClientLoad" EntitySet="ClientLoad" />
@@ -3842,10 +3826,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End EntitySet="ClientInvoices" Role="ClientInvoice" />
           </AssociationSet>
           <AssociationSet Name="FK_ClientLoad_ClientSite" Association="ACTModel.FK_ClientLoad_ClientSite">
-            <End EntitySet="ClientSites" Role="ClientSite" />
-            <End EntitySet="ClientLoads" Role="ClientLoad" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ClientLoad_ClientSite1" Association="ACTModel.FK_ClientLoad_ClientSite1">
             <End EntitySet="ClientSites" Role="ClientSite" />
             <End EntitySet="ClientLoads" Role="ClientLoad" />
           </AssociationSet>
@@ -5939,7 +5919,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="DeliveryNotes" Relationship="ACTModel.FK_DeliveryNote_ClientSite" FromRole="ClientSite" ToRole="DeliveryNote" />
           <NavigationProperty Name="ExtendedClientLoads" Relationship="ACTModel.FK_ExtendedClientLoad_ClientSite" FromRole="ClientSite" ToRole="ExtendedClientLoad" />
           <NavigationProperty Name="ClientLoads" Relationship="ACTModel.FK_ClientLoad_ClientSite" FromRole="ClientSite" ToRole="ClientLoad" />
-          <NavigationProperty Name="ClientLoads1" Relationship="ACTModel.FK_ClientLoad_ClientSite1" FromRole="ClientSite" ToRole="ClientLoad" />
           <Property Name="OptionalSiteId" Type="Int32" />
           <NavigationProperty Name="Site1" Relationship="ACTModel.FK_ClientSite_OptionalSite" FromRole="ClientSite" ToRole="Site" />
         </EntityType>
@@ -6712,8 +6691,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <NavigationProperty Name="Client1" Relationship="ACTModel.FK_ClientLoads_Clients" FromRole="ClientLoad" ToRole="Client" />
           <NavigationProperty Name="ClientAuthorisations" Relationship="ACTModel.FK_ClientAuthorisation_ClientLoad" FromRole="ClientLoad" ToRole="ClientAuthorisation" />
           <NavigationProperty Name="ClientInvoices" Relationship="ACTModel.FK_ClientInvoices_ClientLoads" FromRole="ClientLoad" ToRole="ClientInvoice" />
-          <NavigationProperty Name="ClientSite" Relationship="ACTModel.FK_ClientLoad_ClientSite" FromRole="ClientLoad" ToRole="ClientSite" />
-          <NavigationProperty Name="ClientSite1" Relationship="ACTModel.FK_ClientLoad_ClientSite1" FromRole="ClientLoad" ToRole="ClientSite" />
           <NavigationProperty Name="OutstandingReason" Relationship="ACTModel.FK_ClientLoad_OutstandingReason" FromRole="ClientLoad" ToRole="OutstandingReason" />
           <NavigationProperty Name="PODComment" Relationship="ACTModel.FK_ClientLoad_PODComment" FromRole="ClientLoad" ToRole="PODComment" />
           <NavigationProperty Name="Transporter" Relationship="ACTModel.FK_ClientLoad_Transporter" FromRole="ClientLoad" ToRole="Transporter" />
@@ -6849,18 +6826,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="ClientLoad">
               <PropertyRef Name="ClientSiteId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_ClientLoad_ClientSite1">
-          <End Type="ACTModel.ClientSite" Multiplicity="0..1" Role="ClientSite" />
-          <End Type="ACTModel.ClientLoad" Multiplicity="*" Role="ClientLoad" />
-          <ReferentialConstraint>
-            <Principal Role="ClientSite">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ClientLoad">
-              <PropertyRef Name="ToClientSiteId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>

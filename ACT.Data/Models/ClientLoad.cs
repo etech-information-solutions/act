@@ -99,7 +99,6 @@ namespace ACT.Data.Models
         public string LoadSheetNo { get; set; }
         public string ExchangeNo { get; set; }
         public Nullable<System.DateTime> CompensationDate { get; set; }
-        public string ReceiverNumber1 { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }
@@ -109,8 +108,6 @@ namespace ACT.Data.Models
         public virtual ICollection<ClientAuthorisation> ClientAuthorisations { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ClientInvoice> ClientInvoices { get; set; }
-        public virtual ClientSite ClientSite { get; set; }
-        public virtual ClientSite ClientSite1 { get; set; }
         public virtual OutstandingReason OutstandingReason { get; set; }
         public virtual PODComment PODComment { get; set; }
         public virtual Transporter Transporter { get; set; }

@@ -171,7 +171,6 @@
         <AssociationConnector Association="ACTModel.FK_ClientAuthorisation_ClientLoad" />
         <AssociationConnector Association="ACTModel.FK_ClientInvoices_ClientLoads" />
         <AssociationConnector Association="ACTModel.FK_ClientLoad_ClientSite" />
-        <AssociationConnector Association="ACTModel.FK_ClientLoad_ClientSite1" />
         <AssociationConnector Association="ACTModel.FK_ClientLoad_OutstandingReason" />
         <AssociationConnector Association="ACTModel.FK_ClientLoad_PODComment" />
         <AssociationConnector Association="ACTModel.FK_ClientLoad_Transporter" />
