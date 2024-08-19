@@ -1198,8 +1198,11 @@ namespace ACT.UI.Controllers
             };
 
             // Populate EquipmentCodeOptions
-            using ( var productService = new ProductService() )
+            using ( SiteService sservice = new SiteService() )
+            using ( ProductService productService = new ProductService() )
             {
+                model.SupplierSiteOptions = sservice.ListSupplierSites( true );
+                model.CustomerSiteOptions = sservice.ListCustomers();
                 model.EquipmentCodeOptions = productService.List( true );
             }
 

@@ -297,6 +297,10 @@ namespace ACT.UI.Models
 
         public string CustomerType { get; set; }
 
+        public Dictionary<int, string> SupplierSiteOptions { get; set; } = new Dictionary<int, string>();
+
+        public Dictionary<int, string> CustomerSiteOptions { get; set; } = new Dictionary<int, string>();
+
         public List<EquipmentDetailViewModel> EquipmentDetails { get; set; } = new List<EquipmentDetailViewModel>();
 
         public Dictionary<int, string> EquipmentCodeOptions { get; set; } = new Dictionary<int, string>();

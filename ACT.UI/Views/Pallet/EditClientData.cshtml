@@ -40,7 +40,7 @@
                     @Html.LabelFor( model => model.ClientSiteId )
                 </div>
                 <div class="edit-field">
-                    @Html.DropDownListFor( model => model.ClientSiteId, new SelectList( Model.ClientSiteOptions, "Key", "Value" ), "Select Supplier From", new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.DropDownListFor( model => model.ClientSiteId, new SelectList( Model.SupplierSiteOptions, "Key", "Value" ), "Select Supplier From", new { @class = "chzn", @style = "width: 98%;" } )
                     @Html.ValidationMessageFor( model => model.ClientSiteId )
                 </div>
 
