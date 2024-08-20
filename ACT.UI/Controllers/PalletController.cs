@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Transactions;
 using System.Web.Mvc;
+using System.Web.Services.Description;
 
 using ACT.Core.Enums;
 using ACT.Core.Models;
@@ -1197,13 +1199,17 @@ namespace ACT.UI.Controllers
                 }
             };
 
-            // Populate EquipmentCodeOptions
+            // Populate Dropdown Menus
             using ( SiteService sservice = new SiteService() )
-            using ( ProductService productService = new ProductService() )
+            using ( ProductService pservice = new ProductService() )
+            using ( TransporterService tservice = new TransporterService() )
+            using ( ClientGroupService cgservice = new ClientGroupService() )
             {
-                model.SupplierSiteOptions = sservice.ListSupplierSites( true );
+                model.ClientGroupOptions = cgservice.List( true );
+                model.EquipmentCodeOptions = pservice.List( true );
                 model.CustomerSiteOptions = sservice.ListCustomers();
-                model.EquipmentCodeOptions = productService.List( true );
+                model.TransporterOptions = tservice.ListAllTransporters();
+                model.SupplierSiteOptions = sservice.ListSupplierSites( true );
             }
 
             ViewBag.EquipmentCodeOptions = model.EquipmentCodeOptions;
@@ -1218,24 +1224,25 @@ namespace ACT.UI.Controllers
         {
             if ( !ModelState.IsValid )
             {
-                using ( ClientProductService cpservice = new ClientProductService() )
+                /*using ( ClientProductService cpservice = new ClientProductService() )
                 {
                     var clientProducts = cpservice.ListByClient( model.ClientId );
                     model.EquipmentCodeOptions = clientProducts.ToDictionary(
                         cp => cp.ProductId,
                         cp => cp.Product.Name
                     );
-                }
+                }*/
                 Notify( "Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error );
                 return View( model );
             }
 
+            using ( ClientService cservice = new ClientService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( TransactionScope scope = new TransactionScope() )
             using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( ClientGroupService cgservice = new ClientGroupService() )
             using ( DeliveryNoteService dnservice = new DeliveryNoteService() )
             using ( DeliveryNoteLineService dnlservice = new DeliveryNoteLineService() )
-            using ( AddressService aservice = new AddressService() )
-            using ( ClientService cservice = new ClientService() )
-            using ( TransactionScope scope = new TransactionScope() )
             {
                 #region Create Client Load
                 ClientLoad load = new ClientLoad()
@@ -1271,10 +1278,19 @@ namespace ACT.UI.Controllers
                 load = clservice.Create( load );
                 #endregion
 
+
+                ClientGroup cgroup = new ClientGroup()
+                {
+                    GroupId = ( int ) model.ClientGroupId,
+                };
+
+                cgroup = cgservice.Create( cgroup );
+
+
                 #region Create Equipment Details
                 if ( model.EquipmentDetails != null && model.EquipmentDetails.Count > 0 )
                 {
-                    using ( ClientLoadQuantityService clientLoadQuantityService = new ClientLoadQuantityService() )
+                    using ( ClientLoadQuantityService clqservice = new ClientLoadQuantityService() )
                     {
                         foreach ( var detail in model.EquipmentDetails )
                         {
@@ -1294,7 +1310,7 @@ namespace ACT.UI.Controllers
                                     ModifiedOn = DateTime.Now,
                                 };
 
-                                clientLoadQuantityService.Create( clientLoadQuantity );
+                                clqservice.Create( clientLoadQuantity );
                             }
                         }
                     }
@@ -1312,11 +1328,14 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Edit )]
         public ActionResult EditClientData( int id )
         {
+            using ( SiteService sservice = new SiteService() )
             using ( ImageService iservice = new ImageService() )
+            using ( ProductService pservice = new ProductService() )
             using ( ChepLoadService chservice = new ChepLoadService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( TransporterService tservice = new TransporterService() )
+            using ( ClientGroupService cgservice = new ClientGroupService() )
             using ( ClientProductService cpservice = new ClientProductService() )
-            using ( ProductService pservice = new ProductService() )
             {
                 ClientLoad load = clservice.GetById( id );
                 #region Client Load
@@ -1408,29 +1427,33 @@ namespace ACT.UI.Controllers
 
                 #endregion
 
+                #region Populate Dropdowns
+
+                model.ClientGroupOptions = cgservice.List();
+                model.CustomerSiteOptions = sservice.ListCustomers();
+                model.TransporterOptions = tservice.ListAllTransporters();
+                model.SupplierSiteOptions = sservice.ListSupplierSites( true );
+
+                #endregion
+
                 return View( model );
             }
         }
 
         // POST: Pallet/EditClientData/5
+        // POST: Pallet/EditClientData/5
         [HttpPost]
         [Requires( PermissionTo.Edit )]
         public ActionResult EditClientData( ClientLoadViewModel model )
         {
-            //if ( !ModelState.IsValid )
-            //{
-            //    Notify( "Sorry, the selected Client Load was not updated. Please correct all errors and try again.", NotificationType.Error );
+            if ( !ModelState.IsValid )
+            {
+                Notify( "Sorry, the selected Client Load was not updated. Please correct all errors and try again.", NotificationType.Error );
 
-            //    return View( "ClientDataDetails", model );
-            //}
+                return View( "ClientDataDetails", model );
+            }
 
-            using ( TransactionScope scope = new TransactionScope() )
-            using ( ChepLoadService chservice = new ChepLoadService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
-            using ( DeliveryNoteLineService dnlservice = new DeliveryNoteLineService() )
-            using ( ClientLoadHistoryService clhservice = new ClientLoadHistoryService() )
-            using ( ExtendedClientLoadService ecservice = new ExtendedClientLoadService() )
-            using ( ClientLoadQuantityService clqservice = new ClientLoadQuantityService() )
             {
                 ClientLoad load = clservice.GetById( model.Id );
 
@@ -1441,455 +1464,38 @@ namespace ACT.UI.Controllers
                     return PartialView( "_AccessDenied" );
                 }
 
-                bool updateDeliveryNote = load.NewQuantity != model.NewQuantity || load.OriginalQuantity != model.OriginalQuantity;
-
-                #region Client Load History
-
-                List<ClientLoadHistory> histories = new List<ClientLoadHistory>();
-
-                if ( load.LoadNumber?.Trim()?.ToLower() != model.LoadNumber?.Trim()?.ToLower() )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "LoadNumber",
-                        OldValue = load.LoadNumber,
-                        NewValue = model.LoadNumber ?? string.Empty,
-                    } );
-                }
-
-                if ( load.LoadDate != model.LoadDate )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "LoadDate",
-                        OldValue = load.LoadDate?.ToString(),
-                        NewValue = model.LoadDate?.ToString() ?? string.Empty,
-                    } );
-                }
-
-                if ( load.ClientSiteId != model.ClientSiteId )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "ClientSiteId",
-                        OldValue = load.ClientSiteId?.ToString(),
-                        NewValue = model.ClientSiteId?.ToString() ?? string.Empty,
-                    } );
-                }
-
-                if ( load.ToClientSiteId != model.ClientSiteIdTo )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "ToClientSiteId",
-                        OldValue = load.ToClientSiteId?.ToString(),
-                        NewValue = model.ClientSiteIdTo?.ToString() ?? string.Empty,
-                    } );
-                }
-
-                if ( load.DeliveryNote?.Trim()?.ToLower() != model.DeliveryNote?.Trim()?.ToLower() )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "DeliveryNote",
-                        OldValue = load.DeliveryNote,
-                        NewValue = model.DeliveryNote ?? string.Empty,
-                    } );
-                }
-
-                if ( load.PODNumber?.Trim()?.ToLower() != model.PODNumber?.Trim()?.ToLower() )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "PODNumber",
-                        OldValue = load.PODNumber,
-                        NewValue = model.PODNumber ?? string.Empty,
-                    } );
-                }
-
-                if ( load.ChepInvoiceNo?.Trim()?.ToLower() != model.ChepInvoiceNumber?.Trim()?.ToLower() )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "ChepInvoiceNo",
-                        OldValue = load.ChepInvoiceNo,
-                        NewValue = model.ChepInvoiceNumber ?? string.Empty,
-                    } );
-                }
-
-                if ( ( ReconciliationStatus ) load.Status != model.Status )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        FieldName = "Status",
-                        ClientLoadId = load.Id,
-                        NewValue = model.Status.GetDisplayText(),
-                        OldValue = ( ( ReconciliationStatus ) load.Status ).GetDisplayText() ?? string.Empty,
-                    } );
-                }
-
-                if ( load.TransporterId != model.TransporterId )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "TransporterId",
-                        OldValue = load.TransporterId?.ToString(),
-                        NewValue = model.TransporterId?.ToString() ?? string.Empty,
-                    } );
-                }
-
-                if ( load.VehicleId != model.VehicleId )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "VehicleId",
-                        OldValue = load.VehicleId?.ToString(),
-                        NewValue = model.VehicleId?.ToString() ?? string.Empty,
-                    } );
-                }
-
-                if ( load.ReceiverNumber?.Trim()?.ToLower() != model.ReceiverNumber?.Trim()?.ToLower() )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "ReceiverNumber",
-                        OldValue = load.ReceiverNumber,
-                        NewValue = model.ReceiverNumber ?? string.Empty,
-                    } );
-                }
-
-                if ( load.DebriefDocketNo?.Trim()?.ToLower() != model.DebriefDocketNo?.Trim()?.ToLower() )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "DebriefDocketNo",
-                        OldValue = load.DebriefDocketNo,
-                        NewValue = model.DebriefDocketNo ?? string.Empty,
-                    } );
-                }
-
-                if ( load.PODCommentId != model.PODCommentId )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "PODCommentId",
-                        OldValue = load.PODCommentId?.ToString(),
-                        NewValue = model.PODCommentId?.ToString() ?? string.Empty,
-                    } );
-                }
-
-                if ( load.ClientLoadNotes?.Trim()?.ToLower() != model.ClientLoadNotes?.Trim()?.ToLower() )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "ClientLoadNotes",
-                        OldValue = load.ClientLoadNotes,
-                        NewValue = model.ClientLoadNotes ?? string.Empty,
-                    } );
-                }
-
-                if ( load.NewQuantity != model.ClientLoadQuantities?.Sum( s => s?.OriginalQuantity ) )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "NewQuantity",
-                        OldValue = load.NewQuantity?.ToString(),
-                        NewValue = model?.ClientLoadQuantities?.Sum( s => s?.OriginalQuantity )?.ToString() ?? string.Empty,
-                    } );
-                }
-
-                if ( load.OriginalQuantity != model.ClientLoadQuantities?.Sum( s => s?.OriginalQuantity ) )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "OriginalQuantity",
-                        OldValue = load.NewQuantity?.ToString(),
-                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.OriginalQuantity )?.ToString() ?? string.Empty,
-                    } );
-                }
-
-                if ( load.ReturnQty != model.ClientLoadQuantities?.Sum( s => s?.ReturnQty ) )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "ReturnQty",
-                        OldValue = load.ReturnQty?.ToString(),
-                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.ReturnQty )?.ToString() ?? string.Empty,
-                    } );
-                }
-
-                if ( load.DebriefQty != model.ClientLoadQuantities?.Sum( s => s?.DebriefQty ) )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "DebriefQty",
-                        OldValue = load.DebriefQty?.ToString(),
-                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.DebriefQty )?.ToString() ?? string.Empty,
-                    } );
-                }
-
-                if ( load.TransporterLiableQty != model.ClientLoadQuantities?.Sum( s => s?.TransporterLiableQty ) )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "TransporterLiableQty",
-                        OldValue = load.TransporterLiableQty?.ToString(),
-                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.TransporterLiableQty )?.ToString() ?? string.Empty,
-                    } );
-                }
-
-                if ( load.AdminMovement != model.ClientLoadQuantities?.Sum( s => s?.AdminMovementQty ) )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "AdminMovement",
-                        OldValue = load.AdminMovement?.ToString(),
-                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.AdminMovementQty )?.ToString() ?? string.Empty,
-                    } );
-                }
-
-                if ( load.OutstandingQty != model.ClientLoadQuantities?.Sum( s => s?.OutstandingQty ) )
-                {
-                    histories.Add( new ClientLoadHistory()
-                    {
-                        ClientLoadId = load.Id,
-                        FieldName = "OutstandingQty",
-                        OldValue = load.OutstandingQty?.ToString(),
-                        NewValue = model.ClientLoadQuantities?.Sum( s => s?.OutstandingQty )?.ToString() ?? string.Empty,
-                    } );
-                }
-
-                if ( histories.Any() )
-                {
-                    foreach ( ClientLoadHistory clh in histories )
-                    {
-                        clhservice.Create( clh );
-                    }
-                }
-
-                #endregion
-
-                #region Update Client Load
-
-                load.THAN = model.THAN;
-                //load.ClientId = model.ClientId;
-                load.LoadDate = model.LoadDate;
-                //load.Equipment = model.Equipment;
-                load.PODNumber = model.PODNumber;
-                //load.PCNNumber = model.PCNNumber;
-                //load.PRNNumber = model.PRNNumber;
-                load.VehicleId = model.VehicleId;
-                load.LoadNumber = model.LoadNumber;
-                //load.NotifyDate = model.NotifyDate;
-                load.Status = ( int ) model.Status;
-                load.DeliveryNote = model.DeliveryNote;
+                load.ClientId = model.ClientId;
                 load.ClientSiteId = model.ClientSiteId;
-                load.PODCommentId = model.PODCommentId;
-                //load.ReconcileDate = model.ReconcileDate;
-                load.TransporterId = model.TransporterId;
-                //load.AccountNumber = model.AccountNumber;
-                //load.EffectiveDate = model.EffectiveDate;
                 load.ToClientSiteId = model.ClientSiteIdTo;
-                load.ReceiverNumber = model.ReceiverNumber;
-                load.DebriefDocketNo = model.DebriefDocketNo;
-                load.ClientLoadNotes = model.ClientLoadNotes;
+                load.LoadNumber = model.LoadNumber;
+                load.LoadDate = model.LoadDate;
+                load.DeliveryNote = model.DeliveryNote;
+                load.ChepInvoiceNo = model.ChepInvoiceNo;
+                load.OrderNumber = model.OrderNumber;
+                load.DepoSTONo = model.DepoSTONo;
+                load.GLID = model.GLID;
+                load.DeliveryDate = model.DeliveryDate;
+                load.TransporterId = model.TransporterId;
+                load.VehicleId = !string.IsNullOrEmpty( model.FleetNumber ) && int.TryParse( model.FleetNumber, out int fleetNumber ) ? ( int? ) fleetNumber : null;
                 load.ReferenceNumber = model.ReferenceNumber;
-                load.ChepInvoiceNo = model.ChepInvoiceNumber;
-                //load.CancelledReason = model.CancelledReason;
-                //load.ClientDescription = model.ClientDescription;
-                //load.ChepCompensationNo = model.ChepCompensationNo;
-                //load.OutstandingReasonId = model.OutstandingReasonId;
-                //load.ReconcileInvoice = model.ReconcileInvoice.GetBoolValue();
-
-                load.ReturnQty = model.ClientLoadQuantities?.Sum( s => s?.ReturnQty );
-                load.DebriefQty = model.ClientLoadQuantities?.Sum( s => s?.DebriefQty );
-                load.NewQuantity = model.ClientLoadQuantities?.Sum( s => s?.OriginalQuantity );
-                load.OutstandingQty = model.ClientLoadQuantities?.Sum( s => s?.OutstandingQty );
-                load.AdminMovement = model.ClientLoadQuantities?.Sum( s => s?.AdminMovementQty );
-                load.OriginalQuantity = model.ClientLoadQuantities?.Sum( s => s?.OriginalQuantity );
-                load.TransporterLiableQty = model.ClientLoadQuantities?.Sum( s => s?.TransporterLiableQty );
-
-                load.PalletReturnDate = model.PalletReturnDate;
-                load.PalletReturnSlipNo = model.PalletReturnSlipNo;
+                load.LoadSheetNo = model.LoadsheetNo;
+                load.ReceiverNumber = model.ReceiverNumber;
+                load.DocNumber = model.DocNumber;
+                load.ExchangeNo = model.ExchangeNo;
                 load.ChepCustomerThanDocNo = model.ChepCustomerThanDocNo;
                 load.WarehouseTransferDocNo = model.WarehouseTransferDocNo;
+                load.DebriefDocketNo = model.DebriefDocketNo;
+                load.PalletReturnSlipNo = model.PalletReturnSlipNo;
+                load.PalletReturnDate = model.PalletReturnDate;
+                load.ChepCompensationNo = model.ChepCompensationNo;
+                load.CompensationDate = model.CompensationDate;
+                load.EffectiveDate = model.EffectiveDate;
 
+                // Update the ClientLoad entity
                 clservice.Update( load );
-
-                #endregion
-
-                #region ClientLoad Quantities
-
-                if ( model.ClientLoadQuantities?.NullableAny( a => !string.IsNullOrEmpty( a?.EquipmentCode ) ) == true )
-                {
-                    foreach ( ClientLoadQuantity cq in model.ClientLoadQuantities.Where( a => !string.IsNullOrEmpty( a.EquipmentCode ) ) )
-                    {
-                        ClientLoadQuantity clq = clqservice.GetByClientLoadAndProduct( load.Id, cq.EquipmentCode.Trim() );
-
-                        if ( clq == null )
-                        {
-                            clq = new ClientLoadQuantity()
-                            {
-                                ClientLoadId = load.Id,
-                                ReturnQty = cq.ReturnQty,
-                                DebriefQty = cq.DebriefQty,
-                                EquipmentCode = cq.EquipmentCode,
-                                OutstandingQty = cq.OutstandingQty,
-                                OriginalQuantity = cq.OriginalQuantity,
-                                AdminMovementQty = cq.AdminMovementQty,
-                                TransporterLiableQty = cq.TransporterLiableQty,
-                            };
-
-                            clqservice.Create( clq );
-                        }
-                        else
-                        {
-                            clq.ReturnQty = cq.ReturnQty;
-                            clq.DebriefQty = cq.DebriefQty;
-                            clq.OutstandingQty = cq.OutstandingQty;
-                            clq.OriginalQuantity = cq.OriginalQuantity;
-                            clq.AdminMovementQty = cq.AdminMovementQty;
-                            clq.TransporterLiableQty = cq.TransporterLiableQty;
-
-                            clqservice.Update( clq );
-                        }
-                    }
-                }
-
-                #endregion
-
-                /*if ( updateDeliveryNote )
-                {
-                    #region Update Delivery Note Lines
-
-                    List<DeliveryNoteLine> deliveryNoteLines = dnlservice.ListByLoadNumber( model.LoadNumber );
-
-                    if ( deliveryNoteLines.NullableAny() )
-                    {
-                        foreach ( DeliveryNoteLine dnl in deliveryNoteLines )
-                        {
-                            dnl.Product = model.Equipment;
-                            dnl.Equipment = model.Equipment;
-                            dnl.Delivered = model.NewQuantity;
-                            dnl.ProductDescription = model.Equipment;
-                            dnl.OrderQuantity = model.OriginalQuantity;
-
-                            dnlservice.Update( dnl );
-                        }
-                    }
-
-                    #endregion
-                }*/
-
-                List<ChepLoad> cheps = chservice.ListByReference( load.ClientId, load.ReceiverNumber?.Trim() );
-
-                ChepLoad chep = cheps?.FirstOrDefault();
-
-                #region Extended Chepload
-
-                string docketNumber = model.ChepCustomerThanDocNo ?? model.WarehouseTransferDocNo ?? model.PalletReturnSlipNo;
-
-                if ( load.ExtendedClientLoads.NullableAny() )
-                {
-                    ExtendedClientLoad ec = ecservice.GetById( load.ExtendedClientLoads.FirstOrDefault().Id );
-
-                    ec.Ref = model.ChepRef;
-                    ec.Status = load.Status;
-                    ec.OtherRef = model.ChepOtherRef;
-                    ec.ClientSiteId = load.ClientSiteId;
-                    ec.DeliveryDate = model.DeliveryDate;
-                    ec.ShipmentDate = model.DeliveryDate;
-                    ec.EffectiveDate = model.ChepEffectiveDate;
-                    ec.InvoiceNumber = model.ChepInvoiceNumber;
-                    ec.DocumentType = ( int ) model.DocumentType;
-                    ec.Quantity = ( int? ) load.OriginalQuantity;
-                    ec.PalletReturnDate = model.PalletReturnDate;
-                    ec.PalletReturnSlipNo = model.PalletReturnSlipNo;
-                    ec.ChepCustomerThanDocNo = model.ChepCustomerThanDocNo;
-                    ec.WarehouseTransferDocNo = model.WarehouseTransferDocNo;
-
-                    ecservice.Update( ec );
-                }
-                else
-                {
-                    ExtendedClientLoad ec = new ExtendedClientLoad()
-                    {
-                        UID = chep?.UID,
-                        UMI = chep?.UMI,
-                        Ref = model.ChepRef,
-                        Status = load.Status,
-                        Reason = chep?.Reason,
-                        ClientLoadId = load.Id,
-                        BatchRef = string.Empty,
-                        ClientId = load.ClientId,
-                        CreateDate = DateTime.Now,
-                        DataSource = string.Empty,
-                        ChepStatus = string.Empty,
-                        Location = chep?.Location,
-                        CorrectedRef = string.Empty,
-                        DocketNumber = docketNumber,
-                        Equipment = chep?.Equipment,
-                        LocationId = chep?.LocationId,
-                        OtherParty = chep?.OtherParty,
-                        OtherRef = model.ChepOtherRef,
-                        IsExtra = chep?.IsExtra == true,
-                        ClientSiteId = load.ClientSiteId,
-                        CorrectedOtherRef = string.Empty,
-                        DeliveryDate = model.DeliveryDate,
-                        OtherPartyId = chep?.OtherPartyId,
-                        EquipmentCode = chep?.EquipmentCode,
-                        OriginalDocketNumber = docketNumber,
-                        IsExchange = chep?.IsExchange == true,
-                        ShipmentDate = model.ChepEffectiveDate,
-                        IsPSPPickup = chep?.IsPSPPickup == true,
-                        TransactionType = chep?.TransactionType,
-                        EffectiveDate = model.PalletReturnDate,
-                        InvoiceNumber = model.ChepInvoiceNumber,
-                        PalletReturnDate = model.PalletReturnDate,
-                        DocumentType = ( int ) model.DocumentType,
-                        Quantity = ( int? ) load.OriginalQuantity,
-                        OtherPartyCountry = chep?.OtherPartyCountry,
-                        PalletReturnSlipNo = model.PalletReturnSlipNo,
-                        ManuallyMatchedUID = chep?.ManuallyMatchedUID,
-                        OutstandingReasonId = chep?.OutstandingReasonId,
-                        BalanceStatus = ( int ) BalanceStatus.NotBalanced,
-                        TransporterLiable = chep?.TransporterLiable == true,
-                        ChepCustomerThanDocNo = model.ChepCustomerThanDocNo,
-                        WarehouseTransferDocNo = model.WarehouseTransferDocNo,
-                        ManuallyMatchedLoad = chep?.ManuallyMatchedLoad == true,
-                        CreatedBy = $"{CurrentUser.Name} {CurrentUser.Surname}",
-                        PostingType = chep?.PostingType ?? ( int ) PostingType.Manual,
-                    };
-
-                    ecservice.Create( ec );
-                }
-
-                #endregion
-
-                scope.Complete();
             }
 
-            Notify( "The selected Client Load details were successfully updated.", NotificationType.Success );
-
+            Notify( "The item was successfully created.", NotificationType.Success );
             return ClientData( new PagingModel(), new CustomSearchModel() );
         }
 

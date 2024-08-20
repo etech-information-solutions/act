@@ -301,6 +301,10 @@ namespace ACT.UI.Models
 
         public Dictionary<int, string> CustomerSiteOptions { get; set; } = new Dictionary<int, string>();
 
+        public Dictionary<int, string> ClientGroupOptions { get; set; } = new Dictionary<int, string>();
+
+        public Dictionary<int, string> TransporterOptions { get; set; } = new Dictionary<int, string>();
+
         public List<EquipmentDetailViewModel> EquipmentDetails { get; set; } = new List<EquipmentDetailViewModel>();
 
         public Dictionary<int, string> EquipmentCodeOptions { get; set; } = new Dictionary<int, string>();
@@ -329,19 +333,6 @@ namespace ACT.UI.Models
             }
         }
 
-
-        public Dictionary<int, string> ClientGroupOptions
-        {
-            get
-            {
-                if ( !EditMode ) return null;
-                using ( ClientGroupService service = new ClientGroupService() )
-                {
-                    return service.List( true );
-                }
-            }
-        }
-
         public Dictionary<int, string> VehicleOptions
         {
             //get; set;
@@ -366,20 +357,6 @@ namespace ACT.UI.Models
                 using ( ClientSiteService service = new ClientSiteService() )
                 {
                     return service.List( true, new PagingModel() { Sort = "ASC", SortBy = "s.Name" }, new CustomSearchModel() { ClientId = ClientId } );
-                }
-            }/**/
-        }
-
-        public Dictionary<int, string> TransporterOptions
-        {
-            //get; set;
-            get
-            {
-                if ( !EditMode ) return null;
-
-                using ( TransporterService service = new TransporterService() )
-                {
-                    return service.List( true, ClientId );
                 }
             }/**/
         }

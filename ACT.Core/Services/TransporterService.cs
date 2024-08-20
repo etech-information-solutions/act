@@ -311,6 +311,23 @@ namespace ACT.Core.Services
             return clientOptions;
         }
 
+
+        public Dictionary<int, string> ListAllTransporters()
+        {
+            Dictionary<int, string> transporterOptions = new Dictionary<int, string>();
+            string query = @"
+                    SELECT DISTINCT t.Id AS [TKey], t.Name AS [TValue]
+                    FROM [dbo].[Transporter] t
+                    ORDER BY t.[Name] ASC";
+            var model = context.Database.SqlQuery<IntStringKeyValueModel>( query ).ToList();
+            foreach ( var k in model )
+            {
+                transporterOptions[ k.TKey ] = ( k.TValue ?? "" ).Trim();
+            }
+            return transporterOptions;
+        }
+
+
         /// <summary>
         /// Checks if a transporter with the specified Registration Number already exists
         /// </summary>
