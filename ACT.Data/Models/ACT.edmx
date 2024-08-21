@@ -494,6 +494,8 @@
           <Property Name="ExchangeNo" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="CompensationDate" Type="date" />
           <Property Name="ReceiverNumber" Type="varchar" MaxLength="250" />
+          <Property Name="LoadType" Type="int" />
+          <Property Name="DebtorsCode" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="ClientLoadHistory">
           <Key>
@@ -1897,18 +1899,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_ClientLoad_ClientSite">
-          <End Role="ClientSite" Type="Self.ClientSite" Multiplicity="0..1" />
-          <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ClientSite">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="ClientLoad">
-              <PropertyRef Name="ClientSiteId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_ClientLoad_OutstandingReason">
           <End Role="OutstandingReason" Type="Self.OutstandingReason" Multiplicity="0..1" />
           <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="*" />
@@ -3063,10 +3053,6 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <AssociationSet Name="FK_ClientKPIs_Clients" Association="Self.FK_ClientKPIs_Clients">
             <End Role="Client" EntitySet="Client" />
             <End Role="ClientKPI" EntitySet="ClientKPI" />
-          </AssociationSet>
-          <AssociationSet Name="FK_ClientLoad_ClientSite" Association="Self.FK_ClientLoad_ClientSite">
-            <End Role="ClientSite" EntitySet="ClientSite" />
-            <End Role="ClientLoad" EntitySet="ClientLoad" />
           </AssociationSet>
           <AssociationSet Name="FK_ClientLoad_OutstandingReason" Association="Self.FK_ClientLoad_OutstandingReason">
             <End Role="OutstandingReason" EntitySet="OutstandingReason" />
@@ -6710,6 +6696,8 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="LoadSheetNo" MaxLength="50" FixedLength="false" Unicode="false" Type="String" />
           <Property Name="ExchangeNo" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" Type="String" />
           <Property Name="CompensationDate" Precision="0" Type="DateTime" />
+          <Property Name="LoadType" Type="Int32" />
+          <Property Name="DebtorsCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Country">
           <Key>
@@ -8702,6 +8690,8 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySetMapping Name="ClientLoads">
             <EntityTypeMapping TypeName="ACTModel.ClientLoad">
               <MappingFragment StoreEntitySet="ClientLoad">
+                <ScalarProperty Name="DebtorsCode" ColumnName="DebtorsCode" />
+                <ScalarProperty Name="LoadType" ColumnName="LoadType" />
                 <ScalarProperty Name="CompensationDate" ColumnName="CompensationDate" />
                 <ScalarProperty Name="ExchangeNo" ColumnName="ExchangeNo" />
                 <ScalarProperty Name="LoadSheetNo" ColumnName="LoadSheetNo" />

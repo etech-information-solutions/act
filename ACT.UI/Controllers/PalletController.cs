@@ -1203,9 +1203,9 @@ namespace ACT.UI.Controllers
             using ( SiteService sservice = new SiteService() )
             using ( ProductService pservice = new ProductService() )
             using ( TransporterService tservice = new TransporterService() )
-            using ( ClientGroupService cgservice = new ClientGroupService() )
+            using ( GroupService gservice = new GroupService() )
             {
-                model.ClientGroupOptions = cgservice.List( true );
+                model.ClientGroupOptions = gservice.List( true );
                 model.EquipmentCodeOptions = pservice.List( true );
                 model.CustomerSiteOptions = sservice.ListCustomers();
                 model.TransporterOptions = tservice.ListAllTransporters();
@@ -1237,14 +1237,12 @@ namespace ACT.UI.Controllers
             }
 
             using ( ClientService cservice = new ClientService() )
-            using ( AddressService aservice = new AddressService() )
             using ( TransactionScope scope = new TransactionScope() )
             using ( ClientLoadService clservice = new ClientLoadService() )
-            using ( ClientGroupService cgservice = new ClientGroupService() )
-            using ( DeliveryNoteService dnservice = new DeliveryNoteService() )
-            using ( DeliveryNoteLineService dnlservice = new DeliveryNoteLineService() )
+            using ( GroupService gservice = new GroupService() )
             {
                 #region Create Client Load
+
                 ClientLoad load = new ClientLoad()
                 {
                     ClientId = model.ClientId,
@@ -1257,8 +1255,10 @@ namespace ACT.UI.Controllers
                     OrderNumber = model.OrderNumber,
                     DepoSTONo = model.DepoSTONo,
                     GLID = model.GLID,
+                    GRVNumber = model.GRVNumber,
                     DeliveryDate = model.DeliveryDate,
                     TransporterId = model.TransporterId,
+                    DebtorsCode = model.DebtorsCode,
                     VehicleId = !string.IsNullOrEmpty( model.FleetNumber ) && int.TryParse( model.FleetNumber, out int fleetNumber ) ? ( int? ) fleetNumber : null,
                     ReferenceNumber = model.ReferenceNumber,
                     LoadSheetNo = model.LoadsheetNo,
@@ -1276,45 +1276,44 @@ namespace ACT.UI.Controllers
                 };
 
                 load = clservice.Create( load );
+
                 #endregion
 
-
-                ClientGroup cgroup = new ClientGroup()
-                {
-                    GroupId = ( int ) model.ClientGroupId,
-                };
-
-                cgroup = cgservice.Create( cgroup );
-
-
                 #region Create Equipment Details
+
                 if ( model.EquipmentDetails != null && model.EquipmentDetails.Count > 0 )
                 {
                     using ( ClientLoadQuantityService clqservice = new ClientLoadQuantityService() )
                     {
                         foreach ( var detail in model.EquipmentDetails )
                         {
-                            if ( detail.ProductId.HasValue && detail.ProductId.Value != 0 )
+                            ClientLoadQuantity clientLoadQuantity = new ClientLoadQuantity
                             {
-                                ClientLoadQuantity clientLoadQuantity = new ClientLoadQuantity
-                                {
-                                    ClientLoadId = load.Id,
-                                    EquipmentCode = detail.ProductId.Value.ToString(),
-                                    OriginalQuantity = ( int ) detail.DeliveredQty,
-                                    ReturnQty = ( int ) detail.ReturnedTransferredQty,
-                                    DebriefQty = ( int ) detail.DebriefQty,
-                                    TransporterLiableQty = ( int ) detail.TransporterLiable,
-                                    AdminMovementQty = ( int ) detail.AdminMovement,
-                                    OutstandingQty = ( int ) detail.OutstandingQtyAtCustomer,
-                                    CreatedOn = DateTime.Now,
-                                    ModifiedOn = DateTime.Now,
-                                };
-
-                                clqservice.Create( clientLoadQuantity );
-                            }
+                                ClientLoadId = load.Id,
+                                EquipmentCode = detail.ProductId?.ToString() ?? string.Empty,
+                                OriginalQuantity = ( int ) detail.DeliveredQty,
+                                ReturnQty = ( int ) detail.ReturnedTransferredQty,
+                                DebriefQty = ( int ) detail.DebriefQty,
+                                TransporterLiableQty = ( int ) detail.TransporterLiable,
+                                AdminMovementQty = ( int ) detail.AdminMovement,
+                                OutstandingQty = ( int ) detail.OutstandingQtyAtCustomer,
+                                CreatedOn = DateTime.Now,
+                                ModifiedOn = DateTime.Now,
+                            };
+                            clqservice.Create( clientLoadQuantity );
                         }
                     }
                 }
+
+                #endregion
+
+                #region Handle ClientGroup
+
+                if ( model.ClientGroupId.HasValue )
+                {
+                    gservice.SaveOrUpdateClientGroup( load.ClientId, model.ClientGroupId.Value, User.Identity.Name );
+                }
+
                 #endregion
 
                 scope.Complete();
@@ -1329,15 +1328,17 @@ namespace ACT.UI.Controllers
         public ActionResult EditClientData( int id )
         {
             using ( SiteService sservice = new SiteService() )
-            using ( ImageService iservice = new ImageService() )
+            using ( GroupService gservice = new GroupService() )
             using ( ProductService pservice = new ProductService() )
-            using ( ChepLoadService chservice = new ChepLoadService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
             using ( TransporterService tservice = new TransporterService() )
-            using ( ClientGroupService cgservice = new ClientGroupService() )
             using ( ClientProductService cpservice = new ClientProductService() )
             {
                 ClientLoad load = clservice.GetById( id );
+
+                // Fetch the ClientGroup for this ClientLoad
+                ClientGroup clientGroup = gservice.GetClientGroup( load.ClientId );
+
                 #region Client Load
                 ClientLoadViewModel model = new ClientLoadViewModel()
                 {
@@ -1348,11 +1349,15 @@ namespace ACT.UI.Controllers
                     ClientSiteIdTo = load?.ToClientSiteId,
                     LoadNumber = load?.LoadNumber,
                     LoadDate = load?.LoadDate,
+                    PrimarySecondary = load?.LoadType.HasValue == true ? ( LoadType ) load.LoadType.Value : ( LoadType? ) null,
+                    ClientGroupId = clientGroup?.GroupId,
                     DeliveryNote = load?.DeliveryNote,
                     ChepInvoiceNo = load?.ChepInvoiceNo,
                     OrderNumber = load?.OrderNumber,
                     DepoSTONo = load?.DepoSTONo,
+                    GRVNumber = load?.GRVNumber,
                     GLID = load?.GLID,
+                    DebtorsCode = load?.DebtorsCode,
                     DeliveryDate = load?.DeliveryDate,
                     TransporterId = load?.TransporterId,
                     FleetNumber = load?.VehicleId?.ToString(),
@@ -1385,8 +1390,10 @@ namespace ACT.UI.Controllers
                 #endregion
 
                 #region Equipment Details
+
                 var clientProducts = cpservice.ListByClient( model.ClientId );
-                var allProducts = pservice.List( true ); // Get all active products
+
+                var allProducts = pservice.List( true );
 
                 model.EquipmentDetails = load?.ClientLoadQuantities.Select( clq => new EquipmentDetailViewModel
                 {
@@ -1429,7 +1436,7 @@ namespace ACT.UI.Controllers
 
                 #region Populate Dropdowns
 
-                model.ClientGroupOptions = cgservice.List();
+                model.ClientGroupOptions = gservice.List( true );
                 model.CustomerSiteOptions = sservice.ListCustomers();
                 model.TransporterOptions = tservice.ListAllTransporters();
                 model.SupplierSiteOptions = sservice.ListSupplierSites( true );
@@ -1440,8 +1447,6 @@ namespace ACT.UI.Controllers
             }
         }
 
-        // POST: Pallet/EditClientData/5
-        // POST: Pallet/EditClientData/5
         [HttpPost]
         [Requires( PermissionTo.Edit )]
         public ActionResult EditClientData( ClientLoadViewModel model )
@@ -1449,21 +1454,17 @@ namespace ACT.UI.Controllers
             if ( !ModelState.IsValid )
             {
                 Notify( "Sorry, the selected Client Load was not updated. Please correct all errors and try again.", NotificationType.Error );
-
                 return View( "ClientDataDetails", model );
             }
-
+            using ( GroupService gservice = new GroupService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
             {
                 ClientLoad load = clservice.GetById( model.Id );
-
                 if ( load == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
                     return PartialView( "_AccessDenied" );
                 }
-
                 load.ClientId = model.ClientId;
                 load.ClientSiteId = model.ClientSiteId;
                 load.ToClientSiteId = model.ClientSiteIdTo;
@@ -1476,12 +1477,16 @@ namespace ACT.UI.Controllers
                 load.GLID = model.GLID;
                 load.DeliveryDate = model.DeliveryDate;
                 load.TransporterId = model.TransporterId;
+                load.DebtorsCode = model.DebtorsCode;
+                load.AccountNumber = model.AccountNumber;
                 load.VehicleId = !string.IsNullOrEmpty( model.FleetNumber ) && int.TryParse( model.FleetNumber, out int fleetNumber ) ? ( int? ) fleetNumber : null;
+                load.LoadType = model.PrimarySecondary.HasValue ? ( int ) model.PrimarySecondary.Value : ( int? ) null;
                 load.ReferenceNumber = model.ReferenceNumber;
                 load.LoadSheetNo = model.LoadsheetNo;
                 load.ReceiverNumber = model.ReceiverNumber;
                 load.DocNumber = model.DocNumber;
                 load.ExchangeNo = model.ExchangeNo;
+                load.GRVNumber = model.GRVNumber;
                 load.ChepCustomerThanDocNo = model.ChepCustomerThanDocNo;
                 load.WarehouseTransferDocNo = model.WarehouseTransferDocNo;
                 load.DebriefDocketNo = model.DebriefDocketNo;
@@ -1490,12 +1495,19 @@ namespace ACT.UI.Controllers
                 load.ChepCompensationNo = model.ChepCompensationNo;
                 load.CompensationDate = model.CompensationDate;
                 load.EffectiveDate = model.EffectiveDate;
-
+               
                 // Update the ClientLoad entity
                 clservice.Update( load );
+
+                // Handle ClientGroup
+                if ( model.ClientGroupId.HasValue )
+                {
+                    gservice.SaveOrUpdateClientGroup( load.ClientId, model.ClientGroupId.Value, User.Identity.Name );
+                }
             }
 
-            Notify( "The item was successfully created.", NotificationType.Success );
+            Notify( "The item was successfully updated.", NotificationType.Success );
+
             return ClientData( new PagingModel(), new CustomSearchModel() );
         }
 

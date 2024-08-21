@@ -248,7 +248,7 @@ namespace ACT.Core.Services
                 { new SqlParameter( "userid", ( CurrentUser != null ) ? CurrentUser.Id : 0 ) },
             };
 
-            string query = $"SELECT g.Id AS [TKey], g.Description AS [TValue] FROM [dbo].[Group] g WHERE (1=1)";
+            string query = $"SELECT g.Id AS [TKey], g.Name AS [TValue] FROM [dbo].[Group] g WHERE (1=1)";
 
             //if ( CurrentUser.RoleType == RoleType.PSP )
             //{
@@ -269,6 +269,50 @@ namespace ACT.Core.Services
             }
 
             return pspOptions;
+        }
+
+
+        /// <summary>
+        /// Gets a list of Client Groups
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public ClientGroup GetClientGroup( int clientId )
+        {
+            return context.ClientGroups
+                .FirstOrDefault( cg => cg.ClientId == clientId && cg.Status == ( int ) Status.Active );
+        }
+
+        /// <summary>
+        /// Save or Update Client Group for Client Data
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public void SaveOrUpdateClientGroup( int clientId, int groupId, string modifiedBy )
+        {
+            ClientGroup clientGroup = GetClientGroup( clientId );
+
+            if ( clientGroup == null )
+            {
+                clientGroup = new ClientGroup
+                {
+                    ClientId = clientId,
+                    GroupId = groupId,
+                    CreatedOn = DateTime.Now,
+                    ModifiedOn = DateTime.Now,
+                    ModifiedBy = modifiedBy,
+                    Status = ( int ) Status.Active
+                };
+                context.ClientGroups.Add( clientGroup );
+            }
+            else
+            {
+                clientGroup.GroupId = groupId;
+                clientGroup.ModifiedOn = DateTime.Now;
+                clientGroup.ModifiedBy = modifiedBy;
+            }
+
+            context.SaveChanges();
         }
     }
 }

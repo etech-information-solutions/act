@@ -6,6 +6,7 @@ using ACT.Core.Enums;
 using ACT.Core.Models;
 using ACT.Data.Models;
 using ACT.Core.Models.Custom;
+using System.Data.Entity;
 
 namespace ACT.Core.Services
 {
@@ -48,6 +49,24 @@ namespace ACT.Core.Services
             }
 
             return clientGroupOptions;
+        }
+
+        public ClientGroup GetByClientId( int clientId )
+        {
+            return context.ClientGroups.FirstOrDefault( cg => cg.ClientId == clientId && cg.Status == ( int ) Status.Active );
+        }
+
+        public void SaveOrUpdate( ClientGroup clientGroup )
+        {
+            if ( clientGroup.Id == 0 )
+            {
+                context.ClientGroups.Add( clientGroup );
+            }
+            else
+            {
+                context.Entry( clientGroup ).State = EntityState.Modified;
+            }
+            context.SaveChanges();
         }
     }
 }

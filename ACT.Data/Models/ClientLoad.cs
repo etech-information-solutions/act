@@ -99,6 +99,8 @@ namespace ACT.Data.Models
         public string LoadSheetNo { get; set; }
         public string ExchangeNo { get; set; }
         public Nullable<System.DateTime> CompensationDate { get; set; }
+        public Nullable<int> LoadType { get; set; }
+        public string DebtorsCode { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ChepClient> ChepClients { get; set; }
