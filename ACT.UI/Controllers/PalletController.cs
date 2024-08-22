@@ -1201,15 +1201,16 @@ namespace ACT.UI.Controllers
 
             // Populate Dropdown Menus
             using ( SiteService sservice = new SiteService() )
+            using ( GroupService gservice = new GroupService() )
             using ( ProductService pservice = new ProductService() )
             using ( TransporterService tservice = new TransporterService() )
-            using ( GroupService gservice = new GroupService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
             {
                 model.ClientGroupOptions = gservice.List( true );
                 model.EquipmentCodeOptions = pservice.List( true );
-                model.CustomerSiteOptions = sservice.ListCustomers();
                 model.TransporterOptions = tservice.ListAllTransporters();
                 model.SupplierSiteOptions = sservice.ListSupplierSites( true );
+                model.CustomerSiteOptions = ccservice.GetCustomerNamesAndNumbers();
             }
 
             ViewBag.EquipmentCodeOptions = model.EquipmentCodeOptions;
@@ -1236,10 +1237,11 @@ namespace ACT.UI.Controllers
                 return View( model );
             }
 
+            using ( GroupService gservice = new GroupService() )
             using ( ClientService cservice = new ClientService() )
             using ( TransactionScope scope = new TransactionScope() )
             using ( ClientLoadService clservice = new ClientLoadService() )
-            using ( GroupService gservice = new GroupService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
             {
                 #region Create Client Load
 
@@ -1257,9 +1259,11 @@ namespace ACT.UI.Controllers
                     GLID = model.GLID,
                     GRVNumber = model.GRVNumber,
                     DeliveryDate = model.DeliveryDate,
+                    AccountNumber = model.AccountNumber,
                     TransporterId = model.TransporterId,
                     DebtorsCode = model.DebtorsCode,
                     VehicleId = !string.IsNullOrEmpty( model.FleetNumber ) && int.TryParse( model.FleetNumber, out int fleetNumber ) ? ( int? ) fleetNumber : null,
+                    LoadType = model.PrimarySecondary.HasValue ? ( int ) model.PrimarySecondary.Value : ( int? ) null,
                     ReferenceNumber = model.ReferenceNumber,
                     LoadSheetNo = model.LoadsheetNo,
                     ReceiverNumber = model.ReceiverNumber,
@@ -1307,6 +1311,20 @@ namespace ACT.UI.Controllers
 
                 #endregion
 
+
+                // Update ClientCustomer
+                if ( model.ClientSiteIdTo.HasValue )
+                {
+                    ClientCustomer customer = ccservice.GetById( model.ClientSiteIdTo.Value );
+                    if ( customer != null )
+                    {
+                        customer.CustomerUserId = model.ClientSiteIdTo.Value;
+                        customer.CustomerAccountNo = model.CustomerAccountNumber;
+                        ccservice.Update( customer );
+                    }
+                }
+
+
                 #region Handle ClientGroup
 
                 if ( model.ClientGroupId.HasValue )
@@ -1329,15 +1347,21 @@ namespace ACT.UI.Controllers
         {
             using ( SiteService sservice = new SiteService() )
             using ( GroupService gservice = new GroupService() )
+            using ( VehicleService vservice = new VehicleService() )
             using ( ProductService pservice = new ProductService() )
+            using ( AddressService aservice = new AddressService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
             using ( TransporterService tservice = new TransporterService() )
             using ( ClientProductService cpservice = new ClientProductService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
+            using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
             {
-                ClientLoad load = clservice.GetById( id );
 
-                // Fetch the ClientGroup for this ClientLoad
+                ClientLoad load = clservice.GetById( id );
+                Vehicle vehicle = vservice.GetById( load.ClientId );
                 ClientGroup clientGroup = gservice.GetClientGroup( load.ClientId );
+                ClientAuthorisation clauthorise = caservice.GetByClientLoadId( load.Id );
+                ClientCustomer clientCustomer = ccservice.GetByClientAndUserId( load.ToClientSiteId );
 
                 #region Client Load
                 ClientLoadViewModel model = new ClientLoadViewModel()
@@ -1350,6 +1374,8 @@ namespace ACT.UI.Controllers
                     LoadNumber = load?.LoadNumber,
                     LoadDate = load?.LoadDate,
                     PrimarySecondary = load?.LoadType.HasValue == true ? ( LoadType ) load.LoadType.Value : ( LoadType? ) null,
+                    AuthorizationCode = clauthorise?.Code,
+                    AuthorizedBy = clauthorise != null ? $"{clauthorise.User.Name} {clauthorise.User.Surname}" : null,
                     ClientGroupId = clientGroup?.GroupId,
                     DeliveryNote = load?.DeliveryNote,
                     ChepInvoiceNo = load?.ChepInvoiceNo,
@@ -1358,10 +1384,11 @@ namespace ACT.UI.Controllers
                     GRVNumber = load?.GRVNumber,
                     GLID = load?.GLID,
                     DebtorsCode = load?.DebtorsCode,
+                    CustomerAccountNumber = clientCustomer.CustomerAccountNo,
                     DeliveryDate = load?.DeliveryDate,
                     TransporterId = load?.TransporterId,
-                    FleetNumber = load?.VehicleId?.ToString(),
-                    VehicleRegistration = load?.Vehicle?.Registration,
+                    FleetNumber = vehicle.FleetNumber,
+                    VehicleRegistration = vehicle.Registration,
                     ReferenceNumber = load?.ReferenceNumber,
                     LoadsheetNo = load?.LoadSheetNo,
                     ReceiverNumber = load?.ReceiverNumber,
@@ -1437,9 +1464,9 @@ namespace ACT.UI.Controllers
                 #region Populate Dropdowns
 
                 model.ClientGroupOptions = gservice.List( true );
-                model.CustomerSiteOptions = sservice.ListCustomers();
                 model.TransporterOptions = tservice.ListAllTransporters();
                 model.SupplierSiteOptions = sservice.ListSupplierSites( true );
+                model.CustomerSiteOptions = ccservice.GetCustomerNamesAndNumbers();
 
                 #endregion
 
@@ -1457,14 +1484,21 @@ namespace ACT.UI.Controllers
                 return View( "ClientDataDetails", model );
             }
             using ( GroupService gservice = new GroupService() )
+            using ( VehicleService vservice = new VehicleService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
             {
+
                 ClientLoad load = clservice.GetById( model.Id );
+                Vehicle vehicle = vservice.GetById( model.ClientId );
+                ClientCustomer ccustomer = ccservice.GetById( model.ClientId );
+
                 if ( load == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
                     return PartialView( "_AccessDenied" );
                 }
+
                 load.ClientId = model.ClientId;
                 load.ClientSiteId = model.ClientSiteId;
                 load.ToClientSiteId = model.ClientSiteIdTo;
@@ -1495,9 +1529,28 @@ namespace ACT.UI.Controllers
                 load.ChepCompensationNo = model.ChepCompensationNo;
                 load.CompensationDate = model.CompensationDate;
                 load.EffectiveDate = model.EffectiveDate;
-               
+                load.Status = ( int ) model.Status;
+
                 // Update the ClientLoad entity
                 clservice.Update( load );
+
+                // Update the Vehicle entity
+                vehicle.FleetNumber = model.FleetNumber;
+                vehicle.Registration = model.VehicleRegistration;
+
+                vservice.Update( vehicle );
+
+                // Update ClientCustomer
+                if ( model.ClientSiteIdTo.HasValue )
+                {
+                    ClientCustomer customer = ccservice.GetById( model.ClientSiteIdTo.Value );
+                    if ( customer != null )
+                    {
+                        customer.CustomerUserId = model.ClientSiteIdTo.Value;
+                        customer.CustomerAccountNo = model.CustomerAccountNumber;
+                        ccservice.Update( customer );
+                    }
+                }
 
                 // Handle ClientGroup
                 if ( model.ClientGroupId.HasValue )

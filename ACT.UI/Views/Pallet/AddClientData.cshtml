@@ -161,6 +161,10 @@
                     </div>
                 </div>
 
+            </div>
+
+            <div class="left" style="width: 31%; margin-right: 3%;">
+
                 <div class="form-group">
                     <div class="editor-label">
                         @Html.LabelFor( model => model.DepoSTONo )
@@ -170,9 +174,6 @@
                         @Html.ValidationMessageFor( model => model.DepoSTONo )
                     </div>
                 </div>
-            </div>
-
-            <div class="left" style="width: 31%; margin-right: 3%;">
 
                 <div class="form-group">
                     <div class="editor-label">
@@ -371,7 +372,7 @@
                         @Html.LabelFor( model => model.AuthorizationCode )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.AuthorizationCode, new { @class = "input", @placeholder = "Please Complete", @readonly = "readonly" } )
+                        @Html.TextBoxFor( model => model.AuthorizationCode, new { @class = "input", @placeholder = "Field Auto Generated", @readonly = "readonly" } )
                         @Html.ValidationMessageFor( model => model.AuthorizationCode )
                     </div>
                 </div>
@@ -381,7 +382,7 @@
                         @Html.LabelFor( model => model.AuthorizedBy )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.AuthorizedBy, new { @class = "input", @placeholder = "Please Complete", @readonly = "readonly" } )
+                        @Html.TextBoxFor( model => model.AuthorizedBy, new { @class = "input", @placeholder = "Field Auto Generated", @readonly = "readonly" } )
                         @Html.ValidationMessageFor( model => model.AuthorizedBy )
                     </div>
                 </div>
@@ -391,7 +392,7 @@
                         @Html.LabelFor( model => model.ChepCompensationNo )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.ChepCompensationNo, new { @class = "input", @placeholder = "Please Complete", @readonly = "readonly" } )
+                        @Html.TextBoxFor( model => model.ChepCompensationNo, new { @class = "input", @placeholder = "Please Complete" } )
                         @Html.ValidationMessageFor( model => model.ChepCompensationNo )
                     </div>
                 </div>
@@ -415,6 +416,17 @@
                         @Html.ValidationMessageFor( model => model.EffectiveDate )
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <div class="editor-label">
+                        @Html.LabelFor( model => model.Status )
+                    </div>
+                    <div class="editor-field">
+                        @Html.EnumDropDownListFor( model => model.Status, "-- Select Status --", new { @class = "chzn" } )
+                        @Html.ValidationMessageFor( model => model.Status )
+                    </div>
+                </div>
+
             </div>
 
             <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>

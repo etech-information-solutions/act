@@ -102,11 +102,17 @@ namespace ACT.Core.Models.Custom
 
         public decimal? ChepNewQuantity { get; set; }
 
+        public string SupplierFrom { get; set; }
+        public string CustomerTo { get; set; }
+        public string CustomerGroup { get; set; }
+
 
         // Mobile API
         public string Email { get; set; }
 
         public string APIKey { get; set; }
         public string RegionName { get; set; }
+
+
     }
 }

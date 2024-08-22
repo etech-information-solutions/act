@@ -259,9 +259,13 @@ namespace ACT.Core.Services
 
             string query = @"SELECT
                                 cl.*,
+                                g.Name AS [CustomerGroup],
+                                cg.GroupName AS [CustomerGroup],
+                                cc.CustomerName AS [CustomerTo],
                                 s.Id AS [SiteId],
                                 s2.Id AS [ToSiteId],
                                 s.Description AS [SiteName],
+                                ss.Name AS [SupplierFrom],
                                 pc.[Comment] AS [PODComment],
                                 t.[Name] AS [TransporterName],
                                 c.CompanyName AS [ClientName],
@@ -282,9 +286,13 @@ namespace ACT.Core.Services
                                 LEFT OUTER JOIN [dbo].[PODComment] pc ON pc.[Id]=cl.[PODCommentId]
                                 LEFT OUTER JOIN [dbo].[ClientSite] cs1 ON cs1.[Id]=cl.[ClientSiteId]
                                 LEFT OUTER JOIN [dbo].[ClientSite] cs2 ON cs2.[Id]=cl.[ToClientSiteId]
+                                LEFT OUTER JOIN [dbo].[SupplierSite] ss ON ss.[Id]=cl.[ClientSiteId]
+                                LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cc.[Id]=cl.[ToClientSiteId]
                                 LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs1.[SiteId]
                                 LEFT OUTER JOIN [dbo].[Site] s2 ON s2.[Id]=cs2.[SiteId]
                                 LEFT OUTER JOIN [dbo].[OutstandingReason] otr ON otr.[Id]=cl.[OutstandingReasonId]
+                                LEFT OUTER JOIN [dbo].[ClientGroup] cg ON cg.[ClientId]=cl.[ClientId]
+                                LEFT OUTER JOIN [dbo].[Group] g ON g.[Id]=cg.[GroupId]
                                 LEFT OUTER JOIN [dbo].[ChepLoad] ch ON ch.[Id]=(SELECT TOP 1 ch1.[Id] FROM [dbo].[ChepLoad] ch1 WHERE ch1.[ClientId]=cl.[ClientId] AND cl.[ReceiverNumber] IS NOT NULL AND cl.[ReceiverNumber] != '' AND (RTRIM(LTRIM(cl.[ReceiverNumber])) LIKE '%' + RTRIM(LTRIM(ch1.Ref)) +'%' OR RTRIM(LTRIM(cl.[ReceiverNumber])) LIKE '%' + RTRIM(LTRIM(ch1.OtherRef)) +'%'))";
 
             // WHERE

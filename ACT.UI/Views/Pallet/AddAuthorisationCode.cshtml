@@ -29,7 +29,7 @@
 
             <div class="left" style="width: 48%; margin-right: 3%;">
 
-                <div class="edit-label">
+                @*<div class="edit-label">
                     @Html.LabelFor( model => model.ClientSiteId, new { @style = "display: inline-block;" } )
                 </div>
                 <div class="edit-field">
@@ -43,7 +43,7 @@
                 <div class="edit-field">
                     @Html.DropDownListFor( model => model.TransporterId, model => model.TransporterOptions, s => s.Key, s => s.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
                     @Html.ValidationMessageFor( model => model.TransporterId )
-                </div>
+                </div>*@
 
                 <div class="edit-label">
                     @Html.LabelFor( model => model.Status )
@@ -81,13 +81,13 @@
                     @Html.ValidationMessageFor( model => model.LoadNumber )
                 </div>
 
-                <div class="edit-label">
+                @*<div class="edit-label">
                     @Html.LabelFor( model => model.DocketNumber )
                 </div>
                 <div class="edit-field">
                     @Html.TextBoxFor( model => model.DocketNumber, new { @placeholder = "Enter Docket Number" } )
                     @Html.ValidationMessageFor( model => model.DocketNumber )
-                </div>
+                </div>*@
 
             </div>
 

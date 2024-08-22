@@ -35,8 +35,6 @@ namespace ACT.UI.Models
 
         [Display( Name = "CUSTOMER TO:" )]
         public int? ClientSiteIdTo { get; set; }
-        public ClientSite ToClientSiteName { get; set; }
-
 
         [Display( Name = "REGION FROM:" )]
         public int? RegionFromId { get; set; }
@@ -92,7 +90,7 @@ namespace ACT.UI.Models
         public string ReferenceNumber { get; set; }
 
         //[Required]
-        [Display( Name = "LOAD SHEET NUMBER:" )]
+        [Display( Name = "RECEIVER NUMBER:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ReceiverNumber { get; set; }
 
@@ -125,8 +123,9 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string PRNNumber { get; set; }
 
-        [Display( Name = "RECONCILIATION STATUS:" )]
-        public ReconciliationStatus Status { get; set; }
+        [Required]
+        [Display( Name = "Status" )]
+        public Status Status { get; set; }
 
         [Display( Name = "THAN:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]

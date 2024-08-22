@@ -47,35 +47,26 @@
             <th data-name="LoadDate" data-column="cl.LoadDate">
                 Load Date
             </th>
-            <th data-name="Client" data-column="ch.LocationId">
-                Chep Account/GLID #
+            <th data-name="Client" data-column="c.Client">
+                Client Name
             </th>
-            <th data-name="FromSite" data-column="s.Description">
+            <th data-name="SupplierFrom" data-column="cs1.Description">
                 Supplier From
             </th>
-            <th data-name="LoadNumber" data-column="cl.LoadNumber">
-                Shipment #
-            </th>
-            <th data-name="ToSite" data-column="s2.Description">
+            <th data-name="CustomerTo" data-column="cs2.Description">
                 Customer To
             </th>
-            <th data-name="OriginalQuantity" data-column="cl.OriginalQuantity">
-                Qty
+            <th data-name="CustomerGroup" data-column="g.Name">
+                Customer Group
             </th>
-            <th data-name="PODComment" data-column="pc.Comment">
-                Comment
+            <th data-name="" data-column="">
+                Load/Shipment
             </th>
-            <th data-name="Status" data-column="cl.Status">
+            <th data-name="" data-column="">
+                Transporter Name
+            </th>
+            <th data-name="" data-column="">
                 Status
-            </th>
-            <th data-name="Transporter" data-column="t.Name">
-                Transporter
-            </th>
-            <th data-name="Vehicle" data-column="v.Registration">
-                Vehicle
-            </th>
-            <th data-name="InvoiceNumber" data-column="ch.InvoiceNumber">
-                Invoice #
             </th>
             <th data-name="Actions">
                 Actions
@@ -100,34 +91,25 @@
                         @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
                     </td>
                     <td>
-                        @( item.ChepAccountGLIDNo ?? item.GLID )
+                        @item.ClientName
                     </td>
                     <td>
-                        @item.SiteName
+                        @item.SupplierFrom
+                    </td>
+                    <td>
+                        @item.CustomerTo
+                    </td>
+                    <td>
+                        @item.CustomerGroup
                     </td>
                     <td>
                         @item.LoadNumber
                     </td>
                     <td>
-                        @item.ToSiteName
-                    </td>
-                    <td>
-                        @item.OriginalQuantity
-                    </td>
-                    <td>
-                        @item.PODComment
-                    </td>
-                    <td>
-                        @status.GetDisplayText()
-                    </td>
-                    <td>
                         @item.TransporterName
                     </td>
                     <td>
-                        @item.VehicleRegistration
-                    </td>
-                    <td>
-                        @item.InvoiceNumber
+                        @status.GetDisplayText()
                     </td>
                     <td width="15%">
 
@@ -140,10 +122,6 @@
                             @Html.ActionLink( enable, "DeleteClientData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = enable + " this item?" } )
 
                         </div>
-
-                        <a href="@Url.Action( "CustomerContacts", "Client", new { id = item.Id } )" data-details="1" data-id="@item.Id" data-target=".tr-@item.Id-item">
-                            <i class="fa fa-phone"></i>Contacts
-                        </a>
                     </td>
                 </tr>
                 

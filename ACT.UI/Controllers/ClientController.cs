@@ -1834,12 +1834,17 @@ namespace ACT.UI.Controllers
                     return View( model );
                 }
 
-                if ( !string.IsNullOrEmpty( model.CustomerNumber ) &&
-                    model.CustomerNumber.Trim().ToLower() != customer.CustomerNumber.Trim().ToLower() &&
-                    customerService.ExistByCustomerNumber( model.CustomerNumber.Trim() ) )
+                if ( !string.IsNullOrEmpty( model.CustomerNumber ) )
                 {
-                    Notify( $"Sorry, a Customer with the Number \"{model.CustomerNumber}\" already exists!", NotificationType.Error );
-                    return View( model );
+                    string modelCustomerNumber = model.CustomerNumber.Trim().ToLower();
+                    string existingCustomerNumber = customer?.CustomerNumber?.Trim().ToLower() ?? "";
+
+                    if ( modelCustomerNumber != existingCustomerNumber &&
+                        customerService.ExistByCustomerNumber( model.CustomerNumber.Trim() ) )
+                    {
+                        Notify( $"Sorry, a Customer with the Number \"{model.CustomerNumber}\" already exists!", NotificationType.Error );
+                        return View( model );
+                    }
                 }
 
                 #endregion

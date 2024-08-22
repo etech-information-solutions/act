@@ -785,5 +785,12 @@ namespace ACT.Core.Services
 
             return context.Database.SqlQuery<AuthorizationCodeAuditModel>( query, parameters.ToArray() ).ToList();
         }
+
+        public ClientAuthorisation GetByClientLoadId( int clientLoadId )
+        {
+            return context.ClientAuthorisations
+                .Include( "User" )
+                .FirstOrDefault( ca => ca.ClientLoadId == clientLoadId );
+        }
     }
 }

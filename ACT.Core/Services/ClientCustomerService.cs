@@ -172,7 +172,7 @@ namespace ACT.Core.Services
         /// </summary>
         /// <param name="pm"></param>
         /// <param name="csm"></param>
-        /// <returns></returns>
+        /// <returns></returns>s
         public List<ClientCustomerCustomModel> List1( PagingModel pm, CustomSearchModel csm )
         {
             if ( csm.FromDate.HasValue && csm.ToDate.HasValue && csm.FromDate?.Date == csm.ToDate?.Date )
@@ -312,6 +312,11 @@ namespace ACT.Core.Services
             return context.ClientCustomers.FirstOrDefault( cc => cc.ClientId == clientId );
         }
 
+        public ClientCustomer GetByClientAndUserId( int? customerUserId )
+        {
+            return context.ClientCustomers.FirstOrDefault( cc => cc.CustomerUserId == customerUserId );
+        }
+
         /// <summary>
         /// Checks if a customer with the given customer number exists for any client
         /// </summary>
@@ -383,6 +388,45 @@ namespace ACT.Core.Services
         }
 
         /// <summary>
+        /// Gets a list of customers with their name and number properties
+        /// </summary>
+        /// <param name="CustomerName">Customer Name</param>
+        /// <param name="CustomerNumber">Customer Number</param>
+        /// <returns></returns>
+        public Dictionary<int, string> GetCustomerNamesAndNumbers()
+        {
+            List<object> parameters = new List<object>
+            {
+                new SqlParameter("@userId", (CurrentUser != null) ? CurrentUser.Id : 0)
+            };
+
+            string query = @"
+                            SELECT 
+                                cc.Id,
+                                ISNULL(cc.CustomerName, '') + ' (' + ISNULL(cc.CustomerNumber, '') + ')' AS CustomerNameNumber
+                            FROM [ACT].[dbo].[ClientCustomer] cc
+                            WHERE cc.Status = 1";
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query += @" AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu 
+            INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId = pu.PSPId 
+            WHERE pc.ClientId = cc.ClientId AND pu.UserId = @userId)";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query += @" AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu 
+            WHERE cu.UserId = @userId AND cu.ClientId = cc.ClientId)";
+            }
+
+            query += " ORDER BY cc.CustomerName";
+
+            var results = context.Database.SqlQuery<CustomerIdNameNumber>( query, parameters.ToArray() ).ToList();
+
+            return results.ToDictionary( r => r.Id, r => r.CustomerNameNumber );
+        }
+
+        /// <summary>
         /// Gets the Key Account Manager Info for a client or customer
         /// </summary>
         /// <param name="id">The ID of the client or customer</param>
@@ -406,6 +450,12 @@ namespace ACT.Core.Services
 
             KeyAccountManagerInfo result = context.Database.SqlQuery<KeyAccountManagerInfo>( query, parameters.ToArray() ).FirstOrDefault();
             return result ?? new KeyAccountManagerInfo { ContactName = "No Key Account Manager assigned." };
+        }
+
+        private class CustomerIdNameNumber
+        {
+            public int Id { get; set; }
+            public string CustomerNameNumber { get; set; }
         }
 
         public class KeyAccountManagerInfo
