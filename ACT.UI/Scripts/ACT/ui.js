@@ -72,7 +72,7 @@
             this.DataDeleteImage( $( '*[data-delete-image="1"]' ) );
             this.DataUploadImage( $( '*[data-upload-image="1"]' ) );
             this.DataDeleteDocument( $( '*[data-delete-document="1"]' ) );
-            this.DataAddMoreEquipmentDetails( $( '[data-add-one-more="1"]' ) );
+            this.DataAddMoreEquipmentDetails( $( '[data-add-section="1"]' ) );
 
             // Table CRUD Operations
             this.DataEdit( $( '*[data-edit="1"]' ) );

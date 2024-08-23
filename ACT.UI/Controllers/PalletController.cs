@@ -1144,43 +1144,37 @@ namespace ACT.UI.Controllers
 
         //
         // GET: /Pallet/ClientDataDetails/5
-        public ActionResult ClientDataDetails( int id, bool layout = true, bool canEdit = true )
+        public ActionResult ClientDataDetails( int id, bool layout = true )
         {
-            using ( ChepLoadService chservice = new ChepLoadService() )
             using ( ClientLoadService clservice = new ClientLoadService() )
+            using ( SiteService sservice = new SiteService() )
+            using ( GroupService gservice = new GroupService() )
+            using ( ProductService pservice = new ProductService() )
+            using ( TransporterService tservice = new TransporterService() )
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
             {
-                ClientLoad model = clservice.GetById( id );
-
-                if ( model == null )
+                ClientLoad clientLoad = clservice.GetById( id );
+                if ( clientLoad == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
-                    return PartialView( "_AccessDenied" );
+                    return RedirectToAction( "Index" );
                 }
+
+                ViewBag.ClientLoads = new List<ClientLoad>() { clientLoad };
+
+                // Populate ViewBag with options from other services
+                ViewBag.ClientGroupOptions = gservice.List( true );
+                ViewBag.EquipmentCodeOptions = pservice.List( true );
+                ViewBag.TransporterOptions = tservice.ListAllTransporters();
+                ViewBag.SupplierSiteOptions = sservice.ListSupplierSites( true );
+                ViewBag.CustomerSiteOptions = ccservice.GetCustomerNamesAndNumbers();
 
                 if ( layout )
                 {
                     ViewBag.IncludeLayout = true;
                 }
 
-                ViewBag.CanEdit = canEdit;
-
-                ViewBag.ClientAuthorisation = model.ClientAuthorisations.FirstOrDefault();
-
-                ViewBag.ClientLoads = new List<ClientLoad>() { model };
-
-                ChepLoad chep = chservice.ListByReference( model.ClientId, model.ReceiverNumber?.Trim() )?.FirstOrDefault();
-
-                List<ClientProduct> cp = model.Client.ClientProducts.Where( xcp => xcp.Status == ( int ) Status.Active ).ToList();
-
-                if ( !cp.NullableAny() )
-                {
-                    cp = new List<ClientProduct>() { { new ClientProduct() { Equipment = chep?.EquipmentCode, ProductDescription = chep?.Equipment ?? model.Equipment } } };
-                }
-
-                ViewBag.ClientProducts = cp;
-
-                return View( chep );
+                return View( clientLoad );
             }
         }
 

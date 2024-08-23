@@ -525,7 +525,6 @@
     <Content Include="Views\Shared\_Announcement.cshtml" />
     <Content Include="Views\Shared\_AuditLogCustomSearch.cshtml" />
     <Content Include="Views\Shared\_AutoLogout.cshtml" />
-    <Content Include="Views\Shared\_Empty.cshtml" />
     <Content Include="Views\Shared\_Fail.cshtml" />
     <Content Include="Views\Shared\_Menu.cshtml" />
     <Content Include="Views\Shared\_Modal.cshtml" />

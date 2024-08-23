@@ -27,7 +27,7 @@
         @Html.HiddenFor( model => model.Id )
 
         <div id="item-details" class="item-details" style="width: auto;">
-            <div class="left" style="width: 47%; margin-right: 4%;">
+            <div class="left" style="width: 25%; margin-right: 2%;">
                 <div class="editor-label">
                     @Html.LabelFor( model => model.ClientId, "Select Client" )
                 </div>
@@ -69,9 +69,9 @@
                 </div>
             </div>
 
-            <div class="left" style="width: 47%;">
+            <div class="left" style="width: 73%;">
                 <div id="contact-list">
-                    @Html.Partial( "_Contacts", Model.Contacts )
+                    @Html.Partial( "_ClientContacts", Model.Contacts )
                 </div>
 
                 <div class="clear"></div>
