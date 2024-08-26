@@ -1508,7 +1508,7 @@ namespace ACT.UI.Controllers
                     } );
                 }
 
-                // Ensure we have exactly 3 EquipmentDetails
+                // If there are less than 3 items, add empty ones to make it 3
                 while ( model.EquipmentDetails.Count < 3 )
                 {
                     model.EquipmentDetails.Add( new EquipmentDetailViewModel
@@ -1523,6 +1523,7 @@ namespace ACT.UI.Controllers
                 {
                     detail.ProductOptions = defaultProductOptions;
                 }
+
                 #endregion
 
                 #region Populate EquipmentCodeOptions
@@ -1629,10 +1630,10 @@ namespace ACT.UI.Controllers
                 }
 
                 // Handle Equipment Details
-                // First, delete all existing equipment details for this load
+                // Delete all existing equipment details for this load
                 clqservice.DeleteByClientLoadId( load.Id );
 
-                // Then, add all equipment details from the model
+                // Add all equipment details from the model
                 if ( model.EquipmentDetails != null )
                 {
                     foreach ( var detail in model.EquipmentDetails )

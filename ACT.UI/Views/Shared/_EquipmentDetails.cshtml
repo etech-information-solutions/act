@@ -9,9 +9,9 @@
             @Html.LabelFor( m => m.EquipmentDetails[ 0 ].ProductId )
         </div>
         <div class="editor-field">
-            @for ( int i = 0; i < 3 && i < Model.EquipmentDetails.Count; i++ )
+            @for ( int i = 0; i < 3 && ( section * 3 + i ) < Model.EquipmentDetails.Count; i++ )
             {
-                var index = i;
+                var index = section * 3 + i;
                 <div style="display: inline-block; margin-right: 10px; width: 21.1%;">
                     @Html.DropDownListFor(
                         m => m.EquipmentDetails[ index ].ProductId,
