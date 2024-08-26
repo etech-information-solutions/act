@@ -54,41 +54,56 @@
                 Supplier From:
             </div>
             <div class="display-field">
-                @Html.DisplayFor( model => model.Client1.CompanyName )
+                @(ViewBag.SupplierSiteOptions.ContainsKey(Model.ClientSiteId ?? 0)
+                ? ViewBag.SupplierSiteOptions[Model.ClientSiteId ?? 0]
+                : "N/A")
             </div>
         </div>
-        @*<div class="form-group">
+        <div class="form-group">
             <div class="display-label">
                 Region From:
             </div>
             <div class="display-field">
-                @Html.DisplayFor( model => model.Client1.Region )
+                N/A
             </div>
-        </div>*@
+        </div>
         <div class="form-group">
             <div class="display-label">
                 Customer To:
             </div>
             <div class="display-field">
-                @Html.DisplayFor( model => model.Client.CompanyName )
+                @(ViewBag.CustomerSiteOptions.ContainsKey(Model.ToClientSiteId ?? 0)
+                ? ViewBag.CustomerSiteOptions[Model.ToClientSiteId ?? 0]
+                : "N/A")
             </div>
         </div>
-        @*<div class="form-group">
+        <div class="form-group">
             <div class="display-label">
                 Region To:
             </div>
             <div class="display-field">
-                @Html.DisplayFor( model => model.Client.Region )
+                N/A
             </div>
-        </div>*@
-        @*<div class="form-group">
+        </div>
+        <div class="form-group">
             <div class="display-label">
                 Customer Group:
             </div>
             <div class="display-field">
-                @Html.DisplayFor( model => model.Client.ClientGroup.Name )
+                @{
+                    var groupName = "N/A";
+                    if ( ViewBag.ClientGroupId != null && ViewBag.ClientGroupOptions != null )
+                    {
+                        int groupId = ( int ) ViewBag.ClientGroupId;
+                        if ( ViewBag.ClientGroupOptions.ContainsKey( groupId ) )
+                        {
+                            groupName = ViewBag.ClientGroupOptions[ groupId ];
+                        }
+                    }
+                }
+                @groupName
             </div>
-        </div>*@
+        </div>
         <div class="form-group">
             <div class="display-label">
                 Delivery Note:
@@ -147,14 +162,16 @@
                 @Html.DisplayFor( model => model.DeliveryDate )
             </div>
         </div>
-        @*<div class="form-group">
+        <div class="form-group">
             <div class="display-label">
                 Transporter:
             </div>
             <div class="display-field">
-                @Html.DisplayFor( model => model.Transporter.CompanyName )
+                @(ViewBag.TransporterOptions.ContainsKey(Model.TransporterId ?? 0)
+                ? ViewBag.TransporterOptions[Model.TransporterId ?? 0]
+                : "N/A")
             </div>
-        </div>*@
+        </div>
         <div class="form-group">
             <div class="display-label">
                 Fleet Number:
@@ -290,7 +307,14 @@
                 Authorization Code:
             </div>
             <div class="display-field">
-                @Html.DisplayFor( model => model.ClientAuthorisations.FirstOrDefault().Code )
+                @if ( Model.ClientAuthorisations != null && Model.ClientAuthorisations.Any() )
+                {
+                    @Html.DisplayFor( model => model.ClientAuthorisations.First().Code )
+                }
+                else
+                {
+                    <span>No authorization available</span>
+                }
             </div>
         </div>
         <div class="form-group">
@@ -298,8 +322,15 @@
                 Authorized By:
             </div>
             <div class="display-field">
-                @Html.DisplayFor( model => model.ClientAuthorisations.FirstOrDefault().User.Name )
-                @Html.DisplayFor( model => model.ClientAuthorisations.FirstOrDefault().User.Surname )
+                @if ( Model.ClientAuthorisations != null && Model.ClientAuthorisations.Any() && Model.ClientAuthorisations.First().User != null )
+                {
+                    @Html.DisplayFor( model => model.ClientAuthorisations.First().User.Name )
+                    @Html.DisplayFor( model => model.ClientAuthorisations.First().User.Surname )
+                }
+                else
+                {
+                    <span>No authorizing user available</span>
+                }
             </div>
         </div>
         <div class="form-group">
@@ -335,7 +366,27 @@
             </div>
         </div>
     </div>
-    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
+    <div class="grouped-area">
+
+        <div id="equipment-details-container">
+            @Html.Partial( "_EquipmentDetails", Model )
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; margin-top: 20px; height: 0;">&nbsp;</div>
+        </div>
+
+        <div style="position: relative;">
+            <a data-add-section="1" data-target="#equipment-details-container" rel="tipsyW" title="Add another Section?" style="background: #ece0e0; padding: 8px 10px; position: absolute; left: -35px; border-radius: 18px;">
+                <img alt="Add" src="@Url.Content("~/Images/add.png")" />
+            </a>
+        </div>
+
+    </div>
+
+    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
+
     @if ( ViewBag.IncludeLayout == null )
     {
         <p>

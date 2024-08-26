@@ -1146,12 +1146,16 @@ namespace ACT.UI.Controllers
         // GET: /Pallet/ClientDataDetails/5
         public ActionResult ClientDataDetails( int id, bool layout = true )
         {
-            using ( ClientLoadService clservice = new ClientLoadService() )
             using ( SiteService sservice = new SiteService() )
             using ( GroupService gservice = new GroupService() )
+            using ( VehicleService vservice = new VehicleService() )
             using ( ProductService pservice = new ProductService() )
+            using ( AddressService aservice = new AddressService() )
+            using ( ClientLoadService clservice = new ClientLoadService() )
             using ( TransporterService tservice = new TransporterService() )
+            using ( ClientProductService cpservice = new ClientProductService() )
             using ( ClientCustomerService ccservice = new ClientCustomerService() )
+            using ( ClientAuthorisationService caservice = new ClientAuthorisationService() )
             {
                 ClientLoad clientLoad = clservice.GetById( id );
                 if ( clientLoad == null )
@@ -1160,7 +1164,31 @@ namespace ACT.UI.Controllers
                     return RedirectToAction( "Index" );
                 }
 
+                // Fetch Vehicle
+                Vehicle vehicle = vservice.GetById( clientLoad.ClientId );
+                clientLoad.Vehicle = vehicle;
+
+                // Fetch ClientAuthorisation
+                ClientAuthorisation clauthorise = caservice.GetByClientLoadId( clientLoad.Id );
+                if ( clauthorise != null )
+                {
+                    // Initialize ClientAuthorisations if it's null
+                    if ( clientLoad.ClientAuthorisations == null )
+                    {
+                        clientLoad.ClientAuthorisations = new List<ClientAuthorisation>();
+                    }
+                    clientLoad.ClientAuthorisations.Add( clauthorise );
+                }
+
                 ViewBag.ClientLoads = new List<ClientLoad>() { clientLoad };
+
+                ClientCustomer clientCustomer = ccservice.GetByClientAndUserId( clientLoad.ToClientSiteId );
+
+                clientLoad.AccountNumber = clientCustomer.CustomerAccountNo;
+
+                // Fetch the ClientGroup for this Client
+                ClientGroup clientGroup = gservice.GetClientGroup( clientLoad.ClientId );
+                ViewBag.ClientGroupId = clientGroup?.GroupId;
 
                 // Populate ViewBag with options from other services
                 ViewBag.ClientGroupOptions = gservice.List( true );
