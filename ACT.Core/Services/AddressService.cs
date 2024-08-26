@@ -21,7 +21,6 @@ namespace ACT.Core.Services
         {
             context.Configuration.LazyLoadingEnabled = true;
             context.Configuration.ProxyCreationEnabled = true;
-
             return context.Addresses.FirstOrDefault( a => a.ObjectId == objectId && a.ObjectType == objectType );
         }
     }

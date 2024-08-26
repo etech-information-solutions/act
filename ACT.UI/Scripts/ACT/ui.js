@@ -99,6 +99,8 @@
             this.DataLoadExtra( $( '[data-load-extra="1"]' ) );
             this.DataLoadVersion( $( '[data-load-version="1"]' ) );
 
+            this.DataPopulateRegions( $( '*[data-populate-region="1"]' ) );
+
 
             // Table Quick Links Operations
             this.DataStep( $( '*[data-step="1"]' ) );
@@ -2102,7 +2104,50 @@
             } );
         },
 
-
+        DataPopulateRegions: function ( sender )
+        {
+            sender.each( function ()
+            {
+                console.log( "Region Being Populated:..." );
+                var i = $( this );
+                var dropdown = i.find( 'select[data-populate-region="1"]' );
+                var isSupplier = dropdown.data( 'is-supplier' ) === true;
+                var regionIdField = $( dropdown.data( 'region-id-field' ) );
+                var regionNameField = $( dropdown.data( 'region-name-field' ) );
+                dropdown.unbind( 'change' )
+                    .bind( 'change', function ()
+                    {
+                        var siteId = $( this ).val();
+                        if ( siteId )
+                        {
+                            var url = isSupplier ? '/Pallet/GetSupplierRegion' : '/Pallet/GetCustomerRegion';
+                            $.getJSON( url, { siteId: siteId } )
+                                .done( function ( data )
+                                {
+                                    if ( data && data.regionId != null )
+                                    {
+                                        regionIdField.val( data.regionId );
+                                        regionNameField.val( data.regionName );
+                                    } else
+                                    {
+                                        regionIdField.val( '' );
+                                        regionNameField.val( 'No region found' );
+                                    }
+                                } )
+                                .fail( function ()
+                                {
+                                    console.error( "Failed to fetch region data" );
+                                    regionIdField.val( '' );
+                                    regionNameField.val( 'Error fetching region' );
+                                } );
+                        } else
+                        {
+                            regionIdField.val( '' );
+                            regionNameField.val( '' );
+                        }
+                    } );
+            } );
+        },
 
         DataEdit: function ( sender )
         {

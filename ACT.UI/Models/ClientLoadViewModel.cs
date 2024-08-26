@@ -39,8 +39,14 @@ namespace ACT.UI.Models
         [Display( Name = "Region From:" )]
         public int? RegionFromId { get; set; }
 
+        [Display( Name = "Region From:" )]
+        public string RegionFromName { get; set; }
+
         [Display( Name = "Region To:" )]
         public int? RegionToId { get; set; }
+
+        [Display( Name = "Region To:" )]
+        public string RegionToName { get; set; }
 
 
         [Display( Name = "Transporter Name:" )]

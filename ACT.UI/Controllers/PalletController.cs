@@ -2237,6 +2237,41 @@ namespace ACT.UI.Controllers
             return PartialView( "_Notification" );
         }
 
+        [HttpGet]
+        public JsonResult GetSupplierRegion( int siteId )
+        {
+            using ( SiteService siteService = new SiteService() )
+            using ( AddressService addressService = new AddressService() )
+            using ( ProvinceService provinceService = new ProvinceService() )
+            {
+                SupplierSite site = siteService.GetSupplierSiteById( siteId );
+                Address address = addressService.Get( site.Id, "SupplierSite" );
+                Province province = provinceService.GetById( ( int ) address.ProvinceId );
+
+                return Json( new { regionId = province.Id, regionName = province.Name }, JsonRequestBehavior.AllowGet );
+            }
+        }
+
+        [HttpGet]
+        public JsonResult GetCustomerRegion( int siteId )
+        {
+            using ( ClientSiteService clientSiteService = new ClientSiteService() )
+            using ( AddressService addressService = new AddressService() )
+            using ( ProvinceService provinceService = new ProvinceService() )
+            {
+                Address address = addressService.Get( siteId, "Customer" );
+                if ( address == null || address.ProvinceId == null )
+                {
+                    return Json( new { regionId = ( int? ) null, regionName = "No region found" }, JsonRequestBehavior.AllowGet );
+                }
+
+                var province = provinceService.Get( address.ProvinceId.Value );
+                string regionName = province != null ? province.Name : "Unknown Region";
+
+                return Json( new { regionId = address.ProvinceId, regionName = regionName }, JsonRequestBehavior.AllowGet );
+            }
+        }
+
         #endregion
 
         //-------------------------------------------------------------------------------------

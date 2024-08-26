@@ -66,19 +66,31 @@
                     <div class="editor-label">
                         @Html.LabelFor( model => model.ClientSiteId )
                     </div>
-                    <div class="editor-field">
-                        @Html.DropDownListFor( model => model.ClientSiteId, new SelectList( Model.SupplierSiteOptions, "Key", "Value" ), "Select Supplier From", new { @class = "chzn", @style = "width: 98%;" } )
+                    <div class="editor-field" data-populate-region="1">
+                        @Html.DropDownListFor( model => model.ClientSiteId,
+                            new SelectList( Model.SupplierSiteOptions, "Key", "Value" ),
+                            "Select Supplier From",
+                            new
+                            {
+                                @class = "chzn",
+                                @style = "width: 98%;",
+                                @data_populate_region = "1",
+                                @data_is_supplier = "true",
+                                @data_region_id_field = "#RegionFromId",
+                                @data_region_name_field = "#RegionFromName"
+                            } )
                         @Html.ValidationMessageFor( model => model.ClientSiteId )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.RegionFrom )
+                        @Html.LabelFor( model => model.RegionFromId )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.RegionFrom, new { @class = "input", @placeholder = "Please Complete" } )
-                        @Html.ValidationMessageFor( model => model.RegionFrom )
+                        @Html.HiddenFor( model => model.RegionFromId )
+                        @Html.TextBoxFor( model => model.RegionFromName, new { @readonly = "readonly" } )
+                        @Html.ValidationMessageFor( model => model.RegionFromId )
                     </div>
                 </div>
 
@@ -86,19 +98,31 @@
                     <div class="editor-label">
                         @Html.LabelFor( model => model.ClientSiteIdTo )
                     </div>
-                    <div class="editor-field">
-                        @Html.DropDownListFor( model => model.ClientSiteIdTo, new SelectList( Model.CustomerSiteOptions, "Key", "Value" ), "Select Customer To", new { @class = "chzn", @style = "width: 98%;" } )
+                    <div class="editor-field" data-populate-region="1">
+                        @Html.DropDownListFor( model => model.ClientSiteIdTo,
+                            new SelectList( Model.CustomerSiteOptions, "Key", "Value" ),
+                            "Select Customer To",
+                            new
+                                 {
+                                @class = "chzn",
+                                @style = "width: 98%;",
+                                @data_populate_region = "1",
+                                @data_is_supplier = "false",
+                                @data_region_id_field = "#RegionToId",
+                                @data_region_name_field = "#RegionToName"
+                            } )
                         @Html.ValidationMessageFor( model => model.ClientSiteIdTo )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.RegionTo )
+                        @Html.LabelFor( model => model.RegionToId )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.RegionTo, new { @class = "input", @placeholder = "Please Complete" } )
-                        @Html.ValidationMessageFor( model => model.RegionTo )
+                        @Html.HiddenFor( model => model.RegionToId )
+                        @Html.TextBoxFor( model => model.RegionToName, new { @readonly = "readonly" } )
+                        @Html.ValidationMessageFor( model => model.RegionToId )
                     </div>
                 </div>
 
