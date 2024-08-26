@@ -1192,45 +1192,43 @@ namespace ACT.UI.Controllers
 
                 // Populate ViewBag with options from other services
                 ViewBag.ClientGroupOptions = gservice.List( true );
-                ViewBag.EquipmentCodeOptions = pservice.List( true );
                 ViewBag.TransporterOptions = tservice.ListAllTransporters();
                 ViewBag.SupplierSiteOptions = sservice.ListSupplierSites( true );
                 ViewBag.CustomerSiteOptions = ccservice.GetCustomerNamesAndNumbers();
 
+                // New code to populate equipment details and options
                 var clientProducts = cpservice.ListByClient( clientLoad.ClientId ) ?? new List<ClientProduct>();
                 var allProducts = pservice.List( true ) ?? new Dictionary<int, string>();
 
+                var defaultProductOptions = allProducts.ToDictionary(
+                    p => p.Key,
+                    p => p.Value
+                );
+
                 var equipmentDetails = clientLoad.ClientLoadQuantities.Select( clq => new EquipmentDetailViewModel
                 {
-                    ProductId = clientProducts.FirstOrDefault( cp => cp.Equipment == clq.EquipmentCode )?.ProductId ?? 0,
+                    ProductId = int.TryParse( clq.EquipmentCode, out int productId ) ? productId : 0,
                     DeliveredQty = clq.OriginalQuantity,
                     ReturnedTransferredQty = clq.ReturnQty,
                     DebriefQty = clq.DebriefQty,
                     TransporterLiable = clq.TransporterLiableQty,
                     AdminMovement = clq.AdminMovementQty,
-                    OutstandingQtyAtCustomer = clq.OutstandingQty
+                    OutstandingQtyAtCustomer = clq.OutstandingQty,
+                    ProductOptions = defaultProductOptions
                 } ).ToList();
 
-                if ( !equipmentDetails.Any() )
+                // Ensure we have exactly 3 EquipmentDetails
+                while ( equipmentDetails.Count < 3 )
                 {
                     equipmentDetails.Add( new EquipmentDetailViewModel
                     {
                         ProductId = 0,
-                        DeliveredQty = clientLoad.OriginalQuantity ?? 0,
-                        ReturnedTransferredQty = clientLoad.ReturnQty ?? 0,
-                        DebriefQty = clientLoad.DebriefQty ?? 0,
-                        TransporterLiable = clientLoad.TransporterLiableQty ?? 0,
-                        AdminMovement = clientLoad.AdminMovement ?? 0,
-                        OutstandingQtyAtCustomer = clientLoad.OutstandingQty ?? 0
+                        ProductOptions = defaultProductOptions
                     } );
                 }
 
-                ViewBag.EquipmentCodeOptions = clientProducts.ToDictionary(
-                    cp => cp.ProductId,
-                    cp => allProducts.ContainsKey( cp.ProductId ) ? allProducts[ cp.ProductId ] : "Unknown Product"
-                );
-
                 ViewBag.EquipmentDetails = equipmentDetails;
+                ViewBag.EquipmentCodeOptions = defaultProductOptions;
                 ViewBag.ClientProducts = clientProducts;
 
                 if ( layout )
@@ -1557,10 +1555,11 @@ namespace ACT.UI.Controllers
             }
             using ( GroupService gservice = new GroupService() )
             using ( VehicleService vservice = new VehicleService() )
+            using ( TransactionScope scope = new TransactionScope() )
             using ( ClientLoadService clservice = new ClientLoadService() )
             using ( ClientCustomerService ccservice = new ClientCustomerService() )
+            using ( ClientLoadQuantityService clqservice = new ClientLoadQuantityService() )
             {
-
                 ClientLoad load = clservice.GetById( model.Id );
                 Vehicle vehicle = vservice.GetById( model.ClientId );
                 ClientCustomer ccustomer = ccservice.GetById( model.ClientId );
@@ -1609,7 +1608,6 @@ namespace ACT.UI.Controllers
                 // Update the Vehicle entity
                 vehicle.FleetNumber = model.FleetNumber;
                 vehicle.Registration = model.VehicleRegistration;
-
                 vservice.Update( vehicle );
 
                 // Update ClientCustomer
@@ -1629,10 +1627,42 @@ namespace ACT.UI.Controllers
                 {
                     gservice.SaveOrUpdateClientGroup( load.ClientId, model.ClientGroupId.Value, User.Identity.Name );
                 }
+
+                // Handle Equipment Details
+                // First, delete all existing equipment details for this load
+                clqservice.DeleteByClientLoadId( load.Id );
+
+                // Then, add all equipment details from the model
+                if ( model.EquipmentDetails != null )
+                {
+                    foreach ( var detail in model.EquipmentDetails )
+                    {
+                        // Only create non-null and non-empty equipment details
+                        if ( detail != null && !string.IsNullOrEmpty( detail.ProductId?.ToString() ) )
+                        {
+                            ClientLoadQuantity clientLoadQuantity = new ClientLoadQuantity
+                            {
+                                ClientLoadId = load.Id,
+                                EquipmentCode = detail.ProductId?.ToString() ?? string.Empty,
+                                OriginalQuantity = ( int ) detail.DeliveredQty,
+                                ReturnQty = ( int ) detail.ReturnedTransferredQty,
+                                DebriefQty = ( int ) detail.DebriefQty,
+                                TransporterLiableQty = ( int ) detail.TransporterLiable,
+                                AdminMovementQty = ( int ) detail.AdminMovement,
+                                OutstandingQty = ( int ) detail.OutstandingQtyAtCustomer,
+                                CreatedOn = DateTime.Now,
+                                ModifiedOn = DateTime.Now,
+                            };
+
+                            clqservice.Create( clientLoadQuantity );
+                        }
+                    }
+                }
+
+                scope.Complete();
             }
 
             Notify( "The item was successfully updated.", NotificationType.Success );
-
             return ClientData( new PagingModel(), new CustomSearchModel() );
         }
 

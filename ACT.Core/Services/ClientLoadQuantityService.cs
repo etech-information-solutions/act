@@ -9,7 +9,6 @@ namespace ACT.Core.Services
     {
         public ClientLoadQuantityService()
         {
-
         }
 
         /// <summary>
@@ -21,6 +20,22 @@ namespace ACT.Core.Services
         public ClientLoadQuantity GetByClientLoadAndProduct( int clientLoadId, string equipmentCode )
         {
             return context.ClientLoadQuantities.FirstOrDefault( cq => cq.ClientLoadId == clientLoadId && cq.EquipmentCode == equipmentCode );
+        }
+
+        /// <summary>
+        /// Deletes all ClientLoadQuantity entries for a specific ClientLoadId
+        /// </summary>
+        /// <param name="clientLoadId"></param>
+        public void DeleteByClientLoadId( int clientLoadId )
+        {
+            var entitiesToDelete = context.ClientLoadQuantities.Where( cq => cq.ClientLoadId == clientLoadId ).ToList();
+
+            foreach ( var entity in entitiesToDelete )
+            {
+                context.ClientLoadQuantities.Remove( entity );
+            }
+
+            context.SaveChanges();
         }
     }
 }

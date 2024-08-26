@@ -377,7 +377,7 @@
                 </p>
 
                 @{
-                    var equipmentDetails = Model.ClientLoadQuantities?.ToList() ?? new List<ClientLoadQuantity>();
+                    var equipmentDetails = ViewBag.EquipmentDetails as List<ACT.UI.Models.EquipmentDetailViewModel> ?? new List<ACT.UI.Models.EquipmentDetailViewModel>();
                     var clientProducts = ViewBag.ClientProducts as List<ClientProduct> ?? new List<ClientProduct>();
                     var equipmentCodeOptions = ViewBag.EquipmentCodeOptions as Dictionary<int, string> ?? new Dictionary<int, string>();
 
@@ -389,14 +389,19 @@
                         <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
-                                var currentEquipmentCode = equipmentDetails[ section * 3 + i ].EquipmentCode;
-                                var currentProductId = clientProducts.FirstOrDefault( cp => cp.Equipment == currentEquipmentCode )?.ProductId ?? 0;
-                                <div style="display: inline-block; margin-right: 10px; width: 21.1%;">
-                                    @Html.DropDownList( $"ProductId_{section * 3 + i}",
-                                        new SelectList( equipmentCodeOptions, "Key", "Value", currentProductId ),
-                                        "Select Equipment",
-                                        new { @class = "chzn equipment-dropdown", @style = "width: 100%;" } )
-                                </div>
+                                var currentDetail = equipmentDetails[ section * 3 + i ];
+                                var selectedEquipment = equipmentCodeOptions.ContainsKey( ( int ) currentDetail.ProductId )
+                                    ? equipmentCodeOptions[ ( int ) currentDetail.ProductId ]
+                                    : string.Empty;
+
+                                @Html.TextBox( $"ProductId_{section * 3 + i}",
+                                    selectedEquipment,
+                                    new
+                                         {
+                                        @class = "input equipment-textbox",
+                                        @style = "width: 20%; margin-right: 5px;",
+                                        @readonly = "readonly"
+                                    } )
                             }
                         </div>
 
@@ -406,7 +411,7 @@
                         <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
-                                @Html.TextBox( $"OriginalQuantity_{section * 3 + i}", equipmentDetails[ section * 3 + i ].OriginalQuantity, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
+                                @Html.TextBox( $"DeliveredQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].DeliveredQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
                             }
                         </div>
 
@@ -416,7 +421,7 @@
                         <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
-                                    @Html.TextBox( $"ReturnQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].ReturnQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
+                                @Html.TextBox( $"ReturnedTransferredQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].ReturnedTransferredQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
                             }
                         </div>
 
@@ -426,7 +431,7 @@
                         <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
-                                    @Html.TextBox( $"DebriefQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].DebriefQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
+                                @Html.TextBox( $"DebriefQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].DebriefQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
                             }
                         </div>
 
@@ -436,7 +441,7 @@
                         <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
-                                    @Html.TextBox( $"TransporterLiableQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].TransporterLiableQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
+                                @Html.TextBox( $"TransporterLiable_{section * 3 + i}", equipmentDetails[ section * 3 + i ].TransporterLiable, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
                             }
                         </div>
 
@@ -446,7 +451,7 @@
                         <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
-                                    @Html.TextBox( $"AdminMovementQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].AdminMovementQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
+                                @Html.TextBox( $"AdminMovement_{section * 3 + i}", equipmentDetails[ section * 3 + i ].AdminMovement, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
                             }
                         </div>
 
@@ -456,7 +461,7 @@
                         <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
-                                    @Html.TextBox( $"OutstandingQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].OutstandingQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
+                                @Html.TextBox( $"OutstandingQtyAtCustomer_{section * 3 + i}", equipmentDetails[ section * 3 + i ].OutstandingQtyAtCustomer, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
                             }
                         </div>
 
@@ -476,7 +481,7 @@
     @if ( ViewBag.IncludeLayout == null )
     {
         <p>
-            @Html.ActionLink( "Edit", "EditClientData", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )
+            @*@Html.ActionLink( "Edit", "EditClientData", new { id = Model.Id }, new { @class = "edit", @data_edit = "1", @data_id = Model.Id, @data_target = "#tr-" + Model.Id + "-item" } )*@
             @if ( ViewBag.IncludeLayout == null )
             {
                 <span style="padding: 0 5px;">/</span>
