@@ -19,99 +19,99 @@ namespace ACT.UI.Models
         public int Id { get; set; }
 
         //[Required]
-        [Display( Name = "CLIENT:" )]
+        [Display( Name = "Client:" )]
         public int ClientId { get; set; }
 
         //[Required]
-        [Display( Name = "VEHICLE REGISTRATION:" )]
+        [Display( Name = "Vehicle Id:" )]
         public int? VehicleId { get; set; }
 
-        [Display( Name = "VEHICLE REGISTRATION:" )]
+        [Display( Name = "Vehicle Registration:" )]
         public string VehicleRegistration { get; set; }
 
-        [Display( Name = "SUPPLIER FROM:" )]
+        [Display( Name = "Supplier From:" )]
         public int? ClientSiteId { get; set; }
         public ClientSite FromClientSiteName { get; set; }
 
-        [Display( Name = "CUSTOMER TO:" )]
+        [Display( Name = "Customer To:" )]
         public int? ClientSiteIdTo { get; set; }
 
-        [Display( Name = "REGION FROM:" )]
+        [Display( Name = "Region From:" )]
         public int? RegionFromId { get; set; }
 
-        [Display( Name = "REGION TO:" )]
+        [Display( Name = "Region To:" )]
         public int? RegionToId { get; set; }
 
 
-        [Display( Name = "TRANSPORTER NAME:" )]
+        [Display( Name = "Transporter Name:" )]
         public int? TransporterId { get; set; }
         public string TransporterName { get; set; }
 
-        [Display( Name = "OUTSTANDING REASON ID:" )]
+        [Display( Name = "Outstanding Reason Id:" )]
         public int? OutstandingReasonId { get; set; }
 
         [Display( Name = "Load Comment:" )]
         public int? PODCommentId { get; set; }
 
-        [Display( Name = "LOAD/SHIPMENT NUMBER:" )]
+        [Display( Name = "Load/Shipment Number:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string LoadNumber { get; set; }
 
         //[Required]
-        [Display( Name = "LOAD DATE:" )]
+        [Display( Name = "Load Date:" )]
         public DateTime? LoadDate { get; set; }
 
         //[Required]
-        [Display( Name = "EFFECTIVE DATE:" )]
+        [Display( Name = "Effective Date:" )]
         public DateTime? EffectiveDate { get; set; }
 
         //[Required]
-        [Display( Name = "NOTIFY DATE:" )]
+        [Display( Name = "Notify Date:" )]
         public DateTime? NotifyDate { get; set; }
 
         //[Required]
-        [Display( Name = "ACCOUNT NUMBER:" )]
+        [Display( Name = "Account Number:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string AccountNumber { get; set; }
 
         //[Required]
-        [Display( Name = "CLIENT DESCRIPTION:" )]
+        [Display( Name = "Client Description:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ClientDescription { get; set; }
 
         //[Required]
-        [Display( Name = "DELIVERY NOTE NUMBER:" )]
+        [Display( Name = "Delivery Note Number:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string DeliveryNote { get; set; }
 
         //[Required]
-        [Display( Name = "SALES ORDER NUMBER:" )]
+        [Display( Name = "Sales Order Number:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ReferenceNumber { get; set; }
 
         //[Required]
-        [Display( Name = "RECEIVER NUMBER:" )]
+        [Display( Name = "Receiver Number:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ReceiverNumber { get; set; }
 
-        [Display( Name = "EQUIPMENT:" )]
+        [Display( Name = "Equipment:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string Equipment { get; set; }
 
         //[Required]
-        [Display( Name = "ORIGINAL QUANTITY:" )]
+        [Display( Name = "Original Quantity:" )]
         public decimal? OriginalQuantity { get; set; }
 
-        [Display( Name = "NEW QUANTITY:" )]
+        [Display( Name = "New Quantity:" )]
         public decimal? NewQuantity { get; set; }
 
-        [Display( Name = "RECONCILE INVOICE:" )]
+        [Display( Name = "Reconcile Invoice:" )]
         public YesNo ReconcileInvoice { get; set; }
 
-        [Display( Name = "RETURN DATE:" )]
+        [Display( Name = "Return Date:" )]
         public DateTime? ReconcileDate { get; set; }
 
-        [Display( Name = "POD NUMBER:" )]
+        [Display( Name = "POD Number:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string PODNumber { get; set; }
 
@@ -131,26 +131,11 @@ namespace ACT.UI.Models
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string THAN { get; set; }
 
-        [Display( Name = "RETURN QUANTITY:" )]
-        public decimal? ReturnQty { get; set; }
-
-        [Display( Name = "OUTSTANDING QUANTITY:" )]
-        public decimal? OutstandingQty { get; set; }
-
-        [Display( Name = "DEBRIEF QTY:" )]
-        public decimal? DebriefQty { get; set; }
-
-        [Display( Name = "AMIND MOVEMENT:" )]
-        public decimal? AdminMovement { get; set; }
-
-        [Display( Name = "TRANSPORT LIABLE:" )]
-        public decimal TransporterLiableQty { get; set; }
-
-        [Display( Name = "INVOICE NUMBER:" )]
+        [Display( Name = "Invoice Number:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ChepInvoiceNo { get; set; }
 
-        [Display( Name = "CHEP COMPENSATION #:" )]
+        [Display( Name = "CHEP Compensation #:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ChepCompensationNo { get; set; }
 
@@ -168,7 +153,7 @@ namespace ACT.UI.Models
         [StringLength( 250, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string ClientLoadNotes { get; set; }
 
-        [Display( Name = "DEBRIEF DOC NO:" )]
+        [Display( Name = "Debrief Doc Num:" )]
         [StringLength( 150, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string DebriefDocketNo { get; set; }
 
@@ -182,22 +167,22 @@ namespace ACT.UI.Models
         [StringLength( 250 )]
         public string GRVNumber { get; set; }
 
-        [Display( Name = "ACT CONTROL DOC NO:" )]
+        [Display( Name = "ACT Control Doc No:" )]
         public string ActControlDocNo { get; set; }
 
-        [Display( Name = "CHEP EXCHANGE DOC NO:" )]
+        [Display( Name = "CHEP Exchange Doc No:" )]
         public string ChepExchangeDocNo { get; set; }
 
-        [Display( Name = "DEBTORS CODE:" )]
+        [Display( Name = "Debtors Code:" )]
         public string DebtorsCode { get; set; }
 
-        [Display( Name = "FLEET NUMBER:" )]
+        [Display( Name = "Fleet Number:" )]
         public string FleetNumber { get; set; }
 
-        [Display( Name = "DEPOT STO NUMBER:" )]
+        [Display( Name = "Depot STO Number:" )]
         public string DepotStoNumber { get; set; }
 
-        [Display( Name = "CHEP COMPENSATION DATE:" )]
+        [Display( Name = "CHEP Compensation Date:" )]
         public DateTime? ChepCompensationDate { get; set; }
 
 
@@ -219,7 +204,7 @@ namespace ACT.UI.Models
 
         #region Chepload Properties
 
-        [Display( Name = "DELIVERY DATE:" )]
+        [Display( Name = "Delivery Date:" )]
         public DateTime? DeliveryDate { get; set; }
 
         [Display( Name = "CHEP ACC NO/GLID:" )]
@@ -234,65 +219,65 @@ namespace ACT.UI.Models
         [Display( Name = "Chep Invoice Number:" )]
         public string ChepInvoiceNumber { get; set; }
 
-        [Display( Name = "PALLET RETURN SLIP NO:" )]
+        [Display( Name = "Pallet Return Slip Num:" )]
         public string PalletReturnSlipNo { get; set; }
 
         public string DocketNumber { get; set; }
 
-        [Display( Name = "THAN DOC NO:" )]
+        [Display( Name = "THAN Doc No:" )]
         public string ChepCustomerThanDocNo { get; set; }
 
-        [Display( Name = "WAREHOUSE DOC NO:" )]
+        [Display( Name = "Warehouse Doc No:" )]
         public string WarehouseTransferDocNo { get; set; }
 
-        [Display( Name = "PALLET RETURN DATE:" )]
+        [Display( Name = "Pallet Return Date:" )]
         public DateTime? PalletReturnDate { get; set; }
 
         public DateTime? ChepEffectiveDate { get; set; }
 
 
-        [Display( Name = "REGION FROM:" )]
+        [Display( Name = "Region From:" )]
         public string RegionFrom { get; set; }
 
-        [Display( Name = "REGION TO:" )]
+        [Display( Name = "Region To:" )]
         public string RegionTo { get; set; }
 
-        [Display( Name = "CUSTOMER GROUP:" )]
+        [Display( Name = "Customer Group:" )]
         public int? ClientGroupId { get; set; }
 
-        [Display( Name = "SALES ORDER NUMBER:" )]
+        [Display( Name = "Sales Order Number:" )]
         public string OrderNumber { get; set; }
 
         [Required]
-        [Display( Name = "PRIMARY SECONDARY" )]
+        [Display( Name = "Primary/Secondary" )]
         public LoadType? PrimarySecondary { get; set; }
 
-        [Display( Name = "DEPOT STO NO:" )]
+        [Display( Name = "Depot STO No:" )]
         public string DepoSTONo { get; set; }
 
-        [Display( Name = "CUSTOMER ACCOUNT NUMBER:" )]
+        [Display( Name = "Customer Account Number:" )]
         public string CustomerAccountNumber { get; set; }
 
-        [Display( Name = "CUSTOMER ORDER NUMBER:" )]
+        [Display( Name = "Customer Order Number:" )]
         public string CustomerOrderNumber { get; set; }
 
-        [Display( Name = "LOAD SHEET NO:" )]
+        [Display( Name = "Load Sheet NO:" )]
         public string LoadsheetNo { get; set; }
 
-        [Display( Name = "ACT CONTROL DOC NO:" )]
+        [Display( Name = "ACT Control Doc Num:" )]
         public string DocNumber { get; set; }
 
         [Required]
-        [Display( Name = "CHEP EXCHANGE DOC NO:" )]
+        [Display( Name = "CHEP Exchange Doc No:" )]
         public string ExchangeNo { get; set; }
 
-        [Display( Name = "AUTHORIZATION CODE:" )]
+        [Display( Name = "Authorization Code:" )]
         public string AuthorizationCode { get; set; }
 
-        [Display( Name = "AUTHORIZED BY:" )]
+        [Display( Name = "Authorized By:" )]
         public string AuthorizedBy { get; set; }
 
-        [Display( Name = "CHEP COMPENSATION DATE:" )]
+        [Display( Name = "CHEP Compensation Date:" )]
         public DateTime? CompensationDate { get; set; }
 
         public virtual ClientGroup ClientGroup { get; set; }
@@ -307,17 +292,17 @@ namespace ACT.UI.Models
 
         public string CustomerType { get; set; }
 
-        public Dictionary<int, string> SupplierSiteOptions { get; set; } = new Dictionary<int, string>();
+        public Dictionary<int, string> SupplierSiteOptions { get; set; }
 
-        public Dictionary<int, string> CustomerSiteOptions { get; set; } = new Dictionary<int, string>();
+        public Dictionary<int, string> CustomerSiteOptions { get; set; }
 
-        public Dictionary<int, string> ClientGroupOptions { get; set; } = new Dictionary<int, string>();
+        public Dictionary<int, string> ClientGroupOptions { get; set; }
 
-        public Dictionary<int, string> TransporterOptions { get; set; } = new Dictionary<int, string>();
+        public Dictionary<int, string> TransporterOptions { get; set; }
 
-        public List<EquipmentDetailViewModel> EquipmentDetails { get; set; } = new List<EquipmentDetailViewModel>();
+        public List<EquipmentDetailViewModel> EquipmentDetails { get; set; }
 
-        public Dictionary<int, string> EquipmentCodeOptions { get; set; } = new Dictionary<int, string>();
+        public Dictionary<int, string> EquipmentCodeOptions { get; set; }
 
         #endregion
 

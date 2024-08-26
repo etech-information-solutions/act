@@ -362,7 +362,7 @@
                 Status:
             </div>
             <div class="display-field">
-                @Html.DisplayFor( model => model.Status )
+                @(((Status)Model.Status).GetDisplayText())
             </div>
         </div>
     </div>
@@ -383,15 +383,15 @@
 
                     for ( int section = 0; section < ( equipmentDetails.Count + 2 ) / 3; section++ )
                     {
-                        <div class="editor-label" style="margin-top: 15px !important">
+                        <div class="display-label" style="margin-top: 15px !important">
                             <label>Equipment</label>
                         </div>
-                        <div class="editor-field">
+                        <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
                                 var currentEquipmentCode = equipmentDetails[ section * 3 + i ].EquipmentCode;
                                 var currentProductId = clientProducts.FirstOrDefault( cp => cp.Equipment == currentEquipmentCode )?.ProductId ?? 0;
-                                <div style="display: inline-block; margin-right: 10px; width: 32%;">
+                                <div style="display: inline-block; margin-right: 10px; width: 21.1%;">
                                     @Html.DropDownList( $"ProductId_{section * 3 + i}",
                                         new SelectList( equipmentCodeOptions, "Key", "Value", currentProductId ),
                                         "Select Equipment",
@@ -400,75 +400,63 @@
                             }
                         </div>
 
-                        <div class="editor-label" style="margin-top: 15px !important">
+                        <div class="display-label" style="margin-top: 15px !important">
                             <label>Delivered Quantity</label>
                         </div>
-                        <div class="editor-field">
+                        <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
-                                <div style="display: inline-block; margin-right: 10px; width: 32%;">
-                                    @Html.TextBox( $"OriginalQuantity_{section * 3 + i}", equipmentDetails[ section * 3 + i ].OriginalQuantity, new { @class = "input", @style = "width: 100%;" } )
-                                </div>
+                                @Html.TextBox( $"OriginalQuantity_{section * 3 + i}", equipmentDetails[ section * 3 + i ].OriginalQuantity, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
                             }
                         </div>
 
-                        <div class="editor-label" style="margin-top: 15px !important">
+                        <div class="display-label" style="margin-top: 15px !important">
                             <label>Returned/Transferred Quantity</label>
                         </div>
-                        <div class="editor-field">
+                        <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
-                                <div style="display: inline-block; margin-right: 10px; width: 32%;">
-                                    @Html.TextBox( $"ReturnQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].ReturnQty, new { @class = "input", @style = "width: 100%;" } )
-                                </div>
+                                    @Html.TextBox( $"ReturnQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].ReturnQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
                             }
                         </div>
 
-                        <div class="editor-label" style="margin-top: 15px !important">
+                        <div class="display-label" style="margin-top: 15px !important">
                             <label>Debrief Quantity</label>
                         </div>
-                        <div class="editor-field">
+                        <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
-                                <div style="display: inline-block; margin-right: 10px; width: 32%;">
-                                    @Html.TextBox( $"DebriefQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].DebriefQty, new { @class = "input", @style = "width: 100%;" } )
-                                </div>
+                                    @Html.TextBox( $"DebriefQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].DebriefQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
                             }
                         </div>
 
-                        <div class="editor-label" style="margin-top: 15px !important">
+                        <div class="display-label" style="margin-top: 15px !important">
                             <label>Transporter Liable</label>
                         </div>
-                        <div class="editor-field">
+                        <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
-                                <div style="display: inline-block; margin-right: 10px; width: 32%;">
-                                    @Html.TextBox( $"TransporterLiableQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].TransporterLiableQty, new { @class = "input", @style = "width: 100%;" } )
-                                </div>
+                                    @Html.TextBox( $"TransporterLiableQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].TransporterLiableQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
                             }
                         </div>
 
-                        <div class="editor-label" style="margin-top: 15px !important">
+                        <div class="display-label" style="margin-top: 15px !important">
                             <label>Admin Movement</label>
                         </div>
-                        <div class="editor-field">
+                        <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
-                                <div style="display: inline-block; margin-right: 10px; width: 32%;">
-                                    @Html.TextBox( $"AdminMovementQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].AdminMovementQty, new { @class = "input", @style = "width: 100%;" } )
-                                </div>
+                                    @Html.TextBox( $"AdminMovementQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].AdminMovementQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
                             }
                         </div>
 
-                        <div class="editor-label" style="margin-top: 15px !important">
+                        <div class="display-label" style="margin-top: 15px !important">
                             <label>Outstanding Quantity</label>
                         </div>
-                        <div class="editor-field">
+                        <div class="display-field">
                             @for ( int i = 0; i < 3 && ( section * 3 + i ) < equipmentDetails.Count; i++ )
                             {
-                                <div style="display: inline-block; margin-right: 10px; width: 32%;">
-                                    @Html.TextBox( $"OutstandingQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].OutstandingQty, new { @class = "input", @style = "width: 100%;" } )
-                                </div>
+                                    @Html.TextBox( $"OutstandingQty_{section * 3 + i}", equipmentDetails[ section * 3 + i ].OutstandingQty, new { @class = "input", @style = "width: 20%; margin-right: 5px;" } )
                             }
                         </div>
 

@@ -12,7 +12,9 @@
             @for ( int i = 0; i < 3 && ( section * 3 + i ) < Model.EquipmentDetails.Count; i++ )
             {
                 <div style="display: inline-block; margin-right: 10px; width: 21.1%;">
-                    @Html.DropDownListFor( m => m.EquipmentDetails[ section * 3 + i ].ProductId, new SelectList( Model.EquipmentCodeOptions, "Key", "Value" ), "Select Equipment", new { @class = "chzn equipment-dropdown", @style = "width: 100%;", data_index = section * 3 + i } )
+                    @Html.DropDownListFor( m => m.EquipmentDetails[ section * 3 + i ].ProductId,
+                        new SelectList( Model.EquipmentCodeOptions, "Key", "Value", Model.EquipmentDetails[ section * 3 + i ].ProductId ),
+                        new { @class = "chzn equipment-dropdown", @style = "width: 100%;", data_index = section * 3 + i } )
                 </div>
             }
         </div>
