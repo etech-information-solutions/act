@@ -27,11 +27,11 @@
             <div class="left" style="width: 49%;">
 
                 <div class="editor-label ">
-                    @Html.LabelFor( model => model.VehicleId )
+                    @Html.LabelFor( model => model.CustomerId )
                 </div>
                 <div class="editor-field">
-                    @Html.DropDownListFor( model => model.VehicleId, model => Model.VehicleOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
-                    @Html.ValidationMessageFor( model => model.VehicleId )
+                    @Html.DropDownListFor( model => model.CustomerId, Model.CustomerOptions, "All Customers", new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.CustomerId )
                 </div>
 
             </div>
@@ -40,11 +40,12 @@
 
             <div class="left" style="width: 49%;">
 
-                <div class="editor-label">
-                    Reconciliation Status
+                <div class="editor-label ">
+                    @Html.LabelFor( model => model.VehicleId )
                 </div>
                 <div class="editor-field">
-                    @Html.EnumDropDownFor( model => model.ReconciliationStatus, false, true, new { @class = "chzn", @style = "width: 87%;" } )
+                    @Html.DropDownListFor( model => model.VehicleId, model => Model.VehicleOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 98%;" } )
+                    @Html.ValidationMessageFor( model => model.VehicleId )
                 </div>
 
             </div>

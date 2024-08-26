@@ -50,40 +50,31 @@ namespace ACT.UI.Controllers
             switch ( type )
             {
                 case "clientdata":
-
                     #region Client Data
-
-                    csv = string.Format( "Client,Load Date,CHEP Account/GLID Number,Supplier From,Shipment Number,Customer To,Quantity,Comment,Status,Transporter,Vehicle,Invoice Number {0}", Environment.NewLine );
-
+                    csv = string.Format( "Client,Load Date,Supplier From,Customer To,Customer Group,Load/Shipment,Transporter Name,Status,Invoice Number {0}", Environment.NewLine );
                     using ( ClientLoadService clservice = new ClientLoadService() )
                     {
                         List<ClientLoadCustomModel> clientloads = clservice.List1( pm, csm );
-
                         if ( clientloads.NullableAny() )
                         {
                             foreach ( ClientLoadCustomModel item in clientloads )
                             {
-                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12} {13}",
+                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9} {10}",
                                                     csv,
                                                     "\"" + item.ClientName + "\"",
-                                                    "\"" + item.LoadDate + "\"",
-                                                    "\"" + ( item.ChepAccountGLIDNo ?? item.GLID ) + "\"",
-                                                    "\"" + item.SiteName + "\"",
+                                                    "\"" + item.LoadDate?.ToString( "yyyy-MM-dd" ) + "\"",
+                                                    "\"" + item.SupplierFrom + "\"",
+                                                    "\"" + item.CustomerTo + "\"",
+                                                    "\"" + item.CustomerGroup + "\"",
                                                     "\"" + item.LoadNumber + "\"",
-                                                    "\"" + item.ToSiteName + "\"",
-                                                    "\"" + item.NewQuantity + "\"",
-                                                    "\"" + item.PODComment + "\"",
-                                                    "\"" + ( ( ReconciliationStatus ) item.Status ).GetDisplayText() + "\"",
                                                     "\"" + item.TransporterName + "\"",
-                                                    "\"" + item.VehicleRegistration + "\"",
+                                                    "\"" + ( ( ReconciliationStatus ) item.Status ).GetDisplayText() + "\"",
                                                     "\"" + item.InvoiceNumber + "\"",
                                                     Environment.NewLine );
                             }
                         }
                     }
-
                     #endregion
-
                     break;
 
                 case "outstandingpallets":

@@ -758,20 +758,18 @@ namespace ACT.Core.Models
                     break;
 
                 case "ClientData":
-
                     using ( ClientService cservice = new ClientService() )
                     using ( VehicleService vservice = new VehicleService() )
-                    //using ( ClientSiteService csservice = new ClientSiteService() )
                     using ( TransporterService tservice = new TransporterService() )
                     using ( OutstandingReasonService urservice = new OutstandingReasonService() )
+                    using ( ClientCustomerService ccservice = new ClientCustomerService() )
                     {
                         ClientOptions = cservice.List( true );
                         VehicleOptions = vservice.List( true );
-                        //ClientSiteOptions = csservice.List( true );
                         TransporterOptions = tservice.List( true );
                         OutstandingReasonOptions = urservice.List( true );
+                        CustomerOptions = ccservice.GetCustomerSelectList( true );
                     }
-
                     break;
 
                 case "PODOutstanding":
