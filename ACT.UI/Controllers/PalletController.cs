@@ -1197,6 +1197,42 @@ namespace ACT.UI.Controllers
                 ViewBag.SupplierSiteOptions = sservice.ListSupplierSites( true );
                 ViewBag.CustomerSiteOptions = ccservice.GetCustomerNamesAndNumbers();
 
+                var clientProducts = cpservice.ListByClient( clientLoad.ClientId ) ?? new List<ClientProduct>();
+                var allProducts = pservice.List( true ) ?? new Dictionary<int, string>();
+
+                var equipmentDetails = clientLoad.ClientLoadQuantities.Select( clq => new EquipmentDetailViewModel
+                {
+                    ProductId = clientProducts.FirstOrDefault( cp => cp.Equipment == clq.EquipmentCode )?.ProductId ?? 0,
+                    DeliveredQty = clq.OriginalQuantity,
+                    ReturnedTransferredQty = clq.ReturnQty,
+                    DebriefQty = clq.DebriefQty,
+                    TransporterLiable = clq.TransporterLiableQty,
+                    AdminMovement = clq.AdminMovementQty,
+                    OutstandingQtyAtCustomer = clq.OutstandingQty
+                } ).ToList();
+
+                if ( !equipmentDetails.Any() )
+                {
+                    equipmentDetails.Add( new EquipmentDetailViewModel
+                    {
+                        ProductId = 0,
+                        DeliveredQty = clientLoad.OriginalQuantity ?? 0,
+                        ReturnedTransferredQty = clientLoad.ReturnQty ?? 0,
+                        DebriefQty = clientLoad.DebriefQty ?? 0,
+                        TransporterLiable = clientLoad.TransporterLiableQty ?? 0,
+                        AdminMovement = clientLoad.AdminMovement ?? 0,
+                        OutstandingQtyAtCustomer = clientLoad.OutstandingQty ?? 0
+                    } );
+                }
+
+                ViewBag.EquipmentCodeOptions = clientProducts.ToDictionary(
+                    cp => cp.ProductId,
+                    cp => allProducts.ContainsKey( cp.ProductId ) ? allProducts[ cp.ProductId ] : "Unknown Product"
+                );
+
+                ViewBag.EquipmentDetails = equipmentDetails;
+                ViewBag.ClientProducts = clientProducts;
+
                 if ( layout )
                 {
                     ViewBag.IncludeLayout = true;
