@@ -1248,13 +1248,7 @@ namespace ACT.UI.Controllers
         {
             ClientLoadViewModel model = new ClientLoadViewModel()
             {
-                EditMode = true,
-                EquipmentDetails = new List<EquipmentDetailViewModel>
-                {
-                    new EquipmentDetailViewModel(),
-                    new EquipmentDetailViewModel(),
-                    new EquipmentDetailViewModel()
-                }
+                EditMode = true
             };
 
             // Populate Dropdown Menus
@@ -1265,13 +1259,25 @@ namespace ACT.UI.Controllers
             using ( ClientCustomerService ccservice = new ClientCustomerService() )
             {
                 model.ClientGroupOptions = gservice.List( true );
-                model.EquipmentCodeOptions = pservice.List( true );
+                var allProducts = pservice.List( true );
                 model.TransporterOptions = tservice.ListAllTransporters();
                 model.SupplierSiteOptions = sservice.ListSupplierSites( true );
                 model.CustomerSiteOptions = ccservice.GetCustomerNamesAndNumbers();
-            }
 
-            ViewBag.EquipmentCodeOptions = model.EquipmentCodeOptions;
+                // Create ProductOptions dictionary
+                var productOptions = allProducts.ToDictionary(
+                    p => p.Key,
+                    p => p.Value
+                );
+
+                // Populate EquipmentDetails with ProductOptions
+                model.EquipmentDetails = new List<EquipmentDetailViewModel>
+                {
+                    new EquipmentDetailViewModel { ProductOptions = productOptions },
+                    new EquipmentDetailViewModel { ProductOptions = productOptions },
+                    new EquipmentDetailViewModel { ProductOptions = productOptions }
+                };
+            }
 
             return View( model );
         }
@@ -1477,35 +1483,32 @@ namespace ACT.UI.Controllers
                 #region Equipment Details
 
                 var clientProducts = cpservice.ListByClient( model.ClientId );
-
                 var allProducts = pservice.List( true );
+
+                var defaultProductOptions = clientProducts.ToDictionary(
+                    cp => cp.ProductId,
+                    cp => allProducts.ContainsKey( cp.ProductId ) ? allProducts[ cp.ProductId ] : "Unknown Product"
+                );
 
                 model.EquipmentDetails = load?.ClientLoadQuantities.Select( clq => new EquipmentDetailViewModel
                 {
-                    ProductId = clientProducts.FirstOrDefault( cp => cp.Equipment == clq.EquipmentCode )?.ProductId ?? 0,
+                    ProductId = int.TryParse( clq.EquipmentCode, out int productId ) ? productId : 0,
                     DeliveredQty = clq.OriginalQuantity,
                     ReturnedTransferredQty = clq.ReturnQty,
                     DebriefQty = clq.DebriefQty,
                     TransporterLiable = clq.TransporterLiableQty,
                     AdminMovement = clq.AdminMovementQty,
-                    OutstandingQtyAtCustomer = clq.OutstandingQty
+                    OutstandingQtyAtCustomer = clq.OutstandingQty,
+                    ProductOptions = defaultProductOptions
                 } ).ToList() ?? new List<EquipmentDetailViewModel>();
 
-                if ( !model.EquipmentDetails.Any() )
+                // Ensure we have at least 3 EquipmentDetails
+                while ( model.EquipmentDetails.Count < 3 )
                 {
-                    model.EquipmentDetails = new List<EquipmentDetailViewModel>
+                    model.EquipmentDetails.Add( new EquipmentDetailViewModel
                     {
-                        new EquipmentDetailViewModel
-                        {
-                            ProductId = 0,
-                            DeliveredQty = load?.OriginalQuantity ?? 0,
-                            ReturnedTransferredQty = load?.ReturnQty ?? 0,
-                            DebriefQty = load?.DebriefQty ?? 0,
-                            TransporterLiable = load?.TransporterLiableQty ?? 0,
-                            AdminMovement = load?.AdminMovement ?? 0,
-                            OutstandingQtyAtCustomer = load?.OutstandingQty ?? 0
-                        }
-                    };
+                        ProductOptions = defaultProductOptions
+                    } );
                 }
 
                 #endregion
