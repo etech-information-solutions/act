@@ -9,25 +9,21 @@
             @Html.LabelFor( m => m.EquipmentDetails[ 0 ].ProductId )
         </div>
         <div class="editor-field">
-            @for ( int i = 0; i < 3 && ( section * 3 + i ) < Model.EquipmentDetails.Count; i++ )
+            @for ( int i = 0; i < 3 && i < Model.EquipmentDetails.Count; i++ )
             {
-                var index = section * 3 + i;
+                var index = i;
                 <div style="display: inline-block; margin-right: 10px; width: 21.1%;">
-                    @if ( Model.EquipmentDetails[ index ]?.ProductOptions != null )
-                    {
-                        @Html.DropDownListFor(
-                            m => m.EquipmentDetails[ index ].ProductId,
-                            new SelectList( Model.EquipmentDetails[ index ].ProductOptions, "Key", "Value", Model.EquipmentDetails[ index ].ProductId ),
-                            "Select Equipment",
-                            new { @class = "chzn equipment-dropdown", @style = "width: 100%;", data_index = index }
-                        )
-                    }
-                    else
-                    {
-                        <select class="chzn equipment-dropdown" style="width: 100%;" data-index="@index" disabled>
-                            <option>No options available</option>
-                        </select>
-                    }
+                    @Html.DropDownListFor(
+                        m => m.EquipmentDetails[ index ].ProductId,
+                        new SelectList(
+                            Model.EquipmentDetails[ index ].ProductOptions,
+                            "Key",
+                            "Value",
+                            Model.EquipmentDetails[ index ].ProductId
+                        ),
+                        "Select Equipment",
+                        new { @class = "chzn equipment-dropdown", @style = "width: 100%;", data_index = index }
+                    )
                 </div>
             }
         </div>

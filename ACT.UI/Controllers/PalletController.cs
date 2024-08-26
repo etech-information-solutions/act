@@ -1485,40 +1485,51 @@ namespace ACT.UI.Controllers
                 var clientProducts = cpservice.ListByClient( model.ClientId );
                 var allProducts = pservice.List( true );
 
-                var defaultProductOptions = clientProducts.ToDictionary(
-                    cp => cp.ProductId,
-                    cp => allProducts.ContainsKey( cp.ProductId ) ? allProducts[ cp.ProductId ] : "Unknown Product"
+                var defaultProductOptions = allProducts.ToDictionary(
+                    p => p.Key,
+                    p => p.Value
                 );
 
-                model.EquipmentDetails = load?.ClientLoadQuantities.Select( clq => new EquipmentDetailViewModel
-                {
-                    ProductId = int.TryParse( clq.EquipmentCode, out int productId ) ? productId : 0,
-                    DeliveredQty = clq.OriginalQuantity,
-                    ReturnedTransferredQty = clq.ReturnQty,
-                    DebriefQty = clq.DebriefQty,
-                    TransporterLiable = clq.TransporterLiableQty,
-                    AdminMovement = clq.AdminMovementQty,
-                    OutstandingQtyAtCustomer = clq.OutstandingQty,
-                    ProductOptions = defaultProductOptions
-                } ).ToList() ?? new List<EquipmentDetailViewModel>();
+                var clientLoadQuantities = load?.ClientLoadQuantities.ToList() ?? new List<ClientLoadQuantity>();
 
-                // Ensure we have at least 3 EquipmentDetails
-                while ( model.EquipmentDetails.Count < 3 )
+                model.EquipmentDetails = new List<EquipmentDetailViewModel>();
+
+                // Populate existing data
+                foreach ( var clq in clientLoadQuantities )
                 {
                     model.EquipmentDetails.Add( new EquipmentDetailViewModel
                     {
+                        ProductId = int.TryParse( clq.EquipmentCode, out int productId ) ? productId : 0,
+                        DeliveredQty = clq.OriginalQuantity,
+                        ReturnedTransferredQty = clq.ReturnQty,
+                        DebriefQty = clq.DebriefQty,
+                        TransporterLiable = clq.TransporterLiableQty,
+                        AdminMovement = clq.AdminMovementQty,
+                        OutstandingQtyAtCustomer = clq.OutstandingQty,
                         ProductOptions = defaultProductOptions
                     } );
                 }
 
+                // Ensure we have exactly 3 EquipmentDetails
+                while ( model.EquipmentDetails.Count < 3 )
+                {
+                    model.EquipmentDetails.Add( new EquipmentDetailViewModel
+                    {
+                        ProductId = 0,
+                        ProductOptions = defaultProductOptions
+                    } );
+                }
+
+                // Ensure ProductOptions is set for all items
+                foreach ( var detail in model.EquipmentDetails )
+                {
+                    detail.ProductOptions = defaultProductOptions;
+                }
                 #endregion
 
                 #region Populate EquipmentCodeOptions
 
-                model.EquipmentCodeOptions = clientProducts.ToDictionary(
-                    cp => cp.ProductId,
-                    cp => allProducts.ContainsKey( cp.ProductId ) ? allProducts[ cp.ProductId ] : "Unknown Product"
-                );
+                model.EquipmentCodeOptions = defaultProductOptions;
 
                 #endregion
 
