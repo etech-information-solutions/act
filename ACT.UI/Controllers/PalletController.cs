@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Transactions;
 using System.Web.Mvc;
+using System.Web.Services;
 using System.Web.Services.Description;
 
 using ACT.Core.Enums;
@@ -1329,7 +1330,10 @@ namespace ACT.UI.Controllers
                     PalletReturnDate = model.PalletReturnDate,
                     ChepCompensationNo = model.ChepCompensationNo,
                     CompensationDate = model.CompensationDate,
-                    EffectiveDate = model.EffectiveDate
+                    EffectiveDate = model.EffectiveDate,
+                    CustomerType = model.CustomerType,
+                    PODCommentId = model.PODCommentId,
+                    ClientLoadNotes = model.ClientLoadNotes,
                 };
 
                 load = clservice.Create( load );
@@ -1455,6 +1459,8 @@ namespace ACT.UI.Controllers
                     ChepCompensationNo = load?.ChepCompensationNo,
                     CompensationDate = load?.CompensationDate,
                     EffectiveDate = load?.EffectiveDate,
+                    PODCommentId = load.PODCommentId,
+                    ClientLoadNotes = load.ClientLoadNotes,
                     EquipmentDetails = load?.ClientLoadQuantities.Select( clq => new EquipmentDetailViewModel
                     {
                         ProductId = int.TryParse( clq.EquipmentCode, out int productId ) ? productId : 0,
@@ -1551,6 +1557,7 @@ namespace ACT.UI.Controllers
             using ( ClientLoadService clservice = new ClientLoadService() )
             using ( ClientCustomerService ccservice = new ClientCustomerService() )
             using ( ClientLoadQuantityService clqservice = new ClientLoadQuantityService() )
+            using ( ExtendedClientLoadService ecservice = new ExtendedClientLoadService() )
             {
                 ClientLoad load = clservice.GetById( model.Id );
                 Vehicle vehicle = vservice.GetById( model.ClientId );
@@ -1593,6 +1600,8 @@ namespace ACT.UI.Controllers
                 load.CompensationDate = model.CompensationDate;
                 load.EffectiveDate = model.EffectiveDate;
                 load.Status = ( int ) model.Status;
+                load.PODCommentId = model.PODCommentId;
+                load.ClientLoadNotes = model.ClientLoadNotes;
 
                 // Update the ClientLoad entity
                 clservice.Update( load );

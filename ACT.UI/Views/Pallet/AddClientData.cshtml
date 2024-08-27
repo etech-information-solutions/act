@@ -89,7 +89,7 @@
                     </div>
                     <div class="editor-field">
                         @Html.HiddenFor( model => model.RegionFromId )
-                        @Html.TextBoxFor( model => model.RegionFromName, new { @readonly = "readonly" } )
+                        @Html.TextBoxFor( model => model.RegionFromName, new { @readonly = "readonly", @placeholder = "Field Auto Generated" } )
                         @Html.ValidationMessageFor( model => model.RegionFromId )
                     </div>
                 </div>
@@ -121,7 +121,7 @@
                     </div>
                     <div class="editor-field">
                         @Html.HiddenFor( model => model.RegionToId )
-                        @Html.TextBoxFor( model => model.RegionToName, new { @readonly = "readonly" } )
+                        @Html.TextBoxFor( model => model.RegionToName, new { @readonly = "readonly", @placeholder = "Field Auto Generated" } )
                         @Html.ValidationMessageFor( model => model.RegionToId )
                     </div>
                 </div>
@@ -234,7 +234,7 @@
                         @Html.LabelFor( model => model.FleetNumber )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.FleetNumber, new { @class = "input", @readonly = "readonly", @placeholder = "Field will be auto generated" } )
+                        @Html.TextBoxFor( model => model.FleetNumber, new { @class = "input", @readonly = "readonly", @placeholder = "Field auto generated" } )
                         @Html.ValidationMessageFor( model => model.FleetNumber )
                     </div>
                 </div>
@@ -244,7 +244,7 @@
                         @Html.LabelFor( model => model.VehicleRegistration )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.VehicleRegistration, new { @class = "input", @readonly = "readonly", @placeholder = "Field will be auto generated" } )
+                        @Html.TextBoxFor( model => model.VehicleRegistration, new { @class = "input", @readonly = "readonly", @placeholder = "Field auto generated" } )
                         @Html.ValidationMessageFor( model => model.VehicleRegistration )
                     </div>
                 </div>
@@ -453,14 +453,14 @@
 
             </div>
 
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
 
-            <div class="grouped-area">
+            <div class="left grouped-area" style="width: 55%; margin-right: 3%;">
 
                 <div id="equipment-details-container">
                     @Html.Partial( "_EquipmentDetails", Model )
 
-                    <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; margin-top: 20px; height: 0;">&nbsp;</div>
+                    <div class="clear" style="margin-bottom: 20px; margin-top: 20px; height: 0;">&nbsp;</div>
                 </div>
 
                 <div style="position: relative;">
@@ -471,7 +471,58 @@
 
             </div>
 
-            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; height: 0;">&nbsp;</div>
+            <div class="left grouped-area" style="width: 30%;">
+                <p>
+                    <strong class="uppercase">Load Comments</strong>
+                </p>
+                <div class="form-group">
+                    <div class="editor-label comment-label">
+                        Document Type:
+                    </div>
+                    <div class="editor-field comment-field">
+                        @Html.EnumDropDownFor( model => model.DocumentType, false, true, new { @class = "chzn", @style = "width: 100%;" } )
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="editor-label comment-label">
+                        Load Type
+                    </div>
+                    <div class="editor-field comment-field">
+                        @{
+                            string ltype = "THAN";
+
+                            if ( Model?.CustomerType?.ToUpper()?.Contains( "EXCHANGE" ) == true || Model.ReceiverNumber?.StartsWith( "50000" ) == true || Model.ReceiverNumber?.StartsWith( "52" ) == true || Model.ReceiverNumber?.StartsWith( "51" ) == true )
+                            {
+                                ltype = "PCN";
+                            }
+                            else if ( Model.DocumentType == DocumentType.ACTControlDoc )
+                            {
+                                ltype = "OTHER";
+                            }
+                        }
+                        @Html.Raw( ltype )
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="editor-label comment-label">
+                        Load Comment:
+                    </div>
+                    <div class="editor-field comment-field">
+                        @Html.DropDownListFor( model => model.PODCommentId, model => Model.PODCommentOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 100%;" } )
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="editor-label comment-label">
+                        Pallet Notes:
+                    </div>
+                    <div class="editor-field comment-field">
+                        @Html.TextAreaFor( model => model.ClientLoadNotes, 5, 10, new { @class = "input", @placeholder = "Please Complete" } )
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px;">&nbsp;</div>
 
             <p>
                 <input id="save-btn" type="submit" value="Save" />
@@ -490,17 +541,23 @@
     .form-group {
         display: flex;
         align-items: center;
-        margin-bottom: 10px;
     }
 
     .editor-label {
         width: 120px;
         margin-right: 10px;
-        margin-bottom: 8px;
     }
 
     .editor-field {
         flex-grow: 1;
+    }
+
+    .comment-label {
+        margin-bottom: 30px;
+    }
+
+    .comment-field {
+        margin-bottom: 35px !important;
     }
 
     .chzn {

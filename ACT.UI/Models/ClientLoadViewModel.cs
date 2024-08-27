@@ -17,6 +17,7 @@ namespace ACT.UI.Models
         #region Properties
 
         public int Id { get; set; }
+        public int UID { get; set; }
 
         //[Required]
         [Display( Name = "Client:" )]
@@ -394,25 +395,25 @@ namespace ACT.UI.Models
 
     public class EquipmentDetailViewModel
     {
-        [Display( Name = "Equipment" )]
+        [Display( Name = "Equipment: " )]
         public int? ProductId { get; set; }
 
-        [Display( Name = "Delivered Qty" )]
+        [Display( Name = "Delivered Qty: " )]
         public decimal DeliveredQty { get; set; }
 
-        [Display( Name = "Returned/Transferred Qty" )]
+        [Display( Name = "Returned Qty: " )]
         public decimal ReturnedTransferredQty { get; set; }
 
-        [Display( Name = "Debrief Qty" )]
+        [Display( Name = "Debrief Qty: " )]
         public decimal DebriefQty { get; set; }
 
-        [Display( Name = "Transporter Liable" )]
+        [Display( Name = "Transporter: " )]
         public decimal TransporterLiable { get; set; }
 
-        [Display( Name = "Admin Movement" )]
+        [Display( Name = "Admin Movement: " )]
         public decimal AdminMovement { get; set; }
 
-        [Display( Name = "Outstanding Qty" )]
+        [Display( Name = "Outstanding Qty: " )]
         public decimal OutstandingQtyAtCustomer { get; set; }
 
         public Dictionary<int, string> ProductOptions { get; set; }
