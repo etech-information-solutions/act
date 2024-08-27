@@ -388,6 +388,45 @@ namespace ACT.Core.Services
         }
 
         /// <summary>
+        /// Gets a list of customers connected to a client
+        /// </summary>
+        /// <param name="clientId">Client Id</param>
+        /// <returns></returns>
+        public Dictionary<int, string> GetCustomersForClientList( int clientId )
+        {
+            List<object> parameters = new List<object>
+            {
+                new SqlParameter("@userId", (CurrentUser != null) ? CurrentUser.Id : 0),
+                new SqlParameter("@clientId", clientId)
+            };
+
+            string query = @"
+                            SELECT 
+                                cc.Id,
+                                ISNULL(cc.CustomerName, '') + ' (' + ISNULL(cc.CustomerNumber, '') + ')' AS CustomerNameNumber
+                            FROM [ACT].[dbo].[ClientCustomer] cc
+                            WHERE cc.Status = 1
+                            AND cc.ClientId = @clientId";
+
+            if ( CurrentUser.RoleType == RoleType.PSP )
+            {
+                query += @" AND EXISTS(SELECT 1 FROM [dbo].[PSPUser] pu 
+            INNER JOIN [dbo].[PSPClient] pc ON pc.PSPId = pu.PSPId 
+            WHERE pc.ClientId = cc.ClientId AND pu.UserId = @userId)";
+            }
+            else if ( CurrentUser.RoleType == RoleType.Client )
+            {
+                query += @" AND EXISTS(SELECT 1 FROM [dbo].[ClientUser] cu 
+            WHERE cu.UserId = @userId AND cu.ClientId = cc.ClientId)";
+            }
+
+            query += " ORDER BY cc.CustomerName";
+
+            var results = context.Database.SqlQuery<CustomerIdNameNumber>( query, parameters.ToArray() ).ToList();
+            return results.ToDictionary( r => r.Id, r => r.CustomerNameNumber );
+        }
+
+        /// <summary>
         /// Gets a list of customers with their name and number properties
         /// </summary>
         /// <param name="CustomerName">Customer Name</param>

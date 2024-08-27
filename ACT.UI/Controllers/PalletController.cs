@@ -1293,11 +1293,14 @@ namespace ACT.UI.Controllers
 
             using ( GroupService gservice = new GroupService() )
             using ( ClientService cservice = new ClientService() )
+            using ( VehicleService vservice = new VehicleService() )
             using ( TransactionScope scope = new TransactionScope() )
             using ( ClientLoadService clservice = new ClientLoadService() )
             using ( ClientCustomerService ccservice = new ClientCustomerService() )
             {
                 #region Create Client Load
+
+                Vehicle vehicle = vservice.GetById( model.ClientId );
 
                 ClientLoad load = new ClientLoad()
                 {
@@ -1339,6 +1342,11 @@ namespace ACT.UI.Controllers
                 load = clservice.Create( load );
 
                 #endregion
+
+                // Update the Vehicle entity
+                // vehicle.FleetNumber = model.FleetNumber;
+                vehicle.Registration = model.VehicleRegistration;
+                vservice.Update( vehicle );
 
                 #region Create Equipment Details
 
@@ -2300,6 +2308,16 @@ namespace ACT.UI.Controllers
                 string regionName = province != null ? province.Name : "Unknown Region";
 
                 return Json( new { regionId = address.ProvinceId, regionName = regionName }, JsonRequestBehavior.AllowGet );
+            }
+        }
+
+        public ActionResult GetCustomersForClient( int clientId )
+        {
+            using ( ClientCustomerService ccservice = new ClientCustomerService() )
+            {
+                var customers = ccservice.GetCustomersForClientList( clientId );
+                var result = customers.Select( kvp => new { id = kvp.Key.ToString(), name = kvp.Value } ).ToList();
+                return Json( result, JsonRequestBehavior.AllowGet );
             }
         }
 

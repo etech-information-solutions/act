@@ -100,6 +100,7 @@
             this.DataLoadVersion( $( '[data-load-version="1"]' ) );
 
             this.DataPopulateRegions( $( '*[data-populate-region="1"]' ) );
+            this.PopulateCustomers( $( '*[data-populate-customers="1"]' ) );
 
 
             // Table Quick Links Operations
@@ -1562,21 +1563,26 @@
             {
                 var fields = [ 'DeliveredQty', 'ReturnedTransferredQty', 'DebriefQty', 'TransporterLiable', 'AdminMovement' ];
                 var totals = [ 0, 0, 0 ];
-
                 fields.forEach( function ( field )
                 {
                     section.find( 'input[name$=".' + field + '"]' ).each( function ( index )
                     {
                         var value = parseFloat( $( this ).val() ) || 0;
-                        totals[ index ] += value;
+                        // Subtract the value instead of adding
+                        if ( field === 'DeliveredQty' )
+                        {
+                            totals[ index ] += value; // Keep DeliveredQty as addition
+                        } else
+                        {
+                            totals[ index ] -= value; // Subtract all other fields
+                        }
                         console.log( "Column: " + ( index + 1 ) + ", Field: " + field + ", Value: " + value + ", Running Total: " + totals[ index ] );
                     } );
                 } );
-
                 section.find( 'input[name$=".OutstandingQtyAtCustomer"]' ).each( function ( index )
                 {
                     $( this ).val( totals[ index ].toFixed( 2 ) );
-                    console.log( "Column: " + ( index + 1 ) + ", Final Total: " + totals[ index ].toFixed( 2 ) );
+                    console.log( "Column: " + ( index + 1 ) + ", Final Total: " + totals[ index ] );
                 } );
             }
 
@@ -2146,6 +2152,60 @@
                             regionNameField.val( '' );
                         }
                     } );
+            } );
+        },
+
+        PopulateCustomers: function ( sender )
+        {
+            console.log( "PopulateCustomers function called" );
+            sender.each( function ()
+            {
+                console.log( "Processing a sender element" );
+                var i = $( this );
+                var clientDropdown = i.find( 'select[data-populate-customers="1"]' );
+                var customerDropdown = $( 'select[name="ClientSiteIdTo"]' );
+                console.log( "Client dropdown found:", clientDropdown.length );
+                console.log( "Customer dropdown found:", customerDropdown.length );
+                if ( clientDropdown.length === 0 )
+                {
+                    console.error( "Client dropdown not found" );
+                    return;
+                }
+                clientDropdown.unbind( 'change' ).bind( 'change', function ()
+                {
+                    var clientId = $( this ).val();
+                    console.log( "Client dropdown changed. Selected ID:", clientId );
+                    if ( clientId )
+                    {
+                        $.getJSON( '/Pallet/GetCustomersForClient', { clientId: clientId } )
+                            .done( function ( data )
+                            {
+                                console.log( "Received customer data:", data );
+                                customerDropdown.empty();
+                                customerDropdown.append( $( '<option></option>' ).val( '' ).text( 'Select Customer To' ) );
+                                $.each( data, function ( index, item )
+                                {
+                                    customerDropdown.append( $( '<option></option>' ).val( item.id ).text( item.name ) );
+                                } );
+                                customerDropdown.prop( 'disabled', false );
+                            } )
+                            .fail( function ( jqXHR, textStatus, errorThrown )
+                            {
+                                console.error( "Failed to fetch customer data", textStatus, errorThrown );
+                                console.error( "Response text:", jqXHR.responseText );
+                                customerDropdown.empty();
+                                customerDropdown.append( $( '<option></option>' ).val( '' ).text( 'Error fetching customers' ) );
+                                customerDropdown.prop( 'disabled', true );
+                            } );
+                    } else
+                    {
+                        console.log( "No client selected, resetting customer dropdown" );
+                        customerDropdown.empty();
+                        customerDropdown.append( $( '<option></option>' ).val( '' ).text( 'Select Customer To' ) );
+                        customerDropdown.prop( 'disabled', true );
+                    }
+                } );
+                console.log( "Change event bound to client dropdown" );
             } );
         },
 

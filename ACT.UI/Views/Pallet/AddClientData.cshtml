@@ -15,9 +15,9 @@
 @Html.Partial( "_Notification" )
 
 
-@using ( Html.BeginForm( "AddClientData", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clientdata", @class = "custom-validate", @style = "width: auto;" } ) )
+@using ( Html.BeginForm( "AddClientData", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clientdata", @class = "custom-validate", @style = "width: auto; height: auto" } ) )
 {
-    <div id="edit-item">
+    <div id="edit-item" style="transform: scale(0.64); transform-origin: top left; width: 156.25%; height: 156.25% ">
 
         <h2 class="" style="width: auto;">
             <img alt="" src="@Url.Content("~/images/add.png")" />
@@ -29,15 +29,20 @@
         <div id="item-details" class="item-details" style="width: auto;">
 
             <div class="left" style="width: 31%; margin-right: 3%;">
+
                 <div class="form-group">
                     <div class="editor-label">
                         @Html.LabelFor( model => model.ClientId )
                     </div>
-                    <div class="editor-field">
+                    <div class="editor-field" data-populate-customers="1">
                         @Html.DropDownListFor( model => model.ClientId,
                             new SelectList( Model.ClientOptions, "Key", "Value" ),
                             "Select Client",
-                            new { @class = "chzn" } )
+                            new { @class = "", 
+                                @data_populate_customers = "1",
+                                @data_id_field = "#ClientId",
+                                @data_client_options_field = "#ClientOptions"
+                            } )
                         @Html.ValidationMessageFor( model => model.ClientId )
                     </div>
                 </div>
@@ -72,7 +77,7 @@
                             "Select Supplier From",
                             new
                             {
-                                @class = "chzn",
+                                @class = "",
                                 @style = "width: 98%;",
                                 @data_populate_region = "1",
                                 @data_is_supplier = "true",
@@ -103,13 +108,14 @@
                             new SelectList( Model.CustomerSiteOptions, "Key", "Value" ),
                             "Select Customer To",
                             new
-                                 {
-                                @class = "chzn",
-                                @style = "width: 98%;",
+                            {
+                                @class = "fixed-width-dropdown",
                                 @data_populate_region = "1",
                                 @data_is_supplier = "false",
                                 @data_region_id_field = "#RegionToId",
-                                @data_region_name_field = "#RegionToName"
+                                @data_region_name_field = "#RegionToName",
+                                @data_clientsiteidto_field = "#ClientSiteIdTo",
+                                name = "ClientSiteIdTo"
                             } )
                         @Html.ValidationMessageFor( model => model.ClientSiteIdTo )
                     </div>
@@ -131,7 +137,7 @@
                         @Html.LabelFor( model => model.ClientGroupId )
                     </div>
                     <div class="editor-field">
-                        @Html.DropDownListFor( model => model.ClientGroupId, new SelectList( Model.ClientGroupOptions, "Key", "Value" ), "Select Customer Group", new { @class = "chzn", @style = "width: 98%;" } )
+                        @Html.DropDownListFor( model => model.ClientGroupId, new SelectList( Model.ClientGroupOptions, "Key", "Value" ), "Select Customer Group", new { @class = "", @style = "width: 98%;" } )
                         @Html.ValidationMessageFor( model => model.ClientGroupId )
                     </div>
                 </div>
@@ -180,14 +186,10 @@
                                     Value = ( ( int ) e ).ToString()
                                 } ), "Value", "Text" ),
                             "Select Primary/Secondary",
-                            new { @class = "chzn", @style = "width: 98%;" } )
+                            new { @class = "", @style = "width: 98%;" } )
                         @Html.ValidationMessageFor( model => model.PrimarySecondary )
                     </div>
                 </div>
-
-            </div>
-
-            <div class="left" style="width: 31%; margin-right: 3%;">
 
                 <div class="form-group">
                     <div class="editor-label">
@@ -198,6 +200,10 @@
                         @Html.ValidationMessageFor( model => model.DepoSTONo )
                     </div>
                 </div>
+
+            </div>
+
+            <div class="left" style="width: 31%; margin-right: 3%;">
 
                 <div class="form-group">
                     <div class="editor-label">
@@ -224,7 +230,7 @@
                         @Html.LabelFor( model => model.TransporterId )
                     </div>
                     <div class="editor-field">
-                        @Html.DropDownListFor( model => model.TransporterId, new SelectList( Model.TransporterOptions, "Key", "Value" ), "Select Transporter", new { @class = "chzn", @style = "width: 98%;" } )
+                        @Html.DropDownListFor( model => model.TransporterId, new SelectList( Model.TransporterOptions, "Key", "Value" ), "Select Transporter", new { @class = "", @style = "width: 98%;" } )
                         @Html.ValidationMessageFor( model => model.TransporterId )
                     </div>
                 </div>
@@ -244,7 +250,7 @@
                         @Html.LabelFor( model => model.VehicleRegistration )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.VehicleRegistration, new { @class = "input", @readonly = "readonly", @placeholder = "Field auto generated" } )
+                        @Html.TextBoxFor( model => model.VehicleRegistration, new { @class = "input", @placeholder = "Please Complete" } )
                         @Html.ValidationMessageFor( model => model.VehicleRegistration )
                     </div>
                 </div>
@@ -299,7 +305,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                @*<div class="form-group">
                     <div class="editor-label">
                         @Html.LabelFor( model => model.ReceiverNumber )
                     </div>
@@ -307,7 +313,7 @@
                         @Html.TextBoxFor( model => model.ReceiverNumber, new { @class = "input", @placeholder = "Please Complete" } )
                         @Html.ValidationMessageFor( model => model.ReceiverNumber )
                     </div>
-                </div>
+                </div>*@
 
                 <div class="form-group">
                     <div class="editor-label">
@@ -446,7 +452,7 @@
                         @Html.LabelFor( model => model.Status )
                     </div>
                     <div class="editor-field">
-                        @Html.EnumDropDownListFor( model => model.Status, "-- Select Status --", new { @class = "chzn" } )
+                        @Html.EnumDropDownListFor( model => model.Status, "-- Select Status --", new { @class = "" } )
                         @Html.ValidationMessageFor( model => model.Status )
                     </div>
                 </div>
@@ -480,7 +486,7 @@
                         Document Type:
                     </div>
                     <div class="editor-field comment-field">
-                        @Html.EnumDropDownFor( model => model.DocumentType, false, true, new { @class = "chzn", @style = "width: 100%;" } )
+                        @Html.EnumDropDownFor( model => model.DocumentType, false, true, new { @class = "", @style = "width: 100%;" } )
                     </div>
                 </div>
                 <div class="form-group">
@@ -508,7 +514,7 @@
                         Load Comment:
                     </div>
                     <div class="editor-field comment-field">
-                        @Html.DropDownListFor( model => model.PODCommentId, model => Model.PODCommentOptions, p => p.Key, p => p.Value, true, new { @class = "chzn", @style = "width: 100%;" } )
+                        @Html.DropDownListFor( model => model.PODCommentId, model => Model.PODCommentOptions, p => p.Key, p => p.Value, true, new { @class = "", @style = "width: 100%;" } )
                     </div>
                 </div>
                 <div class="form-group">
@@ -563,4 +569,20 @@
     .chzn {
         width: 100%;
     }
+
+    .fixed-width-dropdown {
+        width: 420px;
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .fixed-width-dropdown option {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
 </style>

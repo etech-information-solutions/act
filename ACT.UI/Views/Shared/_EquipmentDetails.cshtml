@@ -13,7 +13,7 @@
                 @for ( int i = 0; i < 3 && ( section * 3 + i ) < Model.EquipmentDetails.Count; i++ )
                 {
                     var index = section * 3 + i;
-                    <div style="display: inline-block; width: 30%;">
+                    <div style="display: inline-block; width: 30% !important;">
                         @Html.DropDownListFor(
                             m => m.EquipmentDetails[ index ].ProductId,
                             new SelectList(
@@ -23,7 +23,7 @@
                                 Model.EquipmentDetails[ index ].ProductId
                             ),
                             "Select Equipment",
-                            new { @class = "chzn equipment-dropdown", @style = "width: 100%; margin-bottom: 15px !important", data_index = index }
+                            new { @class = "equipment-dropdown", @style = "width: 100%; margin-bottom: 15px !important", data_index = index }
                         )
                     </div>
                 }
