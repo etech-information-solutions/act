@@ -4875,6 +4875,13 @@ namespace ACT.UI.Controllers
 
                 string code = caservice.FormatNumber( "AC", ( n + 1 ) );
 
+                // Check if LoadNumber is null and handle it
+                if ( string.IsNullOrEmpty( cl.LoadNumber ) )
+                {
+                    Notify( "LoadNumber is required. Please provide a valid LoadNumber in Client Loads.", NotificationType.Error );
+                    return AuthorisationCodes( pm, csm );
+                }
+
                 ClientAuthorisation ca = new ClientAuthorisation()
                 {
                     Code = code,
@@ -4886,7 +4893,6 @@ namespace ACT.UI.Controllers
                 };
 
                 ca = caservice.Create( ca );
-
                 ca = caservice.GetById( ca.Id );
 
                 List<string> recipients = new List<string>();

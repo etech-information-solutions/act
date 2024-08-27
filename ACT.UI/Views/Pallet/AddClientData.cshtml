@@ -234,7 +234,7 @@
                         @Html.LabelFor( model => model.FleetNumber )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.FleetNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.FleetNumber, new { @class = "input", @readonly = "readonly", @placeholder = "Field will be auto generated" } )
                         @Html.ValidationMessageFor( model => model.FleetNumber )
                     </div>
                 </div>
@@ -244,7 +244,7 @@
                         @Html.LabelFor( model => model.VehicleRegistration )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.VehicleRegistration, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.VehicleRegistration, new { @class = "input", @readonly = "readonly", @placeholder = "Field will be auto generated" } )
                         @Html.ValidationMessageFor( model => model.VehicleRegistration )
                     </div>
                 </div>

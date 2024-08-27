@@ -59,11 +59,12 @@ namespace ACT.UI.Models
         [Display( Name = "Load Comment:" )]
         public int? PODCommentId { get; set; }
 
+        [Required]
         [Display( Name = "Load/Shipment Number:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string LoadNumber { get; set; }
 
-        //[Required]
+        [Required]
         [Display( Name = "Load Date:" )]
         public DateTime? LoadDate { get; set; }
 
@@ -166,7 +167,7 @@ namespace ACT.UI.Models
         [Display( Name = "Select a Date Format being used in the file your import file" )]
         public DateFormats DateFormats { get; set; }
 
-        [Display( Name = "CHEP ACC NUM/GLID:" )]
+        [Display( Name = "CHEP Acc Num/GLID:" )]
         public string GLID { get; set; }
 
         [Display( Name = "GRV Number:" )]
@@ -213,7 +214,7 @@ namespace ACT.UI.Models
         [Display( Name = "Delivery Date:" )]
         public DateTime? DeliveryDate { get; set; }
 
-        [Display( Name = "CHEP ACC NO/GLID:" )]
+        [Display( Name = "CHEP Acc No/GLID:" )]
         public string ChepAccountNumberGlid { get; set; }
 
         [Display( Name = "Customer Order Number:" )]
