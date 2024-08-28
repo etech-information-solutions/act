@@ -65,7 +65,9 @@
                         @Html.LabelFor( model => model.LoadDate )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.LoadDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
+                        @Html.TextBoxFor( model => model.LoadDate,
+                            Model.LoadDate.HasValue ? Model.LoadDate.Value.ToString( "yyyy-MM-dd" ) : "",
+                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd" } )
                         @Html.ValidationMessageFor( model => model.LoadDate )
                     </div>
                 </div>
@@ -223,7 +225,9 @@
                         @Html.LabelFor( model => model.DeliveryDate )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.DeliveryDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
+                        @Html.TextBoxFor( model => model.DeliveryDate,
+                            Model.DeliveryDate.HasValue ? Model.DeliveryDate.Value.ToString( "yyyy-MM-dd" ) : "",
+                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd" } )
                         @Html.ValidationMessageFor( model => model.DeliveryDate )
                     </div>
                 </div>
@@ -397,7 +401,9 @@
                         @Html.LabelFor( model => model.PalletReturnDate )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.PalletReturnDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
+                        @Html.TextBoxFor( model => model.PalletReturnDate,
+                            Model.PalletReturnDate.HasValue ? Model.PalletReturnDate.Value.ToString( "yyyy-MM-dd" ) : "",
+                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd" } )
                         @Html.ValidationMessageFor( model => model.PalletReturnDate )
                     </div>
                 </div>
@@ -437,7 +443,9 @@
                         @Html.LabelFor( model => model.CompensationDate )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.CompensationDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
+                        @Html.TextBoxFor( model => model.CompensationDate,
+                            Model.CompensationDate.HasValue ? Model.CompensationDate.Value.ToString( "yyyy-MM-dd" ) : "",
+                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd" } )
                         @Html.ValidationMessageFor( model => model.CompensationDate )
                     </div>
                 </div>
@@ -447,7 +455,9 @@
                         @Html.LabelFor( model => model.EffectiveDate )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.EffectiveDate, new { @class = "date-picker", @placeholder = "     /       /       " } )
+                        @Html.TextBoxFor( model => model.EffectiveDate,
+                            Model.EffectiveDate.HasValue ? Model.EffectiveDate.Value.ToString( "yyyy-MM-dd" ) : "",
+                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd" } )
                         @Html.ValidationMessageFor( model => model.EffectiveDate )
                     </div>
                 </div>

@@ -27,6 +27,7 @@ namespace ACT.UI.Models
         [Display( Name = "VEHICLE ID:" )]
         public int? VehicleId { get; set; }
 
+        [Required]
         [Display( Name = "VEHICLE REG#:" )]
         public string VehicleRegistration { get; set; }
 
