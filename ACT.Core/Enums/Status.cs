@@ -27,4 +27,13 @@ namespace ACT.Core.Enums
 
         NA
     }
+
+    public enum LoadStatus
+    {
+        [StringEnumDisplayText( "Outstanding" )]
+        Outstanding,
+
+        [StringEnumDisplayText( "Complete" )]
+        Complete,
+    }
 }

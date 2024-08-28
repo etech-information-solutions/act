@@ -133,7 +133,7 @@ namespace ACT.UI.Models
 
         [Required]
         [Display( Name = "STATUS" )]
-        public Status Status { get; set; }
+        public LoadStatus Status { get; set; }
 
         [Display( Name = "THAN:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
