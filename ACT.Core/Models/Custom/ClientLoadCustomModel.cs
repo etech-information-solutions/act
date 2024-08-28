@@ -13,7 +13,10 @@ namespace ACT.Core.Models.Custom
         public int? ClientSiteId { get; set; }
         public int? TransporterId { get; set; }
         public int? ToClientSiteId { get; set; }
+        public bool HasPOD { get; set; } = false;
         public int? PODCommentId { get; set; }
+        public string DebtorsCode { get; set; }
+        public LoadViewType? LoadType { get; set; }
         public int? OutstandingReasonId { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime ModifiedOn { get; set; }
@@ -113,6 +116,11 @@ namespace ACT.Core.Models.Custom
         public string APIKey { get; set; }
         public string RegionName { get; set; }
 
-
     }
+    public enum LoadViewType
+    {
+        Primary = 1,
+        Secondary = 2
+    }
+
 }

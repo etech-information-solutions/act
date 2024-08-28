@@ -6336,37 +6336,51 @@
                 var isSupplier = dropdown.data( 'is-supplier' ) === true;
                 var regionIdField = $( dropdown.data( 'region-id-field' ) );
                 var regionNameField = $( dropdown.data( 'region-name-field' ) );
+
+                // Function to populate the region name based on the selected siteId
+                function populateRegionName ( siteId )
+                {
+                    if ( siteId )
+                    {
+                        var url = isSupplier ? '/Pallet/GetSupplierRegion' : '/Pallet/GetCustomerRegion';
+                        $.getJSON( url, { siteId: siteId } )
+                            .done( function ( data )
+                            {
+                                if ( data && data.regionId != null )
+                                {
+                                    regionIdField.val( data.regionId );
+                                    regionNameField.val( data.regionName );
+                                } else
+                                {
+                                    regionIdField.val( '' );
+                                    regionNameField.val( 'No region found' );
+                                }
+                            } )
+                            .fail( function ()
+                            {
+                                console.error( "Failed to fetch region data" );
+                                regionIdField.val( '' );
+                                regionNameField.val( 'Error fetching region' );
+                            } );
+                    } else
+                    {
+                        regionIdField.val( '' );
+                        regionNameField.val( '' );
+                    }
+                }
+
+                // Populate the region name on page load if a siteId is already selected
+                var selectedSiteId = dropdown.val();
+                if ( selectedSiteId )
+                {
+                    populateRegionName( selectedSiteId );
+                }
+
                 dropdown.unbind( 'change' )
                     .bind( 'change', function ()
                     {
                         var siteId = $( this ).val();
-                        if ( siteId )
-                        {
-                            var url = isSupplier ? '/Pallet/GetSupplierRegion' : '/Pallet/GetCustomerRegion';
-                            $.getJSON( url, { siteId: siteId } )
-                                .done( function ( data )
-                                {
-                                    if ( data && data.regionId != null )
-                                    {
-                                        regionIdField.val( data.regionId );
-                                        regionNameField.val( data.regionName );
-                                    } else
-                                    {
-                                        regionIdField.val( '' );
-                                        regionNameField.val( 'No region found' );
-                                    }
-                                } )
-                                .fail( function ()
-                                {
-                                    console.error( "Failed to fetch region data" );
-                                    regionIdField.val( '' );
-                                    regionNameField.val( 'Error fetching region' );
-                                } );
-                        } else
-                        {
-                            regionIdField.val( '' );
-                            regionNameField.val( '' );
-                        }
+                        populateRegionName( siteId );
                     } );
             } );
         },

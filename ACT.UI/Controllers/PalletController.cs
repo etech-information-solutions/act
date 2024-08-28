@@ -2079,13 +2079,12 @@ namespace ACT.UI.Controllers
 
                         return PartialView( "_AccessDenied" );
                     }
+                    service.Delete( activeLoad );
 
-                    activeLoad.Status = ( ( ( Status ) activeLoad.Status ) == Status.Active ) ? ( int ) Status.Inactive : ( int ) Status.Active;
-                    service.Update( activeLoad );
                     scope.Complete();
 
                 }
-                Notify( "The selected item was successfully updated.", NotificationType.Success );
+                Notify( "The selected item was successfully Deleted.", NotificationType.Success );
                 return RedirectToAction( "ClientData" );
             }
             catch ( Exception ex )

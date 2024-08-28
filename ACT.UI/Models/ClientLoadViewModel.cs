@@ -89,7 +89,7 @@ namespace ACT.UI.Models
         public string ClientDescription { get; set; }
 
         //[Required]
-        [Display( Name = "DEL NOTE NUM:" )]
+        [Display( Name = "DEL NOTE #:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string DeliveryNote { get; set; }
 

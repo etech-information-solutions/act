@@ -17,7 +17,7 @@
 
 @using ( Html.BeginForm( "AddClientData", "Pallet", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax_form = "1", @data_target = "#clientdata", @class = "custom-validate", @style = "width: auto; height: auto" } ) )
 {
-    <div id="edit-item" style="transform: scale(0.64); transform-origin: top left; width: 156.25%; height: 156.25% ">
+    <div id="edit-item" style="transform: scale(0.64); transform-origin: top left; width: 156.25%">
 
         <h2 class="" style="width: auto;">
             <img alt="" src="@Url.Content("~/images/add.png")" />
@@ -554,6 +554,7 @@
 }
 
 <style>
+
     .form-group {
         display: flex;
         align-items: center;
@@ -593,6 +594,5 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
 
 </style>

@@ -10,16 +10,13 @@
     ViewBag.ViewName = "_ClientData";
 }
 
-
 @Html.Partial( "_Notification" )
-
 
 @{
     int count = Model.Start;
 
     List<ClientLoadCustomModel> items = ( List<ClientLoadCustomModel> ) Model.Items;
 }
-
 
 @if ( Model == null || !items.Any() )
 {
@@ -44,6 +41,7 @@
             <th>
                 Actions
             </th>
+            <th></th>
             <th>
                 Pallet Date
             </th>
@@ -89,32 +87,47 @@
 
                         @Html.ActionLink( "Edit", "EditClientData", new { id = item.Id, returnView = "Pallet" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
                     </td>
+                    <td width="8%">
+                        <div class="button-container">
+                            <a data-upload-pod="1" data-id="@item.Id" class="pod-button pod-upload-button">
+                                UPLOAD POD
+                                <span id="loader"></span>
+                            </a>
+                            <a data-view-pod="1" data-id="@item.Id" class="pod-button pod-view-button">
+                                VIEW POD
+                                <span id="loader"></span>
+                            </a>
+                        </div>
+                    </td>
                     <td>
                         @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
                     </td>
                     <td>
-                        @item.ClientName
+                        @item.DebtorsCode
+                    </td>
+                    <td>
+                        @item.GLID
                     </td>
                     <td>
                         @item.SupplierFrom
                     </td>
                     <td>
-                        @item.CustomerTo
-                    </td>
-                    <td>
-                        @item.CustomerGroup
-                    </td>
-                    <td>
                         @item.LoadNumber
                     </td>
                     <td>
-                        @item.TransporterName
+                        @item.RegionName
                     </td>
                     <td>
-                        @item.TransporterName
+                        @item.ClientLoadNotes
                     </td>
                     <td>
-                        @item.TransporterName
+                        @if ( item.LoadType.HasValue )
+                        {
+                            @item.LoadType.Value.ToString()
+                        }
+                    </td>
+                    <td>
+                        @item.CustomerTo
                     </td>
                 </tr>
 
@@ -126,3 +139,30 @@
 </table>
 
 @Html.Partial( "_Paging" )
+
+<style>
+    .button-container {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .pod-button {
+        background-color: lightblue;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .pod-upload-button {
+        background: lightseagreen;
+    }
+
+    .pod-view-button {
+        background: lightblue;
+    }
+</style>
