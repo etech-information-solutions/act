@@ -41,35 +41,35 @@
 <table id="ClientData-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#ClientData-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
-            <th data-name="Count">
-                #
-            </th>
-            <th data-name="LoadDate" data-column="cl.LoadDate">
-                Load Date
-            </th>
-            <th data-name="Client" data-column="c.Client">
-                Client Name
-            </th>
-            <th data-name="SupplierFrom" data-column="cs1.Description">
-                Supplier From
-            </th>
-            <th data-name="CustomerTo" data-column="cs2.Description">
-                Customer To
-            </th>
-            <th data-name="CustomerGroup" data-column="g.Name">
-                Customer Group
-            </th>
-            <th data-name="" data-column="">
-                Load/Shipment
-            </th>
-            <th data-name="" data-column="">
-                Transporter Name
-            </th>
-            <th data-name="" data-column="">
-                Status
-            </th>
-            <th data-name="Actions">
+            <th>
                 Actions
+            </th>
+            <th>
+                Pallet Date
+            </th>
+            <th>
+                Debtors Code
+            </th>
+            <th>
+                GLID
+            </th>
+            <th>
+                Supplier
+            </th>
+            <th>
+                Load Number
+            </th>
+            <th>
+                Region
+            </th>
+            <th>
+                Comment
+            </th>
+            <th>
+                Type
+            </th>
+            <th>
+                Customer
             </th>
         </tr>
     </thead>
@@ -79,13 +79,15 @@
         {
             foreach ( var item in items )
             {
-                Status status = ( Status ) item.Status;
-                string active = ( status == Status.Active ) ? "active" : "inactive";
-                string enable = ( status == Status.Active ) ? "Disable" : "Enable";
 
                 <tr id="clientdata-@item.Id-item" class="clientdata-@item.Id-item ">
-                    <td>
-                        @count
+                    <td width="10%">
+
+                        @*@Html.ActionLink( "Details", "ClientDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )*@
+
+                        @Html.ActionLink( "Delete", "DeleteClientData", new { id = item.Id }, new { @class = "del", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = "Delete this item?" } )
+
+                        @Html.ActionLink( "Edit", "EditClientData", new { id = item.Id, returnView = "Pallet" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
                     </td>
                     <td>
                         @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
@@ -109,22 +111,13 @@
                         @item.TransporterName
                     </td>
                     <td>
-                        @status.GetDisplayText()
+                        @item.TransporterName
                     </td>
-                    <td width="15%">
-
-                        <div style="border-bottom: 1px dashed #7368e3; padding-bottom: 4px; margin-bottom: 10px;">
-
-                            @Html.ActionLink( "Details", "ClientDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
-
-                            @Html.ActionLink( "Edit", "EditClientData", new { id = item.Id, returnView = "Pallet" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
-
-                            @Html.ActionLink( enable, "DeleteClientData", new { id = item.Id }, new { @class = "warn", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = enable + " this item?" } )
-
-                        </div>
+                    <td>
+                        @item.TransporterName
                     </td>
                 </tr>
-                
+
                 count++;
             }
         }

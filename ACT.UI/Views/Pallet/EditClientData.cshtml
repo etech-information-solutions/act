@@ -35,11 +35,17 @@
                     <div class="editor-label">
                         @Html.LabelFor( model => model.ClientId )
                     </div>
-                    <div class="editor-field">
+                    <div class="editor-field" data-populate-customers="1">
                         @Html.DropDownListFor( model => model.ClientId,
                             new SelectList( Model.ClientOptions, "Key", "Value" ),
                             "Select Client",
-                            new { @class = "" } )
+                            new
+                                 {
+                                     @class = "",
+                                @data_populate_customers = "1",
+                                @data_id_field = "#ClientId",
+                                @data_client_options_field = "#ClientOptions"
+                            } )
                         @Html.ValidationMessageFor( model => model.ClientId )
                     </div>
                 </div>
@@ -105,13 +111,14 @@
                             new SelectList( Model.CustomerSiteOptions, "Key", "Value" ),
                             "Select Customer To",
                             new
-                                 {
-                                @class = "",
-                                @style = "width: 98%;",
+                            {
+                                @class = "fixed-width-dropdown",
                                 @data_populate_region = "1",
                                 @data_is_supplier = "false",
                                 @data_region_id_field = "#RegionToId",
-                                @data_region_name_field = "#RegionToName"
+                                @data_region_name_field = "#RegionToName",
+                                @data_clientsiteidto_field = "#ClientSiteIdTo",
+                                name = "ClientSiteIdTo"
                             } )
                         @Html.ValidationMessageFor( model => model.ClientSiteIdTo )
                     </div>
@@ -563,4 +570,18 @@
     .chzn {
         width: 100%;
     }
+
+    .fixed-width-dropdown {
+        width: 260px;
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .fixed-width-dropdown option {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 </style>

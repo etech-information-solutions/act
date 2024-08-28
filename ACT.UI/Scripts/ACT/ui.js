@@ -72,7 +72,6 @@
             this.DataDeleteImage( $( '*[data-delete-image="1"]' ) );
             this.DataUploadImage( $( '*[data-upload-image="1"]' ) );
             this.DataDeleteDocument( $( '*[data-delete-document="1"]' ) );
-            this.DataAddMoreEquipmentDetails( $( '[data-add-section="1"]' ) );
 
             // Table CRUD Operations
             this.DataEdit( $( '*[data-edit="1"]' ) );
@@ -99,8 +98,10 @@
             this.DataLoadExtra( $( '[data-load-extra="1"]' ) );
             this.DataLoadVersion( $( '[data-load-version="1"]' ) );
 
+            // Client Load functionality (Region, Customer Selections, Equipment Details)
             this.DataPopulateRegions( $( '*[data-populate-region="1"]' ) );
             this.PopulateCustomers( $( '*[data-populate-customers="1"]' ) );
+            this.DataAddMoreEquipmentDetails( $( '[data-add-section="1"]' ) );
 
 
             // Table Quick Links Operations
@@ -1554,206 +1555,6 @@
             } );
         },
 
-        DataAddMoreEquipmentDetails: function ( sender )
-        {
-            var target = $( sender.attr( 'data-target' ) );
-
-            // Function to calculate and update OutstandingQty for a specific row
-            function updateOutstandingQty ( section )
-            {
-                var fields = [ 'DeliveredQty', 'ReturnedTransferredQty', 'DebriefQty', 'TransporterLiable', 'AdminMovement' ];
-                var totals = [ 0, 0, 0 ];
-                fields.forEach( function ( field )
-                {
-                    section.find( 'input[name$=".' + field + '"]' ).each( function ( index )
-                    {
-                        var value = parseFloat( $( this ).val() ) || 0;
-                        // Subtract the value instead of adding
-                        if ( field === 'DeliveredQty' )
-                        {
-                            totals[ index ] += value; // Keep DeliveredQty as addition
-                        } else
-                        {
-                            totals[ index ] -= value; // Subtract all other fields
-                        }
-                        console.log( "Column: " + ( index + 1 ) + ", Field: " + field + ", Value: " + value + ", Running Total: " + totals[ index ] );
-                    } );
-                } );
-                section.find( 'input[name$=".OutstandingQtyAtCustomer"]' ).each( function ( index )
-                {
-                    $( this ).val( totals[ index ].toFixed( 2 ) );
-                    console.log( "Column: " + ( index + 1 ) + ", Final Total: " + totals[ index ] );
-                } );
-            }
-
-            // Function to handle input changes
-            function handleInputChange ()
-            {
-                var section = $( this ).closest( '.equipment-detail-section' );
-                updateOutstandingQty( section );
-            }
-
-            // Apply the event listener to all existing input fields
-            target.on( 'input', '.equipment-detail-section input[type="text"]', handleInputChange );
-
-            // Function to handle dropdown selection
-            function handleDropdownSelection ()
-            {
-                var selectedValue = $( this ).val();
-                var currentIndex = $( this ).data( 'index' );
-
-                console.log( "Dropdown changed!" );
-
-                // Remove the selected option in other dropdowns within the same section
-                $( this ).closest( '.equipment-detail-section' ).find( '.equipment-dropdown' ).each( function ()
-                {
-                    if ( $( this ).data( 'index' ) !== currentIndex )
-                    {
-                        $( this ).find( 'option[value="' + selectedValue + '"]' ).remove();
-                        console.log( "Product removed from other dropdowns!" );
-                    }
-                } );
-
-                // Re-initialize Chosen to reflect the changes
-                $( this ).closest( '.equipment-detail-section' ).find( '.equipment-dropdown' ).trigger( "chosen:updated" );
-            }
-
-            // Apply the event listener to all existing dropdowns
-            target.on( 'change', '.equipment-dropdown', handleDropdownSelection );
-
-            sender.unbind( 'click' );
-            sender.click( function ()
-            {
-                // Get the current number of sections
-                var sectionCount = target.find( '.equipment-detail-section' ).length;
-
-                // Create a new section
-                var newSection = $( '<div class="equipment-detail-section" style="margin-top: 35px !important"></div>' );
-                newSection.attr( 'data-section-index', sectionCount );
-
-                // Function to create new dropdowns
-                function createDropdowns ( fieldName, options )
-                {
-                    var editorField = $( '<div class="editor-field"></div>' );
-                    for ( var i = 0; i < 3; i++ )
-                    {
-                        var wrapper = $( '<div style="display: inline-block; margin-right: 10px; width: 21.1%;"></div>' );
-                        var select = $( '<select>', {
-                            name: 'EquipmentDetails[' + ( sectionCount * 3 + i ) + '].' + fieldName,
-                            id: 'EquipmentDetails_' + ( sectionCount * 3 + i ) + '__' + fieldName,
-                            class: 'chzn equipment-dropdown',
-                            style: 'width: 100%;',
-                            'data-index': i
-                        } );
-                        select.append( $( '<option></option>' ).attr( 'value', '' ).text( 'Select Equipment' ) );
-
-                        if ( typeof options === 'object' && options !== null )
-                        {
-                            $.each( options, function ( key, value )
-                            {
-                                select.append( $( '<option></option>' ).attr( 'value', key ).text( value ) );
-                            } );
-                        } else
-                        {
-                            console.warn( 'Equipment options are not available or not in the correct format' );
-                        }
-
-                        wrapper.append( select );
-                        editorField.append( wrapper );
-                    }
-                    return editorField;
-                }
-
-                // Function to create new input fields with default value
-                function createInputFields ( fieldName, defaultValue )
-                {
-                    var editorField = $( '<div class="editor-field"></div>' );
-                    for ( var i = 0; i < 3; i++ )
-                    {
-                        var input = $( '<input>', {
-                            type: 'text',
-                            name: 'EquipmentDetails[' + ( sectionCount * 3 + i ) + '].' + fieldName,
-                            id: 'EquipmentDetails_' + ( sectionCount * 3 + i ) + '__' + fieldName,
-                            class: 'input',
-                            style: 'width: 20%; margin-right: 5px;',
-                            value: defaultValue
-                        } );
-                        editorField.append( input );
-                    }
-                    return editorField;
-                }
-
-                // Get the equipment options from the first section's dropdown
-                var equipmentOptions = {};
-                var firstDropdown = target.find( '.equipment-detail-section:first select.equipment-dropdown:first' );
-                firstDropdown.find( 'option' ).each( function ()
-                {
-                    var option = $( this );
-                    if ( option.val() !== '' )
-                    {
-                        equipmentOptions[ option.val() ] = option.text();
-                    }
-                } );
-
-                // Add the dropdowns for ProductId
-                newSection.append( '<p><strong class="uppercase">Equipment Details</strong></p>' );
-                newSection.append( '<div class="editor-label" style="margin-top: 15px !important"><label for="EquipmentDetails_' + ( sectionCount * 3 ) + '__ProductId">Equipment</label></div>' );
-                newSection.append( createDropdowns( 'ProductId', equipmentOptions ) );
-
-                // Add input fields for other properties with default value of 0
-                var inputFields = [
-                    { name: 'DeliveredQty', label: 'Original Quantity' },
-                    { name: 'ReturnedTransferredQty', label: 'Return Qty' },
-                    { name: 'DebriefQty', label: 'Debrief Qty' },
-                    { name: 'TransporterLiable', label: 'Transporter Liable Qty' },
-                    { name: 'AdminMovement', label: 'Admin Movement' },
-                    { name: 'OutstandingQtyAtCustomer', label: 'Outstanding Qty' }
-                ];
-                inputFields.forEach( function ( field )
-                {
-                    newSection.append( '<div class="editor-label" style="margin-top: 15px !important"><label for="EquipmentDetails_' + ( sectionCount * 3 ) + '__' + field.name + '">' + field.label + '</label></div>' );
-                    var inputField = createInputFields( field.name, '0' );
-                    newSection.append( inputField );
-
-                    // Make OutstandingQty read-only
-                    if ( field.name === 'OutstandingQtyAtCustomer' )
-                    {
-                        inputField.find( 'input' ).prop( 'readonly', true );
-                    }
-                } );
-
-                // Add a dotted line break after the new section
-                var lineBreak = $( '<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; margin-top: 20px; height: 0;">&nbsp;</div>' );
-
-                // Append the new section and line break to the container
-                target.append( newSection );
-                target.append( lineBreak );
-
-                // Initialize Chosen for the new dropdowns
-                if ( $.fn.chosen )
-                {
-                    newSection.find( 'select.chzn' ).chosen();
-                } else
-                {
-                    console.warn( 'Chosen plugin is not available' );
-                }
-
-                // Reinitialize any other necessary plugins or events for the new section
-                if ( typeof ACT !== 'undefined' && ACT.Init && typeof ACT.Init.Start === 'function' )
-                {
-                    ACT.Init.Start( true );
-                } else
-                {
-                    console.warn( 'ACT.Init.Start is not available' );
-                }
-
-                // Initialize the OutstandingQty for the new section
-                updateOutstandingQty( newSection );
-
-                return false;
-            } );
-        },
-
         DataDelOneMore: function ( sender )
         {
             sender.each( function ()
@@ -2107,105 +1908,6 @@
                 {
 
                 } );
-            } );
-        },
-
-        DataPopulateRegions: function ( sender )
-        {
-            sender.each( function ()
-            {
-                console.log( "Region Being Populated:..." );
-                var i = $( this );
-                var dropdown = i.find( 'select[data-populate-region="1"]' );
-                var isSupplier = dropdown.data( 'is-supplier' ) === true;
-                var regionIdField = $( dropdown.data( 'region-id-field' ) );
-                var regionNameField = $( dropdown.data( 'region-name-field' ) );
-                dropdown.unbind( 'change' )
-                    .bind( 'change', function ()
-                    {
-                        var siteId = $( this ).val();
-                        if ( siteId )
-                        {
-                            var url = isSupplier ? '/Pallet/GetSupplierRegion' : '/Pallet/GetCustomerRegion';
-                            $.getJSON( url, { siteId: siteId } )
-                                .done( function ( data )
-                                {
-                                    if ( data && data.regionId != null )
-                                    {
-                                        regionIdField.val( data.regionId );
-                                        regionNameField.val( data.regionName );
-                                    } else
-                                    {
-                                        regionIdField.val( '' );
-                                        regionNameField.val( 'No region found' );
-                                    }
-                                } )
-                                .fail( function ()
-                                {
-                                    console.error( "Failed to fetch region data" );
-                                    regionIdField.val( '' );
-                                    regionNameField.val( 'Error fetching region' );
-                                } );
-                        } else
-                        {
-                            regionIdField.val( '' );
-                            regionNameField.val( '' );
-                        }
-                    } );
-            } );
-        },
-
-        PopulateCustomers: function ( sender )
-        {
-            console.log( "PopulateCustomers function called" );
-            sender.each( function ()
-            {
-                console.log( "Processing a sender element" );
-                var i = $( this );
-                var clientDropdown = i.find( 'select[data-populate-customers="1"]' );
-                var customerDropdown = $( 'select[name="ClientSiteIdTo"]' );
-                console.log( "Client dropdown found:", clientDropdown.length );
-                console.log( "Customer dropdown found:", customerDropdown.length );
-                if ( clientDropdown.length === 0 )
-                {
-                    console.error( "Client dropdown not found" );
-                    return;
-                }
-                clientDropdown.unbind( 'change' ).bind( 'change', function ()
-                {
-                    var clientId = $( this ).val();
-                    console.log( "Client dropdown changed. Selected ID:", clientId );
-                    if ( clientId )
-                    {
-                        $.getJSON( '/Pallet/GetCustomersForClient', { clientId: clientId } )
-                            .done( function ( data )
-                            {
-                                console.log( "Received customer data:", data );
-                                customerDropdown.empty();
-                                customerDropdown.append( $( '<option></option>' ).val( '' ).text( 'Select Customer To' ) );
-                                $.each( data, function ( index, item )
-                                {
-                                    customerDropdown.append( $( '<option></option>' ).val( item.id ).text( item.name ) );
-                                } );
-                                customerDropdown.prop( 'disabled', false );
-                            } )
-                            .fail( function ( jqXHR, textStatus, errorThrown )
-                            {
-                                console.error( "Failed to fetch customer data", textStatus, errorThrown );
-                                console.error( "Response text:", jqXHR.responseText );
-                                customerDropdown.empty();
-                                customerDropdown.append( $( '<option></option>' ).val( '' ).text( 'Error fetching customers' ) );
-                                customerDropdown.prop( 'disabled', true );
-                            } );
-                    } else
-                    {
-                        console.log( "No client selected, resetting customer dropdown" );
-                        customerDropdown.empty();
-                        customerDropdown.append( $( '<option></option>' ).val( '' ).text( 'Select Customer To' ) );
-                        customerDropdown.prop( 'disabled', true );
-                    }
-                } );
-                console.log( "Change event bound to client dropdown" );
             } );
         },
 
@@ -4968,8 +4670,6 @@
             } );
         },
 
-
-
         DataDNClient: function ( sender )
         {
             sender.each( function ()
@@ -5119,7 +4819,6 @@
             } );
         },
 
-
         DataDisputeStatus: function ( sender )
         {
             sender.each( function ()
@@ -5262,8 +4961,6 @@
             } )
         },
 
-
-
         DataReconcileLoadsDragDrop: function ( draggable, droppable )
         {
 
@@ -5338,8 +5035,6 @@
                     } );
             } );
         },
-
-
 
         DataReconcileInvoicesDragDrop: function ( draggable, droppable )
         {
@@ -6626,6 +6321,307 @@
                             } );
                     }
                 } );
+            } );
+        },
+
+        /* Client Load Functionality for Region, Customer Select and Equipment Details */
+
+        DataPopulateRegions: function ( sender )
+        {
+            sender.each( function ()
+            {
+                console.log( "Region Being Populated:..." );
+                var i = $( this );
+                var dropdown = i.find( 'select[data-populate-region="1"]' );
+                var isSupplier = dropdown.data( 'is-supplier' ) === true;
+                var regionIdField = $( dropdown.data( 'region-id-field' ) );
+                var regionNameField = $( dropdown.data( 'region-name-field' ) );
+                dropdown.unbind( 'change' )
+                    .bind( 'change', function ()
+                    {
+                        var siteId = $( this ).val();
+                        if ( siteId )
+                        {
+                            var url = isSupplier ? '/Pallet/GetSupplierRegion' : '/Pallet/GetCustomerRegion';
+                            $.getJSON( url, { siteId: siteId } )
+                                .done( function ( data )
+                                {
+                                    if ( data && data.regionId != null )
+                                    {
+                                        regionIdField.val( data.regionId );
+                                        regionNameField.val( data.regionName );
+                                    } else
+                                    {
+                                        regionIdField.val( '' );
+                                        regionNameField.val( 'No region found' );
+                                    }
+                                } )
+                                .fail( function ()
+                                {
+                                    console.error( "Failed to fetch region data" );
+                                    regionIdField.val( '' );
+                                    regionNameField.val( 'Error fetching region' );
+                                } );
+                        } else
+                        {
+                            regionIdField.val( '' );
+                            regionNameField.val( '' );
+                        }
+                    } );
+            } );
+        },
+
+        PopulateCustomers: function ( sender )
+        {
+            console.log( "PopulateCustomers function called" );
+            sender.each( function ()
+            {
+                console.log( "Processing a sender element" );
+                var i = $( this );
+                var clientDropdown = i.find( 'select[data-populate-customers="1"]' );
+                var customerDropdown = $( 'select[name="ClientSiteIdTo"]' );
+                console.log( "Client dropdown found:", clientDropdown.length );
+                console.log( "Customer dropdown found:", customerDropdown.length );
+                if ( clientDropdown.length === 0 )
+                {
+                    console.error( "Client dropdown not found" );
+                    return;
+                }
+                clientDropdown.unbind( 'change' ).bind( 'change', function ()
+                {
+                    var clientId = $( this ).val();
+                    console.log( "Client dropdown changed. Selected ID:", clientId );
+                    if ( clientId )
+                    {
+                        $.getJSON( '/Pallet/GetCustomersForClient', { clientId: clientId } )
+                            .done( function ( data )
+                            {
+                                console.log( "Received customer data:", data );
+                                customerDropdown.empty();
+                                customerDropdown.append( $( '<option></option>' ).val( '' ).text( 'Select Customer To' ) );
+                                $.each( data, function ( index, item )
+                                {
+                                    customerDropdown.append( $( '<option></option>' ).val( item.id ).text( item.name ) );
+                                } );
+                                customerDropdown.prop( 'disabled', false );
+                            } )
+                            .fail( function ( jqXHR, textStatus, errorThrown )
+                            {
+                                console.error( "Failed to fetch customer data", textStatus, errorThrown );
+                                console.error( "Response text:", jqXHR.responseText );
+                                customerDropdown.empty();
+                                customerDropdown.append( $( '<option></option>' ).val( '' ).text( 'Error fetching customers' ) );
+                                customerDropdown.prop( 'disabled', true );
+                            } );
+                    } else
+                    {
+                        console.log( "No client selected, resetting customer dropdown" );
+                        customerDropdown.empty();
+                        customerDropdown.append( $( '<option></option>' ).val( '' ).text( 'Select Customer To' ) );
+                        customerDropdown.prop( 'disabled', true );
+                    }
+                } );
+                console.log( "Change event bound to client dropdown" );
+            } );
+        },
+
+        DataAddMoreEquipmentDetails: function ( sender )
+        {
+            var target = $( sender.attr( 'data-target' ) );
+
+            // Function to calculate and update OutstandingQty for a specific row
+            function updateOutstandingQty ( section )
+            {
+                var fields = [ 'DeliveredQty', 'ReturnedTransferredQty', 'DebriefQty', 'TransporterLiable', 'AdminMovement' ];
+                var totals = [ 0, 0, 0 ];
+                fields.forEach( function ( field )
+                {
+                    section.find( 'input[name$=".' + field + '"]' ).each( function ( index )
+                    {
+                        var value = parseFloat( $( this ).val() ) || 0;
+                        // Subtract the value
+                        if ( field === 'DeliveredQty' )
+                        {
+                            totals[ index ] += value; // Keep DeliveredQty as addition
+                        } else
+                        {
+                            totals[ index ] -= value; // Subtract all other fields
+                        }
+                        console.log( "Column: " + ( index + 1 ) + ", Field: " + field + ", Value: " + value + ", Running Total: " + totals[ index ] );
+                    } );
+                } );
+                section.find( 'input[name$=".OutstandingQtyAtCustomer"]' ).each( function ( index )
+                {
+                    $( this ).val( totals[ index ].toFixed( 2 ) );
+                    console.log( "Column: " + ( index + 1 ) + ", Final Total: " + totals[ index ] );
+                } );
+            }
+
+            // Function to handle input changes
+            function handleInputChange ()
+            {
+                var section = $( this ).closest( '.equipment-detail-section' );
+                updateOutstandingQty( section );
+            }
+
+            // Apply the event listener to all existing input fields
+            target.on( 'input', '.equipment-detail-section input[type="text"]', handleInputChange );
+
+            // Function to handle dropdown selection
+            function handleDropdownSelection ()
+            {
+                var selectedValue = $( this ).val();
+                var currentIndex = $( this ).data( 'index' );
+
+                console.log( "Dropdown changed!" );
+
+                // Remove the selected option in other dropdowns within the same section
+                $( this ).closest( '.equipment-detail-section' ).find( '.equipment-dropdown' ).each( function ()
+                {
+                    if ( $( this ).data( 'index' ) !== currentIndex )
+                    {
+                        $( this ).find( 'option[value="' + selectedValue + '"]' ).remove();
+                        console.log( "Product removed from other dropdowns!" );
+                    }
+                } );
+
+                // Re-initialize Chosen to reflect the changes
+                $( this ).closest( '.equipment-detail-section' ).find( '.equipment-dropdown' ).trigger( "chosen:updated" );
+            }
+
+            // Apply the event listener to all existing dropdowns
+            target.on( 'change', '.equipment-dropdown', handleDropdownSelection );
+
+            sender.unbind( 'click' );
+            sender.click( function ()
+            {
+                // Get the current number of sections
+                var sectionCount = target.find( '.equipment-detail-section' ).length;
+
+                // Create a new section
+                var newSection = $( '<div class="equipment-detail-section" style="margin-top: 35px !important"></div>' );
+                newSection.attr( 'data-section-index', sectionCount );
+
+                // Function to create new dropdowns
+                function createDropdowns ( fieldName, options )
+                {
+                    var editorField = $( '<div class="editor-field"></div>' );
+                    for ( var i = 0; i < 3; i++ )
+                    {
+                        var wrapper = $( '<div style="display: inline-block; margin-right: 10px; width: 21.1%;"></div>' );
+                        var select = $( '<select>', {
+                            name: 'EquipmentDetails[' + ( sectionCount * 3 + i ) + '].' + fieldName,
+                            id: 'EquipmentDetails_' + ( sectionCount * 3 + i ) + '__' + fieldName,
+                            class: 'chzn equipment-dropdown',
+                            style: 'width: 100%;',
+                            'data-index': i
+                        } );
+                        select.append( $( '<option></option>' ).attr( 'value', '' ).text( 'Select Equipment' ) );
+
+                        if ( typeof options === 'object' && options !== null )
+                        {
+                            $.each( options, function ( key, value )
+                            {
+                                select.append( $( '<option></option>' ).attr( 'value', key ).text( value ) );
+                            } );
+                        } else
+                        {
+                            console.warn( 'Equipment options are not available or not in the correct format' );
+                        }
+
+                        wrapper.append( select );
+                        editorField.append( wrapper );
+                    }
+                    return editorField;
+                }
+
+                // Function to create new input fields with default value
+                function createInputFields ( fieldName, defaultValue )
+                {
+                    var editorField = $( '<div class="editor-field"></div>' );
+                    for ( var i = 0; i < 3; i++ )
+                    {
+                        var input = $( '<input>', {
+                            type: 'text',
+                            name: 'EquipmentDetails[' + ( sectionCount * 3 + i ) + '].' + fieldName,
+                            id: 'EquipmentDetails_' + ( sectionCount * 3 + i ) + '__' + fieldName,
+                            class: 'input',
+                            style: 'width: 20%; margin-right: 5px;',
+                            value: defaultValue
+                        } );
+                        editorField.append( input );
+                    }
+                    return editorField;
+                }
+
+                // Get the equipment options from the first section's dropdown
+                var equipmentOptions = {};
+                var firstDropdown = target.find( '.equipment-detail-section:first select.equipment-dropdown:first' );
+                firstDropdown.find( 'option' ).each( function ()
+                {
+                    var option = $( this );
+                    if ( option.val() !== '' )
+                    {
+                        equipmentOptions[ option.val() ] = option.text();
+                    }
+                } );
+
+                // Add the dropdowns for ProductId
+                newSection.append( '<p><strong class="uppercase">Equipment Details</strong></p>' );
+                newSection.append( '<div class="editor-label" style="margin-top: 15px !important"><label for="EquipmentDetails_' + ( sectionCount * 3 ) + '__ProductId">Equipment</label></div>' );
+                newSection.append( createDropdowns( 'ProductId', equipmentOptions ) );
+
+                // Add input fields for other properties with default value of 0
+                var inputFields = [
+                    { name: 'DeliveredQty', label: 'Original Quantity' },
+                    { name: 'ReturnedTransferredQty', label: 'Return Qty' },
+                    { name: 'DebriefQty', label: 'Debrief Qty' },
+                    { name: 'TransporterLiable', label: 'Transporter Liable Qty' },
+                    { name: 'AdminMovement', label: 'Admin Movement' },
+                    { name: 'OutstandingQtyAtCustomer', label: 'Outstanding Qty' }
+                ];
+                inputFields.forEach( function ( field )
+                {
+                    newSection.append( '<div class="editor-label" style="margin-top: 15px !important"><label for="EquipmentDetails_' + ( sectionCount * 3 ) + '__' + field.name + '">' + field.label + '</label></div>' );
+                    var inputField = createInputFields( field.name, '0' );
+                    newSection.append( inputField );
+
+                    // Make OutstandingQty read-only
+                    if ( field.name === 'OutstandingQtyAtCustomer' )
+                    {
+                        inputField.find( 'input' ).prop( 'readonly', true );
+                    }
+                } );
+
+                // Add a dotted line break after the new section
+                var lineBreak = $( '<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; margin-top: 20px; height: 0;">&nbsp;</div>' );
+
+                // Append the new section and line break to the container
+                target.append( newSection );
+                target.append( lineBreak );
+
+                // Initialize Chosen for the new dropdowns
+                if ( $.fn.chosen )
+                {
+                    newSection.find( 'select.chzn' ).chosen();
+                } else
+                {
+                    console.warn( 'Chosen plugin is not available' );
+                }
+
+                // Reinitialize any other necessary plugins or events for the new section
+                if ( typeof ACT !== 'undefined' && ACT.Init && typeof ACT.Init.Start === 'function' )
+                {
+                    ACT.Init.Start( true );
+                } else
+                {
+                    console.warn( 'ACT.Init.Start is not available' );
+                }
+
+                // Initialize the OutstandingQty for the new section
+                updateOutstandingQty( newSection );
+
+                return false;
             } );
         },
 
