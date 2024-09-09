@@ -664,7 +664,7 @@ namespace ACT.Core.Services
                     }
                 }
 
-                var props = newItem.GetType().GetProperties();
+                var props = newItem?.GetType().GetProperties();
 
                 foreach ( var item in props )
                 {

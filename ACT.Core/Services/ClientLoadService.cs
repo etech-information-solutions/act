@@ -258,48 +258,48 @@ namespace ACT.Core.Services
             #endregion
 
             string query = @"SELECT
-                        cl.*,
-                        cl.DebtorsCode AS [DebtorsCode],
-                        CAST(cl.LoadType AS INT) AS [LoadType],
-                        g.Name AS [CustomerGroup],
-                        cg.GroupName AS [CustomerGroup], 
-                        cc.CustomerName AS [CustomerTo],
-                        s.Id AS [SiteId],
-                        s2.Id AS [ToSiteId],
-                        s.Description AS [SiteName],
-                        ss.Name AS [SupplierFrom],
-                        a.ProvinceId AS [RegionId],
-                        p.Name AS [RegionName],  
-                        pc.[Comment] AS [PODComment],
-                        t.[Name] AS [TransporterName], 
-                        c.CompanyName AS [ClientName],
-                        s2.Description AS [ToSiteName],
-                        ch.[DocketNumber] AS [DocketNumber],
-                        ch.[InvoiceNumber] AS [InvoiceNumber], 
-                        ch.[LocationId] AS [ChepAccountGLIDNo],
-                        otr.[Description] AS [OutstandingReason],
-                        v.[Registration] AS [VehicleRegistration],
-                        (SELECT COUNT(1) FROM [dbo].[Task] t WHERE cl.Id=t.ClientLoadId) AS [TaskCount],
-                        (SELECT COUNT(1) FROM [dbo].[Journal] j WHERE cl.Id=j.ClientLoadId) AS [JournalCount],
-                        (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ClientLoad') AS [DocumentCount]
-                      FROM
-                        [dbo].[ClientLoad] cl
-                        INNER JOIN [dbo].[Client] c ON c.[Id]=cl.[ClientId]
-                        LEFT OUTER JOIN [dbo].[Vehicle] v ON v.[Id]=cl.[VehicleId]
-                        LEFT OUTER JOIN [dbo].[Transporter] t ON t.[Id]=cl.[TransporterId]
-                        LEFT OUTER JOIN [dbo].[PODComment] pc ON pc.[Id]=cl.[PODCommentId] 
-                        LEFT OUTER JOIN [dbo].[ClientSite] cs1 ON cs1.[Id]=cl.[ClientSiteId]
-                        LEFT OUTER JOIN [dbo].[ClientSite] cs2 ON cs2.[Id]=cl.[ToClientSiteId]
-                        LEFT OUTER JOIN [dbo].[SupplierSite] ss ON ss.[Id]=cl.[ClientSiteId]
-                        LEFT OUTER JOIN [dbo].[Address] a ON a.[ObjectId]=ss.[Id] AND a.[ObjectType]='SupplierSite'  
-                        LEFT OUTER JOIN [dbo].[Province] p ON p.[Id]=a.[ProvinceId]
-                        LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cc.[Id]=cl.[ToClientSiteId]
-                        LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs1.[SiteId]
-                        LEFT OUTER JOIN [dbo].[Site] s2 ON s2.[Id]=cs2.[SiteId]
-                        LEFT OUTER JOIN [dbo].[OutstandingReason] otr ON otr.[Id]=cl.[OutstandingReasonId]
-                        LEFT OUTER JOIN [dbo].[ClientGroup] cg ON cg.[ClientId]=cl.[ClientId] 
-                        LEFT OUTER JOIN [dbo].[Group] g ON g.[Id]=cg.[GroupId]
-                        LEFT OUTER JOIN [dbo].[ChepLoad] ch ON ch.[Id]=(SELECT TOP 1 ch1.[Id] FROM [dbo].[ChepLoad] ch1 WHERE ch1.[ClientId]=cl.[ClientId] AND cl.[ReceiverNumber] IS NOT NULL AND cl.[ReceiverNumber] != '' AND (RTRIM(LTRIM(cl.[ReceiverNumber])) LIKE '%' + RTRIM(LTRIM(ch1.Ref)) +'%' OR RTRIM(LTRIM(cl.[ReceiverNumber])) LIKE '%' + RTRIM(LTRIM(ch1.OtherRef)) +'%'))";
+                cl.*,
+                cl.DebtorsCode AS [DebtorsCode],
+                CAST(cl.LoadType AS INT) AS [LoadType],
+                g.Name AS [CustomerGroup],
+                cg.GroupName AS [CustomerGroup], 
+                cc.CustomerName AS [CustomerTo],
+                s.Id AS [SiteId],
+                s2.Id AS [ToSiteId],
+                s.Description AS [SiteName],
+                ss.Name AS [SupplierFrom],
+                a.ProvinceId AS [RegionId],
+                p.Name AS [RegionName],  
+                pc.[Comment] AS [PODComment],
+                t.[Name] AS [TransporterName], 
+                c.CompanyName AS [ClientName],
+                s2.Description AS [ToSiteName],
+                ch.[DocketNumber] AS [DocketNumber],
+                ch.[InvoiceNumber] AS [InvoiceNumber], 
+                ch.[LocationId] AS [ChepAccountGLIDNo],
+                otr.[Description] AS [OutstandingReason],
+                v.[Registration] AS [VehicleRegistration],
+                (SELECT COUNT(1) FROM [dbo].[Task] t WHERE cl.Id=t.ClientLoadId) AS [TaskCount],
+                (SELECT COUNT(1) FROM [dbo].[Journal] j WHERE cl.Id=j.ClientLoadId) AS [JournalCount],
+                (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ClientLoad') AS [DocumentCount]
+              FROM
+                [dbo].[ClientLoad] cl
+                INNER JOIN [dbo].[Client] c ON c.[Id]=cl.[ClientId]
+                LEFT OUTER JOIN [dbo].[Vehicle] v ON v.[Id]=cl.[VehicleId]
+                LEFT OUTER JOIN [dbo].[Transporter] t ON t.[Id]=cl.[TransporterId]
+                LEFT OUTER JOIN [dbo].[PODComment] pc ON pc.[Id]=cl.[PODCommentId] 
+                LEFT OUTER JOIN [dbo].[ClientSite] cs1 ON cs1.[Id]=cl.[ClientSiteId]
+                LEFT OUTER JOIN [dbo].[ClientSite] cs2 ON cs2.[Id]=cl.[ToClientSiteId]
+                LEFT OUTER JOIN [dbo].[SupplierSite] ss ON ss.[Id]=cl.[ClientSiteId]
+                LEFT OUTER JOIN [dbo].[Address] a ON a.[ObjectId]=ss.[Id] AND a.[ObjectType]='SupplierSite'  
+                LEFT OUTER JOIN [dbo].[Province] p ON p.[Id]=a.[ProvinceId]
+                LEFT OUTER JOIN [dbo].[ClientCustomer] cc ON cc.[Id]=cl.[ToClientSiteId]
+                LEFT OUTER JOIN [dbo].[Site] s ON s.[Id]=cs1.[SiteId]
+                LEFT OUTER JOIN [dbo].[Site] s2 ON s2.[Id]=cs2.[SiteId]
+                LEFT OUTER JOIN [dbo].[OutstandingReason] otr ON otr.[Id]=cl.[OutstandingReasonId]
+                LEFT OUTER JOIN [dbo].[ClientGroup] cg ON cg.[ClientId]=cl.[ClientId] 
+                LEFT OUTER JOIN [dbo].[Group] g ON g.[Id]=cg.[GroupId]
+                LEFT OUTER JOIN [dbo].[ChepLoad] ch ON ch.[Id]=(SELECT TOP 1 ch1.[Id] FROM [dbo].[ChepLoad] ch1 WHERE ch1.[ClientId]=cl.[ClientId] AND cl.[ReceiverNumber] IS NOT NULL AND cl.[ReceiverNumber] != '' AND (RTRIM(LTRIM(cl.[ReceiverNumber])) LIKE '%' + RTRIM(LTRIM(ch1.Ref)) +'%' OR RTRIM(LTRIM(cl.[ReceiverNumber])) LIKE '%' + RTRIM(LTRIM(ch1.OtherRef)) +'%'))";
 
             // WHERE
 

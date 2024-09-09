@@ -93,14 +93,14 @@
             </li>
         }
 
-        @if ( User.Has( PermissionTo.View, PermissionContext.Finance ) )
+        @*@if ( User.Has( PermissionTo.View, PermissionContext.Finance ) )
         {
             <li data-hot-spot="1" data-c="Finance" data-t="" class="@(controller.ToLower().Equals( "finance" ) ? "current" : "")">
                 <a rel="tipsyW" title="Finance" href="@Url.Action( "Index", "Finance" )">
                     <span>Finance</span>
                 </a>
             </li>
-        }
+        }*@
 
         @if ( User.Has( PermissionTo.View, PermissionContext.Transporter ) )
         {

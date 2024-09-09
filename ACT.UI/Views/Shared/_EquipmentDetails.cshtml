@@ -1,7 +1,7 @@
 ﻿@model ACT.UI.Models.ClientLoadViewModel
 @for ( int section = 0; section < ( Model.EquipmentDetails.Count + 2 ) / 3; section++ )
 {
-    <div class="equipment-detail-section">
+    <div class="equipment-detail-section" style="width: 110%; ">
         <p>
             <strong class="uppercase">Equipment Details</strong>
         </p>
@@ -13,7 +13,7 @@
                 @for ( int i = 0; i < 3 && ( section * 3 + i ) < Model.EquipmentDetails.Count; i++ )
                 {
                     var index = section * 3 + i;
-                    <div style="display: inline-block; width: 30% !important;">
+                    <div style="display: inline-block; width: 28%;">
                         @Html.DropDownListFor(
                             m => m.EquipmentDetails[ index ].ProductId,
                             new SelectList(

@@ -32,13 +32,16 @@
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.ClientId )
+                        @Html.LabelFor( model => model.ClientId, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field" data-populate-customers="1">
                         @Html.DropDownListFor( model => model.ClientId,
                             new SelectList( Model.ClientOptions, "Key", "Value" ),
                             "Select Client",
-                            new { @class = "", 
+                            new
+                                 {
+                                @class = "",
+                                @style = "width: 94%;margin-left: 25px;font-size: 15px;height: auto;padding: 5px;",
                                 @data_populate_customers = "1",
                                 @data_id_field = "#ClientId",
                                 @data_client_options_field = "#ClientOptions"
@@ -49,29 +52,29 @@
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.LoadNumber )
+                        @Html.LabelFor( model => model.LoadNumber, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.LoadNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.LoadNumber, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.LoadNumber )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.LoadDate )
+                        @Html.LabelFor( model => model.LoadDate, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor( model => model.LoadDate,
                             Model.LoadDate.HasValue ? Model.LoadDate.Value.ToString( "yyyy-MM-dd" ) : "",
-                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd" } )
+                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.LoadDate )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.ClientSiteId )
+                        @Html.LabelFor( model => model.ClientSiteId, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field" data-populate-region="1">
                         @Html.DropDownListFor( model => model.ClientSiteId,
@@ -80,7 +83,7 @@
                             new
                             {
                                 @class = "",
-                                @style = "width: 98%;",
+                                @style = "width: 94%;margin-left: 25px;font-size: 15px;height: auto;padding: 5px;",
                                 @data_populate_region = "1",
                                 @data_is_supplier = "true",
                                 @data_region_id_field = "#RegionFromId",
@@ -92,18 +95,18 @@
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.RegionFromId )
+                        @Html.LabelFor( model => model.RegionFromId, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
                         @Html.HiddenFor( model => model.RegionFromId )
-                        @Html.TextBoxFor( model => model.RegionFromName, new { @readonly = "readonly", @placeholder = "Field Auto Generated" } )
+                        @Html.TextBoxFor( model => model.RegionFromName, new { @readonly = "readonly", @placeholder = "Field Auto Generated", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.RegionFromId )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.ClientSiteIdTo )
+                        @Html.LabelFor( model => model.ClientSiteIdTo, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field" data-populate-region="1">
                         @Html.DropDownListFor( model => model.ClientSiteIdTo,
@@ -112,6 +115,7 @@
                             new
                             {
                                 @class = "fixed-width-dropdown",
+                                @style = "width: 94%;margin-left: 25px;font-size: 15px;height: auto;padding: 5px;",
                                 @data_populate_region = "1",
                                 @data_is_supplier = "false",
                                 @data_region_id_field = "#RegionToId",
@@ -125,58 +129,58 @@
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.RegionToId )
+                        @Html.LabelFor( model => model.RegionToId, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
                         @Html.HiddenFor( model => model.RegionToId )
-                        @Html.TextBoxFor( model => model.RegionToName, new { @readonly = "readonly", @placeholder = "Field Auto Generated" } )
+                        @Html.TextBoxFor( model => model.RegionToName, new { @readonly = "readonly", @placeholder = "Field Auto Generated", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.RegionToId )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.ClientGroupId )
+                        @Html.LabelFor( model => model.ClientGroupId, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.DropDownListFor( model => model.ClientGroupId, new SelectList( Model.ClientGroupOptions, "Key", "Value" ), "Select Customer Group", new { @class = "", @style = "width: 98%;" } )
+                        @Html.DropDownListFor( model => model.ClientGroupId, new SelectList( Model.ClientGroupOptions, "Key", "Value" ), "Select Customer Group", new { @class = "", @style = "width: 94%;margin-left: 25px;font-size: 15px;height: auto;padding: 5px;" } )
                         @Html.ValidationMessageFor( model => model.ClientGroupId )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.DeliveryNote )
+                        @Html.LabelFor( model => model.DeliveryNote, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.DeliveryNote, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.DeliveryNote, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.DeliveryNote )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.ChepInvoiceNo )
+                        @Html.LabelFor( model => model.ChepInvoiceNo, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.ChepInvoiceNo, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.ChepInvoiceNo, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.ChepInvoiceNo )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.OrderNumber )
+                        @Html.LabelFor( model => model.OrderNumber, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.OrderNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.OrderNumber, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.OrderNumber )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.PrimarySecondary )
+                        @Html.LabelFor( model => model.PrimarySecondary, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
                         @Html.DropDownListFor( model => model.PrimarySecondary,
@@ -188,17 +192,17 @@
                                     Value = ( ( int ) e ).ToString()
                                 } ), "Value", "Text" ),
                             "Select Primary/Secondary",
-                            new { @class = "", @style = "width: 98%;" } )
+                            new { @class = "", @style = "width: 94%;margin-left: 25px;font-size: 15px;height: auto;padding: 5px;" } )
                         @Html.ValidationMessageFor( model => model.PrimarySecondary )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.DepoSTONo )
+                        @Html.LabelFor( model => model.DepoSTONo, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.DepoSTONo, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.DepoSTONo, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.DepoSTONo )
                     </div>
                 </div>
@@ -209,122 +213,122 @@
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.GLID )
+                        @Html.LabelFor( model => model.GLID, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.GLID, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.GLID, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.GLID )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.DeliveryDate )
+                        @Html.LabelFor( model => model.DeliveryDate, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor( model => model.DeliveryDate,
                             Model.DeliveryDate.HasValue ? Model.DeliveryDate.Value.ToString( "yyyy-MM-dd" ) : "",
-                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd" } )
+                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.DeliveryDate )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.TransporterId )
+                        @Html.LabelFor( model => model.TransporterId, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.DropDownListFor( model => model.TransporterId, new SelectList( Model.TransporterOptions, "Key", "Value" ), "Select Transporter", new { @class = "", @style = "width: 98%;" } )
+                        @Html.DropDownListFor( model => model.TransporterId, new SelectList( Model.TransporterOptions, "Key", "Value" ), "Select Transporter", new { @class = "", @style = "width: 94%;margin-left: 25px;font-size: 15px;height: auto;padding: 5px;" } )
                         @Html.ValidationMessageFor( model => model.TransporterId )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.FleetNumber )
+                        @Html.LabelFor( model => model.FleetNumber, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.FleetNumber, new { @class = "input", @readonly = "readonly", @placeholder = "Field auto generated" } )
+                        @Html.TextBoxFor( model => model.FleetNumber, new { @class = "input", @readonly = "readonly", @placeholder = "Field auto generated", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.FleetNumber )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.VehicleRegistration )
+                        @Html.LabelFor( model => model.VehicleRegistration, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.VehicleRegistration, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.VehicleRegistration, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.VehicleRegistration )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.DebtorsCode )
+                        @Html.LabelFor( model => model.DebtorsCode, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.DebtorsCode, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.DebtorsCode, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.DebtorsCode )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.CustomerAccountNumber )
+                        @Html.LabelFor( model => model.CustomerAccountNumber, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.CustomerAccountNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.CustomerAccountNumber, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.CustomerAccountNumber )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.CustomerOrderNumber )
+                        @Html.LabelFor( model => model.CustomerOrderNumber, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.CustomerOrderNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.CustomerOrderNumber, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.CustomerOrderNumber )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.ReferenceNumber )
+                        @Html.LabelFor( model => model.ReferenceNumber, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.ReferenceNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.ReferenceNumber, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.ReferenceNumber )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.LoadsheetNo )
+                        @Html.LabelFor( model => model.LoadsheetNo, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.LoadsheetNo, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.LoadsheetNo, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.LoadsheetNo )
                     </div>
                 </div>
 
                 @*<div class="form-group">
-                    <div class="editor-label">
-                        @Html.LabelFor( model => model.ReceiverNumber )
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor( model => model.ReceiverNumber, new { @class = "input", @placeholder = "Please Complete" } )
-                        @Html.ValidationMessageFor( model => model.ReceiverNumber )
-                    </div>
-                </div>*@
+            <div class="editor-label">
+                @Html.LabelFor( model => model.ReceiverNumber, new { @style = "font-size: 15px;white-space:nowrap;" } )
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor( model => model.ReceiverNumber, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
+                @Html.ValidationMessageFor( model => model.ReceiverNumber )
+            </div>
+        </div>*@
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.GRVNumber )
+                        @Html.LabelFor( model => model.GRVNumber, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.GRVNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.GRVNumber, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.GRVNumber )
                     </div>
                 </div>
@@ -333,136 +337,136 @@
             <div class="left" style="width: 31%;">
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.DocNumber )
+                        @Html.LabelFor( model => model.DocNumber, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.DocNumber, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.DocNumber, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.DocNumber )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.ExchangeNo )
+                        @Html.LabelFor( model => model.ExchangeNo, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.ExchangeNo, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.ExchangeNo, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.ExchangeNo )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.ChepCustomerThanDocNo )
+                        @Html.LabelFor( model => model.ChepCustomerThanDocNo, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.ChepCustomerThanDocNo, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.ChepCustomerThanDocNo, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.ChepCustomerThanDocNo )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.WarehouseTransferDocNo )
+                        @Html.LabelFor( model => model.WarehouseTransferDocNo, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.WarehouseTransferDocNo, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.WarehouseTransferDocNo, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.WarehouseTransferDocNo )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.DebriefDocketNo )
+                        @Html.LabelFor( model => model.DebriefDocketNo, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.DebriefDocketNo, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.DebriefDocketNo, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.DebriefDocketNo )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.PalletReturnSlipNo )
+                        @Html.LabelFor( model => model.PalletReturnSlipNo, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.PalletReturnSlipNo, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.PalletReturnSlipNo, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.PalletReturnSlipNo )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.PalletReturnDate )
+                        @Html.LabelFor( model => model.PalletReturnDate, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor( model => model.PalletReturnDate,
                             Model.PalletReturnDate.HasValue ? Model.PalletReturnDate.Value.ToString( "yyyy-MM-dd" ) : "",
-                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd" } )
+                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.PalletReturnDate )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.AuthorizationCode )
+                        @Html.LabelFor( model => model.AuthorizationCode, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.AuthorizationCode, new { @class = "input", @placeholder = "Field Auto Generated", @readonly = "readonly" } )
+                        @Html.TextBoxFor( model => model.AuthorizationCode, new { @class = "input", @placeholder = "Field Auto Generated", @readonly = "readonly", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.AuthorizationCode )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.AuthorizedBy )
+                        @Html.LabelFor( model => model.AuthorizedBy, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.AuthorizedBy, new { @class = "input", @placeholder = "Field Auto Generated", @readonly = "readonly" } )
+                        @Html.TextBoxFor( model => model.AuthorizedBy, new { @class = "input", @placeholder = "Field Auto Generated", @readonly = "readonly", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.AuthorizedBy )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.ChepCompensationNo )
+                        @Html.LabelFor( model => model.ChepCompensationNo, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor( model => model.ChepCompensationNo, new { @class = "input", @placeholder = "Please Complete" } )
+                        @Html.TextBoxFor( model => model.ChepCompensationNo, new { @class = "input", @placeholder = "Please Complete", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.ChepCompensationNo )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.CompensationDate )
+                        @Html.LabelFor( model => model.CompensationDate, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor( model => model.CompensationDate,
                             Model.CompensationDate.HasValue ? Model.CompensationDate.Value.ToString( "yyyy-MM-dd" ) : "",
-                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd" } )
+                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.CompensationDate )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.EffectiveDate )
+                        @Html.LabelFor( model => model.EffectiveDate, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor( model => model.EffectiveDate,
                             Model.EffectiveDate.HasValue ? Model.EffectiveDate.Value.ToString( "yyyy-MM-dd" ) : "",
-                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd" } )
+                            new { @class = "date-picker", @placeholder = "yyyy-MM-dd", @style = "width: 90%;margin-left: 25px;font-size: 15px;" } )
                         @Html.ValidationMessageFor( model => model.EffectiveDate )
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="editor-label">
-                        @Html.LabelFor( model => model.Status )
+                        @Html.LabelFor( model => model.Status, new { @style = "font-size: 15px;white-space:nowrap;" } )
                     </div>
                     <div class="editor-field">
-                        @Html.EnumDropDownListFor( model => model.Status, "-- Select Status --", new { @class = "" } )
+                        @Html.EnumDropDownListFor( model => model.Status, "-- Select Status --", new { @class = "", @style = "width: 94%;margin-left: 25px;font-size: 15px;height: auto;padding: 5px;" } )
                         @Html.ValidationMessageFor( model => model.Status )
                     </div>
                 </div>

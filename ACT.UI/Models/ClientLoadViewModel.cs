@@ -62,7 +62,7 @@ namespace ACT.UI.Models
         public int? PODCommentId { get; set; }
 
         [Required]
-        [Display( Name = "LOAD #:" )]
+        [Display( Name = "LOAD NUMBER:" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string LoadNumber { get; set; }
 

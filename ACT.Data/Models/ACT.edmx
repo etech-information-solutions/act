@@ -493,9 +493,10 @@
           <Property Name="LoadSheetNo" Type="varchar" MaxLength="50" />
           <Property Name="ExchangeNo" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="CompensationDate" Type="date" />
-          <Property Name="ReceiverNumber" Type="varchar" MaxLength="250" />
           <Property Name="LoadType" Type="int" />
           <Property Name="DebtorsCode" Type="varchar" MaxLength="50" />
+          <Property Name="ReceiverNumber" Type="varchar" MaxLength="50" />
+          <Property Name="CustOrdNum" Type="varchar" MaxLength="250" />
         </EntityType>
         <EntityType Name="ClientLoadHistory">
           <Key>
@@ -1683,6 +1684,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ChepClient_ClientLoad">
+          <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="1" />
+          <End Role="ChepClient" Type="Self.ChepClient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ChepClient">
+              <PropertyRef Name="ClientLoadsId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ChepClients_ChepLoads">
           <End Role="ChepLoad" Type="Self.ChepLoad" Multiplicity="1" />
           <End Role="ChepClient" Type="Self.ChepClient" Multiplicity="*" />
@@ -1803,6 +1816,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ClientAuthorisation_ClientLoad">
+          <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="1" />
+          <End Role="ClientAuthorisation" Type="Self.ClientAuthorisation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ClientAuthorisation">
+              <PropertyRef Name="ClientLoadId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ClientAuthorisation_User">
           <End Role="User" Type="Self.User" Multiplicity="1" />
           <End Role="ClientAuthorisation" Type="Self.ClientAuthorisation" Multiplicity="*" />
@@ -1872,6 +1897,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="ClientGroup">
               <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ClientInvoices_ClientLoads">
+          <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="1" />
+          <End Role="ClientInvoice" Type="Self.ClientInvoice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ClientInvoice">
+              <PropertyRef Name="ClientLoadId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1971,6 +2008,34 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ClientLoadHistory_ClientLoad">
+          <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ClientLoadHistory" Type="Self.ClientLoadHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ClientLoadHistory">
+              <PropertyRef Name="ClientLoadId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ClientLoadQuantity_ClientLoad">
+          <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ClientLoadQuantity" Type="Self.ClientLoadQuantity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ClientLoadQuantity">
+              <PropertyRef Name="ClientLoadId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ClientLoads_ChepClients">
           <End Role="Client" Type="Self.Client" Multiplicity="1" />
           <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="*" />
@@ -2052,6 +2117,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="ClientProduct">
               <PropertyRef Name="ProductId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ClientSite_ClientCustomer">
+          <End Role="ClientCustomer" Type="Self.ClientCustomer" Multiplicity="1" />
+          <End Role="ClientSite" Type="Self.ClientSite" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientCustomer">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ClientSite">
+              <PropertyRef Name="ClientCustomerId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -2259,6 +2336,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ExtendedClientLoad_ClientLoad">
+          <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="1" />
+          <End Role="ExtendedClientLoad" Type="Self.ExtendedClientLoad" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ExtendedClientLoad">
+              <PropertyRef Name="ClientLoadId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ExtendedClientLoad_ClientSite">
           <End Role="ClientSite" Type="Self.ClientSite" Multiplicity="0..1" />
           <End Role="ExtendedClientLoad" Type="Self.ExtendedClientLoad" Multiplicity="*" />
@@ -2342,6 +2431,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="Message">
               <PropertyRef Name="ReceiverUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Postings_ClientLoads">
+          <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="0..1" />
+          <End Role="Journal" Type="Self.Journal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Journal">
+              <PropertyRef Name="ClientLoadId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -2630,6 +2731,18 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             </Principal>
             <Dependent Role="SupplierSite">
               <PropertyRef Name="ARPMSalesManagerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Task_ClientLoad">
+          <End Role="ClientLoad" Type="Self.ClientLoad" Multiplicity="0..1" />
+          <End Role="Task" Type="Self.Task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientLoad">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Task">
+              <PropertyRef Name="ClientLoadId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -2982,6 +3095,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="Site" EntitySet="Site" />
             <End Role="ChepAudit" EntitySet="ChepAudit" />
           </AssociationSet>
+          <AssociationSet Name="FK_ChepClient_ClientLoad" Association="Self.FK_ChepClient_ClientLoad">
+            <End Role="ClientLoad" EntitySet="ClientLoad" />
+            <End Role="ChepClient" EntitySet="ChepClient" />
+          </AssociationSet>
           <AssociationSet Name="FK_ChepClients_ChepLoads" Association="Self.FK_ChepClients_ChepLoads">
             <End Role="ChepLoad" EntitySet="ChepLoad" />
             <End Role="ChepClient" EntitySet="ChepClient" />
@@ -3022,6 +3139,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="OutstandingReason" EntitySet="OutstandingReason" />
             <End Role="ChepLoadJournal" EntitySet="ChepLoadJournal" />
           </AssociationSet>
+          <AssociationSet Name="FK_ClientAuthorisation_ClientLoad" Association="Self.FK_ClientAuthorisation_ClientLoad">
+            <End Role="ClientLoad" EntitySet="ClientLoad" />
+            <End Role="ClientAuthorisation" EntitySet="ClientAuthorisation" />
+          </AssociationSet>
           <AssociationSet Name="FK_ClientAuthorisation_User" Association="Self.FK_ClientAuthorisation_User">
             <End Role="User" EntitySet="User" />
             <End Role="ClientAuthorisation" EntitySet="ClientAuthorisation" />
@@ -3045,6 +3166,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <AssociationSet Name="FK_ClientGroups_Groups" Association="Self.FK_ClientGroups_Groups">
             <End Role="Group" EntitySet="Group" />
             <End Role="ClientGroup" EntitySet="ClientGroup" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ClientInvoices_ClientLoads" Association="Self.FK_ClientInvoices_ClientLoads">
+            <End Role="ClientLoad" EntitySet="ClientLoad" />
+            <End Role="ClientInvoice" EntitySet="ClientInvoice" />
           </AssociationSet>
           <AssociationSet Name="FK_ClientInvoices_Invoices" Association="Self.FK_ClientInvoices_Invoices">
             <End Role="Invoice" EntitySet="Invoice" />
@@ -3078,6 +3203,14 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="User" EntitySet="User" />
             <End Role="ClientLoad" EntitySet="ClientLoad" />
           </AssociationSet>
+          <AssociationSet Name="FK_ClientLoadHistory_ClientLoad" Association="Self.FK_ClientLoadHistory_ClientLoad">
+            <End Role="ClientLoad" EntitySet="ClientLoad" />
+            <End Role="ClientLoadHistory" EntitySet="ClientLoadHistory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ClientLoadQuantity_ClientLoad" Association="Self.FK_ClientLoadQuantity_ClientLoad">
+            <End Role="ClientLoad" EntitySet="ClientLoad" />
+            <End Role="ClientLoadQuantity" EntitySet="ClientLoadQuantity" />
+          </AssociationSet>
           <AssociationSet Name="FK_ClientLoads_ChepClients" Association="Self.FK_ClientLoads_ChepClients">
             <End Role="Client" EntitySet="Client" />
             <End Role="ClientLoad" EntitySet="ClientLoad" />
@@ -3105,6 +3238,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <AssociationSet Name="FK_ClientProducts_Products" Association="Self.FK_ClientProducts_Products">
             <End Role="Product" EntitySet="Product" />
             <End Role="ClientProduct" EntitySet="ClientProduct" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ClientSite_ClientCustomer" Association="Self.FK_ClientSite_ClientCustomer">
+            <End Role="ClientCustomer" EntitySet="ClientCustomer" />
+            <End Role="ClientSite" EntitySet="ClientSite" />
           </AssociationSet>
           <AssociationSet Name="FK_ClientSite_OptionalSite" Association="Self.FK_ClientSite_OptionalSite">
             <End Role="Site" EntitySet="Site" />
@@ -3174,6 +3311,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
             <End Role="Client" EntitySet="Client" />
             <End Role="ExtendedClientLoad" EntitySet="ExtendedClientLoad" />
           </AssociationSet>
+          <AssociationSet Name="FK_ExtendedClientLoad_ClientLoad" Association="Self.FK_ExtendedClientLoad_ClientLoad">
+            <End Role="ClientLoad" EntitySet="ClientLoad" />
+            <End Role="ExtendedClientLoad" EntitySet="ExtendedClientLoad" />
+          </AssociationSet>
           <AssociationSet Name="FK_ExtendedClientLoad_ClientSite" Association="Self.FK_ExtendedClientLoad_ClientSite">
             <End Role="ClientSite" EntitySet="ClientSite" />
             <End Role="ExtendedClientLoad" EntitySet="ExtendedClientLoad" />
@@ -3201,6 +3342,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <AssociationSet Name="FK_Message_User1" Association="Self.FK_Message_User1">
             <End Role="User" EntitySet="User" />
             <End Role="Message" EntitySet="Message" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Postings_ClientLoads" Association="Self.FK_Postings_ClientLoads">
+            <End Role="ClientLoad" EntitySet="ClientLoad" />
+            <End Role="Journal" EntitySet="Journal" />
           </AssociationSet>
           <AssociationSet Name="FK_ProductPrices_Products" Association="Self.FK_ProductPrices_Products">
             <End Role="Product" EntitySet="Product" />
@@ -3297,6 +3442,10 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <AssociationSet Name="FK_SupplierSite_User" Association="Self.FK_SupplierSite_User">
             <End Role="User" EntitySet="User" />
             <End Role="SupplierSite" EntitySet="SupplierSite" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Task_ClientLoad" Association="Self.FK_Task_ClientLoad">
+            <End Role="ClientLoad" EntitySet="ClientLoad" />
+            <End Role="Task" EntitySet="Task" />
           </AssociationSet>
           <AssociationSet Name="FK_Ticket_Department" Association="Self.FK_Ticket_Department">
             <End Role="Department" EntitySet="Department" />
@@ -6626,7 +6775,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="ClientDescription" MaxLength="250" FixedLength="false" Unicode="false" Type="String" />
           <Property Name="DeliveryNote" MaxLength="250" FixedLength="false" Unicode="false" Type="String" />
           <Property Name="ReferenceNumber" MaxLength="250" FixedLength="false" Unicode="false" Type="String" />
-          <Property Name="ReceiverNumber" MaxLength="250" FixedLength="false" Unicode="false" Type="String" />
+          <Property Name="ReceiverNumber" MaxLength="50" FixedLength="false" Unicode="false" Type="String" />
           <Property Name="Equipment" MaxLength="250" FixedLength="false" Unicode="false" Type="String" />
           <Property Name="OriginalQuantity" Precision="18" Scale="0" Type="Decimal" />
           <Property Name="NewQuantity" Precision="18" Scale="0" Type="Decimal" />
@@ -6698,6 +6847,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <Property Name="CompensationDate" Precision="0" Type="DateTime" />
           <Property Name="LoadType" Type="Int32" />
           <Property Name="DebtorsCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CustOrdNum" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Country">
           <Key>
@@ -8690,6 +8840,7 @@ warning 6002: The table/view 'ACT.dbo.PSPPeriod' does not have a primary key def
           <EntitySetMapping Name="ClientLoads">
             <EntityTypeMapping TypeName="ACTModel.ClientLoad">
               <MappingFragment StoreEntitySet="ClientLoad">
+                <ScalarProperty Name="CustOrdNum" ColumnName="CustOrdNum" />
                 <ScalarProperty Name="DebtorsCode" ColumnName="DebtorsCode" />
                 <ScalarProperty Name="LoadType" ColumnName="LoadType" />
                 <ScalarProperty Name="CompensationDate" ColumnName="CompensationDate" />

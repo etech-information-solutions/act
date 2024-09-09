@@ -41,7 +41,7 @@
             <th>
                 Actions
             </th>
-            <th></th>
+            <th>POD</th>
             <th>
                 Pallet Date
             </th>
@@ -77,17 +77,27 @@
         {
             foreach ( var item in items )
             {
+                LoadStatus status = ( LoadStatus ) item.Status;
+                string active = ( status == LoadStatus.Complete ) ? "Complete" : "Outstanding";
 
                 <tr id="clientdata-@item.Id-item" class="clientdata-@item.Id-item ">
                     <td width="10%">
 
                         @*@Html.ActionLink( "Details", "ClientDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )*@
+                        <div style="margin-top: 11px">
+                            @Html.ActionLink( "Delete", "DeleteClientData", new { id = item.Id }, new { @class = "del", @style = "font-size: 12px; margin-top: 7px; margin-left: 5px", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = "Delete this item?" } )
 
-                        @Html.ActionLink( "Delete", "DeleteClientData", new { id = item.Id }, new { @class = "del", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = "Delete this item?" } )
+                            @Html.ActionLink( "Edit", "EditClientData", new { id = item.Id, returnView = "Pallet" }, new { @class = "edit", @style = "font-size: 12px; margin-top: 7px; margin-left: 5px", @data_edit = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
 
-                        @Html.ActionLink( "Edit", "EditClientData", new { id = item.Id, returnView = "Pallet" }, new { @class = "edit", @data_edit = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
+                            <div style="margin-top: 7px; margin-left: 6px">
+                                <strong style="font-size:10px">Status:</strong>
+                                <span style="color: @(status.GetDisplayText().ToLower() == "outstanding" ? "red" : (status.GetDisplayText().ToLower() == "complete" ? "green" : "black")); font-size: 9px">
+                                    @status.GetDisplayText()
+                                </span>
+                            </div>
+                        </div>                    
                     </td>
-                    <td width="8%">
+                    <td width="10%">
                         <div class="button-container">
                             <a data-upload-pod="1" data-id="@item.Id" class="pod-button pod-upload-button">
                                 UPLOAD POD
@@ -118,7 +128,23 @@
                         @item.RegionName
                     </td>
                     <td>
-                        @item.ClientLoadNotes
+                        <div style="margin-bottom: 5px;">
+                            <span style="font-weight: bold;">POD Comment:</span>
+                            @if ( !string.IsNullOrWhiteSpace( item.PODComment ) )
+                            {
+                                <span style="font-size: 10px;">@item.PODComment</span>
+                            }
+                            else
+                            {
+                                <span style="font-size: 10px; color:orangered">None</span>
+                            }
+                        </div>
+                        @if ( !string.IsNullOrWhiteSpace( item.ClientLoadNotes ) )
+                        {
+                            <div style="font-size: 10px; color: forestgreen;">
+                                Notes: <span style="font-style: italic;">@item.ClientLoadNotes</span>
+                            </div>
+                        }
                     </td>
                     <td>
                         @if ( item.LoadType.HasValue )

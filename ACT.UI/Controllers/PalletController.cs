@@ -1317,6 +1317,7 @@ namespace ACT.UI.Controllers
                     GRVNumber = model.GRVNumber,
                     DeliveryDate = model.DeliveryDate,
                     AccountNumber = model.AccountNumber,
+                    CustOrdNum = model.CustomerOrderNumber,
                     TransporterId = model.TransporterId,
                     DebtorsCode = model.DebtorsCode,
                     VehicleId = !string.IsNullOrEmpty( model.FleetNumber ) && int.TryParse( model.FleetNumber, out int fleetNumber ) ? ( int? ) fleetNumber : null,
@@ -1445,6 +1446,7 @@ namespace ACT.UI.Controllers
                     DeliveryNote = load?.DeliveryNote,
                     ChepInvoiceNo = load?.ChepInvoiceNo,
                     OrderNumber = load?.OrderNumber,
+                    CustomerOrderNumber = load.CustOrdNum,
                     DepoSTONo = load?.DepoSTONo,
                     GRVNumber = load?.GRVNumber,
                     GLID = load?.GLID,
@@ -1591,6 +1593,7 @@ namespace ACT.UI.Controllers
                 load.TransporterId = model.TransporterId;
                 load.DebtorsCode = model.DebtorsCode;
                 load.AccountNumber = model.AccountNumber;
+                load.CustOrdNum = model.CustomerOrderNumber;
                 load.VehicleId = !string.IsNullOrEmpty( model.FleetNumber ) && int.TryParse( model.FleetNumber, out int fleetNumber ) ? ( int? ) fleetNumber : null;
                 load.LoadType = model.PrimarySecondary.HasValue ? ( int ) model.PrimarySecondary.Value : ( int? ) null;
                 load.ReferenceNumber = model.ReferenceNumber;
@@ -2064,33 +2067,37 @@ namespace ACT.UI.Controllers
         [Requires( PermissionTo.Delete )]
         public ActionResult DeleteClientData( ClientLoadViewModel model )
         {
-            ClientLoad activeLoad;
             try
             {
-
+                using ( TransactionScope scope = new TransactionScope( TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted } ) )
                 using ( ClientLoadService service = new ClientLoadService() )
-                using ( TransactionScope scope = new TransactionScope() )
+                using ( ClientAuthorisationService caService = new ClientAuthorisationService() )
                 {
-                    activeLoad = service.GetById( model.Id );
-
+                    ClientLoad activeLoad = service.GetById( model.Id );
                     if ( activeLoad == null )
                     {
                         Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
-
                         return PartialView( "_AccessDenied" );
                     }
-                    service.Delete( activeLoad );
 
+                    ClientAuthorisation existingAuthorization = caService.GetByClientLoadId( model.Id );
+                    if ( existingAuthorization != null )
+                    {
+                        Notify( "Cannot delete this client data. Please remove associated authorization first.", NotificationType.Warn );
+                        return RedirectToAction( "ClientData", new { id = model.Id } );
+                    }
+
+                    service.Delete( activeLoad );
                     scope.Complete();
 
+                    Notify( "The selected item was successfully deleted.", NotificationType.Success );
+                    return RedirectToAction( "ClientData" );
                 }
-                Notify( "The selected item was successfully Deleted.", NotificationType.Success );
-                return RedirectToAction( "ClientData" );
             }
             catch ( Exception ex )
             {
-                ViewBag.Message = ex.Message;
-                return View();
+                Notify( $"An error occurred: {ex.Message}", NotificationType.Error );
+                return RedirectToAction( "ClientData" );
             }
         }
 

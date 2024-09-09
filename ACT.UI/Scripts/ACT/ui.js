@@ -6519,15 +6519,23 @@
                 // Function to create new dropdowns
                 function createDropdowns ( fieldName, options )
                 {
+                    var formGroup = $( '<div class="form-group"></div>' );
+                    var editorLabel = $( '<div class="editor-label"></div>' );
+                    var label = $( '<label>', {
+                        for: 'EquipmentDetails_' + ( sectionCount * 3 ) + '__' + fieldName,
+                        text: fieldName === 'ProductId' ? 'EQUIPMENT:' : '',
+                    } );
+                    editorLabel.append( label );
+
                     var editorField = $( '<div class="editor-field"></div>' );
                     for ( var i = 0; i < 3; i++ )
                     {
-                        var wrapper = $( '<div style="display: inline-block; margin-right: 10px; width: 21.1%;"></div>' );
+                        var wrapper = $( '<div style="display: inline-block; margin-right: 10px; width: 30%;"></div>' );
                         var select = $( '<select>', {
                             name: 'EquipmentDetails[' + ( sectionCount * 3 + i ) + '].' + fieldName,
                             id: 'EquipmentDetails_' + ( sectionCount * 3 + i ) + '__' + fieldName,
-                            class: 'chzn equipment-dropdown',
-                            style: 'width: 100%;',
+                            class: 'equipment-dropdown fixed-width-dropdown',
+                            style: 'width: 100%; margin-bottom: 15px',
                             'data-index': i
                         } );
                         select.append( $( '<option></option>' ).attr( 'value', '' ).text( 'Select Equipment' ) );
@@ -6546,12 +6554,28 @@
                         wrapper.append( select );
                         editorField.append( wrapper );
                     }
-                    return editorField;
+
+                    formGroup.append( editorLabel );
+                    formGroup.append( editorField );
+                    return formGroup;
                 }
 
                 // Function to create new input fields with default value
                 function createInputFields ( fieldName, defaultValue )
                 {
+                    var formGroup = $( '<div class="form-group"></div>' );
+                    var editorLabel = $( '<div class="editor-label"></div>' );
+                    var label = $( '<label>', {
+                        for: 'EquipmentDetails_' + ( sectionCount * 3 ) + '__' + fieldName,
+                        text: fieldName === 'DeliveredQty' ? 'DELIVERY QTY:' :
+                            fieldName === 'ReturnedTransferredQty' ? 'RETURN QTY:' :
+                                fieldName === 'DebriefQty' ? 'DEBRIEF QTY:' :
+                                    fieldName === 'TransporterLiable' ? 'TRANSPORTER:' :
+                                        fieldName === 'AdminMovement' ? 'ADM MOVEMENT:' :
+                                            fieldName === 'OutstandingQtyAtCustomer' ? 'OUT QTY:' : ''
+                    } );
+                    editorLabel.append( label );
+
                     var editorField = $( '<div class="editor-field"></div>' );
                     for ( var i = 0; i < 3; i++ )
                     {
@@ -6560,12 +6584,15 @@
                             name: 'EquipmentDetails[' + ( sectionCount * 3 + i ) + '].' + fieldName,
                             id: 'EquipmentDetails_' + ( sectionCount * 3 + i ) + '__' + fieldName,
                             class: 'input',
-                            style: 'width: 20%; margin-right: 5px;',
+                            style: 'width: 28%; margin-right: 5px; margin-top: 10px;',
                             value: defaultValue
                         } );
                         editorField.append( input );
                     }
-                    return editorField;
+
+                    formGroup.append( editorLabel );
+                    formGroup.append( editorField );
+                    return formGroup;
                 }
 
                 // Get the equipment options from the first section's dropdown
@@ -6582,21 +6609,19 @@
 
                 // Add the dropdowns for ProductId
                 newSection.append( '<p><strong class="uppercase">Equipment Details</strong></p>' );
-                newSection.append( '<div class="editor-label" style="margin-top: 15px !important"><label for="EquipmentDetails_' + ( sectionCount * 3 ) + '__ProductId">Equipment</label></div>' );
                 newSection.append( createDropdowns( 'ProductId', equipmentOptions ) );
 
                 // Add input fields for other properties with default value of 0
                 var inputFields = [
-                    { name: 'DeliveredQty', label: 'Original Quantity' },
-                    { name: 'ReturnedTransferredQty', label: 'Return Qty' },
-                    { name: 'DebriefQty', label: 'Debrief Qty' },
-                    { name: 'TransporterLiable', label: 'Transporter Liable Qty' },
-                    { name: 'AdminMovement', label: 'Admin Movement' },
-                    { name: 'OutstandingQtyAtCustomer', label: 'Outstanding Qty' }
+                    { name: 'DeliveredQty' },
+                    { name: 'ReturnedTransferredQty' },
+                    { name: 'DebriefQty' },
+                    { name: 'TransporterLiable' },
+                    { name: 'AdminMovement' },
+                    { name: 'OutstandingQtyAtCustomer' }
                 ];
                 inputFields.forEach( function ( field )
                 {
-                    newSection.append( '<div class="editor-label" style="margin-top: 15px !important"><label for="EquipmentDetails_' + ( sectionCount * 3 ) + '__' + field.name + '">' + field.label + '</label></div>' );
                     var inputField = createInputFields( field.name, '0' );
                     newSection.append( inputField );
 
