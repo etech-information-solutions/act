@@ -34,127 +34,163 @@
     <span class="loader"></span>
 </p>
 
-<table id="ClientData-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#ClientData-table_wrapper" data-starting-point=".ap-tabs ul">
-    <thead>
-        <tr>
-            <th>Actions</th>
-            <th>POD</th>
-            <th>DATE</th>
-            <th>DAYS</th>
-            <th>PLT TYPE</th>
-            <th>GLID</th>
-            <th>SUPPLIER</th>
-            <th>LOAD</th>
-            <th>CUST ACC NO</th>
-            <th>CUSTOMER</th>
-            <th>PROVINCE</th>
-            <th>PCN NOTE</th>
-            <th>DOC</th>
-            <th>DELIVERY NOTE NO</th>
-            <th>DEL QTY</th>
-            <th>RET QTY</th>
-            <th>OUTST QTY</th>
-            <th>ARPM COMMENTS</th>
-            <th>TRANSPORTER NAME</th>
-            <th>TRUCK REG</th>
-            <th>NOTES</th>
-            <th>DAILY RENTAL</th>
-            <th>COMPENSATION</th>
-            <th>PALLET AUTH BY</th>
-            <th>PALLET AUTH CODE</th>
-        </tr>
-    </thead>
+<div class="table-container">
+    <table id="ClientData-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#ClientData-table_wrapper" data-starting-point=".ap-tabs ul">
+        <thead>
+            <tr>
+                <th>Actions</th>
+                <th>POD</th>
+                <th>DATE</th>
+                <th>DAYS</th>
+                <th>PLT TYPE</th>
+                <th>GLID</th>
+                <th>SUPPLIER</th>
+                <th>LOAD</th>
+                <th>CUST ACC NO</th>
+                <th>CUSTOMER</th>
+                <th>PROVINCE</th>
+                <th>PCN NOTE</th>
+                <th>DOC</th>
+                <th>DELIVERY NOTE NO</th>
+                <th>DEL QTY</th>
+                <th>RET QTY</th>
+                <th>OUTST QTY</th>
+                <th>ARPM COMMENTS</th>
+                <th>TRANSPORTER NAME</th>
+                <th>TRUCK REG</th>
+                <th>NOTES</th>
+                <th>DAILY RENTAL</th>
+                <th>COMPENSATION</th>
+                <th>PALLET AUTH BY</th>
+                <th>PALLET AUTH CODE</th>
+            </tr>
+        </thead>
 
-    <tbody>
-        @if ( Model != null && items != null && items.Count() > 0 )
-        {
-            foreach ( var item in items )
+        <tbody>
+            @if ( Model != null && items != null && items.Count() > 0 )
             {
-                LoadStatus status = ( LoadStatus ) item.Status;
-                string active = ( status == LoadStatus.Complete ) ? "Complete" : "Outstanding";
-                int days = ( DateTime.Now - ( item.LoadDate ?? DateTime.Now ) ).Days;
+                foreach ( var item in items )
+                {
+                    LoadStatus status = ( LoadStatus ) item.Status;
+                    string active = ( status == LoadStatus.Complete ) ? "Complete" : "Outstanding";
+                    int days = ( DateTime.Now - ( item.LoadDate ?? DateTime.Now ) ).Days;
 
-                <tr id="clientdata-@item.Id-item" class="clientdata-@item.Id-item">
-                    <td width="10%">
-                        <div style="margin-top: 11px">
-                            @Html.ActionLink( "Delete", "DeleteClientData", new { id = item.Id }, new { @class = "del", @style = "font-size: 12px; margin-top: 7px; margin-left: 5px", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = "Delete this item?" } )
-                            @Html.ActionLink( "Edit", "EditClientData", new { id = item.Id, returnView = "Pallet" }, new { @class = "edit", @style = "font-size: 12px; margin-top: 7px; margin-left: 5px", @data_edit = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
-                            <div style="margin-top: 7px; margin-left: 6px">
-                                <strong style="font-size:10px">Status:</strong>
-                                <span style="color: @(status.GetDisplayText().ToLower() == "outstanding" ? "red" : (status.GetDisplayText().ToLower() == "complete" ? "green" : "black")); font-size: 9px">
-                                    @status.GetDisplayText()
-                                </span>
+                    <tr id="clientdata-@item.Id-item" class="clientdata-@item.Id-item">
+                        <td width="10%">
+                            <div style="margin-top: 11px">
+                                @Html.ActionLink( "Delete", "DeleteClientData", new { id = item.Id }, new { @class = "del", @style = "font-size: 12px; margin-top: 7px; margin-left: 5px", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = "Delete this item?" } )
+                                @Html.ActionLink( "Edit", "EditClientData", new { id = item.Id, returnView = "Pallet" }, new { @class = "edit", @style = "font-size: 12px; margin-top: 7px; margin-left: 5px", @data_edit = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
+                                <div style="margin-top: 7px; margin-left: 6px">
+                                    <strong style="font-size:10px">Status:</strong>
+                                    <span style="color: @(status.GetDisplayText().ToLower() == "outstanding" ? "red" : (status.GetDisplayText().ToLower() == "complete" ? "green" : "black")); font-size: 9px">
+                                        @status.GetDisplayText()
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td width="10%">
-                        <div class="button-container">
-                            <a data-upload-pod="1" data-id="@item.Id" class="pod-button pod-upload-button">
-                                UPLOAD POD
-                                <span id="loader"></span>
-                            </a>
-                            <a data-view-pod="1" data-id="@item.Id" class="pod-button pod-view-button">
-                                VIEW POD
-                                <span id="loader"></span>
-                            </a>
-                        </div>
-                    </td>
-                    <td>@(item.LoadDate?.ToString("yyyy-MM-dd"))</td>
-                    <td>@days</td>
-                    <td>@item.CustomerType</td>
-                    <td>@item.GLID</td>
-                    <td>@item.SupplierFrom</td>
-                    <td>@item.LoadNumber</td>
-                    <td>@item.CustomerAccountNo</td>
-                    <td>@item.CustomerTo</td>
-                    <td>@item.RegionName</td>
-                    <td>@item.PCNComments</td>
-                    <td>@item.DocketNumber</td>
-                    <td>@item.DeliveryNote</td>
-                    <td>@item.OriginalQuantity</td>
-                    <td>@item.ReturnQty</td>
-                    <td>@item.OutstandingQty</td>
-                    <td>@item.PODComment</td>
-                    <td>@item.TransporterName</td>
-                    <td>@item.VehicleRegistration</td>
-                    <td>@item.ClientLoadNotes</td>
-                    <td>@item.DailyRental</td>
-                    <td>@item.ChepCompensationNo</td>
-                    <td>@item.ModifiedBy</td>
-                    <td>@item.PalletAuthCode</td>
-                </tr>
+                        </td>
+                        <td width="10%">
+                            <div class="button-container">
+                                <a data-upload-pod="1" data-id="@item.Id" class="pod-button pod-upload-button">
+                                    UPLOAD POD
+                                    <span id="loader"></span>
+                                </a>
+                                <a data-view-pod="1" data-id="@item.Id" class="pod-button pod-view-button">
+                                    VIEW POD
+                                    <span id="loader"></span>
+                                </a>
+                            </div>
+                        </td>
+                        <td>@(item.LoadDate?.ToString("yyyy-MM-dd"))</td>
+                        <td>@days</td>
+                        <td>@item.PLTType</td>
+                        <td>@item.GLID</td>
+                        <td>@item.SupplierFrom</td>
+                        <td>@item.LoadNumber</td>
+                        <td>@item.CustomerAccountNo</td>
+                        <td>@item.CustomerTo</td>
+                        <td>@item.RegionName</td>
+                        <td>@item.PCNComments</td>
+                        <td>@item.DocketNumber</td>
+                        <td>@item.DeliveryNote</td>
+                        <td>@item.OriginalQuantity</td>
+                        <td>@item.ReturnQty</td>
+                        <td>@item.OutstandingQty</td>
+                        <td>@item.PODComment</td>
+                        <td>@item.TransporterName</td>
+                        <td>@item.VehicleRegistration</td>
+                        <td>@item.ClientLoadNotes</td>
+                        <td>@item.DailyRental</td>
+                        <td>@item.ChepCompensationNo</td>
+                        <td>@item.ModifiedBy</td>
+                        <td>@item.PalletAuthCode</td>
+                    </tr>
 
-                count++;
+                    count++;
+                }
             }
+        </tbody>
+    </table>
+
+    </div>
+
+    @Html.Partial( "_Paging" )
+
+    <style>
+        .table-container {
+            transform-origin: top left;
+            transform: scale(0.85); /* Adjust this value to make table smaller or larger */
+            width: calc(100% * (1/0.85)); /* Compensate for scale to maintain layout */
+            margin-bottom: 20px; /* Add some space after the scaled table */
         }
-    </tbody>
-</table>
 
-@Html.Partial( "_Paging" )
+        /* Keep your existing POD button styles */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
 
-<style>
-    .button-container {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
+        .pod-button {
+            background-color: lightblue;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 7px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: inherit;
+        }
 
-    .pod-button {
-        background-color: lightblue;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 7px;
-        border-radius: 5px;
-        text-decoration: none;
-        color: inherit;
-    }
+        .pod-upload-button {
+            background: lightseagreen;
+        }
 
-    .pod-upload-button {
-        background: lightseagreen;
-    }
+        .pod-view-button {
+            background: lightblue;
+        }
 
-    .pod-view-button {
-        background: lightblue;
-    }
-</style>
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .pod-button {
+            background-color: lightblue;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 7px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .pod-upload-button {
+            background: lightseagreen;
+        }
+
+        .pod-view-button {
+            background: lightblue;
+        }
+    </style>
