@@ -275,5 +275,19 @@ namespace ACT.Core.Services
         {
             return context.Database.SqlQuery<int?>( $"SELECT v.[Id] FROM [dbo].[Vehicle] v WHERE v.[Registration]='{reg}' AND v.[ObjectType]='{objectType}';" ).FirstOrDefault();
         }
+
+        /// <summary>
+        /// Gets a vehicle by registration number
+        /// </summary>
+        /// <param name="registration"></param>
+        /// <returns></returns>
+        public Vehicle GetByRegistration( string registration )
+        {
+            return context.Vehicles
+                .FirstOrDefault( v => v.Registration != null &&
+                                    v.Registration.Trim().Equals( registration.Trim(),
+                                    StringComparison.OrdinalIgnoreCase ) );
+        }
+
     }
 }

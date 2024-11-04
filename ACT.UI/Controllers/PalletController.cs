@@ -52,7 +52,11 @@ namespace ACT.UI.Controllers
             {
                 case "clientdata":
                     #region Client Data
-                    csv = string.Format( "Client,Load Date,Supplier From,Customer To,Customer Group,Load/Shipment,Transporter Name,Status,Invoice Number {0}", Environment.NewLine );
+                    csv = string.Format( "Client,Load Date,Days,PLT Type,GLID,Supplier From,Customer To,Customer Group,Load/Shipment," +
+                                       "Transporter Name,Vehicle Reg,Region,PCN Note,Doc Number,Delivery Note,Del Qty,Ret Qty,Outst Qty," +
+                                       "ARPM Comments,Notes,Daily Rental,Compensation,Pallet Auth By,Pallet Auth Code,Status{0}",
+                                       Environment.NewLine );
+
                     using ( ClientLoadService clservice = new ClientLoadService() )
                     {
                         List<ClientLoadCustomModel> clientloads = clservice.List1( pm, csm );
@@ -60,23 +64,44 @@ namespace ACT.UI.Controllers
                         {
                             foreach ( ClientLoadCustomModel item in clientloads )
                             {
-                                csv = string.Format( "{0} {1},{2},{3},{4},{5},{6},{7},{8},{9} {10}",
-                                                    csv,
-                                                    "\"" + item.ClientName + "\"",
-                                                    "\"" + item.LoadDate?.ToString( "yyyy-MM-dd" ) + "\"",
-                                                    "\"" + item.SupplierFrom + "\"",
-                                                    "\"" + item.CustomerTo + "\"",
-                                                    "\"" + item.CustomerGroup + "\"",
-                                                    "\"" + item.LoadNumber + "\"",
-                                                    "\"" + item.TransporterName + "\"",
-                                                    "\"" + ( ( ReconciliationStatus ) item.Status ).GetDisplayText() + "\"",
-                                                    "\"" + item.InvoiceNumber + "\"",
-                                                    Environment.NewLine );
+                                int days = ( DateTime.Now - ( item.LoadDate ?? DateTime.Now ) ).Days;
+
+                                csv = string.Format( "{0}\"{1}\",\"{2}\",{3},\"{4}\",\"{5}\",\"{6}\",\"{7}\",\"{8}\",\"{9}\"," +
+                                                  "\"{10}\",\"{11}\",\"{12}\",\"{13}\",\"{14}\",\"{15}\",{16},{17},{18}," +
+                                                  "\"{19}\",\"{20}\",\"{21}\",\"{22}\",\"{23}\",\"{24}\",\"{25}\"{26}",
+                                                  csv,
+                                                  item.ClientName,
+                                                  item.LoadDate?.ToString( "yyyy-MM-dd" ),
+                                                  days,
+                                                  item.PLTType,
+                                                  item.GLID,
+                                                  item.SupplierFrom,
+                                                  item.CustomerTo,
+                                                  item.CustomerGroup,
+                                                  item.LoadNumber,
+                                                  item.TransporterName,
+                                                  item.VehicleRegistration,
+                                                  item.RegionName,
+                                                  item.PCNComments,
+                                                  item.DocketNumber,
+                                                  item.DeliveryNote,
+                                                  item.OriginalQuantity,
+                                                  item.ReturnQty,
+                                                  item.OutstandingQty,
+                                                  item.PODComment,
+                                                  item.ClientLoadNotes,
+                                                  item.DailyRental,
+                                                  item.ChepCompensationNo,
+                                                  item.ModifiedBy,
+                                                  item.PalletAuthCode,
+                                                  ( ( ReconciliationStatus ) item.Status ).GetDisplayText(),
+                                                  Environment.NewLine );
                             }
                         }
                     }
                     #endregion
                     break;
+
 
                 case "outstandingpallets":
 
