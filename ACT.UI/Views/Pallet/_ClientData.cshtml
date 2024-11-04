@@ -14,7 +14,6 @@
 
 @{
     int count = Model.Start;
-
     List<ClientLoadCustomModel> items = ( List<ClientLoadCustomModel> ) Model.Items;
 }
 
@@ -38,37 +37,31 @@
 <table id="ClientData-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#ClientData-table_wrapper" data-starting-point=".ap-tabs ul">
     <thead>
         <tr>
-            <th>
-                Actions
-            </th>
+            <th>Actions</th>
             <th>POD</th>
-            <th>
-                Pallet Date
-            </th>
-            <th>
-                Debtors Code
-            </th>
-            <th>
-                GLID
-            </th>
-            <th>
-                Supplier
-            </th>
-            <th>
-                Load Number
-            </th>
-            <th>
-                Region
-            </th>
-            <th>
-                Comment
-            </th>
-            <th>
-                Type
-            </th>
-            <th>
-                Customer
-            </th>
+            <th>DATE</th>
+            <th>DAYS</th>
+            <th>PLT TYPE</th>
+            <th>GLID</th>
+            <th>SUPPLIER</th>
+            <th>LOAD</th>
+            <th>CUST ACC NO</th>
+            <th>CUSTOMER</th>
+            <th>PROVINCE</th>
+            <th>PCN NOTE</th>
+            <th>DOC</th>
+            <th>DELIVERY NOTE NO</th>
+            <th>DEL QTY</th>
+            <th>RET QTY</th>
+            <th>OUTST QTY</th>
+            <th>ARPM COMMENTS</th>
+            <th>TRANSPORTER NAME</th>
+            <th>TRUCK REG</th>
+            <th>NOTES</th>
+            <th>DAILY RENTAL</th>
+            <th>COMPENSATION</th>
+            <th>PALLET AUTH BY</th>
+            <th>PALLET AUTH CODE</th>
         </tr>
     </thead>
 
@@ -79,23 +72,20 @@
             {
                 LoadStatus status = ( LoadStatus ) item.Status;
                 string active = ( status == LoadStatus.Complete ) ? "Complete" : "Outstanding";
+                int days = ( DateTime.Now - ( item.LoadDate ?? DateTime.Now ) ).Days;
 
-                <tr id="clientdata-@item.Id-item" class="clientdata-@item.Id-item ">
+                <tr id="clientdata-@item.Id-item" class="clientdata-@item.Id-item">
                     <td width="10%">
-
-                        @*@Html.ActionLink( "Details", "ClientDataDetails", new { id = item.Id }, new { @class = "info", @data_details = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )*@
                         <div style="margin-top: 11px">
                             @Html.ActionLink( "Delete", "DeleteClientData", new { id = item.Id }, new { @class = "del", @style = "font-size: 12px; margin-top: 7px; margin-left: 5px", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = "Delete this item?" } )
-
                             @Html.ActionLink( "Edit", "EditClientData", new { id = item.Id, returnView = "Pallet" }, new { @class = "edit", @style = "font-size: 12px; margin-top: 7px; margin-left: 5px", @data_edit = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
-
                             <div style="margin-top: 7px; margin-left: 6px">
                                 <strong style="font-size:10px">Status:</strong>
                                 <span style="color: @(status.GetDisplayText().ToLower() == "outstanding" ? "red" : (status.GetDisplayText().ToLower() == "complete" ? "green" : "black")); font-size: 9px">
                                     @status.GetDisplayText()
                                 </span>
                             </div>
-                        </div>                    
+                        </div>
                     </td>
                     <td width="10%">
                         <div class="button-container">
@@ -109,59 +99,35 @@
                             </a>
                         </div>
                     </td>
-                    <td>
-                        @(item.LoadDate?.ToString( "yyyy-MM-dd" ))
-                    </td>
-                    <td>
-                        @item.DebtorsCode
-                    </td>
-                    <td>
-                        @item.GLID
-                    </td>
-                    <td>
-                        @item.SupplierFrom
-                    </td>
-                    <td>
-                        @item.LoadNumber
-                    </td>
-                    <td>
-                        @item.RegionName
-                    </td>
-                    <td>
-                        <div style="margin-bottom: 5px;">
-                            <span style="font-weight: bold;">POD Comment:</span>
-                            @if ( !string.IsNullOrWhiteSpace( item.PODComment ) )
-                            {
-                                <span style="font-size: 10px;">@item.PODComment</span>
-                            }
-                            else
-                            {
-                                <span style="font-size: 10px; color:orangered">None</span>
-                            }
-                        </div>
-                        @if ( !string.IsNullOrWhiteSpace( item.ClientLoadNotes ) )
-                        {
-                            <div style="font-size: 10px; color: forestgreen;">
-                                Notes: <span style="font-style: italic;">@item.ClientLoadNotes</span>
-                            </div>
-                        }
-                    </td>
-                    <td>
-                        @if ( item.LoadType.HasValue )
-                        {
-                            @item.LoadType.Value.ToString()
-                        }
-                    </td>
-                    <td>
-                        @item.CustomerTo
-                    </td>
+                    <td>@(item.LoadDate?.ToString("yyyy-MM-dd"))</td>
+                    <td>@days</td>
+                    <td>@item.CustomerType</td>
+                    <td>@item.GLID</td>
+                    <td>@item.SupplierFrom</td>
+                    <td>@item.LoadNumber</td>
+                    <td>@item.CustomerAccountNo</td>
+                    <td>@item.CustomerTo</td>
+                    <td>@item.RegionName</td>
+                    <td>@item.PCNComments</td>
+                    <td>@item.DocketNumber</td>
+                    <td>@item.DeliveryNote</td>
+                    <td>@item.OriginalQuantity</td>
+                    <td>@item.ReturnQty</td>
+                    <td>@item.OutstandingQty</td>
+                    <td>@item.PODComment</td>
+                    <td>@item.TransporterName</td>
+                    <td>@item.VehicleRegistration</td>
+                    <td>@item.ClientLoadNotes</td>
+                    <td>@item.DailyRental</td>
+                    <td>@item.ChepCompensationNo</td>
+                    <td>@item.ModifiedBy</td>
+                    <td>@item.PalletAuthCode</td>
                 </tr>
 
                 count++;
             }
         }
     </tbody>
-
 </table>
 
 @Html.Partial( "_Paging" )

@@ -448,6 +448,17 @@ namespace ACT.Core.Services
                 }
             }
 
+            using ( ClientLoadQuantityService clqService = new ClientLoadQuantityService() )
+            {
+                foreach ( var item in model )
+                {
+                    var quantities = clqService.GetQuantitiesForClientLoad( item.Id );
+                    item.OriginalQuantity = quantities.delivered;
+                    item.ReturnQty = quantities.returned;
+                    item.OutstandingQty = quantities.outstanding;
+                }
+            }
+
             return model;
         }
 

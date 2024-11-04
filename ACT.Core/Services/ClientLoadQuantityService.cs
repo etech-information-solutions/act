@@ -37,5 +37,23 @@ namespace ACT.Core.Services
 
             context.SaveChanges();
         }
+
+        public (decimal delivered, decimal returned, decimal outstanding) GetQuantitiesForClientLoad( int clientLoadId )
+        {
+            var quantities = context.ClientLoadQuantities
+                .Where( clq => clq.ClientLoadId == clientLoadId )
+                .GroupBy( clq => clq.ClientLoadId )
+                .Select( g => new
+                {
+                    Delivered = g.Sum( clq => clq.OriginalQuantity ),
+                    Returned = g.Sum( clq => clq.ReturnQty ),
+                    Outstanding = g.Sum( clq => clq.OutstandingQty )
+                } )
+                .FirstOrDefault();
+
+            return quantities == null
+                ? (0, 0, 0)
+                : (quantities.Delivered, quantities.Returned, quantities.Outstanding);
+        }
     }
 }

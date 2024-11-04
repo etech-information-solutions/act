@@ -116,6 +116,13 @@ namespace ACT.Core.Models.Custom
         public string APIKey { get; set; }
         public string RegionName { get; set; }
 
+        public string PLTType { get; set; }
+        public string CustomerAccountNo { get; set; }
+        public string PCNNote { get; set; }
+        public string Doc { get; set; }
+        public decimal? DailyRental { get; set; }
+        public string PalletAuthCode { get; set; }
+
     }
     public enum LoadViewType
     {
