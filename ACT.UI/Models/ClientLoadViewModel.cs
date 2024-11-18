@@ -261,6 +261,28 @@ namespace ACT.UI.Models
         [Display( Name = "PRIM/SEC" )]
         public LoadType? PrimarySecondary { get; set; }
 
+        [Display( Name = "LOAD TYPE:" )]
+        public CommentLoadType? LoadCategory { get; set; }
+
+        public CommentLoadType ComputedLoadCategory
+        {
+            get
+            {
+                if ( CustomerType?.ToUpper()?.Contains( "EXCHANGE" ) == true ||
+                    ReceiverNumber?.StartsWith( "50000" ) == true ||
+                    ReceiverNumber?.StartsWith( "52" ) == true ||
+                    ReceiverNumber?.StartsWith( "51" ) == true )
+                {
+                    return CommentLoadType.PCN;
+                }
+                else if ( DocumentType == DocumentType.ACTControlDoc )
+                {
+                    return CommentLoadType.Other;
+                }
+                return CommentLoadType.THAN;
+            }
+        }
+
         [Display( Name = "DEP STO NO:" )]
         public string DepoSTONo { get; set; }
 
@@ -418,11 +440,20 @@ namespace ACT.UI.Models
         public decimal OutstandingQtyAtCustomer { get; set; }
 
         public Dictionary<int, string> ProductOptions { get; set; }
+
+        public string ProductName { get; set; }
     }
 
     public enum LoadType
     {
         Primary = 1,
         Secondary = 2
+    }
+
+    public enum CommentLoadType
+    {
+        Other = 0,
+        PCN = 1,
+        THAN = 2
     }
 }

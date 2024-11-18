@@ -286,7 +286,40 @@ namespace ACT.Core.Services
                             ca.Code as [PalletAuthCode],
                             (SELECT COUNT(1) FROM [dbo].[Task] t WHERE cl.Id=t.ClientLoadId) AS [TaskCount],
                             (SELECT COUNT(1) FROM [dbo].[Journal] j WHERE cl.Id=j.ClientLoadId) AS [JournalCount],
-                            (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ClientLoad') AS [DocumentCount]
+                            (SELECT COUNT(1) FROM [dbo].[Document] d WHERE cl.Id=d.ObjectId AND d.ObjectType='ClientLoad') AS [DocumentCount],
+                            clq.EquipmentCode as Equipment,
+                            (
+                                SELECT TOP 1 p.Name 
+                                FROM Product p 
+                                WHERE p.Id = CAST(clq.EquipmentCode AS INT)
+                            ) as MatchingProduct,
+                            (
+                                SELECT TOP 1 pp.Rate 
+                                FROM ProductPrice pp 
+                                INNER JOIN Product p ON p.Id = pp.ProductId
+                                WHERE p.Id = CAST(clq.EquipmentCode AS INT)
+                                    AND pp.Type = 2
+                                    AND pp.Status = 1
+                                    AND (pp.FromDate IS NULL OR pp.FromDate <= GETDATE())
+                                ORDER BY pp.FromDate DESC
+                            ) as DailyRate,
+                            DATEDIFF(day, cl.LoadDate, GETDATE()) as DaysOutstanding,
+                            clq.OutstandingQty as PalletQty,
+                            ISNULL(clq.OutstandingQty * 
+                                CASE 
+                                    WHEN DATEDIFF(day, cl.LoadDate, GETDATE()) <= 0 THEN 0
+                                    ELSE DATEDIFF(day, cl.LoadDate, GETDATE())
+                                END * 
+                                ISNULL((
+                                    SELECT TOP 1 pp.Rate 
+                                    FROM ProductPrice pp 
+                                    INNER JOIN Product p ON p.Id = pp.ProductId
+                                    WHERE p.Id = CAST(clq.EquipmentCode AS INT)
+                                        AND pp.Type = 2
+                                        AND pp.Status = 1
+                                        AND (pp.FromDate IS NULL OR pp.FromDate <= GETDATE())
+                                    ORDER BY pp.FromDate DESC
+                                ), 0), 0) as [HireAmount]
                         FROM
                             [dbo].[ClientLoad] cl
                             INNER JOIN [dbo].[Client] c ON c.[Id]=cl.[ClientId]
@@ -305,7 +338,23 @@ namespace ACT.Core.Services
                             LEFT OUTER JOIN [dbo].[OutstandingReason] otr ON otr.[Id]=cl.[OutstandingReasonId]
                             LEFT OUTER JOIN [dbo].[ClientGroup] cg ON cg.[ClientId]=cl.[ClientId] 
                             LEFT OUTER JOIN [dbo].[Group] g ON g.[Id]=cg.[GroupId]
-                            LEFT OUTER JOIN [dbo].[ChepLoad] ch ON ch.[Id]=(SELECT TOP 1 ch1.[Id] FROM [dbo].[ChepLoad] ch1 WHERE ch1.[ClientId]=cl.[ClientId] AND cl.[ReceiverNumber] IS NOT NULL AND cl.[ReceiverNumber] != '' AND (RTRIM(LTRIM(cl.[ReceiverNumber])) LIKE '%' + RTRIM(LTRIM(ch1.Ref)) +'%' OR RTRIM(LTRIM(cl.[ReceiverNumber])) LIKE '%' + RTRIM(LTRIM(ch1.OtherRef)) +'%'))";
+                            LEFT OUTER JOIN [dbo].[ChepLoad] ch ON ch.[Id]=(
+                                SELECT TOP 1 ch1.[Id] 
+                                FROM [dbo].[ChepLoad] ch1 
+                                WHERE ch1.[ClientId]=cl.[ClientId] 
+                                    AND cl.[ReceiverNumber] IS NOT NULL 
+                                    AND cl.[ReceiverNumber] != '' 
+                                    AND (RTRIM(LTRIM(cl.[ReceiverNumber])) LIKE '%' + RTRIM(LTRIM(ch1.Ref)) +'%' 
+                                        OR RTRIM(LTRIM(cl.[ReceiverNumber])) LIKE '%' + RTRIM(LTRIM(ch1.OtherRef)) +'%')
+                            )
+                            LEFT OUTER JOIN (
+                            SELECT 
+                                ClientLoadId,
+                                EquipmentCode,  -- Added EquipmentCode to the subquery
+                                SUM(OutstandingQty) as OutstandingQty
+                            FROM ClientLoadQuantity 
+                            GROUP BY ClientLoadId, EquipmentCode  -- Added EquipmentCode to GROUP BY
+                        ) clq ON clq.ClientLoadId = cl.Id";
 
             // WHERE
 

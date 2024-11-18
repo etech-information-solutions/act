@@ -508,22 +508,19 @@
                 </div>
                 <div class="form-group">
                     <div class="editor-label comment-label">
-                        Load Type
+                        @Html.LabelFor( model => model.LoadCategory )
                     </div>
                     <div class="editor-field comment-field">
-                        @{
-                            string ltype = "THAN";
-
-                            if ( Model?.CustomerType?.ToUpper()?.Contains( "EXCHANGE" ) == true || Model.ReceiverNumber?.StartsWith( "50000" ) == true || Model.ReceiverNumber?.StartsWith( "52" ) == true || Model.ReceiverNumber?.StartsWith( "51" ) == true )
-                            {
-                                ltype = "PCN";
-                            }
-                            else if ( Model.DocumentType == DocumentType.ACTControlDoc )
-                            {
-                                ltype = "OTHER";
-                            }
-                        }
-                        @Html.Raw( ltype )
+                        @Html.DropDownListFor( model => model.LoadCategory,
+                            new SelectList( Enum.GetValues( typeof( CommentLoadType ) )
+                                .Cast<CommentLoadType>()
+                                .Select( e => new SelectListItem
+                                {
+                                    Text = e.ToString(),
+                                    Value = ( ( int ) e ).ToString()
+                                } ), "Value", "Text" ),
+                            new { @class = "", @style = "width: 100%" } )
+                        @Html.ValidationMessageFor( model => model.LoadCategory )
                     </div>
                 </div>
                 <div class="form-group">

@@ -20,11 +20,11 @@ namespace ACT.UI.Models
         public int ProductId { get; set; }
 
         [Required]
-        [Display( Name = "Name" )]
+        [Display( Name = "Code" )]
         [StringLength( 50, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string Name { get; set; }
 
-        [Display( Name = "Description" )]
+        [Display( Name = "Name" )]
         [StringLength( 500, ErrorMessage = "Only {1} characters are allowed for this field.", MinimumLength = 0 )]
         public string Description { get; set; }
 

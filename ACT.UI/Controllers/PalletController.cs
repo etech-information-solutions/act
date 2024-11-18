@@ -52,9 +52,9 @@ namespace ACT.UI.Controllers
             {
                 case "clientdata":
                     #region Client Data
-                    csv = string.Format( "Client,Load Date,Days,PLT Type,GLID,Supplier From,Customer To,Customer Group,Load/Shipment," +
-                                       "Transporter Name,Vehicle Reg,Region,PCN Note,Doc Number,Delivery Note,Del Qty,Ret Qty,Outst Qty," +
-                                       "ARPM Comments,Notes,Daily Rental,Compensation,Pallet Auth By,Pallet Auth Code,Status{0}",
+                    csv = string.Format( "Load Date,Days,PLT Type,GLID,Supplier,Load,Customer Acc No,Customer,Province," +
+                                       "Doc,Delivery Note No,Del Qty,Ret Qty,Outst Qty,ARPM Comments,Transporter Name,Truck Reg," +
+                                       "Notes,Daily Rental,Compensation,Pallet Auth By,Pallet Auth Code,Status{0}",
                                        Environment.NewLine );
 
                     using ( ClientLoadService clservice = new ClientLoadService() )
@@ -65,36 +65,34 @@ namespace ACT.UI.Controllers
                             foreach ( ClientLoadCustomModel item in clientloads )
                             {
                                 int days = ( DateTime.Now - ( item.LoadDate ?? DateTime.Now ) ).Days;
+                                LoadStatus status = ( LoadStatus ) item.Status;
 
-                                csv = string.Format( "{0}\"{1}\",\"{2}\",{3},\"{4}\",\"{5}\",\"{6}\",\"{7}\",\"{8}\",\"{9}\"," +
-                                                  "\"{10}\",\"{11}\",\"{12}\",\"{13}\",\"{14}\",\"{15}\",{16},{17},{18}," +
-                                                  "\"{19}\",\"{20}\",\"{21}\",\"{22}\",\"{23}\",\"{24}\",\"{25}\"{26}",
-                                                  csv,
-                                                  item.ClientName,
-                                                  item.LoadDate?.ToString( "yyyy-MM-dd" ),
+                                csv += string.Format( "{0},{1},{2},{3},{4},{5},{6},{7},{8}," +
+                                                   "{9},{10},{11},{12},{13},{14},{15},{16}," +
+                                                   "{17},{18},{19},{20},{21},{22}{23}",
+                                                  "\"" + ( item.LoadDate?.ToString( "yyyy-MM-dd" ) ?? "" ) + "\"",
                                                   days,
-                                                  item.PLTType,
-                                                  item.GLID,
-                                                  item.SupplierFrom,
-                                                  item.CustomerTo,
-                                                  item.CustomerGroup,
-                                                  item.LoadNumber,
-                                                  item.TransporterName,
-                                                  item.VehicleRegistration,
-                                                  item.RegionName,
-                                                  item.PCNComments,
-                                                  item.DocketNumber,
-                                                  item.DeliveryNote,
+                                                  "\"" + item.CustomerType + "\"",
+                                                  "\"" + item.GLID + "\"",
+                                                  "\"" + item.SupplierFrom + "\"",
+                                                  "\"" + item.LoadNumber + "\"",
+                                                  "\"" + item.CustomerAccountNo + "\"",
+                                                  "\"" + item.CustomerTo + "\"",
+                                                  "\"" + item.RegionName + "\"",
+                                                  "\"" + item.DocketNumber + "\"",
+                                                  "\"" + item.DeliveryNote + "\"",
                                                   item.OriginalQuantity,
                                                   item.ReturnQty,
                                                   item.OutstandingQty,
-                                                  item.PODComment,
-                                                  item.ClientLoadNotes,
-                                                  item.DailyRental,
-                                                  item.ChepCompensationNo,
-                                                  item.ModifiedBy,
-                                                  item.PalletAuthCode,
-                                                  ( ( ReconciliationStatus ) item.Status ).GetDisplayText(),
+                                                  "\"" + item.PODComment + "\"",
+                                                  "\"" + item.TransporterName + "\"",
+                                                  "\"" + item.VehicleRegistration + "\"",
+                                                  "\"" + item.ClientLoadNotes + "\"",
+                                                  "\"" + ( item.HireAmount?.ToString( "C2", new System.Globalization.CultureInfo( "en-ZA" ) ) ?? "" ) + "\"",
+                                                  "\"" + item.ChepCompensationNo + "\"",
+                                                  "\"" + item.ModifiedBy + "\"",
+                                                  "\"" + item.PalletAuthCode + "\"",
+                                                  "\"" + status.GetDisplayText() + "\"",
                                                   Environment.NewLine );
                             }
                         }
@@ -1325,7 +1323,23 @@ namespace ACT.UI.Controllers
             {
                 #region Create Client Load
 
-                Vehicle vehicle = vservice.GetById( model.ClientId );
+                Vehicle vehicle = vservice.GetByRegistration( model.VehicleRegistration );
+
+                if ( vehicle == null )
+                {
+                    // Create new vehicle
+                    vehicle = new Vehicle
+                    {
+                        Registration = model.VehicleRegistration,
+                        FleetNumber = model.FleetNumber,
+                        CreatedOn = DateTime.Now,
+                        ModifiedOn = DateTime.Now,
+                        ObjectId = model.ClientId,
+                        ObjectType = "Client"
+                    };
+
+                    vehicle = vservice.Create( vehicle );
+                }
 
                 ClientLoad load = new ClientLoad()
                 {
@@ -1346,7 +1360,6 @@ namespace ACT.UI.Controllers
                     TransporterId = model.TransporterId,
                     DebtorsCode = model.DebtorsCode,
                     VehicleId = !string.IsNullOrEmpty( model.FleetNumber ) && int.TryParse( model.FleetNumber, out int fleetNumber ) ? ( int? ) fleetNumber : null,
-                    LoadType = model.PrimarySecondary.HasValue ? ( int ) model.PrimarySecondary.Value : ( int? ) null,
                     ReferenceNumber = model.ReferenceNumber,
                     LoadSheetNo = model.LoadsheetNo,
                     ReceiverNumber = model.ReceiverNumber,
@@ -1360,9 +1373,12 @@ namespace ACT.UI.Controllers
                     ChepCompensationNo = model.ChepCompensationNo,
                     CompensationDate = model.CompensationDate,
                     EffectiveDate = model.EffectiveDate,
-                    CustomerType = model.CustomerType,
+                    // CustomerType = model.CustomerType,
                     PODCommentId = model.PODCommentId,
                     ClientLoadNotes = model.ClientLoadNotes,
+                    LoadType = model.PrimarySecondary.HasValue ? ( int ) model.PrimarySecondary.Value : ( int? ) null,
+                    CustomerType = model.LoadCategory.HasValue ? model.LoadCategory.Value.ToString() :
+                          model.ComputedLoadCategory.ToString(),
                 };
 
                 load = clservice.Create( load );
@@ -1464,7 +1480,8 @@ namespace ACT.UI.Controllers
                     ClientSiteIdTo = load?.ToClientSiteId,
                     LoadNumber = load?.LoadNumber,
                     LoadDate = load?.LoadDate,
-                    PrimarySecondary = load?.LoadType.HasValue == true ? ( LoadType ) load.LoadType.Value : ( LoadType? ) null,
+                    PrimarySecondary = load?.LoadType.HasValue == true ?
+                ( LoadType ) load.LoadType.Value : ( LoadType? ) null,
                     AuthorizationCode = clauthorise?.Code,
                     AuthorizedBy = clauthorise != null ? $"{clauthorise.User.Name} {clauthorise.User.Surname}" : null,
                     ClientGroupId = clientGroup?.GroupId,
@@ -1496,6 +1513,7 @@ namespace ACT.UI.Controllers
                     EffectiveDate = load?.EffectiveDate,
                     PODCommentId = load.PODCommentId,
                     ClientLoadNotes = load.ClientLoadNotes,
+                    LoadCategory = GetLoadCategoryFromCustomerType( load?.CustomerType ),
                     EquipmentDetails = load?.ClientLoadQuantities.Select( clq => new EquipmentDetailViewModel
                     {
                         ProductId = int.TryParse( clq.EquipmentCode, out int productId ) ? productId : 0,
@@ -1595,13 +1613,35 @@ namespace ACT.UI.Controllers
             using ( ExtendedClientLoadService ecservice = new ExtendedClientLoadService() )
             {
                 ClientLoad load = clservice.GetById( model.Id );
-                Vehicle vehicle = vservice.GetById( model.ClientId );
+                Vehicle vehicle = vservice.GetByRegistration( model.VehicleRegistration );
                 ClientCustomer ccustomer = ccservice.GetById( model.ClientId );
 
                 if ( load == null )
                 {
                     Notify( "Sorry, the requested resource could not be found. Please try again", NotificationType.Error );
                     return PartialView( "_AccessDenied" );
+                }
+
+                if ( vehicle == null )
+                {
+                    vehicle = new Vehicle
+                    {
+                        Registration = model.VehicleRegistration,
+                        FleetNumber = model.FleetNumber,
+                        CreatedOn = DateTime.Now,
+                        ModifiedOn = DateTime.Now,
+                        ObjectId = model.ClientId,
+                        ObjectType = "Client"
+                    };
+
+                    vehicle = vservice.Create( vehicle );
+                }
+                else
+                {
+                    vehicle.Registration = model.VehicleRegistration;
+                    vehicle.FleetNumber = model.FleetNumber;
+                    vehicle.ModifiedOn = DateTime.Now;
+                    vservice.Update( vehicle );
                 }
 
                 load.ClientId = model.ClientId;
@@ -1638,6 +1678,11 @@ namespace ACT.UI.Controllers
                 load.Status = ( int ) model.Status;
                 load.PODCommentId = model.PODCommentId;
                 load.ClientLoadNotes = model.ClientLoadNotes;
+                load.VehicleId = vehicle.Id;
+                load.LoadType = model.PrimarySecondary.HasValue ?
+            ( int ) model.PrimarySecondary.Value : ( int? ) null;
+                load.CustomerType = model.LoadCategory?.ToString() ??
+            GetLoadCategoryFromCustomerType( load.CustomerType ).ToString();
 
                 // Update the ClientLoad entity
                 clservice.Update( load );
@@ -2350,6 +2395,19 @@ namespace ACT.UI.Controllers
                 var result = customers.Select( kvp => new { id = kvp.Key.ToString(), name = kvp.Value } ).ToList();
                 return Json( result, JsonRequestBehavior.AllowGet );
             }
+        }
+
+        private CommentLoadType GetLoadCategoryFromCustomerType( string customerType )
+        {
+            if ( string.IsNullOrEmpty( customerType ) )
+                return CommentLoadType.THAN; // Default value
+
+            if ( customerType.Equals( "PCN", StringComparison.OrdinalIgnoreCase ) )
+                return CommentLoadType.PCN;
+            if ( customerType.Equals( "OTHER", StringComparison.OrdinalIgnoreCase ) )
+                return CommentLoadType.Other;
+
+            return CommentLoadType.THAN;
         }
 
         #endregion

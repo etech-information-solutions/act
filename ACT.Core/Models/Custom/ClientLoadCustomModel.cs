@@ -108,6 +108,7 @@ namespace ACT.Core.Models.Custom
         public string SupplierFrom { get; set; }
         public string CustomerTo { get; set; }
         public string CustomerGroup { get; set; }
+        public decimal? HireAmount { get; set; }
 
 
         // Mobile API
