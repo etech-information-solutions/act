@@ -1283,12 +1283,28 @@ namespace ACT.UI.Controllers
                     p => p.Value
                 );
 
-                // Populate EquipmentDetails with ProductOptions
+                // Find the default product IDs
+                var defaultProduct = allProducts.FirstOrDefault( p =>
+                p.Value == "8001" || p.Value == "8003" || p.Value == "8004" );
+
+                // Populate EquipmentDetails with ProductOptions - exactly as before but with defaults
                 model.EquipmentDetails = new List<EquipmentDetailViewModel>
                 {
-                    new EquipmentDetailViewModel { ProductOptions = productOptions },
-                    new EquipmentDetailViewModel { ProductOptions = productOptions },
-                    new EquipmentDetailViewModel { ProductOptions = productOptions }
+                    new EquipmentDetailViewModel
+                    {
+                        ProductOptions = productOptions,
+                        ProductId = defaultProduct.Key
+                    },
+                    new EquipmentDetailViewModel
+                    {
+                        ProductOptions = productOptions,
+                        ProductId = defaultProduct.Key
+                    },
+                    new EquipmentDetailViewModel
+                    {
+                        ProductOptions = productOptions,
+                        ProductId = defaultProduct.Key
+                    }
                 };
             }
 

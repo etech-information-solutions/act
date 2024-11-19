@@ -6443,7 +6443,6 @@
         {
             var target = $( sender.attr( 'data-target' ) );
 
-            // Function to calculate and update OutstandingQty for a specific row
             function updateOutstandingQty ( section )
             {
                 var fields = [ 'DeliveredQty', 'ReturnedTransferredQty', 'DebriefQty', 'TransporterLiable', 'AdminMovement' ];
@@ -6453,105 +6452,73 @@
                     section.find( 'input[name$=".' + field + '"]' ).each( function ( index )
                     {
                         var value = parseFloat( $( this ).val() ) || 0;
-                        // Subtract the value
                         if ( field === 'DeliveredQty' )
                         {
-                            totals[ index ] += value; // Keep DeliveredQty as addition
+                            totals[ index ] += value;
                         } else
                         {
-                            totals[ index ] -= value; // Subtract all other fields
+                            totals[ index ] -= value;
                         }
-                        console.log( "Column: " + ( index + 1 ) + ", Field: " + field + ", Value: " + value + ", Running Total: " + totals[ index ] );
                     } );
                 } );
                 section.find( 'input[name$=".OutstandingQtyAtCustomer"]' ).each( function ( index )
                 {
                     $( this ).val( totals[ index ].toFixed( 2 ) );
-                    console.log( "Column: " + ( index + 1 ) + ", Final Total: " + totals[ index ] );
                 } );
             }
 
-            // Function to handle input changes
             function handleInputChange ()
             {
                 var section = $( this ).closest( '.equipment-detail-section' );
                 updateOutstandingQty( section );
             }
 
-            // Apply the event listener to all existing input fields
             target.on( 'input', '.equipment-detail-section input[type="text"]', handleInputChange );
-
-            // Function to handle dropdown selection
-            function handleDropdownSelection ()
-            {
-                var selectedValue = $( this ).val();
-                var currentIndex = $( this ).data( 'index' );
-
-                console.log( "Dropdown changed!" );
-
-                // Remove the selected option in other dropdowns within the same section
-                $( this ).closest( '.equipment-detail-section' ).find( '.equipment-dropdown' ).each( function ()
-                {
-                    if ( $( this ).data( 'index' ) !== currentIndex )
-                    {
-                        $( this ).find( 'option[value="' + selectedValue + '"]' ).remove();
-                        console.log( "Product removed from other dropdowns!" );
-                    }
-                } );
-
-                // Re-initialize Chosen to reflect the changes
-                $( this ).closest( '.equipment-detail-section' ).find( '.equipment-dropdown' ).trigger( "chosen:updated" );
-            }
-
-            // Apply the event listener to all existing dropdowns
-            target.on( 'change', '.equipment-dropdown', handleDropdownSelection );
 
             sender.unbind( 'click' );
             sender.click( function ()
             {
-                // Get the current number of sections
                 var sectionCount = target.find( '.equipment-detail-section' ).length;
-
-                // Create a new section
                 var newSection = $( '<div class="equipment-detail-section" style="margin-top: 35px !important"></div>' );
                 newSection.attr( 'data-section-index', sectionCount );
 
-                // Function to create new dropdowns
-                function createDropdowns ( fieldName, options )
+                // Get equipment details from first section
+                var firstSectionProducts = [];
+                var firstSection = target.find( '.equipment-detail-section:first' );
+                firstSection.find( '.form-control' ).each( function ( index )
+                {
+                    firstSectionProducts.push( $( this ).text().trim() );
+                } );
+
+                function createReadOnlyFields ( fieldName )
                 {
                     var formGroup = $( '<div class="form-group"></div>' );
                     var editorLabel = $( '<div class="editor-label"></div>' );
                     var label = $( '<label>', {
                         for: 'EquipmentDetails_' + ( sectionCount * 3 ) + '__' + fieldName,
-                        text: fieldName === 'ProductId' ? 'EQUIPMENT:' : '',
+                        text: fieldName === 'ProductId' ? 'EQUIPMENT:' : ''
                     } );
                     editorLabel.append( label );
 
                     var editorField = $( '<div class="editor-field"></div>' );
                     for ( var i = 0; i < 3; i++ )
                     {
-                        var wrapper = $( '<div style="display: inline-block; margin-right: 10px; width: 30%;"></div>' );
-                        var select = $( '<select>', {
+                        var wrapper = $( '<div style="display: inline-block; width: 24.5%; margin-right: 28px; margin-bottom: 15px;"></div>' );
+                        var hiddenInput = $( '<input>', {
+                            type: 'hidden',
                             name: 'EquipmentDetails[' + ( sectionCount * 3 + i ) + '].' + fieldName,
                             id: 'EquipmentDetails_' + ( sectionCount * 3 + i ) + '__' + fieldName,
-                            class: 'equipment-dropdown fixed-width-dropdown',
-                            style: 'width: 100%; margin-bottom: 15px',
-                            'data-index': i
+                            value: firstSection.find( 'input[name="EquipmentDetails[' + i + '].ProductId"]' ).val() // Copy ProductId from first section
                         } );
-                        select.append( $( '<option></option>' ).attr( 'value', '' ).text( 'Select Equipment' ) );
+                        var productText = firstSectionProducts[ i ] || 'Product Master Unavailable';
+                        var readOnlyDiv = $( '<div>', {
+                            class: 'form-control',
+                            style: 'width: 100%; background-color: #f8f9fa; border: 1px solid #ced4da; padding: 6px 12px; border-radius: 4px; margin-top: 10px;',
+                            text: productText
+                        } );
 
-                        if ( typeof options === 'object' && options !== null )
-                        {
-                            $.each( options, function ( key, value )
-                            {
-                                select.append( $( '<option></option>' ).attr( 'value', key ).text( value ) );
-                            } );
-                        } else
-                        {
-                            console.warn( 'Equipment options are not available or not in the correct format' );
-                        }
-
-                        wrapper.append( select );
+                        wrapper.append( hiddenInput );
+                        wrapper.append( readOnlyDiv );
                         editorField.append( wrapper );
                     }
 
@@ -6560,7 +6527,6 @@
                     return formGroup;
                 }
 
-                // Function to create new input fields with default value
                 function createInputFields ( fieldName, defaultValue )
                 {
                     var formGroup = $( '<div class="form-group"></div>' );
@@ -6595,23 +6561,9 @@
                     return formGroup;
                 }
 
-                // Get the equipment options from the first section's dropdown
-                var equipmentOptions = {};
-                var firstDropdown = target.find( '.equipment-detail-section:first select.equipment-dropdown:first' );
-                firstDropdown.find( 'option' ).each( function ()
-                {
-                    var option = $( this );
-                    if ( option.val() !== '' )
-                    {
-                        equipmentOptions[ option.val() ] = option.text();
-                    }
-                } );
-
-                // Add the dropdowns for ProductId
                 newSection.append( '<p><strong class="uppercase">Equipment Details</strong></p>' );
-                newSection.append( createDropdowns( 'ProductId', equipmentOptions ) );
+                newSection.append( createReadOnlyFields( 'ProductId' ) );
 
-                // Add input fields for other properties with default value of 0
                 var inputFields = [
                     { name: 'DeliveredQty' },
                     { name: 'ReturnedTransferredQty' },
@@ -6620,44 +6572,23 @@
                     { name: 'AdminMovement' },
                     { name: 'OutstandingQtyAtCustomer' }
                 ];
+
                 inputFields.forEach( function ( field )
                 {
                     var inputField = createInputFields( field.name, '0' );
                     newSection.append( inputField );
 
-                    // Make OutstandingQty read-only
                     if ( field.name === 'OutstandingQtyAtCustomer' )
                     {
                         inputField.find( 'input' ).prop( 'readonly', true );
                     }
                 } );
 
-                // Add a dotted line break after the new section
                 var lineBreak = $( '<div class="clear" style="border-bottom: 1px dashed #ccc; margin-bottom: 20px; margin-top: 20px; height: 0;">&nbsp;</div>' );
 
-                // Append the new section and line break to the container
                 target.append( newSection );
                 target.append( lineBreak );
 
-                // Initialize Chosen for the new dropdowns
-                if ( $.fn.chosen )
-                {
-                    newSection.find( 'select.chzn' ).chosen();
-                } else
-                {
-                    console.warn( 'Chosen plugin is not available' );
-                }
-
-                // Reinitialize any other necessary plugins or events for the new section
-                if ( typeof ACT !== 'undefined' && ACT.Init && typeof ACT.Init.Start === 'function' )
-                {
-                    ACT.Init.Start( true );
-                } else
-                {
-                    console.warn( 'ACT.Init.Start is not available' );
-                }
-
-                // Initialize the OutstandingQty for the new section
                 updateOutstandingQty( newSection );
 
                 return false;
