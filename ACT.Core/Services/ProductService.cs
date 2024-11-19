@@ -244,5 +244,11 @@ namespace ACT.Core.Services
         {
             return context.Products.FirstOrDefault( p => p.Name.Trim() == name.Trim() );
         }
+
+        // Add this method to ProductService.cs
+        public IEnumerable<Product> GetAllProductsRaw()
+        {
+            return context.Products.Where( p => p.Status == ( int ) Status.Active ).ToList();
+        }
     }
 }

@@ -350,10 +350,10 @@ namespace ACT.Core.Services
                             LEFT OUTER JOIN (
                             SELECT 
                                 ClientLoadId,
-                                EquipmentCode,  -- Added EquipmentCode to the subquery
+                                MAX(EquipmentCode) as EquipmentCode,
                                 SUM(OutstandingQty) as OutstandingQty
                             FROM ClientLoadQuantity 
-                            GROUP BY ClientLoadId, EquipmentCode  -- Added EquipmentCode to GROUP BY
+                            GROUP BY ClientLoadId
                         ) clq ON clq.ClientLoadId = cl.Id";
 
             // WHERE

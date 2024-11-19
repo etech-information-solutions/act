@@ -1255,7 +1255,7 @@ namespace ACT.UI.Controllers
             }
         }
 
-        // GET: Pallet/AddClientLoad
+        // GET: Pallet/AddClientData
         [Requires( PermissionTo.Create )]
         public ActionResult AddClientData()
         {
@@ -1272,40 +1272,34 @@ namespace ACT.UI.Controllers
             using ( ClientCustomerService ccservice = new ClientCustomerService() )
             {
                 model.ClientGroupOptions = gservice.List( true );
-                var allProducts = pservice.List( true );
                 model.TransporterOptions = tservice.ListAllTransporters();
                 model.SupplierSiteOptions = sservice.ListSupplierSites( true );
                 model.CustomerSiteOptions = ccservice.GetCustomerNamesAndNumbers();
 
-                // Create ProductOptions dictionary
-                var productOptions = allProducts.ToDictionary(
-                    p => p.Key,
-                    p => p.Value
-                );
+                // Fetch specific products using their IDs
+                var products = pservice.GetAllProductsRaw()
+                    .Where( p => new[] { 8001, 8003, 8004 }.Contains( p.Id ) )
+                    .ToDictionary( p => p.Id, p => p.Name );
 
-                // Find the default product IDs
-                var defaultProduct = allProducts.FirstOrDefault( p =>
-                p.Value == "8001" || p.Value == "8003" || p.Value == "8004" );
+                // Create the three default equipment details
+                model.EquipmentDetails = new List<EquipmentDetailViewModel>();
 
-                // Populate EquipmentDetails with ProductOptions - exactly as before but with defaults
-                model.EquipmentDetails = new List<EquipmentDetailViewModel>
+                var defaultProducts = new[] { 8001, 8003, 8004 };
+                foreach ( var productId in defaultProducts )
                 {
-                    new EquipmentDetailViewModel
+                    model.EquipmentDetails.Add( new EquipmentDetailViewModel
                     {
-                        ProductOptions = productOptions,
-                        ProductId = defaultProduct.Key
-                    },
-                    new EquipmentDetailViewModel
-                    {
-                        ProductOptions = productOptions,
-                        ProductId = defaultProduct.Key
-                    },
-                    new EquipmentDetailViewModel
-                    {
-                        ProductOptions = productOptions,
-                        ProductId = defaultProduct.Key
-                    }
-                };
+                        ProductId = productId,
+                        ProductOptions = products,
+                        ProductName = products.ContainsKey( productId ) ? products[ productId ] : productId.ToString(),
+                        DeliveredQty = 0,
+                        ReturnedTransferredQty = 0,
+                        DebriefQty = 0,
+                        TransporterLiable = 0,
+                        AdminMovement = 0,
+                        OutstandingQtyAtCustomer = 0
+                    } );
+                }
             }
 
             return View( model );
@@ -1318,14 +1312,6 @@ namespace ACT.UI.Controllers
         {
             if ( !ModelState.IsValid )
             {
-                /*using ( ClientProductService cpservice = new ClientProductService() )
-                {
-                    var clientProducts = cpservice.ListByClient( model.ClientId );
-                    model.EquipmentCodeOptions = clientProducts.ToDictionary(
-                        cp => cp.ProductId,
-                        cp => cp.Product.Name
-                    );
-                }*/
                 Notify( "Sorry, the item was not created. Please correct all errors and try again.", NotificationType.Error );
                 return View( model );
             }
@@ -1337,13 +1323,11 @@ namespace ACT.UI.Controllers
             using ( ClientLoadService clservice = new ClientLoadService() )
             using ( ClientCustomerService ccservice = new ClientCustomerService() )
             {
-                #region Create Client Load
-
+                #region Create/Update Vehicle
                 Vehicle vehicle = vservice.GetByRegistration( model.VehicleRegistration );
 
                 if ( vehicle == null )
                 {
-                    // Create new vehicle
                     vehicle = new Vehicle
                     {
                         Registration = model.VehicleRegistration,
@@ -1356,7 +1340,10 @@ namespace ACT.UI.Controllers
 
                     vehicle = vservice.Create( vehicle );
                 }
+                #endregion
 
+                #region Create Single Client Load Record
+                // Only create ONE ClientLoad record
                 ClientLoad load = new ClientLoad()
                 {
                     ClientId = model.ClientId,
@@ -1389,53 +1376,57 @@ namespace ACT.UI.Controllers
                     ChepCompensationNo = model.ChepCompensationNo,
                     CompensationDate = model.CompensationDate,
                     EffectiveDate = model.EffectiveDate,
-                    // CustomerType = model.CustomerType,
                     PODCommentId = model.PODCommentId,
                     ClientLoadNotes = model.ClientLoadNotes,
                     LoadType = model.PrimarySecondary.HasValue ? ( int ) model.PrimarySecondary.Value : ( int? ) null,
                     CustomerType = model.LoadCategory.HasValue ? model.LoadCategory.Value.ToString() :
-                          model.ComputedLoadCategory.ToString(),
+                            model.ComputedLoadCategory.ToString(),
                 };
 
+                // Create single ClientLoad record
                 load = clservice.Create( load );
-
                 #endregion
 
-                // Update the Vehicle entity
-                // vehicle.FleetNumber = model.FleetNumber;
-                vehicle.Registration = model.VehicleRegistration;
-                vservice.Update( vehicle );
-
                 #region Create Equipment Details
-
-                if ( model.EquipmentDetails != null && model.EquipmentDetails.Count > 0 )
+                if ( model.EquipmentDetails?.Any() == true )
                 {
                     using ( ClientLoadQuantityService clqservice = new ClientLoadQuantityService() )
                     {
+                        // Create ClientLoadQuantity records for each product
                         foreach ( var detail in model.EquipmentDetails )
                         {
-                            ClientLoadQuantity clientLoadQuantity = new ClientLoadQuantity
+                            // Only create records for equipment with actual quantities
+                            if ( detail.ProductId.HasValue &&
+                                ( detail.DeliveredQty != 0 ||
+                                 detail.ReturnedTransferredQty != 0 ||
+                                 detail.DebriefQty != 0 ||
+                                 detail.TransporterLiable != 0 ||
+                                 detail.AdminMovement != 0 ||
+                                 detail.OutstandingQtyAtCustomer != 0 ) )
                             {
-                                ClientLoadId = load.Id,
-                                EquipmentCode = detail.ProductId?.ToString() ?? string.Empty,
-                                OriginalQuantity = ( int ) detail.DeliveredQty,
-                                ReturnQty = ( int ) detail.ReturnedTransferredQty,
-                                DebriefQty = ( int ) detail.DebriefQty,
-                                TransporterLiableQty = ( int ) detail.TransporterLiable,
-                                AdminMovementQty = ( int ) detail.AdminMovement,
-                                OutstandingQty = ( int ) detail.OutstandingQtyAtCustomer,
-                                CreatedOn = DateTime.Now,
-                                ModifiedOn = DateTime.Now,
-                            };
-                            clqservice.Create( clientLoadQuantity );
+                                var clientLoadQuantity = new ClientLoadQuantity
+                                {
+                                    ClientLoadId = load.Id,
+                                    EquipmentCode = detail.ProductId.Value.ToString(),
+                                    OriginalQuantity = ( int ) detail.DeliveredQty,
+                                    ReturnQty = ( int ) detail.ReturnedTransferredQty,
+                                    DebriefQty = ( int ) detail.DebriefQty,
+                                    TransporterLiableQty = ( int ) detail.TransporterLiable,
+                                    AdminMovementQty = ( int ) detail.AdminMovement,
+                                    OutstandingQty = ( int ) detail.OutstandingQtyAtCustomer,
+                                    CreatedOn = DateTime.Now,
+                                    ModifiedOn = DateTime.Now,
+                                    ModifiedBy = User.Identity.Name
+                                };
+
+                                clqservice.Create( clientLoadQuantity );
+                            }
                         }
                     }
                 }
-
                 #endregion
 
-
-                // Update ClientCustomer
+                #region Update ClientCustomer
                 if ( model.ClientSiteIdTo.HasValue )
                 {
                     ClientCustomer customer = ccservice.GetById( model.ClientSiteIdTo.Value );
@@ -1446,15 +1437,13 @@ namespace ACT.UI.Controllers
                         ccservice.Update( customer );
                     }
                 }
-
+                #endregion
 
                 #region Handle ClientGroup
-
                 if ( model.ClientGroupId.HasValue )
                 {
                     gservice.SaveOrUpdateClientGroup( load.ClientId, model.ClientGroupId.Value, User.Identity.Name );
                 }
-
                 #endregion
 
                 scope.Complete();
@@ -1529,72 +1518,76 @@ namespace ACT.UI.Controllers
                     EffectiveDate = load?.EffectiveDate,
                     PODCommentId = load.PODCommentId,
                     ClientLoadNotes = load.ClientLoadNotes,
-                    LoadCategory = GetLoadCategoryFromCustomerType( load?.CustomerType ),
-                    EquipmentDetails = load?.ClientLoadQuantities.Select( clq => new EquipmentDetailViewModel
-                    {
-                        ProductId = int.TryParse( clq.EquipmentCode, out int productId ) ? productId : 0,
-                        DeliveredQty = clq.OriginalQuantity,
-                        ReturnedTransferredQty = clq.ReturnQty,
-                        DebriefQty = clq.DebriefQty,
-                        TransporterLiable = clq.TransporterLiableQty,
-                        AdminMovement = clq.AdminMovementQty,
-                        OutstandingQtyAtCustomer = clq.OutstandingQty
-                    } ).ToList() ?? new List<EquipmentDetailViewModel>()
+                    LoadCategory = GetLoadCategoryFromCustomerType( load?.CustomerType )
                 };
 
                 #endregion
 
                 #region Equipment Details
 
-                var clientProducts = cpservice.ListByClient( model.ClientId );
-                var allProducts = pservice.List( true );
+                var products = pservice.GetAllProductsRaw().ToDictionary( p => p.Id, p => p.Name );
 
-                var defaultProductOptions = allProducts.ToDictionary(
-                    p => p.Key,
-                    p => p.Value
-                );
-
+                var defaultProducts = new[] { 8001, 8003, 8004 };
                 var clientLoadQuantities = load?.ClientLoadQuantities.ToList() ?? new List<ClientLoadQuantity>();
 
                 model.EquipmentDetails = new List<EquipmentDetailViewModel>();
 
-                // Populate existing data
-                foreach ( var clq in clientLoadQuantities )
-                {
-                    model.EquipmentDetails.Add( new EquipmentDetailViewModel
-                    {
-                        ProductId = int.TryParse( clq.EquipmentCode, out int productId ) ? productId : 0,
-                        DeliveredQty = clq.OriginalQuantity,
-                        ReturnedTransferredQty = clq.ReturnQty,
-                        DebriefQty = clq.DebriefQty,
-                        TransporterLiable = clq.TransporterLiableQty,
-                        AdminMovement = clq.AdminMovementQty,
-                        OutstandingQtyAtCustomer = clq.OutstandingQty,
-                        ProductOptions = defaultProductOptions
-                    } );
-                }
+                // Check if we have any non-empty records
+                bool hasNonEmptyRecords = clientLoadQuantities.Any( clq =>
+                int.TryParse( clq.EquipmentCode, out int pid ) && pid != 0 &&
+                ( clq.OriginalQuantity != 0 ||
+                clq.ReturnQty != 0 ||
+                clq.DebriefQty != 0 ||
+                clq.TransporterLiableQty != 0 ||
+                clq.AdminMovementQty != 0 ||
+                clq.OutstandingQty != 0 ) );
 
-                // If there are less than 3 items, add empty ones to make it 3
-                while ( model.EquipmentDetails.Count < 3 )
+                if ( hasNonEmptyRecords )
                 {
-                    model.EquipmentDetails.Add( new EquipmentDetailViewModel
+                    // Add only existing records
+                    foreach ( var clq in clientLoadQuantities )
                     {
-                        ProductId = 0,
-                        ProductOptions = defaultProductOptions
-                    } );
+                        int productId = int.TryParse( clq.EquipmentCode, out int pid ) ? pid : 0;
+                        model.EquipmentDetails.Add( new EquipmentDetailViewModel
+                        {
+                            ProductId = productId,
+                            ProductOptions = products,
+                            ProductName = products.ContainsKey( productId ) ? products[ productId ] : productId.ToString(),
+                            DeliveredQty = clq.OriginalQuantity,
+                            ReturnedTransferredQty = clq.ReturnQty,
+                            DebriefQty = clq.DebriefQty,
+                            TransporterLiable = clq.TransporterLiableQty,
+                            AdminMovement = clq.AdminMovementQty,
+                            OutstandingQtyAtCustomer = clq.OutstandingQty
+                        } );
+                    }
                 }
-
-                // Ensure ProductOptions is set for all items
-                foreach ( var detail in model.EquipmentDetails )
+                else
                 {
-                    detail.ProductOptions = defaultProductOptions;
+                    // Only add default products if there are no existing records with values
+                    foreach ( var productId in defaultProducts )
+                    {
+                        model.EquipmentDetails.Add( new EquipmentDetailViewModel
+                        {
+                            ProductId = productId,
+                            ProductOptions = products,
+                            ProductName = products.ContainsKey( productId ) ? products[ productId ] : productId.ToString(),
+                            DeliveredQty = 0,
+                            ReturnedTransferredQty = 0,
+                            DebriefQty = 0,
+                            TransporterLiable = 0,
+                            AdminMovement = 0,
+                            OutstandingQtyAtCustomer = 0
+                        } );
+                    }
                 }
 
                 #endregion
 
+
                 #region Populate EquipmentCodeOptions
 
-                model.EquipmentCodeOptions = defaultProductOptions;
+                /*model.EquipmentCodeOptions = defaultProductOptions;*/
 
                 #endregion
 
@@ -1735,13 +1728,21 @@ namespace ACT.UI.Controllers
                 {
                     foreach ( var detail in model.EquipmentDetails )
                     {
-                        // Only create non-null and non-empty equipment details
-                        if ( detail != null && !string.IsNullOrEmpty( detail.ProductId?.ToString() ) )
+                        // Only create records that have a product and at least one non-zero quantity
+                        if ( detail != null &&
+                            detail.ProductId.HasValue &&
+                            detail.ProductId.Value != 0 &&
+                            ( detail.DeliveredQty != 0 ||
+                             detail.ReturnedTransferredQty != 0 ||
+                             detail.DebriefQty != 0 ||
+                             detail.TransporterLiable != 0 ||
+                             detail.AdminMovement != 0 ||
+                             detail.OutstandingQtyAtCustomer != 0 ) )
                         {
                             ClientLoadQuantity clientLoadQuantity = new ClientLoadQuantity
                             {
                                 ClientLoadId = load.Id,
-                                EquipmentCode = detail.ProductId?.ToString() ?? string.Empty,
+                                EquipmentCode = detail.ProductId.Value.ToString(),
                                 OriginalQuantity = ( int ) detail.DeliveredQty,
                                 ReturnQty = ( int ) detail.ReturnedTransferredQty,
                                 DebriefQty = ( int ) detail.DebriefQty,
@@ -1750,6 +1751,7 @@ namespace ACT.UI.Controllers
                                 OutstandingQty = ( int ) detail.OutstandingQtyAtCustomer,
                                 CreatedOn = DateTime.Now,
                                 ModifiedOn = DateTime.Now,
+                                ModifiedBy = User.Identity.Name
                             };
 
                             clqservice.Create( clientLoadQuantity );
