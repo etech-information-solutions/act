@@ -1526,60 +1526,65 @@ namespace ACT.UI.Controllers
                 #region Equipment Details
 
                 var products = pservice.GetAllProductsRaw().ToDictionary( p => p.Id, p => p.Name );
-
                 var defaultProducts = new[] { 8001, 8003, 8004 };
                 var clientLoadQuantities = load?.ClientLoadQuantities.ToList() ?? new List<ClientLoadQuantity>();
 
                 model.EquipmentDetails = new List<EquipmentDetailViewModel>();
 
-                // Check if we have any non-empty records
-                bool hasNonEmptyRecords = clientLoadQuantities.Any( clq =>
-                int.TryParse( clq.EquipmentCode, out int pid ) && pid != 0 &&
-                ( clq.OriginalQuantity != 0 ||
-                clq.ReturnQty != 0 ||
-                clq.DebriefQty != 0 ||
-                clq.TransporterLiableQty != 0 ||
-                clq.AdminMovementQty != 0 ||
-                clq.OutstandingQty != 0 ) );
+                // Create a dictionary to track which positions have valid products
+                var positionProducts = new Dictionary<int, int>();
 
-                if ( hasNonEmptyRecords )
+                // First pass: identify valid products in their positions
+                for ( int i = 0; i < clientLoadQuantities.Count && i < 3; i++ )
                 {
-                    // Add only existing records
-                    foreach ( var clq in clientLoadQuantities )
+                    if ( int.TryParse( clientLoadQuantities[ i ].EquipmentCode, out int productId ) &&
+                         productId != 0 &&
+                         defaultProducts.Contains( productId ) )
                     {
-                        int productId = int.TryParse( clq.EquipmentCode, out int pid ) ? pid : 0;
-                        model.EquipmentDetails.Add( new EquipmentDetailViewModel
-                        {
-                            ProductId = productId,
-                            ProductOptions = products,
-                            ProductName = products.ContainsKey( productId ) ? products[ productId ] : productId.ToString(),
-                            DeliveredQty = clq.OriginalQuantity,
-                            ReturnedTransferredQty = clq.ReturnQty,
-                            DebriefQty = clq.DebriefQty,
-                            TransporterLiable = clq.TransporterLiableQty,
-                            AdminMovement = clq.AdminMovementQty,
-                            OutstandingQtyAtCustomer = clq.OutstandingQty
-                        } );
+                        positionProducts[ i ] = productId;
                     }
                 }
-                else
+
+                // Second pass: fill in the equipment details
+                for ( int i = 0; i < 3; i++ )
                 {
-                    // Only add default products if there are no existing records with values
-                    foreach ( var productId in defaultProducts )
+                    int productId;
+                    ClientLoadQuantity existingQuantity = null;
+
+                    if ( positionProducts.ContainsKey( i ) )
                     {
-                        model.EquipmentDetails.Add( new EquipmentDetailViewModel
-                        {
-                            ProductId = productId,
-                            ProductOptions = products,
-                            ProductName = products.ContainsKey( productId ) ? products[ productId ] : productId.ToString(),
-                            DeliveredQty = 0,
-                            ReturnedTransferredQty = 0,
-                            DebriefQty = 0,
-                            TransporterLiable = 0,
-                            AdminMovement = 0,
-                            OutstandingQtyAtCustomer = 0
-                        } );
+                        // Use the existing product in this position
+                        productId = positionProducts[ i ];
+                        existingQuantity = clientLoadQuantities[ i ];
                     }
+                    else
+                    {
+                        // Find the first unused default product
+                        productId = defaultProducts.FirstOrDefault( dp =>
+                            !positionProducts.Values.Contains( dp ) );
+                        
+                        // If all products are used (shouldn't happen), use the default for this position
+                        if ( productId == 0 )
+                        {
+                            productId = defaultProducts[ i ];
+                        }
+                        
+                        // Add this product to our tracking
+                        positionProducts[ i ] = productId;
+                    }
+
+                    model.EquipmentDetails.Add( new EquipmentDetailViewModel
+                    {
+                        ProductId = productId,
+                        ProductOptions = products,
+                        ProductName = products.ContainsKey( productId ) ? products[ productId ] : productId.ToString(),
+                        DeliveredQty = existingQuantity?.OriginalQuantity ?? 0,
+                        ReturnedTransferredQty = existingQuantity?.ReturnQty ?? 0,
+                        DebriefQty = existingQuantity?.DebriefQty ?? 0,
+                        TransporterLiable = existingQuantity?.TransporterLiableQty ?? 0,
+                        AdminMovement = existingQuantity?.AdminMovementQty ?? 0,
+                        OutstandingQtyAtCustomer = existingQuantity?.OutstandingQty ?? 0
+                    } );
                 }
 
                 #endregion
