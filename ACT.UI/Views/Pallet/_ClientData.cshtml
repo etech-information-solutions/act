@@ -34,162 +34,349 @@
     <span class="loader"></span>
 </p>
 
-<div class="table-container">
-    <table id="ClientData-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#ClientData-table_wrapper" data-starting-point=".ap-tabs ul">
-        <thead>
-            <tr>
-                <th>Actions</th>
-                <th>POD</th>
-                <th>DATE</th>
-                <th>DAYS</th>
-                <th>PLT TYPE</th>
-                <th>GLID</th>
-                <th>SUPPLIER</th>
-                <th>LOAD</th>
-                <th>CUST ACC NO</th>
-                <th>CUSTOMER</th>
-                <th>PROVINCE</th>
-                @*<th>PCN NOTE</th>*@
-                <th>DOC</th>
-                <th>DELIVERY NOTE NO</th>
-                <th>DEL QTY</th>
-                <th>RET QTY</th>
-                <th>OUTST QTY</th>
-                <th>ARPM COMMENTS</th>
-                <th>TRANSPORTER NAME</th>
-                <th>TRUCK REG</th>
-                <th>NOTES</th>
-                <th>DAILY RENTAL</th>
-                <th>COMPENSATION</th>
-                <th>PALLET AUTH BY</th>
-                <th>PALLET AUTH CODE</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @if ( Model != null && items != null && items.Count() > 0 )
-            {
-                foreach ( var item in items )
-                {
-                    LoadStatus status = ( LoadStatus ) item.Status;
-                    string active = ( status == LoadStatus.Complete ) ? "Complete" : "Outstanding";
-                    int days = ( DateTime.Now - ( item.LoadDate ?? DateTime.Now ) ).Days;
-
-                    <tr id="clientdata-@item.Id-item" class="clientdata-@item.Id-item">
-                        <td width="10%">
-                            <div style="margin-top: 11px">
-                                @Html.ActionLink( "Delete", "DeleteClientData", new { id = item.Id }, new { @class = "del", @style = "font-size: 12px; margin-top: 7px; margin-left: 5px", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = "Delete this item?" } )
-                                @Html.ActionLink( "Edit", "EditClientData", new { id = item.Id, returnView = "Pallet" }, new { @class = "edit", @style = "font-size: 12px; margin-top: 7px; margin-left: 5px", @data_edit = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
-                                <div style="margin-top: 7px; margin-left: 6px">
-                                    <strong style="font-size:10px">Status:</strong>
-                                    <span style="color: @(status.GetDisplayText().ToLower() == "outstanding" ? "red" : (status.GetDisplayText().ToLower() == "complete" ? "green" : "black")); font-size: 9px">
-                                        @status.GetDisplayText()
-                                    </span>
-                                </div>
-                            </div>
-                        </td>
-                        <td width="10%">
-                            <div class="button-container">
-                                <a data-upload-pod="1" data-id="@item.Id" class="pod-button pod-upload-button">
-                                    UPLOAD POD
-                                    <span id="loader"></span>
-                                </a>
-                                <a data-view-pod="1" data-id="@item.Id" class="pod-button pod-view-button">
-                                    VIEW POD
-                                    <span id="loader"></span>
-                                </a>
-                            </div>
-                        </td>
-                        <td>@(item.LoadDate?.ToString("yyyy-MM-dd"))</td>
-                        <td>@days</td>
-                        <td>@item.CustomerType</td>
-                        <td>@item.GLID</td>
-                        <td>@item.SupplierFrom</td>
-                        <td>@item.LoadNumber</td>
-                        <td>@item.CustomerAccountNo</td>
-                        <td>@item.CustomerTo</td>
-                        <td>@item.RegionName</td>
-                        @*<td>@item.PCNNumber</td>*@
-                        <td>@item.DocketNumber</td>
-                        <td>@item.DeliveryNote</td>
-                        <td>@item.OriginalQuantity</td>
-                        <td>@item.ReturnQty</td>
-                        <td>@item.OutstandingQty</td>
-                        <td>@item.PODComment</td>
-                        <td>@item.TransporterName</td>
-                        <td>@item.VehicleRegistration</td>
-                        <td>@item.ClientLoadNotes</td>
-                        <td>@(item.HireAmount?.ToString("C2", new System.Globalization.CultureInfo("en-ZA")))</td>
-                        <td>@item.ChepCompensationNo</td>
-                        <td>@item.ModifiedBy</td>
-                        <td>@item.PalletAuthCode</td>
-                    </tr>
-
-                    count++;
-                }
-            }
-        </tbody>
-    </table>
-
+<div class="responsive-table-wrapper">
+    <div class="table-controls">
+        <div class="column-toggles">
+            <div class="warning-message" style="display: none;">
+                Please hide some columns before adding more. Maximum of 12 columns allowed.
+            </div>
+            <div class="column-toggle-buttons">
+                <!-- Column toggle buttons will be added dynamically -->
+            </div>
+        </div>
     </div>
+    <div class="table-scroll-container">
+        <table id="ClientData-table" class="da-table datatable-numberpaging sort fixed-header" data-fixed-header-target="#ClientData-table_wrapper" data-starting-point=".ap-tabs ul">
+            <thead>
+                <tr>
+                    <th>Actions</th>
+                    <th>POD</th>
+                    <th>DATE</th>
+                    <th>DAYS</th>
+                    <th>PLT TYPE</th>
+                    <th>GLID</th>
+                    <th>SUPPLIER</th>
+                    <th>LOAD</th>
+                    <th>CUST ACC NO</th>
+                    <th>CUSTOMER</th>
+                    <th>PROVINCE</th>
+                    @*<th>PCN NOTE</th>*@
+                    <th>DOC</th>
+                    <th>DELIVERY NOTE NO</th>
+                    <th>DEL QTY</th>
+                    <th>RET QTY</th>
+                    <th>OUTST QTY</th>
+                    <th>ARPM COMMENTS</th>
+                    <th>TRANSPORTER NAME</th>
+                    <th>TRUCK REG</th>
+                    <th>NOTES</th>
+                    <th>DAILY RENTAL</th>
+                    <th>COMPENSATION</th>
+                    <th>PALLET AUTH BY</th>
+                    <th>PALLET AUTH CODE</th>
+                </tr>
+            </thead>
 
-    @Html.Partial( "_Paging" )
+            <tbody>
+                @if ( Model != null && items != null && items.Count() > 0 )
+                {
+                    foreach ( var item in items )
+                    {
+                        LoadStatus status = ( LoadStatus ) item.Status;
+                        string active = ( status == LoadStatus.Complete ) ? "Complete" : "Outstanding";
+                        int days = ( DateTime.Now - ( item.LoadDate ?? DateTime.Now ) ).Days;
 
-    <style>
-        .table-container {
-            transform-origin: top left;
-            transform: scale(0.85); /* Adjust this value to make table smaller or larger */
-            width: calc(100% * (1/0.85)); /* Compensate for scale to maintain layout */
-            margin-bottom: 20px; /* Add some space after the scaled table */
+                        <tr id="clientdata-@item.Id-item" class="clientdata-@item.Id-item">
+                            <td width="10%">
+                                <div style="margin-top: 11px">
+                                    @Html.ActionLink( "Delete", "DeleteClientData", new { id = item.Id }, new { @class = "del", @style = "font-size: 12px; margin-top: 7px; margin-left: 5px", @data_delete = "1", @data_id = item.Id, @data_target = "#tr-" + item.Id + "-item", @data_refresh_target = "#clientdata", @rel = "tipsyE", @title = "Delete this item?" } )
+                                    @Html.ActionLink( "Edit", "EditClientData", new { id = item.Id, returnView = "Pallet" }, new { @class = "edit", @style = "font-size: 12px; margin-top: 7px; margin-left: 5px", @data_edit = "1", @data_id = item.Id, @data_target = ".clientdata-" + item.Id + "-item" } )
+                                    <div style="margin-top: 7px; margin-left: 6px">
+                                        <strong style="font-size:10px">Status:</strong>
+                                        <span style="color: @(status.GetDisplayText().ToLower() == "outstanding" ? "red" : (status.GetDisplayText().ToLower() == "complete" ? "green" : "black")); font-size: 9px">
+                                            @status.GetDisplayText()
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td width="10%">
+                                <div class="button-container">
+                                    <a data-upload-pod="1" data-id="@item.Id" class="pod-button pod-upload-button">
+                                        UPLOAD POD
+                                        <span id="loader"></span>
+                                    </a>
+                                    <a data-view-pod="1" data-id="@item.Id" class="pod-button pod-view-button">
+                                        VIEW POD
+                                        <span id="loader"></span>
+                                    </a>
+                                </div>
+                            </td>
+                            <td>@(item.LoadDate?.ToString("yyyy-MM-dd"))</td>
+                            <td>@days</td>
+                            <td>@item.CustomerType</td>
+                            <td>@item.GLID</td>
+                            <td>@item.SupplierFrom</td>
+                            <td>@item.LoadNumber</td>
+                            <td>@item.CustomerAccountNo</td>
+                            <td>@item.CustomerTo</td>
+                            <td>@item.RegionName</td>
+                            @*<td>@item.PCNNumber</td>*@
+                            <td>@item.DocketNumber</td>
+                            <td>@item.DeliveryNote</td>
+                            <td>@item.OriginalQuantity</td>
+                            <td>@item.ReturnQty</td>
+                            <td>@item.OutstandingQty</td>
+                            <td>@item.PODComment</td>
+                            <td>@item.TransporterName</td>
+                            <td>@item.VehicleRegistration</td>
+                            <td>@item.ClientLoadNotes</td>
+                            <td>@(item.HireAmount?.ToString("C2", new System.Globalization.CultureInfo("en-ZA")))</td>
+                            <td>@item.ChepCompensationNo</td>
+                            <td>@item.ModifiedBy</td>
+                            <td>@item.PalletAuthCode</td>
+                        </tr>
+
+                        count++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@Html.Partial( "_Paging" )
+
+<style>
+    .responsive-table-wrapper {
+        width: 100%;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .table-controls {
+        margin-bottom: 1rem;
+    }
+
+    .column-toggles {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .warning-message {
+        color: #721c24;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        padding: 0.5rem;
+        margin: 0.5rem 0;
+        display: none;
+    }
+
+    .column-toggle-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .btn-toggle-all,
+    .btn-toggle-column {
+        padding: 0.25rem 0.5rem;
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+
+    .btn-toggle-all:hover,
+    .btn-toggle-column:hover {
+        background: #e0e0e0;
+    }
+
+    .btn-toggle-column.active {
+        background: #007bff;
+        color: white;
+    }
+
+    .btn-toggle-column.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .table-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        position: relative;
+    }
+
+    #ClientData-table {
+        width: 100%;
+        white-space: nowrap;
+        border-collapse: collapse;
+        /*table-layout: fixed;*/
+    }
+
+    #ClientData-table th {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 1;
+        padding: 0.5rem;
+        min-width: 120px; /* Minimum column width */
+    }
+
+    #ClientData-table td {
+        padding: 0.5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 120px; /* Minimum column width */
+    }
+
+    .button-container {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 100px;
+    }
+
+    .pod-button {
+        background-color: lightblue;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: inherit;
+        white-space: nowrap;
+    }
+
+    .pod-upload-button {
+        background: lightseagreen;
+    }
+
+    .pod-view-button {
+        background: lightblue;
+    }
+
+    /* Style for edit popup */
+    .edit-popup {
+        max-width: 95vw;
+        margin: 0 auto;
+        overflow-x: auto;
+    }
+
+    .edit-popup form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .edit-popup .form-group {
+        margin-bottom: 1rem;
+    }
+
+    /* Responsive adjustments */
+    @* Escape @ character for media queries in Razor *@
+    @@media (max-width: 1200px) {
+        #ClientData-table {
+            font-size: 0.9rem;
         }
-
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+        
+        .edit-popup form {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         }
+    }
 
-        .pod-button {
-            background-color: lightblue;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 7px;
-            border-radius: 5px;
-            text-decoration: none;
-            color: inherit;
+    @@media (max-width: 768px) {
+        #ClientData-table {
+            font-size: 0.8rem;
         }
+        
+        .edit-popup form {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 
-        .pod-upload-button {
-            background: lightseagreen;
-        }
+<script>
+    $(document).ready(function() {
+        const MAX_COLUMNS = 12;
+        const DEFAULT_VISIBLE_COLUMNS = 8;
+        let activeColumns = 0;
 
-        .pod-view-button {
-            background: lightblue;
-        }
+        // Get all table headers
+        const headers = $('#ClientData-table thead th').map(function() {
+            return $(this).text().trim();
+        }).get();
 
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
+        // Create toggle buttons for each column
+        headers.forEach((header, index) => {
+            const button = $('<button>')
+                .addClass('btn-toggle-column')
+                .text(header)
+                .attr('data-column', index);
+            
+            // Set first DEFAULT_VISIBLE_COLUMNS columns as active by default
+            if (index < DEFAULT_VISIBLE_COLUMNS) {
+                button.addClass('active');
+            } else {
+                // Hide table cells for non-default columns
+                $(`#ClientData-table tr > *:nth-child(${index + 1})`).hide();
+            }
+            
+            $('.column-toggle-buttons').append(button);
+        });
 
-        .pod-button {
-            background-color: lightblue;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 7px;
-            border-radius: 5px;
-            text-decoration: none;
-            color: inherit;
-        }
+        // Initialize active columns count
+        activeColumns = DEFAULT_VISIBLE_COLUMNS;
 
-        .pod-upload-button {
-            background: lightseagreen;
-        }
+        // Toggle individual columns
+        $('.btn-toggle-column').click(function() {
+            const $button = $(this);
+            const column = $button.data('column');
+            const isActive = $button.hasClass('active');
+            
+            // Check if we're trying to show a column
+            if (!isActive && activeColumns >= MAX_COLUMNS) {
+                $('.warning-message').show().fadeOut(10000); // Increased to 10 seconds
+                return;
+            }
 
-        .pod-view-button {
-            background: lightblue;
-        }
-    </style>
+            $button.toggleClass('active');
+            const table = $('#ClientData-table');
+            const cells = table.find(`tr > *:nth-child(${column + 1})`);
+            cells.toggle();
+
+            // Update active columns count
+            activeColumns = $('.btn-toggle-column.active').length;
+        });
+
+        // Handle edit popup
+        $('[data-edit]').click(function(e) {
+            e.preventDefault();
+            const target = $(this).data('target');
+            
+            // Add edit-popup class to the loaded content
+            $(target).addClass('edit-popup');
+            
+            // Ensure the popup is visible within viewport
+            setTimeout(function() {
+                const popup = $(target);
+                const rect = popup[0].getBoundingClientRect();
+                
+                if (rect.right > window.innerWidth) {
+                    popup.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 100);
+        });
+    });
+</script>
