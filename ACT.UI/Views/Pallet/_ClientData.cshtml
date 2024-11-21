@@ -38,7 +38,7 @@
     <div class="table-controls">
         <div class="column-toggles">
             <div class="warning-message" style="display: none;">
-                Please hide some columns before adding more. Maximum of 12 columns allowed.
+                Please hide some columns before adding more. Maximum of 10 columns allowed.
             </div>
             <div class="column-toggle-buttons">
                 <!-- Column toggle buttons will be added dynamically -->
@@ -280,9 +280,9 @@
         padding: 1rem;
     }
 
-    .edit-popup .form-group {
+    /* .edit-popup .form-group {
         margin-bottom: 1rem;
-    }
+    } */
 
     /* Responsive adjustments */
     @* Escape @ character for media queries in Razor *@
@@ -309,7 +309,7 @@
 
 <script>
     $(document).ready(function() {
-        const MAX_COLUMNS = 12;
+        const MAX_COLUMNS = 10;
         const DEFAULT_VISIBLE_COLUMNS = 8;
         let activeColumns = 0;
 
@@ -347,7 +347,7 @@
             
             // Check if we're trying to show a column
             if (!isActive && activeColumns >= MAX_COLUMNS) {
-                $('.warning-message').show().fadeOut(10000); // Increased to 10 seconds
+                $('.warning-message').show().fadeOut(10000);
                 return;
             }
 
